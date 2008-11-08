@@ -23,6 +23,7 @@ import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.pango.Style;
+import org.gnome.pango.Weight;
 
 class EditorWindow extends Window
 {
@@ -66,6 +67,8 @@ class EditorWindow extends Window
 
     private TextTag italics;
 
+    private TextTag bold;
+
     private void setupEditor() {
         buffer = new TextBuffer();
 
@@ -74,6 +77,9 @@ class EditorWindow extends Window
 
         italics = new TextTag();
         italics.setStyle(Style.ITALIC);
+
+        bold = new TextTag();
+        bold.setWeight(Weight.BOLD);
     }
 
     private void installKeybindings() {
@@ -88,11 +94,12 @@ class EditorWindow extends Window
                 if (mod == ModifierType.CONTROL_MASK) {
                     if (key == Keyval.i) {
                         applyFormat(italics);
-
+                        return true;
+                    } else if (key == Keyval.b) {
+                        applyFormat(bold);
                         return true;
                     }
                 }
-
                 return false;
             }
         });
