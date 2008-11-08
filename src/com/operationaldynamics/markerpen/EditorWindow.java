@@ -11,17 +11,26 @@
 package com.operationaldynamics.markerpen;
 
 import org.gnome.gdk.Event;
+import org.gnome.gdk.EventKey;
+import org.gnome.gdk.Keyval;
+import org.gnome.gdk.ModifierType;
 import org.gnome.gtk.Gtk;
+import org.gnome.gtk.TextBuffer;
+import org.gnome.gtk.TextMark;
+import org.gnome.gtk.TextTag;
 import org.gnome.gtk.TextView;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
+import org.gnome.pango.Style;
 
 class EditorWindow extends Window
 {
     private Window window;
 
     private VBox top;
+
+    private TextBuffer buffer;
 
     private TextView view;
 
@@ -30,6 +39,8 @@ class EditorWindow extends Window
 
         setupWindow();
         setupEditor();
+
+        installKeybindings();
 
         completeWindow();
     }
@@ -53,9 +64,46 @@ class EditorWindow extends Window
         window.showAll();
     }
 
+    private TextTag italics;
+
     private void setupEditor() {
-        view = new TextView();
+        buffer = new TextBuffer();
+
+        view = new TextView(buffer);
         top.packStart(view);
+
+        italics = new TextTag();
+        italics.setStyle(Style.ITALIC);
     }
 
+    private void installKeybindings() {
+        view.connect(new KeyPressEvent() {
+            public boolean onKeyPressEvent(Widget source, EventKey event) {
+                final Keyval key;
+                final ModifierType mod;
+
+                key = event.getKeyval();
+                mod = event.getState();
+
+                if (mod == ModifierType.CONTROL_MASK) {
+                    if (key == Keyval.i) {
+                        applyFormat(italics);
+
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        });
+    }
+
+    private void applyFormat(TextTag format) {
+        final TextMark selectionBound, insert;
+
+        selectionBound = buffer.getSelectionBound();
+        insert = buffer.getInsert();
+
+        buffer.applyTag(format, selectionBound.getIter(), insert.getIter());
+    }
 }
