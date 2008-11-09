@@ -16,6 +16,7 @@ import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gtk.Gtk;
 import org.gnome.gtk.TextBuffer;
+import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
 import org.gnome.gtk.TextTag;
 import org.gnome.gtk.TextView;
@@ -76,6 +77,7 @@ class EditorWindow extends Window
         top.packStart(view);
 
         italics = new TextTag();
+        italics.setFamily("Serif");
         italics.setStyle(Style.ITALIC);
 
         bold = new TextTag();
@@ -83,7 +85,7 @@ class EditorWindow extends Window
     }
 
     private void installKeybindings() {
-        view.connect(new KeyPressEvent() {
+        view.connect(new Widget.KeyPressEvent() {
             public boolean onKeyPressEvent(Widget source, EventKey event) {
                 final Keyval key;
                 final ModifierType mod;
@@ -93,10 +95,10 @@ class EditorWindow extends Window
 
                 if (mod == ModifierType.CONTROL_MASK) {
                     if (key == Keyval.i) {
-                        applyFormat(italics);
+                        toggleFormat(italics);
                         return true;
                     } else if (key == Keyval.b) {
-                        applyFormat(bold);
+                        toggleFormat(bold);
                         return true;
                     }
                 }
@@ -105,12 +107,39 @@ class EditorWindow extends Window
         });
     }
 
-    private void applyFormat(TextTag format) {
+    private void toggleFormat(TextTag format) {
         final TextMark selectionBound, insert;
+        final TextIter start, end, iter;
+        final boolean apply;
 
         selectionBound = buffer.getSelectionBound();
-        insert = buffer.getInsert();
+        start = selectionBound.getIter();
 
-        buffer.applyTag(format, selectionBound.getIter(), insert.getIter());
+        insert = buffer.getInsert();
+        end = insert.getIter();
+
+        /*
+         * There is a subtle bug that if you have selected moving backwards,
+         * selectionBound will be at a point where the formatting ends, with
+         * the result that the second toggling will fail. Work around this by
+         * ensuring we work from the earlier of the two TextIters.
+         */
+        if (start.getOffset() > end.getOffset()) {
+            iter = end;
+        } else {
+            iter = start;
+        }
+
+        if (iter.hasTag(format)) {
+            apply = false;
+        } else {
+            apply = true;
+        }
+
+        if (apply) {
+            buffer.applyTag(format, start, end);
+        } else {
+            buffer.removeTag(format, start, end);
+        }
     }
 }
