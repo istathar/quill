@@ -120,7 +120,8 @@ class EditorWindow extends Window
     /**
      * Hookup signals to aggregate formats to be used on a subsequent
      * insertion. The insertTags Set starts empty, and builds up as formats
-     * are toggled. The Set is cleared when the cursor moves.
+     * are toggled by the user. When the cursor moves, the Set is changed to
+     * the formatting applying on character back.
      */
     private void hookupFormatManagement() {
         insertTags = new HashSet<TextTag>(4);
@@ -140,8 +141,24 @@ class EditorWindow extends Window
 
         buffer.connect(new TextBuffer.MarkSet() {
             public void onMarkSet(TextBuffer source, TextIter location, TextMark mark) {
-                if (mark == insertBound) {
-                    insertTags.clear();
+                if (mark != insertBound) {
+                    return;
+                }
+
+                /*
+                 * Forget previous insert formatting.
+                 */
+                insertTags.clear();
+
+                /*
+                 * But having moved, pickup the formatting of the character
+                 * preceeding the cursor.
+                 */
+
+                location.backwardChar();
+
+                for (TextTag tag : location.getTags()) {
+                    insertTags.add(tag);
                 }
             };
         });
