@@ -10,6 +10,8 @@
  */
 package com.operationaldynamics.markerpen;
 
+import java.util.HashSet;
+
 import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
@@ -34,6 +36,8 @@ class EditorWindow extends Window
 
     private TextBuffer buffer;
 
+    private TextMark selectionBound, insertBound;
+
     private TextView view;
 
     EditorWindow() {
@@ -43,6 +47,7 @@ class EditorWindow extends Window
         setupEditor();
 
         installKeybindings();
+        hookupFormatManagement();
 
         completeWindow();
     }
@@ -72,6 +77,9 @@ class EditorWindow extends Window
 
     private void setupEditor() {
         buffer = new TextBuffer();
+
+        selectionBound = buffer.getSelectionBound();
+        insertBound = buffer.getInsert();
 
         view = new TextView(buffer);
         top.packStart(view);
@@ -107,39 +115,69 @@ class EditorWindow extends Window
         });
     }
 
+    private HashSet<TextTag> insertTags;
+
+    /**
+     * Hookup signals to aggregate formats to be used on a subsequent
+     * insertion. The insertTags Set starts empty, and builds up as formats
+     * are toggled. The Set is cleared when the cursor moves.
+     */
+    private void hookupFormatManagement() {
+        insertTags = new HashSet<TextTag>(4);
+
+        buffer.connectAfter(new TextBuffer.InsertText() {
+            public void onInsertText(TextBuffer source, TextIter end, String text) {
+                final TextIter start;
+
+                start = end.copy();
+                start.backwardChars(text.length());
+
+                for (TextTag tag : insertTags) {
+                    buffer.applyTag(tag, start, end);
+                }
+            }
+        });
+
+        buffer.connect(new TextBuffer.MarkSet() {
+            public void onMarkSet(TextBuffer source, TextIter location, TextMark mark) {
+                if (mark == insertBound) {
+                    insertTags.clear();
+                }
+            };
+        });
+    }
+
     private void toggleFormat(TextTag format) {
-        final TextMark selectionBound, insert;
         final TextIter start, end, iter;
-        final boolean apply;
 
-        selectionBound = buffer.getSelectionBound();
-        start = selectionBound.getIter();
+        if (buffer.getHasSelection()) {
+            start = selectionBound.getIter();
+            end = insertBound.getIter();
 
-        insert = buffer.getInsert();
-        end = insert.getIter();
+            /*
+             * There is a subtle bug that if you have selected moving
+             * backwards, selectionBound will be at a point where the
+             * formatting ends, with the result that the second toggling will
+             * fail. Work around this by ensuring we work from the earlier of
+             * the two TextIters.
+             */
+            if (start.getOffset() > end.getOffset()) {
+                iter = end;
+            } else {
+                iter = start;
+            }
 
-        /*
-         * There is a subtle bug that if you have selected moving backwards,
-         * selectionBound will be at a point where the formatting ends, with
-         * the result that the second toggling will fail. Work around this by
-         * ensuring we work from the earlier of the two TextIters.
-         */
-        if (start.getOffset() > end.getOffset()) {
-            iter = end;
+            if (iter.hasTag(format)) {
+                buffer.removeTag(format, start, end);
+            } else {
+                buffer.applyTag(format, start, end);
+            }
         } else {
-            iter = start;
-        }
-
-        if (iter.hasTag(format)) {
-            apply = false;
-        } else {
-            apply = true;
-        }
-
-        if (apply) {
-            buffer.applyTag(format, start, end);
-        } else {
-            buffer.removeTag(format, start, end);
+            if (insertTags.contains(format)) {
+                insertTags.remove(format);
+            } else {
+                insertTags.add(format);
+            }
         }
     }
 }
