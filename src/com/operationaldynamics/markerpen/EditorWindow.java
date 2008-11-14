@@ -205,4 +205,52 @@ class EditorWindow extends Window
             }
         }
     }
+
+    /**
+     * Enable unit tests to get to the underlying TextBuffer
+     */
+    TextBuffer getBuffer() {
+        return buffer;
+    }
+
+    TextTag getItalics() {
+        return italics;
+    }
+
+    String extractToFile() {
+        StringBuilder str;
+        TextIter pointer;
+
+        str = new StringBuilder();
+
+        pointer = buffer.getIterStart();
+
+        while (true) {
+            for (TextTag format : new TextTag[] {
+                italics
+            }) {
+                if (pointer.endsTag(format)) {
+                    str.append("_");
+                }
+            }
+
+            if (pointer.isEnd()) {
+                break;
+            }
+
+            for (TextTag format : new TextTag[] {
+                italics
+            }) {
+                if (pointer.beginsTag(format)) {
+                    str.append("_");
+                }
+            }
+
+            str.append(pointer.getChar());
+
+            pointer.forwardChar();
+        }
+
+        return str.toString();
+    }
 }
