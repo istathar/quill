@@ -75,6 +75,8 @@ class EditorWindow extends Window
 
     private TextTag bold;
 
+    private TextTag mono;
+
     private void setupEditor() {
         buffer = new TextBuffer();
 
@@ -90,6 +92,9 @@ class EditorWindow extends Window
 
         bold = new TextTag();
         bold.setWeight(Weight.BOLD);
+
+        mono = new TextTag();
+        mono.setFamily("Mono");
     }
 
     private void installKeybindings() {
@@ -107,6 +112,9 @@ class EditorWindow extends Window
                         return true;
                     } else if (key == Keyval.b) {
                         toggleFormat(bold);
+                        return true;
+                    } else if (key == Keyval.m) {
+                        toggleFormat(mono);
                         return true;
                     }
                 }
