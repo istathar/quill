@@ -118,8 +118,7 @@ class EditorWindow extends Window
                     return;
                 }
 
-                undoStack.add(undoPointer, new Change(pointer, pointer, text));
-                undoPointer++;
+                addToUndoStack(new Change(pointer, pointer, text));
             }
         });
 
@@ -133,11 +132,18 @@ class EditorWindow extends Window
 
                 text = buffer.getText(start, end, false);
 
-                undoStack.add(undoPointer, new Change(start, end, text));
-                undoPointer++;
-
+                addToUndoStack(new Change(start, end, text));
             }
         });
+    }
+
+    private void addToUndoStack(Change change) {
+        while (undoPointer < undoStack.size()) {
+            undoStack.removeLast();
+        }
+
+        undoStack.add(undoPointer, change);
+        undoPointer++;
     }
 
     private void undo() {
