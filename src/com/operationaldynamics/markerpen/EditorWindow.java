@@ -122,6 +122,11 @@ class EditorWindow extends Window
                     } else if (key == Keyval.s) {
                         System.out.println(Serializer.extractToFile(buffer));
                     }
+                } else if (mod.contains(ModifierType.CONTROL_MASK)
+                        && mod.contains(ModifierType.SHIFT_MASK)) {
+                    if (key == Keyval.Space) {
+                        clearFormat();
+                    }
                 }
                 return false;
             }
@@ -209,6 +214,21 @@ class EditorWindow extends Window
                 insertTags.add(format);
             }
         }
+    }
+
+    private void clearFormat() {
+        final TextIter start, end;
+
+        start = selectionBound.getIter();
+        end = insertBound.getIter();
+
+        buffer.removeAllTags(start, end);
+
+        /*
+         * and regardless, deactivate the any insert formatting.
+         */
+
+        insertTags.clear();
     }
 
     /**
