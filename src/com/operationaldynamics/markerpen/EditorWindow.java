@@ -17,6 +17,8 @@ import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gtk.Gtk;
+import org.gnome.gtk.PolicyType;
+import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
@@ -25,6 +27,7 @@ import org.gnome.gtk.TextView;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
+import org.gnome.gtk.WrapMode;
 
 class EditorWindow extends Window
 {
@@ -70,13 +73,21 @@ class EditorWindow extends Window
     }
 
     private void setupEditor() {
+        final ScrolledWindow scroll;
+
         buffer = new TextBuffer();
 
         selectionBound = buffer.getSelectionBound();
         insertBound = buffer.getInsert();
 
         view = new TextView(buffer);
-        top.packStart(view);
+
+        scroll = new ScrolledWindow();
+        scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
+        scroll.add(view);
+        view.setWrapMode(WrapMode.WORD);
+
+        top.packStart(scroll);
     }
 
     private void installKeybindings() {
