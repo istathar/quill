@@ -13,33 +13,27 @@ package com.operationaldynamics.markerpen;
 import org.gnome.gtk.TestCaseGtk;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
-import org.gnome.gtk.TextTag;
 
 public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
 {
-    private static void insertMock(EditorWindow editor) {
-        final TextBuffer buffer;
+    private static void insertMock(TextBuffer buffer) {
         final TextIter pointer;
-        final TextTag italics;
-
-        buffer = editor.getBuffer();
-        italics = editor.getItalics();
 
         pointer = buffer.getIterStart();
 
         buffer.insert(pointer, "Hello ");
-        buffer.insert(pointer, "world", italics);
+        buffer.insert(pointer, "world", Format.italics);
     }
 
     public final void testExport() {
-        EditorWindow editor;
-        String text;
+        final TextBuffer buffer;
+        final String text;
 
-        editor = new EditorWindow();
+        buffer = new TextBuffer();
 
-        insertMock(editor);
+        insertMock(buffer);
 
-        text = editor.extractToFile();
+        text = Serializer.extractToFile(buffer);
 
         assertEquals("Hello _world_", text);
     }

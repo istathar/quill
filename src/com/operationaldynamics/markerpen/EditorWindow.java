@@ -25,8 +25,6 @@ import org.gnome.gtk.TextView;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
-import org.gnome.pango.Style;
-import org.gnome.pango.Weight;
 
 class EditorWindow extends Window
 {
@@ -71,12 +69,6 @@ class EditorWindow extends Window
         window.showAll();
     }
 
-    private TextTag italics;
-
-    private TextTag bold;
-
-    private TextTag mono;
-
     private void setupEditor() {
         buffer = new TextBuffer();
 
@@ -85,16 +77,6 @@ class EditorWindow extends Window
 
         view = new TextView(buffer);
         top.packStart(view);
-
-        italics = new TextTag();
-        italics.setFamily("Serif");
-        italics.setStyle(Style.ITALIC);
-
-        bold = new TextTag();
-        bold.setWeight(Weight.BOLD);
-
-        mono = new TextTag();
-        mono.setFamily("Mono");
     }
 
     private void installKeybindings() {
@@ -108,13 +90,13 @@ class EditorWindow extends Window
 
                 if (mod == ModifierType.CONTROL_MASK) {
                     if (key == Keyval.i) {
-                        toggleFormat(italics);
+                        toggleFormat(Format.italics);
                         return true;
                     } else if (key == Keyval.b) {
-                        toggleFormat(bold);
+                        toggleFormat(Format.bold);
                         return true;
                     } else if (key == Keyval.m) {
-                        toggleFormat(mono);
+                        toggleFormat(Format.mono);
                         return true;
                     }
                 }
@@ -211,46 +193,5 @@ class EditorWindow extends Window
      */
     TextBuffer getBuffer() {
         return buffer;
-    }
-
-    TextTag getItalics() {
-        return italics;
-    }
-
-    String extractToFile() {
-        StringBuilder str;
-        TextIter pointer;
-
-        str = new StringBuilder();
-
-        pointer = buffer.getIterStart();
-
-        while (true) {
-            for (TextTag format : new TextTag[] {
-                italics
-            }) {
-                if (pointer.endsTag(format)) {
-                    str.append("_");
-                }
-            }
-
-            if (pointer.isEnd()) {
-                break;
-            }
-
-            for (TextTag format : new TextTag[] {
-                italics
-            }) {
-                if (pointer.beginsTag(format)) {
-                    str.append("_");
-                }
-            }
-
-            str.append(pointer.getChar());
-
-            pointer.forwardChar();
-        }
-
-        return str.toString();
     }
 }
