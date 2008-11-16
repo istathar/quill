@@ -82,10 +82,20 @@ class EditorWindow extends Window
 
         view = new TextView(buffer);
 
+        /*
+         * word wrap
+         */
+
         scroll = new ScrolledWindow();
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
         scroll.add(view);
         view.setWrapMode(WrapMode.WORD);
+
+        /*
+         * Paragraph spacing
+         */
+
+        view.setPaddingBelowParagraph(10);
 
         top.packStart(scroll);
     }

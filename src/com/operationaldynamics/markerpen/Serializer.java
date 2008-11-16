@@ -24,6 +24,10 @@ class Serializer
         pointer = buffer.getIterStart();
 
         while (true) {
+            /*
+             * Close markup for formats that are now ending
+             */
+
             if (pointer.endsTag(Format.mono)) {
                 str.append("`");
             }
@@ -38,6 +42,20 @@ class Serializer
                 break;
             }
 
+            /*
+             * While a single newline terminates a paragraph in Markdown, for
+             * aesthetic purposes we'll double tap it to create a blank line
+             * in the output textfile.
+             */
+
+            if (pointer.endsLine()) {
+                str.append("\n");
+            }
+
+            /*
+             * Open markup that represents formats that are now beginning.
+             */
+
             if (pointer.beginsTag(Format.italics)) {
                 str.append("_");
             }
@@ -47,6 +65,11 @@ class Serializer
             if (pointer.beginsTag(Format.mono)) {
                 str.append("`");
             }
+
+            /*
+             * Finally, add the TextBuffer's content at this position, and
+             * move to the next character.
+             */
 
             str.append(pointer.getChar());
 

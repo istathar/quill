@@ -92,4 +92,18 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
 
         assertEquals("Much _**`emphasis`**_ needed", text);
     }
+
+    public final void testExportParagraphSpacing() {
+        final TextBuffer buffer;
+        final TextIter pointer;
+        final String text;
+
+        buffer = new TextBuffer();
+        pointer = buffer.getIterStart();
+        buffer.insert(pointer, "One\nTwo");
+
+        text = Serializer.extractToFile(buffer);
+
+        assertEquals("One\n\nTwo", text);
+    }
 }
