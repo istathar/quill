@@ -11,6 +11,7 @@
 package com.operationaldynamics.markerpen;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;
@@ -47,6 +48,7 @@ class EditorWindow extends Window
         setupWindow();
         setupEditor();
 
+        setupUndoRedo();
         installKeybindings();
         hookupFormatManagement();
 
@@ -100,6 +102,60 @@ class EditorWindow extends Window
         top.packStart(scroll);
     }
 
+    private LinkedList<Change> undoStack;
+
+    private boolean undoInProgress;
+
+    private void setupUndoRedo() {
+        undoStack = new LinkedList<Change>();
+
+        buffer.connect(new TextBuffer.InsertText() {
+            public void onInsertText(TextBuffer source, TextIter pointer, String text) {
+                if (undoInProgress) {
+                    return;
+                }
+                undoStack.add(new Change(pointer, pointer, text));
+            }
+        });
+
+        buffer.connect(new TextBuffer.DeleteRange() {
+            public void onDeleteRange(TextBuffer source, TextIter start, TextIter end) {
+                String text;
+
+                if (undoInProgress) {
+                    return;
+                }
+
+                text = buffer.getText(start, end, false);
+
+                undoStack.add(new Change(start, end, text));
+            }
+        });
+    }
+
+    private void undo() {
+        final Change change;
+        final TextIter start, end;
+
+        if (undoStack.size() == 0) {
+            return;
+        }
+        undoInProgress = true;
+
+        change = undoStack.removeLast();
+
+        start = buffer.getIter(change.offset);
+
+        if (change.add) {
+            end = buffer.getIter(change.offset + change.length);
+            buffer.delete(start, end);
+        } else {
+            buffer.insert(start, change.text);
+        }
+
+        undoInProgress = false;
+    }
+
     private void installKeybindings() {
         view.connect(new Widget.KeyPressEvent() {
             public boolean onKeyPressEvent(Widget source, EventKey event) {
@@ -121,6 +177,10 @@ class EditorWindow extends Window
                         return true;
                     } else if (key == Keyval.s) {
                         System.out.println(Serializer.extractToFile(buffer));
+                    } else if (key == Keyval.y) {
+                        // redo();
+                    } else if (key == Keyval.z) {
+                        undo();
                     }
                 } else if (mod.contains(ModifierType.CONTROL_MASK)
                         && mod.contains(ModifierType.SHIFT_MASK)) {
@@ -236,5 +296,42 @@ class EditorWindow extends Window
      */
     TextBuffer getBuffer() {
         return buffer;
+    }
+}
+
+class Change
+{
+    final int offset;
+
+    final int length;
+
+    final String text;
+
+    final boolean add;
+
+    final TextTag tag;
+
+    Change(TextIter start, TextIter end, String text) {
+        this.offset = start.getOffset();
+
+        if (end == start) {
+            this.length = text.length();
+            this.add = true;
+        } else {
+            this.length = end.getOffset() - this.offset;
+            this.add = false;
+        }
+        this.text = text;
+
+        this.tag = null;
+    }
+
+    Change(TextIter start, TextIter end, TextTag tag, boolean apply) {
+        this.offset = start.getOffset();
+        this.length = end.getOffset() - this.offset;
+        this.tag = tag;
+        this.add = apply;
+
+        this.text = null;
     }
 }
