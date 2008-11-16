@@ -104,17 +104,22 @@ class EditorWindow extends Window
 
     private LinkedList<Change> undoStack;
 
+    private int undoPointer;
+
     private boolean undoInProgress;
 
     private void setupUndoRedo() {
         undoStack = new LinkedList<Change>();
+        undoPointer = 0;
 
         buffer.connect(new TextBuffer.InsertText() {
             public void onInsertText(TextBuffer source, TextIter pointer, String text) {
                 if (undoInProgress) {
                     return;
                 }
-                undoStack.add(new Change(pointer, pointer, text));
+
+                undoStack.add(undoPointer, new Change(pointer, pointer, text));
+                undoPointer++;
             }
         });
 
@@ -128,7 +133,9 @@ class EditorWindow extends Window
 
                 text = buffer.getText(start, end, false);
 
-                undoStack.add(new Change(start, end, text));
+                undoStack.add(undoPointer, new Change(start, end, text));
+                undoPointer++;
+
             }
         });
     }
@@ -140,9 +147,13 @@ class EditorWindow extends Window
         if (undoStack.size() == 0) {
             return;
         }
+        if (undoPointer == 0) {
+            return;
+        }
         undoInProgress = true;
+        undoPointer--;
 
-        change = undoStack.removeLast();
+        change = undoStack.get(undoPointer);
 
         start = buffer.getIter(change.offset);
 
@@ -153,6 +164,34 @@ class EditorWindow extends Window
             buffer.insert(start, change.text);
         }
 
+        undoInProgress = false;
+    }
+
+    private void redo() {
+        final Change change;
+        final TextIter start, end;
+
+        if (undoStack.size() == 0) {
+            return;
+        }
+        if (undoPointer == undoStack.size()) {
+            return;
+        }
+        undoInProgress = true;
+
+        change = undoStack.get(undoPointer);
+
+        start = buffer.getIter(change.offset);
+
+        if (change.add) {
+            buffer.insert(start, change.text);
+        } else {
+            end = buffer.getIter(change.offset + change.length);
+
+            buffer.delete(start, end);
+        }
+
+        undoPointer++;
         undoInProgress = false;
     }
 
@@ -178,7 +217,7 @@ class EditorWindow extends Window
                     } else if (key == Keyval.s) {
                         System.out.println(Serializer.extractToFile(buffer));
                     } else if (key == Keyval.y) {
-                        // redo();
+                        redo();
                     } else if (key == Keyval.z) {
                         undo();
                     }
