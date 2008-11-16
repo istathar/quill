@@ -22,8 +22,6 @@ import static org.gnome.gtk.TextMark.LEFT;
 
 public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
 {
-    private static void insertMock(TextBuffer buffer) {}
-
     public final void testExportItalics() {
         final TextBuffer buffer;
         final TextIter pointer;

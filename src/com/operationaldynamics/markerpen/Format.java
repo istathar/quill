@@ -16,6 +16,14 @@ import org.gnome.gtk.TextTag;
 import org.gnome.pango.Style;
 import org.gnome.pango.Weight;
 
+/**
+ * Format TextTags that can be applied to a TextBuffer which represent the
+ * capabilities of the Markdown markup language.
+ * 
+ * The order that tags are created is very significant, as they are implicitly
+ * added to a TextTagTable on creation, and their "priority" is, unless
+ * otherwise altered, that order (last added highest priority).
+ */
 class Format
 {
     static final TextTag italics;
@@ -31,6 +39,10 @@ class Format
 
         list = new ArrayList<TextTag>(4);
 
+        mono = new TextTag();
+        mono.setFamily("Mono");
+        list.add(mono);
+
         italics = new TextTag();
         italics.setFamily("Serif");
         italics.setStyle(Style.ITALIC);
@@ -39,10 +51,6 @@ class Format
         bold = new TextTag();
         bold.setWeight(Weight.BOLD);
         list.add(bold);
-
-        mono = new TextTag();
-        mono.setFamily("Mono");
-        list.add(mono);
 
         tags = list.toArray(new TextTag[list.size()]);
     }

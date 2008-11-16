@@ -98,6 +98,8 @@ class EditorWindow extends Window
                     } else if (key == Keyval.m) {
                         toggleFormat(Format.mono);
                         return true;
+                    } else if (key == Keyval.s) {
+                        System.out.println(Serializer.extractToFile(buffer));
                     }
                 }
                 return false;
