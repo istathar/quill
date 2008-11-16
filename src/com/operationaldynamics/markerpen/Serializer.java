@@ -12,7 +12,6 @@ package com.operationaldynamics.markerpen;
 
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
-import org.gnome.gtk.TextTag;
 
 class Serializer
 {
@@ -25,20 +24,28 @@ class Serializer
         pointer = buffer.getIterStart();
 
         while (true) {
-            for (TextTag format : Format.tags) {
-                if (pointer.endsTag(format)) {
-                    str.append("_");
-                }
+            if (pointer.endsTag(Format.mono)) {
+                str.append("`");
+            }
+            if (pointer.endsTag(Format.bold)) {
+                str.append("**");
+            }
+            if (pointer.endsTag(Format.italics)) {
+                str.append("_");
             }
 
             if (pointer.isEnd()) {
                 break;
             }
 
-            for (TextTag format : Format.tags) {
-                if (pointer.beginsTag(format)) {
-                    str.append("_");
-                }
+            if (pointer.beginsTag(Format.italics)) {
+                str.append("_");
+            }
+            if (pointer.beginsTag(Format.bold)) {
+                str.append("**");
+            }
+            if (pointer.beginsTag(Format.mono)) {
+                str.append("`");
             }
 
             str.append(pointer.getChar());
