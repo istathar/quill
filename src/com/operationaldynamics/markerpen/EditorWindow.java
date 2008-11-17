@@ -252,12 +252,23 @@ class EditorWindow extends Window
         buffer.connectAfter(new TextBuffer.InsertText() {
             public void onInsertText(TextBuffer source, TextIter end, String text) {
                 final TextIter start;
+                TextIter next;
 
                 start = end.copy();
                 start.backwardChars(text.length());
 
                 for (TextTag tag : insertTags) {
                     buffer.applyTag(tag, start, end);
+                }
+
+                while (start.getOffset() != end.getOffset()) {
+                    if (start.getChar() == '\n') {
+                        next = start.copy();
+                        next.forwardChar();
+                        buffer.removeAllTags(start, next);
+                    }
+
+                    start.forwardChar();
                 }
             }
         });
