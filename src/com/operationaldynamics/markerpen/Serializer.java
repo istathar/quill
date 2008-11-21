@@ -10,8 +10,15 @@
  */
 package com.operationaldynamics.markerpen;
 
+import java.util.HashSet;
+
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
+import org.gnome.gtk.TextTag;
+
+import static com.operationaldynamics.markerpen.Format.bold;
+import static com.operationaldynamics.markerpen.Format.italics;
+import static com.operationaldynamics.markerpen.Format.mono;
 
 class Serializer
 {
@@ -28,13 +35,13 @@ class Serializer
              * Close markup for formats that are now ending
              */
 
-            if (pointer.endsTag(Format.mono)) {
+            if (pointer.endsTag(mono)) {
                 str.append("`");
             }
-            if (pointer.endsTag(Format.bold)) {
+            if (pointer.endsTag(bold)) {
                 str.append("**");
             }
-            if (pointer.endsTag(Format.italics)) {
+            if (pointer.endsTag(italics)) {
                 str.append("_");
             }
 
@@ -77,5 +84,61 @@ class Serializer
         }
 
         return str.toString();
+    }
+
+    private static HashSet<TextTag> tags;
+
+    static TextBuffer loadFile(String contents) {
+        final TextBuffer buffer;
+        int i;
+        TextIter pointer, begin;
+        char ch;
+
+        buffer = new TextBuffer();
+
+        if (contents.length() == 0) {
+            return buffer;
+        }
+
+        i = 0;
+        tags = new HashSet<TextTag>(4);
+        pointer = buffer.getIterStart();
+
+        while (i < contents.length()) {
+            ch = contents.charAt(i);
+            i++;
+            if (ch == '_') {
+                toggleFormat(italics);
+                continue;
+            }
+            if (ch == '*') {
+                if (contents.charAt(i) == '*') {
+                    toggleFormat(bold);
+                }
+                continue;
+            }
+            if (ch == '`') {
+                toggleFormat(mono);
+                continue;
+            }
+            if (ch == '\n') {
+                if (contents.charAt(i) == '\n') {
+                    tags.clear();
+                    continue;
+                }
+            }
+
+            buffer.insert(pointer, String.valueOf(ch), tags);
+        }
+
+        return buffer;
+    }
+
+    private static void toggleFormat(TextTag format) {
+        if (tags.contains(format)) {
+            tags.remove(format);
+        } else {
+            tags.add(format);
+        }
     }
 }

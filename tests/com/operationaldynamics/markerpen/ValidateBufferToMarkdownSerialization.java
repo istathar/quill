@@ -14,6 +14,7 @@ import org.gnome.gtk.TestCaseGtk;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
+import org.gnome.gtk.TextTag;
 
 import static com.operationaldynamics.markerpen.Format.bold;
 import static com.operationaldynamics.markerpen.Format.italics;
@@ -105,5 +106,77 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
         text = Serializer.extractToFile(buffer);
 
         assertEquals("One\n\nTwo", text);
+    }
+
+    public final void testLoadingFormatsInSequnce() {
+        TextBuffer buffer;
+        TextIter pointer;
+        TextTag[] tags;
+
+        /*
+         * Applying different formats
+         */
+
+        buffer = Serializer.loadFile("**Hello** _world_");
+        pointer = buffer.getIterStart();
+
+        tags = pointer.getTags();
+        assertEquals(1, tags.length);
+        assertSame(bold, tags[0]);
+
+        pointer.forwardChars(5);
+        tags = pointer.getTags();
+        assertEquals(0, tags.length);
+
+        pointer.forwardChars(1);
+        tags = pointer.getTags();
+        assertEquals(1, tags.length);
+        assertSame(italics, tags[0]);
+    }
+
+    public final void testLoadingFormatsInParallel() {
+        TextBuffer buffer;
+        TextIter pointer;
+        TextTag[] tags;
+
+        buffer = Serializer.loadFile("_**Important**_");
+        pointer = buffer.getIterStart();
+
+        tags = pointer.getTags();
+        assertEquals(2, tags.length);
+        assertNotSame(tags[0], tags[1]);
+    }
+
+    public final void testLoadingParagraphConversion() {
+        TextBuffer buffer;
+        TextIter pointer;
+        int i;
+
+        buffer = Serializer.loadFile("Hello\n\nworld");
+
+        pointer = buffer.getIterStart();
+        assertEquals("Hello\nworld", buffer.getText());
+
+        i = 0;
+        do {
+            i++;
+        } while (pointer.forwardLine());
+        assertEquals(2, i);
+    }
+
+    public final void testLoadingBuggyInputTerminations() {
+        TextBuffer buffer;
+        TextIter pointer;
+        TextTag[] tags;
+
+        buffer = Serializer.loadFile("_**Impor\n\ntant**_");
+        pointer = buffer.getIterStart();
+
+        tags = pointer.getTags();
+        assertEquals(2, tags.length);
+
+        pointer.forwardLine();
+        tags = pointer.getTags();
+        assertEquals(0, tags.length);
     }
 }
