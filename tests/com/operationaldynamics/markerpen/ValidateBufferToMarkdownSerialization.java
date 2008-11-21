@@ -23,6 +23,18 @@ import static org.gnome.gtk.TextMark.LEFT;
 
 public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
 {
+    public final void testExportLastLineTerminated() {
+        final TextBuffer buffer;
+        final String text;
+
+        buffer = new TextBuffer();
+        buffer.setText("End");
+
+        text = Serializer.extractToFile(buffer);
+
+        assertEquals("End\n", text);
+    }
+
     public final void testExportItalics() {
         final TextBuffer buffer;
         final TextIter pointer;
@@ -35,7 +47,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
 
         text = Serializer.extractToFile(buffer);
 
-        assertEquals("Hello _world_", text);
+        assertEquals("Hello _world_\n", text);
     }
 
     public final void testExportBold() {
@@ -51,7 +63,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
 
         text = Serializer.extractToFile(buffer);
 
-        assertEquals("A **brighter** future", text);
+        assertEquals("A **brighter** future\n", text);
     }
 
     public final void testExportMono() {
@@ -67,7 +79,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
 
         text = Serializer.extractToFile(buffer);
 
-        assertEquals("Don't look in `/etc/secret` as it is secret!", text);
+        assertEquals("Don't look in `/etc/secret` as it is secret!\n", text);
     }
 
     public final void testExportSimultaneousMarkup() {
@@ -91,7 +103,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
 
         text = Serializer.extractToFile(buffer);
 
-        assertEquals("Much _**`emphasis`**_ needed", text);
+        assertEquals("Much _**`emphasis`**_ needed\n", text);
     }
 
     public final void testExportParagraphSpacing() {
@@ -105,7 +117,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
 
         text = Serializer.extractToFile(buffer);
 
-        assertEquals("One\n\nTwo", text);
+        assertEquals("One\n\nTwo\n", text);
     }
 
     public final void testLoadingFormatsInSequnce() {
@@ -165,9 +177,10 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
     }
 
     public final void testLoadingBuggyInputTerminations() {
-        TextBuffer buffer;
-        TextIter pointer;
+        final TextBuffer buffer;
+        final TextIter pointer;
         TextTag[] tags;
+        final String text;
 
         buffer = Serializer.loadFile("_**Impor\n\ntant**_");
         pointer = buffer.getIterStart();
@@ -178,6 +191,9 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
         pointer.forwardLine();
         tags = pointer.getTags();
         assertEquals(0, tags.length);
+
+        text = Serializer.extractToFile(buffer);
+        assertEquals("_**Impor**_\n\ntant\n", text);
     }
 
     public final void testLoadingMultipleBlankLines() {
@@ -197,16 +213,14 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
 
     public final void testRoundTripTwoBlankLines() {
         final TextBuffer before, after;
-        final TextIter pointer;
         final String text;
 
         before = new TextBuffer();
-        pointer = before.getIterStart();
-        before.insert(pointer, "One\n\nTwo");
+        before.setText("One\n\nTwo");
 
         text = Serializer.extractToFile(before);
 
-        assertEquals("One\n\n\n\nTwo", text);
+        assertEquals("One\n\n\n\nTwo\n", text);
 
         after = Serializer.loadFile(text);
         assertEquals("One\n\nTwo", after.getText());

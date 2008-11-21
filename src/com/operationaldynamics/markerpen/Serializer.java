@@ -46,6 +46,7 @@ class Serializer
             }
 
             if (pointer.isEnd()) {
+                str.append('\n');
                 break;
             }
 
@@ -124,6 +125,10 @@ class Serializer
             }
             if (ch == '\n') {
                 tags.clear();
+
+                if (i == contents.length()) {
+                    break;
+                }
             }
 
             buffer.insert(pointer, String.valueOf(ch), tags);
