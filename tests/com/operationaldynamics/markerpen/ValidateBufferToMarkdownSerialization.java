@@ -179,4 +179,36 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
         tags = pointer.getTags();
         assertEquals(0, tags.length);
     }
+
+    public final void testLoadingMultipleBlankLines() {
+        TextBuffer buffer;
+
+        buffer = Serializer.loadFile("One\n\n\n\nThree");
+        assertEquals("One\n\nThree", buffer.getText());
+
+        /*
+         * Three is a corner case, which we normalize. It will be four when
+         * written out again.
+         */
+
+        buffer = Serializer.loadFile("One\n\n\nTwo");
+        assertEquals("One\n\nTwo", buffer.getText());
+    }
+
+    public final void testRoundTripTwoBlankLines() {
+        final TextBuffer before, after;
+        final TextIter pointer;
+        final String text;
+
+        before = new TextBuffer();
+        pointer = before.getIterStart();
+        before.insert(pointer, "One\n\nTwo");
+
+        text = Serializer.extractToFile(before);
+
+        assertEquals("One\n\n\n\nTwo", text);
+
+        after = Serializer.loadFile(text);
+        assertEquals("One\n\nTwo", after.getText());
+    }
 }

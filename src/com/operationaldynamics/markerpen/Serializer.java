@@ -36,13 +36,13 @@ class Serializer
              */
 
             if (pointer.endsTag(mono)) {
-                str.append("`");
+                str.append('`');
             }
             if (pointer.endsTag(bold)) {
                 str.append("**");
             }
             if (pointer.endsTag(italics)) {
-                str.append("_");
+                str.append('_');
             }
 
             if (pointer.isEnd()) {
@@ -56,7 +56,7 @@ class Serializer
              */
 
             if (pointer.endsLine()) {
-                str.append("\n");
+                str.append('\n');
             }
 
             /*
@@ -64,13 +64,13 @@ class Serializer
              */
 
             if (pointer.beginsTag(Format.italics)) {
-                str.append("_");
+                str.append('_');
             }
             if (pointer.beginsTag(Format.bold)) {
                 str.append("**");
             }
             if (pointer.beginsTag(Format.mono)) {
-                str.append("`");
+                str.append('`');
             }
 
             /*
@@ -91,7 +91,7 @@ class Serializer
     static TextBuffer loadFile(String contents) {
         final TextBuffer buffer;
         int i;
-        TextIter pointer, begin;
+        TextIter pointer;
         char ch;
 
         buffer = new TextBuffer();
@@ -107,6 +107,7 @@ class Serializer
         while (i < contents.length()) {
             ch = contents.charAt(i);
             i++;
+
             if (ch == '_') {
                 toggleFormat(italics);
                 continue;
@@ -122,13 +123,16 @@ class Serializer
                 continue;
             }
             if (ch == '\n') {
-                if (contents.charAt(i) == '\n') {
-                    tags.clear();
-                    continue;
-                }
+                tags.clear();
             }
 
             buffer.insert(pointer, String.valueOf(ch), tags);
+
+            if (ch == '\n') {
+                if (contents.charAt(i) == '\n') {
+                    i++;
+                }
+            }
         }
 
         return buffer;
