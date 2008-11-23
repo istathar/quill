@@ -33,7 +33,7 @@ class Chunk
      */
     Chunk(Chunk existing, int offset, int length) {
         this.text = existing.text;
-        this.offset = offset;
+        this.offset = existing.offset + offset;
         this.length = length;
     }
 

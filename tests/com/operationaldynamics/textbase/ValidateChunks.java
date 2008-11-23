@@ -30,4 +30,29 @@ public class ValidateChunks extends TestCase
 
         assertEquals("Hello world", initial.toString());
     }
+
+    public final void testChunkFromExsiting() {
+        final Chunk initial, subsequent, another, third, fourth;
+
+        initial = new Chunk("Emergency broadcast system");
+
+        subsequent = new Chunk(initial, 10, 9);
+        assertEquals("broadcast", subsequent.toString());
+        assertSame(initial.text, subsequent.text);
+        assertEquals(9, subsequent.length);
+        assertEquals(10, subsequent.offset);
+
+        another = new Chunk(initial, 0, 9);
+        assertEquals("Emergency", another.toString());
+
+        third = new Chunk(initial, 20, 6);
+        assertEquals("system", third.toString());
+
+        fourth = new Chunk(third, 0, 3);
+        assertSame(initial.text, third.text);
+        assertSame(fourth.text, third.text);
+        assertEquals(20, fourth.offset);
+        assertEquals(3, fourth.length);
+        assertEquals("sys", fourth.toString());
+    }
 }
