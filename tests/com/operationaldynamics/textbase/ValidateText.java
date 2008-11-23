@@ -22,4 +22,37 @@ public class ValidateText extends TestCase
 
         assertEquals("Hello world", start.toString());
     }
+
+    public final void testTwoSequentialChunks() {
+        final Text text;
+        final Chunk second;
+
+        text = new Text("Hello world");
+
+        second = new Chunk(" it is a sunny day");
+        text.append(second);
+
+        assertEquals("Hello world it is a sunny day", text.toString());
+    }
+
+    public final void testExtractedChunks() {
+        final Text text;
+        final Chunk initial, one, two, three, space;
+
+        initial = new Chunk("Emergency broadcast system");
+
+        one = new Chunk(initial, 0, 9);
+        two = new Chunk(initial, 10, 9);
+        three = new Chunk(initial, 20, 6);
+        space = new Chunk(initial, 9, 1);
+
+        text = new Text("");
+        text.append(three);
+        text.append(space);
+        text.append(two);
+        text.append(space);
+        text.append(one);
+
+        assertEquals("system broadcast Emergency", text.toString());
+    }
 }

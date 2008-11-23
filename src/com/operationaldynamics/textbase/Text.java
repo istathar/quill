@@ -10,6 +10,8 @@
  */
 package com.operationaldynamics.textbase;
 
+import java.util.Arrays;
+
 public class Text
 {
     Chunk[] chunks;
@@ -29,5 +31,20 @@ public class Text
         }
 
         return str.toString();
+    }
+
+    public void append(Chunk chunk) {
+        final Chunk[] next;
+        final int i;
+
+        if (chunk == null) {
+            throw new IllegalArgumentException();
+        }
+
+        i = chunks.length;
+        next = Arrays.copyOf(chunks, i + 1);
+        next[i] = chunk;
+
+        chunks = next;
     }
 }
