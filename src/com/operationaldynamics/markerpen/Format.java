@@ -34,6 +34,8 @@ class Format
 
     static final TextTag[] tags;
 
+    static final TextTag hidden;
+
     static {
         ArrayList<TextTag> list;
 
@@ -51,6 +53,9 @@ class Format
         bold = new TextTag();
         bold.setWeight(Weight.BOLD);
         list.add(bold);
+
+        hidden = new TextTag();
+        hidden.setInvisible(true);
 
         tags = list.toArray(new TextTag[list.size()]);
     }

@@ -17,9 +17,12 @@ import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
+import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.Gtk;
+import org.gnome.gtk.IconSize;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ScrolledWindow;
+import org.gnome.gtk.Stock;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
@@ -29,6 +32,8 @@ import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.WrapMode;
+
+import static com.operationaldynamics.markerpen.Format.hidden;
 
 class EditorWindow extends Window
 {
@@ -217,6 +222,9 @@ class EditorWindow extends Window
                     } else if (key == Keyval.b) {
                         toggleFormat(Format.bold);
                         return true;
+                    } else if (key == Keyval.g) {
+                        insertImage();
+                        return true;
                     } else if (key == Keyval.m) {
                         toggleFormat(Format.mono);
                         return true;
@@ -347,11 +355,15 @@ class EditorWindow extends Window
         insertTags.clear();
     }
 
-    /**
-     * Enable unit tests to get to the underlying TextBuffer
-     */
-    TextBuffer getBuffer() {
-        return buffer;
+    private void insertImage() {
+        TextIter cursor;
+        Pixbuf graphic;
+
+        graphic = Gtk.renderIcon(this, Stock.MISSING_IMAGE, IconSize.BUTTON);
+
+        cursor = insertBound.getIter();
+        buffer.insert(cursor, graphic);
+        buffer.insert(cursor, "FIXME.png", hidden);
     }
 }
 

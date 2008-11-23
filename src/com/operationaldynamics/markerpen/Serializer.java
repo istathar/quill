@@ -10,21 +10,30 @@
  */
 package com.operationaldynamics.markerpen;
 
+import java.io.FileNotFoundException;
 import java.util.HashSet;
 
+import org.gnome.gdk.Pixbuf;
+import org.gnome.gtk.Gtk;
+import org.gnome.gtk.IconSize;
+import org.gnome.gtk.Label;
+import org.gnome.gtk.Stock;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextTag;
 
 import static com.operationaldynamics.markerpen.Format.bold;
+import static com.operationaldynamics.markerpen.Format.hidden;
 import static com.operationaldynamics.markerpen.Format.italics;
 import static com.operationaldynamics.markerpen.Format.mono;
+import static org.gnome.gtk.TextBuffer.OBJECT_REPLACEMENT_CHARACTER;
 
 class Serializer
 {
     static String extractToFile(TextBuffer buffer) {
         StringBuilder str;
         TextIter pointer;
+        char ch;
 
         str = new StringBuilder();
 
@@ -76,10 +85,30 @@ class Serializer
 
             /*
              * Finally, add the TextBuffer's content at this position, and
-             * move to the next character.
+             * move to the next character... unless it's something special
              */
 
-            str.append(pointer.getChar());
+            ch = pointer.getChar();
+
+            if (ch == OBJECT_REPLACEMENT_CHARACTER) {
+                str.append("![");
+                str.append("text");
+                str.append("](");
+
+                while (pointer.forwardChar()) {
+                    if (pointer.hasTag(hidden)) {
+                        ch = pointer.getChar();
+                        str.append(ch);
+                    } else {
+                        break;
+                    }
+                }
+
+                str.append(')');
+                continue;
+            } else {
+                str.append(ch);
+            }
 
             pointer.forwardChar();
         }
@@ -91,9 +120,11 @@ class Serializer
 
     static TextBuffer loadFile(String contents) {
         final TextBuffer buffer;
-        int i;
+        int i, j;
         TextIter pointer;
         char ch;
+        String alt, src;
+        Pixbuf graphic;
 
         buffer = new TextBuffer();
 
@@ -129,6 +160,37 @@ class Serializer
                 if (i == contents.length()) {
                     break;
                 }
+            }
+            if (ch == '!') {
+                ch = contents.charAt(i);
+                if (ch != '[') {
+                    continue;
+                }
+                i++;
+
+                j = contents.indexOf(']', i);
+                alt = contents.substring(i, j);
+                i += alt.length() + 1;
+
+                ch = contents.charAt(i);
+                if (ch != '(') {
+                    continue;
+                }
+                i++;
+
+                j = contents.indexOf(')', i);
+                src = contents.substring(i, j);
+                i += src.length() + 1;
+
+                try {
+                    graphic = new Pixbuf(src);
+                } catch (FileNotFoundException fnfe) {
+                    graphic = Gtk.renderIcon(new Label(""), Stock.MISSING_IMAGE, IconSize.BUTTON);
+                }
+
+                buffer.insert(pointer, graphic);
+                buffer.insert(pointer, src, Format.hidden);
+                continue;
             }
 
             buffer.insert(pointer, String.valueOf(ch), tags);

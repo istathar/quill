@@ -10,6 +10,11 @@
  */
 package com.operationaldynamics.markerpen;
 
+import org.gnome.gdk.Pixbuf;
+import org.gnome.gtk.Gtk;
+import org.gnome.gtk.IconSize;
+import org.gnome.gtk.Label;
+import org.gnome.gtk.Stock;
 import org.gnome.gtk.TestCaseGtk;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
@@ -17,6 +22,7 @@ import org.gnome.gtk.TextMark;
 import org.gnome.gtk.TextTag;
 
 import static com.operationaldynamics.markerpen.Format.bold;
+import static com.operationaldynamics.markerpen.Format.hidden;
 import static com.operationaldynamics.markerpen.Format.italics;
 import static com.operationaldynamics.markerpen.Format.mono;
 import static org.gnome.gtk.TextMark.LEFT;
@@ -224,5 +230,43 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
 
         after = Serializer.loadFile(text);
         assertEquals("One\n\nTwo", after.getText());
+    }
+
+    public final void testLoadingImageMarkup() {
+        TextBuffer buffer;
+        TextIter pointer;
+        char ch;
+        buffer = Serializer.loadFile("![Happy](smiley.png)\n");
+
+        pointer = buffer.getIterStart();
+        ch = pointer.getChar();
+        assertEquals(TextBuffer.OBJECT_REPLACEMENT_CHARACTER, ch);
+        assertEquals("smiley.png", buffer.getText());
+        assertEquals("", buffer.getText(pointer, buffer.getIterEnd(), false));
+    }
+
+    public final void testExportImageMarkup() {
+        final TextBuffer buffer;
+        final TextIter pointer;
+        final Pixbuf graphic;
+        final String text;
+
+        buffer = new TextBuffer();
+
+        graphic = Gtk.renderIcon(new Label(""), Stock.MISSING_IMAGE, IconSize.BUTTON);
+
+        pointer = buffer.getIterStart();
+        buffer.insert(pointer, graphic);
+        buffer.insert(pointer, "URL", new TextTag[] {
+            hidden
+        });
+
+        /*
+         * And now export
+         */
+
+        text = Serializer.extractToFile(buffer);
+
+        assertEquals("![text](URL)\n", text);
     }
 }
