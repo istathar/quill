@@ -37,6 +37,10 @@ class Chunk
         this.length = length;
     }
 
+    /**
+     * Get a Java String equal to the array of chars represented by this
+     * Chunk.
+     */
     public String toString() {
         return new String(text, offset, length);
     }
