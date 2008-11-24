@@ -108,7 +108,7 @@ public class ValidateText extends TestCase
         final Chunk zero, one, two;
 
         zero = new Chunk("Hello");
-        assertEquals(5, zero.length);
+        assertEquals(5, zero.width);
         assertEquals(5, zero.text.length);
         text = new Text(zero);
         assertEquals(5, text.length());

@@ -16,15 +16,15 @@ class Chunk
 
     final int offset;
 
-    final int length;
+    final int width;
 
     /**
      * Build an initial Chunk from a String as a baseline.
      */
     Chunk(String start) {
-        this.length = start.length();
-        this.text = new char[length];
-        start.getChars(0, length, this.text, 0);
+        this.width = start.length();
+        this.text = new char[width];
+        start.getChars(0, width, this.text, 0);
         this.offset = 0;
     }
 
@@ -34,7 +34,7 @@ class Chunk
     Chunk(Chunk existing, int offset, int length) {
         this.text = existing.text;
         this.offset = existing.offset + offset;
-        this.length = length;
+        this.width = length;
     }
 
     /**
@@ -42,6 +42,6 @@ class Chunk
      * Chunk.
      */
     public String toString() {
-        return new String(text, offset, length);
+        return new String(text, offset, width);
     }
 }

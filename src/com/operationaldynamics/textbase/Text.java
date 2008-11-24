@@ -38,7 +38,7 @@ public class Text
         result = 0;
 
         for (Chunk chunk : chunks) {
-            result += chunk.length;
+            result += chunk.width;
         }
 
         return result;
@@ -50,7 +50,7 @@ public class Text
         str = new StringBuilder();
 
         for (Chunk chunk : chunks) {
-            str.append(chunk.text, chunk.offset, chunk.length);
+            str.append(chunk.text, chunk.offset, chunk.width);
         }
 
         return str.toString();
@@ -77,7 +77,7 @@ public class Text
         int i, j;
 
         before = new Chunk(which, 0, point);
-        after = new Chunk(which, point, which.length - point);
+        after = new Chunk(which, point, which.width - point);
 
         next = new Chunk[chunks.length + 2];
 
