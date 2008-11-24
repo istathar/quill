@@ -10,30 +10,50 @@
  */
 package com.operationaldynamics.textbase;
 
+/**
+ * A segment of text. This is essentially a reimplementation of Java's String
+ * class, with an emphasis on immutability and reusability; once allocated the
+ * char[] can be reused by new Chunks as they are created to be subsets of an
+ * existing one. This is common in cut and paste operations, but also in the
+ * case of the initial load of a file, where the bulk of the datastore is
+ * frequently broken by splices, but for which there is no reason to
+ * reallocate. This, in turn, forms the basis of the undo ability in Text.
+ * 
+ * @author Andrew Cowie
+ */
 class Chunk
 {
     final char[] text;
 
-    final int offset;
+    /**
+     * The offset into the char[] where this Chunk begins.
+     */
+    final int start;
 
+    /**
+     * The length of the segment of the char[] that this Chunk represents
+     */
     final int width;
 
     /**
      * Build an initial Chunk from a String as a baseline.
      */
-    Chunk(String start) {
-        this.width = start.length();
+    Chunk(String str) {
+        this.width = str.length();
         this.text = new char[width];
-        start.getChars(0, width, this.text, 0);
-        this.offset = 0;
+        str.getChars(0, width, this.text, 0);
+        this.start = 0;
     }
 
     /**
      * Make a new Chunk out of an existing one.
      */
     Chunk(Chunk existing, int offset, int length) {
+        if ((offset + length) > existing.width) {
+            throw new IllegalArgumentException();
+        }
         this.text = existing.text;
-        this.offset = existing.offset + offset;
+        this.start = existing.start + offset;
         this.width = length;
     }
 
@@ -42,6 +62,6 @@ class Chunk
      * Chunk.
      */
     public String toString() {
-        return new String(text, offset, width);
+        return new String(text, start, width);
     }
 }

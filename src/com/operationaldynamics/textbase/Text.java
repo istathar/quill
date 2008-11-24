@@ -12,6 +12,16 @@ package com.operationaldynamics.textbase;
 
 import java.util.Arrays;
 
+/**
+ * A mutable buffer of unicode text to which changes are undoable.
+ * 
+ * @author Andrew Cowie
+ */
+/*
+ * There are a number of places here that we hunt linearly through the array
+ * of Chunks to find offsets. We'll probably need to cache or otherwise build
+ * a datastructure around the offset:Chunk relationship.
+ */
 public class Text
 {
     Chunk[] chunks;
@@ -50,7 +60,7 @@ public class Text
         str = new StringBuilder();
 
         for (Chunk chunk : chunks) {
-            str.append(chunk.text, chunk.offset, chunk.width);
+            str.append(chunk.text, chunk.start, chunk.width);
         }
 
         return str.toString();

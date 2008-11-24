@@ -40,7 +40,7 @@ public class ValidateChunks extends TestCase
         assertEquals("broadcast", subsequent.toString());
         assertSame(initial.text, subsequent.text);
         assertEquals(9, subsequent.width);
-        assertEquals(10, subsequent.offset);
+        assertEquals(10, subsequent.start);
 
         another = new Chunk(initial, 0, 9);
         assertEquals("Emergency", another.toString());
@@ -51,7 +51,7 @@ public class ValidateChunks extends TestCase
         fourth = new Chunk(third, 0, 3);
         assertSame(initial.text, third.text);
         assertSame(fourth.text, third.text);
-        assertEquals(20, fourth.offset);
+        assertEquals(20, fourth.start);
         assertEquals(3, fourth.width);
         assertEquals("sys", fourth.toString());
     }
