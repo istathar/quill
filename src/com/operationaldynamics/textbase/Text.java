@@ -81,7 +81,12 @@ public class Text
         chunks = next;
     }
 
-    void splice(Chunk which, int point, Chunk addition) {
+    /**
+     * Splice a Chunk into the middle of an existing one. You need to have
+     * worked out which existing Chunk that is, and what point (offset) into
+     * that Chunk you want to do the splice.
+     * */
+    void spliceInto(Chunk which, int point, Chunk addition) {
         final Chunk before, after;
         final Chunk[] next;
         int i, j;
@@ -130,9 +135,9 @@ public class Text
      * Insert a Chunk at the specified array index. This assumes you've worked
      * out the appropriate insertion position in that chunks array!
      */
-    void insert(int index, Chunk addition) {
+    void insertAt(int index, Chunk addition) {
         final Chunk[] next;
-        int i, j;
+        int i;
 
         next = new Chunk[chunks.length + 1];
         i = index;
@@ -161,6 +166,12 @@ public class Text
     /**
      * Insert the given Java String at the specified offset.
      */
+    /*
+     * Work out whether the offset falls between two Chunks [meaning we can
+     * call insertBetween()], or whether it falls inside a Chunk [implying we
+     * must call spliceInto()], with the corner case of it being at the end,
+     * in which case we append();
+     */
     public void insert(int offset, String what) {
         int start, next;
         Chunk addition;
@@ -178,24 +189,25 @@ public class Text
 
         for (int i = 0; i < chunks.length; i++) {
             if (start == offset) {
-                insert(i, addition);
+                insertAt(i, addition);
                 return;
             }
 
             next = chunks[i].width;
 
             if (start + next > offset) {
-                splice(chunks[i], offset - start, addition);
+                spliceInto(chunks[i], offset - start, addition);
                 return;
             }
 
             start += next;
         }
 
-        if (start > offset) {
-            throw new IndexOutOfBoundsException();
+        if (start == offset) {
+            append(addition);
+            return;
         }
 
-        append(addition);
+        throw new IndexOutOfBoundsException();
     }
 }

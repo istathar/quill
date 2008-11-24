@@ -67,7 +67,7 @@ public class ValidateText extends TestCase
         assertEquals("Cononate", text.toString());
         assertEquals(1, text.chunks.length);
 
-        text.splice(initial, 3, addition);
+        text.spliceInto(initial, 3, addition);
         assertEquals(3, text.chunks.length);
         assertEquals("Concatonate", text.toString());
     }
@@ -98,7 +98,7 @@ public class ValidateText extends TestCase
          */
 
         addition = new Chunk("wentyT");
-        text.splice(two, 1, addition);
+        text.spliceInto(two, 1, addition);
         assertEquals("One TwentyTwo Three Four", text.toString());
         assertEquals(9, text.chunks.length);
     }
@@ -136,13 +136,13 @@ public class ValidateText extends TestCase
 
         assertEquals("OneTwoThree", text.toString());
 
-        text.insert(0, zero);
+        text.insertAt(0, zero);
         assertEquals("ZeroOneTwoThree", text.toString());
 
-        text.insert(4, zero);
+        text.insertAt(4, zero);
         assertEquals("ZeroOneTwoThreeZero", text.toString());
 
-        text.insert(2, zero);
+        text.insertAt(2, zero);
         assertEquals("ZeroOneZeroTwoThreeZero", text.toString());
     }
 
@@ -157,7 +157,9 @@ public class ValidateText extends TestCase
 
     /*
      * Ideally you'd just call append() here, but perhaps you don't know
-     * you're at the end. So there you go.
+     * you're at the end. So long as you specify an offset equalling the
+     * character length of the Text (ie, not greater), it (should) still still
+     * work, which this tests.
      */
     public final void testInsertIntoEnd() {
         final Text text;
