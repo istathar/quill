@@ -120,4 +120,54 @@ public class ValidateText extends TestCase
         text.append(two);
         assertEquals(14, text.length());
     }
+
+    public final void testInsertBetweenExistingChunks() {
+        final Text text;
+        final Chunk zero, one, two, three;
+
+        zero = new Chunk("Zero");
+        one = new Chunk("One");
+        two = new Chunk("Two");
+        three = new Chunk("Three");
+
+        text = new Text(one);
+        text.append(two);
+        text.append(three);
+
+        assertEquals("OneTwoThree", text.toString());
+
+        text.insert(0, zero);
+        assertEquals("ZeroOneTwoThree", text.toString());
+
+        text.insert(4, zero);
+        assertEquals("ZeroOneTwoThreeZero", text.toString());
+
+        text.insert(2, zero);
+        assertEquals("ZeroOneZeroTwoThreeZero", text.toString());
+    }
+
+    public final void testInsertIntoAChunkFormingSplice() {
+        final Text text;
+
+        text = new Text("This Emergency Broadcast System");
+
+        text.insert(5, "is a test of the ");
+        assertEquals("This is a test of the Emergency Broadcast System", text.toString());
+    }
+
+    /*
+     * Ideally you'd just call append() here, but perhaps you don't know
+     * you're at the end. So there you go.
+     */
+    public final void testInsertIntoEnd() {
+        final Text text;
+        final String str;
+
+        str = "All this has happened before";
+        text = new Text(str);
+
+        text.insert(str.length(), ", all this will happen again.");
+        assertEquals("All this has happened before, all this will happen again.", text.toString());
+    }
+
 }

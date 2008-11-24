@@ -116,7 +116,7 @@ public class Text
         next[j++] = after;
 
         /*
-         * And not copy the remainder of the original array, if any.
+         * And now copy the remainder of the original array, if any.
          */
         i++;
         if (i != chunks.length) {
@@ -124,5 +124,78 @@ public class Text
         }
 
         chunks = next;
+    }
+
+    /**
+     * Insert a Chunk at the specified array index. This assumes you've worked
+     * out the appropriate insertion position in that chunks array!
+     */
+    void insert(int index, Chunk addition) {
+        final Chunk[] next;
+        int i, j;
+
+        next = new Chunk[chunks.length + 1];
+        i = index;
+
+        /*
+         * Copy the first half of the original array, assuming we're not
+         * inserting at the beginning
+         */
+        if (i != 0) {
+            System.arraycopy(chunks, 0, next, 0, i);
+        }
+
+        next[i] = addition;
+
+        /*
+         * And now copy the remainder of the original array, if any.
+         */
+
+        if (i != chunks.length) {
+            System.arraycopy(chunks, i, next, i + 1, chunks.length - i);
+        }
+
+        chunks = next;
+    }
+
+    /**
+     * Insert the given Java String at the specified offset.
+     */
+    public void insert(int offset, String what) {
+        int start, next;
+        Chunk addition;
+
+        if (offset < 0) {
+            throw new IllegalArgumentException();
+        }
+        if (what == null) {
+            return;
+        }
+
+        start = 0;
+        next = 0;
+        addition = new Chunk(what);
+
+        for (int i = 0; i < chunks.length; i++) {
+            if (start == offset) {
+                insert(i, addition);
+                return;
+            }
+
+            next = chunks[i].width;
+
+            if (start + next > offset) {
+                splice(chunks[i], offset - start, addition);
+                return;
+            }
+
+            start += next;
+        }
+
+        if (start > offset) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        append(addition);
     }
 }
