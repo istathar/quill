@@ -16,7 +16,7 @@ public class Text
 {
     Chunk[] chunks;
 
-    Text(String str) {
+    public Text(String str) {
         chunks = new Chunk[1];
         chunks[0] = new Chunk(str);
     }
@@ -26,8 +26,26 @@ public class Text
         chunks[0] = initial;
     }
 
+    /**
+     * The length of this Text, in characters.
+     */
+    /*
+     * Should we be caching this?
+     */
+    public int length() {
+        int result;
+
+        result = 0;
+
+        for (Chunk chunk : chunks) {
+            result += chunk.length;
+        }
+
+        return result;
+    }
+
     public String toString() {
-        StringBuilder str;
+        final StringBuilder str;
 
         str = new StringBuilder();
 
@@ -38,7 +56,7 @@ public class Text
         return str.toString();
     }
 
-    public void append(Chunk addition) {
+    void append(Chunk addition) {
         final Chunk[] next;
         final int i;
 
@@ -53,7 +71,7 @@ public class Text
         chunks = next;
     }
 
-    public void splice(Chunk which, int point, Chunk addition) {
+    void splice(Chunk which, int point, Chunk addition) {
         final Chunk before, after;
         final Chunk[] next;
         int i, j;

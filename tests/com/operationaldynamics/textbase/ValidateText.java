@@ -102,4 +102,22 @@ public class ValidateText extends TestCase
         assertEquals("One TwentyTwo Three Four", text.toString());
         assertEquals(9, text.chunks.length);
     }
+
+    public final void testTextLength() {
+        final Text text;
+        final Chunk zero, one, two;
+
+        zero = new Chunk("Hello");
+        assertEquals(5, zero.length);
+        assertEquals(5, zero.text.length);
+        text = new Text(zero);
+        assertEquals(5, text.length());
+
+        one = new Chunk("Happy");
+        two = new Chunk("Days");
+
+        text.append(one);
+        text.append(two);
+        assertEquals(14, text.length());
+    }
 }
