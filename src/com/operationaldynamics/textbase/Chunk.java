@@ -31,7 +31,8 @@ class Chunk
     final int start;
 
     /**
-     * The length of the segment of the char[] that this Chunk represents
+     * The length of the segment of the char[] that this Chunk represents,
+     * from offset.
      */
     final int width;
 

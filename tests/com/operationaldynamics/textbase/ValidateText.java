@@ -172,7 +172,7 @@ public class ValidateText extends TestCase
         assertEquals("All this has happened before, all this will happen again.", text.toString());
     }
 
-    public final void testReallocatingChunks() {
+    public final void testConcatonatingChunks() {
         final Text text;
         final Chunk zero, one, two, three, result;
 
@@ -192,5 +192,30 @@ public class ValidateText extends TestCase
         assertEquals(0, result.start);
         assertEquals(11, result.width);
         assertEquals("roOneTwoThr", result.toString());
+    }
+
+    public final void testDeleteRange() {
+        final Text text;
+        final Chunk zero, one, two, three;
+
+        zero = new Chunk("Zero");
+        one = new Chunk("One");
+        two = new Chunk("Two");
+        three = new Chunk("Three");
+
+        text = new Text(zero);
+        text.append(one);
+        text.append(two);
+        text.append(three);
+        assertEquals("ZeroOneTwoThree", text.toString());
+
+        text.delete(2, 11);
+        assertEquals("Zeee", text.toString());
+        assertEquals(2, text.chunks.length);
+        assertEquals("Ze", text.chunks[0].toString());
+        assertEquals("ee", text.chunks[1].toString());
+
+        text.delete(1, 2);
+        assertEquals("Ze", text.toString());
     }
 }
