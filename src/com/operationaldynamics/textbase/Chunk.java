@@ -58,6 +58,23 @@ class Chunk
     }
 
     /**
+     * Make a new Chunk from the supplied character array. Do not change any
+     * elements of the char[] after passing it in.
+     */
+    /*
+     * Java has no mechanism to prevent this, so if you keep a reference to
+     * data and then torque it, you will break everything. This is obviously
+     * an encapsulation violation. There doesn't seem any way to avoid this
+     * other than making a copy here, which would be needless since the only
+     * thing calling this is here in this package.
+     */
+    Chunk(char[] data) {
+        this.width = data.length;
+        this.text = data;
+        this.start = 0;
+    }
+
+    /**
      * Get a Java String equal to the array of chars represented by this
      * Chunk.
      */

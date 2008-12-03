@@ -210,4 +210,85 @@ public class Text
 
         throw new IndexOutOfBoundsException();
     }
+
+    /**
+     * Allocate a new Chunk by concatonating any and all Chunks starting at
+     * offset for width. While deleting, as such, does not require this,
+     * undo/redo does.
+     */
+    Chunk concatonateFrom(int offset, int width) {
+        int start, next, index, todo, frag;
+        int i, delta;
+        char[] target;
+
+        if (offset < 0) {
+            throw new IllegalArgumentException();
+        }
+        if (width < 0) {
+            throw new IllegalArgumentException();
+        }
+
+        /*
+         * Find the Chunk containing the start point of the range we want to
+         * isolate.
+         */
+
+        start = 0;
+        next = 0;
+        i = 0;
+        delta = 0;
+
+        for (i = 0; i < chunks.length; i++) {
+            if (start == offset) {
+                delta = 0;
+                break;
+            }
+
+            next = chunks[i].width;
+
+            if (start + next > offset) {
+                delta = offset - start;
+                break;
+            }
+
+            start += next;
+        }
+
+        /*
+         * Copy characters from this and subsequent Chunks into a char[]
+         */
+
+        index = 0;
+        todo = width;
+        target = new char[width];
+
+        while (todo > 0) {
+            if (i == chunks.length) {
+                throw new IndexOutOfBoundsException();
+            }
+
+            // amount of to copy, which is all unless we're on first or last.
+            if (chunks[i].width > todo) {
+                frag = todo;
+            } else {
+                frag = chunks[i].width - delta;
+            }
+
+            System.arraycopy(chunks[i].text, chunks[i].start + delta, target, index, frag);
+            index += frag;
+            todo -= frag;
+            delta = 0;
+            i++;
+        }
+
+        if (todo == 0) {
+            return new Chunk(target);
+        }
+
+        if (index == 0) {
+            throw new IndexOutOfBoundsException("offset too high");
+        } else {
+            throw new IndexOutOfBoundsException("width greater than available text");
+        }
+    }
 }
