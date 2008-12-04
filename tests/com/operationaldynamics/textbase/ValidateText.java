@@ -121,9 +121,6 @@ public class ValidateText extends TestCase
     public final void testMultipleSplice() {
         final Text text;
         final Chunk one, two, three, four, space, addition;
-        Piece p;
-        int i;
-
         one = new Chunk("One");
         space = new Chunk(" ");
         two = new Chunk("Two");
@@ -140,13 +137,7 @@ public class ValidateText extends TestCase
 
         assertEquals("One Two Three Four", text.toString());
 
-        i = 0;
-        p = text.first;
-        while (p != null) {
-            p = p.next;
-            i++;
-        }
-        assertEquals(7, i);
+        assertEquals(7, calculateNumberPieces(text));
 
         /*
          * Now, try splicing something in
@@ -156,13 +147,20 @@ public class ValidateText extends TestCase
         text.insert(5, addition);
         assertEquals("One TwentyTwo Three Four", text.toString());
 
+        assertEquals(9, calculateNumberPieces(text));
+    }
+
+    private static int calculateNumberPieces(Text text) {
+        Piece p;
+        int i;
+
         i = 0;
         p = text.first;
         while (p != null) {
             p = p.next;
             i++;
         }
-        assertEquals(9, i);
+        return i;
     }
 
     public final void testTextLength() {
@@ -228,6 +226,7 @@ public class ValidateText extends TestCase
     public final void testConcatonatingChunks() {
         final Text text;
         final Chunk zero, one, two, three, result;
+        final Piece splice;
 
         zero = new Chunk("Zero");
         one = new Chunk("One");
@@ -241,7 +240,10 @@ public class ValidateText extends TestCase
 
         assertEquals("ZeroOneTwoThree", text.toString());
 
-        result = text.concatonateFrom(2, 11);
+        splice = text.concatonateFrom(2, 11);
+
+        assertEquals("ZeroOneTwoThree", text.toString());
+        result = splice.chunk;
         assertEquals(0, result.start);
         assertEquals(11, result.width);
         assertEquals("roOneTwoThr", result.toString());
@@ -264,11 +266,12 @@ public class ValidateText extends TestCase
 
         text.delete(2, 11);
         assertEquals("Zeee", text.toString());
-        assertEquals(2, text.chunks.length);
-        assertEquals("Ze", text.chunks[0].toString());
-        assertEquals("ee", text.chunks[1].toString());
+        assertEquals(2, calculateNumberPieces(text));
+        assertEquals("Ze", text.first.chunk.toString());
+        assertEquals("ee", text.first.next.chunk.toString());
 
         text.delete(1, 2);
         assertEquals("Ze", text.toString());
+        assertEquals(2, calculateNumberPieces(text));
     }
 }

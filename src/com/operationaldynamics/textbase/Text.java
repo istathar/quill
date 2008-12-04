@@ -233,13 +233,17 @@ public class Text
      * strictly necessary, except that the reason you're usually calling this
      * is to delete, so the boundaries are a good first step, and it makes the
      * algorithm here far simpler.
+     * 
+     * Returns a Piece wrapping the extracted Chunk (and linked in to the
+     * Text).
      */
-    Chunk concatonateFrom(int offset, int width) {
-        final Piece preceeding, one, two, following;
+    Piece concatonateFrom(int offset, int width) {
+        final Piece preceeding, one, two, following, splice;
         Piece p;
         Chunk c;
         int i;
         char[] data;
+        final Chunk extract;
 
         if (offset < 0) {
             throw new IllegalArgumentException();
@@ -266,7 +270,8 @@ public class Text
         following = two.next;
 
         /*
-         * Copy characters from the Pieces in the middle into a char[]
+         * Copy characters from the Pieces in the middle into a char[], then
+         * form them into a Chunk.
          */
 
         data = new char[width];
@@ -282,100 +287,44 @@ public class Text
             p = p.next;
         }
 
-        return new Chunk(data);
+        extract = new Chunk(data);
+
+        /*
+         * Now embed this extract into a Piece and splice that into the Text.
+         * This is the "wasteful" part if we're deleting, except that it gives
+         * us the handle we need to locate the boundaries. Think of it as a
+         * tuple :)
+         */
+
+        splice = new Piece();
+
+        preceeding.next = splice;
+        splice.prev = preceeding;
+        splice.chunk = extract;
+        splice.next = following;
+        following.prev = splice;
+
+        return splice;
     }
 
     /**
-     * Delete a width wide segment starting at offset.
+     * Delete a width wide segment starting at offset. All the hard work is
+     * done by the concatonate method, this just removes the splice.
+     */
+    /*
+     * TODO do something with extracted Chunk to facilitate undo
      */
     public void delete(int offset, int width) {
-        final Chunk before, after;
-        final Chunk[] next;
-        int i, j, start, following, sum, deltaI, deltaJ;
+        final Piece splice, preceeding, following;
+        // final Chunk extract;
 
-        if (offset < 0) {
-            throw new IllegalArgumentException();
-        }
-        if (width < 0) {
-            throw new IllegalArgumentException();
-        }
+        splice = concatonateFrom(offset, width);
+        // extract = splice.chunk;
 
-        if (chunks.length == 1) {
-            before = new Chunk(chunks[0], 0, offset);
-            after = new Chunk(chunks[0], offset + width, chunks[0].width - (offset + width));
+        preceeding = splice.prev;
+        following = splice.next;
 
-            next = new Chunk[2];
-            next[0] = before;
-            next[1] = after;
-
-            chunks = next;
-            return;
-        }
-
-        /*
-         * Identify the index of the Chunk containing offset
-         */
-
-        start = 0;
-        following = 0;
-        deltaI = 0;
-
-        for (i = 0; i < chunks.length; i++) {
-            if (start == offset) {
-                deltaI = 0;
-                break;
-            }
-
-            following = chunks[i].width;
-
-            if (start + following > offset) {
-                deltaI = offset - start;
-                break;
-            }
-
-            start += following;
-        }
-
-        /*
-         * Cross over the Chunks that will be dropped
-         */
-
-        sum = chunks[i].width - deltaI;
-        deltaJ = 0;
-
-        for (j = i + 1; j < chunks.length; j++) {
-            sum += chunks[j].width;
-
-            if (sum > width) {
-                deltaJ = sum - width;
-                break;
-            }
-        }
-
-        before = new Chunk(chunks[i], 0, deltaI);
-        after = new Chunk(chunks[j], deltaJ, chunks[j].width - deltaJ);
-
-        next = new Chunk[i + (chunks.length - j) + 1];
-
-        if (i != 0) {
-            System.arraycopy(chunks, 0, next, 0, i);
-        }
-
-        /*
-         * Now replace
-         */
-
-        next[i++] = before;
-        next[i++] = after;
-
-        /*
-         * And now copy the remainder of the original array, if any.
-         */
-        j++;
-        if (j != chunks.length) {
-            System.arraycopy(chunks, j, next, i, chunks.length - j);
-        }
-
-        chunks = next;
+        preceeding.next = following;
+        following.prev = preceeding;
     }
 }
