@@ -56,20 +56,27 @@ public class ValidateText extends TestCase
         assertEquals("system broadcast Emergency", text.toString());
     }
 
-    public final void testInitialSplice() {
+    public final void testSplittingAtPoint() {
         final Text text;
         final Chunk initial, addition;
+        final Piece one, two;
 
-        initial = new Chunk("Cononate");
-        addition = new Chunk("cat");
-
+        initial = new Chunk("Concave");
         text = new Text(initial);
-        assertEquals("Cononate", text.toString());
-        assertEquals(1, text.chunks.length);
+        assertEquals("Concave", text.toString());
+        assertNull(text.first.next);
+        assertNull(text.first.prev);
 
-        text.spliceInto(initial, 3, addition);
-        assertEquals(3, text.chunks.length);
-        assertEquals("Concatonate", text.toString());
+        one = text.splitAt(text.first, 3);
+        assertEquals("Concave", text.toString());
+
+        assertNotNull(one.next);
+        assertEquals("Con", one.chunk.toString());
+
+        two = one.next;
+        assertEquals("cave", two.chunk.toString());
+        assertNull(two.next);
+        assertEquals(one, two.prev);
     }
 
     public final void testMultipleSplice() {

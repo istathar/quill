@@ -40,6 +40,9 @@ class Chunk
      * Build an initial Chunk from a String as a baseline.
      */
     Chunk(String str) {
+        if (str == null) {
+            throw new IllegalArgumentException();
+        }
         this.width = str.length();
         this.text = new char[width];
         str.getChars(0, width, this.text, 0);

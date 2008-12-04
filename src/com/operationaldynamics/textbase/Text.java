@@ -10,30 +10,23 @@
  */
 package com.operationaldynamics.textbase;
 
-import java.util.Arrays;
-
 /**
  * A mutable buffer of unicode text to which changes are undoable.
  * 
  * @author Andrew Cowie
  */
-/*
- * There are a number of places here that we hunt linearly through the array
- * of Chunks to find offsets. We'll probably need to cache or otherwise build
- * a datastructure around the offset:Chunk relationship.
- */
 public class Text
 {
-    Chunk[] chunks;
+    Piece first;
 
     public Text(String str) {
-        chunks = new Chunk[1];
-        chunks[0] = new Chunk(str);
+        first = new Piece();
+        first.chunk = new Chunk(str);
     }
 
     Text(Chunk initial) {
-        chunks = new Chunk[1];
-        chunks[0] = initial;
+        first = new Piece();
+        first.chunk = initial;
     }
 
     /**
@@ -56,159 +49,161 @@ public class Text
 
     public String toString() {
         final StringBuilder str;
+        Piece piece;
 
         str = new StringBuilder();
+        piece = first;
 
-        for (Chunk chunk : chunks) {
-            str.append(chunk.text, chunk.start, chunk.width);
+        while (piece != null) {
+            str.append(piece.chunk.text, piece.chunk.start, piece.chunk.width);
+            piece = piece.next;
         }
 
         return str.toString();
     }
 
     void append(Chunk addition) {
-        final Chunk[] next;
-        final int i;
+        Piece piece;
+        final Piece last;
 
         if (addition == null) {
             throw new IllegalArgumentException();
         }
 
-        i = chunks.length;
-        next = Arrays.copyOf(chunks, i + 1);
-        next[i] = addition;
+        piece = first;
 
-        chunks = next;
-    }
-
-    /**
-     * Splice a Chunk into the middle of an existing one. You need to have
-     * worked out which existing Chunk that is, and what point (offset) into
-     * that Chunk you want to do the splice.
-     * */
-    void spliceInto(Chunk which, int point, Chunk addition) {
-        final Chunk before, after;
-        final Chunk[] next;
-        int i, j;
-
-        before = new Chunk(which, 0, point);
-        after = new Chunk(which, point, which.width - point);
-
-        next = new Chunk[chunks.length + 2];
-
-        /*
-         * Identify the index which corresponds to. Yes, a List might be
-         * better here.
-         */
-
-        for (i = 0; i < chunks.length; i++) {
-            if (chunks[i] == which) {
-                break;
-            }
+        while (piece.next != null) {
+            piece = piece.next;
         }
 
-        if (i != 0) {
-            System.arraycopy(chunks, 0, next, 0, i);
-        }
-
-        /*
-         * Now replace which with before, addition, after
-         */
-        j = i;
-
-        next[j++] = before;
-        next[j++] = addition;
-        next[j++] = after;
-
-        /*
-         * And now copy the remainder of the original array, if any.
-         */
-        i++;
-        if (i != chunks.length) {
-            System.arraycopy(chunks, i, next, j, chunks.length - i);
-        }
-
-        chunks = next;
-    }
-
-    /**
-     * Insert a Chunk at the specified array index. This assumes you've worked
-     * out the appropriate insertion position in that chunks array!
-     */
-    void insertAt(int index, Chunk addition) {
-        final Chunk[] next;
-        int i;
-
-        next = new Chunk[chunks.length + 1];
-        i = index;
-
-        /*
-         * Copy the first half of the original array, assuming we're not
-         * inserting at the beginning
-         */
-        if (i != 0) {
-            System.arraycopy(chunks, 0, next, 0, i);
-        }
-
-        next[i] = addition;
-
-        /*
-         * And now copy the remainder of the original array, if any.
-         */
-
-        if (i != chunks.length) {
-            System.arraycopy(chunks, i, next, i + 1, chunks.length - i);
-        }
-
-        chunks = next;
+        last = new Piece();
+        last.prev = piece;
+        piece.next = last;
+        last.chunk = addition;
     }
 
     /**
      * Insert the given Java String at the specified offset.
      */
-    /*
-     * Work out whether the offset falls between two Chunks [meaning we can
-     * call insertBetween()], or whether it falls inside a Chunk [implying we
-     * must call spliceInto()], with the corner case of it being at the end,
-     * in which case we append();
-     */
     public void insert(int offset, String what) {
-        int start, next;
-        Chunk addition;
+        insert(offset, new Chunk(what));
+    }
+
+    /**
+     * Cut a Piece in two at point. Amend the linkages so that overall Text is
+     * the same after the operation.
+     */
+    Piece splitAt(Piece from, int point) {
+        Piece one, two;
+        Chunk before, after;
+
+        before = new Chunk(from.chunk, 0, point);
+        after = new Chunk(from.chunk, point, from.chunk.width - point);
+
+        one = new Piece();
+        two = new Piece();
+
+        one.prev = from.prev;
+        one.chunk = before;
+        one.next = two;
+
+        two.prev = one;
+        two.chunk = after;
+        two.next = from.next;
+
+        return one;
+    }
+
+    /**
+     * Find the Piece containing offset, and split it into two. Handle the
+     * boundary cases of an offset at a Piece boundary. Returns first of the
+     * two Pieces.
+     */
+    /*
+     * TODO Initial implementation of this is an ugly linear search; replace
+     * this with an offset cache in the Pieces.
+     */
+    Piece splitAt(int offset) {
+        Piece piece, last;
+        int start;
+
+        if (offset == 0) {
+            return null;
+        }
+
+        piece = first;
+        last = first;
+
+        start = 0;
+
+        while (piece != null) {
+            /*
+             * Are we already at a Piece boundary?
+             */
+
+            if (start == offset) {
+                return piece;
+            }
+
+            /*
+             * Failing that, then let's see if this Piece contains the offset
+             * point. If it does, figure out the delta into this Piece's Chunk
+             * and split at that point.
+             */
+
+            start += piece.chunk.width;
+
+            if (start > offset) {
+                return splitAt(piece, start - offset);
+            }
+
+            last = piece;
+            piece = piece.next;
+        }
+
+        /*
+         * Reached the end; so long as there is nothing left we're in an
+         * append situation and no problem, otherwise out of bounds.
+         */
+
+        if (start == offset) {
+            return last;
+        }
+
+        throw new IndexOutOfBoundsException();
+    }
+
+    /**
+     * Splice a Chunk into the Text. The result of doing this is three Pieces;
+     * a new Piece before and after, and a Piece wrapping the Chunk and linked
+     * between them. This is the workhorse of this class.
+     */
+    public void insert(int offset, Chunk addition) {
+        Piece one, two, piece;
 
         if (offset < 0) {
             throw new IllegalArgumentException();
         }
-        if (what == null) {
+
+        piece = new Piece();
+        piece.chunk = addition;
+
+        if (offset == 0) {
+            piece.next = first;
+            first.prev = piece;
+            first = piece;
             return;
         }
 
-        start = 0;
-        next = 0;
-        addition = new Chunk(what);
+        one = splitAt(offset);
+        two = one.next;
 
-        for (int i = 0; i < chunks.length; i++) {
-            if (start == offset) {
-                insertAt(i, addition);
-                return;
-            }
-
-            next = chunks[i].width;
-
-            if (start + next > offset) {
-                spliceInto(chunks[i], offset - start, addition);
-                return;
-            }
-
-            start += next;
+        if (one.next != null) {
+            piece.next = two;
+            two.prev = piece;
         }
-
-        if (start == offset) {
-            append(addition);
-            return;
-        }
-
-        throw new IndexOutOfBoundsException();
+        one.next = piece;
+        piece.prev = one;
     }
 
     /**
