@@ -109,6 +109,15 @@ public class ValidateText extends TestCase
         assertEquals(one, two.prev);
     }
 
+    public final void testSingleSplice() {
+        final Text text;
+
+        text = new Text("This Emergency Broadcast System");
+
+        text.insert(5, "is a test of the ");
+        assertEquals("This is a test of the Emergency Broadcast System", text.toString());
+    }
+
     public final void testMultipleSplice() {
         final Text text;
         final Chunk one, two, three, four, space, addition;
@@ -197,15 +206,6 @@ public class ValidateText extends TestCase
 
         text.insert(7, zero);
         assertEquals("ZeroOneZeroTwoThreeZero", text.toString());
-    }
-
-    public final void testInsertIntoAChunkFormingSplice() {
-        final Text text;
-
-        text = new Text("This Emergency Broadcast System");
-
-        text.insert(5, "is a test of the ");
-        assertEquals("This is a test of the Emergency Broadcast System", text.toString());
     }
 
     /*

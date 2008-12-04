@@ -107,20 +107,24 @@ public class Text
         two = new Piece();
 
         preceeding = from.prev;
-        if (preceeding != null) {
+
+        if (preceeding == null) {
+            first = one;
+        } else {
             preceeding.next = one;
+            one.prev = preceeding;
         }
 
-        one.prev = from.prev;
         one.chunk = before;
         one.next = two;
 
         two.prev = one;
         two.chunk = after;
-        two.next = from.next;
 
         following = from.next;
+
         if (following != null) {
+            two.next = following;
             following.prev = two;
         }
 
@@ -138,7 +142,7 @@ public class Text
      */
     Piece splitAt(int offset) {
         Piece piece, last;
-        int start;
+        int start, following;
 
         if (offset == 0) {
             return null;
@@ -164,11 +168,12 @@ public class Text
              * and split at that point.
              */
 
-            start += piece.chunk.width;
+            following = start + piece.chunk.width;
 
-            if (start > offset) {
-                return splitAt(piece, start - offset - 1);
+            if (following > offset) {
+                return splitAt(piece, offset - start);
             }
+            start = following;
 
             last = piece;
             piece = piece.next;
