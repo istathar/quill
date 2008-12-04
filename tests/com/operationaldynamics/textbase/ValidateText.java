@@ -298,4 +298,40 @@ public class ValidateText extends TestCase
         assertEquals("", text.toString());
         assertEquals(1, calculateNumberPieces(text));
     }
+
+    public final void testBoundsChecking() {
+        final Text text;
+
+        text = new Text("Magic");
+        try {
+            text.insert(6, "ian");
+            fail();
+        } catch (IndexOutOfBoundsException ioobe) {
+            // good
+        }
+
+        assertEquals("Magic", text.toString());
+        assertEquals(1, calculateNumberPieces(text));
+
+        try {
+            text.delete(7, 3);
+            fail();
+        } catch (IndexOutOfBoundsException ioobe) {
+            // good
+        }
+
+        assertEquals("Magic", text.toString());
+        assertEquals(1, calculateNumberPieces(text));
+
+        try {
+            text.delete(2, 6);
+            fail();
+        } catch (IndexOutOfBoundsException ioobe) {
+            // good
+        }
+
+        assertEquals("Magic", text.toString());
+        assertEquals(2, calculateNumberPieces(text));
+        // is ok
+    }
 }
