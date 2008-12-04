@@ -94,7 +94,7 @@ public class Text
      * the same after the operation.
      */
     Piece splitAt(Piece from, int point) {
-        Piece one, two;
+        Piece preceeding, one, two, following;
         Chunk before, after;
 
         before = new Chunk(from.chunk, 0, point);
@@ -103,6 +103,11 @@ public class Text
         one = new Piece();
         two = new Piece();
 
+        preceeding = from.prev;
+        if (preceeding != null) {
+            preceeding.next = one;
+        }
+
         one.prev = from.prev;
         one.chunk = before;
         one.next = two;
@@ -110,6 +115,11 @@ public class Text
         two.prev = one;
         two.chunk = after;
         two.next = from.next;
+
+        following = from.next;
+        if (following != null) {
+            following.prev = two;
+        }
 
         return one;
     }
@@ -154,7 +164,7 @@ public class Text
             start += piece.chunk.width;
 
             if (start > offset) {
-                return splitAt(piece, start - offset);
+                return splitAt(piece, start - offset - 1);
             }
 
             last = piece;
@@ -198,7 +208,7 @@ public class Text
         one = splitAt(offset);
         two = one.next;
 
-        if (one.next != null) {
+        if (two != null) {
             piece.next = two;
             two.prev = piece;
         }

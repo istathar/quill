@@ -82,6 +82,8 @@ public class ValidateText extends TestCase
     public final void testMultipleSplice() {
         final Text text;
         final Chunk one, two, three, four, space, addition;
+        Piece p;
+        int i;
 
         one = new Chunk("One");
         space = new Chunk(" ");
@@ -98,16 +100,30 @@ public class ValidateText extends TestCase
         text.append(four);
 
         assertEquals("One Two Three Four", text.toString());
-        assertEquals(7, text.chunks.length);
+
+        i = 0;
+        p = text.first;
+        while (p != null) {
+            p = p.next;
+            i++;
+        }
+        assertEquals(7, i);
 
         /*
          * Now, try splicing something in
          */
 
         addition = new Chunk("wentyT");
-        text.spliceInto(two, 1, addition);
+        text.insert(5, addition);
         assertEquals("One TwentyTwo Three Four", text.toString());
-        assertEquals(9, text.chunks.length);
+
+        i = 0;
+        p = text.first;
+        while (p != null) {
+            p = p.next;
+            i++;
+        }
+        assertEquals(9, i);
     }
 
     public final void testTextLength() {
