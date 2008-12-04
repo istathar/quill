@@ -33,15 +33,18 @@ public class Text
      * The length of this Text, in characters.
      */
     /*
-     * Should we be caching this?
+     * TODO cache this when we cache the offsets!
      */
     public int length() {
+        Piece piece;
         int result;
 
+        piece = first;
         result = 0;
 
-        for (Chunk chunk : chunks) {
-            result += chunk.width;
+        while (piece != null) {
+            result += piece.chunk.width;
+            piece = piece.next;
         }
 
         return result;
