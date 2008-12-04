@@ -274,4 +274,16 @@ public class ValidateText extends TestCase
         assertEquals("Ze", text.toString());
         assertEquals(2, calculateNumberPieces(text));
     }
+
+    public final void testDeleteBoundaries() {
+        final Text text;
+
+        text = new Text("Hello World");
+
+        text.delete(0, 6);
+        assertEquals("World", text.toString());
+        assertEquals(1, calculateNumberPieces(text));
+    }
+
+    public final void testDeleteAll() {}
 }

@@ -134,7 +134,7 @@ public class Text
     /**
      * Find the Piece containing offset, and split it into two. Handle the
      * boundary cases of an offset at a Piece boundary. Returns first of the
-     * two Pieces.
+     * two Pieces; or null if the offset co
      */
     /*
      * TODO Initial implementation of this is an ugly linear search; replace
@@ -238,7 +238,7 @@ public class Text
      * Text).
      */
     Piece concatonateFrom(int offset, int width) {
-        final Piece preceeding, one, two, following, splice;
+        final Piece preceeding, two, following, splice;
         Piece p;
         Chunk c;
         int i;
@@ -264,7 +264,6 @@ public class Text
          */
 
         preceeding = splitAt(offset);
-        one = preceeding.next;
 
         two = splitAt(offset + width);
         following = two.next;
@@ -275,7 +274,12 @@ public class Text
          */
 
         data = new char[width];
-        p = one;
+
+        if (preceeding != null) {
+            p = preceeding.next;
+        } else {
+            p = two;
+        }
         i = 0;
 
         while (p != following) {
@@ -298,8 +302,13 @@ public class Text
 
         splice = new Piece();
 
-        preceeding.next = splice;
-        splice.prev = preceeding;
+        if (preceeding == null) {
+            first = splice;
+        } else {
+            preceeding.next = splice;
+            splice.prev = preceeding;
+        }
+
         splice.chunk = extract;
         splice.next = following;
         following.prev = splice;
@@ -323,6 +332,11 @@ public class Text
 
         preceeding = splice.prev;
         following = splice.next;
+
+        if (offset == 0) {
+            first = following;
+            return;
+        }
 
         preceeding.next = following;
         following.prev = preceeding;
