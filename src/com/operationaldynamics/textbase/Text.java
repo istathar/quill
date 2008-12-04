@@ -228,11 +228,18 @@ public class Text
      * Allocate a new Chunk by concatonating any and all Chunks starting at
      * offset for width. While deleting, as such, does not require this,
      * undo/redo does.
+     * 
+     * This will operate on the Text, doing a splits at each end. That isn't
+     * strictly necessary, except that the reason you're usually calling this
+     * is to delete, so the boundaries are a good first step, and it makes the
+     * algorithm here far simpler.
      */
     Chunk concatonateFrom(int offset, int width) {
-        int start, next, index, todo, frag;
-        int i, delta;
-        char[] target;
+        final Piece preceeding, one, two, following;
+        Piece p;
+        Chunk c;
+        int i;
+        char[] data;
 
         if (offset < 0) {
             throw new IllegalArgumentException();
@@ -242,67 +249,40 @@ public class Text
         }
 
         /*
-         * Find the Chunk containing the start point of the range we want to
+         * TODO guard the other end, ie test for conditions
+         * IndexOutOfBoundsException("offset too high") and
+         * IndexOutOfBoundsException("width greater than available text")
+         */
+
+        /*
+         * Find the Piece containing the start point of the range we want to
          * isolate.
          */
 
-        start = 0;
-        next = 0;
-        i = 0;
-        delta = 0;
+        preceeding = splitAt(offset);
+        one = preceeding.next;
 
-        for (i = 0; i < chunks.length; i++) {
-            if (start == offset) {
-                delta = 0;
-                break;
-            }
-
-            next = chunks[i].width;
-
-            if (start + next > offset) {
-                delta = offset - start;
-                break;
-            }
-
-            start += next;
-        }
+        two = splitAt(offset + width);
+        following = two.next;
 
         /*
-         * Copy characters from this and subsequent Chunks into a char[]
+         * Copy characters from the Pieces in the middle into a char[]
          */
 
-        index = 0;
-        todo = width;
-        target = new char[width];
+        data = new char[width];
+        p = one;
+        i = 0;
 
-        while (todo > 0) {
-            if (i == chunks.length) {
-                throw new IndexOutOfBoundsException();
-            }
+        while (p != following) {
+            c = p.chunk;
 
-            // amount of to copy, which is all unless we're on first or last.
-            if (chunks[i].width > todo) {
-                frag = todo;
-            } else {
-                frag = chunks[i].width - delta;
-            }
+            System.arraycopy(c.text, c.start, data, i, c.width);
 
-            System.arraycopy(chunks[i].text, chunks[i].start + delta, target, index, frag);
-            index += frag;
-            todo -= frag;
-            delta = 0;
-            i++;
+            i += c.width;
+            p = p.next;
         }
 
-        if (todo == 0) {
-            return new Chunk(target);
-        }
-
-        if (index == 0) {
-            throw new IndexOutOfBoundsException("offset too high");
-        } else {
-            throw new IndexOutOfBoundsException("width greater than available text");
-        }
+        return new Chunk(data);
     }
 
     /**
