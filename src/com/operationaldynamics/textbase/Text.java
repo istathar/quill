@@ -275,10 +275,10 @@ public class Text
 
         data = new char[width];
 
-        if (preceeding != null) {
-            p = preceeding.next;
-        } else {
+        if (preceeding == null) {
             p = two;
+        } else {
+            p = preceeding.next;
         }
         i = 0;
 
@@ -335,12 +335,26 @@ public class Text
         preceeding = splice.prev;
         following = splice.next;
 
+        /*
+         * There are a number of corner cases here, the most notable being
+         * what happens if you delete from the beginning (in which case you
+         * need to change the firt pointer), and the very special case of
+         * deleting everything (in which case we put in an "empty" Piece with
+         * a zero length Chunk).
+         */
         if (offset == 0) {
-            first = following;
-            return;
+            if (following == null) {
+                first = new Piece();
+                first.chunk = new Chunk(splice.chunk, 0, 0);
+            } else {
+                following.prev = null;
+                first = following;
+            }
+        } else {
+            preceeding.next = following;
+            if (following != null) {
+                following.prev = preceeding;
+            }
         }
-
-        preceeding.next = following;
-        following.prev = preceeding;
     }
 }

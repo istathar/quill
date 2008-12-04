@@ -283,6 +283,10 @@ public class ValidateText extends TestCase
         text.delete(0, 6);
         assertEquals("World", text.toString());
         assertEquals(1, calculateNumberPieces(text));
+
+        text.delete(3, 2);
+        assertEquals("Wor", text.toString());
+        assertEquals(1, calculateNumberPieces(text));
     }
 
     public final void testDeleteAll() {
@@ -292,6 +296,6 @@ public class ValidateText extends TestCase
 
         text.delete(0, 5);
         assertEquals("", text.toString());
-        assertEquals(0, calculateNumberPieces(text));
+        assertEquals(1, calculateNumberPieces(text));
     }
 }
