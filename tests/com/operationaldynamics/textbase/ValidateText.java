@@ -285,5 +285,13 @@ public class ValidateText extends TestCase
         assertEquals(1, calculateNumberPieces(text));
     }
 
-    public final void testDeleteAll() {}
+    public final void testDeleteAll() {
+        final Text text;
+
+        text = new Text("Magic");
+
+        text.delete(0, 5);
+        assertEquals("", text.toString());
+        assertEquals(0, calculateNumberPieces(text));
+    }
 }

@@ -54,7 +54,7 @@ public class Text
         final StringBuilder str;
         Piece piece;
 
-        str = new StringBuilder();
+        str = new StringBuilder("");
         piece = first;
 
         while (piece != null) {
@@ -301,6 +301,7 @@ public class Text
          */
 
         splice = new Piece();
+        splice.chunk = extract;
 
         if (preceeding == null) {
             first = splice;
@@ -309,9 +310,10 @@ public class Text
             splice.prev = preceeding;
         }
 
-        splice.chunk = extract;
-        splice.next = following;
-        following.prev = splice;
+        if (following != null) {
+            splice.next = following;
+            following.prev = splice;
+        }
 
         return splice;
     }
