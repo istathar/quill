@@ -155,7 +155,7 @@ public class Text
              */
 
             if (start == offset) {
-                return piece;
+                return last;
             }
 
             /*

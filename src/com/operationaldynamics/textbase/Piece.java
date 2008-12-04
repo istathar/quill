@@ -29,4 +29,29 @@ class Piece
     Piece() {
 
     }
+
+    /**
+     * For debugging, only!
+     */
+    public String toString() {
+        StringBuilder str;
+        Piece p;
+        int i;
+
+        str = new StringBuilder();
+
+        p = this;
+        i = 0;
+        while (p != null) {
+            p = p.prev;
+            i++;
+        }
+
+        str.append("«");
+        str.append(chunk.toString());
+        str.append("» at ");
+        str.append(i);
+
+        return str.toString();
+    }
 }

@@ -58,7 +58,7 @@ public class ValidateText extends TestCase
 
     public final void testSplittingAtPoint() {
         final Text text;
-        final Chunk initial, addition;
+        final Chunk initial;
         final Piece one, two;
 
         initial = new Chunk("Concave");
@@ -75,6 +75,36 @@ public class ValidateText extends TestCase
 
         two = one.next;
         assertEquals("cave", two.chunk.toString());
+        assertNull(two.next);
+        assertEquals(one, two.prev);
+    }
+
+    public final void testSplittingAtPieceBoundary() {
+        final Text text;
+        final Chunk a, b;
+        final Piece first, one, two;
+
+        a = new Chunk("Alpha");
+        b = new Chunk("Bravo");
+
+        text = new Text(a);
+        text.append(b);
+        assertEquals("AlphaBravo", text.toString());
+
+        assertNull(text.first.prev);
+        assertNull(text.first.next.next);
+
+        first = text.first;
+        one = text.splitAt(5);
+        assertEquals("AlphaBravo", text.toString());
+
+        assertSame(first, one);
+        assertNotNull(one.next);
+        assertNotSame(one, one.next);
+        assertEquals("Alpha", one.chunk.toString());
+
+        two = one.next;
+        assertEquals("Bravo", two.chunk.toString());
         assertNull(two.next);
         assertEquals(one, two.prev);
     }
@@ -159,13 +189,13 @@ public class ValidateText extends TestCase
 
         assertEquals("OneTwoThree", text.toString());
 
-        text.insertAt(0, zero);
+        text.insert(0, zero);
         assertEquals("ZeroOneTwoThree", text.toString());
 
-        text.insertAt(4, zero);
+        text.insert(15, zero);
         assertEquals("ZeroOneTwoThreeZero", text.toString());
 
-        text.insertAt(2, zero);
+        text.insert(7, zero);
         assertEquals("ZeroOneZeroTwoThreeZero", text.toString());
     }
 
