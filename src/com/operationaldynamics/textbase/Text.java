@@ -380,6 +380,17 @@ public class Text
         Chunk c;
         int i;
 
+        /*
+         * We have to go to some trouble to ensure the caller doesn't try to
+         * use the most significant bit, since that's the signedness
+         * indicator.
+         */
+        if ((format < 0) && (format < -0x7F)) {
+            throw new IllegalArgumentException();
+        } else if (format > 0x7F) {
+            throw new IllegalArgumentException();
+        }
+
         splice = concatonateFrom(offset, width);
 
         c = splice.chunk;

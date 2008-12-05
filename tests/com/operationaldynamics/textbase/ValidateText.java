@@ -495,16 +495,55 @@ public class ValidateText extends TestCase
         text = new Text(chunk);
         assertEquals("Yo!", text.toString());
 
+        /*
+         * Should have no effect
+         */
+
         text.format(0, 3, (byte) -0x02);
 
         for (int i = 0; i < 3; i++) {
             assertEquals(0x00, text.first.chunk.markup[i]);
         }
 
+        /*
+         * Should again have no effect
+         */
+
         text.format(0, 3, (byte) -0x0F);
 
         for (int i = 0; i < 3; i++) {
             assertEquals(0x00, text.first.chunk.markup[i]);
+        }
+    }
+
+    public final void testAllowedFormatBits() {
+        final Text text;
+
+        text = new Text("Arnold");
+
+        text.format(2, 3, (byte) 0x7F);
+        text.format(2, 3, (byte) -0x7F);
+
+        try {
+            text.format(2, 3, (byte) 0x80);
+            fail();
+        } catch (IllegalArgumentException iae) {
+            // good
+        }
+
+        try {
+            text.format(2, 3, (byte) -0x80);
+            fail();
+        } catch (IllegalArgumentException iae) {
+            // good
+        }
+
+        text.format(1, 4, (byte) (1 << 6));
+        try {
+            text.format(0, 5, (byte) (1 << 7));
+            fail();
+        } catch (IllegalArgumentException iae) {
+            // good
         }
     }
 }
