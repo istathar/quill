@@ -371,6 +371,10 @@ public class Text
         }
     }
 
+    /**
+     * If format is negative, the formats it refers to will be removed instead
+     * of applied.
+     */
     public void format(int offset, int width, byte format) {
         final Piece splice;
         Chunk c;
@@ -385,8 +389,15 @@ public class Text
             splice.chunk = c;
         }
 
-        for (i = c.start; i < c.start + c.width; i++) {
-            c.markup[i] |= format;
+        if (format >= 0) {
+            for (i = c.start; i < c.start + c.width; i++) {
+                c.markup[i] |= format;
+            }
+        } else {
+            format = (byte) -format;
+            for (i = c.start; i < c.start + c.width; i++) {
+                c.markup[i] &= c.markup[i] ^ format;
+            }
         }
     }
 }

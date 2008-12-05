@@ -55,4 +55,20 @@ public class ValidateChunks extends TestCase
         assertEquals(3, fourth.width);
         assertEquals("sys", fourth.toString());
     }
+
+    public void testChunkFromArray() {
+        final char[] data;
+        final byte[] markup;
+        Chunk chunk;
+
+        data = new char[] {
+                'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd'
+        };
+        markup = new byte[] {
+                0x0E, 0x0E, 0x0E, 0x0E, 0x0E, 0x04, 0x05, 0x05, 0x05, 0x05, 0x05
+        };
+        chunk = new Chunk(data, markup);
+        assertEquals("Hello World", chunk.toString());
+        assertNotNull(chunk.markup);
+    }
 }

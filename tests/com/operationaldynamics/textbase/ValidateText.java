@@ -369,7 +369,7 @@ public class ValidateText extends TestCase
     public void testApplyFormatting() {
         final Text text;
         Piece p;
-        byte[] target;
+        final byte[] target;
 
         text = new Text("Hello World");
 
@@ -378,29 +378,29 @@ public class ValidateText extends TestCase
          * will have the format, the second will not.
          */
 
-        text.format(0, 5, (byte) 0xA);
+        text.format(0, 5, (byte) 0x0A);
 
         assertEquals(2, calculateNumberPieces(text));
         p = text.first;
-        assertEquals(0xA, currentFormat(p));
+        assertEquals(0x0A, currentFormat(p));
         p = p.next;
-        assertEquals(0x0, currentFormat(p));
+        assertEquals(0x00, currentFormat(p));
         assertEquals("Hello World", text.toString());
 
         /*
          * Format second word
          */
 
-        text.format(6, 5, (byte) 0x1);
+        text.format(6, 5, (byte) 0x01);
 
         assertEquals(3, calculateNumberPieces(text));
         p = text.first;
-        assertEquals(0xA, currentFormat(p));
+        assertEquals(0x0A, currentFormat(p));
         p = p.next;
-        assertEquals(0x0, currentFormat(p));
+        assertEquals(0x00, currentFormat(p));
         assertEquals(" ", p.chunk.toString());
         p = p.next;
-        assertEquals(0x1, currentFormat(p));
+        assertEquals(0x01, currentFormat(p));
         assertEquals("World", p.chunk.toString());
         assertNull(p.next);
         assertEquals("Hello World", text.toString());
@@ -409,15 +409,102 @@ public class ValidateText extends TestCase
          * Now do something across entire text
          */
 
-        text.format(0, 11, (byte) 0x4);
+        text.format(0, 11, (byte) 0x04);
 
         assertEquals(1, calculateNumberPieces(text));
         target = new byte[] {
-                0xE, 0xE, 0xE, 0xE, 0xE, 0x4, 0x5, 0x5, 0x5, 0x5, 0x5
+                0x0E, 0x0E, 0x0E, 0x0E, 0x0E, 0x04, 0x05, 0x05, 0x05, 0x05, 0x05
         };
         for (int i = 0; i < 11; i++) {
             assertEquals(target[i], text.first.chunk.markup[i]);
         }
         assertEquals("Hello World", text.toString());
+    }
+
+    public void testRemovingBits() {
+        assertEquals(0xf000, (0xfff0 & 0xf000));
+        assertEquals(0xfff0, (0x0ff0 | 0xf000));
+        assertEquals(0xf0f0, (0xfff0 & 0xf0f0));
+        assertEquals(0xf0f0, (0xfff0 & (0xfff0 ^ 0x0f00)));
+        assertEquals(0xfff0, (0xfff0 & (0xfff0 ^ 0x0000)));
+    }
+
+    public void testRemovingFormatting() {
+        final char[] data;
+        final byte[] markup, target;
+        final Chunk chunk;
+        final Text text;
+
+        data = new char[] {
+                'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd'
+        };
+        markup = new byte[] {
+                0x0E, 0x0E, 0x0E, 0x0E, 0x0E, 0x04, 0x05, 0x07, 0x07, 0x02, 0x07
+        };
+        target = new byte[] {
+                0x0C, 0x0C, 0x0C, 0x0C, 0x0C, 0x04, 0x05, 0x05, 0x05, 0x00, 0x05
+        };
+
+        chunk = new Chunk(data, markup);
+        text = new Text(chunk);
+        assertEquals("Hello World", text.toString());
+
+        text.format(0, 11, (byte) -0x02);
+
+        for (int i = 0; i < 11; i++) {
+            assertEquals(target[i], text.first.chunk.markup[i]);
+        }
+    }
+
+    public void testNullShortcut() {
+        final char[] data;
+        final Chunk chunk;
+        final Text text;
+
+        data = new char[] {
+                'H', 'i', '?'
+        };
+
+        chunk = new Chunk(data, null);
+        text = new Text(chunk);
+        assertEquals("Hi?", text.toString());
+
+        text.format(0, 3, (byte) 0x02);
+
+        for (int i = 0; i < 3; i++) {
+            assertEquals(0x02, text.first.chunk.markup[i]);
+        }
+
+        text.format(0, 3, (byte) -0x02);
+
+        for (int i = 0; i < 3; i++) {
+            assertEquals(0x00, text.first.chunk.markup[i]);
+        }
+    }
+
+    public void testRemovingFormatFromZero() {
+        final char[] data;
+        final Chunk chunk;
+        final Text text;
+
+        data = new char[] {
+                'Y', 'o', '!'
+        };
+
+        chunk = new Chunk(data, null);
+        text = new Text(chunk);
+        assertEquals("Yo!", text.toString());
+
+        text.format(0, 3, (byte) -0x02);
+
+        for (int i = 0; i < 3; i++) {
+            assertEquals(0x00, text.first.chunk.markup[i]);
+        }
+
+        text.format(0, 3, (byte) -0x0F);
+
+        for (int i = 0; i < 3; i++) {
+            assertEquals(0x00, text.first.chunk.markup[i]);
+        }
     }
 }
