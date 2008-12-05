@@ -196,7 +196,7 @@ public class Text
      * a new Piece before and after, and a Piece wrapping the Chunk and linked
      * between them. This is the workhorse of this class.
      */
-    public void insert(int offset, Chunk addition) {
+    void insert(int offset, Chunk addition) {
         Piece one, two, piece;
 
         if (offset < 0) {
@@ -243,6 +243,7 @@ public class Text
         Chunk c;
         int i;
         char[] data;
+        byte[] markup;
         final Chunk extract;
 
         if (offset < 0) {
@@ -274,9 +275,14 @@ public class Text
          */
 
         data = new char[width];
+        markup = null;
 
         if (preceeding == null) {
-            p = two;
+            if (following == null) {
+                p = first;
+            } else {
+                p = two;
+            }
         } else {
             p = preceeding.next;
         }
@@ -287,11 +293,18 @@ public class Text
 
             System.arraycopy(c.text, c.start, data, i, c.width);
 
+            if (c.markup != null) {
+                if (markup == null) {
+                    markup = new byte[width];
+                }
+                System.arraycopy(c.markup, c.start, markup, i, c.width);
+            }
+
             i += c.width;
             p = p.next;
         }
 
-        extract = new Chunk(data);
+        extract = new Chunk(data, markup);
 
         /*
          * Now embed this extract into a Piece and splice that into the Text.
@@ -355,6 +368,25 @@ public class Text
             if (following != null) {
                 following.prev = preceeding;
             }
+        }
+    }
+
+    public void format(int offset, int width, byte format) {
+        final Piece splice;
+        Chunk c;
+        int i;
+
+        splice = concatonateFrom(offset, width);
+
+        c = splice.chunk;
+
+        if (c.markup == null) {
+            c = new Chunk(c.text, new byte[c.text.length]);
+            splice.chunk = c;
+        }
+
+        for (i = c.start; i < c.start + c.width; i++) {
+            c.markup[i] |= format;
         }
     }
 }

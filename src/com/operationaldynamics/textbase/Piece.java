@@ -24,11 +24,7 @@ class Piece
 
     Piece next;
 
-    transient int offset;
-
-    Piece() {
-
-    }
+    Piece() {}
 
     /**
      * For debugging, only!

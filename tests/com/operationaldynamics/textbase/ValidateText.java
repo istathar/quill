@@ -249,6 +249,30 @@ public class ValidateText extends TestCase
         assertEquals("roOneTwoThr", result.toString());
     }
 
+    public final void testConcatonateAll() {
+        final Text text;
+        final Chunk zero, one, two, result;
+        final Piece splice;
+
+        zero = new Chunk("James");
+        one = new Chunk(" T. ");
+        two = new Chunk("Kirk");
+
+        text = new Text(zero);
+        text.append(one);
+        text.append(two);
+
+        assertEquals("James T. Kirk", text.toString());
+
+        splice = text.concatonateFrom(0, 13);
+
+        assertEquals("James T. Kirk", text.toString());
+        result = splice.chunk;
+        assertEquals(0, result.start);
+        assertEquals(13, result.width);
+        assertEquals("James T. Kirk", result.toString());
+    }
+
     public final void testDeleteRange() {
         final Text text;
         final Chunk zero, one, two, three;
@@ -333,5 +357,67 @@ public class ValidateText extends TestCase
         assertEquals("Magic", text.toString());
         assertEquals(2, calculateNumberPieces(text));
         // is ok
+    }
+
+    private static byte currentFormat(Piece p) {
+        if (p.chunk.markup == null) {
+            return 0;
+        }
+        return p.chunk.markup[0];
+    }
+
+    public void testApplyFormatting() {
+        final Text text;
+        Piece p;
+        byte[] target;
+
+        text = new Text("Hello World");
+
+        /*
+         * Call format() on the first word. This will splice; the first Piece
+         * will have the format, the second will not.
+         */
+
+        text.format(0, 5, (byte) 0xA);
+
+        assertEquals(2, calculateNumberPieces(text));
+        p = text.first;
+        assertEquals(0xA, currentFormat(p));
+        p = p.next;
+        assertEquals(0x0, currentFormat(p));
+        assertEquals("Hello World", text.toString());
+
+        /*
+         * Format second word
+         */
+
+        text.format(6, 5, (byte) 0x1);
+
+        assertEquals(3, calculateNumberPieces(text));
+        p = text.first;
+        assertEquals(0xA, currentFormat(p));
+        p = p.next;
+        assertEquals(0x0, currentFormat(p));
+        assertEquals(" ", p.chunk.toString());
+        p = p.next;
+        assertEquals(0x1, currentFormat(p));
+        assertEquals("World", p.chunk.toString());
+        assertNull(p.next);
+        assertEquals("Hello World", text.toString());
+
+        /*
+         * Now do something across entire text
+         */
+
+        text.format(0, 11, (byte) 0x4);
+
+        assertEquals(1, calculateNumberPieces(text));
+        target = new byte[] {
+                0xE, 0xE, 0xE, 0xE, 0xE, 0x4, 0x5, 0x5, 0x5, 0x5, 0x5
+        };
+        for (int i = 0; i < 11; i++) {
+            assertEquals(target[i], text.first.chunk.markup[i]);
+        }
+        assertEquals("Hello World", text.toString());
     }
 }
