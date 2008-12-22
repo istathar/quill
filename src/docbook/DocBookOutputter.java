@@ -1,5 +1,5 @@
 /*
- * FOOutputter.java
+ * DocBookOutputter.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -61,8 +61,8 @@ class DocBookOutputter
     /*
      * TODO this does not deal with element or attribute namespaces. XOM is
      * perfectly capable of representing this information, but at present our
-     * XHTML binding does not permit adding elements with foreign namespaces,
-     * so we just ignore that aspect of things for the time being.
+     * DocBook binding does not support adding elements with foreign
+     * namespaces, so we just ignore that aspect of things for the time being.
      */
     private void write(Node node) {
         DocBookElement element = null;

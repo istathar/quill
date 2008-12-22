@@ -62,8 +62,7 @@ public class Document
     }
 
     /**
-     * Render this web page as XHTML. The byte[] is UTF-8 encoded and ready
-     * for response over the internet.
+     * Render this document as DocBook XML.
      */
     public byte[] toXML() {
         final DocBookOutputter outputter;
