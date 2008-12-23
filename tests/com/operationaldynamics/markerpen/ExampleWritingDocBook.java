@@ -38,12 +38,24 @@ public class ExampleWritingDocBook
         para = new Paragraph("In the beginning...");
         section.add(para);
 
-        para = new Paragraph("And then we had a ");
+        para = new Paragraph("And then we indeed had a very ");
         para.add(new Italics("yummy"));
-        para.add(" breakfast");
+        para.add(" delicious absolutely brilliant delightful breakfast.");
 
         section.add(para);
 
-        System.out.write(doc.toXML());
+        if (true) {
+            for (int i = 1; i <= 70; i++) {
+                System.err.print(i / 10);
+            }
+            System.err.println();
+            for (int i = 1; i <= 70; i++) {
+                System.err.print(i % 10);
+            }
+            System.err.println("\n");
+            System.err.flush();
+        }
+
+        doc.toXML(System.out);
     }
 }

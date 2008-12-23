@@ -75,5 +75,6 @@ public class Document
 
         s = new DocBookSerializer(out);
         s.write(xom);
+        s.flush();
     }
 }
