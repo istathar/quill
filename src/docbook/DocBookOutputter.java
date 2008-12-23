@@ -11,7 +11,6 @@
 package docbook;
 
 import nu.xom.Attribute;
-import nu.xom.DocType;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Node;
@@ -27,7 +26,7 @@ class DocBookOutputter
 {
     private StringBuilder buf;
 
-    private String xhtml;
+    private String docbook;
 
     DocBookOutputter() {
         buf = new StringBuilder(128);
@@ -36,23 +35,22 @@ class DocBookOutputter
     /*
      * In essence, this replaces Document's toXML(). We do the top level
      * manually because it is quite predictable [more to the point, fixed as
-     * to how it has to be according to the validators]. Yes, generic XML can
-     * have more crammed into it, but renderable XHTML doesn't.
+     * to how it has to be according to the validators].
      */
-    String writeAsXML(Document page) {
+    String writeAsXML(Document document) {
         final Element root;
-        final DocType DOCTYPE;
 
         buf.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         buf.append("\n");
 
-        root = page.getRootElement();
+        root = document.getRootElement();
 
         /*
          * Now start the recursive descent.
          */
 
-        xhtml = null;
+        docbook = null;
+
         write(root);
 
         return buf.toString();
@@ -116,28 +114,27 @@ class DocBookOutputter
 
         buf.append(e.getLocalName());
 
+        /*
+         * This takes care of writing the primary namespace declaration on the
+         * root tag. Otherwise, it's a foreign tag, so TODO
+         */
+
         xmlns = e.getNamespaceURI();
-        if (xmlns != xhtml) {
-            /*
-             * This takes care of writing the primary namespace declaration on
-             * the root tag.
-             */
-            if (xhtml == null) {
-                xhtml = xmlns;
+        if (xmlns != docbook) {
+            if (docbook == null) {
+                buf.append(" xmlns=\"");
+                buf.append(xmlns);
+                buf.append("\" version=\"5.0\"");
+
+                docbook = xmlns;
             }
-            buf.append(" xmlns=\"");
-            buf.append(xmlns);
-            buf.append("\" version=\"5.0\"");
         }
 
         num = e.getAttributeCount();
         for (i = 0; i < num; i++) {
             a = e.getAttribute(i);
             buf.append(" ");
-            buf.append(a.getLocalName());
-            buf.append("=\"");
-            buf.append(a.getValue());
-            buf.append("\"");
+            buf.append(a.toXML());
         }
     }
 
