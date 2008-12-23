@@ -1,5 +1,5 @@
 /*
- * Book.java
+ * BookDocument.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,9 +10,16 @@
  */
 package docbook;
 
-public class Book extends RootTag
+public class BookDocument extends Document
 {
-    public Book() {
+    public BookDocument() {
+        super(new Book());
+    }
+}
+
+class Book extends RootTag
+{
+    Book() {
         super("book");
     }
 }

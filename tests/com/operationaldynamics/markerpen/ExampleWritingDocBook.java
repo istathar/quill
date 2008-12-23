@@ -12,6 +12,7 @@ package com.operationaldynamics.markerpen;
 
 import java.io.IOException;
 
+import docbook.BookDocument;
 import docbook.Document;
 
 public class ExampleWritingDocBook
@@ -19,7 +20,8 @@ public class ExampleWritingDocBook
     public static void main(String[] args) throws IOException {
         final Document doc;
 
-        doc = new Document();
+        doc = new BookDocument();
+
         System.out.write(doc.toXML());
     }
 }

@@ -11,6 +11,7 @@
 package docbook;
 
 import nu.xom.Attribute;
+import nu.xom.DocType;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Node;
@@ -40,18 +41,29 @@ class DocBookOutputter
      */
     String writeAsXML(Document page) {
         final Element root;
+        final DocType DOCTYPE;
 
         buf.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         buf.append("\n");
 
-        buf.append(page.getDocType().toXML());
+        root = page.getRootElement();
+
+        /*
+         * Don't really need to bother adding this to the XOM tree, although
+         * if we revert to using XOM's outputters then move it back to
+         * Document. There's also the question of whether or not we actually
+         * need this; at DocBook 5.0 we don't.
+         */
+        DOCTYPE = new DocType(root.getLocalName(), "-//OASIS//DTD DocBook XML V4.5//EN",
+                "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd");
+
+        buf.append(DOCTYPE.toXML());
         buf.append("\n");
 
         /*
          * Now start the recursive descent.
          */
 
-        root = page.getRootElement();
         xhtml = null;
         write(root);
 

@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
-import nu.xom.DocType;
-
 /**
  * Base class for documents encoded in the <code>docbook</code> package.
  * Export it to XHTML XML using {@link #write(OutputStream) write()}.
@@ -36,28 +34,17 @@ public class Document
 
     private final RootTag root;
 
-    public Document() {
-        final DocType DOCTYPE;
+    protected Document(RootTag root) {
 
-        /*
-         * Can't use a static field otherwise we get a MulitpleParentException
-         * on the second page load. Pity.
-         */
-
-        DOCTYPE = new DocType("book", "-//OASIS//DTD DocBook XML V4.5//EN",
-                "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd");
+        xom = new nu.xom.Document(root.element);
 
         /*
          * Setup the structural tags.
          */
-
-        root = new Book();
-
-        xom = new nu.xom.Document(root.element);
-        xom.setDocType(DOCTYPE);
+        this.root = root;
     }
 
-    protected void addChapter(Chapter tag) {
+    public void addChapter(Chapter tag) {
         root.addChild(tag);
     }
 
