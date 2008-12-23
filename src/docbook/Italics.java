@@ -1,5 +1,5 @@
 /*
- * Paragraph.java
+ * Italics.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,22 +10,14 @@
  */
 package docbook;
 
-public class Paragraph extends Block
+public class Italics extends Inline
 {
-    public Paragraph() {
-        super("para");
+    public Italics() {
+        super("emphasis");
     }
 
-    public Paragraph(String str) {
-        super("para");
+    public Italics(String str) {
+        super("emphasis");
         super.addText(str);
-    }
-
-    public void add(String str) {
-        super.addText(str);
-    }
-
-    public void add(Inline tag) {
-        super.addChild(tag);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Paragraph.java
+ * Inline.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,22 +10,14 @@
  */
 package docbook;
 
-public class Paragraph extends Block
+/**
+ * Tags that are presented as spans within Blocks.
+ * 
+ * @author Andrew Cowie
+ */
+abstract class Inline extends DocBookTag
 {
-    public Paragraph() {
-        super("para");
-    }
-
-    public Paragraph(String str) {
-        super("para");
-        super.addText(str);
-    }
-
-    public void add(String str) {
-        super.addText(str);
-    }
-
-    public void add(Inline tag) {
-        super.addChild(tag);
+    Inline(String name) {
+        super(name);
     }
 }

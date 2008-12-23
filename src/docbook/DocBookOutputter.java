@@ -92,12 +92,9 @@ class DocBookOutputter
             } else {
                 writeStartTag(element);
             }
-            // if (tag instanceof StructureTag) {
-            buf.append("\n");
-            // }
-            // if (tag instanceof Division) {
-            // buf.append("\n\n");
-            // }
+            if (!(tag instanceof Inline)) {
+                buf.append("\n");
+            }
         } else if (node instanceof Text) {
             buf.append(node.toXML());
         } else {
@@ -115,15 +112,11 @@ class DocBookOutputter
 
             if (num != 0) {
                 writeEndTag(element);
-                buf.append("\n");
             }
 
-            // if (tag instanceof StructureTag) {
-            // buf.append("\n");
-            // }
-            // if (tag instanceof BlockTag) {
-            // buf.append("\n\n");
-            // }
+            if (!(tag instanceof Italics)) {
+                buf.append("\n");
+            }
         }
     }
 

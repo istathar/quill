@@ -15,6 +15,7 @@ import java.io.IOException;
 import docbook.BookDocument;
 import docbook.Chapter;
 import docbook.Document;
+import docbook.Italics;
 import docbook.Paragraph;
 import docbook.Section;
 
@@ -37,7 +38,10 @@ public class ExampleWritingDocBook
         para = new Paragraph("In the beginning...");
         section.add(para);
 
-        para = new Paragraph("What? Are you still here?");
+        para = new Paragraph("And then we had a ");
+        para.add(new Italics("yummy"));
+        para.add(" breakfast");
+
         section.add(para);
 
         System.out.write(doc.toXML());
