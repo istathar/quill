@@ -48,6 +48,8 @@ public class Document
         /*
          * Setup the structural tags.
          */
+        root.setAttribute("version", "5.0");
+
         this.root = root;
     }
 

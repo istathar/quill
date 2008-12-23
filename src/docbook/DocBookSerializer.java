@@ -15,7 +15,6 @@ import java.io.OutputStream;
 
 import nu.xom.Element;
 import nu.xom.Serializer;
-import nu.xom.Text;
 
 /**
  * Render a document as valid DocBook XML, with slight formatting applied when
@@ -28,7 +27,7 @@ class DocBookSerializer extends Serializer
     DocBookSerializer(OutputStream out) {
         super(out);
         super.setLineSeparator("\n");
-        super.setMaxLength(60);
+        super.setMaxLength(50);
     }
 
     protected void writeStartTag(Element e) throws IOException {
@@ -83,10 +82,6 @@ class DocBookSerializer extends Serializer
         } else {
             return i;
         }
-    }
-
-    protected void write(Text t) throws IOException {
-        super.write(t);
     }
 
     protected void writeEndTag(Element e) throws IOException {

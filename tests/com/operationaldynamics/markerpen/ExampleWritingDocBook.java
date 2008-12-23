@@ -23,17 +23,17 @@ public class ExampleWritingDocBook
 {
     public static void main(String[] args) throws IOException {
         final Document doc;
-        final Chapter one;
+        final Chapter chapter;
         Section section;
         Paragraph para;
 
         doc = new BookDocument();
 
-        one = new Chapter("Chapter 1");
-        doc.add(one);
+        chapter = new Chapter("Chapter 1");
+        doc.add(chapter);
 
         section = new Section("Start");
-        one.add(section);
+        chapter.add(section);
 
         para = new Paragraph("In the beginning...");
         section.add(para);
@@ -41,7 +41,6 @@ public class ExampleWritingDocBook
         para = new Paragraph("And then we indeed had a very ");
         para.add(new Italics("yummy"));
         para.add(" delicious absolutely brilliant delightful breakfast.");
-
         section.add(para);
 
         if (true) {
