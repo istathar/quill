@@ -49,18 +49,6 @@ class DocBookOutputter
         root = page.getRootElement();
 
         /*
-         * Don't really need to bother adding this to the XOM tree, although
-         * if we revert to using XOM's outputters then move it back to
-         * Document. There's also the question of whether or not we actually
-         * need this; at DocBook 5.0 we don't.
-         */
-        DOCTYPE = new DocType(root.getLocalName(), "-//OASIS//DTD DocBook XML V4.5//EN",
-                "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd");
-
-        buf.append(DOCTYPE.toXML());
-        buf.append("\n");
-
-        /*
          * Now start the recursive descent.
          */
 
@@ -139,7 +127,7 @@ class DocBookOutputter
             }
             buf.append(" xmlns=\"");
             buf.append(xmlns);
-            buf.append("\"");
+            buf.append("\" version=\"5.0\"");
         }
 
         num = e.getAttributeCount();
