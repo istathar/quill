@@ -1,5 +1,5 @@
 /*
- * Italics.java
+ * Bold.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -11,17 +11,18 @@
 package docbook;
 
 /**
- * Emphasis to be given italic formatting.
+ * Emphasis to be given bold formatting.
  * 
  * @author Andrew Cowie
  */
-public class Italics extends Inline
+public class Bold extends Inline
 {
-    public Italics() {
+    public Bold() {
         super("emphasis");
+        super.setAttribute("role", "bold");
     }
 
-    public Italics(String str) {
+    public Bold(String str) {
         this();
         super.addText(str);
     }
