@@ -1,5 +1,5 @@
 /*
- * RootTag.java
+ * ComponentTag.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,9 +10,12 @@
  */
 package docbook;
 
-abstract class RootTag extends DocBookTag
+/**
+ * Components are the chapter-like elements.
+ */
+abstract class Component extends DocBookTag
 {
-    RootTag(String name) {
+    Component(String name) {
         super(name);
     }
 }

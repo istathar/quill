@@ -15,17 +15,30 @@ import java.io.IOException;
 import docbook.BookDocument;
 import docbook.Chapter;
 import docbook.Document;
+import docbook.Paragraph;
+import docbook.Section;
 
 public class ExampleWritingDocBook
 {
     public static void main(String[] args) throws IOException {
         final Document doc;
         final Chapter one;
+        Section section;
+        Paragraph para;
 
         doc = new BookDocument();
 
         one = new Chapter("Chapter 1");
-        doc.addChapter(one);
+        doc.add(one);
+
+        section = new Section("Start");
+        one.add(section);
+
+        para = new Paragraph("In the beginning...");
+        section.add(para);
+
+        para = new Paragraph("What? Are you still here?");
+        section.add(para);
 
         System.out.write(doc.toXML());
     }

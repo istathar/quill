@@ -1,5 +1,5 @@
 /*
- * Paragraph.java
+ * BlockTag.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,14 +10,14 @@
  */
 package docbook;
 
-public class Paragraph extends Block
+/**
+ * Base class of tags that comprise the content of the document.
+ * 
+ * @author Andrew Cowie
+ */
+abstract class Block extends DocBookTag
 {
-    public Paragraph() {
-        super("para");
-    }
-
-    public Paragraph(String str) {
-        super("para");
-        super.addText(str);
+    Block(String name) {
+        super(name);
     }
 }

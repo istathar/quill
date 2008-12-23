@@ -1,5 +1,5 @@
 /*
- * Paragraph.java
+ * Section.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,14 +10,23 @@
  */
 package docbook;
 
-public class Paragraph extends Block
+/**
+ * Sections pack into Chapters.
+ * 
+ * @author Andrew Cowie
+ */
+public class Section extends Division
 {
-    public Paragraph() {
-        super("para");
+    public Section() {
+        super("section");
     }
 
-    public Paragraph(String str) {
-        super("para");
-        super.addText(str);
+    public Section(String title) {
+        super("section");
+        super.addChild(new Title(title));
+    }
+
+    public void add(Paragraph para) {
+        super.addChild(para);
     }
 }

@@ -109,7 +109,7 @@ class DocBookOutputter
         }
 
         if (node instanceof DocBookElement) {
-            if (tag instanceof BlockTag) {
+            if (tag instanceof Block) {
                 buf.append("\n");
             }
 
@@ -124,7 +124,6 @@ class DocBookOutputter
             // if (tag instanceof BlockTag) {
             // buf.append("\n\n");
             // }
-
         }
     }
 

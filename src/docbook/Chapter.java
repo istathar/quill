@@ -10,7 +10,7 @@
  */
 package docbook;
 
-public class Chapter extends DocBookTag
+public class Chapter extends Component
 {
     public Chapter() {
         super("chapter");
@@ -18,6 +18,10 @@ public class Chapter extends DocBookTag
 
     public Chapter(String title) {
         super("chapter");
-        this.addChild(new Title(title));
+        super.addChild(new Title(title));
+    }
+
+    public void add(Division section) {
+        super.addChild(section);
     }
 }

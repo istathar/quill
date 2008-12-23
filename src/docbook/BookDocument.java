@@ -17,7 +17,7 @@ public class BookDocument extends Document
     }
 }
 
-class Book extends RootTag
+class Book extends DocBookTag
 {
     Book() {
         super("book");

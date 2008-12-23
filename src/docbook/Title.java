@@ -10,7 +10,7 @@
  */
 package docbook;
 
-public class Title extends BlockTag
+public class Title extends Block
 {
     public Title() {
         super("title");

@@ -1,5 +1,5 @@
 /*
- * BlockTag.java
+ * SubdivisionTag.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -11,13 +11,18 @@
 package docbook;
 
 /**
- * Base class of tags that comprise the content of the document.
+ * The grouping level below Component and above Block. This is what Sections
+ * belong to.
  * 
  * @author Andrew Cowie
  */
-abstract class BlockTag extends DocBookTag
+/*
+ * The documentation sometimes refers to this as "element", but Element is
+ * already horribly over used, so we'll use this as something out of the way.
+ */
+abstract class Division extends DocBookTag
 {
-    BlockTag(String name) {
+    public Division(String name) {
         super(name);
     }
 }

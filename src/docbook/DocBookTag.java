@@ -14,9 +14,9 @@ import nu.xom.Attribute;
 import nu.xom.Element;
 
 /**
- * Internal root class for all FO tags. This is a wrapper around the
+ * Internal root class for all DocBook tags. This is a wrapper around the
  * delelgation to the XOM Element class that is used internally to build the
- * XML form of the formatting objects.
+ * XML when it's time to write to disk.
  * 
  * @author Andrew Cowie
  */

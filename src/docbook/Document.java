@@ -32,9 +32,14 @@ public class Document
 
     private final nu.xom.Document xom;
 
-    private final RootTag root;
+    private final DocBookTag root;
 
-    protected Document(RootTag root) {
+    /**
+     * Though strictly the top of DocBook is <code>&lt;book&gt;</code>, you
+     * can also start from <code>&lt;article&gt;</code> and a number of other
+     * places.
+     */
+    protected Document(DocBookTag root) {
 
         xom = new nu.xom.Document(root.element);
 
@@ -44,7 +49,7 @@ public class Document
         this.root = root;
     }
 
-    public void addChapter(Chapter tag) {
+    public void add(Component tag) {
         root.addChild(tag);
     }
 

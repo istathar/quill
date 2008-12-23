@@ -17,7 +17,12 @@ public class ArticleDocument extends Document
     }
 }
 
-class Article extends RootTag
+/*
+ * This could possibly be made public as it is indeed a peer of <component>,
+ * although why you'd be packing a series of articles into a <book> I don't
+ * know.
+ */
+class Article extends Component
 {
     Article() {
         super("article");
