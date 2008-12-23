@@ -13,14 +13,19 @@ package com.operationaldynamics.markerpen;
 import java.io.IOException;
 
 import docbook.BookDocument;
+import docbook.Chapter;
 import docbook.Document;
 
 public class ExampleWritingDocBook
 {
     public static void main(String[] args) throws IOException {
         final Document doc;
+        final Chapter one;
 
         doc = new BookDocument();
+
+        one = new Chapter("Chapter 1");
+        doc.addChapter(one);
 
         System.out.write(doc.toXML());
     }

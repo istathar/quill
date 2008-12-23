@@ -1,5 +1,5 @@
 /*
- * Chapter.java
+ * Title.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,14 +10,14 @@
  */
 package docbook;
 
-public class Chapter extends DocBookTag
+public class Title extends BlockTag
 {
-    public Chapter() {
-        super("chapter");
+    public Title() {
+        super("title");
     }
 
-    public Chapter(String title) {
-        super("chapter");
-        this.addChild(new Title(title));
+    public Title(String title) {
+        super("title");
+        super.addText(title);
     }
 }

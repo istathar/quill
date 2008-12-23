@@ -109,7 +109,7 @@ class DocBookOutputter
         }
 
         if (node instanceof DocBookElement) {
-            if (tag instanceof Paragraph) {
+            if (tag instanceof BlockTag) {
                 buf.append("\n");
             }
 
