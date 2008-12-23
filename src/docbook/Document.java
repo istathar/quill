@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
+import nu.xom.Serializer;
+
 /**
  * Base class for documents encoded in the <code>docbook</code> package.
  * Export it to XHTML XML using {@link #write(OutputStream) write()}.
@@ -53,19 +55,6 @@ public class Document
         root.addChild(tag);
     }
 
-    /**
-     * Render this document as DocBook XML.
-     */
-    public byte[] toXML() {
-        final DocBookOutputter outputter;
-        final String result;
-
-        outputter = new DocBookOutputter();
-        result = outputter.writeAsXML(xom);
-
-        return result.getBytes(UTF8);
-    }
-
     /*
      * For debugging
      */
@@ -74,10 +63,17 @@ public class Document
 
         try {
             out = new FileOutputStream(filename);
-            out.write(toXML());
+            toXML(out);
             out.close();
         } catch (FileNotFoundException fnfe) {
             fnfe.printStackTrace();
         }
+    }
+
+    public void toXML(OutputStream out) throws IOException {
+        final Serializer s;
+
+        s = new DocBookSerializer(out);
+        s.write(xom);
     }
 }
