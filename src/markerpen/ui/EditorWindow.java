@@ -8,7 +8,7 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package markerpen;
+package markerpen.ui;
 
 import java.util.HashSet;
 
@@ -38,7 +38,8 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.WrapMode;
 
-import static markerpen.Format.hidden;
+import static markerpen.ui.Format.hidden;
+
 
 
 

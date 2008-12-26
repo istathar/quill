@@ -23,10 +23,11 @@ import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
 import org.gnome.gtk.TextTag;
 
-import static markerpen.Format.bold;
-import static markerpen.Format.hidden;
-import static markerpen.Format.italics;
-import static markerpen.Format.mono;
+import static markerpen.ui.Format.bold;
+import static markerpen.ui.Format.hidden;
+import static markerpen.ui.Format.italics;
+import static markerpen.ui.Format.mono;
+
 
 import static org.gnome.gtk.TextMark.LEFT;
 
