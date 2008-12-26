@@ -14,7 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 
 import nu.xom.Serializer;
 
@@ -26,12 +25,6 @@ import nu.xom.Serializer;
  */
 public class Document
 {
-    private static Charset UTF8;
-
-    static {
-        UTF8 = Charset.forName("UTF-8");
-    }
-
     private final nu.xom.Document xom;
 
     private final DocBookTag root;

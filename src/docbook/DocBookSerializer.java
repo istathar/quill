@@ -1,5 +1,5 @@
 /*
- * DocBookOutputter.java
+ * DocBookSerializer.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -21,6 +21,10 @@ import nu.xom.Serializer;
  * outputting.
  * 
  * @author Andrew Cowie
+ */
+/*
+ * FIXME 50 is a convenient width for debugging, but we will of course set it
+ * to 78 for production use.
  */
 class DocBookSerializer extends Serializer
 {
