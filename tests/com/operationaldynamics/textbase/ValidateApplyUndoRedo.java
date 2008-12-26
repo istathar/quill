@@ -30,15 +30,15 @@ public class ValidateApplyUndoRedo extends TestCase
 
         text = new TextStack();
 
-        change = new Insertion(0, "Hello World");
+        change = new InsertChange(0, "Hello World");
         text.apply(change);
         assertEquals("Hello World", text.toString());
 
-        change = new Deletion(5, 6);
+        change = new DeleteChange(5, 6);
         text.apply(change);
         assertEquals("Hello", text.toString());
 
-        change = new Deletion(1, 3);
+        change = new DeleteChange(1, 3);
         text.apply(change);
         assertEquals("Ho", text.toString());
 
@@ -71,7 +71,7 @@ public class ValidateApplyUndoRedo extends TestCase
         assertEquals("Hello World", text.toString());
 
         text.redo();
-        change = new Insertion(5, " Santa Claus");
+        change = new InsertChange(5, " Santa Claus");
         text.apply(change);
         assertEquals("Hello Santa Claus", text.toString());
 

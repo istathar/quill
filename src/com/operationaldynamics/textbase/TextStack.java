@@ -24,7 +24,7 @@ public class TextStack extends Text
 
     private int pointer;
 
-    TextStack() {
+    public TextStack() {
         super("");
         stack = new LinkedList<Change>();
         pointer = 0;
@@ -41,34 +41,38 @@ public class TextStack extends Text
         change.apply(this);
     }
 
-    public void undo() {
+    public Change undo() {
         final Change change;
 
         if (stack.size() == 0) {
-            return;
+            return null;
         }
         if (pointer == 0) {
-            return;
+            return null;
         }
         pointer--;
 
         change = stack.get(pointer);
         change.undo(this);
+
+        return change;
     }
 
-    public void redo() {
+    public Change redo() {
         final Change change;
 
         if (stack.size() == 0) {
-            return;
+            return null;
         }
         if (pointer == stack.size()) {
-            return;
+            return null;
         }
 
         change = stack.get(pointer);
         change.apply(this);
 
         pointer++;
+
+        return change;
     }
 }
