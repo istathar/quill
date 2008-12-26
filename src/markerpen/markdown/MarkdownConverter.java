@@ -26,11 +26,9 @@ import static markerpen.ui.Format.bold;
 import static markerpen.ui.Format.hidden;
 import static markerpen.ui.Format.italics;
 import static markerpen.ui.Format.mono;
-
-
 import static org.gnome.gtk.TextBuffer.OBJECT_REPLACEMENT_CHARACTER;
 
-public class MarkdownSerializer
+public class MarkdownConverter
 {
     public static String extractToFile(TextBuffer buffer) {
         StringBuilder str;
