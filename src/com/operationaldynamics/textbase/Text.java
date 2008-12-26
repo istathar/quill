@@ -11,7 +11,8 @@
 package com.operationaldynamics.textbase;
 
 /**
- * A mutable buffer of unicode text to which changes are undoable.
+ * A mutable buffer of unicode text which manages a linked list of Chunks in
+ * order to maximize sharing of character array storage.
  * 
  * @author Andrew Cowie
  */
@@ -19,7 +20,7 @@ public class Text
 {
     Piece first;
 
-    public Text(String str) {
+    protected Text(String str) {
         first = new Piece();
         first.chunk = new Chunk(str);
     }
@@ -88,7 +89,7 @@ public class Text
     /**
      * Insert the given Java String at the specified offset.
      */
-    public void insert(int offset, String what) {
+    protected void insert(int offset, String what) {
         insert(offset, new Chunk(what));
     }
 
@@ -333,12 +334,13 @@ public class Text
 
     /**
      * Delete a width wide segment starting at offset. All the hard work is
-     * done by the concatonate method, this just removes the splice.
+     * done by the concatonate method, this just removes the splice. Returns a
+     * Chunk representing the removed range.
      */
     /*
      * TODO do something with extracted Chunk to facilitate undo
      */
-    public void delete(int offset, int width) {
+    protected Chunk delete(int offset, int width) {
         final Piece splice, preceeding, following;
         // final Chunk extract;
 
@@ -351,7 +353,7 @@ public class Text
         /*
          * There are a number of corner cases here, the most notable being
          * what happens if you delete from the beginning (in which case you
-         * need to change the firt pointer), and the very special case of
+         * need to change the first pointer), and the very special case of
          * deleting everything (in which case we put in an "empty" Piece with
          * a zero length Chunk).
          */
@@ -369,13 +371,15 @@ public class Text
                 following.prev = preceeding;
             }
         }
+
+        return splice.chunk;
     }
 
     /**
      * If format is negative, the formats it refers to will be removed instead
      * of applied.
      */
-    public void format(int offset, int width, byte format) {
+    protected void format(int offset, int width, byte format) {
         final Piece splice;
         Chunk c;
         int i;

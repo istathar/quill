@@ -42,6 +42,7 @@ public class AllTests
 
         suite.addTestSuite(ValidateChunks.class);
         suite.addTestSuite(ValidateText.class);
+        suite.addTestSuite(ValidateApplyUndoRedo.class);
 
         return suite;
     }

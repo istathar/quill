@@ -1,5 +1,5 @@
 /*
- * ValidateChunks.java
+ * ValidateText.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -366,7 +366,7 @@ public class ValidateText extends TestCase
         return p.chunk.markup[0];
     }
 
-    public void testApplyFormatting() {
+    public final void testApplyFormatting() {
         final Text text;
         Piece p;
         final byte[] target;
@@ -421,7 +421,7 @@ public class ValidateText extends TestCase
         assertEquals("Hello World", text.toString());
     }
 
-    public void testRemovingBits() {
+    public final void testRemovingBits() {
         assertEquals(0xf000, (0xfff0 & 0xf000));
         assertEquals(0xfff0, (0x0ff0 | 0xf000));
         assertEquals(0xf0f0, (0xfff0 & 0xf0f0));
@@ -429,7 +429,7 @@ public class ValidateText extends TestCase
         assertEquals(0xfff0, (0xfff0 & (0xfff0 ^ 0x0000)));
     }
 
-    public void testRemovingFormatting() {
+    public final void testRemovingFormatting() {
         final char[] data;
         final byte[] markup, target;
         final Chunk chunk;
@@ -456,7 +456,7 @@ public class ValidateText extends TestCase
         }
     }
 
-    public void testNullShortcut() {
+    public final void testNullShortcut() {
         final char[] data;
         final Chunk chunk;
         final Text text;
@@ -482,7 +482,7 @@ public class ValidateText extends TestCase
         }
     }
 
-    public void testRemovingFormatFromZero() {
+    public final void testRemovingFormatFromZero() {
         final char[] data;
         final Chunk chunk;
         final Text text;
