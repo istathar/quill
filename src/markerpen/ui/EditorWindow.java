@@ -12,7 +12,7 @@ package markerpen.ui;
 
 import java.util.HashSet;
 
-import markerpen.markdown.MarkdownSerializer;
+import markerpen.converter.DocBookConverter;
 import markerpen.textbase.Change;
 import markerpen.textbase.DeleteChange;
 import markerpen.textbase.InsertChange;
@@ -22,12 +22,9 @@ import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
-import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.Gtk;
-import org.gnome.gtk.IconSize;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ScrolledWindow;
-import org.gnome.gtk.Stock;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
@@ -37,11 +34,6 @@ import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.WrapMode;
-
-import static markerpen.ui.Format.hidden;
-
-
-
 
 class EditorWindow extends Window
 {
@@ -227,7 +219,7 @@ class EditorWindow extends Window
                         toggleFormat(Format.mono);
                         return true;
                     } else if (key == Keyval.s) {
-                        System.out.println(MarkdownSerializer.extractToFile(buffer));
+                        extractText();
                     } else if (key == Keyval.y) {
                         redo();
                     } else if (key == Keyval.z) {
@@ -353,14 +345,22 @@ class EditorWindow extends Window
         insertTags.clear();
     }
 
+    /*
+     * This is a no-op right now.
+     */
     private void insertImage() {
-        TextIter cursor;
-        Pixbuf graphic;
+    // TextIter cursor;
+    // Pixbuf graphic;
+    //
+    // graphic = Gtk.renderIcon(this, Stock.MISSING_IMAGE,
+    // IconSize.BUTTON);
+    //
+    // cursor = insertBound.getIter();
+    // buffer.insert(cursor, graphic);
+    // buffer.insert(cursor, "FIXME.png", hidden);
+    }
 
-        graphic = Gtk.renderIcon(this, Stock.MISSING_IMAGE, IconSize.BUTTON);
-
-        cursor = insertBound.getIter();
-        buffer.insert(cursor, graphic);
-        buffer.insert(cursor, "FIXME.png", hidden);
+    private void extractText() {
+        DocBookConverter.buildTree(buffer);
     }
 }

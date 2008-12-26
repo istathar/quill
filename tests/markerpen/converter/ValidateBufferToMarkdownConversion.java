@@ -8,9 +8,9 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package markerpen.markdown;
+package markerpen.converter;
 
-import markerpen.markdown.MarkdownConverter;
+import markerpen.converter.MarkdownConverter;
 
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.Gtk;
@@ -27,11 +27,9 @@ import static markerpen.ui.Format.bold;
 import static markerpen.ui.Format.hidden;
 import static markerpen.ui.Format.italics;
 import static markerpen.ui.Format.mono;
-
-
 import static org.gnome.gtk.TextMark.LEFT;
 
-public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
+public class ValidateBufferToMarkdownConversion extends TestCaseGtk
 {
     public final void testExportLastLineTerminated() {
         final TextBuffer buffer;

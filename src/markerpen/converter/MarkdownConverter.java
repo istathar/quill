@@ -8,7 +8,7 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package markerpen.markdown;
+package markerpen.converter;
 
 import java.io.FileNotFoundException;
 import java.util.HashSet;
