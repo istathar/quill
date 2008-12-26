@@ -8,9 +8,11 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package com.operationaldynamics.markerpen;
+package markerpen;
 
 import java.util.HashSet;
+
+import markdown.MarkdownSerializer;
 
 import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;
@@ -32,12 +34,13 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.WrapMode;
 
-import com.operationaldynamics.textbase.Change;
-import com.operationaldynamics.textbase.DeleteChange;
-import com.operationaldynamics.textbase.InsertChange;
-import com.operationaldynamics.textbase.TextStack;
+import static markerpen.Format.hidden;
 
-import static com.operationaldynamics.markerpen.Format.hidden;
+import textbase.Change;
+import textbase.DeleteChange;
+import textbase.InsertChange;
+import textbase.TextStack;
+
 
 class EditorWindow extends Window
 {
@@ -223,7 +226,7 @@ class EditorWindow extends Window
                         toggleFormat(Format.mono);
                         return true;
                     } else if (key == Keyval.s) {
-                        System.out.println(Serializer.extractToFile(buffer));
+                        System.out.println(MarkdownSerializer.extractToFile(buffer));
                     } else if (key == Keyval.y) {
                         redo();
                     } else if (key == Keyval.z) {

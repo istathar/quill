@@ -8,7 +8,7 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package com.operationaldynamics.textbase;
+package textbase;
 
 public class InsertChange extends Change
 {

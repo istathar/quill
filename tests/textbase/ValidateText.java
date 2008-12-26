@@ -9,8 +9,11 @@
  * redistribution.
  */
 
-package com.operationaldynamics.textbase;
+package textbase;
 
+import textbase.Chunk;
+import textbase.Piece;
+import textbase.Text;
 import junit.framework.TestCase;
 
 public class ValidateText extends TestCase

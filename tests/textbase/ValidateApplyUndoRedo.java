@@ -9,8 +9,12 @@
  * redistribution.
  */
 
-package com.operationaldynamics.textbase;
+package textbase;
 
+import textbase.Change;
+import textbase.DeleteChange;
+import textbase.InsertChange;
+import textbase.TextStack;
 import junit.framework.TestCase;
 
 /**

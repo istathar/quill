@@ -9,8 +9,9 @@
  * redistribution.
  */
 
-package com.operationaldynamics.textbase;
+package textbase;
 
+import textbase.Chunk;
 import junit.framework.TestCase;
 
 public class ValidateChunks extends TestCase

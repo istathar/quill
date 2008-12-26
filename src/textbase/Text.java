@@ -8,7 +8,7 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package com.operationaldynamics.textbase;
+package textbase;
 
 /**
  * A mutable buffer of unicode text which manages a linked list of Chunks in
