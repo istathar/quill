@@ -18,6 +18,11 @@ import org.gnome.gtk.TextBuffer;
  * 
  * @author Andrew Cowie
  */
+/*
+ * A big reason to have this in its own package is so that we are using only
+ * the public interface of our docbook module. Secondarily is that if other
+ * output formats grow up, this will be the place their converters can live.
+ */
 public class DocBookConverter
 {
     public static void buildTree(TextBuffer buffer) {
