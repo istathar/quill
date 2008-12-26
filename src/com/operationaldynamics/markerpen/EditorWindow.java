@@ -11,7 +11,6 @@
 package com.operationaldynamics.markerpen;
 
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;
@@ -32,6 +31,11 @@ import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.WrapMode;
+
+import com.operationaldynamics.textbase.Change;
+import com.operationaldynamics.textbase.DeleteChange;
+import com.operationaldynamics.textbase.InsertChange;
+import com.operationaldynamics.textbase.TextStack;
 
 import static com.operationaldynamics.markerpen.Format.hidden;
 
@@ -107,15 +111,12 @@ class EditorWindow extends Window
         top.packStart(scroll);
     }
 
-    private LinkedList<Change> undoStack;
-
-    private int undoPointer;
+    private TextStack stack;
 
     private boolean undoInProgress;
 
     private void setupUndoRedo() {
-        undoStack = new LinkedList<Change>();
-        undoPointer = 0;
+        stack = new TextStack(); // FIXME!!!
 
         buffer.connect(new TextBuffer.InsertText() {
             public void onInsertText(TextBuffer source, TextIter pointer, String text) {
@@ -123,7 +124,7 @@ class EditorWindow extends Window
                     return;
                 }
 
-                addToUndoStack(new Change(pointer, pointer, text));
+                stack.apply(new InsertChange(pointer.getOffset(), text));
             }
         });
 
@@ -137,42 +138,29 @@ class EditorWindow extends Window
 
                 text = buffer.getText(start, end, false);
 
-                addToUndoStack(new Change(start, end, text));
+                stack.apply(new DeleteChange(start.getOffset(), end.getOffset()));
             }
         });
-    }
-
-    private void addToUndoStack(Change change) {
-        while (undoPointer < undoStack.size()) {
-            undoStack.removeLast();
-        }
-
-        undoStack.add(undoPointer, change);
-        undoPointer++;
     }
 
     private void undo() {
         final Change change;
         final TextIter start, end;
 
-        if (undoStack.size() == 0) {
-            return;
-        }
-        if (undoPointer == 0) {
-            return;
-        }
         undoInProgress = true;
-        undoPointer--;
 
-        change = undoStack.get(undoPointer);
+        change = stack.undo();
+        if (change == null) {
+            return;
+        }
 
-        start = buffer.getIter(change.offset);
+        start = buffer.getIter(change.getOffset());
 
-        if (change.add) {
-            end = buffer.getIter(change.offset + change.length);
+        if (change instanceof InsertChange) {
+            end = buffer.getIter(change.getOffset() + change.getLength());
             buffer.delete(start, end);
         } else {
-            buffer.insert(start, change.text);
+            buffer.insert(start, change.getText());
         }
 
         undoInProgress = false;
@@ -182,27 +170,22 @@ class EditorWindow extends Window
         final Change change;
         final TextIter start, end;
 
-        if (undoStack.size() == 0) {
-            return;
-        }
-        if (undoPointer == undoStack.size()) {
-            return;
-        }
         undoInProgress = true;
 
-        change = undoStack.get(undoPointer);
+        change = stack.redo();
+        if (change == null) {
+            return;
+        }
 
-        start = buffer.getIter(change.offset);
+        start = buffer.getIter(change.getOffset());
 
-        if (change.add) {
-            buffer.insert(start, change.text);
+        if (change instanceof InsertChange) {
+            buffer.insert(start, change.getText());
         } else {
-            end = buffer.getIter(change.offset + change.length);
-
+            end = buffer.getIter(change.getOffset() + change.getLength());
             buffer.delete(start, end);
         }
 
-        undoPointer++;
         undoInProgress = false;
     }
 
@@ -364,42 +347,5 @@ class EditorWindow extends Window
         cursor = insertBound.getIter();
         buffer.insert(cursor, graphic);
         buffer.insert(cursor, "FIXME.png", hidden);
-    }
-}
-
-class Change
-{
-    final int offset;
-
-    final int length;
-
-    final String text;
-
-    final boolean add;
-
-    final TextTag tag;
-
-    Change(TextIter start, TextIter end, String text) {
-        this.offset = start.getOffset();
-
-        if (end == start) {
-            this.length = text.length();
-            this.add = true;
-        } else {
-            this.length = end.getOffset() - this.offset;
-            this.add = false;
-        }
-        this.text = text;
-
-        this.tag = null;
-    }
-
-    Change(TextIter start, TextIter end, TextTag tag, boolean apply) {
-        this.offset = start.getOffset();
-        this.length = end.getOffset() - this.offset;
-        this.tag = tag;
-        this.add = apply;
-
-        this.text = null;
     }
 }
