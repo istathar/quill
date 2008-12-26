@@ -13,6 +13,10 @@ package markerpen;
 import java.util.HashSet;
 
 import markerpen.markdown.MarkdownSerializer;
+import markerpen.textbase.Change;
+import markerpen.textbase.DeleteChange;
+import markerpen.textbase.InsertChange;
+import markerpen.textbase.TextStack;
 
 import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;
@@ -36,10 +40,6 @@ import org.gnome.gtk.WrapMode;
 
 import static markerpen.Format.hidden;
 
-import textbase.Change;
-import textbase.DeleteChange;
-import textbase.InsertChange;
-import textbase.TextStack;
 
 
 class EditorWindow extends Window

@@ -1,5 +1,5 @@
 /*
- * DeletionChange.java
+ * Insertion.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,25 +8,20 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package textbase;
+package markerpen.textbase;
 
-public class DeleteChange extends Change
+public class InsertChange extends Change
 {
-    int width;
-
-    public DeleteChange(int offset, int width) {
+    public InsertChange(int offset, String what) {
         this.offset = offset;
-        this.width = width;
+        this.what = new Chunk(what);
     }
 
     final void apply(Text text) {
-        super.what = text.delete(offset, width);
+        text.insert(offset, what);
     }
 
     final void undo(Text text) {
-        if (what == null) {
-            throw new IllegalStateException();
-        }
-        text.insert(offset, what);
+        text.delete(offset, what.width);
     }
 }

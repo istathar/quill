@@ -9,11 +9,11 @@
  * redistribution.
  */
 
-package textbase;
+package markerpen.textbase;
 
-import textbase.Chunk;
-import textbase.Piece;
-import textbase.Text;
+import markerpen.textbase.Chunk;
+import markerpen.textbase.Piece;
+import markerpen.textbase.Text;
 import junit.framework.TestCase;
 
 public class ValidateText extends TestCase

@@ -9,12 +9,12 @@
  * redistribution.
  */
 
-package textbase;
+package markerpen.textbase;
 
-import textbase.Change;
-import textbase.DeleteChange;
-import textbase.InsertChange;
-import textbase.TextStack;
+import markerpen.textbase.Change;
+import markerpen.textbase.DeleteChange;
+import markerpen.textbase.InsertChange;
+import markerpen.textbase.TextStack;
 import junit.framework.TestCase;
 
 /**

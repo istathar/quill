@@ -9,9 +9,9 @@
  * redistribution.
  */
 
-package textbase;
+package markerpen.textbase;
 
-import textbase.Chunk;
+import markerpen.textbase.Chunk;
 import junit.framework.TestCase;
 
 public class ValidateChunks extends TestCase
