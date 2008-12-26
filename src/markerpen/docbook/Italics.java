@@ -1,5 +1,5 @@
 /*
- * BlockTag.java
+ * Italics.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,16 +8,21 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package docbook;
+package markerpen.docbook;
 
 /**
- * Base class of tags that comprise the content of the document.
+ * Emphasis to be given italic formatting.
  * 
  * @author Andrew Cowie
  */
-abstract class Block extends DocBookTag
+public class Italics extends Inline
 {
-    Block(String name) {
-        super(name);
+    public Italics() {
+        super("emphasis");
+    }
+
+    public Italics(String str) {
+        this();
+        super.addText(str);
     }
 }

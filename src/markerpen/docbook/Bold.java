@@ -1,5 +1,5 @@
 /*
- * Paragraph.java
+ * Bold.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,24 +8,22 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package docbook;
+package markerpen.docbook;
 
-public class Paragraph extends Block
+/**
+ * Emphasis to be given bold formatting.
+ * 
+ * @author Andrew Cowie
+ */
+public class Bold extends Inline
 {
-    public Paragraph() {
-        super("para");
+    public Bold() {
+        super("emphasis");
+        super.setAttribute("role", "bold");
     }
 
-    public Paragraph(String str) {
-        super("para");
+    public Bold(String str) {
+        this();
         super.addText(str);
-    }
-
-    public void add(String str) {
-        super.addText(str);
-    }
-
-    public void add(Inline tag) {
-        super.addChild(tag);
     }
 }

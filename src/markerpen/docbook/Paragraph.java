@@ -1,5 +1,5 @@
 /*
- * Italics.java
+ * Paragraph.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,21 +8,24 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package docbook;
+package markerpen.docbook;
 
-/**
- * Emphasis to be given italic formatting.
- * 
- * @author Andrew Cowie
- */
-public class Italics extends Inline
+public class Paragraph extends Block
 {
-    public Italics() {
-        super("emphasis");
+    public Paragraph() {
+        super("para");
     }
 
-    public Italics(String str) {
-        this();
+    public Paragraph(String str) {
+        super("para");
         super.addText(str);
+    }
+
+    public void add(String str) {
+        super.addText(str);
+    }
+
+    public void add(Inline tag) {
+        super.addChild(tag);
     }
 }

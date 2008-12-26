@@ -1,5 +1,5 @@
 /*
- * Chapter.java
+ * Title.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,20 +8,16 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package docbook;
+package markerpen.docbook;
 
-public class Chapter extends Component
+public class Title extends Block
 {
-    public Chapter() {
-        super("chapter");
+    public Title() {
+        super("title");
     }
 
-    public Chapter(String title) {
-        super("chapter");
-        super.addChild(new Title(title));
-    }
-
-    public void add(Division section) {
-        super.addChild(section);
+    public Title(String title) {
+        super("title");
+        super.addText(title);
     }
 }

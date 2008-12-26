@@ -8,7 +8,7 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package docbook;
+package markerpen.docbook;
 
 import nu.xom.Attribute;
 import nu.xom.Element;

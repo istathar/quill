@@ -1,5 +1,5 @@
 /*
- * Section.java
+ * BlockTag.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,25 +8,16 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package docbook;
+package markerpen.docbook;
 
 /**
- * Sections pack into Chapters.
+ * Base class of tags that comprise the content of the document.
  * 
  * @author Andrew Cowie
  */
-public class Section extends Division
+abstract class Block extends DocBookTag
 {
-    public Section() {
-        super("section");
-    }
-
-    public Section(String title) {
-        super("section");
-        super.addChild(new Title(title));
-    }
-
-    public void add(Paragraph para) {
-        super.addChild(para);
+    Block(String name) {
+        super(name);
     }
 }

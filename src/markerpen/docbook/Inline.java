@@ -1,5 +1,5 @@
 /*
- * BookDocument.java
+ * Inline.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,18 +8,16 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package docbook;
+package markerpen.docbook;
 
-public class BookDocument extends Document
+/**
+ * Tags that are presented as spans within Blocks.
+ * 
+ * @author Andrew Cowie
+ */
+abstract class Inline extends DocBookTag
 {
-    public BookDocument() {
-        super(new Book());
-    }
-}
-
-class Book extends DocBookTag
-{
-    Book() {
-        super("book");
+    Inline(String name) {
+        super(name);
     }
 }

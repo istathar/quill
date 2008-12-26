@@ -1,5 +1,5 @@
 /*
- * ComponentTag.java
+ * BookDocument.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,14 +8,18 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package docbook;
+package markerpen.docbook;
 
-/**
- * Components are the chapter-like elements.
- */
-abstract class Component extends DocBookTag
+public class BookDocument extends Document
 {
-    Component(String name) {
-        super(name);
+    public BookDocument() {
+        super(new Book());
+    }
+}
+
+class Book extends DocBookTag
+{
+    Book() {
+        super("book");
     }
 }

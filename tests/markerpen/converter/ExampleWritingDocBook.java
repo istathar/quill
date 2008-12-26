@@ -8,16 +8,17 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package com.operationaldynamics.markerpen;
+package markerpen.converter;
 
 import java.io.IOException;
 
-import docbook.BookDocument;
-import docbook.Chapter;
-import docbook.Document;
-import docbook.Italics;
-import docbook.Paragraph;
-import docbook.Section;
+import markerpen.docbook.BookDocument;
+import markerpen.docbook.Chapter;
+import markerpen.docbook.Document;
+import markerpen.docbook.Italics;
+import markerpen.docbook.Paragraph;
+import markerpen.docbook.Section;
+
 
 public class ExampleWritingDocBook
 {

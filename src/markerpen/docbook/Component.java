@@ -1,5 +1,5 @@
 /*
- * Bold.java
+ * ComponentTag.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,22 +8,14 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package docbook;
+package markerpen.docbook;
 
 /**
- * Emphasis to be given bold formatting.
- * 
- * @author Andrew Cowie
+ * Components are the chapter-like elements.
  */
-public class Bold extends Inline
+abstract class Component extends DocBookTag
 {
-    public Bold() {
-        super("emphasis");
-        super.setAttribute("role", "bold");
-    }
-
-    public Bold(String str) {
-        this();
-        super.addText(str);
+    Component(String name) {
+        super(name);
     }
 }
