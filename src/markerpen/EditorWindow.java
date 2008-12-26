@@ -12,7 +12,7 @@ package markerpen;
 
 import java.util.HashSet;
 
-import markdown.MarkdownSerializer;
+import markerpen.markdown.MarkdownSerializer;
 
 import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;

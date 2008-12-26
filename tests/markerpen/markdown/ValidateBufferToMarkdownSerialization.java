@@ -8,9 +8,9 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package markdown;
+package markerpen.markdown;
 
-import markdown.MarkdownSerializer;
+import markerpen.markdown.MarkdownSerializer;
 
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.Gtk;
