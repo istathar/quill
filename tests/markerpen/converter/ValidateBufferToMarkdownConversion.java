@@ -8,7 +8,9 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package com.operationaldynamics.markerpen;
+package markerpen.converter;
+
+import markerpen.converter.MarkdownConverter;
 
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.Gtk;
@@ -21,13 +23,13 @@ import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
 import org.gnome.gtk.TextTag;
 
-import static com.operationaldynamics.markerpen.Format.bold;
-import static com.operationaldynamics.markerpen.Format.hidden;
-import static com.operationaldynamics.markerpen.Format.italics;
-import static com.operationaldynamics.markerpen.Format.mono;
+import static markerpen.ui.Format.bold;
+import static markerpen.ui.Format.hidden;
+import static markerpen.ui.Format.italics;
+import static markerpen.ui.Format.mono;
 import static org.gnome.gtk.TextMark.LEFT;
 
-public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
+public class ValidateBufferToMarkdownConversion extends TestCaseGtk
 {
     public final void testExportLastLineTerminated() {
         final TextBuffer buffer;
@@ -36,7 +38,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
         buffer = new TextBuffer();
         buffer.setText("End");
 
-        text = Serializer.extractToFile(buffer);
+        text = MarkdownConverter.extractToFile(buffer);
 
         assertEquals("End\n", text);
     }
@@ -51,7 +53,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
         buffer.insert(pointer, "Hello ");
         buffer.insert(pointer, "world", italics);
 
-        text = Serializer.extractToFile(buffer);
+        text = MarkdownConverter.extractToFile(buffer);
 
         assertEquals("Hello _world_\n", text);
     }
@@ -67,7 +69,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
         buffer.insert(pointer, "brighter", bold);
         buffer.insert(pointer, " future");
 
-        text = Serializer.extractToFile(buffer);
+        text = MarkdownConverter.extractToFile(buffer);
 
         assertEquals("A **brighter** future\n", text);
     }
@@ -83,7 +85,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
         buffer.insert(pointer, "/etc/secret", mono);
         buffer.insert(pointer, " as it is secret!");
 
-        text = Serializer.extractToFile(buffer);
+        text = MarkdownConverter.extractToFile(buffer);
 
         assertEquals("Don't look in `/etc/secret` as it is secret!\n", text);
     }
@@ -107,7 +109,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
 
         buffer.insert(pointer, " needed");
 
-        text = Serializer.extractToFile(buffer);
+        text = MarkdownConverter.extractToFile(buffer);
 
         assertEquals("Much _**`emphasis`**_ needed\n", text);
     }
@@ -121,7 +123,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
         pointer = buffer.getIterStart();
         buffer.insert(pointer, "One\nTwo");
 
-        text = Serializer.extractToFile(buffer);
+        text = MarkdownConverter.extractToFile(buffer);
 
         assertEquals("One\n\nTwo\n", text);
     }
@@ -135,7 +137,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
          * Applying different formats
          */
 
-        buffer = Serializer.loadFile("**Hello** _world_");
+        buffer = MarkdownConverter.loadFile("**Hello** _world_");
         pointer = buffer.getIterStart();
 
         tags = pointer.getTags();
@@ -157,7 +159,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
         TextIter pointer;
         TextTag[] tags;
 
-        buffer = Serializer.loadFile("_**Important**_");
+        buffer = MarkdownConverter.loadFile("_**Important**_");
         pointer = buffer.getIterStart();
 
         tags = pointer.getTags();
@@ -170,7 +172,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
         TextIter pointer;
         int i;
 
-        buffer = Serializer.loadFile("Hello\n\nworld");
+        buffer = MarkdownConverter.loadFile("Hello\n\nworld");
 
         pointer = buffer.getIterStart();
         assertEquals("Hello\nworld", buffer.getText());
@@ -188,7 +190,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
         TextTag[] tags;
         final String text;
 
-        buffer = Serializer.loadFile("_**Impor\n\ntant**_");
+        buffer = MarkdownConverter.loadFile("_**Impor\n\ntant**_");
         pointer = buffer.getIterStart();
 
         tags = pointer.getTags();
@@ -198,14 +200,14 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
         tags = pointer.getTags();
         assertEquals(0, tags.length);
 
-        text = Serializer.extractToFile(buffer);
+        text = MarkdownConverter.extractToFile(buffer);
         assertEquals("_**Impor**_\n\ntant\n", text);
     }
 
     public final void testLoadingMultipleBlankLines() {
         TextBuffer buffer;
 
-        buffer = Serializer.loadFile("One\n\n\n\nThree");
+        buffer = MarkdownConverter.loadFile("One\n\n\n\nThree");
         assertEquals("One\n\nThree", buffer.getText());
 
         /*
@@ -213,7 +215,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
          * written out again.
          */
 
-        buffer = Serializer.loadFile("One\n\n\nTwo");
+        buffer = MarkdownConverter.loadFile("One\n\n\nTwo");
         assertEquals("One\n\nTwo", buffer.getText());
     }
 
@@ -224,11 +226,11 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
         before = new TextBuffer();
         before.setText("One\n\nTwo");
 
-        text = Serializer.extractToFile(before);
+        text = MarkdownConverter.extractToFile(before);
 
         assertEquals("One\n\n\n\nTwo\n", text);
 
-        after = Serializer.loadFile(text);
+        after = MarkdownConverter.loadFile(text);
         assertEquals("One\n\nTwo", after.getText());
     }
 
@@ -236,7 +238,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
         TextBuffer buffer;
         TextIter pointer;
         char ch;
-        buffer = Serializer.loadFile("![Happy](smiley.png)\n");
+        buffer = MarkdownConverter.loadFile("![Happy](smiley.png)\n");
 
         pointer = buffer.getIterStart();
         ch = pointer.getChar();
@@ -265,7 +267,7 @@ public class ValidateBufferToMarkdownSerialization extends TestCaseGtk
          * And now export
          */
 
-        text = Serializer.extractToFile(buffer);
+        text = MarkdownConverter.extractToFile(buffer);
 
         assertEquals("![text](URL)\n", text);
     }

@@ -8,7 +8,7 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package com.operationaldynamics.markerpen;
+package markerpen.ui;
 
 import java.util.ArrayList;
 
@@ -24,17 +24,17 @@ import org.gnome.pango.Weight;
  * added to a TextTagTable on creation, and their "priority" is, unless
  * otherwise altered, that order (last added highest priority).
  */
-class Format
+public class Format
 {
-    static final TextTag italics;
+    public static final TextTag italics;
 
-    static final TextTag bold;
+    public static final TextTag bold;
 
-    static final TextTag mono;
+    public static final TextTag mono;
 
-    static final TextTag[] tags;
+    public static final TextTag[] tags;
 
-    static final TextTag hidden;
+    public static final TextTag hidden;
 
     static {
         ArrayList<TextTag> list;

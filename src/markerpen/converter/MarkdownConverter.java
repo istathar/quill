@@ -8,7 +8,7 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package com.operationaldynamics.markerpen;
+package markerpen.converter;
 
 import java.io.FileNotFoundException;
 import java.util.HashSet;
@@ -22,15 +22,15 @@ import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextTag;
 
-import static com.operationaldynamics.markerpen.Format.bold;
-import static com.operationaldynamics.markerpen.Format.hidden;
-import static com.operationaldynamics.markerpen.Format.italics;
-import static com.operationaldynamics.markerpen.Format.mono;
+import static markerpen.ui.Format.bold;
+import static markerpen.ui.Format.hidden;
+import static markerpen.ui.Format.italics;
+import static markerpen.ui.Format.mono;
 import static org.gnome.gtk.TextBuffer.OBJECT_REPLACEMENT_CHARACTER;
 
-class Serializer
+public class MarkdownConverter
 {
-    static String extractToFile(TextBuffer buffer) {
+    public static String extractToFile(TextBuffer buffer) {
         StringBuilder str;
         TextIter pointer;
         char ch;
@@ -73,13 +73,13 @@ class Serializer
              * Open markup that represents formats that are now beginning.
              */
 
-            if (pointer.beginsTag(Format.italics)) {
+            if (pointer.beginsTag(italics)) {
                 str.append('_');
             }
-            if (pointer.beginsTag(Format.bold)) {
+            if (pointer.beginsTag(bold)) {
                 str.append("**");
             }
-            if (pointer.beginsTag(Format.mono)) {
+            if (pointer.beginsTag(mono)) {
                 str.append('`');
             }
 
@@ -189,7 +189,7 @@ class Serializer
                 }
 
                 buffer.insert(pointer, graphic);
-                buffer.insert(pointer, src, Format.hidden);
+                buffer.insert(pointer, src, hidden);
                 continue;
             }
 

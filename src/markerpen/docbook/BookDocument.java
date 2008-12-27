@@ -1,5 +1,5 @@
 /*
- * Markerpen.java
+ * BookDocument.java
  *
  * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,17 +8,18 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package com.operationaldynamics.markerpen;
+package markerpen.docbook;
 
-import org.gnome.gtk.Gtk;
-
-public class Markerpen
+public class BookDocument extends Document
 {
-    public static void main(String[] args) {
-        Gtk.init(args);
+    public BookDocument() {
+        super(new Book());
+    }
+}
 
-        new EditorWindow();
-
-        Gtk.main();
+class Book extends DocBookTag
+{
+    Book() {
+        super("book");
     }
 }
