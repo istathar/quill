@@ -10,7 +10,16 @@
  */
 package markerpen.converter;
 
+import markerpen.docbook.BookDocument;
+import markerpen.docbook.Chapter;
+import markerpen.docbook.Document;
+import markerpen.docbook.Paragraph;
+import markerpen.docbook.Section;
+
 import org.gnome.gtk.TextBuffer;
+import org.gnome.gtk.TextIter;
+
+import static org.gnome.gtk.TextBuffer.OBJECT_REPLACEMENT_CHARACTER;
 
 /**
  * Build a DocBook XOM tree equivalent to the data in our textbase, ready for
@@ -25,7 +34,63 @@ import org.gnome.gtk.TextBuffer;
  */
 public class DocBookConverter
 {
-    public static void buildTree(TextBuffer buffer) {
+    public static Document buildTree(TextBuffer buffer) {
+        final Document book;
+        final Chapter chapter;
+        final Section section;
+        final StringBuilder str;
+        TextIter pointer;
+        char ch;
+        Paragraph para;
 
+        book = new BookDocument();
+
+        chapter = new Chapter();
+        book.add(chapter);
+
+        section = new Section();
+        chapter.add(section);
+
+        str = new StringBuilder();
+
+        pointer = buffer.getIterStart();
+
+        while (true) {
+            /*
+             * Close markup for formats that are now ending
+             */
+            // TODO
+            if (pointer.endsLine()) {
+                para = new Paragraph(str.toString());
+                section.add(para);
+                str.setLength(0);
+            }
+
+            if (pointer.isEnd()) {
+                break;
+            }
+
+            /*
+             * Open markup that represents formats that are now beginning.
+             */
+            // TODO
+            /*
+             * Finally, add the TextBuffer's content at this position, and
+             * move to the next character... unless it's something special
+             */
+
+            ch = pointer.getChar();
+
+            // TODO images
+            if (ch == OBJECT_REPLACEMENT_CHARACTER) {
+                continue;
+            } else {
+                str.append(ch);
+            }
+
+            pointer.forwardChar();
+        }
+
+        return book;
     }
 }

@@ -10,9 +10,11 @@
  */
 package markerpen.ui;
 
+import java.io.IOException;
 import java.util.HashSet;
 
 import markerpen.converter.DocBookConverter;
+import markerpen.docbook.Document;
 import markerpen.textbase.Change;
 import markerpen.textbase.DeleteChange;
 import markerpen.textbase.InsertChange;
@@ -346,21 +348,23 @@ class EditorWindow extends Window
     }
 
     /*
-     * This is a no-op right now.
+     * TODO We're ignoring images and rich media for the moment.
      */
-    private void insertImage() {
-    // TextIter cursor;
-    // Pixbuf graphic;
-    //
-    // graphic = Gtk.renderIcon(this, Stock.MISSING_IMAGE,
-    // IconSize.BUTTON);
-    //
-    // cursor = insertBound.getIter();
-    // buffer.insert(cursor, graphic);
-    // buffer.insert(cursor, "FIXME.png", hidden);
-    }
+    private void insertImage() {}
 
+    /*
+     * FIXME this is to be replaced by working off of the internal TextStack
+     * undo stack, not the TextBuffer backing the TextView.
+     */
     private void extractText() {
-        DocBookConverter.buildTree(buffer);
+        final Document book;
+
+        book = DocBookConverter.buildTree(buffer);
+        try {
+            book.toXML(System.out);
+        } catch (IOException ioe) {
+            throw new Error(ioe);
+        }
+        System.gc();
     }
 }
