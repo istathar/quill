@@ -68,7 +68,7 @@ public class Document
     public void toXML(OutputStream out) throws IOException {
         final Serializer s;
 
-        s = new DocBookSerializer(out);
+        s = new DocBookSerializer(out, root);
         s.write(xom);
         s.flush();
     }

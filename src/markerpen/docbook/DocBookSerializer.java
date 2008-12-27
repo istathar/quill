@@ -28,10 +28,13 @@ import nu.xom.Serializer;
  */
 class DocBookSerializer extends Serializer
 {
-    DocBookSerializer(OutputStream out) {
+    private final DocBookTag root;
+
+    DocBookSerializer(OutputStream out, DocBookTag root) {
         super(out);
         super.setLineSeparator("\n");
         super.setMaxLength(50);
+        this.root = root;
     }
 
     protected void writeStartTag(Element e) throws IOException {
@@ -102,6 +105,13 @@ class DocBookSerializer extends Serializer
         super.writeEndTag(e);
 
         if (tag instanceof Inline) {
+            return;
+        }
+        if (tag == root) {
+            /*
+             * Serializer does a line break between each piece of a Document.
+             * So on the very last of our tags, we don't need to do a newline.
+             */
             return;
         }
         breakLine();
