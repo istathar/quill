@@ -230,7 +230,7 @@ public class Text
      * offset for width. While deleting, as such, does not require this,
      * undo/redo does.
      * 
-     * This will operate on the Text, doing a splits at each end. That isn't
+     * This will operate on the Text, doing a split at each end. That isn't
      * strictly necessary, except that the reason you're usually calling this
      * is to delete, so the boundaries are a good first step, and it makes the
      * algorithm here far simpler.
@@ -337,9 +337,6 @@ public class Text
      * done by the concatonate method, this just removes the splice. Returns a
      * Chunk representing the removed range.
      */
-    /*
-     * TODO do something with extracted Chunk to facilitate undo
-     */
     protected Chunk delete(int offset, int width) {
         final Piece splice, preceeding, following;
         // final Chunk extract;
@@ -377,9 +374,9 @@ public class Text
 
     /**
      * If format is negative, the formats it refers to will be removed instead
-     * of applied.
+     * of applied. Like delete() it returns the Chunk representing the splice.
      */
-    protected void format(int offset, int width, byte format) {
+    protected Chunk format(int offset, int width, byte format) {
         final Piece splice;
         Chunk c;
         int i;
@@ -414,5 +411,7 @@ public class Text
                 c.markup[i] &= c.markup[i] ^ format;
             }
         }
+
+        return splice.chunk;
     }
 }
