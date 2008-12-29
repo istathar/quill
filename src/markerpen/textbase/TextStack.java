@@ -18,6 +18,12 @@ import java.util.LinkedList;
  * 
  * @author Andrew Cowie
  */
+/*
+ * TODO at the moment the depth of the undo list is unlimited; that's cool
+ * except that ultimately it will be a memory problem, so someday presumably
+ * something will need to act to limit its size. A Queue, perhaps? Or maybe
+ * discarding older operations at certain defined lifecycle points?
+ */
 public class TextStack extends Text
 {
     private LinkedList<Change> stack;
