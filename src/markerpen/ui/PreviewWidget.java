@@ -1,7 +1,7 @@
 /*
  * PreviewWidget.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -11,6 +11,7 @@
 package markerpen.ui;
 
 import org.freedesktop.cairo.Context;
+import org.freedesktop.cairo.FontOptions;
 import org.freedesktop.cairo.Matrix;
 import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Allocation;
@@ -21,6 +22,8 @@ import org.gnome.gtk.Widget;
 import org.gnome.pango.FontDescription;
 import org.gnome.pango.Layout;
 import org.gnome.pango.LayoutLine;
+
+import static org.freedesktop.cairo.HintMetrics.OFF;
 
 /*
  * Work in "points", which makes sense since the target back end is PDF.
@@ -103,22 +106,31 @@ class PreviewWidget extends EventBox
     public void drawText(Context cr) {
         final Layout layout;
         final FontDescription desc;
+        final FontOptions options;
         final String[] paras;
         double y, b, v = 0;
 
         cr.moveTo(leftMargin, topMargin);
 
         layout = new Layout(cr);
-        desc = new FontDescription("Liberation Serif, 10");
+        desc = new FontDescription("Liberation Serif");
+        desc.setSize(12.0);
         layout.setFontDescription(desc);
 
+        options = new FontOptions();
+        options.setHintMetrics(OFF);
+        layout.getContext().setFontOptions(options);
+
+        /*
+         * This is fake. TODO pass in our TextStack object (which already
+         * knows what the paragraphs are) and process from that.
+         */
         paras = text.split("\n");
 
         layout.setWidth(pageWidth - (leftMargin + rightMargin));
 
         cr.setSourceRGB(0.0, 0.0, 0.0);
 
-        cr.updateLayout(layout);
         b = layout.getBaseline();
         y = topMargin + b;
         for (String para : paras) {
