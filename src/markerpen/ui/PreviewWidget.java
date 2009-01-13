@@ -92,13 +92,13 @@ class PreviewWidget extends EventBox
         final double shadow = 3.0;
 
         cr.rectangle(shadow, shadow, pageWidth, pageHeight);
-        cr.setSourceRGB(0.1, 0.1, 0.1);
+        cr.setSource(0.1, 0.1, 0.1);
         cr.fill();
 
         cr.rectangle(0, 0, pageWidth, pageHeight);
-        cr.setSourceRGB(1.0, 1.0, 1.0);
+        cr.setSource(1.0, 1.0, 1.0);
         cr.fillPreserve();
-        cr.setSourceRGB(0.0, 0.0, 0.0);
+        cr.setSource(0.0, 0.0, 0.0);
         cr.setLineWidth(0.5);
         cr.stroke();
     }
@@ -113,13 +113,14 @@ class PreviewWidget extends EventBox
         cr.moveTo(leftMargin, topMargin);
 
         layout = new Layout(cr);
-        desc = new FontDescription("Liberation Serif");
-        desc.setSize(12.0);
-        layout.setFontDescription(desc);
 
         options = new FontOptions();
         options.setHintMetrics(OFF);
         layout.getContext().setFontOptions(options);
+
+        desc = new FontDescription("Liberation Serif");
+        desc.setSize(12.0);
+        layout.setFontDescription(desc);
 
         /*
          * This is fake. TODO pass in our TextStack object (which already
@@ -128,8 +129,9 @@ class PreviewWidget extends EventBox
         paras = text.split("\n");
 
         layout.setWidth(pageWidth - (leftMargin + rightMargin));
+        layout.setText("Workaround");
 
-        cr.setSourceRGB(0.0, 0.0, 0.0);
+        cr.setSource(0.0, 0.0, 0.0);
 
         b = layout.getBaseline();
         y = topMargin + b;
@@ -138,7 +140,6 @@ class PreviewWidget extends EventBox
 
             for (LayoutLine line : layout.getLinesReadonly()) {
                 v = line.getExtentsLogical().getHeight();
-                System.err.println(v); // DEBUG
 
                 y += v;
 
