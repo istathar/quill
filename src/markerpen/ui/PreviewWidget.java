@@ -15,7 +15,7 @@ import org.freedesktop.cairo.FontOptions;
 import org.freedesktop.cairo.Matrix;
 import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Allocation;
-import org.gnome.gtk.EventBox;
+import org.gnome.gtk.DrawingArea;
 import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.Unit;
 import org.gnome.gtk.Widget;
@@ -28,7 +28,7 @@ import static org.freedesktop.cairo.HintMetrics.OFF;
 /*
  * Work in "points", which makes sense since the target back end is PDF.
  */
-class PreviewWidget extends EventBox
+class PreviewWidget extends DrawingArea
 {
     private int pixelWidth;
 
@@ -169,6 +169,12 @@ class PreviewWidget extends EventBox
 
         matrix = new Matrix();
         matrix.scale(scaleFactor, scaleFactor);
+
+        if (scaleWidth > scaleHeight) {
+            matrix.translate(((pixelWidth / scaleFactor) - pageWidth) / 2.0, 0.0);
+        } else {
+            matrix.translate(0.0, ((pixelHeight / scaleFactor) - pageHeight) / 2.0);
+        }
 
         /*
          * Bump the image off of the top left corner.
