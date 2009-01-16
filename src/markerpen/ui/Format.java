@@ -46,7 +46,6 @@ public class Format
         list.add(mono);
 
         italics = new TextTag();
-        italics.setFamily("Serif");
         italics.setStyle(Style.ITALIC);
         list.add(italics);
 

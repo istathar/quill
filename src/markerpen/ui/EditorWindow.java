@@ -36,6 +36,7 @@ import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.WrapMode;
+import org.gnome.pango.FontDescription;
 
 class EditorWindow extends Window
 {
@@ -90,6 +91,7 @@ class EditorWindow extends Window
         insertBound = buffer.getInsert();
 
         view = new TextView(buffer);
+        view.modifyFont(new FontDescription("DejaVu Serif, 10"));
 
         /*
          * word wrap
