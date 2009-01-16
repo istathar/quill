@@ -15,6 +15,7 @@ import markerpen.docbook.Chapter;
 import markerpen.docbook.Document;
 import markerpen.docbook.Paragraph;
 import markerpen.docbook.Section;
+import markerpen.textbase.TextStack;
 
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
@@ -34,6 +35,31 @@ import static org.gnome.gtk.TextBuffer.OBJECT_REPLACEMENT_CHARACTER;
  */
 public class DocBookConverter
 {
+    public static Document buildTree(TextStack text) {
+        final Document book;
+        final Chapter chapter;
+        final Section section;
+        Paragraph para;
+
+        book = new BookDocument();
+
+        chapter = new Chapter();
+        book.add(chapter);
+
+        section = new Section();
+        chapter.add(section);
+
+        // FIXME actually iterate over the format changes!
+
+        while (true) {
+            para = new Paragraph(text.toString());
+            section.add(para);
+            break;
+        }
+
+        return book;
+    }
+
     public static Document buildTree(TextBuffer buffer) {
         final Document book;
         final Chapter chapter;

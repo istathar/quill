@@ -352,14 +352,10 @@ class EditorWindow extends Window
      */
     private void insertImage() {}
 
-    /*
-     * FIXME this is to be replaced by working off of the internal TextStack
-     * undo stack, not the TextBuffer backing the TextView.
-     */
     private void extractText() {
         final Document book;
 
-        book = DocBookConverter.buildTree(buffer);
+        book = DocBookConverter.buildTree(stack);
         try {
             book.toXML(System.out);
         } catch (IOException ioe) {
