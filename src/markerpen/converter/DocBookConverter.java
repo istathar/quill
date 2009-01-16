@@ -119,4 +119,13 @@ public class DocBookConverter
 
         return book;
     }
+
+    public static TextStack parseTree(nu.xom.Document document) {
+        final TextStack result;
+
+        result = new TextStack();
+
+        return result;
+    }
+
 }

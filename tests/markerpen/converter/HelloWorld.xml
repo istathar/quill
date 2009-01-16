@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book version="5.0" xmlns="http://docbook.org/ns/docbook">
+<chapter>
+<section>
+<para>
+Hello world
+</para>
+</section>
+</chapter>
+</book>
