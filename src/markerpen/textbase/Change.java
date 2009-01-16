@@ -10,8 +10,6 @@
  */
 package markerpen.textbase;
 
-import java.io.File;
-
 /**
  * Operations that can be applied to a TextStack.
  * 
@@ -44,32 +42,5 @@ public abstract class Change
 
     public int getLength() {
         return what.width;
-    }
-}
-
-/**
- * Populate a Text, but don't hold a reference to the data being added.
- * 
- * @author Andrew Cowie
- */
-class LoadFile extends Change
-{
-    /**
-     * Load a String into a Text.
-     */
-    LoadFile(String text) {
-        what = new Chunk(text);
-    }
-
-    public LoadFile(File file) {
-    // TODO
-    }
-
-    void apply(Text text) {
-        text.append(what);
-    }
-
-    void undo(Text text) {
-        return;
     }
 }
