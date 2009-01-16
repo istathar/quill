@@ -15,8 +15,6 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 import markerpen.textbase.TextStack;
-import nu.xom.Builder;
-import nu.xom.Document;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 
@@ -26,19 +24,14 @@ public class ValidateStackToDocBookConversion extends TestCase
 {
     public final void testLoadDocbook() throws IOException, ValidityException, ParsingException {
         final File source;
-        final Builder parser;
-        final Document document;
         final TextStack text;
 
         source = new File("tests/markerpen/converter/HelloWorld.xml");
         assertTrue(source.exists());
 
-        parser = new Builder();
-        document = parser.build(source);
-
-        text = parseTree(document);
+        text = parseTree(source);
 
         assertNotNull(text);
+        assertEquals("Hello world", text.toString());
     }
-
 }

@@ -10,12 +10,19 @@
  */
 package markerpen.converter;
 
+import java.io.File;
+import java.io.IOException;
+
 import markerpen.docbook.BookDocument;
 import markerpen.docbook.Chapter;
 import markerpen.docbook.Document;
 import markerpen.docbook.Paragraph;
 import markerpen.docbook.Section;
+import markerpen.textbase.EfficientNoNodeFactory;
 import markerpen.textbase.TextStack;
+import nu.xom.Builder;
+import nu.xom.ParsingException;
+import nu.xom.ValidityException;
 
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
@@ -120,12 +127,16 @@ public class DocBookConverter
         return book;
     }
 
-    public static TextStack parseTree(nu.xom.Document document) {
-        final TextStack result;
+    public static TextStack parseTree(File source) throws ValidityException, ParsingException,
+            IOException {
+        final Builder parser;
+        final EfficientNoNodeFactory factory;
 
-        result = new TextStack();
+        factory = new EfficientNoNodeFactory();
 
-        return result;
+        parser = new Builder(factory);
+        parser.build(source);
+
+        return factory.createText();
     }
-
 }
