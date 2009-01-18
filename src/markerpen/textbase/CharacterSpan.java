@@ -10,15 +10,26 @@
  */
 package markerpen.textbase;
 
+/**
+ * A Span comprising only a single Unicode character.
+ * 
+ * @author Andrew Cowie
+ * @author Devdas Bhagat
+ */
 public class CharacterSpan extends Span
 {
-    private char ch;
+    final char ch;
 
-    public CharacterSpan(char ch) {
+    public CharacterSpan(char ch, Markup[] markup) {
+        super(markup);
         this.ch = ch;
     }
 
     public String getText() {
         return Character.toString(ch);
+    }
+
+    public char getChar() {
+        return ch;
     }
 }

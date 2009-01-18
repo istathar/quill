@@ -1,5 +1,5 @@
 /*
- * MetaSpan.java
+ * Frame.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -11,14 +11,18 @@
 package markerpen.textbase;
 
 /**
- * A Span with metadata
+ * All kinds of formatting relating to positioning and displaying an image.
+ * Includes borders, padding, size, etc.
  * 
  * @author Andrew Cowie
- * @author Devdas Bhagat
  */
-abstract class MetaSpan extends Span
+public class Frame extends Markup
 {
-    public String getText() {
-        return "Δ";
+    public Frame() {
+        super();
     }
+
+    /*
+     * TODO, obviously
+     */
 }

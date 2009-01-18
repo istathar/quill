@@ -11,22 +11,47 @@
 package markerpen.textbase;
 
 /**
+ * A contigiously formatted span of text.
+ * 
+ * In editing use, Spans will usually be one character wide, but as loaded
+ * from an existing document, there will already be a String of the char data
+ * and we thus greatly optimize by reusing these.
+ * 
+ * Formatting is handled by the reference to a Markup instance, most of which
+ * are common and reusable. More complicated metadata, such as URLs, are
+ * handled by per-use instances.
  * 
  * @author Andrew Cowie
  * @author Devdas Bhagat
  */
 public abstract class Span
 {
-    Span prev;
+    /**
+     * The formatting applicable on this span. Will be null for the common
+     * case of there being no particular markup on normal text.
+     */
+    /*
+     * WARNING Our use of these arrays is to allocate them once and then reuse
+     * them, but since Java arrays are mutable we will have to change to a
+     * wrapper Object if the array setters make it outside this package.
+     */
+    final Markup[] markup;
 
-    Span next;
+    protected Span(Markup[] markup) {
+        this.markup = markup;
+    }
 
-    protected Span() {}
+    /**
+     * Get the char this Span represents, if it is only one character wide.
+     * Will return 0x0 if the Span is wider than a single character.
+     */
+    public abstract char getChar();
 
     /**
      * Get the text behind this Span for representation in the GUI. Since many
-     * spans are only one character wide, access the char field directly if
+     * spans are only one character wide, use {@link #getChar()} directly if
      * building up Strings to pass populate Element bodies.
      */
     public abstract String getText();
+
 }

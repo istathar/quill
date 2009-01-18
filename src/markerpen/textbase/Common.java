@@ -1,5 +1,5 @@
 /*
- * StringSpan.java
+ * Common.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,25 +10,22 @@
  */
 package markerpen.textbase;
 
+
 /**
- * A Span multiple characters wide built by reusing an existing String.
+ * Common markups that are frequently reused by reference.
+ * 
+ * In DocBook these are standard block and spanning elements without
+ * attributes.
  * 
  * @author Andrew Cowie
  */
-public class StringSpan extends Span
+public class Common extends Markup
 {
-    private final String data;
-
-    public StringSpan(String str, Markup[] markup) {
-        super(markup);
-        data = str;
+    private Common() {
+        super();
     }
 
-    public String getText() {
-        return data;
-    }
+    public static final Common ITALICS = new Common();
 
-    public char getChar() {
-        return 0;
-    }
+    public static final Common BOLD = new Common();
 }

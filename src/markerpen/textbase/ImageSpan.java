@@ -11,14 +11,49 @@
 package markerpen.textbase;
 
 /**
+ * A placeholder for an image.
+ * 
+ * Images are a bit special in that they are one characted wide in
+ * TextBuffers; they could be zero characters wide in textbase, but they doing
+ * it this way means we have offset consistency between TextBuffer and Chain.
+ * 
+ * The metadata relating to positioning such as size information goes in an
+ * {@link Frame} that should be placed at this location's markup.
+ * 
  * @author Andrew Cowie
  * @author Devdas Bhagat
  */
-public class ImageSpan extends MetaSpan
+/*
+ * Make this a Markup instead?
+ */
+public class ImageSpan extends Span
 {
+    /*
+     * This could become a richer type if more than a single relative path or
+     * whatever is needed.
+     */
     private String ref;
 
-    public ImageSpan(String ref) {
+    /*
+     * TODO: image type?
+     */
+    public ImageSpan(String ref, Markup[] markup) {
+        super(markup);
         this.ref = ref;
+    }
+
+    public String getText() {
+        return null;
+    }
+
+    public char getChar() {
+        return 0;
+    }
+
+    /*
+     * Do we actually want to expose in this fashion.
+     */
+    public String getRef() {
+        return ref;
     }
 }

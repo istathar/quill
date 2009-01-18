@@ -1,5 +1,5 @@
 /*
- * UrlSpan.java
+ * Markup.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,11 +10,12 @@
  */
 package markerpen.textbase;
 
-public class UrlSpan extends MetaSpan
+/**
+ * Base class for indicating formatting and markup.
+ * 
+ * @author Andrew Cowie
+ */
+public abstract class Markup
 {
-    private String url;
-
-    public UrlSpan(String url) {
-        this.url = url;
-    }
+    protected Markup() {}
 }

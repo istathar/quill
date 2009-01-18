@@ -10,11 +10,6 @@
  */
 package markerpen.textbase;
 
-import markerpen.textbase.CharacterSpan;
-import markerpen.textbase.ImageSpan;
-import markerpen.textbase.Span;
-import markerpen.textbase.StringSpan;
-import markerpen.textbase.UrlSpan;
 import junit.framework.TestCase;
 
 public class ValidateSpanOperations extends TestCase
@@ -22,20 +17,21 @@ public class ValidateSpanOperations extends TestCase
     public final void testSpanStringAccess() {
         final Span one, two;
 
-        one = new StringSpan("Hello Devdas");
+        one = new StringSpan("Hello Devdas", null);
         assertEquals("Hello Devdas", one.getText());
+        assertEquals(0, one.getChar());
 
-        two = new CharacterSpan('£');
+        two = new CharacterSpan('£', null);
         assertEquals("£", two.getText());
+        assertEquals('£', two.getChar());
     }
 
     public final void testMetaSpansTextForm() {
-        final Span img, url;
+        final Span img;
 
-        img = new ImageSpan("images/Logo.png");
-        assertNotNull(img.getText());
-
-        url = new UrlSpan("http://www.example.com/");
-        assertNotNull(url.getText());
+        img = new ImageSpan("images/Logo.png", null);
+        assertNull(img.getText());
+        assertEquals(0, img.getChar());
+        assertEquals("images/Logo.png", ((ImageSpan) img).getRef());
     }
 }
