@@ -94,7 +94,7 @@ public class Text
      * Insert the given Java String at the specified offset.
      */
     protected void insert(int offset, String what) {
-        insert(offset, new Chunk(what));
+        insert(offset, new StringSpan(what, null));
     }
 
     /**
@@ -219,7 +219,7 @@ public class Text
      * a new Piece before and after, and a Piece wrapping the Chunk and linked
      * between them. This is the workhorse of this class.
      */
-    void insert(int offset, Chunk addition) {
+    void insert(int offset, Span addition) {
         Piece one, two, piece;
 
         if (offset < 0) {
@@ -227,7 +227,7 @@ public class Text
         }
 
         piece = new Piece();
-        piece.chunk = addition;
+        piece.span = addition;
 
         if (offset == 0) {
             piece.next = first;

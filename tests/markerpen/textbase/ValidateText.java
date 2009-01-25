@@ -118,12 +118,12 @@ public class ValidateText extends TestCase
 
     public final void testMultipleSplice() {
         final Text text;
-        final Chunk one, two, three, four, space, addition;
-        one = new Chunk("One");
-        space = new Chunk(" ");
-        two = new Chunk("Two");
-        three = new Chunk("Three");
-        four = new Chunk("Four");
+        final Span one, two, three, four, space, addition;
+        one = new StringSpan("One", null);
+        space = new CharacterSpan(' ', null);
+        two = new StringSpan("Two", null);
+        three = new StringSpan("Three", null);
+        four = new StringSpan("Four", null);
 
         text = new Text(one);
         text.append(space);
@@ -141,7 +141,7 @@ public class ValidateText extends TestCase
          * Now, try splicing something in
          */
 
-        addition = new Chunk("wentyT");
+        addition = new StringSpan("wentyT", null);
         text.insert(5, addition);
         assertEquals("One TwentyTwo Three Four", text.toString());
 
@@ -163,16 +163,16 @@ public class ValidateText extends TestCase
 
     public final void testTextLength() {
         final Text text;
-        final Chunk zero, one, two;
+        final Span zero, one, two;
 
-        zero = new Chunk("Hello");
-        assertEquals(5, zero.width);
-        assertEquals(5, zero.text.length);
+        zero = new StringSpan("Hello", null);
+        assertEquals(5, zero.getWidth());
+        assertEquals(5, zero.getText().length());
         text = new Text(zero);
         assertEquals(5, text.length());
 
-        one = new Chunk("Happy");
-        two = new Chunk("Days");
+        one = new StringSpan("Happy", null);
+        two = new StringSpan("Days", null);
 
         text.append(one);
         text.append(two);
@@ -181,12 +181,12 @@ public class ValidateText extends TestCase
 
     public final void testInsertBetweenExistingChunks() {
         final Text text;
-        final Chunk zero, one, two, three;
+        final Span zero, one, two, three;
 
-        zero = new Chunk("Zero");
-        one = new Chunk("One");
-        two = new Chunk("Two");
-        three = new Chunk("Three");
+        zero = new StringSpan("Zero", null);
+        one = new StringSpan("One", null);
+        two = new StringSpan("Two", null);
+        three = new StringSpan("Three", null);
 
         text = new Text(one);
         text.append(two);
@@ -223,13 +223,13 @@ public class ValidateText extends TestCase
 
     public final void testConcatonatingChunks() {
         final Text text;
-        final Chunk zero, one, two, three, result;
+        final Span zero, one, two, three, result;
         final Piece splice;
 
-        zero = new Chunk("Zero");
-        one = new Chunk("One");
-        two = new Chunk("Two");
-        three = new Chunk("Three");
+        zero = new StringSpan("Zero", null);
+        one = new StringSpan("One", null);
+        two = new StringSpan("Two", null);
+        three = new StringSpan("Three", null);
 
         text = new Text(zero);
         text.append(one);
@@ -241,9 +241,8 @@ public class ValidateText extends TestCase
         splice = text.concatonateFrom(2, 11);
 
         assertEquals("ZeroOneTwoThree", text.toString());
-        result = splice.chunk;
-        assertEquals(0, result.start);
-        assertEquals(11, result.width);
+        result = splice.span;
+        assertEquals(11, result.getWidth());
         assertEquals("roOneTwoThr", result.toString());
     }
 

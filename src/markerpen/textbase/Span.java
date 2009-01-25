@@ -69,9 +69,9 @@ public abstract class Span
         str.append('»');
 
         if (markup == null) {
-            str.append(" no format");
+            str.append(" no markup");
         } else {
-            str.append(" with formats ");
+            str.append(" with markups ");
 
             for (int i = 0; i < markup.length; i++) {
                 str.append(markup[i]);
