@@ -119,7 +119,7 @@ class PreviewWidget extends DrawingArea
         layout.getContext().setFontOptions(options);
 
         desc = new FontDescription("Liberation Serif");
-        desc.setSize(12.0);
+        desc.setSize(10.0);
         layout.setFontDescription(desc);
 
         /*

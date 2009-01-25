@@ -19,6 +19,7 @@ import markerpen.docbook.Italics;
 import markerpen.docbook.Paragraph;
 import markerpen.docbook.Section;
 
+import static textview.LoremIpsum.text;
 
 public class ExampleWritingDocBook
 {
@@ -43,6 +44,15 @@ public class ExampleWritingDocBook
         para.add(new Italics("yummy"));
         para.add(" delicious absolutely brilliant delightful breakfast.");
         section.add(para);
+
+        String[] paras;
+
+        paras = text.split("\n");
+
+        for (String blob : paras) {
+            para = new Paragraph(blob);
+            section.add(para);
+        }
 
         if (true) {
             for (int i = 1; i <= 70; i++) {

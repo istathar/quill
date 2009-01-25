@@ -23,6 +23,7 @@ import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.WrapMode;
+import org.gnome.pango.FontDescription;
 
 import static textview.LoremIpsum.text;
 
@@ -56,6 +57,7 @@ public class DemoWindow extends Window
         for (i = 1; i < 5; i++) {
             TextView view;
             TextBuffer buffer;
+            FontDescription desc;
 
             spread = new HBox(false, 3);
             spread.packStart(new Entry("Title " + i));
@@ -66,6 +68,11 @@ public class DemoWindow extends Window
             view = new TextView();
             view.setWrapMode(WrapMode.WORD);
             view.setPaddingBelowParagraph(10);
+            desc = new FontDescription("Deja Vu Sans, 9");
+            view.modifyFont(desc);
+            view.setBorderWidth(2);
+
+            view.setLeftMargin(3);
 
             buffer = view.getBuffer();
             buffer.setText(text);
