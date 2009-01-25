@@ -11,7 +11,7 @@
 package markerpen.textbase;
 
 /**
- * A mutable buffer of unicode text which manages a linked list of Chunks in
+ * A mutable buffer of unicode text which manages a linked list of Spans in
  * order to maximize sharing of character array storage.
  * 
  * @author Andrew Cowie
@@ -22,12 +22,12 @@ public class Text
 
     protected Text(String str) {
         first = new Piece();
-        first.chunk = new Chunk(str);
+        first.span = new StringSpan(str, null);
     }
 
-    Text(Chunk initial) {
+    Text(Span initial) {
         first = new Piece();
-        first.chunk = initial;
+        first.span = initial;
     }
 
     /**
@@ -44,7 +44,7 @@ public class Text
         result = 0;
 
         while (piece != null) {
-            result += piece.chunk.width;
+            result += piece.span.getWidth();
             piece = piece.next;
         }
 
@@ -59,14 +59,18 @@ public class Text
         piece = first;
 
         while (piece != null) {
-            str.append(piece.chunk.text, piece.chunk.start, piece.chunk.width);
+            if (piece.span instanceof CharacterSpan) {
+                str.append(piece.span.getChar());
+            } else {
+                str.append(piece.span.getText());
+            }
             piece = piece.next;
         }
 
         return str.toString();
     }
 
-    void append(Chunk addition) {
+    void append(Span addition) {
         Piece piece;
         final Piece last;
 
@@ -83,7 +87,7 @@ public class Text
         last = new Piece();
         last.prev = piece;
         piece.next = last;
-        last.chunk = addition;
+        last.span = addition;
     }
 
     /**
@@ -99,10 +103,28 @@ public class Text
      */
     Piece splitAt(Piece from, int point) {
         Piece preceeding, one, two, following;
-        Chunk before, after;
+        Span before, after;
 
-        before = new Chunk(from.chunk, 0, point);
-        after = new Chunk(from.chunk, point, from.chunk.width - point);
+        /*
+         * If it's already a width one span, then we're done. Note that this
+         * includes width one StringSpans.
+         */
+
+        if (from.span.getWidth() == 1) {
+            return from;
+        }
+
+        /*
+         * Otherwise, split the StringSpan into two StringSpans. FIXME or
+         * CharacterSpans?
+         */
+
+        before = new StringSpan(from.span, 0, point);
+        after = new StringSpan(from.span, point);
+
+        /*
+         * and wrap Pieces around them.
+         */
 
         one = new Piece();
         two = new Piece();
@@ -116,11 +138,11 @@ public class Text
             one.prev = preceeding;
         }
 
-        one.chunk = before;
+        one.span = before;
         one.next = two;
 
         two.prev = one;
-        two.chunk = after;
+        two.span = after;
 
         following = from.next;
 
@@ -169,7 +191,7 @@ public class Text
              * and split at that point.
              */
 
-            following = start + piece.chunk.width;
+            following = start + piece.span.getWidth();
 
             if (following > offset) {
                 return splitAt(piece, offset - start);

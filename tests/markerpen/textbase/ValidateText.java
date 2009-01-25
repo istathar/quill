@@ -11,9 +11,6 @@
 
 package markerpen.textbase;
 
-import markerpen.textbase.Chunk;
-import markerpen.textbase.Piece;
-import markerpen.textbase.Text;
 import junit.framework.TestCase;
 
 public class ValidateText extends TestCase
@@ -28,11 +25,11 @@ public class ValidateText extends TestCase
 
     public final void testTwoSequentialChunks() {
         final Text text;
-        final Chunk second;
+        final Span second;
 
         text = new Text("Hello world");
 
-        second = new Chunk(" it is a sunny day");
+        second = new StringSpan(" it is a sunny day", null);
         text.append(second);
 
         assertEquals("Hello world it is a sunny day", text.toString());
@@ -40,14 +37,12 @@ public class ValidateText extends TestCase
 
     public final void testExtractedChunks() {
         final Text text;
-        final Chunk initial, one, two, three, space;
+        final Span one, two, three, space;
 
-        initial = new Chunk("Emergency broadcast system");
-
-        one = new Chunk(initial, 0, 9);
-        two = new Chunk(initial, 10, 9);
-        three = new Chunk(initial, 20, 6);
-        space = new Chunk(initial, 9, 1);
+        one = new StringSpan("Emergency", null);
+        two = new StringSpan("broadcast", null);
+        three = new StringSpan("system", null);
+        space = new CharacterSpan(' ', null);
 
         text = new Text("");
         text.append(three);
@@ -61,10 +56,10 @@ public class ValidateText extends TestCase
 
     public final void testSplittingAtPoint() {
         final Text text;
-        final Chunk initial;
+        final Span initial;
         final Piece one, two;
 
-        initial = new Chunk("Concave");
+        initial = new StringSpan("Concave", null);
         text = new Text(initial);
         assertEquals("Concave", text.toString());
         assertNull(text.first.next);
@@ -74,21 +69,21 @@ public class ValidateText extends TestCase
         assertEquals("Concave", text.toString());
 
         assertNotNull(one.next);
-        assertEquals("Con", one.chunk.toString());
+        assertEquals("Con", one.span.getText());
 
         two = one.next;
-        assertEquals("cave", two.chunk.toString());
+        assertEquals("cave", two.span.getText());
         assertNull(two.next);
         assertEquals(one, two.prev);
     }
 
     public final void testSplittingAtPieceBoundary() {
         final Text text;
-        final Chunk a, b;
+        final Span a, b;
         final Piece first, one, two;
 
-        a = new Chunk("Alpha");
-        b = new Chunk("Bravo");
+        a = new StringSpan("Alpha", null);
+        b = new StringSpan("Bravo", null);
 
         text = new Text(a);
         text.append(b);
@@ -104,10 +99,10 @@ public class ValidateText extends TestCase
         assertSame(first, one);
         assertNotNull(one.next);
         assertNotSame(one, one.next);
-        assertEquals("Alpha", one.chunk.toString());
+        assertEquals("Alpha", one.span.getText());
 
         two = one.next;
-        assertEquals("Bravo", two.chunk.toString());
+        assertEquals("Bravo", two.span.getText());
         assertNull(two.next);
         assertEquals(one, two.prev);
     }

@@ -24,6 +24,21 @@ public class StringSpan extends Span
         data = str;
     }
 
+    /*
+     * The OpenJava implementation reuses the underlying character array, so
+     * this is all good.
+     */
+
+    StringSpan(Span span, int begin) {
+        super(span.markup);
+        data = span.getText().substring(begin);
+    }
+
+    StringSpan(Span span, int begin, int end) {
+        super(span.markup);
+        data = span.getText().substring(begin, end);
+    }
+
     public String getText() {
         return data;
     }

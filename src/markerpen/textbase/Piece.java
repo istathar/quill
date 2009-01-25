@@ -20,7 +20,7 @@ class Piece
 {
     Piece prev;
 
-    Chunk chunk;
+    Span span;
 
     Piece next;
 
@@ -44,7 +44,7 @@ class Piece
         }
 
         str.append("«");
-        str.append(chunk.toString());
+        str.append(span.toString());
         str.append("» at ");
         str.append(i);
 
