@@ -65,7 +65,7 @@ class EditorWindow extends Window
 
     private void setupWindow() {
         window = this;
-        window.setDefaultSize(200, 300);
+        window.setDefaultSize(400, 300);
 
         top = new VBox(false, 6);
         window.add(top);
@@ -83,15 +83,19 @@ class EditorWindow extends Window
     }
 
     private void setupEditor() {
+        final FontDescription desc;
         final ScrolledWindow scroll;
 
         buffer = new TextBuffer();
-
         selectionBound = buffer.getSelectionBound();
         insertBound = buffer.getInsert();
 
         view = new TextView(buffer);
-        view.modifyFont(new FontDescription("DejaVu Serif, 10"));
+        view.setSizeRequest(400, -1);
+        desc = new FontDescription();
+        desc.setFamily("DejaVu Serif");
+        desc.setSize(9.0);
+        view.modifyFont(desc);
 
         /*
          * word wrap

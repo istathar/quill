@@ -37,12 +37,13 @@ public class Format
     public static final TextTag hidden;
 
     static {
-        ArrayList<TextTag> list;
+        final ArrayList<TextTag> list;
 
         list = new ArrayList<TextTag>(4);
 
         mono = new TextTag();
-        mono.setFamily("Mono");
+        mono.setFamily("DejaVu Sans Mono");
+        mono.setSize(9.0);
         list.add(mono);
 
         italics = new TextTag();
