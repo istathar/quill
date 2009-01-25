@@ -45,6 +45,24 @@ public class ValidateSpanOperations extends TestCase
         assertEquals(1, c.getWidth());
         assertEquals(11, s.getWidth());
         assertEquals(1, i.getWidth());
+    }
 
+    public final void testCharacterSpanStringCaching() {
+        final Span d1, d2, e1, e2;
+
+        /*
+         * Will be cached.
+         */
+        d1 = new CharacterSpan('$', null);
+        d2 = new CharacterSpan('$', null);
+
+        /*
+         * Wouldn't be cached, except that we intern() these after creation.
+         */
+        e1 = new CharacterSpan('€', null);
+        e2 = new CharacterSpan('€', null);
+
+        assertSame(d1.getText(), d2.getText());
+        assertSame(e1.getText(), e2.getText());
     }
 }

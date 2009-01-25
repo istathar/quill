@@ -20,13 +20,47 @@ public class CharacterSpan extends Span
 {
     final char ch;
 
+    /**
+     * We get the Text value so often that we will cache the conversion here,
+     * and while doing so, cache references to the common Strings as well.
+     */
+    final String text;
+
     public CharacterSpan(char ch, Markup[] markup) {
         super(markup);
         this.ch = ch;
+        this.text = toString(ch);
+    }
+
+    /*
+     * This can be tuned, obviously.
+     */
+
+    private static String[] cache;
+
+    static {
+        cache = new String[256];
+    }
+
+    /**
+     * Implement the same caching approach as is used in places like
+     * Integer.valueOf() for low range common characters. In the case of
+     * higher range numbers, we turn to the JVM's interning infrastructure for
+     * Strings.
+     */
+    private static String toString(char ch) {
+        if (ch < 256) {
+            if (cache[ch] == null) {
+                cache[ch] = String.valueOf(ch);
+            }
+            return cache[ch];
+        } else {
+            return String.valueOf(ch).intern();
+        }
     }
 
     public String getText() {
-        return Character.toString(ch);
+        return text;
     }
 
     public char getChar() {
