@@ -55,4 +55,32 @@ public abstract class Span
     public abstract String getText();
 
     public abstract int getWidth();
+
+    /**
+     * For debugging, only!
+     */
+    public String toString() {
+        StringBuilder str;
+
+        str = new StringBuilder();
+
+        str.append('«');
+        str.append(getText());
+        str.append('»');
+
+        if (markup == null) {
+            str.append(" no format");
+        } else {
+            str.append(" with formats ");
+
+            for (int i = 0; i < markup.length; i++) {
+                str.append(markup[i]);
+                if (i > 0) {
+                    str.append(", ");
+                }
+            }
+        }
+
+        return str.toString();
+    }
 }
