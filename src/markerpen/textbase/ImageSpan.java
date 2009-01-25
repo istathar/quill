@@ -43,7 +43,7 @@ public class ImageSpan extends Span
     }
 
     public String getText() {
-        return null;
+        return "";
     }
 
     public char getChar() {
@@ -55,5 +55,14 @@ public class ImageSpan extends Span
      */
     public String getRef() {
         return ref;
+    }
+
+    /*
+     * As stored in a TextBuffer, Images and Widgets take 1 char. We return
+     * this value so that the TextBuffer : TextChain offset ratios remain
+     * equal.
+     */
+    public int getWidth() {
+        return 1;
     }
 }

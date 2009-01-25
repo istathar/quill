@@ -32,4 +32,8 @@ public class CharacterSpan extends Span
     public char getChar() {
         return ch;
     }
+
+    public int getWidth() {
+        return 1;
+    }
 }

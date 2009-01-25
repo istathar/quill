@@ -17,8 +17,8 @@ public class ValidateSpanOperations extends TestCase
     public final void testSpanStringAccess() {
         final Span one, two;
 
-        one = new StringSpan("Hello Devdas", null);
-        assertEquals("Hello Devdas", one.getText());
+        one = new StringSpan("Hello World", null);
+        assertEquals("Hello World", one.getText());
         assertEquals(0, one.getChar());
 
         two = new CharacterSpan('£', null);
@@ -30,8 +30,21 @@ public class ValidateSpanOperations extends TestCase
         final Span img;
 
         img = new ImageSpan("images/Logo.png", null);
-        assertNull(img.getText());
+        assertEquals("", img.getText());
         assertEquals(0, img.getChar());
         assertEquals("images/Logo.png", ((ImageSpan) img).getRef());
+    }
+
+    public final void testSpanWidths() {
+        final Span c, s, i;
+
+        c = new CharacterSpan('A', null);
+        s = new StringSpan("Hello World", null);
+        i = new ImageSpan("share/picture.png", null);
+
+        assertEquals(1, c.getWidth());
+        assertEquals(11, s.getWidth());
+        assertEquals(1, i.getWidth());
+
     }
 }

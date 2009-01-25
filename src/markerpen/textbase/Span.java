@@ -54,4 +54,5 @@ public abstract class Span
      */
     public abstract String getText();
 
+    public abstract int getWidth();
 }

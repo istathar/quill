@@ -31,4 +31,8 @@ public class StringSpan extends Span
     public char getChar() {
         return 0;
     }
+
+    public int getWidth() {
+        return data.length();
+    }
 }
