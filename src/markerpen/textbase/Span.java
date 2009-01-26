@@ -64,9 +64,9 @@ public abstract class Span
 
         str = new StringBuilder();
 
-        str.append('«');
+        str.append('"');
         str.append(getText());
-        str.append('»');
+        str.append('"');
 
         if (markup == null) {
             str.append(" no markup");

@@ -221,10 +221,32 @@ public class ValidateText extends TestCase
         assertEquals("All this has happened before, all this will happen again.", text.toString());
     }
 
+    private static int lengthOf(Span[] range) {
+        int i;
+
+        i = 0;
+        for (Span s : range) {
+            i += s.getWidth();
+        }
+
+        return i;
+    }
+
+    private static String textOf(Span[] range) {
+        final StringBuilder str;
+
+        str = new StringBuilder();
+        for (Span s : range) {
+            str.append(s.getText());
+        }
+
+        return str.toString();
+    }
+
     public final void testConcatonatingChunks() {
         final Text text;
         final Span zero, one, two, three, result;
-        final Piece splice;
+        final Span[] range;
 
         zero = new StringSpan("Zero", null);
         one = new StringSpan("One", null);
@@ -238,22 +260,22 @@ public class ValidateText extends TestCase
 
         assertEquals("ZeroOneTwoThree", text.toString());
 
-        splice = text.concatonateFrom(2, 11);
+        range = text.concatonateFrom(2, 11);
 
         assertEquals("ZeroOneTwoThree", text.toString());
-        result = splice.span;
-        assertEquals(11, result.getWidth());
-        assertEquals("roOneTwoThr", result.toString());
+
+        assertEquals(11, lengthOf(range));
+        assertEquals("roOneTwoThr", textOf(range));
     }
 
     public final void testConcatonateAll() {
         final Text text;
-        final Chunk zero, one, two, result;
-        final Piece splice;
+        final Span zero, one, two;
+        final Span[] range;
 
-        zero = new Chunk("James");
-        one = new Chunk(" T. ");
-        two = new Chunk("Kirk");
+        zero = new StringSpan("James", null);
+        one = new StringSpan(" T. ", null);
+        two = new StringSpan("Kirk", null);
 
         text = new Text(zero);
         text.append(one);
@@ -261,13 +283,12 @@ public class ValidateText extends TestCase
 
         assertEquals("James T. Kirk", text.toString());
 
-        splice = text.concatonateFrom(0, 13);
+        range = text.concatonateFrom(0, 13);
 
         assertEquals("James T. Kirk", text.toString());
-        result = splice.chunk;
-        assertEquals(0, result.start);
-        assertEquals(13, result.width);
-        assertEquals("James T. Kirk", result.toString());
+
+        assertEquals(13, lengthOf(range));
+        assertEquals("James T. Kirk", textOf(range));
     }
 
     public final void testDeleteRange() {

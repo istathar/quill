@@ -157,7 +157,7 @@ public class Text
     /**
      * Find the Piece containing offset, and split it into two. Handle the
      * boundary cases of an offset at a Piece boundary. Returns first of the
-     * two Pieces; or null if the offset co
+     * two Pieces; or null if the offset FIXME
      */
     /*
      * TODO Initial implementation of this is an ugly linear search; replace
@@ -248,6 +248,9 @@ public class Text
     }
 
     /**
+     * Get an array of Pieces representing the concatonation of the marked up
+     * Spans in a given range.
+     * 
      * Allocate a new Chunk by concatonating any and all Chunks starting at
      * offset for width. While deleting, as such, does not require this,
      * undo/redo does.
@@ -257,17 +260,14 @@ public class Text
      * is to delete, so the boundaries are a good first step, and it makes the
      * algorithm here far simpler.
      * 
-     * Returns a Piece wrapping the extracted Chunk (and linked in to the
-     * Text).
+     * Returns an array of Pieces wrapping the extracted range.
      */
-    Piece concatonateFrom(int offset, int width) {
-        final Piece preceeding, two, following, splice;
+    Span[] concatonateFrom(int offset, int width) {
+        final Piece preceeding, alpha, omega, following;
+        final Span[] result;
         Piece p;
-        Chunk c;
+        Span s;
         int i;
-        char[] data;
-        byte[] markup;
-        final Chunk extract;
 
         if (offset < 0) {
             throw new IllegalArgumentException();
@@ -288,70 +288,46 @@ public class Text
          */
 
         preceeding = splitAt(offset);
+        alpha = preceeding.next;
 
-        two = splitAt(offset + width);
-        following = two.next;
+        omega = splitAt(offset + width);
+        following = omega.next;
 
         /*
-         * Copy characters from the Pieces in the middle into a char[], then
-         * form them into a Chunk.
+         * Need to know how many pieces are in between so we can size the
+         * return array.
          */
-
-        data = new char[width];
-        markup = null;
 
         if (preceeding == null) {
             if (following == null) {
                 p = first;
             } else {
-                p = two;
+                p = omega;
             }
         } else {
             p = preceeding.next;
         }
-        i = 0;
 
-        while (p != following) {
-            c = p.chunk;
-
-            System.arraycopy(c.text, c.start, data, i, c.width);
-
-            if (c.markup != null) {
-                if (markup == null) {
-                    markup = new byte[width];
-                }
-                System.arraycopy(c.markup, c.start, markup, i, c.width);
-            }
-
-            i += c.width;
+        i = 1;
+        while (p != omega) {
+            i++;
             p = p.next;
         }
 
-        extract = new Chunk(data, markup);
+        result = new Span[i];
 
         /*
-         * Now embed this extract into a Piece and splice that into the Text.
-         * This is the "wasteful" part if we're deleting, except that it gives
-         * us the handle we need to locate the boundaries. Think of it as a
-         * tuple :)
+         * And now populate the array representing the concatonation.
          */
 
-        splice = new Piece();
-        splice.chunk = extract;
+        p = alpha;
 
-        if (preceeding == null) {
-            first = splice;
-        } else {
-            preceeding.next = splice;
-            splice.prev = preceeding;
+        for (i = 0; i < result.length; i++) {
+            result[i] = p.span;
+            p = p.next;
         }
 
-        if (following != null) {
-            splice.next = following;
-            following.prev = splice;
-        }
-
-        return splice;
+        return result;
     }
 
     /**
