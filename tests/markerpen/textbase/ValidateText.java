@@ -384,17 +384,22 @@ public class ValidateText extends TestCase
         // is ok
     }
 
-    private static byte currentFormat(Piece p) {
-        if (p.chunk.markup == null) {
-            return 0;
+    private final boolean containsFormat(Piece p, Markup format) {
+        if (p.span.markup == null) {
+            return false;
         }
-        return p.chunk.markup[0];
+
+        for (Markup m : p.span.markup) {
+            if (m == format) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public final void testApplyFormatting() {
         final Text text;
         Piece p;
-        final byte[] target;
 
         text = new Text("Hello World");
 
@@ -403,30 +408,31 @@ public class ValidateText extends TestCase
          * will have the format, the second will not.
          */
 
-        text.format(0, 5, (byte) 0x0A);
+        text.format(0, 5, Common.ITALICS, true);
 
         assertEquals(2, calculateNumberPieces(text));
         p = text.first;
-        assertEquals(0x0A, currentFormat(p));
+        assertTrue(containsFormat(p, Common.ITALICS));
         p = p.next;
-        assertEquals(0x00, currentFormat(p));
+        assertNull(p.span.markup);
+        assertFalse(containsFormat(p, Common.ITALICS));
         assertEquals("Hello World", text.toString());
 
         /*
          * Format second word
          */
 
-        text.format(6, 5, (byte) 0x01);
+        text.format(6, 5, Common.BOLD, true);
 
         assertEquals(3, calculateNumberPieces(text));
         p = text.first;
-        assertEquals(0x0A, currentFormat(p));
+        assertTrue(containsFormat(p, Common.ITALICS));
         p = p.next;
-        assertEquals(0x00, currentFormat(p));
-        assertEquals(" ", p.chunk.toString());
+        assertEquals(null, p.span.markup);
+        assertEquals(" ", p.span.getText());
         p = p.next;
-        assertEquals(0x01, currentFormat(p));
-        assertEquals("World", p.chunk.toString());
+        assertTrue(containsFormat(p, Common.BOLD));
+        assertEquals("World", p.span.getText());
         assertNull(p.next);
         assertEquals("Hello World", text.toString());
 
@@ -434,15 +440,22 @@ public class ValidateText extends TestCase
          * Now do something across entire text
          */
 
-        text.format(0, 11, (byte) 0x04);
+        text.format(0, 11, Common.FILENAME, true);
 
-        assertEquals(1, calculateNumberPieces(text));
-        target = new byte[] {
-                0x0E, 0x0E, 0x0E, 0x0E, 0x0E, 0x04, 0x05, 0x05, 0x05, 0x05, 0x05
-        };
-        for (int i = 0; i < 11; i++) {
-            assertEquals(target[i], text.first.chunk.markup[i]);
-        }
+        assertEquals(3, calculateNumberPieces(text));
+        p = text.first;
+        assertTrue(containsFormat(p, Common.ITALICS));
+        assertTrue(containsFormat(p, Common.FILENAME));
+        assertFalse(containsFormat(p, Common.BOLD));
+        p = p.next;
+        assertFalse(containsFormat(p, Common.ITALICS));
+        assertTrue(containsFormat(p, Common.FILENAME));
+        assertFalse(containsFormat(p, Common.BOLD));
+        p = p.next;
+        assertFalse(containsFormat(p, Common.ITALICS));
+        assertTrue(containsFormat(p, Common.FILENAME));
+        assertTrue(containsFormat(p, Common.BOLD));
+
         assertEquals("Hello World", text.toString());
     }
 
@@ -456,8 +469,6 @@ public class ValidateText extends TestCase
 
     public final void testRemovingFormatting() {
         final char[] data;
-        final byte[] markup, target;
-        final Chunk chunk;
         final Text text;
 
         data = new char[] {

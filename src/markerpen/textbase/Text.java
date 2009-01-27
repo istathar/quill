@@ -398,34 +398,40 @@ public class Text
     }
 
     /**
-     * If format is negative, the formats it refers to will be removed instead
-     * of applied. Like delete() it returns the Chunk representing the splice.
+     * Add or remove a Markup format from a range of text. Like delete() it
+     * returns the Span[] representing the splice.
      */
     protected Span[] format(int offset, int width, Markup format, boolean additive) {
-        final Piece splice;
-        Chunk c;
-        int i;
+        final Pair pair;
+        Piece p;
+        Span s;
 
-        range = extractFrom(offset, width);
+        pair = extractFrom(offset, width);
 
-        c = splice.chunk;
+        /*
+         * Unlike the insert() and delete() operations, we can leave the Piece
+         * sequence alone. The difference is that we change the Spans that are
+         * pointed to in the range being changed.
+         */
 
-        if (c.markup == null) {
-            c = new Chunk(c.text, new byte[c.text.length]);
-            splice.chunk = c;
+        p = pair.one;
+
+        while (true) {
+            s = p.span;
+
+            if (additive) {
+                p.span = s.applyMarkup(format);
+            } else {
+                p.span = s.removeMarkup(format);
+            }
+
+            if (p == pair.two) {
+                break;
+            }
+
+            p = p.next;
         }
 
-        if (format >= 0) {
-            for (i = c.start; i < c.start + c.width; i++) {
-                c.markup[i] |= format;
-            }
-        } else {
-            format = (byte) -format;
-            for (i = c.start; i < c.start + c.width; i++) {
-                c.markup[i] &= c.markup[i] ^ format;
-            }
-        }
-
-        return splice.chunk;
+        return formArray(pair);
     }
 }

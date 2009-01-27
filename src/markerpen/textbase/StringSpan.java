@@ -24,6 +24,10 @@ public class StringSpan extends Span
         data = str;
     }
 
+    protected Span copy(Markup[] markup) {
+        return new StringSpan(this.data, markup);
+    }
+
     /*
      * The OpenJava implementation reuses the underlying character array, so
      * this is all good.

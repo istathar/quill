@@ -41,6 +41,8 @@ public abstract class Span
         this.markup = markup;
     }
 
+    protected abstract Span copy(Markup[] markup);
+
     /**
      * Get the char this Span represents, if it is only one character wide.
      * Will return 0x0 if the Span is wider than a single character.
@@ -55,6 +57,82 @@ public abstract class Span
     public abstract String getText();
 
     public abstract int getWidth();
+
+    /**
+     * Does this Span contain the specified formatting?
+     */
+    private final boolean contains(Markup format) {
+        if (markup == null) {
+            return false;
+        }
+        for (Markup m : markup) {
+            if (m == format) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    Span applyMarkup(Markup format) {
+        final Markup[] replacement;
+        final Span result;
+        final int len;
+
+        if (markup == null) {
+            len = 0;
+        } else {
+            len = markup.length;
+        }
+
+        if (contains(format)) {
+            return this;
+        }
+
+        replacement = new Markup[len + 1];
+        if (len > 0) {
+            System.arraycopy(markup, 0, replacement, 0, len);
+        }
+
+        replacement[len] = format;
+        result = this.copy(replacement);
+
+        return result;
+    }
+
+    Span removeMarkup(Markup format) {
+        final Markup[] replacement;
+        final Span result;
+        final int len;
+        int i;
+
+        if (markup == null) {
+            return this;
+        }
+
+        if (!(contains(format))) {
+            return this;
+        }
+
+        len = markup.length - 1;
+
+        if (len == 0) {
+            return this.copy(null);
+        }
+
+        replacement = new Markup[len];
+
+        i = 0;
+        for (Markup m : markup) {
+            if (m == format) {
+                continue;
+            }
+            replacement[i++] = m;
+        }
+
+        result = this.copy(replacement);
+
+        return result;
+    }
 
     /**
      * For debugging, only!

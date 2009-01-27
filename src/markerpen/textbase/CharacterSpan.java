@@ -32,6 +32,10 @@ public class CharacterSpan extends Span
         this.text = toString(ch);
     }
 
+    protected Span copy(Markup[] markup) {
+        return new CharacterSpan(this.ch, markup);
+    }
+
     /*
      * This can be tuned, obviously.
      */

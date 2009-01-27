@@ -10,7 +10,6 @@
  */
 package markerpen.textbase;
 
-
 /**
  * Common markups that are frequently reused by reference.
  * 
@@ -28,4 +27,6 @@ public class Common extends Markup
     public static final Common ITALICS = new Common();
 
     public static final Common BOLD = new Common();
+
+    public static final Common FILENAME = new Common();
 }
