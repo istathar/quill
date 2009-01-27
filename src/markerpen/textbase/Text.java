@@ -269,7 +269,7 @@ public class Text
      * Returns a Pair of the two Pieces enclosing the extracted range.
      */
     Pair extractFrom(int offset, int width) {
-        final Piece a, b;
+        final Piece preceeding, alpha, omega;
 
         if (offset < 0) {
             throw new IllegalArgumentException();
@@ -285,28 +285,36 @@ public class Text
          */
 
         /*
-         * Find the Piece containing the start point of the range we want to
-         * isolate.
+         * Ensure splices at the start and end points of the deletion, and
+         * find out the pieces deliniating it. Then create a Span[] of the
+         * range that will be removed which we can return out for storage in
+         * the Change stack.
          */
 
-        a = splitAt(offset);
-        b = splitAt(offset + width);
+        preceeding = splitAt(offset);
+        omega = splitAt(offset + width);
 
-        if (a == null) {
-            return new Pair(null, b);
+        if (preceeding == null) {
+            if (omega.prev == null) {
+                alpha = omega;
+            } else {
+                alpha = first;
+            }
         } else {
-            return new Pair(a.next, b);
+            alpha = preceeding.next;
         }
+
+        return new Pair(alpha, omega);
     }
 
-    Span[] formArray(Pair pair) {
+    static Span[] formArray(Pair pair) {
         return formArray(pair.one, pair.two);
     }
 
     /**
      * Form a Span[] from the Spans between Pieces start and end.
      */
-    Span[] formArray(Piece alpha, Piece omega) {
+    static Span[] formArray(Piece alpha, Piece omega) {
         final Span[] result;
         Piece p;
         int i;
@@ -345,44 +353,20 @@ public class Text
      * representing the removed range.
      */
     protected Span[] delete(int offset, int width) {
-        final Piece preceeding, alpha, omega, following;
+        final Piece preceeding, following;
         final Span[] result;
-
-        if (offset < 0) {
-            throw new IllegalArgumentException();
-        }
-        if (width < 0) {
-            throw new IllegalArgumentException();
-        }
-
-        /*
-         * TODO guard the other end, ie test for conditions
-         * IndexOutOfBoundsException("offset too high") and
-         * IndexOutOfBoundsException("width greater than available text")
-         */
+        final Pair pair;
 
         /*
          * Ensure splices at the start and end points of the deletion, and
-         * find out the pieces deliniating it. Then create a Span[] of the
+         * find out the Pieces deliniating it. Then create a Span[] of the
          * range that will be removed which we can return out for storage in
          * the Change stack.
          */
 
-        preceeding = splitAt(offset);
-        omega = splitAt(offset + width);
+        pair = extractFrom(offset, width);
 
-        if (preceeding == null) {
-            if (omega.prev == null) {
-                alpha = omega;
-            } else {
-                alpha = omega.prev;
-            }
-        } else {
-            alpha = preceeding.next;
-        }
-        following = omega.next;
-
-        result = formArray(alpha, omega);
+        result = formArray(pair);
 
         /*
          * Now change the linkages so we affect the deletion. There are a
@@ -391,6 +375,9 @@ public class Text
          * first pointer), and the very special case of deleting everything
          * (in which case we put in an "empty" Piece with a zero length Span).
          */
+
+        preceeding = pair.one.prev;
+        following = pair.two.next;
 
         if (offset == 0) {
             if (following == null) {

@@ -13,6 +13,8 @@ package markerpen.textbase;
 
 import junit.framework.TestCase;
 
+import static markerpen.textbase.Text.formArray;
+
 public class ValidateText extends TestCase
 {
     public final void testInitialText() {
@@ -266,7 +268,7 @@ public class ValidateText extends TestCase
 
         assertEquals("ZeroOneTwoThree", text.toString());
 
-        range = text.formArray(pair);
+        range = formArray(pair);
         assertEquals(11, lengthOf(range));
         assertEquals("roOneTwoThr", textOf(range));
     }
@@ -291,7 +293,7 @@ public class ValidateText extends TestCase
 
         assertEquals("James T. Kirk", text.toString());
 
-        range = text.formArray(pair);
+        range = formArray(pair);
         assertEquals(13, lengthOf(range));
         assertEquals("James T. Kirk", textOf(range));
     }
