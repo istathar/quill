@@ -72,6 +72,7 @@ public class ValidateText extends TestCase
         assertEquals("Con", one.span.getText());
 
         two = one.next;
+
         assertEquals("cave", two.span.getText());
         assertNull(two.next);
         assertEquals(one, two.prev);
@@ -243,10 +244,11 @@ public class ValidateText extends TestCase
         return str.toString();
     }
 
-    public final void testConcatonatingChunks() {
+    public final void testExtractRange() {
         final Text text;
-        final Span zero, one, two, three, result;
+        final Span zero, one, two, three;
         final Span[] range;
+        final Pair pair;
 
         zero = new StringSpan("Zero", null);
         one = new StringSpan("One", null);
@@ -260,17 +262,19 @@ public class ValidateText extends TestCase
 
         assertEquals("ZeroOneTwoThree", text.toString());
 
-        range = text.concatonateFrom(2, 11);
+        pair = text.extractFrom(2, 11);
 
         assertEquals("ZeroOneTwoThree", text.toString());
 
+        range = text.formArray(pair);
         assertEquals(11, lengthOf(range));
         assertEquals("roOneTwoThr", textOf(range));
     }
 
-    public final void testConcatonateAll() {
+    public final void testExtractAll() {
         final Text text;
         final Span zero, one, two;
+        final Pair pair;
         final Span[] range;
 
         zero = new StringSpan("James", null);
@@ -283,22 +287,23 @@ public class ValidateText extends TestCase
 
         assertEquals("James T. Kirk", text.toString());
 
-        range = text.concatonateFrom(0, 13);
+        pair = text.extractFrom(0, 13);
 
         assertEquals("James T. Kirk", text.toString());
 
+        range = text.formArray(pair);
         assertEquals(13, lengthOf(range));
         assertEquals("James T. Kirk", textOf(range));
     }
 
     public final void testDeleteRange() {
         final Text text;
-        final Chunk zero, one, two, three;
+        final Span zero, one, two, three;
 
-        zero = new Chunk("Zero");
-        one = new Chunk("One");
-        two = new Chunk("Two");
-        three = new Chunk("Three");
+        zero = new StringSpan("Zero", null);
+        one = new StringSpan("One", null);
+        two = new StringSpan("Two", null);
+        three = new StringSpan("Three", null);
 
         text = new Text(zero);
         text.append(one);
@@ -309,8 +314,8 @@ public class ValidateText extends TestCase
         text.delete(2, 11);
         assertEquals("Zeee", text.toString());
         assertEquals(2, calculateNumberPieces(text));
-        assertEquals("Ze", text.first.chunk.toString());
-        assertEquals("ee", text.first.next.chunk.toString());
+        assertEquals("Ze", text.first.span.getText());
+        assertEquals("ee", text.first.next.span.getText());
 
         text.delete(1, 2);
         assertEquals("Ze", text.toString());

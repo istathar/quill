@@ -19,7 +19,7 @@ public abstract class Change
 {
     int offset;
 
-    Chunk what;
+    Span[] range;
 
     protected Change() {}
 
@@ -36,11 +36,27 @@ public abstract class Change
         return offset;
     }
 
+    // FIXME
     public String getText() {
-        return what.toString();
+        final StringBuilder str;
+
+        str = new StringBuilder();
+        for (Span s : range) {
+            str.append(s.getText());
+        }
+
+        return str.toString();
     }
 
+    // FIXME cache?
     public int getLength() {
-        return what.width;
+        int i;
+
+        i = 0;
+        for (Span s : range) {
+            i += s.getWidth();
+        }
+
+        return i;
     }
 }

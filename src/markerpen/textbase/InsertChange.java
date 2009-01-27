@@ -12,9 +12,13 @@ package markerpen.textbase;
 
 public class InsertChange extends Change
 {
+
+    // FIXME probably have to pass in format here?
     public InsertChange(int offset, String what) {
         this.offset = offset;
-        this.what = new Chunk(what);
+        this.range = new Span[] {
+                new StringSpan(what, null),
+        }
     }
 
     final void apply(Text text) {

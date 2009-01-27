@@ -97,6 +97,11 @@ public class Text
         insert(offset, new StringSpan(what, null));
     }
 
+    // TODO
+    protected void insert(int offset, Span[] range) {
+        assert false;
+    }
+
     /**
      * Cut a Piece in two at point. Amend the linkages so that overall Text is
      * the same after the operation.
@@ -156,8 +161,9 @@ public class Text
 
     /**
      * Find the Piece containing offset, and split it into two. Handle the
-     * boundary cases of an offset at a Piece boundary. Returns first of the
-     * two Pieces; or null if the offset FIXME
+     * boundary cases of an offset at a Piece boundary. Returns a Pair around
+     * the two Pieces. null will be set if there is no Piece before (or after)
+     * this point.
      */
     /*
      * TODO Initial implementation of this is an ugly linear search; replace
@@ -260,14 +266,10 @@ public class Text
      * is to delete, so the boundaries are a good first step, and it makes the
      * algorithm here far simpler.
      * 
-     * Returns an array of Pieces wrapping the extracted range.
+     * Returns a Pair of the two Pieces enclosing the extracted range.
      */
-    Span[] concatonateFrom(int offset, int width) {
-        final Piece preceeding, alpha, omega, following;
-        final Span[] result;
-        Piece p;
-        Span s;
-        int i;
+    Pair extractFrom(int offset, int width) {
+        final Piece a, b;
 
         if (offset < 0) {
             throw new IllegalArgumentException();
@@ -287,28 +289,36 @@ public class Text
          * isolate.
          */
 
-        preceeding = splitAt(offset);
-        alpha = preceeding.next;
+        a = splitAt(offset);
+        b = splitAt(offset + width);
 
-        omega = splitAt(offset + width);
-        following = omega.next;
+        if (a == null) {
+            return new Pair(null, b);
+        } else {
+            return new Pair(a.next, b);
+        }
+    }
+
+    Span[] formArray(Pair pair) {
+        return formArray(pair.one, pair.two);
+    }
+
+    /**
+     * Form a Span[] from the Spans between Pieces start and end.
+     */
+    Span[] formArray(Piece alpha, Piece omega) {
+        final Span[] result;
+        Piece p;
+        int i;
 
         /*
          * Need to know how many pieces are in between so we can size the
          * return array.
          */
 
-        if (preceeding == null) {
-            if (following == null) {
-                p = first;
-            } else {
-                p = omega;
-            }
-        } else {
-            p = preceeding.next;
-        }
-
+        p = alpha;
         i = 1;
+
         while (p != omega) {
             i++;
             p = p.next;
@@ -331,31 +341,61 @@ public class Text
     }
 
     /**
-     * Delete a width wide segment starting at offset. All the hard work is
-     * done by the concatonate method, this just removes the splice. Returns a
-     * Chunk representing the removed range.
+     * Delete a width wide segment starting at offset. Returns a Span[]
+     * representing the removed range.
      */
-    protected Chunk delete(int offset, int width) {
-        final Piece splice, preceeding, following;
-        // final Chunk extract;
+    protected Span[] delete(int offset, int width) {
+        final Piece preceeding, alpha, omega, following;
+        final Span[] result;
 
-        splice = concatonateFrom(offset, width);
-        // extract = splice.chunk;
-
-        preceeding = splice.prev;
-        following = splice.next;
+        if (offset < 0) {
+            throw new IllegalArgumentException();
+        }
+        if (width < 0) {
+            throw new IllegalArgumentException();
+        }
 
         /*
-         * There are a number of corner cases here, the most notable being
-         * what happens if you delete from the beginning (in which case you
-         * need to change the first pointer), and the very special case of
-         * deleting everything (in which case we put in an "empty" Piece with
-         * a zero length Chunk).
+         * TODO guard the other end, ie test for conditions
+         * IndexOutOfBoundsException("offset too high") and
+         * IndexOutOfBoundsException("width greater than available text")
          */
+
+        /*
+         * Ensure splices at the start and end points of the deletion, and
+         * find out the pieces deliniating it. Then create a Span[] of the
+         * range that will be removed which we can return out for storage in
+         * the Change stack.
+         */
+
+        preceeding = splitAt(offset);
+        omega = splitAt(offset + width);
+
+        if (preceeding == null) {
+            if (omega.prev == null) {
+                alpha = omega;
+            } else {
+                alpha = omega.prev;
+            }
+        } else {
+            alpha = preceeding.next;
+        }
+        following = omega.next;
+
+        result = formArray(alpha, omega);
+
+        /*
+         * Now change the linkages so we affect the deletion. There are a
+         * number of corner cases here, the most notable being what happens if
+         * you delete from the beginning (in which case you need to change the
+         * first pointer), and the very special case of deleting everything
+         * (in which case we put in an "empty" Piece with a zero length Span).
+         */
+
         if (offset == 0) {
             if (following == null) {
                 first = new Piece();
-                first.chunk = new Chunk(splice.chunk, 0, 0);
+                first.span = new StringSpan("", null); // TODO?
             } else {
                 following.prev = null;
                 first = following;
@@ -367,30 +407,19 @@ public class Text
             }
         }
 
-        return splice.chunk;
+        return result;
     }
 
     /**
      * If format is negative, the formats it refers to will be removed instead
      * of applied. Like delete() it returns the Chunk representing the splice.
      */
-    protected Chunk format(int offset, int width, byte format) {
+    protected Span[] format(int offset, int width, Markup format, boolean additive) {
         final Piece splice;
         Chunk c;
         int i;
 
-        /*
-         * We have to go to some trouble to ensure the caller doesn't try to
-         * use the most significant bit, since that's the signedness
-         * indicator.
-         */
-        if ((format < 0) && (format < -0x7F)) {
-            throw new IllegalArgumentException();
-        } else if (format > 0x7F) {
-            throw new IllegalArgumentException();
-        }
-
-        splice = concatonateFrom(offset, width);
+        range = extractFrom(offset, width);
 
         c = splice.chunk;
 
