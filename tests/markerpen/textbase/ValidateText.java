@@ -468,28 +468,93 @@ public class ValidateText extends TestCase
     }
 
     public final void testRemovingFormatting() {
-        final char[] data;
         final Text text;
+        Piece p;
 
-        data = new char[] {
-                'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd'
-        };
-        markup = new byte[] {
-                0x0E, 0x0E, 0x0E, 0x0E, 0x0E, 0x04, 0x05, 0x07, 0x07, 0x02, 0x07
-        };
-        target = new byte[] {
-                0x0C, 0x0C, 0x0C, 0x0C, 0x0C, 0x04, 0x05, 0x05, 0x05, 0x00, 0x05
-        };
-
-        chunk = new Chunk(data, markup);
-        text = new Text(chunk);
+        text = new Text("Hello World");
         assertEquals("Hello World", text.toString());
 
-        text.format(0, 11, (byte) -0x02);
+        /*
+         * Setup as demonstrated above
+         */
 
-        for (int i = 0; i < 11; i++) {
-            assertEquals(target[i], text.first.chunk.markup[i]);
-        }
+        text.format(0, 5, Common.ITALICS, true);
+        text.format(6, 5, Common.BOLD, true);
+        text.format(0, 11, Common.FILENAME, true);
+
+        /*
+         * Now remove one, and test
+         */
+
+        text.format(0, 11, Common.ITALICS, false);
+
+        assertEquals(3, calculateNumberPieces(text));
+        p = text.first;
+        assertFalse(containsFormat(p, Common.ITALICS));
+        assertTrue(containsFormat(p, Common.FILENAME));
+        assertFalse(containsFormat(p, Common.BOLD));
+        p = p.next;
+        assertFalse(containsFormat(p, Common.ITALICS));
+        assertTrue(containsFormat(p, Common.FILENAME));
+        assertFalse(containsFormat(p, Common.BOLD));
+        p = p.next;
+        assertFalse(containsFormat(p, Common.ITALICS));
+        assertTrue(containsFormat(p, Common.FILENAME));
+        assertTrue(containsFormat(p, Common.BOLD));
+
+        /*
+         * Does doing it twice hurt?
+         */
+
+        text.format(0, 11, Common.ITALICS, false);
+
+        assertEquals(3, calculateNumberPieces(text));
+        p = text.first;
+        assertFalse(containsFormat(p, Common.ITALICS));
+        assertTrue(containsFormat(p, Common.FILENAME));
+        assertFalse(containsFormat(p, Common.BOLD));
+        p = p.next;
+        assertFalse(containsFormat(p, Common.ITALICS));
+        assertTrue(containsFormat(p, Common.FILENAME));
+        assertFalse(containsFormat(p, Common.BOLD));
+        p = p.next;
+        assertFalse(containsFormat(p, Common.ITALICS));
+        assertTrue(containsFormat(p, Common.FILENAME));
+        assertTrue(containsFormat(p, Common.BOLD));
+
+        text.format(3, 5, Common.FILENAME, false);
+
+        assertEquals(5, calculateNumberPieces(text));
+
+        // Hel
+        p = text.first;
+        assertFalse(containsFormat(p, Common.ITALICS));
+        assertTrue(containsFormat(p, Common.FILENAME));
+        assertFalse(containsFormat(p, Common.BOLD));
+
+        // "lo"
+        p = p.next;
+        assertFalse(containsFormat(p, Common.ITALICS));
+        assertFalse(containsFormat(p, Common.FILENAME));
+        assertFalse(containsFormat(p, Common.BOLD));
+
+        // " "
+        p = p.next;
+        assertFalse(containsFormat(p, Common.ITALICS));
+        assertFalse(containsFormat(p, Common.FILENAME));
+        assertFalse(containsFormat(p, Common.BOLD));
+
+        // "Wo"
+        p = p.next;
+        assertFalse(containsFormat(p, Common.ITALICS));
+        assertFalse(containsFormat(p, Common.FILENAME));
+        assertTrue(containsFormat(p, Common.BOLD));
+
+        // "rld"
+        p = p.next;
+        assertFalse(containsFormat(p, Common.ITALICS));
+        assertTrue(containsFormat(p, Common.FILENAME));
+        assertTrue(containsFormat(p, Common.BOLD));
     }
 
     public final void testNullShortcut() {
