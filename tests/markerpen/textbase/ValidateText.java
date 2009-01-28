@@ -557,94 +557,42 @@ public class ValidateText extends TestCase
         assertTrue(containsFormat(p, Common.BOLD));
     }
 
-    public final void testNullShortcut() {
-        final char[] data;
-        final Chunk chunk;
-        final Text text;
-
-        data = new char[] {
-                'H', 'i', '?'
-        };
-
-        chunk = new Chunk(data, null);
-        text = new Text(chunk);
-        assertEquals("Hi?", text.toString());
-
-        text.format(0, 3, (byte) 0x02);
-
-        for (int i = 0; i < 3; i++) {
-            assertEquals(0x02, text.first.chunk.markup[i]);
-        }
-
-        text.format(0, 3, (byte) -0x02);
-
-        for (int i = 0; i < 3; i++) {
-            assertEquals(0x00, text.first.chunk.markup[i]);
-        }
-    }
-
     public final void testRemovingFormatFromZero() {
         final char[] data;
-        final Chunk chunk;
         final Text text;
+        Piece p;
 
-        data = new char[] {
-                'Y', 'o', '!'
-        };
-
-        chunk = new Chunk(data, null);
-        text = new Text(chunk);
+        text = new Text("Yo!");
         assertEquals("Yo!", text.toString());
+
+        p = text.first;
+        while (p != null) {
+            assertNull(p.span.markup);
+            p = p.next;
+        }
 
         /*
          * Should have no effect
          */
 
-        text.format(0, 3, (byte) -0x02);
+        text.format(0, 3, Common.FILENAME, false);
 
-        for (int i = 0; i < 3; i++) {
-            assertEquals(0x00, text.first.chunk.markup[i]);
+        p = text.first;
+        while (p != null) {
+            assertNull(p.span.markup);
+            p = p.next;
         }
 
         /*
          * Should again have no effect
          */
 
-        text.format(0, 3, (byte) -0x0F);
+        text.format(0, 3, Common.FILENAME, false);
 
-        for (int i = 0; i < 3; i++) {
-            assertEquals(0x00, text.first.chunk.markup[i]);
-        }
-    }
-
-    public final void testAllowedFormatBits() {
-        final Text text;
-
-        text = new Text("Arnold");
-
-        text.format(2, 3, (byte) 0x7F);
-        text.format(2, 3, (byte) -0x7F);
-
-        try {
-            text.format(2, 3, (byte) 0x80);
-            fail();
-        } catch (IllegalArgumentException iae) {
-            // good
-        }
-
-        try {
-            text.format(2, 3, (byte) -0x80);
-            fail();
-        } catch (IllegalArgumentException iae) {
-            // good
-        }
-
-        text.format(1, 4, (byte) (1 << 6));
-        try {
-            text.format(0, 5, (byte) (1 << 7));
-            fail();
-        } catch (IllegalArgumentException iae) {
-            // good
+        p = text.first;
+        while (p != null) {
+            assertNull(p.span.markup);
+            p = p.next;
         }
     }
 }
