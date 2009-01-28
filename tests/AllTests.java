@@ -1,7 +1,7 @@
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import markerpen.textbase.ValidateApplyUndoRedo;
-import markerpen.textbase.ValidateChunks;
+import markerpen.textbase.ValidateSpanOperations;
 import markerpen.textbase.ValidateText;
 
 import com.operationaldynamics.junit.VerboseTestRunner;
@@ -28,7 +28,7 @@ public class AllTests
 
         TestSuite suite = new TestSuite("Complete markerpen unit test suite");
 
-        suite.addTestSuite(ValidateChunks.class);
+        suite.addTestSuite(ValidateSpanOperations.class);
         suite.addTestSuite(ValidateText.class);
         suite.addTestSuite(ValidateApplyUndoRedo.class);
 

@@ -558,7 +558,6 @@ public class ValidateText extends TestCase
     }
 
     public final void testRemovingFormatFromZero() {
-        final char[] data;
         final Text text;
         Piece p;
 

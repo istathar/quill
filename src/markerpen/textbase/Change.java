@@ -19,9 +19,13 @@ public abstract class Change
 {
     int offset;
 
+    int width;
+
     Span[] range;
 
-    protected Change() {}
+    protected Change() {
+        width = -1;
+    }
 
     /*
      * Interestingly (if somewhat by accident), by specifying Text here and
@@ -36,7 +40,7 @@ public abstract class Change
         return offset;
     }
 
-    // FIXME
+    // FIXME cache?
     public String getText() {
         final StringBuilder str;
 
@@ -48,15 +52,19 @@ public abstract class Change
         return str.toString();
     }
 
-    // FIXME cache?
     public int getLength() {
-        int i;
+        int w;
 
-        i = 0;
-        for (Span s : range) {
-            i += s.getWidth();
+        if (width == -1) {
+            w = 0;
+
+            for (Span s : range) {
+                w += s.getWidth();
+            }
+
+            width = w;
         }
 
-        return i;
+        return width;
     }
 }

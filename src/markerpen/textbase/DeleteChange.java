@@ -1,7 +1,7 @@
 /*
- * DeletionChange.java
+ * DeleteChange.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -12,21 +12,19 @@ package markerpen.textbase;
 
 public class DeleteChange extends Change
 {
-    int width;
-
     public DeleteChange(int offset, int width) {
         this.offset = offset;
-        this.width = width;
+        super.width = width;
     }
 
     final void apply(Text text) {
-        super.what = text.delete(offset, width);
+        super.range = text.delete(offset, width);
     }
 
     final void undo(Text text) {
-        if (what == null) {
+        if (range == null) {
             throw new IllegalStateException();
         }
-        text.insert(offset, what);
+        text.insert(offset, range);
     }
 }

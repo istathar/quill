@@ -97,9 +97,61 @@ public class Text
         insert(offset, new StringSpan(what, null));
     }
 
-    // TODO
+    /**
+     * Insert the given range of Spans at the specified offset.
+     */
     protected void insert(int offset, Span[] range) {
-        assert false;
+        final Piece one, two;
+        Piece p, last;
+
+        if (offset < 0) {
+            throw new IllegalArgumentException();
+        }
+
+        /*
+         * Create the insertion point
+         */
+
+        one = splitAt(offset);
+        if (one == null) {
+            two = first;
+        } else {
+            two = one.next;
+        }
+
+        /*
+         * Create and insert Pieces wrapping the Spans.
+         */
+
+        last = one;
+
+        for (Span s : range) {
+            p = new Piece();
+            p.span = s;
+            p.prev = last;
+            last = p;
+        }
+
+        /*
+         * And correct the linkages in the reverse direction
+         */
+
+        last.next = two;
+        if (two != null) {
+            two.prev = last;
+        }
+
+        p = last;
+
+        do {
+            p = p.prev;
+            if (p == null) {
+                first = last;
+                break;
+            }
+            p.next = last;
+            last = p;
+        } while (p != one);
     }
 
     /**
