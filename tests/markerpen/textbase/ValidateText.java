@@ -46,7 +46,7 @@ public class ValidateText extends TestCase
         three = new StringSpan("system", null);
         space = new CharacterSpan(' ', null);
 
-        text = new Text("");
+        text = new Text();
         text.append(three);
         text.append(space);
         text.append(two);
@@ -345,7 +345,7 @@ public class ValidateText extends TestCase
 
         text.delete(0, 5);
         assertEquals("", text.toString());
-        assertEquals(1, calculateNumberPieces(text));
+        assertEquals(0, calculateNumberPieces(text));
     }
 
     public final void testBoundsChecking() {

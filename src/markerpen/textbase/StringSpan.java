@@ -21,6 +21,11 @@ public class StringSpan extends Span
 
     public StringSpan(String str, Markup[] markup) {
         super(markup);
+
+        if (str.length() == 0) {
+            throw new IllegalArgumentException();
+        }
+
         data = str;
     }
 

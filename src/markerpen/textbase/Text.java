@@ -20,7 +20,11 @@ public class Text
 {
     Piece first;
 
-    protected Text(String str) {
+    protected Text() {
+        first = null;
+    }
+
+    Text(String str) {
         first = new Piece();
         first.span = new StringSpan(str, null);
     }
@@ -55,7 +59,7 @@ public class Text
         final StringBuilder str;
         Piece piece;
 
-        str = new StringBuilder("");
+        str = new StringBuilder();
         piece = first;
 
         while (piece != null) {
@@ -77,6 +81,20 @@ public class Text
         if (addition == null) {
             throw new IllegalArgumentException();
         }
+
+        /*
+         * Handle empty Text case
+         */
+
+        if (first == null) {
+            first = new Piece();
+            first.span = addition;
+            return;
+        }
+
+        /*
+         * Otherwise, we are appending. Hop to the end.
+         */
 
         piece = first;
 
@@ -433,8 +451,7 @@ public class Text
 
         if (offset == 0) {
             if (following == null) {
-                first = new Piece();
-                first.span = new StringSpan("", null); // TODO?
+                first = null;
             } else {
                 following.prev = null;
                 first = following;

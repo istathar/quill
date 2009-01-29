@@ -31,7 +31,7 @@ public class TextStack extends Text
     private int pointer;
 
     public TextStack() {
-        super("");
+        super();
         stack = new LinkedList<Change>();
         pointer = 0;
     }
