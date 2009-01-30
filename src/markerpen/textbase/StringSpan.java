@@ -39,12 +39,12 @@ public class StringSpan extends Span
      */
 
     StringSpan(Span span, int begin) {
-        super(span.markup);
+        super(span.getMarkup());
         data = span.getText().substring(begin);
     }
 
     StringSpan(Span span, int begin, int end) {
-        super(span.markup);
+        super(span.getMarkup());
         data = span.getText().substring(begin, end);
     }
 

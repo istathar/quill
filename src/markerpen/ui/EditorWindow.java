@@ -122,7 +122,7 @@ class EditorWindow extends Window
     private void setupUndoRedo() {
         /*
          * FIXME!!! This is predicated on it just being the undo stack, and
-         * its offsets conveniently matching the TextBufferes. That won't hold
+         * its offsets conveniently matching the TextBuffers. That won't hold
          * very long, and more to the point, the Text is what we are going to
          * Serialize out of, so this is NOT what we're actually headed for!
          */

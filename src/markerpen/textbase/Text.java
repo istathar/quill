@@ -503,4 +503,50 @@ public class Text
 
         return formArray(pair);
     }
+
+    public Markup[] getMarkupAt(int offset) {
+        Piece piece, last;
+        int start, following;
+
+        if (offset == 0) {
+            return null;
+        }
+
+        piece = first;
+        last = first;
+
+        start = 0;
+
+        while (piece != null) {
+            if (start == offset) {
+                return last.span.getMarkup();
+            }
+
+            /*
+             * Failing that, then let's see if this Piece contains the offset
+             * point.
+             */
+
+            following = start + piece.span.getWidth();
+
+            if (following > offset) {
+                return piece.span.getMarkup();
+            }
+            start = following;
+
+            last = piece;
+            piece = piece.next;
+        }
+
+        /*
+         * Reached the end; so long as there is nothing left we're in an
+         * append situation and no problem, otherwise out of bounds.
+         */
+
+        if (start == offset) {
+            return last.span.getMarkup();
+        }
+
+        throw new IllegalArgumentException();
+    }
 }

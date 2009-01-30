@@ -28,6 +28,9 @@ public class CharacterSpan extends Span
 
     public CharacterSpan(char ch, Markup[] markup) {
         super(markup);
+        if (ch == 0) {
+            throw new IllegalArgumentException();
+        }
         this.ch = ch;
         this.text = toString(ch);
     }

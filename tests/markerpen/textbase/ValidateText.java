@@ -385,11 +385,11 @@ public class ValidateText extends TestCase
     }
 
     private final boolean containsFormat(Piece p, Markup format) {
-        if (p.span.markup == null) {
+        if (p.span.getMarkup() == null) {
             return false;
         }
 
-        for (Markup m : p.span.markup) {
+        for (Markup m : p.span.getMarkup()) {
             if (m == format) {
                 return true;
             }
@@ -414,7 +414,7 @@ public class ValidateText extends TestCase
         p = text.first;
         assertTrue(containsFormat(p, Common.ITALICS));
         p = p.next;
-        assertNull(p.span.markup);
+        assertNull(p.span.getMarkup());
         assertFalse(containsFormat(p, Common.ITALICS));
         assertEquals("Hello World", text.toString());
 
@@ -428,7 +428,7 @@ public class ValidateText extends TestCase
         p = text.first;
         assertTrue(containsFormat(p, Common.ITALICS));
         p = p.next;
-        assertEquals(null, p.span.markup);
+        assertEquals(null, p.span.getMarkup());
         assertEquals(" ", p.span.getText());
         p = p.next;
         assertTrue(containsFormat(p, Common.BOLD));
@@ -566,7 +566,7 @@ public class ValidateText extends TestCase
 
         p = text.first;
         while (p != null) {
-            assertNull(p.span.markup);
+            assertNull(p.span.getMarkup());
             p = p.next;
         }
 
@@ -578,7 +578,7 @@ public class ValidateText extends TestCase
 
         p = text.first;
         while (p != null) {
-            assertNull(p.span.markup);
+            assertNull(p.span.getMarkup());
             p = p.next;
         }
 
@@ -590,7 +590,7 @@ public class ValidateText extends TestCase
 
         p = text.first;
         while (p != null) {
-            assertNull(p.span.markup);
+            assertNull(p.span.getMarkup());
             p = p.next;
         }
     }

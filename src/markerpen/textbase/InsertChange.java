@@ -20,6 +20,20 @@ public class InsertChange extends Change
         };
     }
 
+    public InsertChange(int offset, String what, Markup[] markup) {
+        this.offset = offset;
+        this.range = new Span[] {
+            new StringSpan(what, markup),
+        };
+    }
+
+    public InsertChange(int offset, Span span) {
+        this.offset = offset;
+        this.range = new Span[] {
+            span,
+        };
+    }
+
     final void apply(Text text) {
         text.insert(offset, range);
     }

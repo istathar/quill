@@ -35,7 +35,7 @@ public abstract class Span
      * them, but since Java arrays are mutable we will have to change to a
      * wrapper Object if the array setters make it outside this package.
      */
-    final Markup[] markup;
+    private final Markup[] markup;
 
     protected Span(Markup[] markup) {
         this.markup = markup;
@@ -57,6 +57,10 @@ public abstract class Span
     public abstract String getText();
 
     public abstract int getWidth();
+
+    public Markup[] getMarkup() {
+        return markup;
+    }
 
     /**
      * Does this Span contain the specified formatting?
