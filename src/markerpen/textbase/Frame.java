@@ -19,7 +19,7 @@ package markerpen.textbase;
 public class Frame extends Markup
 {
     public Frame() {
-        super();
+        super("Frame.FIXME");
     }
 
     /*

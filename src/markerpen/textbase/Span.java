@@ -62,80 +62,28 @@ public abstract class Span
         return markup;
     }
 
-    /**
-     * Does this Span contain the specified formatting?
-     */
-    private final boolean contains(Markup format) {
-        if (markup == null) {
-            return false;
-        }
-        for (Markup m : markup) {
-            if (m == format) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     Span applyMarkup(Markup format) {
         final Markup[] replacement;
-        final Span result;
-        final int len;
 
-        if (markup == null) {
-            len = 0;
-        } else {
-            len = markup.length;
-        }
+        replacement = Markup.applyMarkup(markup, format);
 
-        if (contains(format)) {
+        if (replacement == markup) {
             return this;
+        } else {
+            return this.copy(replacement);
         }
-
-        replacement = new Markup[len + 1];
-        if (len > 0) {
-            System.arraycopy(markup, 0, replacement, 0, len);
-        }
-
-        replacement[len] = format;
-        result = this.copy(replacement);
-
-        return result;
     }
 
     Span removeMarkup(Markup format) {
         final Markup[] replacement;
-        final Span result;
-        final int len;
-        int i;
 
-        if (markup == null) {
+        replacement = Markup.removeMarkup(markup, format);
+
+        if (replacement == markup) {
             return this;
+        } else {
+            return this.copy(replacement);
         }
-
-        if (!(contains(format))) {
-            return this;
-        }
-
-        len = markup.length - 1;
-
-        if (len == 0) {
-            return this.copy(null);
-        }
-
-        replacement = new Markup[len];
-
-        i = 0;
-        for (Markup m : markup) {
-            if (m == format) {
-                continue;
-            }
-            replacement[i++] = m;
-        }
-
-        result = this.copy(replacement);
-
-        return result;
     }
 
     /**

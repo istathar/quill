@@ -15,6 +15,7 @@ public class Hyperlink extends Markup
     private String ref;
 
     public Hyperlink(String url) {
+        super("Hyperlink(" + url + ")");
         this.ref = url;
     }
 
