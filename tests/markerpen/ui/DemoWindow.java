@@ -32,14 +32,18 @@ public class DemoWindow extends Window
     private final Window window;
 
     private DemoWindow() {
+        final FontDescription desc;
         final HBox two;
         final VBox left;
         HBox spread;
+        final Entry chapter;
         final ScrolledWindow editor;
         final PreviewWidget preview;
 
         window = this;
         window.setMaximize(true);
+        desc = new FontDescription("Deja Vu Sans, 11");
+        window.modifyFont(desc);
 
         /*
          * LHS
@@ -47,7 +51,9 @@ public class DemoWindow extends Window
         left = new VBox(false, 3);
 
         spread = new HBox(false, 3);
-        spread.packStart(new Entry("Chapter 1"));
+        chapter = new Entry("Chapter 1");
+        chapter.modifyFont(desc);
+        spread.packStart(chapter);
         spread.packEnd(new Label("Chapter"));
 
         left.packStart(spread, false, false, 0);
@@ -55,12 +61,14 @@ public class DemoWindow extends Window
         int i;
 
         for (i = 1; i < 5; i++) {
+            Entry entry;
             TextView view;
             TextBuffer buffer;
-            FontDescription desc;
 
             spread = new HBox(false, 3);
-            spread.packStart(new Entry("Title " + i));
+            entry = new Entry("Title " + i);
+            entry.modifyFont(desc);
+            spread.packStart(entry);
             spread.packEnd(new Label("Section"));
 
             left.packStart(spread, false, false, 0);
@@ -68,7 +76,6 @@ public class DemoWindow extends Window
             view = new TextView();
             view.setWrapMode(WrapMode.WORD);
             view.setPaddingBelowParagraph(10);
-            desc = new FontDescription("Deja Vu Sans, 11");
             view.modifyFont(desc);
             view.setBorderWidth(2);
 
