@@ -12,7 +12,9 @@ package markerpen.ui;
 
 import markerpen.textbase.Change;
 import markerpen.textbase.CharacterSpan;
+import markerpen.textbase.Common;
 import markerpen.textbase.DeleteChange;
+import markerpen.textbase.FormatChange;
 import markerpen.textbase.InsertChange;
 import markerpen.textbase.Markup;
 import markerpen.textbase.Span;
@@ -39,13 +41,17 @@ class EditorWidget extends TextView
 
     private TextStack stack;
 
+    private Markup[] insertMarkup;
+
     EditorWidget() {
         super();
         view = this;
 
         setupTextView();
         setupInternalStack();
-        installKeybindings();
+
+        hookupKeybindings();
+        hookupFormatManagement();
     }
 
     private void setupTextView() {
@@ -66,7 +72,7 @@ class EditorWidget extends TextView
         clipboard = new Span[0];
     }
 
-    private void installKeybindings() {
+    private void hookupKeybindings() {
         view.connect(new Widget.KeyPressEvent() {
             public boolean onKeyPressEvent(Widget source, EventKey event) {
                 final Keyval key;
@@ -152,11 +158,11 @@ class EditorWidget extends TextView
                     return true;
                 }
                 if (mod == ModifierType.CONTROL_MASK) {
-                    if (key == Keyval.i) {
-                        toggleFormat(Format.italics);
-                        return true;
+                    if (key == Keyval.a) {
+                        // select all; pass through
+                        return false;
                     } else if (key == Keyval.b) {
-                        toggleFormat(Format.bold);
+                        // no-op
                         return true;
                     } else if (key == Keyval.c) {
                         copyText();
@@ -165,7 +171,7 @@ class EditorWidget extends TextView
                         insertImage();
                         return true;
                     } else if (key == Keyval.m) {
-                        toggleFormat(Format.mono);
+                        toggleMarkup(Common.FILENAME);
                         return true;
                     } else if (key == Keyval.s) {
                         exportContents();
@@ -187,6 +193,13 @@ class EditorWidget extends TextView
                         && mod.contains(ModifierType.SHIFT_MASK)) {
                     if (key == Keyval.Space) {
                         clearFormat();
+                        return true;
+                    } else if (key == Keyval.B) {
+                        toggleMarkup(Common.BOLD);
+                        return true;
+                    } else if (key == Keyval.I) {
+                        toggleMarkup(Common.ITALICS);
+                        return true;
                     }
                 }
 
@@ -195,13 +208,32 @@ class EditorWidget extends TextView
                  * handing all keyboard input. Boom :(
                  */
 
-                throw new IllegalStateException();
+                throw new IllegalStateException("\n" + "Unhandled " + key + " with " + mod);
+            }
+        });
+    }
+
+    /**
+     * Hookup signals to aggregate formats to be used on a subsequent
+     * insertion. The insertTags Set starts empty, and builds up as formats
+     * are toggled by the user. When the cursor moves, the Set is changed to
+     * the formatting applying on character back.
+     */
+    private void hookupFormatManagement() {
+        insertMarkup = null;
+
+        buffer.connect(new TextBuffer.NotifyCursorPosition() {
+            public void onNotifyCursorPosition(TextBuffer source) {
+                final int offset;
+
+                offset = buffer.getCursorPosition();
+                insertMarkup = stack.getMarkupAt(offset);
             }
         });
     }
 
     private void insert(char ch) {
-        final TextIter pointer;
+        final TextIter start, pointer;
         final int offset;
         final Markup[] markup;
         final Span span;
@@ -217,8 +249,8 @@ class EditorWidget extends TextView
          * Create a Span and insert into our internal stack.
          */
 
-        markup = stack.getMarkupAt(offset);
-        span = new CharacterSpan(ch, markup);
+        // markup = stack.getMarkupAt(offset);
+        span = new CharacterSpan(ch, insertMarkup);
         stack.apply(new InsertChange(offset, span));
 
         /*
@@ -226,11 +258,17 @@ class EditorWidget extends TextView
          * to reflect the user's input.
          */
 
-        insertText(pointer, span.getText());
+        if (buffer.getHasSelection()) {
+            start = buffer.getIter(selectionBound);
+            deleteRange(start, pointer);
+        }
+
+        buffer.insert(pointer, span.getText(), tagsForMarkup(insertMarkup));
     }
 
     private void insert(Span[] range) {
         final TextIter pointer;
+        final TextIter start;
         final int offset;
 
         /*
@@ -247,10 +285,46 @@ class EditorWidget extends TextView
          * here.
          */
 
-        for (Span span : range) {
-            stack.apply(new InsertChange(offset, span));
-            insertText(pointer, span.getText());
+        if (buffer.getHasSelection()) {
+            start = buffer.getIter(selectionBound);
+            // where is insertBound
+
+            deleteRange(start, pointer);
         }
+
+        stack.apply(new InsertChange(offset, range));
+        for (Span span : range) {
+            buffer.insert(pointer, span.getText(), tagsForMarkup(span.getMarkup()));
+        }
+    }
+
+    static TextTag[] tagsForMarkup(Markup[] markup) {
+        final TextTag[] tags;
+
+        if (markup == null) {
+            return null;
+        }
+
+        tags = new TextTag[markup.length];
+
+        for (int i = 0; i < markup.length; i++) {
+            tags[i] = tagForMarkup(markup[i]);
+        }
+
+        return tags;
+    }
+
+    static TextTag tagForMarkup(Markup m) {
+        if (m instanceof Common) {
+            if (m == Common.ITALICS) {
+                return Format.italics;
+            } else if (m == Common.BOLD) {
+                return Format.bold;
+            }
+        }
+        // else TODO
+
+        throw new IllegalArgumentException();
     }
 
     private void deleteBack() {
@@ -316,25 +390,45 @@ class EditorWidget extends TextView
         buffer.delete(start, end);
     }
 
-    /**
-     * At last we update the TextView by inserting the new text. There's a
-     * catch: if there is a selection we need to delete it first. So we check
-     * for one, and action the removal if necessary before inserting.
-     */
-    private void insertText(TextIter where, String text) {
-        final TextIter start;
+    private void toggleMarkup(Markup format) {
+        final TextIter start, end;
+        int alpha, omega, width;
+        final Markup[] replacement;
+
+        /*
+         * If there is a selection then toggle the markup applied there.
+         * Otherwise, change the current insertion point formats.
+         */
 
         if (buffer.getHasSelection()) {
-            start = buffer.getIter(selectionBound);
-            // where is insertBound
+            start = selectionBound.getIter();
+            end = insertBound.getIter();
 
-            deleteRange(start, where);
+            alpha = start.getOffset();
+            omega = end.getOffset();
+
+            width = omega - alpha;
+
+            if (width < 0) {
+                width = -width;
+                alpha = omega;
+            }
+
+            // FIXME what about toggling off?
+            stack.apply(new FormatChange(alpha, width, format));
+
+            for (Span s : stack.copyRange(alpha, width)) {
+                buffer.applyTag(tagForMarkup(format), start, end);
+            }
+        } else {
+            replacement = Markup.applyMarkup(insertMarkup, format);
+            if (replacement == insertMarkup) {
+                insertMarkup = Markup.removeMarkup(insertMarkup, format);
+            } else {
+                insertMarkup = replacement;
+            }
         }
-
-        buffer.insert(where, text);
     }
-
-    private void toggleFormat(TextTag format) {}
 
     private void insertImage() {}
 
@@ -468,10 +562,45 @@ class EditorWidget extends TextView
         }
 
         insert(clipboard);
-
     }
 
     private void exportContents() {}
 
-    private void clearFormat() {}
+    private void clearFormat() {
+        final TextIter start, end;
+        int alpha, omega, width;
+
+        /*
+         * If there is a selection then clear the markup applied there. This
+         * may not be the correct implementation; there could be Markups which
+         * are structural and not block or inline.
+         */
+
+        if (buffer.getHasSelection()) {
+            start = selectionBound.getIter();
+            end = insertBound.getIter();
+
+            alpha = start.getOffset();
+            omega = end.getOffset();
+
+            width = omega - alpha;
+
+            if (width < 0) {
+                width = -width;
+                alpha = omega;
+            }
+
+            // TODO
+            // stack.apply(new FormatChange(alpha, width, , false));
+
+            buffer.removeAllTags(start, end);
+        }
+
+        /*
+         * Deactivate the any insert formatting.
+         */
+
+        insertMarkup = null;
+
+    }
 }

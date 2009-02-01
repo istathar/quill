@@ -34,6 +34,11 @@ public class InsertChange extends Change
         };
     }
 
+    public InsertChange(int offset, Span[] range) {
+        this.offset = offset;
+        this.range = range;
+    }
+
     final void apply(Text text) {
         text.insert(offset, range);
     }

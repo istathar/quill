@@ -338,7 +338,7 @@ public class Text
      * 
      * Returns a Pair of the two Pieces enclosing the extracted range.
      */
-    public Pair extractFrom(int offset, int width) {
+    Pair extractFrom(int offset, int width) {
         final Piece preceeding, alpha, omega;
 
         if (offset < 0) {
@@ -504,17 +504,18 @@ public class Text
         return formArray(pair);
     }
 
+    /*
+     * FIXME This is another case where we linear search through the offsets.
+     * We should probably be caching this? Also, this is essentially the same
+     * code as splitAt(), so something probably needs to be abstracted out
+     * here.
+     */
     public Markup[] getMarkupAt(int offset) {
         Piece piece, last;
         int start, following;
 
-        if (offset == 0) {
-            return null;
-        }
-
         piece = first;
         last = first;
-
         start = 0;
 
         while (piece != null) {
@@ -539,12 +540,15 @@ public class Text
         }
 
         /*
-         * Reached the end; so long as there is nothing left we're in an
-         * append situation and no problem, otherwise out of bounds.
+         * Reached the end
          */
 
         if (start == offset) {
-            return last.span.getMarkup();
+            if (first == null) {
+                return null;
+            } else {
+                return last.span.getMarkup();
+            }
         }
 
         throw new IllegalArgumentException();
