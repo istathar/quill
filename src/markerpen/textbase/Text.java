@@ -338,7 +338,7 @@ public class Text
      * 
      * Returns a Pair of the two Pieces enclosing the extracted range.
      */
-    Pair extractFrom(int offset, int width) {
+    public Pair extractFrom(int offset, int width) {
         final Piece preceeding, alpha, omega;
 
         if (offset < 0) {
@@ -548,5 +548,12 @@ public class Text
         }
 
         throw new IllegalArgumentException();
+    }
+
+    public Span[] copyRange(int start, int width) {
+        final Pair pair;
+
+        pair = extractFrom(start, width);
+        return formArray(pair);
     }
 }

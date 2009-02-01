@@ -16,7 +16,6 @@ import markerpen.textbase.DeleteChange;
 import markerpen.textbase.InsertChange;
 import markerpen.textbase.Markup;
 import markerpen.textbase.Span;
-import markerpen.textbase.StringSpan;
 import markerpen.textbase.TextStack;
 
 import org.gnome.gdk.EventKey;
@@ -71,7 +70,7 @@ class EditorWidget extends TextView
                 key = event.getKeyval();
 
                 /*
-                 * Let default keybindings handle cursor movement
+                 * Let default keybindings handle cursor movement keys
                  */
 
                 if ((key == Keyval.Up) || (key == Keyval.Down) || (key == Keyval.Left)
@@ -81,13 +80,15 @@ class EditorWidget extends TextView
                 }
 
                 /*
-                 * Other special keys.
+                 * Other special keys that we DO handle.
                  */
 
                 if ((key == Keyval.Escape) || (key == Keyval.Insert)) {
                     // deliberate no-op
                     return true;
                 } else if (key == Keyval.Return) {
+                    // rather likely that special things are going to happen
+                    // here.
                     insert('\n');
                     return true;
                 } else if (key == Keyval.Delete) {
@@ -151,6 +152,9 @@ class EditorWidget extends TextView
                     } else if (key == Keyval.b) {
                         toggleFormat(Format.bold);
                         return true;
+                    } else if (key == Keyval.c) {
+                        copyText();
+                        return true;
                     } else if (key == Keyval.g) {
                         insertImage();
                         return true;
@@ -159,10 +163,16 @@ class EditorWidget extends TextView
                         return true;
                     } else if (key == Keyval.s) {
                         extractText();
+                        return true;
+                    } else if (key == Keyval.v) {
+                        pasteText();
+                        return true;
                     } else if (key == Keyval.y) {
                         redo();
+                        return true;
                     } else if (key == Keyval.z) {
                         undo();
+                        return true;
                     }
                 } else if (mod.contains(ModifierType.CONTROL_MASK)
                         && mod.contains(ModifierType.SHIFT_MASK)) {
@@ -176,8 +186,7 @@ class EditorWidget extends TextView
                  * handing all keyboard input. Boom :(
                  */
 
-                // throw new IllegalStateException();
-                return false;
+                throw new IllegalStateException();
             }
         });
     }
@@ -211,11 +220,9 @@ class EditorWidget extends TextView
         insertText(pointer, span.getText());
     }
 
-    private void insert(String str) {
+    private void insert(Span[] range) {
         final TextIter pointer;
         final int offset;
-        final Markup[] markup;
-        final Span span;
 
         /*
          * Where, in TextBuffer terms?
@@ -225,19 +232,16 @@ class EditorWidget extends TextView
         offset = pointer.getOffset();
 
         /*
-         * Create a Span and insert into our internal stack.
+         * FIXME: this will cause a whole set of Changes to be added to the
+         * stack, when really we want this to be a single undoable operation.
+         * The same fix for inserting when a selection is active will apply
+         * here.
          */
 
-        markup = stack.getMarkupAt(offset);
-        span = new StringSpan(str, markup);
-        stack.apply(new InsertChange(offset, span));
-
-        /*
-         * And now send the character to the TextBuffer, updating the TextView
-         * to reflect the user's input.
-         */
-
-        insertText(pointer, str);
+        for (Span span : range) {
+            stack.apply(new InsertChange(offset, span));
+            insertText(pointer, span.getText());
+        }
     }
 
     private void deleteBack() {
@@ -378,6 +382,56 @@ class EditorWidget extends TextView
         } else if (change instanceof DeleteChange) {
             buffer.insert(start, change.getText());
         }
+    }
+
+    private Span[] clipboard;
+
+    private void copyText() {
+        final TextIter start, end;
+        int alpha, omega, width;
+
+        if (!buffer.getHasSelection()) {
+            return;
+        }
+
+        start = buffer.getIter(selectionBound);
+        end = buffer.getIter(insertBound);
+
+        alpha = start.getOffset();
+        omega = end.getOffset();
+
+        width = omega - alpha;
+
+        if (width < 0) {
+            width = -width;
+            alpha = omega;
+        }
+
+        clipboard = stack.copyRange(alpha, width);
+    }
+
+    private void pasteText() {
+        final TextIter pointer, start;
+
+        /*
+         * Where, in TextBuffer terms?
+         */
+
+        pointer = buffer.getIter(insertBound);
+
+        /*
+         * FIXME this needs to be one operation, not two.
+         */
+
+        if (buffer.getHasSelection()) {
+            start = buffer.getIter(selectionBound);
+            // where is insertBound
+
+            deleteRange(start, pointer);
+        }
+
+        insert(clipboard);
+
     }
 
     private void extractText() {}
