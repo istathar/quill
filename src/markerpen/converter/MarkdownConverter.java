@@ -1,7 +1,7 @@
 /*
- * EditorWindow.java
+ * MarkdownConverter.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -26,6 +26,19 @@ import static org.gnome.gtk.TextBuffer.OBJECT_REPLACEMENT_CHARACTER;
 
 public class MarkdownConverter
 {
+    /*
+     * These are placeholders to allow the class to compiler. As it stands,
+     * this is all legacy, broken, and to be replaced by operating over the
+     * TextChain.
+     */
+    private static final TextTag italics = null;
+
+    private static final TextTag bold = null;
+
+    private static final TextTag mono = null;
+
+    private static final TextTag hidden = null;
+
     public static String extractToFile(TextBuffer buffer) {
         StringBuilder str;
         TextIter pointer;
