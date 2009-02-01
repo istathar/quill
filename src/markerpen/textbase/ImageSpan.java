@@ -65,4 +65,8 @@ public class ImageSpan extends Span
     public int getWidth() {
         return 1;
     }
+
+    protected Span copy(Markup[] markup) {
+        return new ImageSpan(this.ref, markup);
+    }
 }
