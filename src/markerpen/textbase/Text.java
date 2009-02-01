@@ -504,6 +504,35 @@ public class Text
         return formArray(pair);
     }
 
+    /**
+     * Clear all markup from a range of text.
+     */
+    protected Span[] clear(int offset, int width) {
+        final Pair pair;
+        Piece p;
+        Span s;
+
+        pair = extractFrom(offset, width);
+
+        p = pair.one;
+
+        while (true) {
+            s = p.span;
+
+            if (s.getMarkup() != null) {
+                p.span = s.copy(null);
+            }
+
+            if (p == pair.two) {
+                break;
+            }
+
+            p = p.next;
+        }
+
+        return formArray(pair);
+    }
+
     /*
      * FIXME This is another case where we linear search through the offsets.
      * We should probably be caching this? Also, this is essentially the same

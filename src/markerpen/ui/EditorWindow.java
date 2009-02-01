@@ -224,7 +224,7 @@ class EditorWindow extends Window
                         insertImage();
                         return true;
                     } else if (key == Keyval.m) {
-                        toggleFormat(Format.mono);
+                        toggleFormat(Format.filename);
                         return true;
                     } else if (key == Keyval.s) {
                         extractText();

@@ -1,7 +1,7 @@
 /*
- * EditorWindow.java
+ * Format.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -10,7 +10,8 @@
  */
 package markerpen.ui;
 
-import java.util.ArrayList;
+import markerpen.textbase.Common;
+import markerpen.textbase.Markup;
 
 import org.gnome.gtk.TextTag;
 import org.gnome.pango.Style;
@@ -24,39 +25,68 @@ import org.gnome.pango.Weight;
  * added to a TextTagTable on creation, and their "priority" is, unless
  * otherwise altered, that order (last added highest priority).
  */
-public class Format
+class Format
 {
-    public static final TextTag italics;
+    static final TextTag italics;
 
-    public static final TextTag bold;
+    static final TextTag bold;
 
-    public static final TextTag mono;
+    static final TextTag filename;
 
-    public static final TextTag[] tags;
+    static final TextTag classname;
 
-    public static final TextTag hidden;
+    static final TextTag hidden;
 
     static {
-        final ArrayList<TextTag> list;
+        filename = new TextTag();
+        filename.setFamily("DejaVu Sans Mono");
+        filename.setForeground("darkgreen");
+        filename.setStyle(Style.ITALIC);
 
-        list = new ArrayList<TextTag>(4);
-
-        mono = new TextTag();
-        mono.setFamily("DejaVu Sans Mono");
-        mono.setSize(9.0);
-        list.add(mono);
+        classname = new TextTag();
+        classname.setFamily("DejaVu Sans Mono");
+        classname.setForeground("blue");
 
         italics = new TextTag();
         italics.setStyle(Style.ITALIC);
-        list.add(italics);
 
         bold = new TextTag();
         bold.setWeight(Weight.BOLD);
-        list.add(bold);
 
         hidden = new TextTag();
         hidden.setInvisible(true);
+    }
 
-        tags = list.toArray(new TextTag[list.size()]);
+    static TextTag[] tagsForMarkup(Markup[] markup) {
+        final TextTag[] tags;
+
+        if (markup == null) {
+            return null;
+        }
+
+        tags = new TextTag[markup.length];
+
+        for (int i = 0; i < markup.length; i++) {
+            tags[i] = tagForMarkup(markup[i]);
+        }
+
+        return tags;
+    }
+
+    static TextTag tagForMarkup(Markup m) {
+        if (m instanceof Common) {
+            if (m == Common.ITALICS) {
+                return italics;
+            } else if (m == Common.BOLD) {
+                return bold;
+            } else if (m == Common.FILENAME) {
+                return filename;
+            } else if (m == Common.CLASSNAME) {
+                return classname;
+            }
+        }
+        // else TODO
+
+        throw new IllegalArgumentException("\n" + "Translation of " + m + " not yet implemented");
     }
 }

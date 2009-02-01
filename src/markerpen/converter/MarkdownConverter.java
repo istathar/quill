@@ -22,10 +22,6 @@ import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextTag;
 
-import static markerpen.ui.Format.bold;
-import static markerpen.ui.Format.hidden;
-import static markerpen.ui.Format.italics;
-import static markerpen.ui.Format.mono;
 import static org.gnome.gtk.TextBuffer.OBJECT_REPLACEMENT_CHARACTER;
 
 public class MarkdownConverter

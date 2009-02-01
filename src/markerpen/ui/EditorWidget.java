@@ -26,10 +26,12 @@ import org.gnome.gdk.ModifierType;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
-import org.gnome.gtk.TextTag;
 import org.gnome.gtk.TextView;
 import org.gnome.gtk.Widget;
 import org.gnome.pango.FontDescription;
+
+import static markerpen.ui.Format.tagForMarkup;
+import static markerpen.ui.Format.tagsForMarkup;
 
 class EditorWidget extends TextView
 {
@@ -162,7 +164,7 @@ class EditorWidget extends TextView
                         // select all; pass through
                         return false;
                     } else if (key == Keyval.b) {
-                        // no-op
+                        toggleMarkup(Common.BOLD);
                         return true;
                     } else if (key == Keyval.c) {
                         copyText();
@@ -170,8 +172,8 @@ class EditorWidget extends TextView
                     } else if (key == Keyval.g) {
                         insertImage();
                         return true;
-                    } else if (key == Keyval.m) {
-                        toggleMarkup(Common.FILENAME);
+                    } else if (key == Keyval.i) {
+                        toggleMarkup(Common.ITALICS);
                         return true;
                     } else if (key == Keyval.s) {
                         exportContents();
@@ -188,17 +190,27 @@ class EditorWidget extends TextView
                     } else if (key == Keyval.z) {
                         undo();
                         return true;
+                    } else {
+                        /*
+                         * No keybinding
+                         */
+                        return true;
                     }
                 } else if (mod.contains(ModifierType.CONTROL_MASK)
                         && mod.contains(ModifierType.SHIFT_MASK)) {
                     if (key == Keyval.Space) {
                         clearFormat();
                         return true;
-                    } else if (key == Keyval.B) {
-                        toggleMarkup(Common.BOLD);
+                    } else if (key == Keyval.C) {
+                        toggleMarkup(Common.CLASSNAME);
                         return true;
-                    } else if (key == Keyval.I) {
-                        toggleMarkup(Common.ITALICS);
+                    } else if (key == Keyval.F) {
+                        toggleMarkup(Common.FILENAME);
+                        return true;
+                    } else {
+                        /*
+                         * No keybinding
+                         */
                         return true;
                     }
                 }
@@ -213,29 +225,9 @@ class EditorWidget extends TextView
         });
     }
 
-    /**
-     * Hookup signals to aggregate formats to be used on a subsequent
-     * insertion. The insertTags Set starts empty, and builds up as formats
-     * are toggled by the user. When the cursor moves, the Set is changed to
-     * the formatting applying on character back.
-     */
-    private void hookupFormatManagement() {
-        insertMarkup = null;
-
-        buffer.connect(new TextBuffer.NotifyCursorPosition() {
-            public void onNotifyCursorPosition(TextBuffer source) {
-                final int offset;
-
-                offset = buffer.getCursorPosition();
-                insertMarkup = stack.getMarkupAt(offset);
-            }
-        });
-    }
-
     private void insert(char ch) {
         final TextIter start, pointer;
         final int offset;
-        final Markup[] markup;
         final Span span;
 
         /*
@@ -249,7 +241,6 @@ class EditorWidget extends TextView
          * Create a Span and insert into our internal stack.
          */
 
-        // markup = stack.getMarkupAt(offset);
         span = new CharacterSpan(ch, insertMarkup);
         stack.apply(new InsertChange(offset, span));
 
@@ -296,35 +287,6 @@ class EditorWidget extends TextView
         for (Span span : range) {
             buffer.insert(pointer, span.getText(), tagsForMarkup(span.getMarkup()));
         }
-    }
-
-    static TextTag[] tagsForMarkup(Markup[] markup) {
-        final TextTag[] tags;
-
-        if (markup == null) {
-            return null;
-        }
-
-        tags = new TextTag[markup.length];
-
-        for (int i = 0; i < markup.length; i++) {
-            tags[i] = tagForMarkup(markup[i]);
-        }
-
-        return tags;
-    }
-
-    static TextTag tagForMarkup(Markup m) {
-        if (m instanceof Common) {
-            if (m == Common.ITALICS) {
-                return Format.italics;
-            } else if (m == Common.BOLD) {
-                return Format.bold;
-            }
-        }
-        // else TODO
-
-        throw new IllegalArgumentException();
     }
 
     private void deleteBack() {
@@ -566,6 +528,26 @@ class EditorWidget extends TextView
 
     private void exportContents() {}
 
+    /**
+     * Hookup signals to aggregate formats to be used on a subsequent
+     * insertion. The insertTags Set starts empty, and builds up as formats
+     * are toggled by the user. When the cursor moves, the Set is changed to
+     * the formatting applying on character back.
+     */
+    private void hookupFormatManagement() {
+        insertMarkup = null;
+
+        buffer.connect(new TextBuffer.NotifyCursorPosition() {
+            public void onNotifyCursorPosition(TextBuffer source) {
+                final int offset;
+
+                offset = buffer.getCursorPosition();
+                System.out.println(offset + "\t" + (insertMarkup != null ? insertMarkup[0] : ""));
+                insertMarkup = stack.getMarkupAt(offset);
+            }
+        });
+    }
+
     private void clearFormat() {
         final TextIter start, end;
         int alpha, omega, width;
@@ -590,9 +572,7 @@ class EditorWidget extends TextView
                 alpha = omega;
             }
 
-            // TODO
-            // stack.apply(new FormatChange(alpha, width, , false));
-
+            stack.apply(new FormatChange(alpha, width));
             buffer.removeAllTags(start, end);
         }
 
@@ -601,6 +581,5 @@ class EditorWidget extends TextView
          */
 
         insertMarkup = null;
-
     }
 }

@@ -31,14 +31,37 @@ public class FormatChange extends Change
         this.additive = true;
     }
 
+    /**
+     * Clear all format in the given range.
+     */
+    public FormatChange(int offset, int width) {
+        super();
+        this.offset = offset;
+        this.width = width;
+        this.format = null;
+        this.additive = false;
+    }
+
     /*
      * Not using the returned Span[] for anything at the moment. What SHOULD
      * we be using it for?
      */
+    /*
+     * Doing clear() this way is cumbersome.
+     */
     void apply(Text text) {
-        super.range = text.format(offset, width, format, additive);
+        if (format == null) {
+            super.range = text.clear(offset, width);
+        } else {
+            super.range = text.format(offset, width, format, additive);
+        }
     }
 
+    /*
+     * What about having cleared? We should be restoring the range, maybe?
+     * Actually, this is wrong; if we're undoing we have the Span[] and should
+     * be able to just "replace" with it.
+     */
     void undo(Text text) {
         if (range == null) {
             throw new IllegalStateException();
