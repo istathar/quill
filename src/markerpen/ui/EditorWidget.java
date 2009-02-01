@@ -27,6 +27,7 @@ import org.gnome.gtk.TextMark;
 import org.gnome.gtk.TextTag;
 import org.gnome.gtk.TextView;
 import org.gnome.gtk.Widget;
+import org.gnome.pango.FontDescription;
 
 class EditorWidget extends TextView
 {
@@ -48,16 +49,21 @@ class EditorWidget extends TextView
     }
 
     private void setupTextView() {
+        final FontDescription desc;
+
+        desc = new FontDescription("DejaVu Sans, Book 11");
         buffer = new TextBuffer();
 
         selectionBound = buffer.getSelectionBound();
         insertBound = buffer.getInsert();
 
         view.setBuffer(buffer);
+        view.modifyFont(desc);
     }
 
     private void setupInternalStack() {
         stack = new TextStack();
+        clipboard = new Span[0];
     }
 
     private void installKeybindings() {
@@ -162,10 +168,13 @@ class EditorWidget extends TextView
                         toggleFormat(Format.mono);
                         return true;
                     } else if (key == Keyval.s) {
-                        extractText();
+                        exportContents();
                         return true;
                     } else if (key == Keyval.v) {
                         pasteText();
+                        return true;
+                    } else if (key == Keyval.x) {
+                        cutText();
                         return true;
                     } else if (key == Keyval.y) {
                         redo();
@@ -387,8 +396,20 @@ class EditorWidget extends TextView
     private Span[] clipboard;
 
     private void copyText() {
+        extractText(true);
+    }
+
+    private void cutText() {
+        extractText(false);
+    }
+
+    private void extractText(boolean copy) {
         final TextIter start, end;
         int alpha, omega, width;
+
+        /*
+         * If there's no selection, we can't "Copy" or "Cut"
+         */
 
         if (!buffer.getHasSelection()) {
             return;
@@ -407,7 +428,23 @@ class EditorWidget extends TextView
             alpha = omega;
         }
 
+        /*
+         * Copy the range to clipboard, being the "Copy" behviour.
+         */
+
         clipboard = stack.copyRange(alpha, width);
+
+        if (copy) {
+            return;
+        }
+
+        /*
+         * And now delete the selected range, which makes this the "Cut"
+         * behaviour.
+         */
+
+        stack.apply(new DeleteChange(alpha, width));
+        buffer.delete(start, end);
     }
 
     private void pasteText() {
@@ -434,7 +471,7 @@ class EditorWidget extends TextView
 
     }
 
-    private void extractText() {}
+    private void exportContents() {}
 
     private void clearFormat() {}
 }

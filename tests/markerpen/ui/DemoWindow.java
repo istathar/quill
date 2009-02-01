@@ -68,7 +68,7 @@ public class DemoWindow extends Window
             view = new TextView();
             view.setWrapMode(WrapMode.WORD);
             view.setPaddingBelowParagraph(10);
-            desc = new FontDescription("Deja Vu Sans, 9");
+            desc = new FontDescription("Deja Vu Sans, 11");
             view.modifyFont(desc);
             view.setBorderWidth(2);
 

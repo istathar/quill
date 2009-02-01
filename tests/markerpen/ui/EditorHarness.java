@@ -29,6 +29,7 @@ public final class EditorHarness
 
         editor = new EditorWidget();
         window.add(editor);
+        window.setTitle("EditorWidget");
         window.showAll();
 
         window.connect(new DeleteEvent() {
