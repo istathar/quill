@@ -13,8 +13,7 @@ package markerpen.textbase;
 public class DeleteChange extends Change
 {
     public DeleteChange(int offset, int width) {
-        this.offset = offset;
-        super.width = width;
+        super(offset, width);
     }
 
     final void apply(Text text) {

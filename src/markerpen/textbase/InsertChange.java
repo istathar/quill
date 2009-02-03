@@ -12,31 +12,14 @@ package markerpen.textbase;
 
 public class InsertChange extends Change
 {
-    // FIXME probably have to pass in format here?
-    public InsertChange(int offset, String what) {
-        this.offset = offset;
-        this.range = new Span[] {
+    InsertChange(int offset, String what) {
+        super(offset, new Span[] {
             new StringSpan(what, null),
-        };
-    }
-
-    public InsertChange(int offset, String what, Markup[] markup) {
-        this.offset = offset;
-        this.range = new Span[] {
-            new StringSpan(what, markup),
-        };
-    }
-
-    public InsertChange(int offset, Span span) {
-        this.offset = offset;
-        this.range = new Span[] {
-            span,
-        };
+        });
     }
 
     public InsertChange(int offset, Span[] range) {
-        this.offset = offset;
-        this.range = range;
+        super(offset, range);
     }
 
     final void apply(Text text) {
@@ -44,6 +27,6 @@ public class InsertChange extends Change
     }
 
     final void undo(Text text) {
-        text.delete(offset, super.getLength());
+        text.delete(offset, width);
     }
 }

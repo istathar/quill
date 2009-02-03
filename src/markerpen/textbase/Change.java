@@ -17,14 +17,29 @@ package markerpen.textbase;
  */
 public abstract class Change
 {
-    int offset;
+    final int offset;
 
-    int width;
+    final int width;
 
     Span[] range;
 
-    protected Change() {
-        width = -1;
+    protected Change(int offset, Span[] range) {
+        int w;
+
+        w = 0;
+
+        for (Span s : range) {
+            w += s.getWidth();
+        }
+
+        this.offset = offset;
+        this.width = w;
+        this.range = range;
+    }
+
+    protected Change(int offset, int width) {
+        this.offset = offset;
+        this.width = width;
     }
 
     /*
@@ -40,31 +55,15 @@ public abstract class Change
         return offset;
     }
 
-    // FIXME cache?
-    public String getText() {
-        final StringBuilder str;
-
-        str = new StringBuilder();
-        for (Span s : range) {
-            str.append(s.getText());
-        }
-
-        return str.toString();
+    /**
+     * WARNING. Do not change the elements of the Span[]; if something changes
+     * it that would be dangerous. So don't.
+     */
+    public Span[] getRange() {
+        return range;
     }
 
     public int getLength() {
-        int w;
-
-        if (width == -1) {
-            w = 0;
-
-            for (Span s : range) {
-                w += s.getWidth();
-            }
-
-            width = w;
-        }
-
         return width;
     }
 }
