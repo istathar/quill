@@ -42,7 +42,7 @@ public class DemoWindow extends Window
 
         window = this;
         window.setMaximize(true);
-        desc = new FontDescription("Deja Vu Sans, 11");
+        desc = new FontDescription("Deja Vu Serif, 11");
         window.modifyFont(desc);
 
         /*

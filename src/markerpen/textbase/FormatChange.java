@@ -17,16 +17,12 @@ package markerpen.textbase;
  */
 public class FormatChange extends Change
 {
-    int width;
-
     Markup format;
 
     boolean additive;
 
     public FormatChange(int offset, int width, Markup format) {
-        super();
-        this.offset = offset;
-        this.width = width;
+        super(offset, width);
         this.format = format;
         this.additive = true;
     }
@@ -34,10 +30,11 @@ public class FormatChange extends Change
     /**
      * Clear all format in the given range.
      */
+    /*
+     * TODO into its own class?
+     */
     public FormatChange(int offset, int width) {
-        super();
-        this.offset = offset;
-        this.width = width;
+        super(offset, width);
         this.format = null;
         this.additive = false;
     }

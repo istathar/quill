@@ -10,15 +10,21 @@
  */
 package markerpen.ui;
 
+import java.io.IOException;
+
+import markerpen.converter.DocBookConverter;
+import markerpen.docbook.Document;
 import markerpen.textbase.Change;
 import markerpen.textbase.CharacterSpan;
 import markerpen.textbase.Common;
 import markerpen.textbase.DeleteChange;
+import markerpen.textbase.Extract;
 import markerpen.textbase.FormatChange;
 import markerpen.textbase.InsertChange;
 import markerpen.textbase.Markup;
 import markerpen.textbase.Span;
 import markerpen.textbase.TextStack;
+import markerpen.textbase.TextualChange;
 
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
@@ -42,6 +48,11 @@ class EditorWidget extends TextView
     private TextMark selectionBound, insertBound;
 
     private TextStack stack;
+
+    /**
+     * Cache of the offset into the TextBuffer of the insertBound TextMark.
+     */
+    private int insertOffset;
 
     private Markup[] insertMarkup;
 
@@ -71,7 +82,7 @@ class EditorWidget extends TextView
 
     private void setupInternalStack() {
         stack = new TextStack();
-        clipboard = new Span[0];
+        clipboard = Extract.EMPTY;
     }
 
     private void hookupKeybindings() {
@@ -226,41 +237,40 @@ class EditorWidget extends TextView
     }
 
     private void insert(char ch) {
-        final TextIter start, pointer;
-        final int offset;
+        final Extract removed;
         final Span span;
+        final Change change;
+        final TextIter other;
+        final int width;
 
         /*
-         * Where, in TextBuffer terms?
-         */
-
-        pointer = buffer.getIter(insertBound);
-        offset = pointer.getOffset();
-
-        /*
-         * Create a Span and insert into our internal stack.
+         * Create a Span and insert into our internal representation. Then
+         * send the character to the TextBuffer, updating the TextView to
+         * reflect the user's input.
          */
 
         span = new CharacterSpan(ch, insertMarkup);
-        stack.apply(new InsertChange(offset, span));
-
-        /*
-         * And now send the character to the TextBuffer, updating the TextView
-         * to reflect the user's input.
-         */
 
         if (buffer.getHasSelection()) {
-            start = buffer.getIter(selectionBound);
-            deleteRange(start, pointer);
+            other = buffer.getIter(selectionBound);
+            width = other.getOffset() - insertOffset;
+
+            removed = stack.extractRange(insertOffset, width);
+            change = new TextualChange(insertOffset, removed, span);
+        } else {
+            change = new InsertChange(insertOffset, span);
         }
 
-        buffer.insert(pointer, span.getText(), tagsForMarkup(insertMarkup));
+        stack.apply(change);
+        this.affect(change);
     }
 
-    private void insert(Span[] range) {
+    private void insert(Extract range) {
         final TextIter pointer;
         final TextIter start;
         final int offset;
+        Span span;
+        int i;
 
         /*
          * Where, in TextBuffer terms?
@@ -284,7 +294,9 @@ class EditorWidget extends TextView
         }
 
         stack.apply(new InsertChange(offset, range));
-        for (Span span : range) {
+
+        for (i = 0; i < range.size(); i++) {
+            span = range.get(i);
             buffer.insert(pointer, span.getText(), tagsForMarkup(span.getMarkup()));
         }
     }
@@ -330,31 +342,26 @@ class EditorWidget extends TextView
      */
     private void deleteRange(TextIter start, TextIter end) {
         int alpha, omega, width;
+        final Extract range;
+        final Change change;
 
         alpha = start.getOffset();
         omega = end.getOffset();
 
         width = omega - alpha;
 
-        /*
-         * There is a subtle bug that if you have selected moving backwards,
-         * selectionBound will be at a point where the range ends. We need to
-         * work in increasing order in our internal Text representation.
-         */
-
-        if (width < 0) {
-            width = -width;
-            alpha = omega;
-        }
-
-        stack.apply(new DeleteChange(alpha, width));
-
-        buffer.delete(start, end);
+        range = stack.extractRange(alpha, width);
+        change = new DeleteChange(alpha, range);
+        stack.apply(change);
+        this.affect(change);
     }
 
     private void toggleMarkup(Markup format) {
         final TextIter start, end;
         int alpha, omega, width;
+        Extract r;
+        int i;
+        Span s;
         final Markup[] replacement;
 
         /*
@@ -371,15 +378,12 @@ class EditorWidget extends TextView
 
             width = omega - alpha;
 
-            if (width < 0) {
-                width = -width;
-                alpha = omega;
-            }
-
             // FIXME what about toggling off?
             stack.apply(new FormatChange(alpha, width, format));
 
-            for (Span s : stack.copyRange(alpha, width)) {
+            r = stack.extractRange(alpha, width);
+            for (i = 0; i < r.size(); i++) {
+                s = r.get(i);
                 buffer.applyTag(tagForMarkup(format), start, end);
             }
         } else {
@@ -417,18 +421,30 @@ class EditorWidget extends TextView
     }
 
     /**
-     * Cause the given Change to be reflected in the view.
+     * Cause the given Change to be reflected in the TextView. The assumption
+     * is made that the backing TextBuffer is in a state where applying this
+     * Change makes sense.
      */
     private void affect(Change change) {
-        final TextIter start, end;
+        TextIter start, end;
+        Extract r;
+        int i;
+        Span s;
 
         start = buffer.getIter(change.getOffset());
 
         if (change instanceof InsertChange) {
-            buffer.insert(start, change.getText());
-        } else {
-            end = buffer.getIter(change.getOffset() + change.getLength());
+            r = change.getAdded();
+            for (i = 0; i < r.size(); i++) {
+                s = r.get(i);
+                buffer.insert(start, s.getText(), tagsForMarkup(s.getMarkup()));
+            }
+        } else if (change instanceof DeleteChange) {
+            r = change.getRemoved();
+            end = buffer.getIter(change.getOffset() + r.getWidth());
             buffer.delete(start, end);
+        } else if (change instanceof TextualChange) {
+            // FIXME
         }
     }
 
@@ -438,18 +454,26 @@ class EditorWidget extends TextView
      */
     private void reverse(Change change) {
         final TextIter start, end;
+        Extract r;
+        int i;
+        Span s;
 
         start = buffer.getIter(change.getOffset());
 
         if (change instanceof InsertChange) {
-            end = buffer.getIter(change.getOffset() + change.getLength());
+            r = change.getAdded();
+            end = buffer.getIter(change.getOffset() + r.getWidth());
             buffer.delete(start, end);
         } else if (change instanceof DeleteChange) {
-            buffer.insert(start, change.getText());
+            r = change.getRemoved();
+            for (i = 0; i < r.size(); i++) {
+                s = r.get(i);
+                buffer.insert(start, s.getText(), tagsForMarkup(s.getMarkup()));
+            }
         }
     }
 
-    private Span[] clipboard;
+    private Extract clipboard;
 
     private void copyText() {
         extractText(true);
@@ -462,6 +486,7 @@ class EditorWidget extends TextView
     private void extractText(boolean copy) {
         final TextIter start, end;
         int alpha, omega, width;
+        final Change change;
 
         /*
          * If there's no selection, we can't "Copy" or "Cut"
@@ -479,16 +504,11 @@ class EditorWidget extends TextView
 
         width = omega - alpha;
 
-        if (width < 0) {
-            width = -width;
-            alpha = omega;
-        }
-
         /*
          * Copy the range to clipboard, being the "Copy" behviour.
          */
 
-        clipboard = stack.copyRange(alpha, width);
+        clipboard = stack.extractRange(alpha, width);
 
         if (copy) {
             return;
@@ -499,7 +519,8 @@ class EditorWidget extends TextView
          * behaviour.
          */
 
-        stack.apply(new DeleteChange(alpha, width));
+        change = new DeleteChange(alpha, clipboard);
+        stack.apply(change);
         buffer.delete(start, end);
     }
 
@@ -526,23 +547,36 @@ class EditorWidget extends TextView
         insert(clipboard);
     }
 
-    private void exportContents() {}
+    private void exportContents() {
+        final Document book;
+
+        book = DocBookConverter.buildTree(stack);
+        try {
+            book.toXML(System.out);
+        } catch (IOException ioe) {
+            throw new Error(ioe);
+        }
+    }
 
     /**
      * Hookup signals to aggregate formats to be used on a subsequent
-     * insertion. The insertTags Set starts empty, and builds up as formats
-     * are toggled by the user. When the cursor moves, the Set is changed to
-     * the formatting applying on character back.
+     * insertion. The insertMarkup array starts empty, and builds up as
+     * formats are toggled by the user. When the cursor moves, the Set is
+     * changed to the formatting applying on character back.
      */
     private void hookupFormatManagement() {
         insertMarkup = null;
 
         buffer.connect(new TextBuffer.NotifyCursorPosition() {
             public void onNotifyCursorPosition(TextBuffer source) {
-                final int offset;
+                final TextIter pointer;
+                int offset;
 
-                offset = buffer.getCursorPosition();
-                System.out.println(offset + "\t" + (insertMarkup != null ? insertMarkup[0] : ""));
+                pointer = buffer.getIter(insertBound);
+                offset = pointer.getOffset();
+
+                insertOffset = offset;
+
                 insertMarkup = stack.getMarkupAt(offset);
             }
         });
@@ -567,11 +601,8 @@ class EditorWidget extends TextView
 
             width = omega - alpha;
 
-            if (width < 0) {
-                width = -width;
-                alpha = omega;
-            }
-
+            // FIXME
+            // TODO replace with a ClearFormattingChange?
             stack.apply(new FormatChange(alpha, width));
             buffer.removeAllTags(start, end);
         }
