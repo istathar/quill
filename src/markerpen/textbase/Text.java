@@ -610,8 +610,7 @@ public class Text
         final Span[] spans;
 
         if (width < 0) {
-            width = -width;
-            start = start - width;
+            throw new IllegalArgumentException();
         }
 
         pair = extractFrom(start, width);

@@ -40,6 +40,12 @@ public class ValidateExtracts extends TestCase
         assertEquals("o World", extract.range[2].getText());
     }
 
+    /*
+     * This used to check that extractRange() would deal with inverted
+     * parameters, but we later ran into a problem whereby we need the
+     * absolute offset to construct the Change objects, and had no [good] way
+     * to get the correct offset value back.
+     */
     public final void testWidthNegative() {
         final Text text;
         Extract extract;
@@ -47,8 +53,12 @@ public class ValidateExtracts extends TestCase
         text = new Text();
         text.append(new StringSpan("Hello World", null));
 
-        extract = text.extractRange(9, -2);
-        assertEquals(1, extract.range.length);
-        assertEquals("or", extract.range[0].getText());
+        try {
+            extract = text.extractRange(9, -2);
+            fail();
+            extract.getWidth();
+        } catch (IllegalArgumentException iae) {
+            // good
+        }
     }
 }

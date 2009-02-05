@@ -19,9 +19,9 @@ public abstract class Change
 {
     final int offset;
 
-    Extract removed;
+    final Extract removed;
 
-    Extract added;
+    final Extract added;
 
     Change(int offset, Extract removed, Extract added) {
         this.offset = offset;

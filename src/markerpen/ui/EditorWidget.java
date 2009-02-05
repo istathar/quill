@@ -236,27 +236,29 @@ class EditorWidget extends TextView
         });
     }
 
+    /**
+     * Create a Span and insert into our internal representation. Then apply()
+     * to send the character to the TextBuffer, updating the TextView to
+     * reflect the user's input.
+     */
     private void insert(char ch) {
-        final Extract removed;
         final Span span;
+        final Extract removed;
         final Change change;
         final TextIter other;
-        final int width;
-
-        /*
-         * Create a Span and insert into our internal representation. Then
-         * send the character to the TextBuffer, updating the TextView to
-         * reflect the user's input.
-         */
+        final int otherOffset, offset, width;
 
         span = new CharacterSpan(ch, insertMarkup);
 
         if (buffer.getHasSelection()) {
             other = buffer.getIter(selectionBound);
-            width = other.getOffset() - insertOffset;
+            otherOffset = other.getOffset();
 
-            removed = stack.extractRange(insertOffset, width);
-            change = new TextualChange(insertOffset, removed, span);
+            offset = normalizeOffset(insertOffset, otherOffset);
+            width = normalizeWidth(insertOffset, otherOffset);
+
+            removed = stack.extractRange(offset, width);
+            change = new TextualChange(offset, removed, span);
         } else {
             change = new InsertChange(insertOffset, span);
         }
@@ -265,41 +267,53 @@ class EditorWidget extends TextView
         this.affect(change);
     }
 
-    private void insert(Extract range) {
-        final TextIter pointer;
-        final TextIter start;
-        final int offset;
-        Span span;
-        int i;
+    /*
+     * Note that this code is almost identical to insert(char). That's pretty
+     * lame, but several attempt to clear this up have not been successful.
+     * It'll do for now.
+     */
 
-        /*
-         * Where, in TextBuffer terms?
-         */
+    private void pasteText() {
+        final Extract removed;
+        final Change change;
+        final TextIter selection;
+        final int selectionOffset, offset, width;
 
-        pointer = buffer.getIter(insertBound);
-        offset = pointer.getOffset();
-
-        /*
-         * FIXME: this will cause a whole set of Changes to be added to the
-         * stack, when really we want this to be a single undoable operation.
-         * The same fix for inserting when a selection is active will apply
-         * here.
-         */
+        if (clipboard == null) {
+            return;
+        }
 
         if (buffer.getHasSelection()) {
-            start = buffer.getIter(selectionBound);
-            // where is insertBound
+            selection = buffer.getIter(selectionBound);
+            selectionOffset = selection.getOffset();
 
-            deleteRange(start, pointer);
+            offset = normalizeOffset(insertOffset, selectionOffset);
+            width = normalizeOffset(insertOffset, selectionOffset);
+
+            removed = stack.extractRange(offset, width);
+            change = new TextualChange(offset, removed, clipboard);
+        } else {
+            change = new InsertChange(insertOffset, clipboard);
         }
 
-        stack.apply(new InsertChange(offset, range));
-
-        for (i = 0; i < range.size(); i++) {
-            span = range.get(i);
-            buffer.insert(pointer, span.getText(), tagsForMarkup(span.getMarkup()));
-        }
+        stack.apply(change);
+        this.affect(change);
     }
+
+    /**
+     * <p>
+     * If width is negative, start will be decremented by that amount and the
+     * range will be
+     * 
+     * <pre>
+     * extractRange(start-width, |width|)
+     * </pre>
+     * 
+     * This accounts for the common but subtle bug that if you have selected
+     * moving backwards, selectionBound will be at a point where the range
+     * ends and have an offset greater than insertBound's, resulting in a
+     * negative width.
+     */
 
     private void deleteBack() {
         final TextIter start, end;
@@ -341,17 +355,19 @@ class EditorWidget extends TextView
      * Effect a deletion from start to end.
      */
     private void deleteRange(TextIter start, TextIter end) {
-        int alpha, omega, width;
+        int alpha, omega, offset, width;
         final Extract range;
         final Change change;
 
         alpha = start.getOffset();
         omega = end.getOffset();
 
-        width = omega - alpha;
+        offset = normalizeOffset(alpha, omega);
+        width = normalizeWidth(alpha, omega);
 
-        range = stack.extractRange(alpha, width);
-        change = new DeleteChange(alpha, range);
+        range = stack.extractRange(offset, width);
+        change = new DeleteChange(offset, range);
+
         stack.apply(change);
         this.affect(change);
     }
@@ -433,18 +449,20 @@ class EditorWidget extends TextView
 
         start = buffer.getIter(change.getOffset());
 
-        if (change instanceof InsertChange) {
+        r = change.getRemoved();
+        if (r != null) {
+            end = buffer.getIter(change.getOffset() + r.getWidth());
+            buffer.delete(start, end);
+            start = end;
+        }
+
+        r = change.getAdded();
+        if (r != null) {
             r = change.getAdded();
             for (i = 0; i < r.size(); i++) {
                 s = r.get(i);
                 buffer.insert(start, s.getText(), tagsForMarkup(s.getMarkup()));
             }
-        } else if (change instanceof DeleteChange) {
-            r = change.getRemoved();
-            end = buffer.getIter(change.getOffset() + r.getWidth());
-            buffer.delete(start, end);
-        } else if (change instanceof TextualChange) {
-            // FIXME
         }
     }
 
@@ -460,12 +478,14 @@ class EditorWidget extends TextView
 
         start = buffer.getIter(change.getOffset());
 
-        if (change instanceof InsertChange) {
-            r = change.getAdded();
+        r = change.getAdded();
+        if (r != null) {
             end = buffer.getIter(change.getOffset() + r.getWidth());
             buffer.delete(start, end);
-        } else if (change instanceof DeleteChange) {
-            r = change.getRemoved();
+        }
+
+        r = change.getRemoved();
+        if (r != null) {
             for (i = 0; i < r.size(); i++) {
                 s = r.get(i);
                 buffer.insert(start, s.getText(), tagsForMarkup(s.getMarkup()));
@@ -485,7 +505,7 @@ class EditorWidget extends TextView
 
     private void extractText(boolean copy) {
         final TextIter start, end;
-        int alpha, omega, width;
+        int alpha, omega, offset, width;
         final Change change;
 
         /*
@@ -502,13 +522,14 @@ class EditorWidget extends TextView
         alpha = start.getOffset();
         omega = end.getOffset();
 
-        width = omega - alpha;
+        offset = normalizeOffset(alpha, omega);
+        width = normalizeWidth(alpha, omega);
 
         /*
          * Copy the range to clipboard, being the "Copy" behviour.
          */
 
-        clipboard = stack.extractRange(alpha, width);
+        clipboard = stack.extractRange(offset, width);
 
         if (copy) {
             return;
@@ -519,32 +540,29 @@ class EditorWidget extends TextView
          * behaviour.
          */
 
-        change = new DeleteChange(alpha, clipboard);
+        change = new DeleteChange(offset, clipboard);
         stack.apply(change);
-        buffer.delete(start, end);
+        this.affect(change);
     }
 
-    private void pasteText() {
-        final TextIter pointer, start;
-
-        /*
-         * Where, in TextBuffer terms?
-         */
-
-        pointer = buffer.getIter(insertBound);
-
-        /*
-         * FIXME this needs to be one operation, not two.
-         */
-
-        if (buffer.getHasSelection()) {
-            start = buffer.getIter(selectionBound);
-            // where is insertBound
-
-            deleteRange(start, pointer);
+    private static int normalizeOffset(int alpha, int omega) {
+        if (omega > alpha) {
+            return alpha;
+        } else {
+            return omega;
         }
+    }
 
-        insert(clipboard);
+    private static int normalizeWidth(int alpha, int omega) {
+        final int width;
+
+        width = omega - alpha;
+
+        if (width < 0) {
+            return -width;
+        } else {
+            return width;
+        }
     }
 
     private void exportContents() {
