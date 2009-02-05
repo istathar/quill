@@ -12,21 +12,27 @@ package markerpen.textbase;
 
 public class InsertChange extends Change
 {
-    InsertChange(int offset, String what) {
-        super(offset, new Span[] {
-            new StringSpan(what, null),
-        });
+    /**
+     * This is the usual case: you've created a single Span and want to insert
+     * it.
+     */
+    public InsertChange(int offset, Span span) {
+        super(offset, null, new Extract(span));
     }
 
-    public InsertChange(int offset, Span[] range) {
-        super(offset, range);
+    /**
+     * Alternately, you've been given a Range from somewhere and you want to
+     * (re)insert it.
+     */
+    public InsertChange(int offset, Extract added) {
+        super(offset, null, added);
     }
 
     final void apply(Text text) {
-        text.insert(offset, range);
+        text.insert(offset, added.range);
     }
 
     final void undo(Text text) {
-        text.delete(offset, width);
+        text.delete(offset, added.width);
     }
 }

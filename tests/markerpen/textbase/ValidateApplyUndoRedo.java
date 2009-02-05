@@ -11,10 +11,6 @@
 
 package markerpen.textbase;
 
-import markerpen.textbase.Change;
-import markerpen.textbase.DeleteChange;
-import markerpen.textbase.InsertChange;
-import markerpen.textbase.TextStack;
 import junit.framework.TestCase;
 
 /**
@@ -30,19 +26,22 @@ public class ValidateApplyUndoRedo extends TestCase
 {
     public final void testInsertionAndDeletion() {
         final TextStack text;
+        Extract extract;
         Change change;
 
         text = new TextStack();
 
-        change = new InsertChange(0, "Hello World");
+        change = new InsertChange(0, new Extract(new StringSpan("Hello World", null)));
         text.apply(change);
         assertEquals("Hello World", text.toString());
 
-        change = new DeleteChange(5, 6);
+        extract = text.extractRange(5, 6);
+        change = new DeleteChange(5, extract);
         text.apply(change);
         assertEquals("Hello", text.toString());
 
-        change = new DeleteChange(1, 3);
+        extract = text.extractRange(1, 3);
+        change = new DeleteChange(1, extract);
         text.apply(change);
         assertEquals("Ho", text.toString());
 
@@ -75,7 +74,9 @@ public class ValidateApplyUndoRedo extends TestCase
         assertEquals("Hello World", text.toString());
 
         text.redo();
-        change = new InsertChange(5, " Santa Claus");
+        change = new InsertChange(5, new Extract(new Span[] {
+            new StringSpan(" Santa Claus", null),
+        }));
         text.apply(change);
         assertEquals("Hello Santa Claus", text.toString());
 

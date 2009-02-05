@@ -19,27 +19,14 @@ public abstract class Change
 {
     final int offset;
 
-    final int width;
+    Extract removed;
 
-    Span[] range;
+    Extract added;
 
-    protected Change(int offset, Span[] range) {
-        int w;
-
-        w = 0;
-
-        for (Span s : range) {
-            w += s.getWidth();
-        }
-
+    Change(int offset, Extract removed, Extract added) {
         this.offset = offset;
-        this.width = w;
-        this.range = range;
-    }
-
-    protected Change(int offset, int width) {
-        this.offset = offset;
-        this.width = width;
+        this.removed = removed;
+        this.added = added;
     }
 
     /*
@@ -55,15 +42,11 @@ public abstract class Change
         return offset;
     }
 
-    /**
-     * WARNING. Do not change the elements of the Span[]; if something changes
-     * it that would be dangerous. So don't.
-     */
-    public Span[] getRange() {
-        return range;
+    public Extract getRemoved() {
+        return removed;
     }
 
-    public int getLength() {
-        return width;
+    public Extract getAdded() {
+        return added;
     }
 }

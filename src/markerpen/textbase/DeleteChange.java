@@ -12,18 +12,21 @@ package markerpen.textbase;
 
 public class DeleteChange extends Change
 {
-    public DeleteChange(int offset, int width) {
-        super(offset, width);
+    /**
+     * While it would be nice to be able to say
+     * "just remove between these two points", we need to have the Extract of
+     * Spans that are going to be removed so we can restore them later if an
+     * undo happens.
+     */
+    public DeleteChange(int offset, Extract removed) {
+        super(offset, removed, null);
     }
 
     final void apply(Text text) {
-        super.range = text.delete(offset, width);
+        text.delete(offset, removed.width);
     }
 
     final void undo(Text text) {
-        if (range == null) {
-            throw new IllegalStateException();
-        }
-        text.insert(offset, range);
+        text.insert(offset, removed.range);
     }
 }
