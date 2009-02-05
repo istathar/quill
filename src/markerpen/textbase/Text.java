@@ -467,10 +467,9 @@ public class Text
     }
 
     /**
-     * Add or remove a Markup format from a range of text. Like delete() it
-     * returns the Span[] representing the splice.
+     * Add or remove a Markup format from a range of text.
      */
-    protected Span[] format(int offset, int width, Markup format, boolean additive) {
+    protected void format(int offset, int width, Markup format) {
         final Pair pair;
         Piece p;
         Span s;
@@ -488,11 +487,7 @@ public class Text
         while (true) {
             s = p.span;
 
-            if (additive) {
-                p.span = s.applyMarkup(format);
-            } else {
-                p.span = s.removeMarkup(format);
-            }
+            p.span = s.applyMarkup(format);
 
             if (p == pair.two) {
                 break;
@@ -500,14 +495,43 @@ public class Text
 
             p = p.next;
         }
+    }
 
-        return formArray(pair);
+    /**
+     * Remove a Markup format from a range of text.
+     */
+    protected void clear(int offset, int width, Markup format) {
+        final Pair pair;
+        Piece p;
+        Span s;
+
+        pair = extractFrom(offset, width);
+
+        /*
+         * Unlike the insert() and delete() operations, we can leave the Piece
+         * sequence alone. The difference is that we change the Spans that are
+         * pointed to in the range being changed.
+         */
+
+        p = pair.one;
+
+        while (true) {
+            s = p.span;
+
+            p.span = s.removeMarkup(format);
+
+            if (p == pair.two) {
+                break;
+            }
+
+            p = p.next;
+        }
     }
 
     /**
      * Clear all markup from a range of text.
      */
-    protected Span[] clear(int offset, int width) {
+    protected void clear(int offset, int width) {
         final Pair pair;
         Piece p;
         Span s;
@@ -529,8 +553,6 @@ public class Text
 
             p = p.next;
         }
-
-        return formArray(pair);
     }
 
     /*

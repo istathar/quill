@@ -19,24 +19,49 @@ public class FormatChange extends Change
 {
     Markup format;
 
-    boolean additive;
-
-    public FormatChange(int offset, int width, Markup format) {
-        super(offset, width);
+    public FormatChange(int offset, Extract range, Markup format) {
+        super(offset, range, applyMarkup(range, format));
         this.format = format;
-        this.additive = true;
+    }
+
+    private static Extract applyMarkup(Extract original, Markup format) {
+        int i;
+        Span s;
+        Span[] range;
+
+        range = new Span[original.size()];
+
+        for (i = 0; i < original.size(); i++) {
+            s = original.get(i);
+
+            range[i] = s.applyMarkup(format);
+        }
+
+        return new Extract(range);
     }
 
     /**
      * Clear all format in the given range.
      */
-    /*
-     * TODO into its own class?
-     */
-    public FormatChange(int offset, int width) {
-        super(offset, width);
+    public FormatChange(int offset, Extract original) {
+        super(offset, original, clearMarkup(original));
         this.format = null;
-        this.additive = false;
+    }
+
+    private static Extract clearMarkup(Extract original) {
+        int i;
+        Span s;
+        Span[] range;
+
+        range = new Span[original.size()];
+
+        for (i = 0; i < original.size(); i++) {
+            s = original.get(i);
+
+            range[i] = s.copy(null);
+        }
+
+        return new Extract(range);
     }
 
     /*
@@ -47,11 +72,8 @@ public class FormatChange extends Change
      * Doing clear() this way is cumbersome.
      */
     void apply(Text text) {
-        if (format == null) {
-            super.range = text.clear(offset, width);
-        } else {
-            super.range = text.format(offset, width, format, additive);
-        }
+        text.delete(offset, removed.width);
+        text.insert(offset, added.range);
     }
 
     /*
@@ -60,9 +82,7 @@ public class FormatChange extends Change
      * be able to just "replace" with it.
      */
     void undo(Text text) {
-        if (range == null) {
-            throw new IllegalStateException();
-        }
-        text.format(offset, width, format, !additive);
+        text.delete(offset, added.width);
+        text.insert(offset, removed.range);
     }
 }

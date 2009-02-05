@@ -32,11 +32,11 @@ import org.gnome.gdk.ModifierType;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
+import org.gnome.gtk.TextTag;
 import org.gnome.gtk.TextView;
 import org.gnome.gtk.Widget;
 import org.gnome.pango.FontDescription;
 
-import static markerpen.ui.Format.tagForMarkup;
 import static markerpen.ui.Format.tagsForMarkup;
 
 class EditorWidget extends TextView
@@ -373,9 +373,10 @@ class EditorWidget extends TextView
     }
 
     private void toggleMarkup(Markup format) {
-        final TextIter start, end;
-        int alpha, omega, width;
-        Extract r;
+        TextIter start, end;
+        int alpha, omega, offset, width;
+        final Change change;
+        final Extract original;
         int i;
         Span s;
         final Markup[] replacement;
@@ -392,16 +393,17 @@ class EditorWidget extends TextView
             alpha = start.getOffset();
             omega = end.getOffset();
 
-            width = omega - alpha;
+            offset = normalizeOffset(alpha, omega);
+            width = normalizeWidth(alpha, omega);
 
             // FIXME what about toggling off?
-            stack.apply(new FormatChange(alpha, width, format));
 
-            r = stack.extractRange(alpha, width);
-            for (i = 0; i < r.size(); i++) {
-                s = r.get(i);
-                buffer.applyTag(tagForMarkup(format), start, end);
-            }
+            original = stack.extractRange(offset, width);
+
+            change = new FormatChange(offset, original, format);
+            stack.apply(change);
+            this.affect(change);
+
         } else {
             replacement = Markup.applyMarkup(insertMarkup, format);
             if (replacement == insertMarkup) {
@@ -444,24 +446,52 @@ class EditorWidget extends TextView
     private void affect(Change change) {
         TextIter start, end;
         Extract r;
-        int i;
+        int i, offset;
         Span s;
+        TextTag[] tags;
 
         start = buffer.getIter(change.getOffset());
 
-        r = change.getRemoved();
-        if (r != null) {
-            end = buffer.getIter(change.getOffset() + r.getWidth());
-            buffer.delete(start, end);
-            start = end;
-        }
+        if ((change instanceof InsertChange) || (change instanceof DeleteChange)
+                || (change instanceof TextualChange)) {
+            r = change.getRemoved();
+            if (r != null) {
+                end = buffer.getIter(change.getOffset() + r.getWidth());
+                buffer.delete(start, end);
+                start = end;
+            }
 
-        r = change.getAdded();
-        if (r != null) {
             r = change.getAdded();
+            if (r != null) {
+                r = change.getAdded();
+                for (i = 0; i < r.size(); i++) {
+                    s = r.get(i);
+                    buffer.insert(start, s.getText(), tagsForMarkup(s.getMarkup()));
+                }
+            }
+        } else if (change instanceof FormatChange) {
+            r = change.getAdded();
+            offset = change.getOffset();
+
             for (i = 0; i < r.size(); i++) {
                 s = r.get(i);
-                buffer.insert(start, s.getText(), tagsForMarkup(s.getMarkup()));
+
+                start = buffer.getIter(offset);
+                offset += s.getWidth();
+                end = buffer.getIter(offset);
+
+                /*
+                 * FUTURE this is horribly inefficient compared to just adding
+                 * or removing the tag that has changed. But it is undeniably
+                 * easy to express. To do this properly we'll have to get the
+                 * individual Markup and whether it was added or removed from
+                 * the FormatChange.
+                 */
+
+                buffer.removeAllTags(start, end);
+
+                tags = tagsForMarkup(s.getMarkup());
+                buffer.applyTag(tags, start, end);
             }
         }
     }
@@ -602,7 +632,9 @@ class EditorWidget extends TextView
 
     private void clearFormat() {
         final TextIter start, end;
-        int alpha, omega, width;
+        final Extract original;
+        final Change change;
+        int alpha, omega, offset, width;
 
         /*
          * If there is a selection then clear the markup applied there. This
@@ -617,12 +649,13 @@ class EditorWidget extends TextView
             alpha = start.getOffset();
             omega = end.getOffset();
 
-            width = omega - alpha;
+            offset = normalizeOffset(alpha, omega);
+            width = normalizeWidth(alpha, omega);
 
-            // FIXME
-            // TODO replace with a ClearFormattingChange?
-            stack.apply(new FormatChange(alpha, width));
-            buffer.removeAllTags(start, end);
+            original = stack.extractRange(offset, width);
+            change = new FormatChange(offset, original);
+            stack.apply(change);
+            this.affect(change);
         }
 
         /*
