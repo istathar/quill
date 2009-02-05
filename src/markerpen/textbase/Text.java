@@ -1,7 +1,7 @@
 /*
  * Text.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -422,9 +422,8 @@ public class Text
      * Delete a width wide segment starting at offset. Returns a Span[]
      * representing the removed range.
      */
-    protected Span[] delete(int offset, int width) {
+    protected void delete(int offset, int width) {
         final Piece preceeding, following;
-        final Span[] result;
         final Pair pair;
 
         /*
@@ -432,11 +431,14 @@ public class Text
          * find out the Pieces deliniating it. Then create a Span[] of the
          * range that will be removed which we can return out for storage in
          * the Change stack.
+         * 
+         * TODO now that we have exposed extractRange() and people have to
+         * call it before creating a DeleteChange, this will likely be
+         * duplicate effort. Once we are caching offsets hopefully we can cut
+         * down the work.
          */
 
         pair = extractFrom(offset, width);
-
-        result = formArray(pair);
 
         /*
          * Now change the linkages so we affect the deletion. There are a
@@ -462,8 +464,6 @@ public class Text
                 following.prev = preceeding;
             }
         }
-
-        return result;
     }
 
     /**
@@ -583,10 +583,39 @@ public class Text
         throw new IllegalArgumentException();
     }
 
-    public Span[] copyRange(int start, int width) {
+    /**
+     * Gets the array of Spans that represent the characters and formatting
+     * width wide from start. The result is returned wrapped in a read-only
+     * Range object.
+     * 
+     * <p>
+     * If width is negative, start will be decremented by that amount and the
+     * range will be
+     * 
+     * <pre>
+     * extractRange(start-width, |width|)
+     * </pre>
+     * 
+     * This accounts for the common but subtle bug that if you have selected
+     * moving backwards, selectionBound will be at a point where the range
+     * ends - and greater than insertBound.
+     */
+    /*
+     * Having exposed this so that external APIs can get a Range to pass when
+     * constructing a DeleteChange, we probably end up duplicating a lot of
+     * work when actually calling delete() after this here.
+     */
+    public Extract extractRange(int start, int width) {
         final Pair pair;
+        final Span[] spans;
+
+        if (width < 0) {
+            width = -width;
+            start = start - width;
+        }
 
         pair = extractFrom(start, width);
-        return formArray(pair);
+        spans = formArray(pair);
+        return new Extract(spans);
     }
 }
