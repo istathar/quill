@@ -639,4 +639,12 @@ public class Text
         spans = formArray(pair);
         return new Extract(spans);
     }
+
+    /*
+     * Strictly there is no reason for this to be here, but it allows us to
+     * keep the constructors in Extract out of view.
+     */
+    public Extract extractFor(Span span) {
+        return new Extract(span);
+    }
 }

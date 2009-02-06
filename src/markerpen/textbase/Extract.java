@@ -26,17 +26,6 @@ public class Extract
 
     final int width;
 
-    public static final Extract EMPTY;
-
-    static {
-        EMPTY = new Extract();
-    }
-
-    private Extract() {
-        this.width = 0;
-        this.range = null;
-    }
-
     Extract(Span[] range) {
         int w;
 
@@ -76,5 +65,44 @@ public class Extract
      */
     public int getWidth() {
         return width;
+    }
+
+    /**
+     * Get a single continuous String with the textual contents of this
+     * Extract. The only time you should need this is for writing to
+     * clipboard.
+     */
+    public String getText() {
+        final StringBuilder str;
+        int i;
+
+        str = new StringBuilder();
+
+        for (i = 0; i < range.length; i++) {
+            if (range[i] instanceof CharacterSpan) {
+                str.append(range[i].getChar());
+            } else {
+                str.append(range[i].getText());
+            }
+        }
+
+        return str.toString();
+    }
+
+    /**
+     * For debugging, only!
+     */
+    public String toString() {
+        final StringBuilder str;
+        int i;
+
+        str = new StringBuilder();
+
+        for (i = 0; i < range.length; i++) {
+            str.append(range[i].toString());
+            str.append('\n');
+        }
+
+        return str.toString();
     }
 }

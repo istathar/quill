@@ -23,12 +23,15 @@ import markerpen.textbase.FormatChange;
 import markerpen.textbase.InsertChange;
 import markerpen.textbase.Markup;
 import markerpen.textbase.Span;
+import markerpen.textbase.StringSpan;
 import markerpen.textbase.TextStack;
 import markerpen.textbase.TextualChange;
 
 import org.gnome.gdk.EventKey;
+import org.gnome.gdk.EventOwnerChange;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
+import org.gnome.gtk.Clipboard;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
@@ -57,6 +60,13 @@ class EditorWidget extends TextView
 
     private Markup[] insertMarkup;
 
+    private Clipboard clipboard;
+
+    /**
+     * Do we [think] we're the owner of the clipboard?
+     */
+    private boolean owner;
+
     EditorWidget() {
         super();
         view = this;
@@ -66,6 +76,7 @@ class EditorWidget extends TextView
 
         hookupKeybindings();
         hookupFormatManagement();
+        hookupExternalClipboard();
     }
 
     private void setupTextView() {
@@ -85,7 +96,7 @@ class EditorWidget extends TextView
 
     private void setupInternalStack() {
         stack = new TextStack();
-        clipboard = Extract.EMPTY;
+        stash = null;
     }
 
     private void hookupKeybindings() {
@@ -286,7 +297,7 @@ class EditorWidget extends TextView
         final TextIter selection;
         final int selectionOffset, offset, width;
 
-        if (clipboard == null) {
+        if (stash == null) {
             return;
         }
 
@@ -298,9 +309,9 @@ class EditorWidget extends TextView
             width = normalizeOffset(insertOffset, selectionOffset);
 
             removed = stack.extractRange(offset, width);
-            change = new TextualChange(offset, removed, clipboard);
+            change = new TextualChange(offset, removed, stash);
         } else {
-            change = new InsertChange(insertOffset, clipboard);
+            change = new InsertChange(insertOffset, stash);
         }
 
         stack.apply(change);
@@ -530,7 +541,13 @@ class EditorWidget extends TextView
         }
     }
 
-    private Extract clipboard;
+    /**
+     * When text is cut or copied out, it will be cached here.
+     */
+    /*
+     * TODO move to an application level reference.
+     */
+    private Extract stash;
 
     private void copyText() {
         extractText(true);
@@ -566,7 +583,15 @@ class EditorWidget extends TextView
          * Copy the range to clipboard, being the "Copy" behviour.
          */
 
-        clipboard = stack.extractRange(offset, width);
+        stash = stack.extractRange(offset, width);
+
+        /*
+         * Put the extracted text into the system clipboard. TODO move to an
+         * Application class.
+         */
+
+        owner = true;
+        clipboard.setText(stash.getText());
 
         if (copy) {
             return;
@@ -577,7 +602,7 @@ class EditorWidget extends TextView
          * behaviour.
          */
 
-        change = new DeleteChange(offset, clipboard);
+        change = new DeleteChange(offset, stash);
         stack.apply(change);
         this.affect(change);
     }
@@ -670,5 +695,30 @@ class EditorWidget extends TextView
          */
 
         insertMarkup = null;
+    }
+
+    private void hookupExternalClipboard() {
+        clipboard = Clipboard.getDefault();
+
+        /*
+         * This gets hit whenever the clipboard is written to. In our case, we
+         * toggle the owner state variable to true when we know we're about to
+         * programatically set the clipboard; this handler gets called once,
+         * and we can ignore it. Any other receipt of this event and we have
+         * to get the text from the system.
+         */
+
+        clipboard.connect(new Clipboard.OwnerChange() {
+            public void onOwnerChange(Clipboard source, EventOwnerChange event) {
+                final Span span;
+
+                if (owner) {
+                    owner = false;
+                } else {
+                    span = new StringSpan(clipboard.getText(), null);
+                    stash = stack.extractFor(span);
+                }
+            }
+        });
     }
 }
