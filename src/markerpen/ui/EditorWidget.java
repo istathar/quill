@@ -395,8 +395,6 @@ class EditorWidget extends TextView
         int alpha, omega, offset, width;
         final Change change;
         final Extract original;
-        int i;
-        Span s;
         final Markup[] replacement;
 
         /*
@@ -413,8 +411,6 @@ class EditorWidget extends TextView
 
             offset = normalizeOffset(alpha, omega);
             width = normalizeWidth(alpha, omega);
-
-            // FIXME what about toggling off?
 
             original = stack.extractRange(offset, width);
 

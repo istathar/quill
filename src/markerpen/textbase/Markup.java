@@ -93,7 +93,7 @@ public abstract class Markup
     /**
      * Does the given Markup[] contain the specified formatting?
      */
-    private static final boolean contains(Markup[] markup, Markup format) {
+    static final boolean contains(Markup[] markup, Markup format) {
         if (markup == null) {
             return false;
         }
