@@ -35,6 +35,7 @@ import org.gnome.gtk.TextMark;
 import org.gnome.gtk.TextTag;
 import org.gnome.gtk.TextView;
 import org.gnome.gtk.Widget;
+import org.gnome.gtk.WrapMode;
 import org.gnome.pango.FontDescription;
 
 import static markerpen.ui.Format.tagsForMarkup;
@@ -70,7 +71,7 @@ class EditorWidget extends TextView
     private void setupTextView() {
         final FontDescription desc;
 
-        desc = new FontDescription("DejaVu Sans, Book 11");
+        desc = new FontDescription("DejaVu Serif, Book 11");
         buffer = new TextBuffer();
 
         selectionBound = buffer.getSelectionBound();
@@ -78,6 +79,8 @@ class EditorWidget extends TextView
 
         view.setBuffer(buffer);
         view.modifyFont(desc);
+
+        view.setWrapMode(WrapMode.WORD);
     }
 
     private void setupInternalStack() {
@@ -217,6 +220,10 @@ class EditorWidget extends TextView
                         return true;
                     } else if (key == Keyval.F) {
                         toggleMarkup(Common.FILENAME);
+                        return true;
+                    } else if (key == Keyval.M) {
+                        // function or _m_ethod
+                        toggleMarkup(Common.FUNCTION);
                         return true;
                     } else {
                         /*

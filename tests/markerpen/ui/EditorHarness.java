@@ -12,6 +12,8 @@ package markerpen.ui;
 
 import org.gnome.gdk.Event;
 import org.gnome.gtk.Gtk;
+import org.gnome.gtk.PolicyType;
+import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.Window.DeleteEvent;
@@ -20,6 +22,7 @@ public final class EditorHarness
 {
     public static void main(String[] args) {
         final Window window;
+        final ScrolledWindow scroll;
         final EditorWidget editor;
 
         Gtk.init(args);
@@ -28,7 +31,10 @@ public final class EditorHarness
         window.setDefaultSize(400, 300);
 
         editor = new EditorWidget();
-        window.add(editor);
+        scroll = new ScrolledWindow();
+        scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
+        scroll.add(editor);
+        window.add(scroll);
         window.setTitle("EditorWidget");
         window.showAll();
 

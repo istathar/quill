@@ -35,6 +35,8 @@ class Format
 
     static final TextTag classname;
 
+    static final TextTag function;
+
     static final TextTag hidden;
 
     static {
@@ -46,6 +48,9 @@ class Format
         classname = new TextTag();
         classname.setFamily("DejaVu Sans Mono");
         classname.setForeground("blue");
+
+        function = new TextTag();
+        function.setFamily("DejaVu Sans Mono");
 
         italics = new TextTag();
         italics.setStyle(Style.ITALIC);
@@ -83,6 +88,8 @@ class Format
                 return filename;
             } else if (m == Common.CLASSNAME) {
                 return classname;
+            } else if (m == Common.FUNCTION) {
+                return function;
             }
         }
         // else TODO

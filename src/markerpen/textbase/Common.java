@@ -31,4 +31,6 @@ public class Common extends Markup
     public static final Common FILENAME = new Common("FILENAME");
 
     public static final Common CLASSNAME = new Common("CLASSNAME");
+
+    public static final Common FUNCTION = new Common("FUNCTION");
 }
