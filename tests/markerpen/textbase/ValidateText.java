@@ -408,7 +408,7 @@ public class ValidateText extends TestCase
          * will have the format, the second will not.
          */
 
-        text.format(0, 5, Common.ITALICS, true);
+        text.format(0, 5, Common.ITALICS);
 
         assertEquals(2, calculateNumberPieces(text));
         p = text.first;
@@ -422,7 +422,7 @@ public class ValidateText extends TestCase
          * Format second word
          */
 
-        text.format(6, 5, Common.BOLD, true);
+        text.format(6, 5, Common.BOLD);
 
         assertEquals(3, calculateNumberPieces(text));
         p = text.first;
@@ -440,7 +440,7 @@ public class ValidateText extends TestCase
          * Now do something across entire text
          */
 
-        text.format(0, 11, Common.FILENAME, true);
+        text.format(0, 11, Common.FILENAME);
 
         assertEquals(3, calculateNumberPieces(text));
         p = text.first;
@@ -478,15 +478,15 @@ public class ValidateText extends TestCase
          * Setup as demonstrated above
          */
 
-        text.format(0, 5, Common.ITALICS, true);
-        text.format(6, 5, Common.BOLD, true);
-        text.format(0, 11, Common.FILENAME, true);
+        text.format(0, 5, Common.ITALICS);
+        text.format(6, 5, Common.BOLD);
+        text.format(0, 11, Common.FILENAME);
 
         /*
          * Now remove one, and test
          */
 
-        text.format(0, 11, Common.ITALICS, false);
+        text.clear(0, 11, Common.ITALICS);
 
         assertEquals(3, calculateNumberPieces(text));
         p = text.first;
@@ -506,7 +506,7 @@ public class ValidateText extends TestCase
          * Does doing it twice hurt?
          */
 
-        text.format(0, 11, Common.ITALICS, false);
+        text.clear(0, 11, Common.ITALICS);
 
         assertEquals(3, calculateNumberPieces(text));
         p = text.first;
@@ -522,7 +522,7 @@ public class ValidateText extends TestCase
         assertTrue(containsFormat(p, Common.FILENAME));
         assertTrue(containsFormat(p, Common.BOLD));
 
-        text.format(3, 5, Common.FILENAME, false);
+        text.clear(3, 5, Common.FILENAME);
 
         assertEquals(5, calculateNumberPieces(text));
 
@@ -574,7 +574,7 @@ public class ValidateText extends TestCase
          * Should have no effect
          */
 
-        text.format(0, 3, Common.FILENAME, false);
+        text.clear(0, 3, Common.FILENAME);
 
         p = text.first;
         while (p != null) {
@@ -586,7 +586,7 @@ public class ValidateText extends TestCase
          * Should again have no effect
          */
 
-        text.format(0, 3, Common.FILENAME, false);
+        text.clear(0, 3, Common.FILENAME);
 
         p = text.first;
         while (p != null) {

@@ -34,10 +34,10 @@ public class EfficientNoNodeFactory extends NodeFactory
         empty = new Nodes();
     }
 
-    private final ArrayList<Chunk> list;
+    private final ArrayList<Span> list;
 
     public EfficientNoNodeFactory() {
-        list = new ArrayList<Chunk>(32);
+        list = new ArrayList<Span>(32);
     }
 
     public TextStack createText() {
@@ -45,8 +45,8 @@ public class EfficientNoNodeFactory extends NodeFactory
 
         result = new TextStack();
 
-        for (Chunk chunk : list) {
-            result.append(chunk);
+        for (Span span : list) {
+            result.append(span);
         }
 
         return result;
@@ -57,7 +57,13 @@ public class EfficientNoNodeFactory extends NodeFactory
      */
 
     public Nodes makeText(String text) {
-        list.add(new Chunk(text.trim()));
+        final String trimmed;
+
+        trimmed = text.trim();
+
+        if (trimmed.length() != 0) {
+            list.add(new StringSpan(trimmed, null));
+        }
 
         return empty;
     }

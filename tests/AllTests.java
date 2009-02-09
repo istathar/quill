@@ -11,6 +11,7 @@
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import markerpen.converter.ValidateStackToDocBookConversion;
 import markerpen.textbase.ValidateApplyUndoRedo;
 import markerpen.textbase.ValidateExtracts;
 import markerpen.textbase.ValidateSpanOperations;
@@ -40,6 +41,7 @@ public class AllTests
 
         TestSuite suite = new TestSuite("Complete markerpen unit test suite");
 
+        suite.addTestSuite(ValidateStackToDocBookConversion.class);
         suite.addTestSuite(ValidateSpanOperations.class);
         suite.addTestSuite(ValidateText.class);
         suite.addTestSuite(ValidateExtracts.class);
