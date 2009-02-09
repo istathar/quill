@@ -1,7 +1,7 @@
 /*
  * EfficientNoNodeFactory.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -59,12 +59,22 @@ public class EfficientNoNodeFactory extends NodeFactory
     public Nodes makeText(String text) {
         final String trimmed;
 
+        /*
+         * Fortunately this will not allocate a new char[] so we don't have an
+         * arraycopy going on here.
+         */
+
         trimmed = text.trim();
 
-        if (trimmed.length() != 0) {
-            list.add(new StringSpan(trimmed, null));
+        if (trimmed.length() == 0) {
+            return empty;
         }
 
+        /*
+         * FIXME this doesn't take into account the formatting that has been
+         * established by surrounding inline elements.
+         */
+        list.add(new StringSpan(trimmed, null));
         return empty;
     }
 
