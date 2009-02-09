@@ -717,4 +717,19 @@ class EditorWidget extends TextView
             }
         });
     }
+
+    /*
+     * Temporary? Replace with a more domain specific populate() or load()
+     * function.
+     */
+    void setText(String str) {
+        Span span;
+        Change change;
+
+        span = new StringSpan(str, null);
+        change = new InsertChange(0, span);
+
+        stack.apply(change);
+        this.affect(change);
+    }
 }

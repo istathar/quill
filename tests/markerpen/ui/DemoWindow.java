@@ -17,8 +17,6 @@ import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ScrolledWindow;
-import org.gnome.gtk.TextBuffer;
-import org.gnome.gtk.TextView;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
@@ -37,7 +35,7 @@ public class DemoWindow extends Window
         final VBox left;
         HBox spread;
         final Entry chapter;
-        final ScrolledWindow editor;
+        final ScrolledWindow scroll;
         final PreviewWidget preview;
 
         window = this;
@@ -62,8 +60,7 @@ public class DemoWindow extends Window
 
         for (i = 1; i < 5; i++) {
             Entry entry;
-            TextView view;
-            TextBuffer buffer;
+            EditorWidget editor;
 
             spread = new HBox(false, 3);
             entry = new Entry("Title " + i);
@@ -73,23 +70,23 @@ public class DemoWindow extends Window
 
             left.packStart(spread, false, false, 0);
 
-            view = new TextView();
-            view.setWrapMode(WrapMode.WORD);
-            view.setPaddingBelowParagraph(10);
-            view.modifyFont(desc);
-            view.setBorderWidth(2);
+            editor = new EditorWidget();
+            editor.setWrapMode(WrapMode.WORD);
+            editor.setPaddingBelowParagraph(10);
+            editor.modifyFont(desc);
+            editor.setBorderWidth(2);
 
-            view.setLeftMargin(3);
+            editor.setLeftMargin(3);
 
-            buffer = view.getBuffer();
-            buffer.setText(text);
+            // replace
+            editor.setText(text);
 
-            left.packStart(view, false, false, 0);
+            left.packStart(editor, false, false, 0);
         }
 
-        editor = new ScrolledWindow();
-        editor.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
-        editor.addWithViewport(left);
+        scroll = new ScrolledWindow();
+        scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
+        scroll.addWithViewport(left);
 
         /*
          * RHS
@@ -102,7 +99,7 @@ public class DemoWindow extends Window
          */
 
         two = new HBox(true, 6);
-        two.packStart(editor, true, true, 0);
+        two.packStart(scroll, true, true, 0);
         two.packStart(preview, true, true, 0);
 
         window.add(two);
