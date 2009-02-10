@@ -418,6 +418,34 @@ public class Text
         return result;
     }
 
+    public Extract extractAll() {
+        Piece p, last;
+        Span[] range;
+
+        if (first == null) {
+            return null;
+        }
+
+        /*
+         * Maybe we should cache last?
+         */
+
+        p = first;
+
+        while (p.next != null) {
+            p = p.next;
+        }
+
+        last = p;
+
+        /*
+         * get an array
+         */
+
+        range = formArray(first, last);
+        return new Extract(range);
+    }
+
     /**
      * Delete a width wide segment starting at offset. Returns a Span[]
      * representing the removed range.

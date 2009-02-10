@@ -624,9 +624,12 @@ class EditorWidget extends TextView
     }
 
     private void exportContents() {
+        final DocBookConverter converter;
         final Document book;
 
-        book = DocBookConverter.buildTree(stack);
+        converter = new DocBookConverter();
+        converter.append(stack);
+        book = converter.result();
         try {
             book.toXML(System.out);
         } catch (IOException ioe) {

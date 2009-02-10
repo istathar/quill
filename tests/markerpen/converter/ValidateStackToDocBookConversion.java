@@ -10,10 +10,16 @@
  */
 package markerpen.converter;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
 import junit.framework.TestCase;
+import markerpen.docbook.Document;
+import markerpen.textbase.Change;
+import markerpen.textbase.InsertChange;
+import markerpen.textbase.Span;
+import markerpen.textbase.StringSpan;
 import markerpen.textbase.TextStack;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
@@ -33,5 +39,41 @@ public class ValidateStackToDocBookConversion extends TestCase
 
         assertNotNull(text);
         assertEquals("Hello world", text.toString());
+    }
+
+    public final void testWritePlainParas() throws IOException {
+        final TextStack stack;
+        final Span span;
+        final Change change;
+        final DocBookConverter converter;
+        final Document book;
+        final ByteArrayOutputStream out;
+
+        /*
+         * Build up a trivial example
+         */
+
+        span = new StringSpan("Hello\nWorld", null);
+        change = new InsertChange(0, span);
+        stack = new TextStack();
+        stack.apply(change);
+
+        /*
+         * Now run conversion process.
+         */
+
+        converter = new DocBookConverter();
+        converter.append(stack);
+        book = converter.result();
+
+        assertNotNull(book);
+
+        out = new ByteArrayOutputStream();
+        book.toXML(out);
+
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                + "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">\n" + "<chapter>\n"
+                + "<section>\n" + "<para>\n" + "Hello\n" + "</para>\n" + "<para>\n" + "World\n"
+                + "</para>\n" + "</section>\n" + "</chapter>\n" + "</book>\n", out.toString());
     }
 }
