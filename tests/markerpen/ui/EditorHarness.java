@@ -28,14 +28,15 @@ public final class EditorHarness
         Gtk.init(args);
 
         window = new Window();
-        window.setDefaultSize(400, 300);
 
         editor = new EditorWidget();
+
         scroll = new ScrolledWindow();
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
         scroll.add(editor);
         window.add(scroll);
         window.setTitle("EditorWidget");
+        window.setDefaultSize(400, 300);
         window.showAll();
 
         window.connect(new DeleteEvent() {

@@ -722,7 +722,7 @@ class EditorWidget extends TextView
      * Temporary? Replace with a more domain specific populate() or load()
      * function.
      */
-    void setText(String str) {
+    void setRaw(String str) {
         Span span;
         Change change;
 

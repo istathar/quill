@@ -79,7 +79,7 @@ public class DemoWindow extends Window
             editor.setLeftMargin(3);
 
             // replace
-            editor.setText(text);
+            editor.setRaw(text);
 
             left.packStart(editor, false, false, 0);
         }
