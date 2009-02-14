@@ -15,7 +15,7 @@ package markerpen.docbook;
  * 
  * @author Andrew Cowie
  */
-abstract class Block extends DocBookTag
+public abstract class Block extends DocBookTag
 {
     Block(String name) {
         super(name);

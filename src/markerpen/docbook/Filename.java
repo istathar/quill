@@ -1,7 +1,7 @@
 /*
- * Inline.java
+ * Filename.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -11,17 +11,13 @@
 package markerpen.docbook;
 
 /**
- * Tags that are presented as spans within Blocks.
+ * A filename
  * 
  * @author Andrew Cowie
  */
-public abstract class Inline extends DocBookTag
+public class Filename extends Inline
 {
-    Inline(String name) {
-        super(name);
-    }
-
-    public void add(String str) {
-        super.addText(str);
+    public Filename() {
+        super("filename");
     }
 }
