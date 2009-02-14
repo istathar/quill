@@ -41,11 +41,11 @@ public class AllTests
 
         TestSuite suite = new TestSuite("Complete markerpen unit test suite");
 
-        suite.addTestSuite(ValidateStackToDocBookConversion.class);
         suite.addTestSuite(ValidateSpanOperations.class);
         suite.addTestSuite(ValidateText.class);
         suite.addTestSuite(ValidateExtracts.class);
         suite.addTestSuite(ValidateApplyUndoRedo.class);
+        suite.addTestSuite(ValidateStackToDocBookConversion.class);
 
         return suite;
     }

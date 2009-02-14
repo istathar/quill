@@ -20,12 +20,4 @@ public class Paragraph extends Block
         super("para");
         super.addText(str);
     }
-
-    public void add(String str) {
-        super.addText(str);
-    }
-
-    public void add(Inline tag) {
-        super.addChild(tag);
-    }
 }

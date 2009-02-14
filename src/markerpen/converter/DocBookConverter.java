@@ -19,12 +19,20 @@ package markerpen.converter;
 import java.io.File;
 import java.io.IOException;
 
+import markerpen.docbook.Block;
+import markerpen.docbook.Bold;
 import markerpen.docbook.BookDocument;
 import markerpen.docbook.Chapter;
 import markerpen.docbook.Document;
+import markerpen.docbook.Filename;
+import markerpen.docbook.Function;
+import markerpen.docbook.Inline;
+import markerpen.docbook.Italics;
 import markerpen.docbook.Paragraph;
 import markerpen.docbook.Section;
+import markerpen.docbook.Type;
 import markerpen.textbase.CharacterSpan;
+import markerpen.textbase.Common;
 import markerpen.textbase.EfficientNoNodeFactory;
 import markerpen.textbase.Extract;
 import markerpen.textbase.Markup;
@@ -65,7 +73,9 @@ public class DocBookConverter
     /**
      * Current block we are building up.
      */
-    private Paragraph para;
+    private Block block;
+
+    private Inline inline;
 
     public DocBookConverter() {
         book = new BookDocument();
@@ -95,7 +105,7 @@ public class DocBookConverter
         section = new Section();
         chapter.add(section);
 
-        para = new Paragraph();
+        start(new Paragraph());
 
         entire = text.extractAll();
         num = entire.size();
@@ -107,8 +117,8 @@ public class DocBookConverter
             markup = span.getMarkup();
 
             if (markup != previous) {
-                // TODO change Element
-                buf.setLength(0);
+                flush();
+                change(markup);
             }
 
             if (span instanceof CharacterSpan) {
@@ -124,20 +134,69 @@ public class DocBookConverter
 
             previous = markup;
         }
-        process('\n');
+        flush();
     }
 
     public Document result() {
         return book;
     }
 
+    /**
+     * Change to a new element. This is a somewhat complicated expression, as
+     * it counts for the case of returning from Inline to Block as well as
+     * nesting Inlines into Blocks.
+     */
+    private void change(Markup format) {
+        if (format == null) {
+            return;
+        }
+        if (format instanceof Common) {
+            if (format == Common.FILENAME) {
+                start(new Filename());
+            } else if (format == Common.TYPE) {
+                start(new Type());
+            } else if (format == Common.FUNCTION) {
+                start(new Function());
+            } else if (format == Common.ITALICS) {
+                start(new Italics());
+            } else if (format == Common.BOLD) {
+                start(new Bold());
+            } else {
+                // TODO boom?
+            }
+        }
+    }
+
+    /*
+     * Assumes finish() has already been called.
+     */
+    private void start(Block block) {
+        this.block = block;
+        section.add(block);
+    }
+
+    /*
+     * Assumes finish() has already been called.
+     */
+    private void start(Inline inline) {
+        this.inline = inline;
+        block.add(inline);
+    }
+
+    private void flush() {
+        if (inline != null) {
+            inline.add(buf.toString());
+            inline = null;
+        } else {
+            block.add(buf.toString());
+        }
+        buf.setLength(0);
+    }
+
     private void process(char ch) {
         if (ch == '\n') {
-            para.add(buf.toString());
-            section.add(para);
-
-            para = new Paragraph();
-            buf.setLength(0);
+            flush();
+            start(new Paragraph()); // won't work with different Block types
         } else {
             buf.append(ch);
         }

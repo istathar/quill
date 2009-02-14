@@ -26,7 +26,7 @@ public class Section extends Division
         super.addChild(new Title(title));
     }
 
-    public void add(Paragraph para) {
+    public void add(Block para) {
         super.addChild(para);
     }
 }

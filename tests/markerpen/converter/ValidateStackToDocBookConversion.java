@@ -48,6 +48,7 @@ public class ValidateStackToDocBookConversion extends TestCase
         final DocBookConverter converter;
         final Document book;
         final ByteArrayOutputStream out;
+        final String blob;
 
         /*
          * Build up a trivial example
@@ -71,9 +72,34 @@ public class ValidateStackToDocBookConversion extends TestCase
         out = new ByteArrayOutputStream();
         book.toXML(out);
 
-        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                + "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">\n" + "<chapter>\n"
-                + "<section>\n" + "<para>\n" + "Hello\n" + "</para>\n" + "<para>\n" + "World\n"
-                + "</para>\n" + "</section>\n" + "</chapter>\n" + "</book>\n", out.toString());
+        blob = combine(new String[] {
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+                "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
+                "<chapter>",
+                "<section>",
+                "<para>",
+                "Hello",
+                "</para>",
+                "<para>",
+                "World",
+                "</para>",
+                "</section>",
+                "</chapter>",
+                "</book>"
+        });
+        assertEquals(blob, out.toString());
+    }
+
+    private static String combine(String[] elements) {
+        StringBuilder buf;
+
+        buf = new StringBuilder(128);
+
+        for (String element : elements) {
+            buf.append(element);
+            buf.append('\n');
+        }
+
+        return buf.toString();
     }
 }

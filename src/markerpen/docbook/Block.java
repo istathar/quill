@@ -20,4 +20,16 @@ public abstract class Block extends DocBookTag
     Block(String name) {
         super(name);
     }
+
+    /*
+     * Nothing wrong with packing normal text into a Block. Usually that'll be
+     * Paragraph anyway.
+     */
+    public void add(String str) {
+        super.addText(str);
+    }
+
+    public void add(Inline tag) {
+        super.addChild(tag);
+    }
 }
