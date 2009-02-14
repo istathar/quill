@@ -21,8 +21,7 @@ public class FormatChange extends Change
 
     /**
      * Toggle format in the given range. This means applying it, unless the
-     * first Span in the Extract already contains the format, in which case
-     * toss it.
+     * first Span in the Extract is that format, in which case toss it.
      */
     public FormatChange(int offset, Extract range, Markup format) {
         super(offset, range, toggleMarkup(range, format));
@@ -30,13 +29,14 @@ public class FormatChange extends Change
     }
 
     private static Extract toggleMarkup(Extract original, Markup format) {
-        final Markup[] markup;
+        final Markup markup;
 
         markup = original.range[0].getMarkup();
 
+        // TODO change to handle instances rather than singletons
         if (markup == null) {
             return applyMarkup(original, format);
-        } else if (Markup.contains(markup, format)) {
+        } else if (markup == format) {
             return removeMarkup(original, format);
         } else {
             return applyMarkup(original, format);

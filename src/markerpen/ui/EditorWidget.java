@@ -41,6 +41,7 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.WrapMode;
 import org.gnome.pango.FontDescription;
 
+import static markerpen.ui.Format.tagForMarkup;
 import static markerpen.ui.Format.tagsForMarkup;
 
 class EditorWidget extends TextView
@@ -58,7 +59,7 @@ class EditorWidget extends TextView
      */
     private int insertOffset;
 
-    private Markup[] insertMarkup;
+    private Markup insertMarkup;
 
     private Clipboard clipboard;
 
@@ -395,7 +396,6 @@ class EditorWidget extends TextView
         int alpha, omega, offset, width;
         final Change change;
         final Extract original;
-        final Markup[] replacement;
 
         /*
          * If there is a selection then toggle the markup applied there.
@@ -419,11 +419,10 @@ class EditorWidget extends TextView
             this.affect(change);
 
         } else {
-            replacement = Markup.applyMarkup(insertMarkup, format);
-            if (replacement == insertMarkup) {
-                insertMarkup = Markup.removeMarkup(insertMarkup, format);
+            if (insertMarkup == format) {
+                insertMarkup = null; // OR, something more block oriented?
             } else {
-                insertMarkup = replacement;
+                insertMarkup = format;
             }
         }
     }
@@ -480,7 +479,7 @@ class EditorWidget extends TextView
                 r = change.getAdded();
                 for (i = 0; i < r.size(); i++) {
                     s = r.get(i);
-                    buffer.insert(start, s.getText(), tagsForMarkup(s.getMarkup()));
+                    buffer.insert(start, s.getText(), tagForMarkup(s.getMarkup()));
                 }
             }
         } else if (change instanceof FormatChange) {
@@ -532,7 +531,7 @@ class EditorWidget extends TextView
         if (r != null) {
             for (i = 0; i < r.size(); i++) {
                 s = r.get(i);
-                buffer.insert(start, s.getText(), tagsForMarkup(s.getMarkup()));
+                buffer.insert(start, s.getText(), tagForMarkup(s.getMarkup()));
             }
         }
     }

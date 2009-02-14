@@ -62,23 +62,32 @@ class Format
         hidden.setInvisible(true);
     }
 
-    static TextTag[] tagsForMarkup(Markup[] markup) {
+    /**
+     * Keep this around as a reminder of what we'll do if we return multiple
+     * tags covering block and inline format.
+     * 
+     * @deprecated
+     */
+    static TextTag[] tagsForMarkup(Markup markup) {
         final TextTag[] tags;
 
         if (markup == null) {
             return null;
         }
 
-        tags = new TextTag[markup.length];
+        tags = new TextTag[1];
 
-        for (int i = 0; i < markup.length; i++) {
-            tags[i] = tagForMarkup(markup[i]);
+        for (int i = 0; i < 1; i++) {
+            tags[i] = tagForMarkup(markup);
         }
 
         return tags;
     }
 
     static TextTag tagForMarkup(Markup m) {
+        if (m == null) {
+            return null;
+        }
         if (m instanceof Common) {
             if (m == Common.ITALICS) {
                 return italics;
