@@ -28,20 +28,18 @@ public abstract class Span
 {
     /**
      * The formatting applicable on this span. Will be null for the common
-     * case of there being no particular markup on normal text.
+     * case of there being no particular markup on a paragraph of text.
      */
-    /*
-     * WARNING Our use of these arrays is to allocate them once and then reuse
-     * them, but since Java arrays are mutable we will have to change to a
-     * wrapper Object if the array setters make it outside this package.
-     */
-    private final Markup[] markup;
+    private final Markup markup;
 
-    protected Span(Markup[] markup) {
+    protected Span(Markup markup) {
         this.markup = markup;
     }
 
-    protected abstract Span copy(Markup[] markup);
+    /**
+     * Create a copy of this Span but with different Markup applying to it.
+     */
+    protected abstract Span copy(Markup markup);
 
     /**
      * Get the char this Span represents, if it is only one character wide.
@@ -58,31 +56,24 @@ public abstract class Span
 
     public abstract int getWidth();
 
-    public Markup[] getMarkup() {
+    public Markup getMarkup() {
         return markup;
     }
 
     Span applyMarkup(Markup format) {
-        final Markup[] replacement;
-
-        replacement = Markup.applyMarkup(markup, format);
-
-        if (replacement == markup) {
+        if (format == markup) {
             return this;
         } else {
-            return this.copy(replacement);
+            return this.copy(format);
         }
     }
 
+    // TODO combine or revove!
     Span removeMarkup(Markup format) {
-        final Markup[] replacement;
-
-        replacement = Markup.removeMarkup(markup, format);
-
-        if (replacement == markup) {
-            return this;
+        if (format == markup) {
+            return this.copy(null);
         } else {
-            return this.copy(replacement);
+            return this;
         }
     }
 
@@ -99,16 +90,10 @@ public abstract class Span
         str.append('"');
 
         if (markup == null) {
-            str.append(" no markup");
+            str.append(", paragraph");
         } else {
-            str.append(" with markups ");
-
-            for (int i = 0; i < markup.length; i++) {
-                str.append(markup[i]);
-                if (i > 0) {
-                    str.append(", ");
-                }
-            }
+            str.append(", ");
+            str.append(markup.toString());
         }
 
         return str.toString();

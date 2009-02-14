@@ -589,7 +589,7 @@ public class Text
      * code as splitAt(), so something probably needs to be abstracted out
      * here.
      */
-    public Markup[] getMarkupAt(int offset) {
+    public Markup getMarkupAt(int offset) {
         Piece piece, last;
         int start, following;
 

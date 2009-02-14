@@ -26,7 +26,7 @@ public class CharacterSpan extends Span
      */
     final String text;
 
-    public CharacterSpan(char ch, Markup[] markup) {
+    public CharacterSpan(char ch, Markup markup) {
         super(markup);
         if (ch == 0) {
             throw new IllegalArgumentException();
@@ -35,7 +35,7 @@ public class CharacterSpan extends Span
         this.text = toString(ch);
     }
 
-    protected Span copy(Markup[] markup) {
+    protected Span copy(Markup markup) {
         return new CharacterSpan(this.ch, markup);
     }
 

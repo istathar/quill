@@ -384,19 +384,6 @@ public class ValidateText extends TestCase
         // is ok
     }
 
-    private final boolean containsFormat(Piece p, Markup format) {
-        if (p.span.getMarkup() == null) {
-            return false;
-        }
-
-        for (Markup m : p.span.getMarkup()) {
-            if (m == format) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public final void testApplyFormatting() {
         final Text text;
         Piece p;
@@ -412,10 +399,9 @@ public class ValidateText extends TestCase
 
         assertEquals(2, calculateNumberPieces(text));
         p = text.first;
-        assertTrue(containsFormat(p, Common.ITALICS));
+        assertSame(p.span.getMarkup(), Common.ITALICS);
         p = p.next;
         assertNull(p.span.getMarkup());
-        assertFalse(containsFormat(p, Common.ITALICS));
         assertEquals("Hello World", text.toString());
 
         /*
@@ -426,12 +412,12 @@ public class ValidateText extends TestCase
 
         assertEquals(3, calculateNumberPieces(text));
         p = text.first;
-        assertTrue(containsFormat(p, Common.ITALICS));
+        assertSame(p.span.getMarkup(), Common.ITALICS);
         p = p.next;
         assertEquals(null, p.span.getMarkup());
         assertEquals(" ", p.span.getText());
         p = p.next;
-        assertTrue(containsFormat(p, Common.BOLD));
+        assertSame(p.span.getMarkup(), Common.BOLD);
         assertEquals("World", p.span.getText());
         assertNull(p.next);
         assertEquals("Hello World", text.toString());
@@ -442,20 +428,14 @@ public class ValidateText extends TestCase
 
         text.format(0, 11, Common.FILENAME);
 
+        // NEW: will replace all
         assertEquals(3, calculateNumberPieces(text));
         p = text.first;
-        assertTrue(containsFormat(p, Common.ITALICS));
-        assertTrue(containsFormat(p, Common.FILENAME));
-        assertFalse(containsFormat(p, Common.BOLD));
+        assertSame(p.span.getMarkup(), Common.FILENAME);
         p = p.next;
-        assertFalse(containsFormat(p, Common.ITALICS));
-        assertTrue(containsFormat(p, Common.FILENAME));
-        assertFalse(containsFormat(p, Common.BOLD));
+        assertSame(p.span.getMarkup(), Common.FILENAME);
         p = p.next;
-        assertFalse(containsFormat(p, Common.ITALICS));
-        assertTrue(containsFormat(p, Common.FILENAME));
-        assertTrue(containsFormat(p, Common.BOLD));
-
+        assertSame(p.span.getMarkup(), Common.FILENAME);
         assertEquals("Hello World", text.toString());
     }
 
@@ -478,9 +458,9 @@ public class ValidateText extends TestCase
          * Setup as demonstrated above
          */
 
+        text.format(0, 11, Common.FILENAME);
         text.format(0, 5, Common.ITALICS);
         text.format(6, 5, Common.BOLD);
-        text.format(0, 11, Common.FILENAME);
 
         /*
          * Now remove one, and test
@@ -490,17 +470,11 @@ public class ValidateText extends TestCase
 
         assertEquals(3, calculateNumberPieces(text));
         p = text.first;
-        assertFalse(containsFormat(p, Common.ITALICS));
-        assertTrue(containsFormat(p, Common.FILENAME));
-        assertFalse(containsFormat(p, Common.BOLD));
+        assertEquals(null, p.span.getMarkup());
         p = p.next;
-        assertFalse(containsFormat(p, Common.ITALICS));
-        assertTrue(containsFormat(p, Common.FILENAME));
-        assertFalse(containsFormat(p, Common.BOLD));
+        assertSame(p.span.getMarkup(), Common.FILENAME);
         p = p.next;
-        assertFalse(containsFormat(p, Common.ITALICS));
-        assertTrue(containsFormat(p, Common.FILENAME));
-        assertTrue(containsFormat(p, Common.BOLD));
+        assertSame(p.span.getMarkup(), Common.BOLD);
 
         /*
          * Does doing it twice hurt?
@@ -510,17 +484,11 @@ public class ValidateText extends TestCase
 
         assertEquals(3, calculateNumberPieces(text));
         p = text.first;
-        assertFalse(containsFormat(p, Common.ITALICS));
-        assertTrue(containsFormat(p, Common.FILENAME));
-        assertFalse(containsFormat(p, Common.BOLD));
+        assertEquals(null, p.span.getMarkup());
         p = p.next;
-        assertFalse(containsFormat(p, Common.ITALICS));
-        assertTrue(containsFormat(p, Common.FILENAME));
-        assertFalse(containsFormat(p, Common.BOLD));
+        assertSame(p.span.getMarkup(), Common.FILENAME);
         p = p.next;
-        assertFalse(containsFormat(p, Common.ITALICS));
-        assertTrue(containsFormat(p, Common.FILENAME));
-        assertTrue(containsFormat(p, Common.BOLD));
+        assertSame(p.span.getMarkup(), Common.BOLD);
 
         text.clear(3, 5, Common.FILENAME);
 
@@ -528,33 +496,23 @@ public class ValidateText extends TestCase
 
         // Hel
         p = text.first;
-        assertFalse(containsFormat(p, Common.ITALICS));
-        assertTrue(containsFormat(p, Common.FILENAME));
-        assertFalse(containsFormat(p, Common.BOLD));
+        assertEquals(null, p.span.getMarkup());
 
         // "lo"
         p = p.next;
-        assertFalse(containsFormat(p, Common.ITALICS));
-        assertFalse(containsFormat(p, Common.FILENAME));
-        assertFalse(containsFormat(p, Common.BOLD));
+        assertEquals(null, p.span.getMarkup());
 
         // " "
         p = p.next;
-        assertFalse(containsFormat(p, Common.ITALICS));
-        assertFalse(containsFormat(p, Common.FILENAME));
-        assertFalse(containsFormat(p, Common.BOLD));
+        assertEquals(null, p.span.getMarkup());
 
         // "Wo"
         p = p.next;
-        assertFalse(containsFormat(p, Common.ITALICS));
-        assertFalse(containsFormat(p, Common.FILENAME));
-        assertTrue(containsFormat(p, Common.BOLD));
+        assertSame(p.span.getMarkup(), Common.BOLD);
 
         // "rld"
         p = p.next;
-        assertFalse(containsFormat(p, Common.ITALICS));
-        assertTrue(containsFormat(p, Common.FILENAME));
-        assertTrue(containsFormat(p, Common.BOLD));
+        assertSame(p.span.getMarkup(), Common.BOLD);
     }
 
     public final void testRemovingFormatFromZero() {

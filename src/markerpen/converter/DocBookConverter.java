@@ -87,7 +87,7 @@ public class DocBookConverter
         Span span;
         String str;
         char ch;
-        Markup[] previous, markup;
+        Markup previous, markup;
 
         chapter = new Chapter();
         book.add(chapter);

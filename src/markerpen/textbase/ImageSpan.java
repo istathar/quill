@@ -37,7 +37,7 @@ public class ImageSpan extends Span
     /*
      * TODO: image type?
      */
-    public ImageSpan(String ref, Markup[] markup) {
+    public ImageSpan(String ref, Markup markup) {
         super(markup);
         this.ref = ref;
     }
@@ -66,7 +66,7 @@ public class ImageSpan extends Span
         return 1;
     }
 
-    protected Span copy(Markup[] markup) {
+    protected Span copy(Markup markup) {
         return new ImageSpan(this.ref, markup);
     }
 }

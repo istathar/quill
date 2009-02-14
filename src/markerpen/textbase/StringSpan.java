@@ -19,7 +19,7 @@ public class StringSpan extends Span
 {
     private final String data;
 
-    public StringSpan(String str, Markup[] markup) {
+    public StringSpan(String str, Markup markup) {
         super(markup);
 
         if (str.length() == 0) {
@@ -29,7 +29,7 @@ public class StringSpan extends Span
         data = str;
     }
 
-    protected Span copy(Markup[] markup) {
+    protected Span copy(Markup markup) {
         return new StringSpan(this.data, markup);
     }
 
