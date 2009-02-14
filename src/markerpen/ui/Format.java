@@ -95,7 +95,7 @@ class Format
                 return bold;
             } else if (m == Common.FILENAME) {
                 return filename;
-            } else if (m == Common.CLASSNAME) {
+            } else if (m == Common.TYPE) {
                 return classname;
             } else if (m == Common.FUNCTION) {
                 return function;

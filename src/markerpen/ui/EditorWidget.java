@@ -227,15 +227,15 @@ class EditorWidget extends TextView
                     if (key == Keyval.Space) {
                         clearFormat();
                         return true;
-                    } else if (key == Keyval.C) {
-                        toggleMarkup(Common.CLASSNAME);
-                        return true;
                     } else if (key == Keyval.F) {
                         toggleMarkup(Common.FILENAME);
                         return true;
                     } else if (key == Keyval.M) {
                         // function or _m_ethod
                         toggleMarkup(Common.FUNCTION);
+                        return true;
+                    } else if (key == Keyval.T) {
+                        toggleMarkup(Common.TYPE);
                         return true;
                     } else {
                         /*
