@@ -1,7 +1,7 @@
 /*
  * DocBookSerializer.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -115,5 +115,23 @@ class DocBookSerializer extends Serializer
             return;
         }
         breakLine();
+    }
+
+    /*
+     * There's no real reason for there to do anything special with empty
+     * elements except that an empty block needs a trailing line break.
+     */
+    protected void writeEmptyElementTag(Element e) throws IOException {
+        DocBookTag tag = null;
+
+        if (e instanceof DocBookElement) {
+            tag = ((DocBookElement) e).proxy;
+        }
+
+        super.writeEmptyElementTag(e);
+
+        if (tag instanceof Block) {
+            breakLine();
+        }
     }
 }
