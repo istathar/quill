@@ -186,4 +186,18 @@ public class ValidateStackToDocBookConversion extends TestCase
         assertEquals(blob, out.toString());
     }
 
+    public final void testLoadComplexDocument() throws IOException, ValidityException, ParsingException {
+        final File source;
+        final TextStack text;
+
+        source = new File("tests/markerpen/converter/TemporaryFiles.xml");
+        assertTrue(source.exists());
+
+        text = parseTree(source);
+
+        assertNotNull(text);
+        assertEquals("Accessing the /tmp directory directly is fine, "
+                + "but the File class has a createTempFile() function "
+                + "that you are often better off using.", text.toString());
+    }
 }
