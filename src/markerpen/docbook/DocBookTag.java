@@ -50,6 +50,17 @@ abstract class DocBookTag
             return null;
         }
     }
+
+    /**
+     * Set the <code>xml:space="preserve"</code> Attribute on an Element.
+     */
+    /*
+     * How nasty is this expression! No kidding we wrap it up.
+     */
+    void setPreserveWhitespace() {
+        element.addAttribute(new Attribute("xml:space", "http://www.w3.org/XML/1998/namespace",
+                "preserve"));
+    }
 }
 
 /**

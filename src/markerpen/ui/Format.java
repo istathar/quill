@@ -12,6 +12,7 @@ package markerpen.ui;
 
 import markerpen.textbase.Common;
 import markerpen.textbase.Markup;
+import markerpen.textbase.Preformat;
 
 import org.gnome.gtk.TextTag;
 import org.gnome.pango.Style;
@@ -39,6 +40,8 @@ class Format
 
     static final TextTag hidden;
 
+    static final TextTag preformat;
+
     static {
         filename = new TextTag();
         filename.setFamily("DejaVu Sans Mono");
@@ -60,6 +63,13 @@ class Format
 
         hidden = new TextTag();
         hidden.setInvisible(true);
+
+        preformat = new TextTag();
+        preformat.setFamily("DejaVu Sans Mono");
+        preformat.setBackground("#F0F0F0");
+        preformat.setPaddingInsideParagraph(0);
+        preformat.setPaddingAboveParagraph(0);
+        preformat.setPaddingBelowParagraph(0);
     }
 
     /**
@@ -99,6 +109,10 @@ class Format
                 return classname;
             } else if (m == Common.FUNCTION) {
                 return function;
+            }
+        } else if (m instanceof Preformat) {
+            if (m == Preformat.NORMAL) {
+                return preformat;
             }
         }
         // else TODO
