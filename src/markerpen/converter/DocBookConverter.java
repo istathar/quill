@@ -1,7 +1,7 @@
 /*
  * DocBookConverter.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -36,6 +36,7 @@ import markerpen.textbase.Common;
 import markerpen.textbase.EfficientNoNodeFactory;
 import markerpen.textbase.Extract;
 import markerpen.textbase.Markup;
+import markerpen.textbase.Preformat;
 import markerpen.textbase.Span;
 import markerpen.textbase.StringSpan;
 import markerpen.textbase.TextStack;
@@ -46,7 +47,6 @@ import nu.xom.ValidityException;
 /**
  * Build a DocBook XOM tree equivalent to the data in our textbase, ready for
  * subsequent serialization (and thence saving to disk).
- * 
  * 
  * @author Andrew Cowie
  */
@@ -94,26 +94,29 @@ public class DocBookConverter
         char ch;
         Markup previous, markup;
 
+        entire = text.extractAll();
+        if (entire == null) {
+            return;
+        }
+
         chapter = new Chapter();
         book.add(chapter);
 
         section = new Section();
         chapter.add(section);
 
-        start(new Paragraph());
-
-        entire = text.extractAll();
         num = entire.size();
         previous = entire.get(0).getMarkup();
+        start(previous);
 
         for (i = 0; i < num; i++) {
             span = entire.get(i);
 
             markup = span.getMarkup();
-
             if (markup != previous) {
-                flush();
-                change(markup);
+                finish();
+                start(markup);
+                previous = markup;
             }
 
             if (span instanceof CharacterSpan) {
@@ -126,10 +129,14 @@ public class DocBookConverter
                     process(str.charAt(j));
                 }
             }
-
-            previous = markup;
         }
-        flush();
+
+        /*
+         * Finally, we need to deal with the fact that TextStacks (like the
+         * TextBuffers they back) do not end with a paragraph separator, so we
+         * need to act to close out the last block.
+         */
+        process('\n');
     }
 
     public Document result() {
@@ -137,66 +144,94 @@ public class DocBookConverter
     }
 
     /**
-     * Change to a new element. This is a somewhat complicated expression, as
-     * it counts for the case of returning from Inline to Block as well as
+     * Start a new element. This is a somewhat complicated expression, as it
+     * counts for the case of returning from Inline to Block as well as
      * nesting Inlines into Blocks.
      */
-    private void change(Markup format) {
-        if (format == null) {
+    private void start(Markup format) {
+        /*
+         * Are we returning from an inline to block level? If so, we're
+         * already nested and can just reset the state and escape.
+         */
+        if (inline != null) {
+            inline = null;
             return;
         }
-        if (format instanceof Common) {
+
+        /*
+         * Otherwise, we're either starting a new block or a new inline. Deal
+         * with the Block cases first:
+         */
+
+        if (format == null) {
+            block = new Paragraph();
+            return;
+        }
+
+        /*
+         * Failing that, we cover off all the the Inline cases:
+         */
+
+        if (inline == null) {
             if (format == Common.FILENAME) {
-                start(new Filename());
+                inline = new Filename();
             } else if (format == Common.TYPE) {
-                start(new Type());
+                inline = new Type();
             } else if (format == Common.FUNCTION) {
-                start(new Function());
+                inline = new Function();
             } else if (format == Common.ITALICS) {
-                start(new Italics());
+                inline = new Italics();
             } else if (format == Common.BOLD) {
-                start(new Bold());
+                inline = new Bold();
+            } else if (format == Preformat.USERINPUT) {
+                // boom?
             } else {
-                // TODO boom?
+                // boom!
             }
         }
     }
 
-    /*
-     * Assumes finish() has already been called.
+    /**
+     * Add accumulated text to the pending element. Reset the accumulator.
      */
-    private void start(Block block) {
-        this.block = block;
-        section.add(block);
-    }
+    private void finish() {
+        if (buf.length() == 0) {
+            /*
+             * At the moment we have no empty tags, and so nothing that would
+             * cause us to flush something with no content. When we do, we'll
+             * handle it here.
+             */
+            return;
+        }
 
-    /*
-     * Assumes finish() has already been called.
-     */
-    private void start(Inline inline) {
-        this.inline = inline;
-        block.add(inline);
-    }
-
-    private void flush() {
         if (inline != null) {
             inline.add(buf.toString());
-            inline = null;
+            block.add(inline);
         } else {
             block.add(buf.toString());
         }
         buf.setLength(0);
     }
 
+    /**
+     * Accumulate a character.
+     */
     private void process(char ch) {
         if (ch == '\n') {
-            flush();
-            start(new Paragraph()); // won't work with different Block types
+            finish();
+            if (inline != null) {
+                inline = null;
+            }
+            section.add(block);
+            block = new Paragraph();
         } else {
             buf.append(ch);
         }
     }
 
+    /*
+     * This will be moving somewhere else, I expect
+     */
     public static TextStack parseTree(File source) throws ValidityException, ParsingException,
             IOException {
         final Builder parser;
