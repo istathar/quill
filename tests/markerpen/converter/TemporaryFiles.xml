@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book version="5.0" xmlns="http://docbook.org/ns/docbook">
+<chapter>
+<section>
+<para>
+Accessing the <filename>/tmp</filename> directory
+directly is fine, but the <type>File</type>
+class has a <function>createTempFile()</function>
+function that you are often better off using.
+</para>
+</section>
+</chapter>
+</book>

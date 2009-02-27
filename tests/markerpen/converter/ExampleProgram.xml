@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book version="5.0" xmlns="http://docbook.org/ns/docbook">
+<chapter>
+<section>
+<para>
+This is a simple java-gnome program:
+</para>
+<programlisting xml:space="preserve">
+public class Example {
+    public static void main(String[] args) {
+        Gtk.init(args);
+        Gtk.main();
+    }
+}
+</programlisting>
+<para>
+This program has the drawback of not doing very much
+and even worse, not telling you that that's not what
+it's doing.
+</para>
+</section>
+</chapter>
+</book>
+
