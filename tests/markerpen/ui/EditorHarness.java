@@ -10,6 +10,13 @@
  */
 package markerpen.ui;
 
+import java.io.File;
+import java.io.IOException;
+
+import markerpen.textbase.TextStack;
+import nu.xom.ParsingException;
+import nu.xom.ValidityException;
+
 import org.gnome.gdk.Event;
 import org.gnome.gtk.Gtk;
 import org.gnome.gtk.PolicyType;
@@ -18,12 +25,16 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.Window.DeleteEvent;
 
+import static markerpen.converter.DocBookConverter.parseTree;
+
 public final class EditorHarness
 {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ValidityException, ParsingException, IOException {
         final Window window;
         final ScrolledWindow scroll;
         final EditorWidget editor;
+        final File target;
+        final TextStack stack;
 
         Gtk.init(args);
 
@@ -45,6 +56,11 @@ public final class EditorHarness
                 return false;
             }
         });
+
+        target = new File("tests/markerpen/converter/ExampleProgram.xml");
+
+        stack = parseTree(target);
+        editor.loadText(stack);
 
         Gtk.main();
     }
