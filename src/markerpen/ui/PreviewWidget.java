@@ -112,6 +112,8 @@ class PreviewWidget extends DrawingArea
     }
 
     private void drawCrosshairAt(Context cr, final double x, final double y) {
+        cr.setSource(0.8, 0.0, 0.8);
+
         cr.moveTo(x, y - 10);
         cr.lineRelative(0, 20);
         cr.moveTo(x - 10, y);
@@ -135,6 +137,7 @@ class PreviewWidget extends DrawingArea
         final Layout layout;
         final FontDescription desc;
         final FontOptions options;
+        final LayoutLine line;
         double y, b, v;
 
         layout = new Layout(cr);
@@ -152,13 +155,16 @@ class PreviewWidget extends DrawingArea
 
         cr.setSource(0.0, 0.0, 0.0);
 
-        y = cursor;
-        v = layout.getSizeHeight();
+        line = layout.getLineReadonly(0);
+        b = line.getExtentsInk().getAscent();
+        v = line.getExtentsLogical().getHeight();
+        y = cursor + b;
 
+        line.getExtentsLogical().getAscent();
         cr.moveTo(leftMargin, y);
-        cr.showLayout(layout);
+        cr.showLayout(line);
 
-        cursor += v + 5;
+        cursor += v;
     }
 
     public void drawBlockText(Context cr, String text) {
@@ -205,7 +211,7 @@ class PreviewWidget extends DrawingArea
             for (LayoutLine line : layout.getLinesReadonly()) {
                 v = line.getExtentsLogical().getHeight();
 
-                if (y > (pageHeight - topMargin - bottomMargin)) {
+                if (y > (pageHeight - bottomMargin)) {
                     return;
                 }
                 cr.moveTo(leftMargin, y);
@@ -256,7 +262,7 @@ class PreviewWidget extends DrawingArea
             for (LayoutLine line : layout.getLinesReadonly()) {
                 v = line.getExtentsLogical().getHeight();
 
-                if (y > pageHeight) {
+                if (y > (pageHeight - bottomMargin)) {
                     return;
                 }
                 cr.moveTo(leftMargin, y);

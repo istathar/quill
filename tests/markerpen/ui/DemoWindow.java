@@ -72,7 +72,11 @@ public class DemoWindow extends Window
             TextStack lorem, prog;
 
             spread = new HBox(false, 3);
-            entry = new Entry("Title " + i);
+            if (i == 1) {
+                entry = new Entry("In the beginning");
+            } else {
+                entry = new Entry("Title " + i);
+            }
             entry.modifyFont(desc);
             spread.packStart(entry);
             spread.packEnd(new Label("Section"));
