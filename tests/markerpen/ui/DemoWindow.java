@@ -10,6 +10,13 @@
  */
 package markerpen.ui;
 
+import markerpen.textbase.Change;
+import markerpen.textbase.InsertChange;
+import markerpen.textbase.Preformat;
+import markerpen.textbase.Span;
+import markerpen.textbase.StringSpan;
+import markerpen.textbase.TextStack;
+
 import org.gnome.gdk.Event;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.Gtk;
@@ -22,8 +29,6 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.WrapMode;
 import org.gnome.pango.FontDescription;
-
-import static textview.LoremIpsum.text;
 
 public class DemoWindow extends Window
 {
@@ -61,6 +66,7 @@ public class DemoWindow extends Window
         for (i = 1; i < 5; i++) {
             Entry entry;
             EditorWidget editor;
+            TextStack lorem, prog;
 
             spread = new HBox(false, 3);
             entry = new Entry("Title " + i);
@@ -70,18 +76,52 @@ public class DemoWindow extends Window
 
             left.packStart(spread, false, false, 0);
 
+            /*
+             * some paras
+             */
+
             editor = new EditorWidget();
-            editor.setWrapMode(WrapMode.WORD);
             editor.setPaddingBelowParagraph(10);
             editor.modifyFont(desc);
             editor.setBorderWidth(2);
-
             editor.setLeftMargin(3);
 
-            // replace
-            editor.setRaw(text);
+            lorem = demoLoremIpsum();
+            editor.loadText(lorem);
 
             left.packStart(editor, false, false, 0);
+
+            /*
+             * some program listing
+             */
+
+            editor = new EditorWidget();
+            editor.setWrapMode(WrapMode.NONE);
+            editor.setPaddingBelowParagraph(0);
+            editor.modifyFont(desc);
+            editor.setBorderWidth(2);
+            editor.setLeftMargin(3);
+
+            prog = demoProgramListing();
+            editor.loadText(prog);
+
+            left.packStart(editor, false, false, 0);
+
+            /*
+             * more paras
+             */
+
+            editor = new EditorWidget();
+            editor.setPaddingBelowParagraph(10);
+            editor.modifyFont(desc);
+            editor.setBorderWidth(2);
+            editor.setLeftMargin(3);
+
+            lorem = demoLoremIpsum();
+            editor.loadText(lorem);
+
+            left.packStart(editor, false, false, 0);
+
         }
 
         scroll = new ScrolledWindow();
@@ -92,7 +132,7 @@ public class DemoWindow extends Window
          * RHS
          */
 
-        preview = new PreviewWidget(text);
+        preview = new PreviewWidget(textview.LoremIpsum.text);
 
         /*
          * Setup window
@@ -123,5 +163,37 @@ public class DemoWindow extends Window
         new DemoWindow();
 
         Gtk.main();
+    }
+
+    private TextStack demoLoremIpsum() {
+        final TextStack result;
+        final Span span;
+        final Change change;
+
+        result = new TextStack();
+
+        span = new StringSpan(textview.LoremIpsum.text, null); // change
+
+        change = new InsertChange(0, span);
+        result.apply(change);
+
+        return result;
+    }
+
+    private TextStack demoProgramListing() {
+        final TextStack result;
+        final Span span;
+        final Change change;
+
+        result = new TextStack();
+
+        span = new StringSpan("public class Hello {\n"
+                + "    public static void main(String[] args) {\n" + "        Gtk.init(args);\n"
+                + "        Gtk.main();\n" + "    }\n" + "}", Preformat.NORMAL); // change
+
+        change = new InsertChange(0, span);
+        result.apply(change);
+
+        return result;
     }
 }

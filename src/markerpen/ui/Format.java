@@ -66,10 +66,6 @@ class Format
 
         preformat = new TextTag();
         preformat.setFamily("DejaVu Sans Mono");
-        preformat.setBackground("#F0F0F0");
-        preformat.setPaddingInsideParagraph(0);
-        preformat.setPaddingAboveParagraph(0);
-        preformat.setPaddingBelowParagraph(0);
     }
 
     /**

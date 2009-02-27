@@ -93,6 +93,8 @@ class EditorWidget extends TextView
         view.modifyFont(desc);
 
         view.setWrapMode(WrapMode.WORD);
+
+        view.setPaddingBelowParagraph(18);
     }
 
     private void setupInternalStack() {
@@ -110,7 +112,8 @@ class EditorWidget extends TextView
                 key = event.getKeyval();
 
                 /*
-                 * Let default keybindings handle cursor movement keys
+                 * Let default keybindings handle cursor movement keys and for
+                 * a few other special keys we don't need to handle.
                  */
 
                 if ((key == Keyval.Up) || (key == Keyval.Down) || (key == Keyval.Left)
@@ -119,16 +122,18 @@ class EditorWidget extends TextView
                     return false;
                 }
 
-                /*
-                 * Other special keys that we DO handle.
-                 */
-
                 if ((key == Keyval.Escape) || (key == Keyval.Insert)) {
                     // deliberate no-op
                     return true;
-                } else if (key == Keyval.Return) {
-                    // rather likely that special things are going to happen
-                    // here.
+                }
+
+                /*
+                 * Other special keys that we DO handle. The newline case is
+                 * interesting. We let a \n fly but clear any current
+                 * formatting first.
+                 */
+                if (key == Keyval.Return) {
+                    insertMarkup = null;
                     insert('\n');
                     return true;
                 } else if (key == Keyval.Delete) {
@@ -709,11 +714,20 @@ class EditorWidget extends TextView
         clipboard.connect(new Clipboard.OwnerChange() {
             public void onOwnerChange(Clipboard source, EventOwnerChange event) {
                 final Span span;
+                final String str;
 
                 if (owner) {
                     owner = false;
                 } else {
-                    span = new StringSpan(clipboard.getText(), null);
+                    str = clipboard.getText();
+                    if (str == null) {
+                        /*
+                         * If the data in the system clipboard was put there
+                         * in a a form other than plain text we get null back.
+                         */
+                        return;
+                    }
+                    span = new StringSpan(str, null);
                     stash = stack.extractFor(span);
                 }
             }
@@ -721,17 +735,26 @@ class EditorWidget extends TextView
     }
 
     /*
-     * Temporary? Replace with a more domain specific populate() or load()
-     * function.
+     * Temporary!
      */
-    void setRaw(String str) {
+    void loadText(TextStack load) {
+        final Extract entire;
+        int i, x;
         Span span;
         Change change;
 
-        span = new StringSpan(str, null);
-        change = new InsertChange(0, span);
+        entire = load.extractAll();
 
-        stack.apply(change);
-        this.affect(change);
+        x = 0;
+        for (i = 0; i < entire.size(); i++) {
+            span = entire.get(i);
+            change = new InsertChange(x, span);
+
+            stack.apply(change);
+            this.affect(change);
+
+            x += span.getWidth();
+        }
+        // TODO LoadChange?
     }
 }
