@@ -68,6 +68,7 @@ public class DemoWindow extends Window
         for (i = 1; i < 5; i++) {
             Entry entry;
             EditorWidget editor;
+            ScrolledWindow wide;
             TextStack lorem, prog;
 
             spread = new HBox(false, 3);
@@ -107,7 +108,11 @@ public class DemoWindow extends Window
             prog = demoProgramListing();
             editor.loadText(prog);
 
-            left.packStart(editor, false, false, 0);
+            wide = new ScrolledWindow();
+            wide.setPolicy(PolicyType.AUTOMATIC, PolicyType.NEVER);
+            wide.add(editor);
+
+            left.packStart(wide, false, false, 0);
 
             /*
              * more paras
