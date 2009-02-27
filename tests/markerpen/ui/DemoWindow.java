@@ -18,6 +18,8 @@ import markerpen.textbase.StringSpan;
 import markerpen.textbase.TextStack;
 
 import org.gnome.gdk.Event;
+import org.gnome.gdk.EventExpose;
+import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.Gtk;
 import org.gnome.gtk.HBox;
@@ -128,11 +130,21 @@ public class DemoWindow extends Window
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
         scroll.addWithViewport(left);
 
+        scroll.connect(new ExposeEvent() {
+            public boolean onExposeEvent(Widget source, EventExpose event) {
+                Adjustment adj;
+
+                adj = scroll.getVAdjustment();
+                System.out.format("%4.0f + %3.0f = %4.0f to %4.0f\n", adj.getValue(), adj.getPageSize(),
+                        adj.getValue() + adj.getPageSize(), adj.getUpper());
+                return false;
+            }
+        });
         /*
          * RHS
          */
 
-        preview = new PreviewWidget(textview.LoremIpsum.text);
+        preview = new PreviewWidget();
 
         /*
          * Setup window

@@ -40,19 +40,18 @@ class PreviewWidget extends DrawingArea
 
     private double topMargin;
 
+    private double bottomMargin;
+
     private double leftMargin;
 
     private double rightMargin;
 
     private double scaleFactor;
 
-    // Temporary
-    private final String text;
+    private double cursor;
 
-    PreviewWidget(final String text) {
+    PreviewWidget() {
         super();
-
-        this.text = text;
 
         this.connect(new Widget.ExposeEvent() {
             public boolean onExposeEvent(Widget source, EventExpose event) {
@@ -63,7 +62,7 @@ class PreviewWidget extends DrawingArea
                 processSize(cr);
                 scaleOutput(cr);
                 drawPageOutline(cr);
-                drawText(cr);
+                processText(cr);
 
                 return true;
             }
@@ -84,6 +83,7 @@ class PreviewWidget extends DrawingArea
         pageHeight = paper.getHeight(Unit.POINTS);
 
         topMargin = 25;
+        bottomMargin = 25;
         leftMargin = 45;
         rightMargin = 20;
     }
@@ -103,14 +103,23 @@ class PreviewWidget extends DrawingArea
         cr.stroke();
     }
 
-    public void drawText(Context cr) {
+    public void processText(Context cr) {
+        cursor = topMargin;
+
+        drawBlockText(cr, textview.LoremIpsum.text);
+        drawBlockProgram(cr, "public class Hello {\n" + "    public static void main(String[] args) {\n"
+                + "        Gtk.init(args);\n" + "        Gtk.main();\n" + "    }\n" + "}");
+        drawBlockText(cr, textview.LoremIpsum.text);
+
+    }
+
+    public void drawBlockText(Context cr, String text) {
         final Layout layout;
         final FontDescription desc;
         final FontOptions options;
         final String[] paras;
         double y, b, v = 0;
-
-        cr.moveTo(leftMargin, topMargin);
+        boolean second;
 
         layout = new Layout(cr);
 
@@ -134,7 +143,65 @@ class PreviewWidget extends DrawingArea
         cr.setSource(0.0, 0.0, 0.0);
 
         b = layout.getBaseline();
-        y = topMargin + b;
+        y = cursor + b;
+        second = false;
+
+        for (String para : paras) {
+
+            layout.setText(para);
+
+            if (second) {
+                y += v; // blank line between paras
+            }
+
+            for (LayoutLine line : layout.getLinesReadonly()) {
+                v = line.getExtentsLogical().getHeight();
+
+                y += v;
+
+                if (y > (pageHeight - topMargin - bottomMargin)) {
+                    return;
+                }
+                cr.moveTo(leftMargin, y);
+                cr.showLayout(line);
+            }
+
+            second = true;
+        }
+
+        cursor = y;
+    }
+
+    public void drawBlockProgram(Context cr, String prog) {
+        final Layout layout;
+        final FontDescription desc;
+        final FontOptions options;
+        final String[] paras;
+        double y, b, v = 0;
+
+        layout = new Layout(cr);
+
+        options = new FontOptions();
+        options.setHintMetrics(OFF);
+        layout.getContext().setFontOptions(options);
+
+        desc = new FontDescription("Liberation Mono");
+        desc.setSize(8.0);
+        layout.setFontDescription(desc);
+
+        /*
+         * This is fake. TODO pass in our TextStack object (which already
+         * knows what the paragraphs are) and process from that.
+         */
+        paras = prog.split("\n");
+
+        layout.setWidth(pageWidth - (leftMargin + rightMargin));
+        layout.setText("Workaround");
+
+        cr.setSource(0.0, 0.0, 0.0);
+
+        b = layout.getBaseline();
+        y = cursor + b;
         for (String para : paras) {
             layout.setText(para);
 
@@ -150,8 +217,10 @@ class PreviewWidget extends DrawingArea
                 cr.showLayout(line);
             }
 
-            y += v; // blank line between paras
+            // no blank line between paras
         }
+
+        cursor = y;
     }
 
     private void scaleOutput(Context cr) {

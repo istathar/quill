@@ -31,6 +31,8 @@ import org.gnome.gdk.EventKey;
 import org.gnome.gdk.EventOwnerChange;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
+import org.gnome.gdk.Rectangle;
+import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Clipboard;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
@@ -661,6 +663,18 @@ class EditorWidget extends TextView
                 insertOffset = offset;
 
                 insertMarkup = stack.getMarkupAt(offset);
+
+                // DEBUG
+
+                Rectangle location;
+                Allocation alloc;
+
+                location = view.getLocationOf(pointer);
+                alloc = view.getAllocation();
+
+                System.out.format("\t%4d + %4d = %4d\n", alloc.getY(), location.getY(), alloc.getY()
+                        + location.getY());
+                System.out.println();
             }
         });
     }
