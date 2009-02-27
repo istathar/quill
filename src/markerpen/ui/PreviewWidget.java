@@ -122,11 +122,43 @@ class PreviewWidget extends DrawingArea
     public void processText(Context cr) {
         cursor = topMargin;
 
+        drawHeading(cr, "Chapter 1", 32.0);
+        drawHeading(cr, "In the beginning", 16.0);
         drawBlockText(cr, textview.LoremIpsum.text);
         drawBlockProgram(cr, "public class Hello {\n" + "    public static void main(String[] args) {\n"
                 + "        Gtk.init(args);\n" + "        Gtk.main();\n" + "    }\n" + "}");
         drawBlockText(cr, textview.LoremIpsum.text);
 
+    }
+
+    public void drawHeading(Context cr, String title, double size) {
+        final Layout layout;
+        final FontDescription desc;
+        final FontOptions options;
+        double y, b, v;
+
+        layout = new Layout(cr);
+
+        options = new FontOptions();
+        options.setHintMetrics(OFF);
+        layout.getContext().setFontOptions(options);
+
+        desc = new FontDescription("Liberation Serif");
+        desc.setSize(size);
+        layout.setFontDescription(desc);
+
+        layout.setWidth(pageWidth - (leftMargin + rightMargin));
+        layout.setText(title);
+
+        cr.setSource(0.0, 0.0, 0.0);
+
+        y = cursor;
+        v = layout.getSizeHeight();
+
+        cr.moveTo(leftMargin, y);
+        cr.showLayout(layout);
+
+        cursor += v + 5;
     }
 
     public void drawBlockText(Context cr, String text) {
