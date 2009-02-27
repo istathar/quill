@@ -62,6 +62,7 @@ class PreviewWidget extends DrawingArea
                 processSize(cr);
                 scaleOutput(cr);
                 drawPageOutline(cr);
+                drawCrosshairs(cr);
                 processText(cr);
 
                 return true;
@@ -100,6 +101,21 @@ class PreviewWidget extends DrawingArea
         cr.fillPreserve();
         cr.setSource(0.0, 0.0, 0.0);
         cr.setLineWidth(0.5);
+        cr.stroke();
+    }
+
+    private void drawCrosshairs(Context cr) {
+        drawCrosshairAt(cr, leftMargin, topMargin);
+        drawCrosshairAt(cr, pageWidth - rightMargin, topMargin);
+        drawCrosshairAt(cr, leftMargin, pageHeight - bottomMargin);
+        drawCrosshairAt(cr, pageWidth - rightMargin, pageHeight - bottomMargin);
+    }
+
+    private void drawCrosshairAt(Context cr, final double x, final double y) {
+        cr.moveTo(x, y - 10);
+        cr.lineRelative(0, 20);
+        cr.moveTo(x - 10, y);
+        cr.lineRelative(20, 0);
         cr.stroke();
     }
 
