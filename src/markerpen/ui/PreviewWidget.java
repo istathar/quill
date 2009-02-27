@@ -173,13 +173,13 @@ class PreviewWidget extends DrawingArea
             for (LayoutLine line : layout.getLinesReadonly()) {
                 v = line.getExtentsLogical().getHeight();
 
-                y += v;
-
                 if (y > (pageHeight - topMargin - bottomMargin)) {
                     return;
                 }
                 cr.moveTo(leftMargin, y);
                 cr.showLayout(line);
+
+                y += v;
             }
 
             second = true;
@@ -224,13 +224,13 @@ class PreviewWidget extends DrawingArea
             for (LayoutLine line : layout.getLinesReadonly()) {
                 v = line.getExtentsLogical().getHeight();
 
-                y += v;
-
                 if (y > pageHeight) {
                     return;
                 }
                 cr.moveTo(leftMargin, y);
                 cr.showLayout(line);
+
+                y += v;
             }
 
             // no blank line between paras
