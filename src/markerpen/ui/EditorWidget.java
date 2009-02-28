@@ -666,14 +666,14 @@ class EditorWidget extends TextView
 
                 // DEBUG
 
-                Rectangle location;
+                Rectangle rect;
                 Allocation alloc;
 
-                location = view.getLocationOf(pointer);
+                rect = view.getLocation(pointer);
                 alloc = view.getAllocation();
 
-                System.out.format("\t%4d + %4d = %4d\n", alloc.getY(), location.getY(), alloc.getY()
-                        + location.getY());
+                System.out.format("\t%4d + %4d = %4d\n", alloc.getY(), rect.getY(), alloc.getY()
+                        + rect.getY());
                 System.out.println();
             }
         });
