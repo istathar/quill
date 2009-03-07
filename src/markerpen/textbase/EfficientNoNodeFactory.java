@@ -34,7 +34,7 @@ public class EfficientNoNodeFactory extends NodeFactory
         empty = new Nodes();
     }
 
-    private final ArrayList<Span> list;
+    private final ArrayList<Segment> list;
 
     /**
      * The (single) formatting applicable at this insertion point.
@@ -47,38 +47,61 @@ public class EfficientNoNodeFactory extends NodeFactory
     private boolean block;
 
     /**
-     * Convert line endings to LINE SEPARATOR?
+     * The current block level element wrapper
      */
-    private boolean convert;
+    private Segment segment;
+
+    /**
+     * The current text body we are building up.
+     */
+    private TextStack stack;
+
+    /**
+     * Are we in a block where line endings and other whitespace is preserved?
+     */
+    private boolean preserve;
 
     public EfficientNoNodeFactory() {
-        list = new ArrayList<Span>(32);
+        list = new ArrayList<Segment>(5);
+        stack = null;
     }
 
-    public TextStack createText() {
-        final TextStack result;
+    public Segment[] createSegments() {
+        Segment[] result;
 
-        result = new TextStack();
+        result = new Segment[list.size()];
 
-        for (Span span : list) {
-            result.append(span);
-        }
+        list.toArray(result);
 
         return result;
+    }
+
+    private void setSegment(Segment segment) {
+        stack = new TextStack();
+        segment.setText(stack);
+        this.segment = segment;
+        list.add(segment);
     }
 
     /*
      * The rest of this class are overrides of the NodeFactory parent class.
      */
 
+    /*
+     * This will be the contiguous text body of the element until either a) an
+     * nested (inline) element starts, or b) the end of the element is
+     * reached. So we trim off the leading pretty-print whitespace then add a
+     * single StringSpan with this content.
+     */
     public Nodes makeText(String text) {
         final String trim, str;
         final int len;
-        boolean first, last;
 
         len = text.length();
-        first = false;
-        last = false;
+
+        /*
+         * These two cases are common for structure tags
+         */
 
         if (len == 0) {
             return empty;
@@ -90,21 +113,43 @@ public class EfficientNoNodeFactory extends NodeFactory
             }
         }
 
+        /*
+         * Do we think we're starting a block? If not, we need to pad the
+         * inline we're starting instead one space off of the normal text that
+         * preceeded it.
+         */
+
         if (block) {
             block = false;
         } else {
-            list.add(new CharacterSpan(' ', markup));
+            stack.append(new CharacterSpan(' ', null));
         }
+
+        /*
+         * Trim the leading and trailing newlines and if not preformatted
+         * text, turn any interior newlines into spaces, then add.
+         */
 
         trim = text.trim();
 
-        if (convert) {
-            str = trim.replace('\n', '\u2028');
+        if (preserve) {
+            str = trim;
         } else {
             str = trim.replace('\n', ' ');
         }
 
-        list.add(new StringSpan(str, markup));
+        stack.append(new StringSpan(str, markup));
+
+        /*
+         * And, having processed the inline, reset to normal.
+         */
+
+        markup = null;
+
+        /*
+         * We end with the minimum to keep NodeFactory going.
+         */
+
         return empty;
     }
 
@@ -122,12 +167,20 @@ public class EfficientNoNodeFactory extends NodeFactory
         if (name.equals("para")) {
             markup = null;
             block = true;
-            convert = false;
+            preserve = false;
+            if (segment instanceof ParagraphSegment) {
+                stack.append(new CharacterSpan('\n', null));
+            } else {
+                setSegment(new ParagraphSegment());
+            }
             return null;
         } else if (name.equals("programlisting")) {
-            markup = Preformat.NORMAL;
+            markup = null;
             block = true;
-            convert = true;
+            preserve = true;
+            if (!(segment instanceof PreformatSegment)) {
+                setSegment(new PreformatSegment());
+            }
             return null;
         }
 
@@ -136,7 +189,7 @@ public class EfficientNoNodeFactory extends NodeFactory
          */
 
         block = false;
-        convert = false;
+        preserve = false;
 
         if (name.equals("function")) {
             markup = Common.FUNCTION;

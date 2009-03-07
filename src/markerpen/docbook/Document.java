@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import nu.xom.Element;
 import nu.xom.Serializer;
 
 /**
@@ -71,5 +72,19 @@ public class Document
         s = new DocBookSerializer(out, root);
         s.write(xom);
         s.flush();
+    }
+
+    /**
+     * Extract the XOM Element.
+     */
+    public static Element elementOf(DocBookTag tag) {
+        return tag.element;
+    }
+
+    /**
+     * Extract the XOM Element.
+     */
+    public static Element elementOf(Document doc) {
+        return doc.root.element;
     }
 }

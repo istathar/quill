@@ -22,6 +22,7 @@ import markerpen.textbase.Extract;
 import markerpen.textbase.FormatChange;
 import markerpen.textbase.InsertChange;
 import markerpen.textbase.Markup;
+import markerpen.textbase.ParagraphSegment;
 import markerpen.textbase.Span;
 import markerpen.textbase.StringSpan;
 import markerpen.textbase.TextStack;
@@ -629,12 +630,18 @@ class EditorWidget extends TextView
         }
     }
 
+    /*
+     * This is temporary as saving will move to an application level Action.
+     */
     private void exportContents() {
         final DocBookConverter converter;
+        final ParagraphSegment segment;
         final Document book;
 
+        segment = new ParagraphSegment();
+        segment.setText(stack);
         converter = new DocBookConverter();
-        converter.append(stack);
+        converter.append(segment);
         book = converter.result();
         try {
             book.toXML(System.out);

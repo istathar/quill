@@ -28,7 +28,6 @@ import markerpen.docbook.Filename;
 import markerpen.docbook.Function;
 import markerpen.docbook.Inline;
 import markerpen.docbook.Italics;
-import markerpen.docbook.Paragraph;
 import markerpen.docbook.Section;
 import markerpen.docbook.Type;
 import markerpen.textbase.CharacterSpan;
@@ -37,6 +36,8 @@ import markerpen.textbase.EfficientNoNodeFactory;
 import markerpen.textbase.Extract;
 import markerpen.textbase.Markup;
 import markerpen.textbase.Preformat;
+import markerpen.textbase.PreformatSegment;
+import markerpen.textbase.Segment;
 import markerpen.textbase.Span;
 import markerpen.textbase.StringSpan;
 import markerpen.textbase.TextStack;
@@ -66,15 +67,28 @@ public class DocBookConverter
     private Section section;
 
     /**
-     * Current block we are building up.
+     * The current internal block we are working through
+     */
+    private Segment segment;
+
+    /**
+     * Current output block we are building up.
      */
     private Block block;
 
     private Inline inline;
 
     public DocBookConverter() {
+        final Chapter chapter;
+
         book = new BookDocument();
         buf = new StringBuilder();
+
+        chapter = new Chapter();
+        book.add(chapter);
+
+        section = new Section();
+        chapter.add(section);
     }
 
     /**
@@ -84,8 +98,8 @@ public class DocBookConverter
      * so we'll assume there is one (and only one) for now.
      * 
      */
-    public void append(TextStack text) {
-        final Chapter chapter;
+    public void append(final Segment segment) {
+        final TextStack text;
         final Extract entire;
         final int num;
         int i, j, len;
@@ -94,16 +108,17 @@ public class DocBookConverter
         char ch;
         Markup previous, markup;
 
+        this.segment = segment;
+
+        text = segment.getText();
+        if (text == null) {
+            return;
+        }
+
         entire = text.extractAll();
         if (entire == null) {
             return;
         }
-
-        chapter = new Chapter();
-        book.add(chapter);
-
-        section = new Section();
-        chapter.add(section);
 
         num = entire.size();
         previous = entire.get(0).getMarkup();
@@ -136,6 +151,7 @@ public class DocBookConverter
          * TextBuffers they back) do not end with a paragraph separator, so we
          * need to act to close out the last block.
          */
+        this.segment = null;
         process('\n');
     }
 
@@ -164,7 +180,7 @@ public class DocBookConverter
          */
 
         if (format == null) {
-            block = new Paragraph();
+            block = segment.createBlock();
             return;
         }
 
@@ -214,7 +230,9 @@ public class DocBookConverter
     }
 
     /**
-     * Accumulate a character.
+     * Accumulate a character. If the character is '\n' and we're not in a
+     * PreformatSegment then we create a new Block. Setting segment to null is
+     * how we signal the end.
      */
     private void process(char ch) {
         if (ch == '\n') {
@@ -222,8 +240,15 @@ public class DocBookConverter
             if (inline != null) {
                 inline = null;
             }
+            if (segment instanceof PreformatSegment) {
+                buf.append('\n');
+                return;
+            }
             section.add(block);
-            block = new Paragraph();
+            if (segment == null) {
+                return;
+            }
+            block = segment.createBlock();
         } else {
             buf.append(ch);
         }
@@ -232,7 +257,7 @@ public class DocBookConverter
     /*
      * This will be moving somewhere else, I expect
      */
-    public static TextStack parseTree(File source) throws ValidityException, ParsingException,
+    public static Segment[] parseTree(File source) throws ValidityException, ParsingException,
             IOException {
         final Builder parser;
         final EfficientNoNodeFactory factory;
@@ -242,6 +267,6 @@ public class DocBookConverter
         parser = new Builder(factory);
         parser.build(source);
 
-        return factory.createText();
+        return factory.createSegments();
     }
 }

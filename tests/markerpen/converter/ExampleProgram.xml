@@ -3,7 +3,9 @@
 <chapter>
 <section>
 <para>
-This is a simple java-gnome program:
+This is a simple java-gnome program. As you
+will see, there's really nothing to it that
+you need to be worried about:
 </para>
 <programlisting xml:space="preserve">
 public class Example {
@@ -14,11 +16,15 @@ public class Example {
 }
 </programlisting>
 <para>
-This program has the drawback of not doing very much
-and even worse, not telling you that that's not what
-it's doing.
+This program has the drawback of not doing
+very much and even worse, not telling you
+that that's not what it's doing.
+</para>
+<para>
+The way you fix that is by not making the
+call to <function>Gtk.main()</function> and
+instead just letting the program exit.
 </para>
 </section>
 </chapter>
 </book>
-

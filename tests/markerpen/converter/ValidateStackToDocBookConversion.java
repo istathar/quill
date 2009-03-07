@@ -20,6 +20,7 @@ import markerpen.textbase.Change;
 import markerpen.textbase.CharacterSpan;
 import markerpen.textbase.Common;
 import markerpen.textbase.InsertChange;
+import markerpen.textbase.Segment;
 import markerpen.textbase.Span;
 import markerpen.textbase.StringSpan;
 import markerpen.textbase.TextStack;
@@ -32,13 +33,17 @@ public class ValidateStackToDocBookConversion extends TestCase
 {
     public final void testLoadDocbook() throws IOException, ValidityException, ParsingException {
         final File source;
+        final Segment[] segments;
         final TextStack text;
 
         source = new File("tests/markerpen/converter/HelloWorld.xml");
         assertTrue(source.exists());
 
-        text = parseTree(source);
+        segments = parseTree(source);
 
+        assertEquals(1, segments.length);
+
+        text = segments[0].getText();
         assertNotNull(text);
         assertEquals("Hello world", text.toString());
     }
@@ -188,12 +193,16 @@ public class ValidateStackToDocBookConversion extends TestCase
 
     public final void testLoadComplexDocument() throws IOException, ValidityException, ParsingException {
         final File source;
+        final Segment[] segments;
         final TextStack text;
 
         source = new File("tests/markerpen/converter/TemporaryFiles.xml");
         assertTrue(source.exists());
 
-        text = parseTree(source);
+        segments = parseTree(source);
+        assertEquals(1, segments.length);
+
+        text = segments[0].getText();
 
         assertNotNull(text);
         assertEquals("Accessing the /tmp directory directly is fine, "
