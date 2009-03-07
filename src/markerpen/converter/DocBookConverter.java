@@ -16,9 +16,6 @@ package markerpen.converter;
  * output formats grow up, this will be the place their converters can live.
  */
 
-import java.io.File;
-import java.io.IOException;
-
 import markerpen.docbook.Block;
 import markerpen.docbook.Bold;
 import markerpen.docbook.BookDocument;
@@ -32,7 +29,6 @@ import markerpen.docbook.Section;
 import markerpen.docbook.Type;
 import markerpen.textbase.CharacterSpan;
 import markerpen.textbase.Common;
-import markerpen.textbase.EfficientNoNodeFactory;
 import markerpen.textbase.Extract;
 import markerpen.textbase.Markup;
 import markerpen.textbase.Preformat;
@@ -41,9 +37,6 @@ import markerpen.textbase.Segment;
 import markerpen.textbase.Span;
 import markerpen.textbase.StringSpan;
 import markerpen.textbase.TextStack;
-import nu.xom.Builder;
-import nu.xom.ParsingException;
-import nu.xom.ValidityException;
 
 /**
  * Build a DocBook XOM tree equivalent to the data in our textbase, ready for
@@ -252,21 +245,5 @@ public class DocBookConverter
         } else {
             buf.append(ch);
         }
-    }
-
-    /*
-     * This will be moving somewhere else, I expect
-     */
-    public static Segment[] parseTree(File source) throws ValidityException, ParsingException,
-            IOException {
-        final Builder parser;
-        final EfficientNoNodeFactory factory;
-
-        factory = new EfficientNoNodeFactory();
-
-        parser = new Builder(factory);
-        parser.build(source);
-
-        return factory.createSegments();
     }
 }

@@ -13,6 +13,8 @@ package markerpen.ui;
 import java.io.File;
 import java.io.IOException;
 
+import markerpen.converter.DocBookLoader;
+import markerpen.textbase.Segment;
 import markerpen.textbase.TextStack;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
@@ -25,8 +27,6 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.Window.DeleteEvent;
 
-import static markerpen.converter.DocBookConverter.parseTree;
-
 public final class EditorHarness
 {
     public static void main(String[] args) throws ValidityException, ParsingException, IOException {
@@ -34,6 +34,8 @@ public final class EditorHarness
         final ScrolledWindow scroll;
         final EditorWidget editor;
         final File target;
+        final DocBookLoader loader;
+        final Segment[] segments;
         final TextStack stack;
 
         Gtk.init(args);
@@ -59,8 +61,9 @@ public final class EditorHarness
 
         target = new File("tests/markerpen/converter/ExampleProgram.xml");
 
-        stack = parseTree(target);
-        editor.loadText(stack);
+        loader = new DocBookLoader(target);
+        segments = loader.parseTree();
+        editor.loadText(segments[0].getText());
 
         Gtk.main();
     }

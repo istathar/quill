@@ -19,7 +19,9 @@ import markerpen.textbase.Change;
 import markerpen.textbase.CharacterSpan;
 import markerpen.textbase.Common;
 import markerpen.textbase.InsertChange;
+import markerpen.textbase.ParagraphSegment;
 import markerpen.textbase.Preformat;
+import markerpen.textbase.Segment;
 import markerpen.textbase.Span;
 import markerpen.textbase.StringSpan;
 import markerpen.textbase.TextStack;
@@ -53,6 +55,7 @@ public class ValidatepPreformattedConversion extends TestCase
         final Span[] spans;
         int offset;
         Change change;
+        final Segment segment;
         final DocBookConverter converter;
         final Document book;
         final ByteArrayOutputStream out;
@@ -90,8 +93,11 @@ public class ValidatepPreformattedConversion extends TestCase
          * Now run conversion process.
          */
 
+        segment = new ParagraphSegment();
+        segment.setText(stack);
+
         converter = new DocBookConverter();
-        converter.append(stack);
+        converter.append(segment);
         book = converter.result();
 
         assertNotNull(book);

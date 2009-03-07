@@ -20,6 +20,7 @@ import markerpen.textbase.Change;
 import markerpen.textbase.CharacterSpan;
 import markerpen.textbase.Common;
 import markerpen.textbase.InsertChange;
+import markerpen.textbase.ParagraphSegment;
 import markerpen.textbase.Segment;
 import markerpen.textbase.Span;
 import markerpen.textbase.StringSpan;
@@ -27,19 +28,19 @@ import markerpen.textbase.TextStack;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 
-import static markerpen.converter.DocBookConverter.parseTree;
-
 public class ValidateStackToDocBookConversion extends TestCase
 {
     public final void testLoadDocbook() throws IOException, ValidityException, ParsingException {
         final File source;
+        final DocBookLoader loader;
         final Segment[] segments;
         final TextStack text;
 
         source = new File("tests/markerpen/converter/HelloWorld.xml");
         assertTrue(source.exists());
 
-        segments = parseTree(source);
+        loader = new DocBookLoader(source);
+        segments = loader.parseTree();
 
         assertEquals(1, segments.length);
 
@@ -52,6 +53,7 @@ public class ValidateStackToDocBookConversion extends TestCase
         final TextStack stack;
         final Span span;
         final Change change;
+        final Segment segment;
         final DocBookConverter converter;
         final Document book;
         final ByteArrayOutputStream out;
@@ -70,8 +72,11 @@ public class ValidateStackToDocBookConversion extends TestCase
          * Now run conversion process.
          */
 
+        segment = new ParagraphSegment();
+        segment.setText(stack);
+
         converter = new DocBookConverter();
-        converter.append(stack);
+        converter.append(segment);
         book = converter.result();
 
         assertNotNull(book);
@@ -115,6 +120,7 @@ public class ValidateStackToDocBookConversion extends TestCase
         final Span[] spans;
         int offset;
         Change change;
+        final Segment segment;
         final DocBookConverter converter;
         final Document book;
         final ByteArrayOutputStream out;
@@ -158,8 +164,10 @@ public class ValidateStackToDocBookConversion extends TestCase
          * Now run conversion process.
          */
 
+        segment = new ParagraphSegment();
+        segment.setText(stack);
         converter = new DocBookConverter();
-        converter.append(stack);
+        converter.append(segment);
         book = converter.result();
 
         assertNotNull(book);
@@ -193,13 +201,15 @@ public class ValidateStackToDocBookConversion extends TestCase
 
     public final void testLoadComplexDocument() throws IOException, ValidityException, ParsingException {
         final File source;
+        final DocBookLoader loader;
         final Segment[] segments;
         final TextStack text;
 
         source = new File("tests/markerpen/converter/TemporaryFiles.xml");
         assertTrue(source.exists());
 
-        segments = parseTree(source);
+        loader = new DocBookLoader(source);
+        segments = loader.parseTree();
         assertEquals(1, segments.length);
 
         text = segments[0].getText();
