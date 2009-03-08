@@ -11,11 +11,11 @@
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import markerpen.converter.ValidateStackToDocBookConversion;
-import markerpen.textbase.ValidateApplyUndoRedo;
-import markerpen.textbase.ValidateExtracts;
-import markerpen.textbase.ValidateSpanOperations;
-import markerpen.textbase.ValidateText;
+import quill.converter.ValidateStackToDocBookConversion;
+import quill.textbase.ValidateApplyUndoRedo;
+import quill.textbase.ValidateExtracts;
+import quill.textbase.ValidateSpanOperations;
+import quill.textbase.ValidateText;
 
 import com.operationaldynamics.junit.VerboseTestRunner;
 
@@ -39,7 +39,7 @@ public class AllTests
     private static Test suite(String[] args) {
         ClassLoader.getSystemClassLoader().setDefaultAssertionStatus(true);
 
-        TestSuite suite = new TestSuite("Complete markerpen unit test suite");
+        TestSuite suite = new TestSuite("Complete quill unit test suite");
 
         suite.addTestSuite(ValidateSpanOperations.class);
         suite.addTestSuite(ValidateText.class);
