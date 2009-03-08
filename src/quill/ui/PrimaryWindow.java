@@ -78,6 +78,11 @@ class PrimaryWindow extends Window
                     System.out.println(key.toString());
                 }
 
+                if (key == Keyval.F11) {
+                    ui.toggleFullscreen();
+                    return true;
+                }
+
                 return false;
             }
         });

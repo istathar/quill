@@ -15,6 +15,7 @@ package quill.ui;
 import java.io.FileNotFoundException;
 
 import org.gnome.gdk.Pixbuf;
+import org.gnome.gdk.WindowState;
 import org.gnome.gtk.Gtk;
 
 public class UserInterface
@@ -50,6 +51,19 @@ public class UserInterface
      */
     public void shutdown() {
         Gtk.mainQuit();
+    }
+
+    /**
+     * Change the user interface from full screen to normal and back again.
+     * Quill is designed to work maximized, but you get an even better
+     * experience if you fullscreen.
+     */
+    public void toggleFullscreen() {
+        if (primary.getWindow().getState().contains(WindowState.FULLSCREEN)) {
+            primary.setFullscreen(false);
+        } else {
+            primary.setFullscreen(true);
+        }
     }
 }
 
