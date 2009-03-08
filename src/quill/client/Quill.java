@@ -1,5 +1,5 @@
 /*
- * Markerpen.java
+ * Quill.java
  *
  * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,15 +8,31 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package quill.ui;
+package quill.client;
 
 import org.gnome.gtk.Gtk;
 
-public class Markerpen
+import quill.ui.UserInterface;
+
+public class Quill
 {
+    public static UserInterface ui;
+
     public static void main(String[] args) {
+        initializeUserInterface(args);
+        runUserInterface(); // blocks
+    }
+
+    static void initializeUserInterface(String[] args) {
         Gtk.init(args);
 
+        ui = new UserInterface();
+    }
+
+    /**
+     * Run the GTK main loop. This call blocks.
+     */
+    static void runUserInterface() {
         Gtk.main();
     }
 }

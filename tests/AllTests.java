@@ -1,5 +1,5 @@
 /*
- * AllTests.java (for the markerpen application)
+ * AllTests.java (for the Quill application)
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
