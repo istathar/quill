@@ -14,6 +14,10 @@ import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
+import org.gnome.gdk.WindowState;
+import org.gnome.gtk.HBox;
+import org.gnome.gtk.Notebook;
+import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.pango.FontDescription;
@@ -29,9 +33,19 @@ class PrimaryWindow extends Window
 {
     private Window window;
 
+    private VBox top;
+
+    private HBox two;
+
+    private Notebook left;
+
+    private Notebook right;
+
     PrimaryWindow() {
         super();
         setupWindow();
+        setupEditorSide();
+        setupPreviewSide();
         hookupDefaultKeyhandlers();
         hookupWindowManagement();
         initialPresentation();
@@ -45,6 +59,33 @@ class PrimaryWindow extends Window
 
         desc = new FontDescription("Deja Vu Serif, 11");
         window.modifyFont(desc);
+
+        top = new VBox(false, 0);
+        window.add(top);
+
+        two = new HBox(true, 6);
+        top.packStart(two, true, true, 0);
+    }
+
+    private void setupEditorSide() {
+        left = new Notebook();
+        left.setShowTabs(false);
+        left.setShowBorder(false);
+
+        left.insertPage(new EditorWidget(), null, 0);
+
+        two.add(left);
+    }
+
+    private void setupPreviewSide() {
+        right = new Notebook();
+        right.setShowTabs(false);
+        right.setShowBorder(false);
+
+        right.add(new PreviewWidget());
+        right.add(new HelpWidget());
+
+        two.add(right);
     }
 
     private void initialPresentation() {
@@ -74,17 +115,41 @@ class PrimaryWindow extends Window
                  * a few other special keys we don't need to handle.
                  */
 
-                if ((key == Keyval.F1) || (key == Keyval.F10)) {
-                    System.out.println(key.toString());
+                if (key == Keyval.F1) {
+                    switchToHelp();
+                }
+                if (key == Keyval.F2) {
+                    switchToPreview();
                 }
 
                 if (key == Keyval.F11) {
-                    ui.toggleFullscreen();
+                    toggleFullscreen();
                     return true;
                 }
 
                 return false;
             }
         });
+    }
+
+    /**
+     * Change the user interface from full screen to normal and back again.
+     * Quill is designed to work maximized, but you get an even better
+     * experience if you fullscreen.
+     */
+    void toggleFullscreen() {
+        if (window.getWindow().getState().contains(WindowState.FULLSCREEN)) {
+            window.setFullscreen(false);
+        } else {
+            window.setFullscreen(true);
+        }
+    }
+
+    void switchToHelp() {
+        right.setCurrentPage(1);
+    }
+
+    void switchToPreview() {
+        right.setCurrentPage(0);
     }
 }

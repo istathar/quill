@@ -12,7 +12,6 @@ package quill.ui;
 
 import java.io.IOException;
 
-
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.EventOwnerChange;
 import org.gnome.gdk.Keyval;
@@ -28,9 +27,6 @@ import org.gnome.gtk.TextView;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.WrapMode;
 import org.gnome.pango.FontDescription;
-
-import static quill.ui.Format.tagForMarkup;
-import static quill.ui.Format.tagsForMarkup;
 
 import quill.converter.DocBookConverter;
 import quill.docbook.Document;
@@ -48,6 +44,8 @@ import quill.textbase.StringSpan;
 import quill.textbase.TextStack;
 import quill.textbase.TextualChange;
 
+import static quill.ui.Format.tagForMarkup;
+import static quill.ui.Format.tagsForMarkup;
 
 class EditorWidget extends TextView
 {
@@ -127,6 +125,17 @@ class EditorWidget extends TextView
                     return false;
                 }
 
+                /*
+                 * Let function keys be handled by PrimaryWindow.
+                 */
+
+                if ((key == Keyval.F1) || (key == Keyval.F2) || (key == Keyval.F3) || (key == Keyval.F4)
+                        || (key == Keyval.F5) || (key == Keyval.F6) || (key == Keyval.F7)
+                        || (key == Keyval.F8) || (key == Keyval.F9) || (key == Keyval.F10)
+                        || ((key == Keyval.F11) || (key == Keyval.F12))) {
+                    return false;
+                }
+
                 if ((key == Keyval.Escape) || (key == Keyval.Insert)) {
                     // deliberate no-op
                     return true;
@@ -146,6 +155,15 @@ class EditorWidget extends TextView
                     return true;
                 } else if (key == Keyval.BackSpace) {
                     deleteBack();
+                    return true;
+                }
+
+                /*
+                 * Context menu!
+                 */
+
+                if (key == Keyval.Menu) {
+                    // TODO
                     return true;
                 }
 
