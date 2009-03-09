@@ -95,7 +95,9 @@ class EditorWidget extends TextView
 
         view.setWrapMode(WrapMode.WORD);
 
-        view.setPaddingBelowParagraph(18);
+        view.setLeftMargin(3);
+        view.setPaddingAboveParagraph(8);
+        view.setPaddingBelowParagraph(8);
     }
 
     private void setupInternalStack() {

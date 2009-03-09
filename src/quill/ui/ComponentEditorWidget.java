@@ -41,7 +41,7 @@ class ComponentEditorWidget extends ScrolledWindow
     }
 
     private void setupScrolling() {
-        series = new VBox(false, 0);
+        series = new VBox(false, 3);
 
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
         scroll.addWithViewport(series);
