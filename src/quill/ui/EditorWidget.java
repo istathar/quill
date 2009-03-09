@@ -771,26 +771,30 @@ class EditorWidget extends TextView
         });
     }
 
-    /*
-     * Temporary!
-     */
     void loadText(TextStack load) {
         final Extract entire;
-        int i, x;
-        Span span;
-        Change change;
+        TextIter pointer;
+        int i;
+        Span s;
+
+        /*
+         * Easy enough to just set the internal TextStack backing this editor
+         * to the one passed in
+         */
+
+        stack = load;
+
+        /*
+         * But now we need to cycle over its Spans and place its content into
+         * the view.
+         */
 
         entire = load.extractAll();
+        pointer = buffer.getIterStart();
 
-        x = 0;
         for (i = 0; i < entire.size(); i++) {
-            span = entire.get(i);
-            change = new InsertChange(x, span);
-
-            stack.apply(change);
-            this.affect(change);
-
-            x += span.getWidth();
+            s = entire.get(i);
+            buffer.insert(pointer, s.getText(), tagForMarkup(s.getMarkup()));
         }
     }
 }

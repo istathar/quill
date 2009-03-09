@@ -16,6 +16,10 @@ public class Example {
 }
 </programlisting>
 <para>
+Place this code in <filename>Hello.java</filename>
+and compile it.
+</para>
+<para>
 This program has the drawback of not doing
 very much and even worse, not telling you
 that that's not what it's doing.
