@@ -17,6 +17,8 @@ import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
+import quill.textbase.ParagraphSegment;
+import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 
 /**
@@ -41,7 +43,7 @@ class ComponentEditorWidget extends ScrolledWindow
     }
 
     private void setupScrolling() {
-        series = new VBox(false, 3);
+        series = new VBox(false, 6);
 
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
         scroll.addWithViewport(series);
@@ -60,16 +62,27 @@ class ComponentEditorWidget extends ScrolledWindow
     }
 
     void initializeSeries(Segment[] segments) {
-        EditorWidget editor;
+        EditorTextView editor;
+        Widget widget;
+        ScrolledWindow wide;
 
         for (Segment segment : segments) {
-            /*
-             * FIXME this will have to change to a mechanism that is aware of
-             * the Segment type
-             */
-            editor = new EditorWidget();
+            if (segment instanceof ParagraphSegment) {
+                editor = new ParagraphEditorTextView();
+                widget = editor;
+            } else if (segment instanceof PreformatSegment) {
+                editor = new PreformatEditorTextView();
+
+                wide = new ScrolledWindow();
+                wide.setPolicy(PolicyType.AUTOMATIC, PolicyType.NEVER);
+                wide.add(editor);
+
+                widget = wide;
+            } else {
+                throw new IllegalStateException("Unknown Segment type");
+            }
             editor.loadText(segment.getText());
-            series.packStart(editor, false, false, 0);
+            series.packStart(widget, false, false, 0);
         }
 
         series.showAll();

@@ -10,7 +10,6 @@
  */
 package quill.ui;
 
-
 import org.gnome.gdk.Event;
 import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Adjustment;
@@ -32,8 +31,6 @@ import quill.textbase.Preformat;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
 import quill.textbase.TextStack;
-import quill.ui.EditorWidget;
-import quill.ui.PreviewWidget;
 
 public class DemoWindow extends Window
 {
@@ -70,7 +67,7 @@ public class DemoWindow extends Window
 
         for (i = 1; i < 5; i++) {
             Entry entry;
-            EditorWidget editor;
+            EditorTextView editor;
             ScrolledWindow wide;
             TextStack lorem, prog;
 
@@ -90,11 +87,8 @@ public class DemoWindow extends Window
              * some paras
              */
 
-            editor = new EditorWidget();
-            editor.setPaddingBelowParagraph(10);
+            editor = new ParagraphEditorTextView();
             editor.modifyFont(desc);
-            editor.setBorderWidth(2);
-            editor.setLeftMargin(3);
 
             lorem = demoLoremIpsum();
             editor.loadText(lorem);
@@ -105,12 +99,8 @@ public class DemoWindow extends Window
              * some program listing
              */
 
-            editor = new EditorWidget();
+            editor = new PreformatEditorTextView();
             editor.setWrapMode(WrapMode.NONE);
-            editor.setPaddingBelowParagraph(0);
-            editor.modifyFont(desc);
-            editor.setBorderWidth(2);
-            editor.setLeftMargin(3);
 
             prog = demoProgramListing();
             editor.loadText(prog);
@@ -125,11 +115,7 @@ public class DemoWindow extends Window
              * more paras
              */
 
-            editor = new EditorWidget();
-            editor.setPaddingBelowParagraph(10);
-            editor.modifyFont(desc);
-            editor.setBorderWidth(2);
-            editor.setLeftMargin(3);
+            editor = new ParagraphEditorTextView();
 
             lorem = demoLoremIpsum();
             editor.loadText(lorem);

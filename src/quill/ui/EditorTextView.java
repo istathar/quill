@@ -1,5 +1,5 @@
 /*
- * EditorWidget.java
+ * EditorTextView.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -25,7 +25,6 @@ import org.gnome.gtk.TextMark;
 import org.gnome.gtk.TextView;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.WrapMode;
-import org.gnome.pango.FontDescription;
 
 import quill.converter.DocBookConverter;
 import quill.docbook.Document;
@@ -45,7 +44,7 @@ import quill.textbase.TextualChange;
 
 import static quill.ui.Format.tagForMarkup;
 
-class EditorWidget extends TextView
+abstract class EditorTextView extends TextView
 {
     private final TextView view;
 
@@ -69,7 +68,7 @@ class EditorWidget extends TextView
      */
     private boolean owner;
 
-    EditorWidget() {
+    EditorTextView() {
         super();
         view = this;
 
@@ -82,22 +81,15 @@ class EditorWidget extends TextView
     }
 
     private void setupTextView() {
-        final FontDescription desc;
-
-        desc = new FontDescription("DejaVu Serif, Book 11");
         buffer = new TextBuffer();
 
         selectionBound = buffer.getSelectionBound();
         insertBound = buffer.getInsert();
 
         view.setBuffer(buffer);
-        view.modifyFont(desc);
-
         view.setWrapMode(WrapMode.WORD);
 
         view.setLeftMargin(3);
-        view.setPaddingAboveParagraph(8);
-        view.setPaddingBelowParagraph(8);
     }
 
     private void setupInternalStack() {
@@ -774,7 +766,7 @@ class EditorWidget extends TextView
     }
 
     /**
-     * Given a newly created TextStack, make this EditorWidget reflect its
+     * Given a newly created TextStack, make this EditorTextView reflect its
      * contents. It must be a new TextStack, not one that's had Changes made
      * to it.
      */

@@ -26,14 +26,14 @@ import org.gnome.gtk.Window.DeleteEvent;
 
 import quill.converter.DocBookLoader;
 import quill.textbase.Segment;
-import quill.ui.EditorWidget;
+import quill.ui.EditorTextView;
 
 public final class EditorHarness
 {
     public static void main(String[] args) throws ValidityException, ParsingException, IOException {
         final Window window;
         final ScrolledWindow scroll;
-        final EditorWidget editor;
+        final EditorTextView editor;
         final File target;
         final DocBookLoader loader;
         final Segment[] segments;
@@ -42,7 +42,7 @@ public final class EditorHarness
 
         window = new Window();
 
-        editor = new EditorWidget();
+        editor = new EditorTextView();
 
         scroll = new ScrolledWindow();
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
