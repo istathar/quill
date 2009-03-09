@@ -15,14 +15,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import quill.converter.DocBookConverter;
-import quill.docbook.Document;
-import quill.textbase.EfficientNoNodeFactory;
-import quill.textbase.Segment;
-
 import nu.xom.Builder;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import quill.docbook.Document;
+import quill.textbase.EfficientNoNodeFactory;
+import quill.textbase.Segment;
 
 /**
  * <p>
@@ -42,7 +40,7 @@ public class ExampleThereAndBackAgain
         final DocBookConverter converter;
         final OutputStream out;
 
-        source = new File("tests/markerpen/converter/ExampleProgram.xml");
+        source = new File("tests/quill/converter/ExampleProgram.xml");
         assert (source.exists());
 
         factory = new EfficientNoNodeFactory();

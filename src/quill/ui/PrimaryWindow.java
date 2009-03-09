@@ -22,6 +22,8 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.pango.FontDescription;
 
+import quill.textbase.Segment;
+
 import static quill.client.Quill.ui;
 
 /**
@@ -40,6 +42,12 @@ class PrimaryWindow extends Window
     private Notebook left;
 
     private Notebook right;
+
+    ComponentEditorWidget editor;
+
+    HelpWidget help;
+
+    PreviewWidget preview;
 
     PrimaryWindow() {
         super();
@@ -72,7 +80,8 @@ class PrimaryWindow extends Window
         left.setShowTabs(false);
         left.setShowBorder(false);
 
-        left.insertPage(new EditorWidget(), null, 0);
+        editor = new ComponentEditorWidget();
+        left.insertPage(editor, null, 0);
 
         two.add(left);
     }
@@ -82,8 +91,11 @@ class PrimaryWindow extends Window
         right.setShowTabs(false);
         right.setShowBorder(false);
 
-        right.add(new PreviewWidget());
-        right.add(new HelpWidget());
+        preview = new PreviewWidget();
+        right.add(preview);
+
+        help = new HelpWidget();
+        right.add(help);
 
         two.add(right);
     }
@@ -117,12 +129,13 @@ class PrimaryWindow extends Window
 
                 if (key == Keyval.F1) {
                     switchToHelp();
-                }
-                if (key == Keyval.F2) {
+                    return true;
+                } else if (key == Keyval.F2) {
                     switchToPreview();
+                    return true;
                 }
-
-                if (key == Keyval.F11) {
+                // ...
+                else if (key == Keyval.F11) {
                     toggleFullscreen();
                     return true;
                 }
@@ -145,11 +158,28 @@ class PrimaryWindow extends Window
         }
     }
 
+    /**
+     * Change the left side to show the chapter editor.
+     */
+    void switchToEditor() {
+        left.setCurrentPage(0);
+    }
+
+    /**
+     * Change the right side to show the help pane.
+     */
     void switchToHelp() {
         right.setCurrentPage(1);
     }
 
+    /**
+     * Change the right side to show the preview display.
+     */
     void switchToPreview() {
         right.setCurrentPage(0);
+    }
+
+    void loadDocument(Segment[] segments) {
+        editor.initializeSeries(segments);
     }
 }

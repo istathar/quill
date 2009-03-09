@@ -17,6 +17,8 @@ import java.io.FileNotFoundException;
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.Gtk;
 
+import quill.textbase.Segment;
+
 public class UserInterface
 {
     PrimaryWindow primary;
@@ -50,6 +52,10 @@ public class UserInterface
      */
     public void shutdown() {
         Gtk.mainQuit();
+    }
+
+    public void loadDocument(Segment[] segments) {
+        primary.loadDocument(segments);
     }
 }
 
