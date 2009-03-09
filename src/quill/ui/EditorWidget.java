@@ -771,11 +771,20 @@ class EditorWidget extends TextView
         });
     }
 
+    /**
+     * Given a newly created TextStack, make this EditorWidget reflect its
+     * contents. It must be a new TextStack, not one that's had Changes made
+     * to it.
+     */
     void loadText(TextStack load) {
         final Extract entire;
         TextIter pointer;
         int i;
         Span s;
+
+        if (load.undo() != null) {
+            throw new IllegalArgumentException();
+        }
 
         /*
          * Easy enough to just set the internal TextStack backing this editor
