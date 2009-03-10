@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.Gtk;
+import org.gnome.pango.FontDescription;
 
 import quill.textbase.Segment;
 
@@ -25,6 +26,7 @@ public class UserInterface
 
     public UserInterface() {
         loadImages();
+        loadFonts();
         setupApplication();
         setupWindows();
     }
@@ -39,6 +41,12 @@ public class UserInterface
         } catch (FileNotFoundException fnfe) {
             System.err.println("Icon file not found: " + fnfe.getMessage());
         }
+    }
+
+    private void loadFonts() {
+        fonts.serif = new FontDescription("Deja Vu Serif, 11");
+        fonts.sans = new FontDescription("Deja Vu Sans, 11");
+        fonts.mono = new FontDescription("Deja Vu Sans Mono, 11");
     }
 
     private void setupApplication() {
@@ -62,4 +70,13 @@ public class UserInterface
 class images
 {
     static Pixbuf quill;
+}
+
+class fonts
+{
+    static FontDescription sans;
+
+    static FontDescription serif;
+
+    static FontDescription mono;
 }

@@ -1,5 +1,5 @@
 /*
- * PreformatEditorTextView.java
+ * HeadingSegment.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,17 +8,17 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package quill.ui;
+package quill.textbase;
 
-import org.gnome.gtk.WrapMode;
+import quill.docbook.Block;
 
-class PreformatEditorTextView extends EditorTextView
+public class HeadingSegment extends Segment
 {
-    public PreformatEditorTextView() {
-        super();
-
-        super.modifyFont(fonts.mono);
-
-        super.setWrapMode(WrapMode.NONE);
+    /*
+     * There is not actually a Block level element associated with these, nor
+     * continuation.
+     */
+    public Block createBlock() {
+        return null;
     }
 }

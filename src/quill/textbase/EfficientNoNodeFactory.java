@@ -182,6 +182,11 @@ public class EfficientNoNodeFactory extends NodeFactory
                 setSegment(new PreformatSegment());
             }
             return null;
+        } else if (name.equals("section")) {
+            markup = null;
+            block = true;
+            preserve = false;
+            setSegment(new HeadingSegment());
         }
 
         /*

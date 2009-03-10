@@ -174,6 +174,9 @@ public class DocBookConverter
 
         if (format == null) {
             block = segment.createBlock();
+            if (block == null) {
+                section = new Section();
+            }
             return;
         }
 

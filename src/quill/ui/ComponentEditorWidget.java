@@ -17,6 +17,7 @@ import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
+import quill.textbase.HeadingSegment;
 import quill.textbase.ParagraphSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
@@ -69,19 +70,26 @@ class ComponentEditorWidget extends ScrolledWindow
         for (Segment segment : segments) {
             if (segment instanceof ParagraphSegment) {
                 editor = new ParagraphEditorTextView();
+                editor.loadText(segment.getText());
+
                 widget = editor;
             } else if (segment instanceof PreformatSegment) {
                 editor = new PreformatEditorTextView();
+                editor.loadText(segment.getText());
 
                 wide = new ScrolledWindow();
                 wide.setPolicy(PolicyType.AUTOMATIC, PolicyType.NEVER);
                 wide.add(editor);
 
                 widget = wide;
+            } else if (segment instanceof HeadingSegment) {
+
+                widget = new SectionHeadingBox();
             } else {
+
                 throw new IllegalStateException("Unknown Segment type");
             }
-            editor.loadText(segment.getText());
+
             series.packStart(widget, false, false, 0);
         }
 

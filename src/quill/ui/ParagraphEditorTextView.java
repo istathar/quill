@@ -10,17 +10,12 @@
  */
 package quill.ui;
 
-import org.gnome.pango.FontDescription;
-
 class ParagraphEditorTextView extends EditorTextView
 {
     public ParagraphEditorTextView() {
         super();
 
-        final FontDescription desc;
-
-        desc = new FontDescription("DejaVu Serif, Book 11");
-        this.modifyFont(desc);
+        this.modifyFont(fonts.serif);
 
         this.setPaddingAboveParagraph(0);
         this.setPaddingBelowParagraph(10);
