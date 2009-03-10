@@ -10,28 +10,11 @@
  */
 package quill.ui;
 
-import org.gnome.gtk.Entry;
-import org.gnome.gtk.HBox;
-import org.gnome.gtk.Label;
 
-class SectionHeadingBox extends HBox
+class SectionHeadingBox extends HeadingBox
 {
-    private HBox box;
-
-    private Entry title;
-
-    private Label label;
-
     public SectionHeadingBox() {
-        super(false, 0);
-        box = this;
-
-        title = new Entry();
-        title.modifyFont(fonts.serif);
-        box.packStart(title, true, true, 0);
-
-        label = new Label();
+        super();
         label.setLabel("Section");
-        box.packEnd(label, true, true, 0);
     }
 }

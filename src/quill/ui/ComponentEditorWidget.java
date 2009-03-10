@@ -44,7 +44,7 @@ class ComponentEditorWidget extends ScrolledWindow
     }
 
     private void setupScrolling() {
-        series = new VBox(false, 6);
+        series = new VBox(false, 3);
 
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
         scroll.addWithViewport(series);
@@ -64,6 +64,7 @@ class ComponentEditorWidget extends ScrolledWindow
 
     void initializeSeries(Segment[] segments) {
         EditorTextView editor;
+        HeadingBox heading;
         Widget widget;
         ScrolledWindow wide;
 
@@ -83,8 +84,10 @@ class ComponentEditorWidget extends ScrolledWindow
 
                 widget = wide;
             } else if (segment instanceof HeadingSegment) {
+                heading = new SectionHeadingBox();
+                heading.loadText(segment.getText());
 
-                widget = new SectionHeadingBox();
+                widget = heading;
             } else {
 
                 throw new IllegalStateException("Unknown Segment type");

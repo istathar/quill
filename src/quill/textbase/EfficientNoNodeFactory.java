@@ -187,6 +187,17 @@ public class EfficientNoNodeFactory extends NodeFactory
             block = true;
             preserve = false;
             setSegment(new HeadingSegment());
+            return null;
+        } else if (name.equals("title")) {
+            markup = null;
+            block = true;
+            preserve = false;
+            if (segment instanceof HeadingSegment) {
+                // kludge
+                stack = new TextStack();
+                segment.setText(stack);
+            }
+            return null;
         }
 
         /*

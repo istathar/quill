@@ -11,14 +11,14 @@
 package quill.textbase;
 
 import quill.docbook.Block;
+import quill.docbook.Title;
 
-public class HeadingSegment extends Segment
+public final class HeadingSegment extends Segment
 {
     /*
-     * There is not actually a Block level element associated with these, nor
-     * continuation.
+     * We assume that a Section heading always has a title.
      */
     public Block createBlock() {
-        return null;
+        return new Title();
     }
 }

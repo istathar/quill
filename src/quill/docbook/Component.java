@@ -1,7 +1,7 @@
 /*
  * ComponentTag.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -13,9 +13,13 @@ package quill.docbook;
 /**
  * Components are the chapter-like elements.
  */
-abstract class Component extends DocBookTag
+public abstract class Component extends DocBookTag
 {
     Component(String name) {
         super(name);
+    }
+
+    public void add(Division section) {
+        super.addChild(section);
     }
 }

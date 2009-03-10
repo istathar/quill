@@ -2,10 +2,14 @@
 <book version="5.0" xmlns="http://docbook.org/ns/docbook">
 <chapter>
 <section>
+<title>
+Getting started
+</title>
 <para>
 This is a simple java-gnome program. As you
-will see, there's really nothing to it that
-you need to be worried about:
+will see in the following definition of 
+<type>Example</type> there's really nothing
+to it that you need to be worried about:
 </para>
 <programlisting xml:space="preserve">
 public class Example {
@@ -16,8 +20,9 @@ public class Example {
 }
 </programlisting>
 <para>
-Place this code in <filename>Hello.java</filename>
-and compile it.
+Place this code in
+<filename>Example.java</filename> and compile
+it.
 </para>
 <para>
 This program has the drawback of not doing

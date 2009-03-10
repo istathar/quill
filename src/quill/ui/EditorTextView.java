@@ -90,6 +90,7 @@ abstract class EditorTextView extends TextView
         view.setWrapMode(WrapMode.WORD);
 
         view.setLeftMargin(3);
+        view.setBorderWidth(2);
     }
 
     private void setupInternalStack() {

@@ -20,6 +20,7 @@ import quill.docbook.Block;
 import quill.docbook.Bold;
 import quill.docbook.BookDocument;
 import quill.docbook.Chapter;
+import quill.docbook.Component;
 import quill.docbook.Document;
 import quill.docbook.Filename;
 import quill.docbook.Function;
@@ -52,6 +53,8 @@ public class DocBookConverter
 {
     private final Document book;
 
+    private final Component chapter;
+
     private final StringBuilder buf;
 
     /**
@@ -72,8 +75,6 @@ public class DocBookConverter
     private Inline inline;
 
     public DocBookConverter() {
-        final Chapter chapter;
-
         book = new BookDocument();
         buf = new StringBuilder();
 
@@ -85,11 +86,7 @@ public class DocBookConverter
     }
 
     /**
-     * Append a Text, which represents a Chapter (probably).
-     * 
-     * FUTURE as of this writing we have no modelling of Sections in the UI,
-     * so we'll assume there is one (and only one) for now.
-     * 
+     * Append a Segment.
      */
     public void append(final Segment segment) {
         final TextStack text;
@@ -176,6 +173,7 @@ public class DocBookConverter
             block = segment.createBlock();
             if (block == null) {
                 section = new Section();
+                chapter.add(section);
             }
             return;
         }
