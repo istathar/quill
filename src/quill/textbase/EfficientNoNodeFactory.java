@@ -188,6 +188,12 @@ public class EfficientNoNodeFactory extends NodeFactory
             preserve = false;
             setSegment(new HeadingSegment());
             return null;
+        } else if (name.equals("chapter")) {
+            markup = null;
+            block = true;
+            preserve = false;
+            setSegment(new ComponentSegment());
+            return null;
         } else if (name.equals("title")) {
             markup = null;
             block = true;

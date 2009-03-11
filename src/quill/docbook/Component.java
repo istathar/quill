@@ -22,4 +22,12 @@ public abstract class Component extends DocBookTag
     public void add(Division section) {
         super.addChild(section);
     }
+
+    /**
+     * Less common is adding block level elements to a Chapter. These occur
+     * before the first Section. Mostly this is how a Title gets added.
+     */
+    public void add(Block para) {
+        super.addChild(para);
+    }
 }

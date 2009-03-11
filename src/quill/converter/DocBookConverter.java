@@ -31,6 +31,7 @@ import quill.docbook.Type;
 import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
 import quill.textbase.Extract;
+import quill.textbase.HeadingSegment;
 import quill.textbase.Markup;
 import quill.textbase.Preformat;
 import quill.textbase.PreformatSegment;
@@ -80,9 +81,6 @@ public class DocBookConverter
 
         chapter = new Chapter();
         book.add(chapter);
-
-        section = new Section();
-        chapter.add(section);
     }
 
     /**
@@ -90,6 +88,24 @@ public class DocBookConverter
      */
     public void append(final Segment segment) {
         final TextStack text;
+
+        this.segment = segment;
+
+        if (segment instanceof HeadingSegment) {
+            if (section == null) {
+                section = new Section();
+                chapter.add(section);
+            }
+            block = null;
+
+        }
+
+        text = segment.getText();
+
+        append(text);
+    }
+
+    private void append(final TextStack text) {
         final Extract entire;
         final int num;
         int i, j, len;
@@ -98,9 +114,6 @@ public class DocBookConverter
         char ch;
         Markup previous, markup;
 
-        this.segment = segment;
-
-        text = segment.getText();
         if (text == null) {
             return;
         }
@@ -171,10 +184,6 @@ public class DocBookConverter
 
         if (format == null) {
             block = segment.createBlock();
-            if (block == null) {
-                section = new Section();
-                chapter.add(section);
-            }
             return;
         }
 
@@ -238,7 +247,11 @@ public class DocBookConverter
                 buf.append('\n');
                 return;
             }
-            section.add(block);
+            if (section == null) {
+                chapter.add(block);
+            } else {
+                section.add(block);
+            }
             if (segment == null) {
                 return;
             }

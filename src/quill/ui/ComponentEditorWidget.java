@@ -17,6 +17,7 @@ import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
+import quill.textbase.ComponentSegment;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ParagraphSegment;
 import quill.textbase.PreformatSegment;
@@ -85,6 +86,11 @@ class ComponentEditorWidget extends ScrolledWindow
                 widget = wide;
             } else if (segment instanceof HeadingSegment) {
                 heading = new SectionHeadingBox();
+                heading.loadText(segment.getText());
+
+                widget = heading;
+            } else if (segment instanceof ComponentSegment) {
+                heading = new ChapterHeadingBox();
                 heading.loadText(segment.getText());
 
                 widget = heading;
