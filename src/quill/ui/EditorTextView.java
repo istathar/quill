@@ -22,6 +22,7 @@ import org.gnome.gtk.Clipboard;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
+import org.gnome.gtk.TextTag;
 import org.gnome.gtk.TextView;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.WrapMode;
@@ -482,6 +483,7 @@ abstract class EditorTextView extends TextView
         Extract r;
         int i, offset;
         Span s;
+        TextTag tag;
 
         start = buffer.getIter(change.getOffset());
 
@@ -522,8 +524,11 @@ abstract class EditorTextView extends TextView
                  */
 
                 buffer.removeAllTags(start, end);
-
-                buffer.applyTag(tagForMarkup(s.getMarkup()), start, end);
+                tag = tagForMarkup(s.getMarkup());
+                if (tag == null) {
+                    return;
+                }
+                buffer.applyTag(tag, start, end);
             }
         }
     }
