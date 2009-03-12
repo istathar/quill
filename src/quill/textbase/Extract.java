@@ -17,8 +17,8 @@ package quill.textbase;
  */
 /*
  * The fields are package visible and that's ok because in here we know not to
- * change Span[], but if a Range escapes outside this package then the public
- * methods are available and this class is immutable.
+ * change Span[], but if an Extract escapes outside this package then the
+ * public methods are available and this class is immutable.
  */
 public class Extract
 {

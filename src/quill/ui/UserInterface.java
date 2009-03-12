@@ -14,11 +14,18 @@ package quill.ui;
 
 import java.io.FileNotFoundException;
 
+import org.gnome.gdk.EventOwnerChange;
 import org.gnome.gdk.Pixbuf;
+import org.gnome.gtk.Clipboard;
 import org.gnome.gtk.Gtk;
 import org.gnome.pango.FontDescription;
 
+import quill.textbase.Extract;
 import quill.textbase.Segment;
+import quill.textbase.Span;
+import quill.textbase.StringSpan;
+
+import static quill.textbase.Text.extractFor;
 
 public class UserInterface
 {
@@ -29,6 +36,7 @@ public class UserInterface
         loadFonts();
         setupApplication();
         setupWindows();
+        hookupExternalClipboard();
     }
 
     private void setupWindows() {
@@ -60,6 +68,71 @@ public class UserInterface
      */
     public void shutdown() {
         Gtk.mainQuit();
+    }
+
+    private Clipboard clipboard;
+
+    /**
+     * Do we [think] we're the owner of the clipboard?
+     */
+    private boolean owner;
+
+    /**
+     * When text is cut or copied out, it will be cached here.
+     */
+    private Extract stash;
+
+    private void hookupExternalClipboard() {
+        stash = null;
+        clipboard = Clipboard.getDefault();
+
+        /*
+         * This gets hit whenever the clipboard is written to. In our case, we
+         * toggle the owner state variable to true when we know we're about to
+         * programatically set the clipboard; this handler gets called once,
+         * and we can ignore it. Any other receipt of this event and we have
+         * to get the text from the system.
+         */
+
+        clipboard.connect(new Clipboard.OwnerChange() {
+            public void onOwnerChange(Clipboard source, EventOwnerChange event) {
+                final Span span;
+                final String str;
+
+                if (owner) {
+                    owner = false;
+                } else {
+                    str = clipboard.getText();
+                    if (str == null) {
+                        /*
+                         * If the data in the system clipboard was put there
+                         * in a a form other than plain text we get null back.
+                         */
+                        return;
+                    }
+                    span = new StringSpan(str, null);
+                    stash = extractFor(span);
+                }
+            }
+        });
+    }
+
+    /**
+     * Get the Span(s) that are currently in the clipboard. This will be rich
+     * Spans with Markup if the cut/copy operation was done within our
+     * application, otherwise it will be a plain text.
+     */
+    Extract getClipboard() {
+        return stash;
+    }
+
+    /**
+     * Put the extracted text into the system clipboard.
+     */
+    void setClipboard(Extract range) {
+        owner = true;
+        stash = range;
+        clipboard.setText(range.getText());
     }
 
     public void loadDocument(Segment[] segments) {

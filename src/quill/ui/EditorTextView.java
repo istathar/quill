@@ -13,12 +13,10 @@ package quill.ui;
 import java.io.IOException;
 
 import org.gnome.gdk.EventKey;
-import org.gnome.gdk.EventOwnerChange;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gdk.Rectangle;
 import org.gnome.gtk.Allocation;
-import org.gnome.gtk.Clipboard;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
@@ -39,10 +37,10 @@ import quill.textbase.InsertChange;
 import quill.textbase.Markup;
 import quill.textbase.ParagraphSegment;
 import quill.textbase.Span;
-import quill.textbase.StringSpan;
 import quill.textbase.TextStack;
 import quill.textbase.TextualChange;
 
+import static quill.client.Quill.ui;
 import static quill.ui.Format.tagForMarkup;
 
 abstract class EditorTextView extends TextView
@@ -62,13 +60,6 @@ abstract class EditorTextView extends TextView
 
     private Markup insertMarkup;
 
-    private Clipboard clipboard;
-
-    /**
-     * Do we [think] we're the owner of the clipboard?
-     */
-    private boolean owner;
-
     EditorTextView() {
         super();
         view = this;
@@ -78,7 +69,6 @@ abstract class EditorTextView extends TextView
 
         hookupKeybindings();
         hookupFormatManagement();
-        hookupExternalClipboard();
     }
 
     private void setupTextView() {
@@ -96,7 +86,6 @@ abstract class EditorTextView extends TextView
 
     private void setupInternalStack() {
         stack = new TextStack();
-        stash = null;
     }
 
     private void hookupKeybindings() {
@@ -315,11 +304,12 @@ abstract class EditorTextView extends TextView
      */
 
     private void pasteText() {
-        final Extract removed;
+        final Extract stash, removed;
         final Change change;
         final TextIter selection;
         final int selectionOffset, offset, width;
 
+        stash = ui.getClipboard();
         if (stash == null) {
             return;
         }
@@ -560,14 +550,6 @@ abstract class EditorTextView extends TextView
         }
     }
 
-    /**
-     * When text is cut or copied out, it will be cached here.
-     */
-    /*
-     * TODO move to an application level reference.
-     */
-    private Extract stash;
-
     private void copyText() {
         extractText(true);
     }
@@ -579,6 +561,7 @@ abstract class EditorTextView extends TextView
     private void extractText(boolean copy) {
         final TextIter start, end;
         int alpha, omega, offset, width;
+        final Extract extract;
         final Change change;
 
         /*
@@ -602,15 +585,8 @@ abstract class EditorTextView extends TextView
          * Copy the range to clipboard, being the "Copy" behviour.
          */
 
-        stash = stack.extractRange(offset, width);
-
-        /*
-         * Put the extracted text into the system clipboard. TODO move to an
-         * Application class.
-         */
-
-        owner = true;
-        clipboard.setText(stash.getText());
+        extract = stack.extractRange(offset, width);
+        ui.setClipboard(extract);
 
         if (copy) {
             return;
@@ -621,7 +597,7 @@ abstract class EditorTextView extends TextView
          * behaviour.
          */
 
-        change = new DeleteChange(offset, stash);
+        change = new DeleteChange(offset, ui.getClipboard());
         stack.apply(change);
         this.affect(change);
     }
@@ -735,40 +711,6 @@ abstract class EditorTextView extends TextView
          */
 
         insertMarkup = null;
-    }
-
-    private void hookupExternalClipboard() {
-        clipboard = Clipboard.getDefault();
-
-        /*
-         * This gets hit whenever the clipboard is written to. In our case, we
-         * toggle the owner state variable to true when we know we're about to
-         * programatically set the clipboard; this handler gets called once,
-         * and we can ignore it. Any other receipt of this event and we have
-         * to get the text from the system.
-         */
-
-        clipboard.connect(new Clipboard.OwnerChange() {
-            public void onOwnerChange(Clipboard source, EventOwnerChange event) {
-                final Span span;
-                final String str;
-
-                if (owner) {
-                    owner = false;
-                } else {
-                    str = clipboard.getText();
-                    if (str == null) {
-                        /*
-                         * If the data in the system clipboard was put there
-                         * in a a form other than plain text we get null back.
-                         */
-                        return;
-                    }
-                    span = new StringSpan(str, null);
-                    stash = stack.extractFor(span);
-                }
-            }
-        });
     }
 
     /**
