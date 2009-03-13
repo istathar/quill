@@ -22,6 +22,7 @@ import quill.textbase.HeadingSegment;
 import quill.textbase.ParagraphSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
+import quill.textbase.Series;
 
 /**
  * Left hand side of a PrimaryWindow for editing a Component (Article or
@@ -35,7 +36,7 @@ class ComponentEditorWidget extends ScrolledWindow
 
     private Adjustment adj;
 
-    private VBox series;
+    private VBox box;
 
     ComponentEditorWidget() {
         super();
@@ -45,10 +46,10 @@ class ComponentEditorWidget extends ScrolledWindow
     }
 
     private void setupScrolling() {
-        series = new VBox(false, 3);
+        box = new VBox(false, 3);
 
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
-        scroll.addWithViewport(series);
+        scroll.addWithViewport(box);
 
         adj = scroll.getVAdjustment();
     }
@@ -63,13 +64,17 @@ class ComponentEditorWidget extends ScrolledWindow
         });
     }
 
-    void initializeSeries(Segment[] segments) {
+    void initializeSeries(Series series) {
+        Segment segment;
+        int i;
         EditorTextView editor;
         HeadingBox heading;
         Widget widget;
         ScrolledWindow wide;
 
-        for (Segment segment : segments) {
+        for (i = 0; i < series.size(); i++) {
+            segment = series.get(i);
+
             if (segment instanceof ParagraphSegment) {
                 editor = new ParagraphEditorTextView();
                 editor.loadText(segment.getText());
@@ -99,9 +104,9 @@ class ComponentEditorWidget extends ScrolledWindow
                 throw new IllegalStateException("Unknown Segment type");
             }
 
-            series.packStart(widget, false, false, 0);
+            box.packStart(widget, false, false, 0);
         }
 
-        series.showAll();
+        box.showAll();
     }
 }

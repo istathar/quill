@@ -1,7 +1,7 @@
 /*
  * Document.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by the authors under the terms of the "GNU General Public Licence,
@@ -20,7 +20,7 @@ import nu.xom.Serializer;
 
 /**
  * Base class for documents encoded in the <code>docbook</code> package.
- * Export it to XHTML XML using {@link #write(OutputStream) write()}.
+ * Export it to XHTML XML using {@link #toXML(OutputStream) toXML()}.
  * 
  * @author Andrew Cowie
  */
@@ -32,8 +32,8 @@ public class Document
 
     /**
      * Though strictly the top of DocBook is <code>&lt;book&gt;</code>, you
-     * can also start from <code>&lt;article&gt;</code> and a number of other
-     * places.
+     * can also reasonably start from <code>&lt;article&gt;</code> and a
+     * number of other places.
      */
     protected Document(DocBookTag root) {
 

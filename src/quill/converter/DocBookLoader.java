@@ -50,6 +50,6 @@ public class DocBookLoader
         parser = new Builder(factory);
         parser.build(source);
 
-        return factory.createSegments();
+        return factory.createSeries();
     }
 }

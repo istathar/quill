@@ -21,7 +21,7 @@ import org.gnome.gtk.Gtk;
 import org.gnome.pango.FontDescription;
 
 import quill.textbase.Extract;
-import quill.textbase.Segment;
+import quill.textbase.Series;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
 
@@ -135,8 +135,12 @@ public class UserInterface
         clipboard.setText(range.getText());
     }
 
-    public void loadDocument(Segment[] segments) {
-        primary.loadDocument(segments);
+    public void loadDocument(Series series) {
+        primary.loadDocument(series);
+    }
+
+    public void saveDocument() {
+
     }
 }
 

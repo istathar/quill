@@ -22,7 +22,7 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.pango.FontDescription;
 
-import quill.textbase.Segment;
+import quill.textbase.Series;
 
 import static quill.client.Quill.ui;
 
@@ -43,11 +43,16 @@ class PrimaryWindow extends Window
 
     private Notebook right;
 
-    ComponentEditorWidget editor;
+    private ComponentEditorWidget editor;
 
-    HelpWidget help;
+    private HelpWidget help;
 
-    PreviewWidget preview;
+    private PreviewWidget preview;
+
+    /**
+     * The Components currently being represented by this PrimaryWindow
+     */
+    Series series;
 
     PrimaryWindow() {
         super();
@@ -179,7 +184,9 @@ class PrimaryWindow extends Window
         right.setCurrentPage(0);
     }
 
-    void loadDocument(Segment[] segments) {
-        editor.initializeSeries(segments);
+    void loadDocument(Series series) {
+        this.series = series;
+
+        editor.initializeSeries(series);
     }
 }

@@ -48,7 +48,7 @@ public class ExampleThereAndBackAgain
         parser = new Builder(factory);
         parser.build(source);
 
-        segments = factory.createSegments();
+        segments = factory.createSeries();
 
         converter = new DocBookConverter();
 

@@ -17,7 +17,7 @@ import nu.xom.Builder;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.textbase.EfficientNoNodeFactory;
-import quill.textbase.Segment;
+import quill.textbase.Series;
 
 import static quill.client.Quill.initializeUserInterface;
 import static quill.client.Quill.runUserInterface;
@@ -35,7 +35,7 @@ public class DevelopmentHarness
         final File source;
         final Builder parser;
         final EfficientNoNodeFactory factory;
-        final Segment[] segments;
+        final Series series;
 
         source = new File("tests/quill/converter/ExampleProgram.xml");
         assert (source.exists());
@@ -45,8 +45,8 @@ public class DevelopmentHarness
         parser = new Builder(factory);
         parser.build(source);
 
-        segments = factory.createSegments();
+        series = factory.createSeries();
 
-        ui.loadDocument(segments);
+        ui.loadDocument(series);
     }
 }

@@ -66,14 +66,13 @@ public class EfficientNoNodeFactory extends NodeFactory
         stack = null;
     }
 
-    public Segment[] createSegments() {
-        Segment[] result;
+    public Series createSeries() {
+        Segment[] segments;
 
-        result = new Segment[list.size()];
+        segments = new Segment[list.size()];
+        list.toArray(segments);
 
-        list.toArray(result);
-
-        return result;
+        return new Series(segments);
     }
 
     private void setSegment(Segment segment) {
