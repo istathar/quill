@@ -186,11 +186,14 @@ abstract class EditorTextView extends TextView
                     if (ch == 0) {
                         /*
                          * Don't know what this is. If it's a modifier, we
-                         * ought to have skipped it explicitly above. If it
-                         * results in a character being inserted into the
-                         * TextBuffer things will break. So, needs fixing!
+                         * ought to have skipped it explicitly above. We
+                         * cannot let it result in a character being inserted
+                         * into the TextBuffer as things will break. So, we
+                         * swollow it. If you're wondering why your keystrokes
+                         * are disappearing off to nowhere, this is the
+                         * answer.
                          */
-                        throw new UnsupportedOperationException();
+                        return true;
                     }
 
                     insert(ch);
