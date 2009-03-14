@@ -21,7 +21,7 @@ import org.gnome.gtk.Gtk;
 import org.gnome.pango.FontDescription;
 
 import quill.textbase.Extract;
-import quill.textbase.Series;
+import quill.textbase.Folio;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
 
@@ -135,8 +135,22 @@ public class UserInterface
         clipboard.setText(range.getText());
     }
 
-    public void loadDocument(Series series) {
-        primary.loadDocument(series);
+    /**
+     * Initiate display of the given document.
+     */
+    /*
+     * For now this starts at the first component, but presumably we want to
+     * record somewhere what the last edited point was and start there
+     * instead. We also need to instruct the PrimaryWindow about what
+     * navigation options it can offer. Which means maybe we should pass it
+     * the Folio?
+     */
+    public void displayDocument(Folio folio) {
+        if (folio.size() == 0) {
+            throw new IllegalStateException();
+        }
+
+        primary.displaySeries(folio.get(0));
     }
 
     public void saveDocument() {

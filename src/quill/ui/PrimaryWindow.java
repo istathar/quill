@@ -196,9 +196,18 @@ class PrimaryWindow extends Window
         editor.ensureVisible(from, height);
     }
 
-    void loadDocument(Series series) {
+    /**
+     * Show the nominated Series in this PrimaryWindow
+     */
+    /*
+     * FUTURE considerations: when we start dealing in multiple chapters,
+     * we'll want to be able to navigate between them, which means this UI
+     * will need to be told what other Series are available/
+     */
+    void displaySeries(Series series) {
         this.series = series;
 
         editor.initializeSeries(series);
+        preview.renderSeries(series);
     }
 }

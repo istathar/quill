@@ -23,6 +23,8 @@ import org.gnome.pango.FontDescription;
 import org.gnome.pango.Layout;
 import org.gnome.pango.LayoutLine;
 
+import quill.textbase.Series;
+
 import static org.freedesktop.cairo.HintMetrics.OFF;
 
 /*
@@ -304,5 +306,17 @@ class PreviewWidget extends DrawingArea
          */
         matrix.translate(0.5, 1.5);
         cr.transform(matrix);
+    }
+
+    /**
+     * Given a Series representing the Segments in a chapter or article,
+     * instruct this Widget to render a preview of them.
+     */
+    /*
+     * This will need refinement, obviously, once we start having live preview
+     * and start dealing with multiple pages.
+     */
+    void renderSeries(Series series) {
+    // TODO
     }
 }

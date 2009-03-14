@@ -12,15 +12,23 @@ package quill.client;
 
 import org.gnome.gtk.Gtk;
 
+import quill.textbase.DataLayer;
 import quill.ui.UserInterface;
 
 public class Quill
 {
     public static UserInterface ui;
 
+    public static DataLayer data;
+
     public static void main(String[] args) {
+        initializeDataLayer();
         initializeUserInterface(args);
         runUserInterface(); // blocks
+    }
+
+    static void initializeDataLayer() {
+        data = new DataLayer();
     }
 
     static void initializeUserInterface(String[] args) {

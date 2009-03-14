@@ -10,15 +10,14 @@
  */
 package quill.client;
 
-import java.io.File;
 import java.io.IOException;
 
-import nu.xom.Builder;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import quill.textbase.EfficientNoNodeFactory;
-import quill.textbase.Series;
+import quill.textbase.Folio;
 
+import static quill.client.Quill.data;
+import static quill.client.Quill.initializeDataLayer;
 import static quill.client.Quill.initializeUserInterface;
 import static quill.client.Quill.runUserInterface;
 import static quill.client.Quill.ui;
@@ -26,27 +25,17 @@ import static quill.client.Quill.ui;
 public class DevelopmentHarness
 {
     public static void main(String[] args) throws ValidityException, ParsingException, IOException {
+        initializeDataLayer();
         initializeUserInterface(args);
         loadExampleDocument();
         runUserInterface(); // blocks
     }
 
     private static void loadExampleDocument() throws ValidityException, ParsingException, IOException {
-        final File source;
-        final Builder parser;
-        final EfficientNoNodeFactory factory;
-        final Series series;
+        final Folio folio;
 
-        source = new File("tests/quill/converter/ExampleProgram.xml");
-        assert (source.exists());
-
-        factory = new EfficientNoNodeFactory();
-
-        parser = new Builder(factory);
-        parser.build(source);
-
-        series = factory.createSeries();
-
-        ui.loadDocument(series);
+        data.loadDocument("tests/quill/converter/ExampleProgram.xml");
+        folio = data.getActiveDocument();
+        ui.displayDocument(folio);
     }
 }
