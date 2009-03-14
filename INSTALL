@@ -1,0 +1,16 @@
+INSTALL
+
+This project is still in the inception phases, so at the moment there is no
+build infrastructure.
+
+You will need the following prerequisites:
+
+ - java-gnome	>= 4.0.10 (and, probably, 'mainline')
+ - xom		>= 1.2.1
+
+To build Quill, import this source tree as an Eclipse project called "quill".
+Follow the same pattern for setting up `~/workspace/quill` being a checkout of
+`~/src/quill/mainline` as you have done following java-gnome's `HACKING`
+instructions.
+
+
