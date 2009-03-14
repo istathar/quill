@@ -10,7 +10,6 @@
  */
 package quill.ui;
 
-import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ScrolledWindow;
@@ -54,14 +53,29 @@ class ComponentEditorWidget extends ScrolledWindow
         adj = scroll.getVAdjustment();
     }
 
-    private void hookupAdjustmentReactions() {
-        scroll.connect(new ExposeEvent() {
-            public boolean onExposeEvent(Widget source, EventExpose event) {
-                System.out.format("%4.0f + %3.0f = %4.0f to %4.0f\n", adj.getValue(), adj.getPageSize(),
-                        adj.getValue() + adj.getPageSize(), adj.getUpper());
-                return false;
-            }
-        });
+    private void hookupAdjustmentReactions() {}
+
+    /**
+     * Tell the ComponentEditorWidget to ensure that the range from to
+     * from+height is scrolled to and within view. This is used by the
+     * EditorTextViews to handle the cursor moving one line above or below the
+     * current viewport.
+     */
+    void ensureVisible(int from, int height) {
+        int v, h;
+
+        if (from < 0) {
+            return;
+        }
+
+        v = (int) adj.getValue();
+        h = (int) adj.getPageSize();
+
+        if (from < v) {
+            adj.setValue(from);
+        } else if (from + height > v + h) {
+            adj.setValue(from + height - h);
+        }
     }
 
     void initializeSeries(Series series) {

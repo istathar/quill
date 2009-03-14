@@ -184,6 +184,18 @@ class PrimaryWindow extends Window
         right.setCurrentPage(0);
     }
 
+    /**
+     * Adjust the left side editor to show the supplied vertical location.
+     */
+    /*
+     * This probably doesn't need to be a UI function; an EditorTextView
+     * should know or be able to find out its parent and simply call its
+     * parent's ensureVisible() method.
+     */
+    void scrollEditorToShow(int from, int height) {
+        editor.ensureVisible(from, height);
+    }
+
     void loadDocument(Series series) {
         this.series = series;
 

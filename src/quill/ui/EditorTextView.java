@@ -655,6 +655,8 @@ abstract class EditorTextView extends TextView
             public void onNotifyCursorPosition(TextBuffer source) {
                 final TextIter pointer;
                 int offset;
+                final Rectangle rect;
+                final Allocation alloc;
 
                 pointer = buffer.getIter(insertBound);
                 offset = pointer.getOffset();
@@ -663,17 +665,10 @@ abstract class EditorTextView extends TextView
 
                 insertMarkup = stack.getMarkupAt(offset);
 
-                // DEBUG
-
-                Rectangle rect;
-                Allocation alloc;
-
                 rect = view.getLocation(pointer);
                 alloc = view.getAllocation();
 
-                System.out.format("\t%4d + %4d = %4d\n", alloc.getY(), rect.getY(), alloc.getY()
-                        + rect.getY());
-                System.out.println();
+                ui.primary.scrollEditorToShow(alloc.getY() + rect.getY(), rect.getHeight() + 5);
             }
         });
     }
