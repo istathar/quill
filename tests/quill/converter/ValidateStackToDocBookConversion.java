@@ -11,43 +11,39 @@
 package quill.converter;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-
-import quill.converter.DocBookConverter;
-import quill.converter.DocBookLoader;
-import quill.docbook.Document;
-import quill.textbase.Change;
-import quill.textbase.CharacterSpan;
-import quill.textbase.Common;
-import quill.textbase.InsertChange;
-import quill.textbase.ParagraphSegment;
-import quill.textbase.Segment;
-import quill.textbase.Span;
-import quill.textbase.StringSpan;
-import quill.textbase.TextStack;
 
 import junit.framework.TestCase;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import quill.docbook.Document;
+import quill.textbase.Change;
+import quill.textbase.CharacterSpan;
+import quill.textbase.Common;
+import quill.textbase.DataLayer;
+import quill.textbase.HeadingSegment;
+import quill.textbase.InsertChange;
+import quill.textbase.ParagraphSegment;
+import quill.textbase.Segment;
+import quill.textbase.Series;
+import quill.textbase.Span;
+import quill.textbase.StringSpan;
+import quill.textbase.TextStack;
 
 public class ValidateStackToDocBookConversion extends TestCase
 {
     public final void testLoadDocbook() throws IOException, ValidityException, ParsingException {
-        final File source;
-        final DocBookLoader loader;
-        final Segment[] segments;
+        final DataLayer data;
+        final Series series;
         final TextStack text;
 
-        source = new File("tests/markerpen/converter/HelloWorld.xml");
-        assertTrue(source.exists());
+        data = new DataLayer();
+        data.loadDocument("tests/quill/converter/HelloWorld.xml");
 
-        loader = new DocBookLoader(source);
-        segments = loader.parseTree();
+        series = data.getActiveDocument().get(0);
+        assertEquals(3, series.size());
 
-        assertEquals(1, segments.length);
-
-        text = segments[0].getText();
+        text = series.get(2).getText();
         assertNotNull(text);
         assertEquals("Hello world", text.toString());
     }
@@ -91,14 +87,12 @@ public class ValidateStackToDocBookConversion extends TestCase
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
                 "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
                 "<chapter>",
-                "<section>",
                 "<para>",
                 "Hello",
                 "</para>",
                 "<para>",
                 "World",
                 "</para>",
-                "</section>",
                 "</chapter>",
                 "</book>"
         });
@@ -123,7 +117,7 @@ public class ValidateStackToDocBookConversion extends TestCase
         final Span[] spans;
         int offset;
         Change change;
-        final Segment segment;
+        Segment segment;
         final DocBookConverter converter;
         final Document book;
         final ByteArrayOutputStream out;
@@ -166,10 +160,13 @@ public class ValidateStackToDocBookConversion extends TestCase
         /*
          * Now run conversion process.
          */
+        converter = new DocBookConverter();
+
+        segment = new HeadingSegment();
+        converter.append(segment);
 
         segment = new ParagraphSegment();
         segment.setText(stack);
-        converter = new DocBookConverter();
         converter.append(segment);
         book = converter.result();
 
@@ -203,19 +200,17 @@ public class ValidateStackToDocBookConversion extends TestCase
     }
 
     public final void testLoadComplexDocument() throws IOException, ValidityException, ParsingException {
-        final File source;
-        final DocBookLoader loader;
-        final Segment[] segments;
+        final DataLayer data;
+        final Series series;
         final TextStack text;
 
-        source = new File("tests/markerpen/converter/TemporaryFiles.xml");
-        assertTrue(source.exists());
+        data = new DataLayer();
+        data.loadDocument("tests/quill/converter/TemporaryFiles.xml");
 
-        loader = new DocBookLoader(source);
-        segments = loader.parseTree();
-        assertEquals(1, segments.length);
+        series = data.getActiveDocument().get(0);
+        assertEquals(3, series.size());
 
-        text = segments[0].getText();
+        text = series.get(2).getText();
 
         assertNotNull(text);
         assertEquals("Accessing the /tmp directory directly is fine, "
