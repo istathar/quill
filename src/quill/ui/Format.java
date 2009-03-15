@@ -10,7 +10,6 @@
  */
 package quill.ui;
 
-
 import org.gnome.gtk.TextTag;
 import org.gnome.pango.Style;
 import org.gnome.pango.Weight;
@@ -39,9 +38,11 @@ class Format
 
     static final TextTag function;
 
+    static final TextTag application;
+
     static final TextTag hidden;
 
-    static final TextTag preformat;
+    static final TextTag userinput;
 
     static {
         filename = new TextTag();
@@ -56,6 +57,11 @@ class Format
         function = new TextTag();
         function.setFamily("DejaVu Sans Mono");
 
+        application = new TextTag();
+        application.setFamily("DejaVu Sans Mono");
+        application.setWeight(Weight.BOLD);
+        application.setForeground("#444444");
+
         italics = new TextTag();
         italics.setStyle(Style.ITALIC);
 
@@ -65,8 +71,8 @@ class Format
         hidden = new TextTag();
         hidden.setInvisible(true);
 
-        preformat = new TextTag();
-        preformat.setFamily("DejaVu Sans Mono");
+        userinput = new TextTag();
+        userinput.setWeight(Weight.BOLD);
     }
 
     /**
@@ -106,10 +112,12 @@ class Format
                 return classname;
             } else if (m == Common.FUNCTION) {
                 return function;
+            } else if (m == Common.APPLICATION) {
+                return application;
             }
         } else if (m instanceof Preformat) {
-            if (m == Preformat.NORMAL) {
-                return preformat;
+            if (m == Preformat.USERINPUT) {
+                return userinput;
             }
         }
         // else TODO

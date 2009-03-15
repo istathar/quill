@@ -218,6 +218,10 @@ public class EfficientNoNodeFactory extends NodeFactory
             markup = Common.FILENAME;
         } else if (name.equals("type")) {
             markup = Common.TYPE;
+        } else if (name.equals("userinput")) {
+            markup = Preformat.USERINPUT;
+        } else if (name.equals("application")) {
+            markup = Common.APPLICATION;
         } else if (name.equals("emphasis")) {
             markup = Common.ITALICS;
             // TODO what about bold?
