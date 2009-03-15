@@ -23,15 +23,46 @@ import org.gnome.pango.FontDescription;
 import org.gnome.pango.Layout;
 import org.gnome.pango.LayoutLine;
 
+import quill.textbase.ComponentSegment;
+import quill.textbase.HeadingSegment;
+import quill.textbase.ParagraphSegment;
+import quill.textbase.PreformatSegment;
+import quill.textbase.Segment;
 import quill.textbase.Series;
+import quill.textbase.Text;
 
 import static org.freedesktop.cairo.HintMetrics.OFF;
+import static quill.client.Quill.data;
 
+/**
+ * Display a preview of what the final output document is going to be. This
+ * shows the "current" page. Figuring out what the current page is requires a
+ * fair bit of work; we start at the previous known hard page break (which is
+ * likely a Chapter boundary or the start of the Article) and then render
+ * forward from there until we reach the point we've been told to render to.
+ * 
+ * @author Andrew Cowie
+ */
 /*
- * Work in "points", which makes sense since the target back end is PDF.
+ * TODO This is mostly a demonstrator at this point; we have yet to implement
+ * the mechanism for communicating where the current editor point is. We also
+ * have to define what the tracking behaviour is. Follow the cursor? Only when
+ * F2 is pressed? PgUp/PgDown with PreviewWidget focused?
+ * 
+ * FUTURE Also, one really nifty idea is that we could use the PreviewWidget
+ * for navigation, ie, click on the area of a Segment as rendered and be taken
+ * to the editor for that Segment! That will imply maintaining a table of
+ * associations from rendered block to origin Segment, which will be a lot of
+ * work especially in the face of a changing textbase. Nevertheless, since
+ * this rerenders after a change, it should be mostly up to date, and we can
+ * always force an invalidation on Segment creation/deletion.
  */
 class PreviewWidget extends DrawingArea
 {
+    /*
+     * Work in "points", which makes sense since the target back end is PDF.
+     */
+
     private int pixelWidth;
 
     private int pixelHeight;
@@ -124,15 +155,37 @@ class PreviewWidget extends DrawingArea
     }
 
     public void processText(Context cr) {
+        final Series series;
+        int i;
+        Segment segment;
+        Text text;
+        String str;
+
         cursor = topMargin;
 
-        drawHeading(cr, "Chapter 1", 32.0);
-        drawHeading(cr, "In the beginning", 16.0);
-        drawBlockText(cr, textview.LoremIpsum.text);
-        drawBlockProgram(cr, "public class Hello {\n" + "    public static void main(String[] args) {\n"
-                + "        Gtk.init(args);\n" + "        Gtk.main();\n" + "    }\n" + "}");
-        drawBlockText(cr, textview.LoremIpsum.text);
+        series = data.getActiveDocument().get(0);
 
+        for (i = 0; i < series.size(); i++) {
+            segment = series.get(i);
+            text = segment.getText();
+
+            /*
+             * This is still mockup; the real implementation will work across
+             * the Spans to aggregate consecutively formatted runs of text and
+             * then apply Pango Attributes accordingly.
+             */
+            str = text.toString();
+
+            if (segment instanceof ComponentSegment) {
+                drawHeading(cr, str, 32.0);
+            } else if (segment instanceof HeadingSegment) {
+                drawHeading(cr, str, 16.0);
+            } else if (segment instanceof PreformatSegment) {
+                drawBlockProgram(cr, str);
+            } else if (segment instanceof ParagraphSegment) {
+                drawBlockText(cr, str);
+            }
+        }
     }
 
     public void drawHeading(Context cr, String title, double size) {
@@ -317,6 +370,6 @@ class PreviewWidget extends DrawingArea
      * and start dealing with multiple pages.
      */
     void renderSeries(Series series) {
-    // TODO
+
     }
 }
