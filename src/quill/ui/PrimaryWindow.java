@@ -11,6 +11,7 @@
 package quill.ui;
 
 import org.gnome.gdk.Event;
+import org.gnome.gdk.EventFocus;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
@@ -113,6 +114,16 @@ class PrimaryWindow extends Window
     private void hookupWindowManagement() {
         window.connect(new Window.DeleteEvent() {
             public boolean onDeleteEvent(Widget source, Event event) {
+                ui.shutdown();
+                return false;
+            }
+        });
+
+        /*
+         * REMOVE! This is just here to make development easier.
+         */
+        window.connect(new FocusOutEvent() {
+            public boolean onFocusOutEvent(Widget source, EventFocus event) {
                 ui.shutdown();
                 return false;
             }
