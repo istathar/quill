@@ -20,7 +20,7 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.docbook.Document;
 import quill.textbase.EfficientNoNodeFactory;
-import quill.textbase.Segment;
+import quill.textbase.Series;
 
 /**
  * <p>
@@ -35,7 +35,8 @@ public class ExampleThereAndBackAgain
         final File source, target;
         final Builder parser;
         final EfficientNoNodeFactory factory;
-        final Segment[] segments;
+        final Series series;
+        int i;
         final Document doc;
         final DocBookConverter converter;
         final OutputStream out;
@@ -48,7 +49,7 @@ public class ExampleThereAndBackAgain
         parser = new Builder(factory);
         parser.build(source);
 
-        segments = factory.createSeries();
+        series = factory.createSeries();
 
         converter = new DocBookConverter();
 
@@ -56,17 +57,17 @@ public class ExampleThereAndBackAgain
          * This logic is going to need to go somewhere else!
          */
 
-        for (Segment segment : segments) {
-            converter.append(segment);
+        for (i = 0; i < series.size(); i++) {
+            converter.append(series.get(i));
         }
 
         doc = converter.result();
         if (true) {
-            for (int i = 1; i <= 70; i++) {
+            for (i = 1; i <= 70; i++) {
                 System.err.print(i / 10);
             }
             System.err.println();
-            for (int i = 1; i <= 70; i++) {
+            for (i = 1; i <= 70; i++) {
                 System.err.print(i % 10);
             }
             System.err.println("\n");
