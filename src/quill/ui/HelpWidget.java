@@ -58,6 +58,12 @@ class HelpWidget extends VBox
                         "",
                         "Outline",
                         "An outline of the documents chapters and section headings allowing you to navigate."
+                },
+                new String[] {
+                        "F11",
+                        "",
+                        "Fullscreen",
+                        "Work in fullscreen mode, giving you an even better view of your document."
                 }
         };
 
