@@ -10,8 +10,6 @@
  */
 package quill.ui;
 
-import java.io.IOException;
-
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
@@ -25,8 +23,6 @@ import org.gnome.gtk.TextView;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.WrapMode;
 
-import quill.converter.DocBookConverter;
-import quill.docbook.Document;
 import quill.textbase.Change;
 import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
@@ -35,7 +31,6 @@ import quill.textbase.Extract;
 import quill.textbase.FormatChange;
 import quill.textbase.InsertChange;
 import quill.textbase.Markup;
-import quill.textbase.ParagraphSegment;
 import quill.textbase.Span;
 import quill.textbase.TextStack;
 import quill.textbase.TextualChange;
@@ -215,9 +210,6 @@ abstract class EditorTextView extends TextView
                     } else if (key == Keyval.i) {
                         toggleMarkup(Common.ITALICS);
                         return true;
-                    } else if (key == Keyval.s) {
-                        exportContents();
-                        return true;
                     } else if (key == Keyval.v) {
                         pasteText();
                         return true;
@@ -232,9 +224,10 @@ abstract class EditorTextView extends TextView
                         return true;
                     } else {
                         /*
-                         * No keybinding
+                         * No keybinding in the editor, let PrimaryWindow
+                         * handle it.
                          */
-                        return true;
+                        return false;
                     }
                 } else if (mod.contains(ModifierType.CONTROL_MASK)
                         && mod.contains(ModifierType.SHIFT_MASK)) {
@@ -622,26 +615,6 @@ abstract class EditorTextView extends TextView
             return -width;
         } else {
             return width;
-        }
-    }
-
-    /*
-     * This is temporary as saving will move to an application level Action.
-     */
-    private void exportContents() {
-        final DocBookConverter converter;
-        final ParagraphSegment segment;
-        final Document book;
-
-        segment = new ParagraphSegment();
-        segment.setText(stack);
-        converter = new DocBookConverter();
-        converter.append(segment);
-        book = converter.result();
-        try {
-            book.toXML(System.out);
-        } catch (IOException ioe) {
-            throw new Error(ioe);
         }
     }
 

@@ -12,11 +12,15 @@ package quill.textbase;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import nu.xom.Builder;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import quill.converter.DocBookConverter;
+import quill.docbook.Document;
 
 /**
  * Mechanism for loading documents and getting at them in memory.
@@ -72,5 +76,40 @@ public class DataLayer
 
     public Folio getActiveDocument() {
         return current;
+    }
+
+    public void saveDocument(String filename) throws IOException {
+        final Series series;
+        final DocBookConverter converter;
+        final OutputStream out;
+        int i;
+        final Document doc;
+
+        /*
+         * On the temporary assumption that there's only one chapter being
+         * edited
+         */
+
+        series = current.get(0);
+
+        /*
+         * Create an output converter and run the segments through it to turn
+         * them into DocBook elements.
+         */
+
+        converter = new DocBookConverter();
+
+        for (i = 0; i < series.size(); i++) {
+            converter.append(series.get(i));
+        }
+
+        /*
+         * Get the resultant top level Document and serialize it.
+         */
+
+        out = new FileOutputStream(filename);
+
+        doc = converter.result();
+        doc.toXML(out);
     }
 }

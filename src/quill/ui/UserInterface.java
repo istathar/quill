@@ -13,10 +13,13 @@
 package quill.ui;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import org.gnome.gdk.EventOwnerChange;
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.Clipboard;
+import org.gnome.gtk.Dialog;
+import org.gnome.gtk.ErrorMessageDialog;
 import org.gnome.gtk.Gtk;
 import org.gnome.pango.FontDescription;
 
@@ -25,6 +28,7 @@ import quill.textbase.Folio;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
 
+import static quill.client.Quill.data;
 import static quill.textbase.Text.extractFor;
 
 public class UserInterface
@@ -154,7 +158,15 @@ public class UserInterface
     }
 
     public void saveDocument() {
-
+        final Dialog dialog;
+        try {
+            data.saveDocument("HARDCODE.xml");
+        } catch (IOException ioe) {
+            dialog = new ErrorMessageDialog(primary, "Save failed", "There's some kind of I/O problem: "
+                    + ioe.getMessage());
+            dialog.run();
+            dialog.hide();
+        }
     }
 }
 

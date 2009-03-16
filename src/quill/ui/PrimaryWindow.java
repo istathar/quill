@@ -126,23 +126,31 @@ class PrimaryWindow extends Window
                 final ModifierType mod;
 
                 key = event.getKeyval();
+                mod = event.getState();
 
                 /*
                  * Let default keybindings handle cursor movement keys and for
                  * a few other special keys we don't need to handle.
                  */
 
-                if (key == Keyval.F1) {
-                    switchToHelp();
-                    return true;
-                } else if (key == Keyval.F2) {
-                    switchToPreview();
-                    return true;
-                }
-                // ...
-                else if (key == Keyval.F11) {
-                    toggleFullscreen();
-                    return true;
+                if (mod == ModifierType.NONE) {
+                    if (key == Keyval.F1) {
+                        switchToHelp();
+                        return true;
+                    } else if (key == Keyval.F2) {
+                        switchToPreview();
+                        return true;
+                    }
+                    // ...
+                    else if (key == Keyval.F11) {
+                        toggleFullscreen();
+                        return true;
+                    }
+                } else if (mod == ModifierType.CONTROL_MASK) {
+                    if (key == Keyval.s) {
+                        ui.saveDocument();
+                        return true;
+                    }
                 }
 
                 return false;
