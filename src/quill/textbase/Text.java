@@ -683,7 +683,7 @@ public class Text
         Extract[] result;
         Piece p, alpha, omega;
         Span s;
-        int num, i, start, width;
+        int num, i;
 
         if (first == null) {
             return new Extract[] {};
@@ -711,31 +711,48 @@ public class Text
         result = new Extract[num];
 
         /*
-         * Now gather the Spans together that comprise each line.
+         * Now gather the Spans together that comprise each paragraph. This
+         * relies rather heavily on the assumption that there is not a newline
+         * character at the end of the Text.
          */
 
         i = 0;
         p = first;
+        s = null;
         start = 0;
         width = 0;
 
         alpha = p;
+        omega = p;
 
         while (p != null) {
             s = p.span;
 
             if (s.getChar() == '\n') {
-                result[i] = extractRange(start, width);
-                start += width + 1;
-                width = 0;
+                if (alpha == p) {
+                    /*
+                     * blank paragraph
+                     */
+                    result[i] = new Extract();
+                } else {
+                    /*
+                     * normal paragraph
+                     */
+                    result[i] = new Extract(formArray(alpha, omega));
+                }
                 i++;
+                alpha = p.next;
             } else {
-                width += s.getWidth();
+                omega = p;
             }
 
             p = p.next;
         }
-        result[i] = extractRange(start, width);
+        if (s.getChar() == '\n') {
+            result[i] = new Extract();
+        } else {
+            result[i] = new Extract(formArray(alpha, omega));
+        }
 
         return result;
     }

@@ -89,4 +89,83 @@ public class ValidateExtracts extends TestCase
         span = extract.get(0);
         assertEquals("Goodbye Eternity", span.getText());
     }
+
+    /*
+     * Corner case: only a single span
+     */
+    public final void testExtractLinesSingle() {
+        final Text text;
+        Extract[] lines;
+        Extract extract;
+        Span span;
+
+        text = new Text();
+        text.append(new StringSpan("Hello World", null));
+
+        lines = text.extractLines();
+        assertEquals(1, lines.length);
+
+        extract = lines[0];
+        assertNotNull(extract);
+        assertEquals(1, extract.size());
+        span = extract.get(0);
+        assertEquals("Hello World", span.getText());
+    }
+
+    /*
+     * Corner case: no content
+     */
+    public final void testExtractLinesNone() {
+        final Text text;
+        Extract[] lines;
+
+        text = new Text();
+
+        lines = text.extractLines();
+        assertEquals(0, lines.length);
+    }
+
+    /*
+     * Corner case: only a single CharacterSpan
+     */
+    public final void testExtractLinesChar() {
+        final Text text;
+        Extract[] lines;
+        Extract extract;
+        Span span;
+
+        text = new Text();
+        text.append(new CharacterSpan('H', null));
+
+        lines = text.extractLines();
+        assertEquals(1, lines.length);
+
+        extract = lines[0];
+        assertNotNull(extract);
+        assertEquals(1, extract.size());
+        span = extract.get(0);
+        assertEquals("H", span.getText());
+    }
+
+    /*
+     * Corner case: only a single span
+     */
+    public final void testExtractLinesTwoEmpty() {
+        final Text text;
+        Extract[] lines;
+        Extract extract;
+
+        text = new Text();
+        text.append(new CharacterSpan('\n', null));
+
+        lines = text.extractLines();
+        assertEquals(2, lines.length);
+
+        extract = lines[0];
+        assertNotNull(extract);
+        assertEquals(0, extract.size());
+        extract = lines[1];
+        assertNotNull(extract);
+        assertEquals(0, extract.size());
+    }
 }
