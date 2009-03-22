@@ -636,7 +636,7 @@ public class Text
     /**
      * Gets the array of Spans that represent the characters and formatting
      * width wide from start. The result is returned wrapped in a read-only
-     * Range object.
+     * Extract object.
      * 
      * <p>
      * If width is negative, start will be decremented by that amount and the
@@ -674,5 +674,69 @@ public class Text
      */
     public static Extract extractFor(Span span) {
         return new Extract(span);
+    }
+
+    /**
+     * Generate an array of Extracts, one for each \n separated paragraph.
+     */
+    public Extract[] extractLines() {
+        Extract[] result;
+        Piece p, alpha, omega;
+        Span s;
+        int num, i, start, width;
+
+        if (first == null) {
+            return new Extract[] {};
+        }
+
+        /*
+         * First work out how many lines are in this Text as it stands right
+         * now. Assumes that we don't have any StringSpans containing
+         * newlines.
+         */
+
+        num = 1;
+        p = first;
+
+        while (p != null) {
+            s = p.span;
+
+            if (s.getChar() == '\n') {
+                num++;
+            }
+
+            p = p.next;
+        }
+
+        result = new Extract[num];
+
+        /*
+         * Now gather the Spans together that comprise each line.
+         */
+
+        i = 0;
+        p = first;
+        start = 0;
+        width = 0;
+
+        alpha = p;
+
+        while (p != null) {
+            s = p.span;
+
+            if (s.getChar() == '\n') {
+                result[i] = extractRange(start, width);
+                start += width + 1;
+                width = 0;
+                i++;
+            } else {
+                width += s.getWidth();
+            }
+
+            p = p.next;
+        }
+        result[i] = extractRange(start, width);
+
+        return result;
     }
 }

@@ -11,9 +11,6 @@
 
 package quill.textbase;
 
-import quill.textbase.Extract;
-import quill.textbase.StringSpan;
-import quill.textbase.Text;
 import junit.framework.TestCase;
 
 /**
@@ -63,5 +60,33 @@ public class ValidateExtracts extends TestCase
         } catch (IllegalArgumentException iae) {
             // good
         }
+    }
+
+    public final void testExtractLines() {
+        final Text text;
+        Extract[] lines;
+        Extract extract;
+        Span span;
+
+        text = new Text();
+        text.append(new StringSpan("Hello World", null));
+        text.append(new CharacterSpan('\n', null));
+        text.append(new StringSpan("Goodbye Eternity", null));
+        assertEquals("Hello World\nGoodbye Eternity", text.toString());
+
+        lines = text.extractLines();
+        assertEquals(2, lines.length);
+
+        extract = lines[0];
+        assertNotNull(extract);
+        assertEquals(1, extract.size());
+        span = extract.get(0);
+        assertEquals("Hello World", span.getText());
+
+        extract = lines[1];
+        assertNotNull(extract);
+        assertEquals(1, extract.size());
+        span = extract.get(0);
+        assertEquals("Goodbye Eternity", span.getText());
     }
 }
