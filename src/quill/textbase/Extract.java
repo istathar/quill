@@ -46,6 +46,11 @@ public class Extract
         };
     }
 
+    Extract() {
+        this.width = 0;
+        this.range = new Span[] {};
+    }
+
     /**
      * Get the number of Spans in this Range.
      */

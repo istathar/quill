@@ -168,4 +168,30 @@ public class ValidateExtracts extends TestCase
         assertNotNull(extract);
         assertEquals(0, extract.size());
     }
+
+    public final void testExtractLinesEmbeddedNewline() {
+        final Text text;
+        Extract[] lines;
+        Extract extract;
+        Span span;
+
+        text = new Text();
+        text.append(new StringSpan("Hello World\nGoodbye Eternity", null));
+        assertEquals("Hello World\nGoodbye Eternity", text.toString());
+
+        lines = text.extractLines();
+        assertEquals(2, lines.length);
+
+        extract = lines[0];
+        assertNotNull(extract);
+        assertEquals(1, extract.size());
+        span = extract.get(0);
+        assertEquals("Hello World", span.getText());
+
+        extract = lines[1];
+        assertNotNull(extract);
+        assertEquals(1, extract.size());
+        span = extract.get(0);
+        assertEquals("Goodbye Eternity", span.getText());
+    }
 }

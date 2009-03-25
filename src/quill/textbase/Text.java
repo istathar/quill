@@ -683,7 +683,7 @@ public class Text
         Extract[] result;
         Piece p, alpha, omega;
         Span s;
-        int num, i;
+        int num, i, delta;
 
         if (first == null) {
             return new Extract[] {};
@@ -691,8 +691,8 @@ public class Text
 
         /*
          * First work out how many lines are in this Text as it stands right
-         * now. Assumes that we don't have any StringSpans containing
-         * newlines.
+         * now. And, since we need paragraph breaks to be isolated into
+         * individual CharacterSpans, we also do that here.
          */
 
         num = 1;
@@ -701,8 +701,21 @@ public class Text
         while (p != null) {
             s = p.span;
 
-            if (s.getChar() == '\n') {
-                num++;
+            if (s instanceof CharacterSpan) {
+                if (s.getChar() == '\n') {
+                    num++;
+                }
+            } else if (s instanceof StringSpan) {
+                delta = s.getText().indexOf('\n');
+                if (delta > -1) {
+                    p = splitAt(p, delta);
+
+                    p = p.next;
+                    p = splitAt(p, 1);
+                    p.span = new CharacterSpan('\n', p.span.getMarkup());
+
+                    num++;
+                }
             }
 
             p = p.next;
@@ -711,17 +724,13 @@ public class Text
         result = new Extract[num];
 
         /*
-         * Now gather the Spans together that comprise each paragraph. This
-         * relies rather heavily on the assumption that there is not a newline
-         * character at the end of the Text.
+         * This relies rather heavily on the assumption that there is not a
+         * newline character at the end of the Text.
          */
 
         i = 0;
         p = first;
         s = null;
-        start = 0;
-        width = 0;
-
         alpha = p;
         omega = p;
 
