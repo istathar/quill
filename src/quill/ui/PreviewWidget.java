@@ -19,16 +19,30 @@ import org.gnome.gtk.DrawingArea;
 import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.Unit;
 import org.gnome.gtk.Widget;
+import org.gnome.pango.Attribute;
+import org.gnome.pango.AttributeList;
 import org.gnome.pango.FontDescription;
+import org.gnome.pango.FontDescriptionAttribute;
 import org.gnome.pango.Layout;
 import org.gnome.pango.LayoutLine;
+import org.gnome.pango.Style;
+import org.gnome.pango.StyleAttribute;
+import org.gnome.pango.Weight;
+import org.gnome.pango.WeightAttribute;
 
+import quill.textbase.CharacterSpan;
+import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
+import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
+import quill.textbase.Markup;
 import quill.textbase.ParagraphSegment;
+import quill.textbase.Preformat;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
+import quill.textbase.Span;
+import quill.textbase.StringSpan;
 import quill.textbase.Text;
 
 import static org.freedesktop.cairo.HintMetrics.OFF;
@@ -160,6 +174,7 @@ class PreviewWidget extends DrawingArea
         Segment segment;
         Text text;
         String str;
+        Extract[] paras;
 
         cursor = topMargin;
 
@@ -183,7 +198,10 @@ class PreviewWidget extends DrawingArea
             } else if (segment instanceof PreformatSegment) {
                 drawBlockProgram(cr, str);
             } else if (segment instanceof ParagraphSegment) {
-                drawBlockText(cr, str);
+                paras = text.extractLines();
+                for (Extract extract : paras) {
+                    drawBlockText(cr, extract);
+                }
             }
         }
     }
@@ -222,13 +240,18 @@ class PreviewWidget extends DrawingArea
         cursor += v;
     }
 
-    public void drawBlockText(Context cr, String text) {
+    public void drawBlockText(Context cr, Extract extract) {
         final Layout layout;
         final FontDescription desc;
         final FontOptions options;
-        final String[] paras;
+        final StringBuilder buf;
         double y, b, v = 0;
         boolean second;
+        AttributeList list;
+        Attribute attr;
+        int i, j, len, offset, width;
+        Span span;
+        String str;
 
         layout = new Layout(cr);
 
@@ -240,12 +263,6 @@ class PreviewWidget extends DrawingArea
         desc.setSize(8.0);
         layout.setFontDescription(desc);
 
-        /*
-         * This is fake. TODO pass in our TextStack object (which already
-         * knows what the paragraphs are) and process from that.
-         */
-        paras = text.split("\n");
-
         layout.setWidth(pageWidth - (leftMargin + rightMargin));
         layout.setText("Workaround");
 
@@ -255,30 +272,112 @@ class PreviewWidget extends DrawingArea
         y = cursor + b;
         second = false;
 
-        for (String para : paras) {
+        buf = new StringBuilder();
 
-            layout.setText(para);
+        for (i = 0; i < extract.size(); i++) {
+            span = extract.get(i);
 
-            if (second) {
-                y += v; // blank line between paras
-            }
-
-            for (LayoutLine line : layout.getLinesReadonly()) {
-                v = line.getExtentsLogical().getHeight();
-
-                if (y > (pageHeight - bottomMargin)) {
-                    return;
+            if (span instanceof CharacterSpan) {
+                buf.append(span.getChar());
+            } else if (span instanceof StringSpan) {
+                str = span.getText();
+                len = str.length();
+                for (j = 0; j < len; j++) {
+                    buf.append(str.charAt(j));
                 }
-                cr.moveTo(leftMargin, y);
-                cr.showLayout(line);
-
-                y += v;
             }
-
-            second = true;
         }
 
+        str = buf.toString();
+        layout.setText(str);
+
+        /*
+         * Now iterate over the Spans, and create Attributes for each
+         * contiguous run.
+         */
+
+        list = new AttributeList();
+        offset = 0;
+
+        for (i = 0; i < extract.size(); i++) {
+            span = extract.get(i);
+            width = span.getWidth();
+
+            if (span instanceof CharacterSpan) {
+                attr = attributesForMarkup(span.getMarkup());
+                if (attr != null) {
+                    attr.setIndices(layout, offset, width);
+                    list.insert(attr);
+                }
+
+            } else if (span instanceof StringSpan) {
+                attr = attributesForMarkup(span.getMarkup());
+                if (attr != null) {
+                    attr.setIndices(layout, offset, width);
+                    list.insert(attr);
+                }
+            }
+
+            offset += width;
+        }
+
+        layout.setAttributes(list);
+
+        // if (second) {
+        // y += v; // blank line between paras
+        // }
+
+        /*
+         * Finally, we can render the individual lines of the paragraph.
+         */
+
+        for (LayoutLine line : layout.getLinesReadonly()) {
+            v = line.getExtentsLogical().getHeight();
+
+            if (y > (pageHeight - bottomMargin)) {
+                return;
+            }
+            cr.moveTo(leftMargin, y);
+            cr.showLayout(line);
+
+            y += v;
+        }
+
+        // second = true;
+
         cursor = y;
+    }
+
+    /*
+     * This is just a placeholder... move to rendering engine once we have
+     * such things
+     */
+    private static Attribute attributesForMarkup(Markup m) {
+        if (m == null) {
+            return null;
+        }
+        if (m instanceof Common) {
+            if (m == Common.ITALICS) {
+                return new StyleAttribute(Style.ITALIC);
+            } else if (m == Common.BOLD) {
+                return new WeightAttribute(Weight.BOLD);
+            } else if (m == Common.FILENAME) {
+                return new FontDescriptionAttribute(new FontDescription("Liberation Serif, Italic 8"));
+            } else if (m == Common.TYPE) {
+                return new FontDescriptionAttribute(new FontDescription("Liberation Sans, 8"));
+            } else if (m == Common.FUNCTION) {
+                return new FontDescriptionAttribute(new FontDescription("Liberation Mono, 8"));
+            } else if (m == Common.APPLICATION) {
+                return new WeightAttribute(Weight.BOLD);
+            }
+        } else if (m instanceof Preformat) {
+            if (m == Preformat.USERINPUT) {
+                return null;
+            }
+        }
+        // else TODO
+
+        throw new IllegalArgumentException("\n" + "Translation of " + m + " not yet implemented");
     }
 
     public void drawBlockProgram(Context cr, String prog) {
