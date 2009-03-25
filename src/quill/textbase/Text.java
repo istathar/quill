@@ -189,13 +189,27 @@ public class Text
             return from;
         }
 
+        if (point == 0) {
+            return from;
+        }
+
         /*
-         * Otherwise, split the StringSpan into two StringSpans. FIXME or
-         * CharacterSpans?
+         * Otherwise, split the StringSpan into two Spans - StringSpans
+         * ordinarily, but CharacterSpans if the widths are down to 1. When
+         * called on two succeeding offsets that happen to enclose a newline,
+         * this gives us newlines isolated in their own CharacterSpans.
          */
 
-        before = new StringSpan(from.span, 0, point);
-        after = new StringSpan(from.span, point);
+        if (point == 1) {
+            before = new CharacterSpan(from.span.getText().charAt(0), from.span.getMarkup());
+        } else {
+            before = new StringSpan(from.span, 0, point);
+        }
+        if (from.span.getWidth() - point == 1) {
+            after = new CharacterSpan(from.span.getText().charAt(point), from.span.getMarkup());
+        } else {
+            after = new StringSpan(from.span, point);
+        }
 
         /*
          * and wrap Pieces around them.
@@ -692,7 +706,8 @@ public class Text
         /*
          * First work out how many lines are in this Text as it stands right
          * now. And, since we need paragraph breaks to be isolated into
-         * individual CharacterSpans, we also do that here.
+         * individual CharacterSpans, which we achieve between logic here and
+         * splitAt() making width one spans CharacterSpans.
          */
 
         num = 1;
@@ -707,13 +722,13 @@ public class Text
                 }
             } else if (s instanceof StringSpan) {
                 delta = s.getText().indexOf('\n');
-                if (delta > -1) {
+                if (delta == 0) {
+                    p = splitAt(p, 1);
+                    num++;
+                } else if (delta > 0) {
                     p = splitAt(p, delta);
-
                     p = p.next;
                     p = splitAt(p, 1);
-                    p.span = new CharacterSpan('\n', p.span.getMarkup());
-
                     num++;
                 }
             }

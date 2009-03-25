@@ -194,4 +194,67 @@ public class ValidateExtracts extends TestCase
         span = extract.get(0);
         assertEquals("Goodbye Eternity", span.getText());
     }
+
+    /*
+     * Same test again, but with leading and trailing newlines.
+     */
+    public final void testExtractLinesBoundaryConditions() {
+        Text text;
+        Extract[] lines;
+        Extract extract;
+        Span span;
+
+        text = new Text();
+        text.append(new StringSpan("H\nello World", null));
+        assertEquals("H\nello World", text.toString());
+
+        lines = text.extractLines();
+        assertEquals(2, lines.length);
+
+        extract = lines[0];
+        assertNotNull(extract);
+        assertEquals(1, extract.size());
+        span = extract.get(0);
+        assertEquals("H", span.getText());
+
+        extract = lines[1];
+        assertNotNull(extract);
+        assertEquals(1, extract.size());
+        span = extract.get(0);
+        assertEquals("ello World", span.getText());
+
+        text = new Text();
+        text.append(new StringSpan("\nHello World", null));
+        assertEquals("\nHello World", text.toString());
+
+        lines = text.extractLines();
+        assertEquals(2, lines.length);
+
+        extract = lines[0];
+        assertNotNull(extract);
+        assertEquals(0, extract.size());
+
+        extract = lines[1];
+        assertNotNull(extract);
+        assertEquals(1, extract.size());
+        span = extract.get(0);
+        assertEquals("Hello World", span.getText());
+
+        text = new Text();
+        text.append(new StringSpan("Hello World\n", null));
+        assertEquals("Hello World\n", text.toString());
+
+        lines = text.extractLines();
+        assertEquals(2, lines.length);
+
+        extract = lines[0];
+        assertNotNull(extract);
+        assertEquals(1, extract.size());
+        span = extract.get(0);
+        assertEquals("Hello World", span.getText());
+
+        extract = lines[1];
+        assertNotNull(extract);
+        assertEquals(0, extract.size());
+    }
 }
