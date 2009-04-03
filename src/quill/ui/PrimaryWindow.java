@@ -88,13 +88,14 @@ class PrimaryWindow extends Window
         editor = new ComponentEditorWidget();
         left.insertPage(editor, null, 0);
 
-        two.add(left);
+        two.packStart(left, true, true, 0);
     }
 
     private void setupPreviewSide() {
         right = new Notebook();
         right.setShowTabs(false);
         right.setShowBorder(false);
+        // right.setSizeRequest(400, -1);
 
         preview = new PreviewWidget();
         right.add(preview);
@@ -102,7 +103,7 @@ class PrimaryWindow extends Window
         help = new HelpWidget();
         right.add(help);
 
-        two.add(right);
+        two.packStart(right, false, false, 0);
     }
 
     private void initialPresentation() {

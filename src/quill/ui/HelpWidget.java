@@ -32,16 +32,18 @@ import static org.gnome.gtk.SizeGroupMode.HORIZONTAL;
  * 
  * @author Andrew Cowie
  */
-class HelpWidget extends VBox
+class HelpWidget extends HBox
 {
-    private final VBox vbox;
+    private final HBox top;
+
+    private VBox vbox;
 
     private final SizeGroup group;
 
     HelpWidget() {
-        super(false, 0);
-        final String[][] views, actions, markup;
-        vbox = this;
+        super(true, 0);
+        final String[][] views, actions, editing, markup;
+        top = this;
 
         views = new String[][] {
                 new String[] {
@@ -66,38 +68,70 @@ class HelpWidget extends VBox
 
         actions = new String[][] {
                 new String[] {
-                        "Ctrl+S", "Save", "Save the document."
+                        "Ctrl+S", "Save", "_Save the document."
                 }, new String[] {
-                        "Ctrl+P", "Print", "Render the document to PDF so you can print it."
-                },
+                        "Ctrl+P", "Print", "Render the document to PDF so you can _print it."
+                }
+        };
+
+        editing = new String[][] {
+                new String[] {
+                        "Ctrl+C", "Copy", ""
+                }, new String[] {
+                        "Ctrl+X", "Cut", ""
+                }, new String[] {
+                        "Ctrl+V", "Paste", ""
+                }, new String[] {
+                        "Ctrl+Z", "Undo", ""
+                }, new String[] {
+                        "Ctrl+Y", "Redo", "You can undo and redo changes to editors independently."
+                }
         };
 
         markup = new String[][] {
                 new String[] {
-                        "Ctrl+Shift+Space",
+                        "Ctrl+Shift+\nSpace",
                         "Clear!",
                         "Remove any inline formatting from the currently selected range."
                 },
                 new String[] {
-                        "Ctrl+I", "Italics", "Make the text appear in italics."
+                        "Ctrl+I", "Italics", "Make the text appear in _italics."
                 },
                 new String[] {
-                        "Ctrl+B", "Bold", "Make the text appear in bold face."
+                        "Ctrl+B", "Bold", "Make the text appear in _bold face."
                 },
                 new String[] {
-                        "Ctrl+Shift+F", "File", "A path on the filesystem."
+                        "Ctrl+Shift+F", "File", "A path on the _filesystem."
                 },
                 new String[] {
                         "Ctrl+Shift+T",
                         "Class or Type",
-                        "The name of an object-oriented class or similar type."
+                        "The name of an object-oriented class or similar _type."
                 },
                 new String[] {
-                        "Ctrl+Shift+M", "Method or Function", "The name of a method or function call."
+                        "Ctrl+Shift+M", "Method or Function", "The name of a _method or function call."
                 },
+                new String[] {
+                        "Ctrl+Shift+A",
+                        "Application",
+                        "The proper name of a program, _application suite, or project."
+                },
+                new String[] {
+                        "Ctrl+Shift+O",
+                        "Command",
+                        "The name of a c_ommand or program you'd run from the command line."
+                },
+                new String[] {
+                        "Ctrl+Shift+C",
+                        "Code fragment",
+                        "An inline source _code frament or literal value."
+                },
+
         };
 
         group = new SizeGroup(HORIZONTAL);
+
+        vbox = new VBox(false, 0);
 
         addHeading("View selection");
         for (String[] line : views) {
@@ -109,10 +143,25 @@ class HelpWidget extends VBox
             addHelpLine(line[0], line[1], line[2]);
         }
 
+        addHeading("Editing");
+        for (String[] line : editing) {
+            addHelpLine(line[0], line[1], line[2]);
+        }
+
+        top.packStart(vbox, false, false, 0);
+
+        /*
+         * Start second column
+         */
+
+        vbox = new VBox(false, 0);
+
         addHeading("Markup keys");
         for (String[] line : markup) {
             addHelpLine(line[0], line[1], line[2]);
         }
+
+        top.packStart(vbox, false, false, 0);
     }
 
     private void addHeading(String title) {
@@ -136,22 +185,27 @@ class HelpWidget extends VBox
 
         label = new Label(keys);
         label.setAlignment(LEFT, TOP);
-        spread.packStart(label, false, true, 0);
+        spread.packStart(label, true, true, 3);
         group.add(label);
 
         str = new StringBuilder();
         str.append("<b>");
         str.append(title);
-        str.append("</b>\n");
-        str.append(description);
+        str.append("</b>");
+        if (description != "") {
+            str.append("\n");
+            str.append(description);
+        }
 
         label = new Label();
         label.setLabel(str.toString());
         label.setUseMarkup(true);
+        label.setUseUnderline(true);
         label.setLineWrap(true);
+        label.setWidthChars(25);
         label.setAlignment(LEFT, TOP);
-        spread.packStart(label, true, true, 6);
+        spread.packStart(label, true, true, 3);
 
-        vbox.packStart(spread, false, false, 6);
+        vbox.packStart(spread, false, false, 3);
     }
 }
