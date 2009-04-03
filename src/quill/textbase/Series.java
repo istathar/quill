@@ -11,8 +11,8 @@
 package quill.textbase;
 
 /**
- * A collection of Components, comprising a visible section of a document.
- * Like other areas in textbase, is is a wrapper around an array.
+ * A collection of Segments, comprising a visible section of a document. Like
+ * other areas in textbase, is is a wrapper around an array.
  * 
  * @author Andrew Cowie
  */

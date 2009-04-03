@@ -32,8 +32,11 @@ public class Common extends Markup
 
     public static final Common TYPE = new Common("TYPE");
 
+    public static final Common CODE = new Common("CODE");
+
     public static final Common FUNCTION = new Common("FUNCTION");
 
     public static final Common APPLICATION = new Common("APPLICATION");
 
+    public static final Common COMMAND = new Common("COMMAND");
 }

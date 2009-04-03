@@ -38,7 +38,11 @@ class Format
 
     static final TextTag function;
 
+    static final TextTag code;
+
     static final TextTag application;
+
+    static final TextTag command;
 
     static final TextTag hidden;
 
@@ -51,16 +55,25 @@ class Format
         filename.setStyle(Style.ITALIC);
 
         classname = new TextTag();
-        classname.setFamily("DejaVu Sans Mono");
+        classname.setFamily("DejaVu Sans");
         classname.setForeground("blue");
 
         function = new TextTag();
         function.setFamily("DejaVu Sans Mono");
+        function.setForeground("darkblue");
+
+        code = new TextTag();
+        code.setFamily("DejaVu Sans Mono");
 
         application = new TextTag();
-        application.setFamily("DejaVu Sans Mono");
+        application.setFamily("DejaVu Sans");
         application.setWeight(Weight.BOLD);
         application.setForeground("#444444");
+
+        command = new TextTag();
+        command.setFamily("DejaVu Sans Mono");
+        command.setWeight(Weight.BOLD);
+        command.setForeground("#444444");
 
         italics = new TextTag();
         italics.setStyle(Style.ITALIC);
@@ -114,6 +127,8 @@ class Format
                 return function;
             } else if (m == Common.APPLICATION) {
                 return application;
+            } else if (m == Common.COMMAND) {
+                return command;
             }
         } else if (m instanceof Preformat) {
             if (m == Preformat.USERINPUT) {

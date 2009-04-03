@@ -16,10 +16,13 @@ package quill.converter;
  * output formats grow up, this will be the place their converters can live.
  */
 
+import quill.docbook.Application;
 import quill.docbook.Block;
 import quill.docbook.Bold;
 import quill.docbook.BookDocument;
 import quill.docbook.Chapter;
+import quill.docbook.Code;
+import quill.docbook.Command;
 import quill.docbook.Component;
 import quill.docbook.Document;
 import quill.docbook.Filename;
@@ -201,6 +204,12 @@ public class DocBookConverter
                 inline = new Italics();
             } else if (format == Common.BOLD) {
                 inline = new Bold();
+            } else if (format == Common.CODE) {
+                inline = new Code();
+            } else if (format == Common.APPLICATION) {
+                inline = new Application();
+            } else if (format == Common.COMMAND) {
+                inline = new Command();
             } else if (format == Preformat.USERINPUT) {
                 // boom?
             } else {

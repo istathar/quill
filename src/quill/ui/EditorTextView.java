@@ -234,12 +234,21 @@ abstract class EditorTextView extends TextView
                     if (key == Keyval.Space) {
                         clearFormat();
                         return true;
+                    } else if (key == Keyval.A) {
+                        toggleMarkup(Common.APPLICATION);
+                        return true;
+                    } else if (key == Keyval.C) {
+                        toggleMarkup(Common.CODE);
+                        return true;
                     } else if (key == Keyval.F) {
                         toggleMarkup(Common.FILENAME);
                         return true;
                     } else if (key == Keyval.M) {
                         // function or _m_ethod
                         toggleMarkup(Common.FUNCTION);
+                        return true;
+                    } else if (key == Keyval.O) {
+                        toggleMarkup(Common.COMMAND);
                         return true;
                     } else if (key == Keyval.T) {
                         toggleMarkup(Common.TYPE);

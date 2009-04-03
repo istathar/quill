@@ -1,5 +1,5 @@
 /*
- * SectionHeadingBox.java
+ * Application.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,12 +8,16 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package quill.ui;
+package quill.docbook;
 
-class SectionHeadingBox extends HeadingBox
+/**
+ * A method or function name.
+ * 
+ * @author Andrew Cowie
+ */
+public class Application extends Inline
 {
-    public SectionHeadingBox() {
-        super();
-        label.setLabel("Section");
+    public Application() {
+        super("application");
     }
 }
