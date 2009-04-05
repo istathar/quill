@@ -129,6 +129,8 @@ class Format
                 return application;
             } else if (m == Common.COMMAND) {
                 return command;
+            } else if (m == Common.CODE) {
+                return code;
             }
         } else if (m instanceof Preformat) {
             if (m == Preformat.USERINPUT) {
