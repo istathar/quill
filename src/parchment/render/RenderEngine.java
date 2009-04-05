@@ -78,6 +78,8 @@ public abstract class RenderEngine
      * line spacing
      */
 
+    private double extraSpacing;
+
     private double defaultLineHeight;
 
     private double defaultLineAscent;
@@ -93,6 +95,17 @@ public abstract class RenderEngine
     }
 
     /**
+     * Specify additional spacing to be added to the default line height. If
+     * you've got a font whose extents are unreasonably spacious, then you can
+     * use a negative value to pull it back (but, beware that if you specify a
+     * negative delta that is greater than the ascent value, Bad Things will
+     * happen).
+     */
+    protected void setSpacing(double spacing) {
+        this.extraSpacing = spacing;
+    }
+
+    /**
      * Given a Context, have the rendering engine to draw to it. This assumes
      * that the target Surface either a) has the size as the PaperSize passed
      * to the constructor, or b) has been scaled to that size.
@@ -102,8 +115,12 @@ public abstract class RenderEngine
         processText(cr, series);
     }
 
+    /*
+     * This will move to the actual RenderEngine subclass, I expect.
+     */
     private void loadFonts() {
         fonts.serif = new FontDescription("Charis SIL, 8.0");
+        setSpacing(-4.5);
         fonts.mono = new FontDescription("Liberation Mono, 7.0");
         fonts.sans = new FontDescription("Liberation Sans, 7.0");
     }
@@ -131,12 +148,13 @@ public abstract class RenderEngine
 
         layout.setFontDescription(fonts.serif);
 
-        layout.setText("Spacing");
+        layout.setText("Some text");
 
         line = layout.getLineReadonly(0);
         logical = line.getExtentsLogical();
-        defaultLineHeight = logical.getHeight();
-        defaultLineAscent = logical.getAscent();
+        defaultLineHeight = logical.getHeight() + extraSpacing;
+        defaultLineAscent = logical.getAscent() + extraSpacing;
+
     }
 
     public void processText(final Context cr, final Series series) {
@@ -176,16 +194,16 @@ public abstract class RenderEngine
         }
     }
 
-    private static final boolean debug = true;
+    private static final boolean debug = false;
 
     protected void drawBlankLine(Context cr) {
-        cursor += defaultLineHeight;
+        cursor += defaultLineHeight * 0.7;
 
         if (debug) {
-            cr.setSource(1.0, 0.0, 0.1);
+            cr.setSource(0.3, 0.0, 0.1);
             cr.setLineWidth(0.1);
             cr.moveTo(leftMargin, cursor);
-            cr.lineTo(pageWidth, cursor);
+            cr.lineTo(pageWidth - rightMargin, cursor);
             cr.stroke();
             cr.setSource(0.0, 0.0, 0.0);
         }
@@ -222,21 +240,18 @@ public abstract class RenderEngine
         cr.moveTo(leftMargin, cursor + b);
         cr.showLayout(line);
 
-        cursor += v;
+        cursor += v + 5.0;
     }
 
     protected void drawBlockText(Context cr, Extract extract) {
         final Layout layout;
         final FontOptions options;
         final StringBuilder buf;
-        final double spacing;
         boolean first;
-        double b, v = 0;
         AttributeList list;
         int i, j, len, offset, width;
         Span span;
         String str;
-        Rectangle logical;
 
         layout = new Layout(cr);
 
@@ -245,7 +260,6 @@ public abstract class RenderEngine
         layout.getContext().setFontOptions(options);
 
         layout.setFontDescription(fonts.serif);
-        spacing = 0.0;
 
         layout.setWidth(pageWidth - (leftMargin + rightMargin));
 
@@ -302,36 +316,31 @@ public abstract class RenderEngine
         layout.setAttributes(list);
 
         /*
-         * Finally, we can render the individual lines of the paragraph.
+         * Finally, we can render the individual lines of the paragraph. We do
+         * NOT use each line's logical extents! We keep the line spacing
+         * consistent; it's up to the RenderEngine [subclass] and font choices
+         * therein to ensure that the various markup being drawn stays between
+         * the lines.
          */
 
         cr.setSource(0.0, 0.0, 0.0);
         first = true;
 
         for (LayoutLine line : layout.getLinesReadonly()) {
-            logical = line.getExtentsLogical();
-
-            v = logical.getHeight();
-            b = logical.getAscent();
-
-            if (cursor + v > (pageHeight - bottomMargin)) {
+            if ((cursor + defaultLineHeight) > (pageHeight - bottomMargin)) {
                 return;
             }
 
-            if (!first) {
-                cursor += spacing;
-            }
-
-            cr.moveTo(leftMargin, cursor + b);
+            cr.moveTo(leftMargin, cursor + defaultLineAscent);
             cr.showLayout(line);
 
-            cursor += v;
+            cursor += defaultLineHeight;
 
             if (debug) {
                 cr.setSource(0.1, 1.0, 0.1);
                 cr.setLineWidth(0.1);
                 cr.moveTo(leftMargin, cursor);
-                cr.lineTo(pageWidth, cursor);
+                cr.lineTo(pageWidth - rightMargin, cursor);
                 cr.stroke();
                 cr.setSource(0.0, 0.0, 0.0);
             }
