@@ -48,6 +48,11 @@ compile it with <command>javac</command>
 and you're on your way.
 </para>
 <para>
+The real question is whether or not you know
+enough to <emphasis>run</emphasis> the program,
+or if you'd rather just run away screaming now.
+</para>
+<para>
 Lorem ipsum dolor sit amet, consectetuer
 adipiscing elit. Proin adipiscing locus est.
 Curabitur vel odio. Morbi ipsum sem, viverra
@@ -88,6 +93,11 @@ ornare suscipit, magna nunc pharetra lorem,
 eget ornare velit sem vel tortor. Ut dolor.
 Fusce tincidunt.
 </para>
+</section>
+<section>
+<title>
+And continuing
+</title>
 <para>
 Curabitur viverra. Proin lectus nunc, elementum
 a, consequat vel, interdum non, mauris. Cras
