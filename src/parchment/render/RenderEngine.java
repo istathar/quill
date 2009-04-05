@@ -22,7 +22,6 @@ import org.gnome.pango.ForegroundColorAttribute;
 import org.gnome.pango.Layout;
 import org.gnome.pango.LayoutLine;
 import org.gnome.pango.Rectangle;
-import org.gnome.pango.SizeAttribute;
 import org.gnome.pango.Style;
 import org.gnome.pango.StyleAttribute;
 import org.gnome.pango.Weight;
@@ -74,11 +73,21 @@ public abstract class RenderEngine
 
     private Series series;
 
+    /*
+     * Cached calculations of normal text metrics, used for ensuring uniform
+     * line spacing
+     */
+
+    private double defaultLineHeight;
+
+    private double defaultLineAscent;
+
     /**
      * Construct a new RenderEngine. Call {@link #render(Context) render()} to
      * actually draw.
      */
     protected RenderEngine(final PaperSize paper, final Series series) {
+        loadFonts();
         processSize(paper);
         this.series = series;
     }
@@ -89,10 +98,17 @@ public abstract class RenderEngine
      * to the constructor, or b) has been scaled to that size.
      */
     public void render(final Context cr) {
+        calculateDefaultSpacing(cr);
         processText(cr, series);
     }
 
-    private void processSize(PaperSize paper) {
+    private void loadFonts() {
+        fonts.serif = new FontDescription("Charis SIL, 8.0");
+        fonts.mono = new FontDescription("Liberation Mono, 7.0");
+        fonts.sans = new FontDescription("Liberation Sans, 7.0");
+    }
+
+    private void processSize(final PaperSize paper) {
         pageWidth = paper.getWidth(Unit.POINTS);
         pageHeight = paper.getHeight(Unit.POINTS);
 
@@ -100,6 +116,27 @@ public abstract class RenderEngine
         bottomMargin = 25;
         leftMargin = 45;
         rightMargin = 20;
+    }
+
+    private void calculateDefaultSpacing(final Context cr) {
+        final Layout layout;
+        final FontOptions options;
+        final LayoutLine line;
+        final Rectangle logical;
+
+        layout = new Layout(cr);
+        options = new FontOptions();
+        options.setHintMetrics(OFF);
+        layout.getContext().setFontOptions(options);
+
+        layout.setFontDescription(fonts.serif);
+
+        layout.setText("Spacing");
+
+        line = layout.getLineReadonly(0);
+        logical = line.getExtentsLogical();
+        defaultLineHeight = logical.getHeight();
+        defaultLineAscent = logical.getAscent();
     }
 
     public void processText(final Context cr, final Series series) {
@@ -142,7 +179,7 @@ public abstract class RenderEngine
     private static final boolean debug = true;
 
     protected void drawBlankLine(Context cr) {
-        cursor += 8.0;
+        cursor += defaultLineHeight;
 
         if (debug) {
             cr.setSource(1.0, 0.0, 0.1);
@@ -190,17 +227,16 @@ public abstract class RenderEngine
 
     protected void drawBlockText(Context cr, Extract extract) {
         final Layout layout;
-        final FontDescription desc;
         final FontOptions options;
         final StringBuilder buf;
         final double spacing;
         boolean first;
-        double y, b, v = 0;
+        double b, v = 0;
         AttributeList list;
         int i, j, len, offset, width;
         Span span;
         String str;
-        Rectangle logical, ink;
+        Rectangle logical;
 
         layout = new Layout(cr);
 
@@ -208,16 +244,8 @@ public abstract class RenderEngine
         options.setHintMetrics(OFF);
         layout.getContext().setFontOptions(options);
 
-        if (false) {
-            desc = new FontDescription("Liberation Serif");
-            spacing = 0.0;
-        } else {
-            desc = new FontDescription("Charis SIL");
-            spacing = -4.0;
-        }
-        desc.setSize(8.0);
-
-        layout.setFontDescription(desc);
+        layout.setFontDescription(fonts.serif);
+        spacing = 0.0;
 
         layout.setWidth(pageWidth - (leftMargin + rightMargin));
 
@@ -282,7 +310,6 @@ public abstract class RenderEngine
 
         for (LayoutLine line : layout.getLinesReadonly()) {
             logical = line.getExtentsLogical();
-            ink = line.getExtentsInk();
 
             v = logical.getHeight();
             b = logical.getAscent();
@@ -334,24 +361,19 @@ public abstract class RenderEngine
                 };
             } else if (m == Common.FILENAME) {
                 return new Attribute[] {
-                        new FontDescriptionAttribute(new FontDescription("Liberation Mono")),
-                        new SizeAttribute(7.0),
-                        new StyleAttribute(Style.ITALIC),
+                        new FontDescriptionAttribute(fonts.mono), new StyleAttribute(Style.ITALIC),
                 };
             } else if (m == Common.TYPE) {
                 return new Attribute[] {
-                        new FontDescriptionAttribute(new FontDescription("Liberation Sans")),
-                        new SizeAttribute(7.0),
+                    new FontDescriptionAttribute(fonts.sans),
                 };
             } else if (m == Common.FUNCTION) {
                 return new Attribute[] {
-                        new FontDescriptionAttribute(new FontDescription("Liberation Mono")),
-                        new SizeAttribute(7.0),
+                    new FontDescriptionAttribute(fonts.mono),
                 };
             } else if (m == Common.CODE) {
                 return new Attribute[] {
-                        new FontDescriptionAttribute(new FontDescription("Liberation Mono")),
-                        new SizeAttribute(7.0),
+                    new FontDescriptionAttribute(fonts.mono),
                 };
             } else if (m == Common.APPLICATION) {
                 return new Attribute[] {
@@ -359,8 +381,7 @@ public abstract class RenderEngine
                 };
             } else if (m == Common.COMMAND) {
                 return new Attribute[] {
-                        new FontDescriptionAttribute(new FontDescription("Liberation Mono")),
-                        new SizeAttribute(7.0),
+                        new FontDescriptionAttribute(fonts.mono),
                         new WeightAttribute(Weight.SEMIBOLD),
                         new ForegroundColorAttribute(0.1, 0.1, 0.1),
                 };
@@ -378,7 +399,6 @@ public abstract class RenderEngine
 
     protected void drawBlockProgram(Context cr, String prog) {
         final Layout layout;
-        final FontDescription desc;
         final FontOptions options;
         final String[] paras;
         double y, b, v = 0;
@@ -390,9 +410,7 @@ public abstract class RenderEngine
         options.setHintMetrics(OFF);
         layout.getContext().setFontOptions(options);
 
-        desc = new FontDescription("Liberation Mono");
-        desc.setSize(7.0);
-        layout.setFontDescription(desc);
+        layout.setFontDescription(fonts.mono);
 
         /*
          * This is fake. TODO pass in our TextStack object (which already
@@ -466,4 +484,13 @@ public abstract class RenderEngine
     public double getMarginBottom() {
         return bottomMargin;
     }
+}
+
+class fonts
+{
+    static FontDescription sans;
+
+    static FontDescription serif;
+
+    static FontDescription mono;
 }
