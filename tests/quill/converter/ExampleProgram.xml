@@ -12,10 +12,13 @@ You're going to like this!
 Getting started
 </title>
 <para>
-This is a simple java-gnome program. As you
-will see in the following definition of 
-<type>Example</type> there's really nothing
-to it that you need to be worried about:
+This is a simple 
+<application>java-gnome</application> program.
+As you will see in the following definition
+of Example <type>GtkButton</type>'s 
+<function>setLabel()</function> there's really
+nothing to it that you need to be worried
+about:
 </para>
 <programlisting xml:space="preserve">
 public class Example {
@@ -26,19 +29,23 @@ public class Example {
 }
 </programlisting>
 <para>
-Place this code in
+Place this code in 
 <filename>Example.java</filename> and compile
 it.
 </para>
 <para>
-This program has the drawback of not doing
-very much and even worse, not telling you
-that that's not what it's doing.
+This program has the drawback of 
+<emphasis>not</emphasis> doing very much
+and even worse, 
+<emphasis role="bold">not</emphasis> telling
+you that that's not what it's doing.
 </para>
 <para>
 The way you fix that is by not making the
-call to <function>Gtk.main()</function> and
-instead just letting the program exit.
+call to <code>Gtk.main()</code> and instead
+just letting the program exit. Then just
+compile it with <command>javac</command>
+and you're on your way.
 </para>
 <para>
 Lorem ipsum dolor sit amet, consectetuer

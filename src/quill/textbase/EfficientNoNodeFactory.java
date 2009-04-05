@@ -239,7 +239,22 @@ public class EfficientNoNodeFactory extends NodeFactory
             markup = null;
         }
 
-        return null;
+        /*
+         * Annoyingly, we need to return an element after all, otherwise
+         * makeAttribute() never gets called.
+         */
+        return new Element("fake");
+    }
+
+    public Nodes makeAttribute(String name, String URI, String value, Attribute.Type type) {
+        if (markup == Common.ITALICS) {
+            if (name.equals("role")) {
+                if (value.equals("bold")) {
+                    markup = Common.BOLD;
+                }
+            }
+        }
+        return empty;
     }
 
     /*
@@ -257,10 +272,6 @@ public class EfficientNoNodeFactory extends NodeFactory
 
     public void finishMakingDocument(Document document) {
 
-    }
-
-    public Nodes makeAttribute(String name, String uri, String value, Attribute.Type type) {
-        return empty;
     }
 
     public Nodes makeComment(String text) {
