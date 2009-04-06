@@ -130,14 +130,10 @@ public class ValidateStackToDocBookConversion extends TestCase
         spans = new Span[] {
                 new StringSpan("Accessing the ", null),
                 new StringSpan("/tmp", Common.FILENAME),
-                new StringSpan(" directory directly is fine, but the ", null),
+                new StringSpan(" directory directly is fine, but you are often better off using ", null),
                 new StringSpan("File", Common.TYPE),
-                new StringSpan(" class ", null),
-                new CharacterSpan('h', null),
-                new CharacterSpan('a', null),
+                new CharacterSpan('\'', null),
                 new CharacterSpan('s', null),
-                new CharacterSpan(' ', null),
-                new CharacterSpan('a', null),
                 new CharacterSpan(' ', null),
                 new StringSpan("createTemp", Common.FUNCTION),
                 new CharacterSpan('F', Common.FUNCTION),
@@ -145,7 +141,7 @@ public class ValidateStackToDocBookConversion extends TestCase
                 new CharacterSpan('l', Common.FUNCTION),
                 new CharacterSpan('e', Common.FUNCTION),
                 new StringSpan("()", Common.FUNCTION),
-                new StringSpan(" function that you are often better off using.", null),
+                new StringSpan(" function.", null),
         };
 
         stack = new TextStack();
@@ -182,9 +178,9 @@ public class ValidateStackToDocBookConversion extends TestCase
                 "<section>",
                 "<para>",
                 "Accessing the " + "<filename>/tmp</filename>" + " directory",
-                "directly is fine, but the " + "<type>" + "File" + "</type>",
-                "class has a " + "<function>" + "createTempFile()" + "</function>",
-                "function that you are often better off using.",
+                "directly is fine, but you are often better",
+                "off using " + "<type>" + "File" + "</type>'s ",
+                "<function>" + "createTempFile()" + "</function> function.",
                 "</para>",
                 "</section>",
                 "</chapter>",
@@ -214,7 +210,7 @@ public class ValidateStackToDocBookConversion extends TestCase
 
         assertNotNull(text);
         assertEquals("Accessing the /tmp directory directly is fine, "
-                + "but the File class has a createTempFile() function "
-                + "that you are often better off using.", text.toString());
+                + "but you are often better off using File's createTempFile() function.",
+                text.toString());
     }
 }
