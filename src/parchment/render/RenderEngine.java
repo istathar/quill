@@ -121,8 +121,8 @@ public abstract class RenderEngine
     private void loadFonts() {
         fonts.serif = new FontDescription("Charis SIL, 8.0");
         setSpacing(-4.5);
-        fonts.mono = new FontDescription("Liberation Mono, 7.0");
-        fonts.sans = new FontDescription("Liberation Sans, 7.0");
+        fonts.mono = new FontDescription("Liberation Mono, 7.3");
+        fonts.sans = new FontDescription("Liberation Sans, 7.3");
     }
 
     private void processSize(final PaperSize paper) {
@@ -132,7 +132,7 @@ public abstract class RenderEngine
         topMargin = 25;
         bottomMargin = 25;
         leftMargin = 45;
-        rightMargin = 20;
+        rightMargin = 30;
     }
 
     private void calculateDefaultSpacing(final Context cr) {
