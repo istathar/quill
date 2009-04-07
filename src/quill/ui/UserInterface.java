@@ -160,7 +160,7 @@ public class UserInterface
     public void saveDocument() {
         final Dialog dialog;
         try {
-            data.saveDocument("HARDCODE.xml");
+            data.saveDocument("tmp/HardcodedSaveResult.xml");
         } catch (IOException ioe) {
             dialog = new ErrorMessageDialog(primary, "Save failed", "There's some kind of I/O problem: "
                     + ioe.getMessage());
