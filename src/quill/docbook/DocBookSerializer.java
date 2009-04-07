@@ -15,6 +15,7 @@ import java.io.OutputStream;
 
 import nu.xom.Element;
 import nu.xom.Serializer;
+import nu.xom.Text;
 
 /**
  * Render a document as valid DocBook XML, with slight formatting applied when
@@ -30,11 +31,14 @@ class DocBookSerializer extends Serializer
 {
     private final DocBookTag root;
 
+    private String swollowed;
+
     DocBookSerializer(OutputStream out, DocBookTag root) {
         super(out);
         super.setLineSeparator("\n");
         super.setMaxLength(50);
         this.root = root;
+        this.swollowed = "";
     }
 
     protected void writeStartTag(Element e) throws IOException {
@@ -58,9 +62,21 @@ class DocBookSerializer extends Serializer
         if (tag instanceof Inline) {
             nested = e.toXML();
 
-            if (getColumnNumber() + firstBreakPoint(nested) > getMaxLength()) {
+            if (getColumnNumber() + firstBreakPoint(nested) + swollowed.length() > getMaxLength()) {
                 breakLine();
+                if (swollowed != "") {
+                    if (swollowed == " ") {
+                        swollowed = "";
+                    } else {
+                        swollowed = swollowed.substring(1, swollowed.length());
+                    }
+
+                }
             }
+        }
+        if (swollowed != "") {
+            writeEscaped(swollowed);
+            swollowed = "";
         }
 
         super.writeStartTag(e);
@@ -98,6 +114,11 @@ class DocBookSerializer extends Serializer
             tag = ((DocBookElement) e).proxy;
         }
 
+        if (swollowed != null) {
+            writeEscaped(swollowed);
+            swollowed = "";
+        }
+
         if (tag instanceof Block) {
             breakLine();
         }
@@ -133,5 +154,35 @@ class DocBookSerializer extends Serializer
         if (tag instanceof Block) {
             breakLine();
         }
+    }
+
+    /*
+     * Override XOM's text writing method so that we can be more intelligent
+     * about [not] writing trailing whitespace.
+     */
+    protected void write(Text text) throws IOException {
+        String str;
+        int len, i;
+
+        if (swollowed != "") {
+            writeEscaped(swollowed);
+            swollowed = "";
+        }
+
+        str = text.getValue();
+        len = str.length();
+
+        i = str.lastIndexOf(' ');
+
+        if (i != -1) {
+            if (i == len - 1) {
+                swollowed = " ";
+                str = str.substring(0, len - 1);
+            } else {
+                swollowed = str.substring(i, len);
+                str = str.substring(0, i);
+            }
+        }
+        writeEscaped(str);
     }
 }
