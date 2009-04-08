@@ -61,6 +61,12 @@ public class EfficientNoNodeFactory extends NodeFactory
      */
     private boolean preserve;
 
+    /**
+     * Did we trim a whitespace character (newline, specifically) from the end
+     * of the previous Text?
+     */
+    private boolean space;
+
     public EfficientNoNodeFactory() {
         list = new ArrayList<Segment>(5);
         stack = null;
@@ -94,7 +100,8 @@ public class EfficientNoNodeFactory extends NodeFactory
      */
     public Nodes makeText(String text) {
         final String trim, str;
-        final int len;
+        int len;
+        char ch;
 
         len = text.length();
 
@@ -103,33 +110,53 @@ public class EfficientNoNodeFactory extends NodeFactory
          */
 
         if (len == 0) {
+            space = false;
             return empty;
         }
 
         if (len == 1) {
             if (text.charAt(0) == '\n') {
+                space = false;
                 return empty;
             }
         }
 
         /*
-         * Do we think we're starting a block? If not, we need to pad the
-         * inline we're starting instead one space off of the normal text that
-         * preceeded it.
+         * Do we think we're starting a block? If so, trim off the leading
+         * newline. If we're starting an inline and we swollowed a trailing
+         * space from the previous run of text, pad the inline with one space.
          */
 
         if (block) {
             block = false;
-        } else {
+            space = false;
+            text = text.substring(1);
+            len--;
+        } else if (space) {
             stack.append(new CharacterSpan(' ', null));
         }
 
         /*
-         * Trim the leading and trailing newlines and if not preformatted
-         * text, turn any interior newlines into spaces, then add.
+         * Trim the trailing newline (if there is one) as it could be the
+         * break before a close-element tag. We replace it with a space and
+         * prepend it if we find it is just a linebreak separator between a
+         * Text and an Inline when making the next Text node.
          */
 
-        trim = text.trim();
+        ch = text.charAt(len - 1);
+        if (ch == '\n') {
+            trim = text.substring(0, len - 1);
+            len--;
+            space = true;
+        } else {
+            trim = text;
+            space = false;
+        }
+
+        /*
+         * If not preformatted text, turn any interior newlines into spaces,
+         * then add.
+         */
 
         if (preserve) {
             str = trim;

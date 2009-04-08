@@ -95,10 +95,8 @@ public class DocBookConverter
         this.segment = segment;
 
         if (segment instanceof HeadingSegment) {
-            if (section == null) {
-                section = new Section();
-                chapter.add(section);
-            }
+            section = new Section();
+            chapter.add(section);
             block = null;
         }
 

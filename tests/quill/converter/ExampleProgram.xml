@@ -12,10 +12,10 @@ You're going to like this!
 Getting started
 </title>
 <para>
-This is a simple 
+This is a simple
 <application>java-gnome</application> program.
 As you will see in the following definition
-of Example <type>GtkButton</type>'s 
+of Example <type>GtkButton</type>'s
 <function>setLabel()</function> there's really
 nothing to it that you need to be worried
 about:
@@ -29,14 +29,14 @@ public class Example {
 }
 </programlisting>
 <para>
-Place this code in 
+Place this code in
 <filename>Example.java</filename> and compile
 it.
 </para>
 <para>
-This program has the drawback of 
+This program has the drawback of
 <emphasis>not</emphasis> doing very much
-and even worse, 
+and even worse,
 <emphasis role="bold">not</emphasis> telling
 you that that's not what it's doing.
 </para>
@@ -50,27 +50,30 @@ and you're on your way.
 <para>
 The real question is whether or not you know
 enough to <emphasis>run</emphasis> the program,
-or if you'd rather just run away screaming now.
+or if you'd rather just run away screaming
+now.
 </para>
 <para>
-Lorem ipsum dolor sit amet, consectetuer
-adipiscing elit. Proin adipiscing locus est.
-Curabitur vel odio. Morbi ipsum sem, viverra
-eget, tristique tincidunt, mollis vestibulum,
-nulla. Suspendisse blandit. Fuse bibendum
-neque at est. Mauris eget turpis. Sed erat.
-Class aptent taciti sociosqu ad litora torquent
-per conubia nostra, per inceptos himenaeos.
-Phasellus in diam. Donec felis. Pellentesque
-libero libero, interdum et, accumsan quis,
-interdum quis, odio. Vestibulum nec lacus.
-Etiam id lacus. Curabitur ornare, felis sit
-amet auctor iaculis, metus eros feugiat nisl,
-sed adipiscing nisl urna nec odio. Nam magna.
-Pellentesque sed ante non massa pulvinar
-dapibus. Suspendisse at sapien. Sed lobortis,
-nisi non tempor consequat, nisl ante lobortis
-dolor, ut hendrerit tortor quam id augue.
+<emphasis>Lor</emphasis>em
+ip<emphasis>sum</emphasis> dolor sit amet,
+consectetuer adipiscing elit. Proin adipiscing
+locus est. Curabitur vel odio. Morbi ipsum
+sem, viverra eget, tristique tincidunt, mollis
+vestibulum, nulla. Suspendisse blandit. Fuse
+bibendum neque at est. Mauris eget turpis.
+Sed erat. Class aptent taciti sociosqu ad
+litora torquent per conubia nostra, per inceptos
+himenaeos. Phasellus in diam. Donec felis.
+Pellentesque libero libero, interdum et,
+accumsan quis, interdum quis, odio. Vestibulum
+nec lacus. Etiam id lacus. Curabitur ornare,
+felis sit amet auctor iaculis, metus eros
+feugiat nisl, sed adipiscing nisl urna nec
+odio. Nam magna. Pellentesque sed ante non
+massa pulvinar dapibus. Suspendisse at sapien.
+Sed lobortis, nisi non tempor consequat,
+nisl ante lobortis dolor, ut hendrerit tortor
+quam id augue.
 </para>
 <para>
 Phasellus mollis, ante quis tincidunt rutrum,

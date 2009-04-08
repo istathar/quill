@@ -4,9 +4,9 @@
 <section>
 <para>
 Accessing the <filename>/tmp</filename> directory
-directly is fine, but the <type>File</type>
-class has a <function>createTempFile()</function>
-function that you are often better off using.
+directly is fine, but you are often better
+off using <type>File</type>'s
+<function>createTempFile()</function> function.
 </para>
 </section>
 </chapter>
