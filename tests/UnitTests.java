@@ -1,5 +1,5 @@
 /*
- * AllTests.java (for the Quill application)
+ * UnitTests.java (for the Quill application)
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -19,7 +19,7 @@ import quill.textbase.ValidateText;
 
 import com.operationaldynamics.junit.VerboseTestRunner;
 
-public class AllTests
+public class UnitTests
 {
     /**
      * Entry point from the command line, of course. Uses VerboseTestRunner to

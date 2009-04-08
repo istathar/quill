@@ -179,7 +179,7 @@ public class ValidateStackToDocBookConversion extends TestCase
                 "<para>",
                 "Accessing the " + "<filename>/tmp</filename>" + " directory",
                 "directly is fine, but you are often better",
-                "off using " + "<type>" + "File" + "</type>'s ",
+                "off using " + "<type>" + "File" + "</type>'s",
                 "<function>" + "createTempFile()" + "</function> function.",
                 "</para>",
                 "</section>",
