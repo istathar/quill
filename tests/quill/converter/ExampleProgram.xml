@@ -12,10 +12,10 @@ You're going to like this!
 Getting started
 </title>
 <para>
-This is a simple 
+This is a simple
 <application>java-gnome</application> program.
 As you will see in the following definition
-of Example <type>GtkButton</type>'s 
+of Example <type>GtkButton</type>'s
 <function>setLabel()</function> there's really
 nothing to it that you need to be worried
 about:
@@ -29,14 +29,14 @@ public class Example {
 }
 </programlisting>
 <para>
-Place this code in 
+Place this code in
 <filename>Example.java</filename> and compile
 it.
 </para>
 <para>
-This program has the drawback of 
+This program has the drawback of
 <emphasis>not</emphasis> doing very much
-and even worse, 
+and even worse,
 <emphasis role="bold">not</emphasis> telling
 you that that's not what it's doing.
 </para>

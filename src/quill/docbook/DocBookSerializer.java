@@ -90,11 +90,16 @@ class DocBookSerializer extends Serializer
     /**
      * Find out the offset of the first space available that we can break at
      * in an Inline tag, or the whole width of the Element if there isn't one.
+     * Note that we're not breaking inside start tags.
      */
     /*
-     * Input of the form "<emphasis>One or more words</emphasis>"
+     * Input of the form:
+     * 
+     * <emphasis role="bold">One or more words</emphasis>
+     * 
+     * will return 26, the space between "One" and "or".
      */
-    private int firstBreakPoint(String frag) {
+    private static int firstBreakPoint(String frag) {
         int i = 0;
 
         i = frag.indexOf('>');
