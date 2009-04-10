@@ -693,7 +693,7 @@ public class Text
     /**
      * Generate an array of Extracts, one for each \n separated paragraph.
      */
-    public Extract[] extractLines() {
+    public Extract[] extractParagraphs() {
         Extract[] result;
         Piece p, alpha, omega;
         Span s;

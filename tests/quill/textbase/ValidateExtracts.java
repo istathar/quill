@@ -74,7 +74,7 @@ public class ValidateExtracts extends TestCase
         text.append(new StringSpan("Goodbye Eternity", null));
         assertEquals("Hello World\nGoodbye Eternity", text.toString());
 
-        lines = text.extractLines();
+        lines = text.extractParagraphs();
         assertEquals(2, lines.length);
 
         extract = lines[0];
@@ -102,7 +102,7 @@ public class ValidateExtracts extends TestCase
         text = new Text();
         text.append(new StringSpan("Hello World", null));
 
-        lines = text.extractLines();
+        lines = text.extractParagraphs();
         assertEquals(1, lines.length);
 
         extract = lines[0];
@@ -121,7 +121,7 @@ public class ValidateExtracts extends TestCase
 
         text = new Text();
 
-        lines = text.extractLines();
+        lines = text.extractParagraphs();
         assertEquals(0, lines.length);
     }
 
@@ -137,7 +137,7 @@ public class ValidateExtracts extends TestCase
         text = new Text();
         text.append(new CharacterSpan('H', null));
 
-        lines = text.extractLines();
+        lines = text.extractParagraphs();
         assertEquals(1, lines.length);
 
         extract = lines[0];
@@ -158,7 +158,7 @@ public class ValidateExtracts extends TestCase
         text = new Text();
         text.append(new CharacterSpan('\n', null));
 
-        lines = text.extractLines();
+        lines = text.extractParagraphs();
         assertEquals(2, lines.length);
 
         extract = lines[0];
@@ -179,7 +179,7 @@ public class ValidateExtracts extends TestCase
         text.append(new StringSpan("Hello World\nGoodbye Eternity", null));
         assertEquals("Hello World\nGoodbye Eternity", text.toString());
 
-        lines = text.extractLines();
+        lines = text.extractParagraphs();
         assertEquals(2, lines.length);
 
         extract = lines[0];
@@ -208,7 +208,7 @@ public class ValidateExtracts extends TestCase
         text.append(new StringSpan("H\nello World", null));
         assertEquals("H\nello World", text.toString());
 
-        lines = text.extractLines();
+        lines = text.extractParagraphs();
         assertEquals(2, lines.length);
 
         extract = lines[0];
@@ -227,7 +227,7 @@ public class ValidateExtracts extends TestCase
         text.append(new StringSpan("\nHello World", null));
         assertEquals("\nHello World", text.toString());
 
-        lines = text.extractLines();
+        lines = text.extractParagraphs();
         assertEquals(2, lines.length);
 
         extract = lines[0];
@@ -244,7 +244,7 @@ public class ValidateExtracts extends TestCase
         text.append(new StringSpan("Hello World\n", null));
         assertEquals("Hello World\n", text.toString());
 
-        lines = text.extractLines();
+        lines = text.extractParagraphs();
         assertEquals(2, lines.length);
 
         extract = lines[0];
