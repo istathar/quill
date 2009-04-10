@@ -109,7 +109,7 @@ public abstract class RenderEngine
     /*
      * This will move to the actual RenderEngine subclass, I expect.
      */
-    private void specifyFonts(Context cr) {
+    private void specifyFonts(final Context cr) {
         serifFace = new Typeface(cr, new FontDescription("Charis SIL, 8.0"), -4.5);
 
         monoFace = new Typeface(cr, new FontDescription("Inconsolata, 8.3"), 0.0);
@@ -188,25 +188,22 @@ public abstract class RenderEngine
     /**
      * Carry out smart typography replacements.
      */
-    private char translate(final char ch, boolean code) {
-        final char result;
-
+    private void translateAndAppend(final StringBuilder buf, final char ch, final boolean code) {
         if (code) {
-            result = ch;
+            buf.append(ch);
         } else if (ch == '"') {
             if (previous == 0) {
-                result = '“';
+                buf.append('“');
             } else if (!Character.isWhitespace(previous)) {
-                result = '”';
+                buf.append('”');
             } else {
-                result = '“';
+                buf.append('“');
             }
         } else {
-            result = ch;
+            buf.append(ch);
         }
 
         previous = ch;
-        return result;
     }
 
     /**
@@ -251,12 +248,12 @@ public abstract class RenderEngine
             }
 
             if (span instanceof CharacterSpan) {
-                buf.append(translate(span.getChar(), code));
+                translateAndAppend(buf, span.getChar(), code);
             } else if (span instanceof StringSpan) {
                 str = span.getText();
                 len = str.length();
                 for (j = 0; j < len; j++) {
-                    buf.append(translate(str.charAt(j), code));
+                    translateAndAppend(buf, str.charAt(j), code);
                 }
             }
         }
@@ -276,16 +273,9 @@ public abstract class RenderEngine
             span = extract.get(i);
             width = span.getWidth();
 
-            if (span instanceof CharacterSpan) {
-                for (Attribute attr : attributesForMarkup(span.getMarkup())) {
-                    attr.setIndices(layout, offset, width);
-                    list.insert(attr);
-                }
-            } else if (span instanceof StringSpan) {
-                for (Attribute attr : attributesForMarkup(span.getMarkup())) {
-                    attr.setIndices(layout, offset, width);
-                    list.insert(attr);
-                }
+            for (Attribute attr : attributesForMarkup(span.getMarkup())) {
+                attr.setIndices(layout, offset, width);
+                list.insert(attr);
             }
 
             offset += width;
