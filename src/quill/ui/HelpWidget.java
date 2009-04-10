@@ -185,7 +185,7 @@ class HelpWidget extends HBox
 
         label = new Label(keys);
         label.setAlignment(LEFT, TOP);
-        spread.packStart(label, true, true, 3);
+        spread.packStart(label, true, true, 0);
         group.add(label);
 
         str = new StringBuilder();
@@ -204,8 +204,8 @@ class HelpWidget extends HBox
         label.setLineWrap(true);
         label.setWidthChars(25);
         label.setAlignment(LEFT, TOP);
-        spread.packStart(label, true, true, 3);
+        spread.packStart(label, true, true, 6);
 
-        vbox.packStart(spread, false, false, 3);
+        vbox.packStart(spread, false, false, 6);
     }
 }
