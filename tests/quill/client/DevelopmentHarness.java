@@ -34,7 +34,7 @@ public class DevelopmentHarness
     private static void loadExampleDocument() throws ValidityException, ParsingException, IOException {
         final Folio folio;
 
-        data.loadDocument("tests/quill/converter/ExampleProgram.xml");
+        data.loadDocument("tests/ExampleProgram.xml");
         folio = data.getActiveDocument();
         ui.displayDocument(folio);
     }

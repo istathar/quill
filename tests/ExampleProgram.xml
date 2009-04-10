@@ -14,8 +14,10 @@ Getting started
 <para>
 This is a simple
 <application>java-gnome</application> program.
+</para>
+<para>
 As you will see in the following definition
-of Example <type>GtkButton</type>'s
+of <type>GtkButton</type>'s
 <function>setLabel()</function> there's really
 nothing to it that you need to be worried
 about:

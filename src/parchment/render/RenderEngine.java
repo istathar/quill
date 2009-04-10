@@ -12,6 +12,8 @@ package parchment.render;
 
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.FontOptions;
+import org.freedesktop.cairo.Surface;
+import org.freedesktop.cairo.XlibSurface;
 import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.Unit;
 import org.gnome.pango.Attribute;
@@ -111,8 +113,13 @@ public abstract class RenderEngine
      * to the constructor, or b) has been scaled to that size.
      */
     public void render(final Context cr) {
-        calculateDefaultSpacing(cr);
-        processText(cr, series);
+        /*
+         * An instance of this class can only do one render at a time.
+         */
+        synchronized (this) {
+            calculateDefaultSpacing(cr);
+            processText(cr, series);
+        }
     }
 
     /*
@@ -121,8 +128,12 @@ public abstract class RenderEngine
     private void loadFonts() {
         fonts.serif = new FontDescription("Charis SIL, 8.0");
         setSpacing(-4.5);
-        fonts.mono = new FontDescription("Liberation Mono, 7.3");
+
+        fonts.mono = new FontDescription("Inconsolata, 8.3");
+
         fonts.sans = new FontDescription("Liberation Sans, 7.3");
+
+        fonts.heading = new FontDescription("Linux Libertine C");
     }
 
     private void processSize(final PaperSize paper) {
@@ -179,8 +190,10 @@ public abstract class RenderEngine
 
             if (segment instanceof ComponentSegment) {
                 drawHeading(cr, str, 32.0);
+                drawBlankLine(cr);
             } else if (segment instanceof HeadingSegment) {
                 drawHeading(cr, str, 16.0);
+                drawBlankLine(cr);
             } else if (segment instanceof PreformatSegment) {
                 drawBlockProgram(cr, str);
                 drawBlankLine(cr);
@@ -213,9 +226,10 @@ public abstract class RenderEngine
         final Layout layout;
         final FontDescription desc;
         final FontOptions options;
-        final LayoutLine line;
+        LayoutLine line;
         final Rectangle ink;
-        double b, v;
+        double b, d, v;
+        int i, num;
 
         layout = new Layout(cr);
 
@@ -223,7 +237,7 @@ public abstract class RenderEngine
         options.setHintMetrics(OFF);
         layout.getContext().setFontOptions(options);
 
-        desc = new FontDescription("Essays1743");
+        desc = fonts.heading.copy();
         desc.setSize(size);
         layout.setFontDescription(desc);
 
@@ -232,22 +246,39 @@ public abstract class RenderEngine
 
         cr.setSource(0.0, 0.0, 0.0);
 
+        /*
+         * We draw headings at the from the ink extent, not the logical one;
+         * otherwise the apparent top padding (especially from the top margin
+         * if a heading is first on a page) is both variable and too large.
+         */
+
         line = layout.getLineReadonly(0);
         ink = line.getExtentsInk();
         b = ink.getAscent();
+        d = ink.getDescent();
         v = ink.getHeight();
+
+        num = layout.getLineCount();
 
         cr.moveTo(leftMargin, cursor + b);
         cr.showLayout(line);
 
-        cursor += v + 5.0;
+        cursor += v;
+
+        for (i = 1; i < num; i++) {
+            cr.moveTo(leftMargin, cursor + b);
+            line = layout.getLineReadonly(i);
+            cr.showLayout(line);
+            cursor += v;
+        }
+
+        cursor += 3.0;
     }
 
     protected void drawBlockText(Context cr, Extract extract) {
         final Layout layout;
         final FontOptions options;
         final StringBuilder buf;
-        boolean first;
         AttributeList list;
         int i, j, len, offset, width;
         Span span;
@@ -324,10 +355,9 @@ public abstract class RenderEngine
          */
 
         cr.setSource(0.0, 0.0, 0.0);
-        first = true;
 
         for (LayoutLine line : layout.getLinesReadonly()) {
-            if ((cursor + defaultLineHeight) > (pageHeight - bottomMargin)) {
+            if (!paginate(cr, defaultLineHeight)) {
                 return;
             }
 
@@ -344,9 +374,29 @@ public abstract class RenderEngine
                 cr.stroke();
                 cr.setSource(0.0, 0.0, 0.0);
             }
-
-            first = false;
         }
+    }
+
+    /**
+     * Check and see if there is sufficient vertical space for the requested
+     * height. If not, finish the page being drawn and star a fresh one if
+     * possible. Return false if the vertical cursor can't be restarted (which
+     * is the case when drawing to PreviewWidget).
+     */
+    private boolean paginate(Context cr, double requestedHeight) {
+        final Surface surface;
+
+        if ((cursor + requestedHeight) > (pageHeight - bottomMargin)) {
+            surface = cr.getTarget();
+            if (surface instanceof XlibSurface) {
+                return false;
+            }
+
+            surface.showPage();
+            cursor = topMargin;
+        }
+
+        return true;
     }
 
     private static final Attribute[] empty = new Attribute[] {};
@@ -428,7 +478,6 @@ public abstract class RenderEngine
         paras = prog.split("\n");
 
         layout.setWidth(pageWidth - (leftMargin + rightMargin));
-        layout.setText("Workaround");
 
         cr.setSource(0.0, 0.0, 0.0);
 
@@ -440,9 +489,7 @@ public abstract class RenderEngine
                 v = logical.getHeight();
                 b = logical.getAscent();
 
-                y = cursor + v;
-
-                if (y > (pageHeight - bottomMargin)) {
+                if (!paginate(cr, v)) {
                     return;
                 }
 
@@ -502,4 +549,6 @@ class fonts
     static FontDescription serif;
 
     static FontDescription mono;
+
+    static FontDescription heading;
 }
