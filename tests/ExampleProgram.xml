@@ -52,7 +52,7 @@ and you're on your way.
 <para>
 The real question is whether or not you know
 enough to <emphasis>run</emphasis> the program,
-or if you'd rather just run away screaming
+or if you'd rather just "run away screaming"
 now.
 </para>
 <para>
@@ -75,10 +75,10 @@ odio. Nam magna. Pellentesque sed ante non
 massa pulvinar dapibus. Suspendisse at sapien.
 Sed lobortis, nisi non tempor consequat,
 nisl ante lobortis dolor, ut hendrerit tortor
-quam id augue.
+"quam id augue."
 </para>
 <para>
-Phasellus mollis, ante quis tincidunt rutrum,
+"Phasellus mollis", ante quis tincidunt rutrum,
 augue nisl malesuada ipsum, sit amet condimentum
 dolor felis nec lorem. Nulla ante. Etiam
 vulputate lorem quis orci. Duis mattis odio
@@ -103,6 +103,13 @@ Fusce tincidunt.
 <title>
 And continuing
 </title>
+<para>
+We mentioned <function>setLabel()</function>.
+In general you'll probably call it in code
+like this <code>button.setLabel("Hello World");</code>
+which isn't terribly original but is very
+important as a starting point.
+</para>
 <para>
 Curabitur viverra. Proin lectus nunc, elementum
 a, consequat vel, interdum non, mauris. Cras

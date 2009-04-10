@@ -183,6 +183,32 @@ public abstract class RenderEngine
         drawAreaText(cr, entire, monoFace, true);
     }
 
+    private char previous;
+
+    /**
+     * Carry out smart typography replacements.
+     */
+    private char translate(final char ch, boolean code) {
+        final char result;
+
+        if (code) {
+            result = ch;
+        } else if (ch == '"') {
+            if (previous == 0) {
+                result = '“';
+            } else if (!Character.isWhitespace(previous)) {
+                result = '”';
+            } else {
+                result = '“';
+            }
+        } else {
+            result = ch;
+        }
+
+        previous = ch;
+        return result;
+    }
+
     /**
      * Given an Extract of text and a FontDescription, render it to the target
      * Surface. Fancy typesetting character substitutions (smary quotes, etc)
@@ -194,7 +220,9 @@ public abstract class RenderEngine
         final StringBuilder buf;
         final AttributeList list;
         int i, j, len, offset, width;
+        boolean code;
         Span span;
+        Markup format;
         String str;
 
         layout = new Layout(cr);
@@ -208,17 +236,27 @@ public abstract class RenderEngine
         layout.setWidth(pageWidth - (leftMargin + rightMargin));
 
         buf = new StringBuilder();
+        previous = 0;
 
         for (i = 0; i < extract.size(); i++) {
             span = extract.get(i);
+            format = span.getMarkup();
+
+            if (preformatted) {
+                code = true;
+            } else if (format == Common.CODE) {
+                code = true;
+            } else {
+                code = false;
+            }
 
             if (span instanceof CharacterSpan) {
-                buf.append(span.getChar());
+                buf.append(translate(span.getChar(), code));
             } else if (span instanceof StringSpan) {
                 str = span.getText();
                 len = str.length();
                 for (j = 0; j < len; j++) {
-                    buf.append(str.charAt(j));
+                    buf.append(translate(str.charAt(j), code));
                 }
             }
         }
