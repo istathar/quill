@@ -23,7 +23,6 @@ import org.gnome.pango.FontDescriptionAttribute;
 import org.gnome.pango.ForegroundColorAttribute;
 import org.gnome.pango.Layout;
 import org.gnome.pango.LayoutLine;
-import org.gnome.pango.Rectangle;
 import org.gnome.pango.Style;
 import org.gnome.pango.StyleAttribute;
 import org.gnome.pango.Weight;
@@ -75,36 +74,21 @@ public abstract class RenderEngine
 
     private Series series;
 
-    /*
-     * Cached calculations of normal text metrics, used for ensuring uniform
-     * line spacing
-     */
+    Typeface sansFace;
 
-    private double extraSpacing;
+    Typeface serifFace;
 
-    private double defaultLineHeight;
+    Typeface monoFace;
 
-    private double defaultLineAscent;
+    Typeface headingFace;
 
     /**
      * Construct a new RenderEngine. Call {@link #render(Context) render()} to
      * actually draw.
      */
     protected RenderEngine(final PaperSize paper, final Series series) {
-        loadFonts();
-        processSize(paper);
+        specifySize(paper);
         this.series = series;
-    }
-
-    /**
-     * Specify additional spacing to be added to the default line height. If
-     * you've got a font whose extents are unreasonably spacious, then you can
-     * use a negative value to pull it back (but, beware that if you specify a
-     * negative delta that is greater than the ascent value, Bad Things will
-     * happen).
-     */
-    protected void setSpacing(double spacing) {
-        this.extraSpacing = spacing;
     }
 
     /**
@@ -117,26 +101,25 @@ public abstract class RenderEngine
          * An instance of this class can only do one render at a time.
          */
         synchronized (this) {
-            calculateDefaultSpacing(cr);
-            processText(cr, series);
+            specifyFonts(cr);
+            processSeries(cr, series);
         }
     }
 
     /*
      * This will move to the actual RenderEngine subclass, I expect.
      */
-    private void loadFonts() {
-        fonts.serif = new FontDescription("Charis SIL, 8.0");
-        setSpacing(-4.5);
+    private void specifyFonts(Context cr) {
+        serifFace = new Typeface(cr, new FontDescription("Charis SIL, 8.0"), -4.5);
 
-        fonts.mono = new FontDescription("Inconsolata, 8.3");
+        monoFace = new Typeface(cr, new FontDescription("Inconsolata, 8.3"), 0.0);
 
-        fonts.sans = new FontDescription("Liberation Sans, 7.3");
+        sansFace = new Typeface(cr, new FontDescription("Liberation Sans, 7.3"), 0.0);
 
-        fonts.heading = new FontDescription("Linux Libertine C");
+        headingFace = new Typeface(cr, new FontDescription("Linux Libertine C"), 0.0);
     }
 
-    private void processSize(final PaperSize paper) {
+    private void specifySize(final PaperSize paper) {
         pageWidth = paper.getWidth(Unit.POINTS);
         pageHeight = paper.getHeight(Unit.POINTS);
 
@@ -146,33 +129,10 @@ public abstract class RenderEngine
         rightMargin = 30;
     }
 
-    private void calculateDefaultSpacing(final Context cr) {
-        final Layout layout;
-        final FontOptions options;
-        final LayoutLine line;
-        final Rectangle logical;
-
-        layout = new Layout(cr);
-        options = new FontOptions();
-        options.setHintMetrics(OFF);
-        layout.getContext().setFontOptions(options);
-
-        layout.setFontDescription(fonts.serif);
-
-        layout.setText("Some text");
-
-        line = layout.getLineReadonly(0);
-        logical = line.getExtentsLogical();
-        defaultLineHeight = logical.getHeight() + extraSpacing;
-        defaultLineAscent = logical.getAscent() + extraSpacing;
-
-    }
-
-    public void processText(final Context cr, final Series series) {
+    public void processSeries(final Context cr, final Series series) {
         int i;
         Segment segment;
         Text text;
-        String str;
         Extract[] paras;
 
         cursor = topMargin;
@@ -181,105 +141,58 @@ public abstract class RenderEngine
             segment = series.get(i);
             text = segment.getText();
 
-            /*
-             * This is still mockup; the real implementation will work across
-             * the Spans to aggregate consecutively formatted runs of text and
-             * then apply Pango Attributes accordingly.
-             */
-            str = text.toString();
-
             if (segment instanceof ComponentSegment) {
-                drawHeading(cr, str, 32.0);
+                drawHeading(cr, text.extractAll(), 32.0);
                 drawBlankLine(cr);
             } else if (segment instanceof HeadingSegment) {
-                drawHeading(cr, str, 16.0);
+                drawHeading(cr, text.extractAll(), 16.0);
                 drawBlankLine(cr);
             } else if (segment instanceof PreformatSegment) {
-                drawBlockProgram(cr, str);
+                drawProgramCode(cr, text.extractAll());
                 drawBlankLine(cr);
             } else if (segment instanceof ParagraphSegment) {
-                paras = text.extractLines();
+                paras = text.extractParagraphs();
                 for (Extract extract : paras) {
-                    drawBlockText(cr, extract);
+                    drawNormalParagraph(cr, extract);
                     drawBlankLine(cr);
                 }
             }
         }
     }
 
-    private static final boolean debug = false;
-
     protected void drawBlankLine(Context cr) {
-        cursor += defaultLineHeight * 0.7;
-
-        if (debug) {
-            cr.setSource(0.3, 0.0, 0.1);
-            cr.setLineWidth(0.1);
-            cr.moveTo(leftMargin, cursor);
-            cr.lineTo(pageWidth - rightMargin, cursor);
-            cr.stroke();
-            cr.setSource(0.0, 0.0, 0.0);
-        }
+        cursor += serifFace.lineHeight * 0.7;
     }
 
-    protected void drawHeading(Context cr, String title, double size) {
-        final Layout layout;
-        final FontDescription desc;
-        final FontOptions options;
-        LayoutLine line;
-        final Rectangle ink;
-        double b, d, v;
-        int i, num;
+    protected void drawHeading(Context cr, Extract entire, double size) {
+        FontDescription desc;
+        Typeface face;
 
-        layout = new Layout(cr);
-
-        options = new FontOptions();
-        options.setHintMetrics(OFF);
-        layout.getContext().setFontOptions(options);
-
-        desc = fonts.heading.copy();
+        desc = headingFace.desc.copy();
         desc.setSize(size);
-        layout.setFontDescription(desc);
+        face = new Typeface(cr, desc, 0.0);
 
-        layout.setWidth(pageWidth - (leftMargin + rightMargin));
-        layout.setText(title);
-
-        cr.setSource(0.0, 0.0, 0.0);
-
-        /*
-         * We draw headings at the from the ink extent, not the logical one;
-         * otherwise the apparent top padding (especially from the top margin
-         * if a heading is first on a page) is both variable and too large.
-         */
-
-        line = layout.getLineReadonly(0);
-        ink = line.getExtentsInk();
-        b = ink.getAscent();
-        d = ink.getDescent();
-        v = ink.getHeight();
-
-        num = layout.getLineCount();
-
-        cr.moveTo(leftMargin, cursor + b);
-        cr.showLayout(line);
-
-        cursor += v;
-
-        for (i = 1; i < num; i++) {
-            cr.moveTo(leftMargin, cursor + b);
-            line = layout.getLineReadonly(i);
-            cr.showLayout(line);
-            cursor += v;
-        }
-
-        cursor += 3.0;
+        drawAreaText(cr, entire, face, false);
     }
 
-    protected void drawBlockText(Context cr, Extract extract) {
+    protected void drawNormalParagraph(Context cr, Extract extract) {
+        drawAreaText(cr, extract, serifFace, false);
+    }
+
+    protected void drawProgramCode(Context cr, Extract entire) {
+        drawAreaText(cr, entire, monoFace, true);
+    }
+
+    /**
+     * Given an Extract of text and a FontDescription, render it to the target
+     * Surface. Fancy typesetting character substitutions (smary quotes, etc)
+     * will occur if not preformatted text.
+     */
+    protected final void drawAreaText(Context cr, Extract extract, Typeface face, boolean preformatted) {
         final Layout layout;
         final FontOptions options;
         final StringBuilder buf;
-        AttributeList list;
+        final AttributeList list;
         int i, j, len, offset, width;
         Span span;
         String str;
@@ -290,7 +203,7 @@ public abstract class RenderEngine
         options.setHintMetrics(OFF);
         layout.getContext().setFontOptions(options);
 
-        layout.setFontDescription(fonts.serif);
+        layout.setFontDescription(face.desc);
 
         layout.setWidth(pageWidth - (leftMargin + rightMargin));
 
@@ -327,17 +240,13 @@ public abstract class RenderEngine
 
             if (span instanceof CharacterSpan) {
                 for (Attribute attr : attributesForMarkup(span.getMarkup())) {
-                    if (attr != null) {
-                        attr.setIndices(layout, offset, width);
-                        list.insert(attr);
-                    }
+                    attr.setIndices(layout, offset, width);
+                    list.insert(attr);
                 }
             } else if (span instanceof StringSpan) {
                 for (Attribute attr : attributesForMarkup(span.getMarkup())) {
-                    if (attr != null) {
-                        attr.setIndices(layout, offset, width);
-                        list.insert(attr);
-                    }
+                    attr.setIndices(layout, offset, width);
+                    list.insert(attr);
                 }
             }
 
@@ -357,23 +266,14 @@ public abstract class RenderEngine
         cr.setSource(0.0, 0.0, 0.0);
 
         for (LayoutLine line : layout.getLinesReadonly()) {
-            if (!paginate(cr, defaultLineHeight)) {
+            if (!paginate(cr, face.lineHeight)) {
                 return;
             }
 
-            cr.moveTo(leftMargin, cursor + defaultLineAscent);
+            cr.moveTo(leftMargin, cursor + face.lineAscent);
             cr.showLayout(line);
 
-            cursor += defaultLineHeight;
-
-            if (debug) {
-                cr.setSource(0.1, 1.0, 0.1);
-                cr.setLineWidth(0.1);
-                cr.moveTo(leftMargin, cursor);
-                cr.lineTo(pageWidth - rightMargin, cursor);
-                cr.stroke();
-                cr.setSource(0.0, 0.0, 0.0);
-            }
+            cursor += face.lineHeight;
         }
     }
 
@@ -405,7 +305,7 @@ public abstract class RenderEngine
      * This is just a placeholder... move to rendering engine once we have
      * such things
      */
-    private static Attribute[] attributesForMarkup(Markup m) {
+    private Attribute[] attributesForMarkup(Markup m) {
         if (m == null) {
             return empty;
         }
@@ -420,19 +320,19 @@ public abstract class RenderEngine
                 };
             } else if (m == Common.FILENAME) {
                 return new Attribute[] {
-                        new FontDescriptionAttribute(fonts.mono), new StyleAttribute(Style.ITALIC),
+                        new FontDescriptionAttribute(monoFace.desc), new StyleAttribute(Style.ITALIC),
                 };
             } else if (m == Common.TYPE) {
                 return new Attribute[] {
-                    new FontDescriptionAttribute(fonts.sans),
+                    new FontDescriptionAttribute(sansFace.desc),
                 };
             } else if (m == Common.FUNCTION) {
                 return new Attribute[] {
-                    new FontDescriptionAttribute(fonts.mono),
+                    new FontDescriptionAttribute(monoFace.desc),
                 };
             } else if (m == Common.CODE) {
                 return new Attribute[] {
-                    new FontDescriptionAttribute(fonts.mono),
+                    new FontDescriptionAttribute(monoFace.desc),
                 };
             } else if (m == Common.APPLICATION) {
                 return new Attribute[] {
@@ -440,7 +340,7 @@ public abstract class RenderEngine
                 };
             } else if (m == Common.COMMAND) {
                 return new Attribute[] {
-                        new FontDescriptionAttribute(fonts.mono),
+                        new FontDescriptionAttribute(monoFace.desc),
                         new WeightAttribute(Weight.SEMIBOLD),
                         new ForegroundColorAttribute(0.1, 0.1, 0.1),
                 };
@@ -454,51 +354,6 @@ public abstract class RenderEngine
         // else TODO
 
         throw new IllegalArgumentException("\n" + "Translation of " + m + " not yet implemented");
-    }
-
-    protected void drawBlockProgram(Context cr, String prog) {
-        final Layout layout;
-        final FontOptions options;
-        final String[] paras;
-        double y, b, v = 0;
-        Rectangle logical;
-
-        layout = new Layout(cr);
-
-        options = new FontOptions();
-        options.setHintMetrics(OFF);
-        layout.getContext().setFontOptions(options);
-
-        layout.setFontDescription(fonts.mono);
-
-        /*
-         * This is fake. TODO pass in our TextStack object (which already
-         * knows what the paragraphs are) and process from that.
-         */
-        paras = prog.split("\n");
-
-        layout.setWidth(pageWidth - (leftMargin + rightMargin));
-
-        cr.setSource(0.0, 0.0, 0.0);
-
-        for (String para : paras) {
-            layout.setText(para);
-
-            for (LayoutLine line : layout.getLinesReadonly()) {
-                logical = line.getExtentsLogical();
-                v = logical.getHeight();
-                b = logical.getAscent();
-
-                if (!paginate(cr, v)) {
-                    return;
-                }
-
-                cr.moveTo(leftMargin, cursor + b);
-                cr.showLayout(line);
-
-                cursor += v;
-            }
-        }
     }
 
     /**
@@ -540,15 +395,4 @@ public abstract class RenderEngine
     public double getMarginBottom() {
         return bottomMargin;
     }
-}
-
-class fonts
-{
-    static FontDescription sans;
-
-    static FontDescription serif;
-
-    static FontDescription mono;
-
-    static FontDescription heading;
 }
