@@ -10,11 +10,17 @@
  */
 package quill.ui;
 
+import org.gnome.gtk.Editable;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
 
+import quill.textbase.Change;
+import quill.textbase.Extract;
+import quill.textbase.Span;
+import quill.textbase.StringSpan;
 import quill.textbase.TextStack;
+import quill.textbase.TextualChange;
 
 class HeadingBox extends HBox
 {
@@ -24,8 +30,16 @@ class HeadingBox extends HBox
 
     protected Label label;
 
+    private TextStack stack;
+
     public HeadingBox() {
         super(false, 0);
+
+        setupBox();
+        hookupChangeHandler();
+    }
+
+    private void setupBox() {
         box = this;
 
         title = new Entry();
@@ -37,10 +51,32 @@ class HeadingBox extends HBox
         box.packEnd(label, true, true, 0);
     }
 
+    /*
+     * This is ad-hoc while we persist at having an Entry here as the Widget
+     * for entering title te
+     */
+    private void hookupChangeHandler() {
+        title.connect(new Entry.Changed() {
+            public void onChanged(Editable source) {
+                Change change;
+                Extract entire;
+                Span span;
+
+                entire = stack.extractAll();
+                span = new StringSpan(title.getText(), null);
+
+                change = new TextualChange(0, entire, span);
+                stack.apply(change);
+            }
+        });
+    }
+
     void loadText(TextStack load) {
         if (load.undo() != null) {
             throw new IllegalArgumentException();
         }
+
+        this.stack = load;
 
         /*
          * Should we change to rich markup in titles, we can use the logic in
@@ -50,5 +86,4 @@ class HeadingBox extends HBox
 
         title.setText(load.toString());
     }
-
 }

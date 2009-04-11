@@ -20,10 +20,7 @@ import org.gnome.gtk.Widget;
 
 import parchment.render.RenderEngine;
 import parchment.render.ReportRenderEngine;
-import quill.textbase.Folio;
 import quill.textbase.Series;
-
-import static quill.client.Quill.data;
 
 /**
  * Display a preview of what the final output document is going to be. This
@@ -58,18 +55,17 @@ class PreviewWidget extends DrawingArea
 
     private int pixelHeight;
 
+    private Series series;
+
     PreviewWidget() {
         super();
 
         this.connect(new Widget.ExposeEvent() {
             public boolean onExposeEvent(Widget source, EventExpose event) {
-                final Folio folio;
                 final RenderEngine engine;
                 final Context cr;
 
-                folio = data.getActiveDocument();
-
-                engine = new ReportRenderEngine(PaperSize.A4, folio.get(0));
+                engine = new ReportRenderEngine(PaperSize.A4, series);
 
                 cr = new Context(source.getWindow());
 
@@ -178,6 +174,7 @@ class PreviewWidget extends DrawingArea
      * and start dealing with multiple pages.
      */
     void renderSeries(Series series) {
-
+        this.series = series;
+        this.queueDraw();
     }
 }
