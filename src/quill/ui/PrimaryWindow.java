@@ -187,10 +187,12 @@ class PrimaryWindow extends Window
     }
 
     /**
-     * Change the right side to show the preview display.
+     * Change the right side to show the preview display, and ensure it is up
+     * to date.
      */
     void switchToPreview() {
         right.setCurrentPage(0);
+        preview.queueDraw();
     }
 
     /**
