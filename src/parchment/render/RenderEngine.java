@@ -186,24 +186,65 @@ public abstract class RenderEngine
     private char previous;
 
     /**
-     * Carry out smart typography replacements.
+     * Carry out smart typography replacements. Returns the number of
+     * characters actually added, since some cases insert Unicode control
+     * sequences.
      */
-    private void translateAndAppend(final StringBuilder buf, final char ch, final boolean code) {
+    private int translateAndAppend(final StringBuilder buf, final char ch, final boolean code) {
+        int num;
+
+        num = 0;
+
         if (code) {
+            /*
+             * Prevent Pango from doing line breaks on opening brackets.
+             * U+2060 is the WORD JOINER character, similar to a zero width
+             * space but with a more precise semantic.
+             */
+
+            if ((ch == '(') || (ch == '{') || (ch == '[')) {
+                buf.append('\u2060');
+                num++;
+            }
+
+            /*
+             * Should we choose to replace spaces with non-breaking spaces in
+             * code blocks, it's U+00A0. Anyway, now add the character.
+             */
+
             buf.append(ch);
+            num++;
         } else if (ch == '"') {
-            if (previous == 0) {
+            /*
+             * Replace normal quotes. When there's a space (or paragraph
+             * start) preceeding the character we're considering, replace with
+             * U+201C aka the LEFT DOUBLE QUOTATION MARK. Otherwise, close the
+             * quotation with U+201D aka the RIGHT DOUBLE QUOTATION MARK.
+             * Inspired by Smarty, of Markdown fame. Note that we don't do
+             * this in preformatted code blocks
+             */
+
+            if (previous == '\0') {
                 buf.append('“');
+                num++;
             } else if (!Character.isWhitespace(previous)) {
                 buf.append('”');
+                num++;
             } else {
                 buf.append('“');
+                num++;
             }
         } else {
+            /*
+             * Normal character. Just add it.
+             */
+
             buf.append(ch);
+            num++;
         }
 
         previous = ch;
+        return num;
     }
 
     /**
@@ -233,54 +274,50 @@ public abstract class RenderEngine
         layout.setWidth(pageWidth - (leftMargin + rightMargin));
 
         buf = new StringBuilder();
-        previous = 0;
+
+        list = new AttributeList();
+        offset = 0;
+        previous = '\0';
+
+        /*
+         * Now iterate over the Spans, accumulating their characters, and
+         * creating Attributes along the way.
+         */
 
         for (i = 0; i < extract.size(); i++) {
             span = extract.get(i);
             format = span.getMarkup();
+            width = 0;
 
             if (preformatted) {
                 code = true;
-            } else if (format == Common.CODE) {
+            } else if ((format == Common.CODE) || (format == Common.FILENAME)) {
                 code = true;
             } else {
                 code = false;
             }
 
             if (span instanceof CharacterSpan) {
-                translateAndAppend(buf, span.getChar(), code);
+                width += translateAndAppend(buf, span.getChar(), code);
             } else if (span instanceof StringSpan) {
                 str = span.getText();
                 len = str.length();
+
                 for (j = 0; j < len; j++) {
-                    translateAndAppend(buf, str.charAt(j), code);
+                    width += translateAndAppend(buf, str.charAt(j), code);
                 }
             }
-        }
-
-        str = buf.toString();
-        layout.setText(str);
-
-        /*
-         * Now iterate over the Spans, and create Attributes for each
-         * contiguous run.
-         */
-
-        list = new AttributeList();
-        offset = 0;
-
-        for (i = 0; i < extract.size(); i++) {
-            span = extract.get(i);
-            width = span.getWidth();
 
             for (Attribute attr : attributesForMarkup(span.getMarkup())) {
-                attr.setIndices(layout, offset, width);
+                attr.setIndices(offset, width);
                 list.insert(attr);
             }
 
             offset += width;
         }
 
+        str = buf.toString();
+        layout.setText(str);
         layout.setAttributes(list);
 
         /*
