@@ -324,7 +324,7 @@ abstract class EditorTextView extends TextView
             selectionOffset = selection.getOffset();
 
             offset = normalizeOffset(insertOffset, selectionOffset);
-            width = normalizeOffset(insertOffset, selectionOffset);
+            width = normalizeWidth(insertOffset, selectionOffset);
 
             removed = stack.extractRange(offset, width);
             change = new TextualChange(offset, removed, stash);
