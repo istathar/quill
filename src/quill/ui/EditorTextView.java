@@ -521,7 +521,7 @@ abstract class EditorTextView extends TextView
                 buffer.removeAllTags(start, end);
                 tag = tagForMarkup(s.getMarkup());
                 if (tag == null) {
-                    return;
+                    continue;
                 }
                 buffer.applyTag(tag, start, end);
             }
