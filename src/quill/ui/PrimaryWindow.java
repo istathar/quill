@@ -49,6 +49,8 @@ class PrimaryWindow extends Window
 
     private PreviewWidget preview;
 
+    private OutlineWidget outline;
+
     /**
      * The Components currently being represented by this PrimaryWindow
      */
@@ -102,6 +104,9 @@ class PrimaryWindow extends Window
         help = new HelpWidget();
         right.add(help);
 
+        outline = new OutlineWidget();
+        right.add(outline);
+
         two.add(right);
     }
 
@@ -137,6 +142,9 @@ class PrimaryWindow extends Window
                     return true;
                 } else if (key == Keyval.F2) {
                     switchToPreview();
+                    return true;
+                } else if (key == Keyval.F3) {
+                    switchToOutline();
                     return true;
                 }
                 // ...
@@ -182,6 +190,13 @@ class PrimaryWindow extends Window
      */
     void switchToPreview() {
         right.setCurrentPage(0);
+    }
+
+    /**
+     * Change the right side to show the outline navigator.
+     */
+    void switchToOutline() {
+        right.setCurrentPage(2);
     }
 
     /**
