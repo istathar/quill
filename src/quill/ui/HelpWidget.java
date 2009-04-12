@@ -57,7 +57,7 @@ class HelpWidget extends HBox
                 new String[] {
                         "F3",
                         "Outline",
-                        "An outline of the documents chapters and section headings allowing you to navigate."
+                        "An outline of the document's chapters and section headings allowing you to navigate."
                 },
                 new String[] {
                         "F11",

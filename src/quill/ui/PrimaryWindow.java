@@ -49,6 +49,8 @@ class PrimaryWindow extends Window
 
     private PreviewWidget preview;
 
+    private OutlineWidget outline;
+
     /**
      * The Components currently being represented by this PrimaryWindow
      */
@@ -76,7 +78,7 @@ class PrimaryWindow extends Window
         top = new VBox(false, 0);
         window.add(top);
 
-        two = new HBox(true, 6);
+        two = new HBox(false, 6);
         top.packStart(two, true, true, 0);
     }
 
@@ -84,6 +86,7 @@ class PrimaryWindow extends Window
         left = new Notebook();
         left.setShowTabs(false);
         left.setShowBorder(false);
+        left.setSizeRequest(600, -1);
 
         editor = new ComponentEditorWidget();
         left.insertPage(editor, null, 0);
@@ -95,13 +98,15 @@ class PrimaryWindow extends Window
         right = new Notebook();
         right.setShowTabs(false);
         right.setShowBorder(false);
-        // right.setSizeRequest(400, -1);
 
         preview = new PreviewWidget();
         right.add(preview);
 
         help = new HelpWidget();
         right.add(help);
+
+        outline = new OutlineWidget();
+        right.add(outline);
 
         two.packStart(right, false, false, 0);
     }
@@ -141,10 +146,16 @@ class PrimaryWindow extends Window
                     } else if (key == Keyval.F2) {
                         switchToPreview();
                         return true;
+                    } else if (key == Keyval.F3) {
+                        switchToOutline();
+                        return true;
                     }
                     // ...
                     else if (key == Keyval.F11) {
                         toggleFullscreen();
+                        return true;
+                    } else if (key == Keyval.F12) {
+                        toggleRightSide();
                         return true;
                     }
                 } else if (mod == ModifierType.CONTROL_MASK) {
@@ -172,6 +183,29 @@ class PrimaryWindow extends Window
         }
     }
 
+    private boolean showingRightSide = true;
+
+    /*
+     * Not a documented public feature. This code is here only so we can
+     * demonstrate just how hard getting the user experience correct for this
+     * is. The correct end result would be keeping the vertical height of
+     * previously set, and probably horizontal width as well. What is really
+     * bad is that if you return to maximized with the right hand side turned
+     * off suddenly the editor is super wide, and that's a horrible
+     * experience.
+     */
+    private void toggleRightSide() {
+        if (showingRightSide) {
+            right.hide();
+            window.setMaximize(false);
+            window.resize(600, 700);
+            showingRightSide = false;
+        } else {
+            right.show();
+            showingRightSide = true;
+        }
+    }
+
     /**
      * Change the left side to show the chapter editor.
      */
@@ -196,6 +230,14 @@ class PrimaryWindow extends Window
     }
 
     /**
+     * Change the right side to show the outline navigator.
+     */
+    void switchToOutline() {
+        right.setCurrentPage(2);
+        outline.renderSeries(series);
+    }
+
+    /**
      * Adjust the left side editor to show the supplied vertical location.
      */
     /*
@@ -213,12 +255,13 @@ class PrimaryWindow extends Window
     /*
      * FUTURE considerations: when we start dealing in multiple chapters,
      * we'll want to be able to navigate between them, which means this UI
-     * will need to be told what other Series are available/
+     * will need to be told what other Series are available.
      */
     void displaySeries(Series series) {
         this.series = series;
 
         editor.initializeSeries(series);
         preview.renderSeries(series);
+        outline.renderSeries(series);
     }
 }
