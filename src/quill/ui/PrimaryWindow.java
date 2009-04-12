@@ -208,6 +208,7 @@ class PrimaryWindow extends Window
      */
     void switchToOutline() {
         right.setCurrentPage(2);
+        outline.renderSeries(series);
     }
 
     /**

@@ -15,6 +15,7 @@ import org.gnome.gtk.Button;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.ReliefStyle;
 import org.gnome.gtk.VBox;
+import org.gnome.gtk.Widget;
 
 import quill.textbase.ComponentSegment;
 import quill.textbase.HeadingSegment;
@@ -41,10 +42,10 @@ class OutlineWidget extends VBox
     public OutlineWidget() {
         super(false, 0);
         top = this;
-        build();
+        series = null;
     }
 
-    private void build() {
+    private void buildOutline() {
         Segment segment;
         int i;
         Text text;
@@ -88,8 +89,21 @@ class OutlineWidget extends VBox
         top.showAll();
     }
 
+    /**
+     * Given a Series, display it.
+     */
+    /*
+     * At the moment this is horribly inefficient; we should have something
+     * more dynamic that merely updates the Labels rather than wholesale
+     * recreates everything.
+     */
     void renderSeries(Series series) {
         this.series = series;
-        build();
+
+        for (Widget child : top.getChildren()) {
+            top.remove(child);
+        }
+
+        buildOutline();
     }
 }
