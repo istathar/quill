@@ -22,6 +22,7 @@ import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
 import quill.textbase.ComponentSegment;
+import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
@@ -81,11 +82,11 @@ class OutlineWidget extends VBox
                 str.append(text.toString());
             } else {
                 text = segment.getText();
-                num = text.extractParagraphs().length;
+                text.extractParagraphs();
                 if (segment instanceof PreformatSegment) {
-                    lines = new CompressedLines(num, true);
+                    lines = new CompressedLines(text, true);
                 } else {
-                    lines = new CompressedLines(num, false);
+                    lines = new CompressedLines(text, false);
                 }
                 top.packStart(lines, false, false, 0);
                 continue;
@@ -124,34 +125,64 @@ class OutlineWidget extends VBox
 
 class CompressedLines extends DrawingArea
 {
-    private int lines;
+    private int[] dots;
 
-    private boolean preformatted;
+    private int num;
 
-    CompressedLines(int num, boolean program) {
+    private boolean pre;
+
+    private static final int WIDTH = 200;
+
+    private static final int SPACING = 3;
+
+    CompressedLines(Text text, boolean program) {
         super();
         final DrawingArea self;
+        Extract[] paras;
+        String line;
+        int j, i, words, width;
 
         self = this;
 
-        lines = num;
-        preformatted = program;
+        paras = text.extractParagraphs();
+        dots = new int[paras.length];
+        j = 0;
 
-        if (program) {
-            lines /= 10;
-            lines++;
+        for (Extract extract : paras) {
+            line = extract.getText();
+            i = -1;
+            words = 0;
+
+            do {
+                i++;
+                words++;
+            } while ((i = line.indexOf(' ', i)) != -1);
+
+            dots[j++] = words;
         }
 
-        self.setSizeRequest(150, 4 * lines);
+        num = 1;
+        width = 0;
+        for (i = 0; i < dots.length; i++) {
+            width += dots[i] + 2;
+            if (width > WIDTH) {
+                num++;
+                width = 0;
+            }
+        }
+
+        pre = program;
+
+        self.setSizeRequest(40 + WIDTH, SPACING * num);
 
         this.connect(new Widget.ExposeEvent() {
             public boolean onExposeEvent(Widget source, EventExpose event) {
                 final Context cr;
-                int i;
+                int i, j, width, rem;
 
                 cr = new Context(source.getWindow());
 
-                if (preformatted) {
+                if (pre) {
                     cr.setSource(0.7, 0.7, 0.7);
                 } else {
                     cr.setSource(0.5, 0.5, 0.5);
@@ -160,10 +191,25 @@ class CompressedLines extends DrawingArea
                 cr.setLineWidth(1.0);
                 cr.setAntialias(Antialias.NONE);
 
-                for (i = 0; i < lines; i++) {
-                    cr.moveTo(40, 4 * i + 2);
-                    cr.lineRelative(100, 0);
+                cr.moveTo(40, 0);
+                width = 0;
+                j = 0;
+
+                for (i = 0; i < dots.length; i++) {
+                    if (width + dots[i] > WIDTH) {
+                        rem = WIDTH - width;
+                        cr.lineRelative(rem, 0);
+                        j++;
+                        cr.moveTo(40, SPACING * j);
+                        cr.lineRelative(dots[i] - rem, 0);
+                        width = dots[i] - rem + 2;
+                    } else {
+                        cr.lineRelative(dots[i], 0);
+                        width += dots[i] + 2;
+                    }
+                    cr.moveRelative(2, 0);
                 }
+
                 cr.stroke();
 
                 return true;
