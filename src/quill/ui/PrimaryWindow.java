@@ -78,7 +78,7 @@ class PrimaryWindow extends Window
         top = new VBox(false, 0);
         window.add(top);
 
-        two = new HBox(true, 6);
+        two = new HBox(false, 6);
         top.packStart(two, true, true, 0);
     }
 
@@ -86,6 +86,7 @@ class PrimaryWindow extends Window
         left = new Notebook();
         left.setShowTabs(false);
         left.setShowBorder(false);
+        left.setSizeRequest(600, -1);
 
         editor = new ComponentEditorWidget();
         left.insertPage(editor, null, 0);
@@ -97,7 +98,6 @@ class PrimaryWindow extends Window
         right = new Notebook();
         right.setShowTabs(false);
         right.setShowBorder(false);
-        // right.setSizeRequest(400, -1);
 
         preview = new PreviewWidget();
         right.add(preview);
@@ -154,6 +154,9 @@ class PrimaryWindow extends Window
                     else if (key == Keyval.F11) {
                         toggleFullscreen();
                         return true;
+                    } else if (key == Keyval.F12) {
+                        toggleRightSide();
+                        return true;
                     }
                 } else if (mod == ModifierType.CONTROL_MASK) {
                     if (key == Keyval.s) {
@@ -177,6 +180,29 @@ class PrimaryWindow extends Window
             window.setFullscreen(false);
         } else {
             window.setFullscreen(true);
+        }
+    }
+
+    private boolean showingRightSide = true;
+
+    /*
+     * Not a documented public feature. This code is here only so we can
+     * demonstrate just how hard getting the user experience correct for this
+     * is. The correct end result would be keeping the vertical height of
+     * previously set, and probably horizontal width as well. What is really
+     * bad is that if you return to maximized with the right hand side turned
+     * off suddenly the editor is super wide, and that's a horrible
+     * experience.
+     */
+    private void toggleRightSide() {
+        if (showingRightSide) {
+            right.hide();
+            window.setMaximize(false);
+            window.resize(600, 700);
+            showingRightSide = false;
+        } else {
+            right.show();
+            showingRightSide = true;
         }
     }
 
