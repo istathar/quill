@@ -49,6 +49,8 @@ class PrimaryWindow extends Window
 
     private PreviewWidget preview;
 
+    private OutlineWidget outline;
+
     /**
      * The Components currently being represented by this PrimaryWindow
      */
@@ -103,6 +105,9 @@ class PrimaryWindow extends Window
         help = new HelpWidget();
         right.add(help);
 
+        outline = new OutlineWidget();
+        right.add(outline);
+
         two.packStart(right, false, false, 0);
     }
 
@@ -140,6 +145,9 @@ class PrimaryWindow extends Window
                         return true;
                     } else if (key == Keyval.F2) {
                         switchToPreview();
+                        return true;
+                    } else if (key == Keyval.F3) {
+                        switchToOutline();
                         return true;
                     }
                     // ...
@@ -196,6 +204,13 @@ class PrimaryWindow extends Window
     }
 
     /**
+     * Change the right side to show the outline navigator.
+     */
+    void switchToOutline() {
+        right.setCurrentPage(2);
+    }
+
+    /**
      * Adjust the left side editor to show the supplied vertical location.
      */
     /*
@@ -220,5 +235,6 @@ class PrimaryWindow extends Window
 
         editor.initializeSeries(series);
         preview.renderSeries(series);
+        outline.renderSeries(series);
     }
 }
