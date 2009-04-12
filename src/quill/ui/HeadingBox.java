@@ -16,6 +16,7 @@ import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
 
 import quill.textbase.Change;
+import quill.textbase.DeleteChange;
 import quill.textbase.Extract;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
@@ -61,11 +62,17 @@ class HeadingBox extends HBox
                 Change change;
                 Extract entire;
                 Span span;
+                String str;
 
                 entire = stack.extractAll();
-                span = new StringSpan(title.getText(), null);
+                str = title.getText();
 
-                change = new TextualChange(0, entire, span);
+                if (str.length() == 0) {
+                    change = new DeleteChange(0, entire);
+                } else {
+                    span = new StringSpan(str, null);
+                    change = new TextualChange(0, entire, span);
+                }
                 stack.apply(change);
             }
         });

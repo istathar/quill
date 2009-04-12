@@ -461,8 +461,7 @@ public class Text
     }
 
     /**
-     * Delete a width wide segment starting at offset. Returns a Span[]
-     * representing the removed range.
+     * Delete a width wide segment starting at offset.
      */
     protected void delete(int offset, int width) {
         final Piece preceeding, following;

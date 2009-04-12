@@ -263,6 +263,10 @@ public abstract class RenderEngine
         Markup format;
         String str;
 
+        if (extract == null) {
+            return;
+        }
+
         layout = new Layout(cr);
 
         options = new FontOptions();
