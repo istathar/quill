@@ -10,8 +10,12 @@
  */
 package quill.ui;
 
+import org.freedesktop.cairo.Antialias;
+import org.freedesktop.cairo.Context;
+import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Button;
+import org.gnome.gtk.DrawingArea;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.ReliefStyle;
 import org.gnome.gtk.VBox;
@@ -19,6 +23,7 @@ import org.gnome.gtk.Widget;
 
 import quill.textbase.ComponentSegment;
 import quill.textbase.HeadingSegment;
+import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Text;
@@ -47,11 +52,12 @@ class OutlineWidget extends VBox
 
     private void buildOutline() {
         Segment segment;
-        int i;
+        int i, num;
         Text text;
         StringBuilder str;
         Button button;
         Label label;
+        DrawingArea lines;
 
         if (series == null) {
             return;
@@ -71,9 +77,17 @@ class OutlineWidget extends VBox
                 text = segment.getText();
 
                 str = new StringBuilder();
-                str.append("           ");
+                str.append("      ");
                 str.append(text.toString());
             } else {
+                text = segment.getText();
+                num = text.extractParagraphs().length;
+                if (segment instanceof PreformatSegment) {
+                    lines = new CompressedLines(num, true);
+                } else {
+                    lines = new CompressedLines(num, false);
+                }
+                top.packStart(lines, false, false, 0);
                 continue;
             }
 
@@ -105,5 +119,55 @@ class OutlineWidget extends VBox
         }
 
         buildOutline();
+    }
+}
+
+class CompressedLines extends DrawingArea
+{
+    private int lines;
+
+    private boolean preformatted;
+
+    CompressedLines(int num, boolean program) {
+        super();
+        final DrawingArea self;
+
+        self = this;
+
+        lines = num;
+        preformatted = program;
+
+        if (program) {
+            lines /= 10;
+            lines++;
+        }
+
+        self.setSizeRequest(150, 4 * lines);
+
+        this.connect(new Widget.ExposeEvent() {
+            public boolean onExposeEvent(Widget source, EventExpose event) {
+                final Context cr;
+                int i;
+
+                cr = new Context(source.getWindow());
+
+                if (preformatted) {
+                    cr.setSource(0.7, 0.7, 0.7);
+                } else {
+                    cr.setSource(0.5, 0.5, 0.5);
+                }
+
+                cr.setLineWidth(1.0);
+                cr.setAntialias(Antialias.NONE);
+
+                for (i = 0; i < lines; i++) {
+                    cr.moveTo(40, 4 * i + 2);
+                    cr.lineRelative(100, 0);
+                }
+                cr.stroke();
+
+                return true;
+            }
+        });
     }
 }
