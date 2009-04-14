@@ -191,7 +191,7 @@ public abstract class RenderEngine
      * sequences.
      */
     private int translateAndAppend(final StringBuilder buf, final char ch, final boolean code) {
-        int num;
+        int num, i;
 
         num = 0;
 
@@ -234,6 +234,19 @@ public abstract class RenderEngine
                 buf.append('“');
                 num++;
             }
+        } else if (ch == ' ') {
+            /*
+             * If the preceeding sequence is " - " then replace the hyphen
+             * with U+2014 EM DASH.
+             */
+            if (previous == '-') {
+                i = buf.length();
+                if ((i > 1) && (buf.charAt(i - 2) == ' ')) {
+                    buf.setCharAt(i - 1, '\u2014');
+                }
+            }
+            buf.append(' ');
+            num++;
         } else {
             /*
              * Normal character. Just add it.
