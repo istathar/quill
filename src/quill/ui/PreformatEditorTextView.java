@@ -20,5 +20,6 @@ class PreformatEditorTextView extends EditorTextView
         super.modifyFont(fonts.mono);
 
         super.setWrapMode(WrapMode.NONE);
+        super.setAcceptsTab(true);
     }
 }

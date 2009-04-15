@@ -19,5 +19,7 @@ class ParagraphEditorTextView extends EditorTextView
 
         this.setPaddingAboveParagraph(0);
         this.setPaddingBelowParagraph(10);
+
+        super.setAcceptsTab(true);
     }
 }

@@ -32,6 +32,7 @@ import quill.textbase.FormatChange;
 import quill.textbase.InsertChange;
 import quill.textbase.Markup;
 import quill.textbase.Span;
+import quill.textbase.StringSpan;
 import quill.textbase.TextStack;
 import quill.textbase.TextualChange;
 
@@ -83,12 +84,51 @@ abstract class EditorTextView extends TextView
         stack = new TextStack();
     }
 
+    private boolean user;
+
     private void hookupKeybindings() {
+        buffer.connect(new TextBuffer.InsertText() {
+            public void onInsertText(TextBuffer source, TextIter pointer, String text) {
+                Span span;
+                Change change;
+
+                System.out.println("InsertText:\t" + user);
+                if (!user) {
+                    return;
+                }
+
+                span = new StringSpan(text, insertMarkup);
+
+                change = new InsertChange(pointer.getOffset(), span);
+                stack.apply(change);
+            }
+        });
+
+        buffer.connect(new TextBuffer.DeleteRange() {
+            public void onDeleteRange(TextBuffer source, TextIter start, TextIter end) {
+                System.out.println("DeleteRange:\t" + user);
+                if (!user) {
+                    return;
+                }
+                deleteRange(start, end);
+            }
+        });
+
+        buffer.connect(new TextBuffer.BeginUserAction() {
+            public void onBeginUserAction(TextBuffer source) {
+                user = true;
+            }
+        });
+        buffer.connect(new TextBuffer.EndUserAction() {
+            public void onEndUserAction(TextBuffer source) {
+                user = false;
+            }
+        });
+
         view.connect(new Widget.KeyPressEvent() {
             public boolean onKeyPressEvent(Widget source, EventKey event) {
                 final Keyval key;
                 final ModifierType mod;
-                final char ch;
 
                 key = event.getKeyval();
 
@@ -99,7 +139,7 @@ abstract class EditorTextView extends TextView
 
                 if ((key == Keyval.Up) || (key == Keyval.Down) || (key == Keyval.Left)
                         || (key == Keyval.Right) || (key == Keyval.Home) || (key == Keyval.End)
-                        || (key == Keyval.PageUp) || (key == Keyval.PageDown)) {
+                        || (key == Keyval.PageUp) || (key == Keyval.PageDown) || (key == Keyval.Compose)) {
                     return false;
                 }
 
@@ -126,14 +166,13 @@ abstract class EditorTextView extends TextView
                  */
                 if (key == Keyval.Return) {
                     insertMarkup = null;
-                    insert('\n');
-                    return true;
+                    return false;
                 } else if (key == Keyval.Delete) {
-                    deleteAt();
-                    return true;
+                    // deleteAt();
+                    return false;
                 } else if (key == Keyval.BackSpace) {
-                    deleteBack();
-                    return true;
+                    // deleteBack();
+                    return false;
                 }
 
                 /*
@@ -158,15 +197,14 @@ abstract class EditorTextView extends TextView
                 }
 
                 /*
-                 * Tab is a strange one. At first glance it is tempting to set
-                 * the TextView to not accept them and to have Tab change
+                 * Tab is a strange one. At first glance it is tempting to let
+                 * the TextView accept them and to have Tab change
                  * focus, but there is the case of program code in a
                  * preformatted block which might need indent support.
                  */
 
                 if (key == Keyval.Tab) {
-                    insert('\t');
-                    return true;
+                    return false;
                 }
 
                 /*
@@ -176,23 +214,7 @@ abstract class EditorTextView extends TextView
                 mod = event.getState();
 
                 if ((mod == ModifierType.NONE) || (mod == ModifierType.SHIFT_MASK)) {
-                    ch = key.toUnicode();
-
-                    if (ch == 0) {
-                        /*
-                         * Don't know what this is. If it's a modifier, we
-                         * ought to have skipped it explicitly above. We
-                         * cannot let it result in a character being inserted
-                         * into the TextBuffer as things will break. So, we
-                         * swollow it. If you're wondering why your keystrokes
-                         * are disappearing off to nowhere, this is the
-                         * answer.
-                         */
-                        return true;
-                    }
-
-                    insert(ch);
-                    return true;
+                    return false;
                 }
                 if (mod == ModifierType.CONTROL_MASK) {
                     if (key == Keyval.a) {
@@ -275,6 +297,8 @@ abstract class EditorTextView extends TextView
      * Create a Span and insert into our internal representation. Then apply()
      * to send the character to the TextBuffer, updating the TextView to
      * reflect the user's input.
+     * 
+     * @deprecated
      */
     private void insert(char ch) {
         final Span span;
@@ -405,7 +429,7 @@ abstract class EditorTextView extends TextView
         change = new DeleteChange(offset, range);
 
         stack.apply(change);
-        this.affect(change);
+        // this.affect(change);
     }
 
     private void toggleMarkup(Markup format) {
