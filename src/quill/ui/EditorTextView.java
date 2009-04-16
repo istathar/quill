@@ -41,7 +41,7 @@ import static quill.ui.Format.tagForMarkup;
 
 abstract class EditorTextView extends TextView
 {
-    private final TextView view;
+    protected final TextView view;
 
     private TextBuffer buffer;
 
@@ -78,13 +78,26 @@ abstract class EditorTextView extends TextView
 
         view.setLeftMargin(3);
         view.setBorderWidth(2);
+
+        view.setAcceptsTab(true);
     }
 
     private void setupInternalStack() {
         stack = new TextStack();
     }
 
+    /**
+     * Is a user initiated input action in progress?
+     */
     private boolean user;
+
+    /**
+     * Override this and return true if you want TAB characters to be inserted
+     * rather than swollowed.
+     */
+    protected boolean isCodeBlock() {
+        return false;
+    }
 
     private void hookupKeybindings() {
         buffer.connect(new TextBuffer.InsertText() {
@@ -92,7 +105,6 @@ abstract class EditorTextView extends TextView
                 Span span;
                 Change change;
 
-                System.out.println("InsertText:\t" + user);
                 if (!user) {
                     return;
                 }
@@ -106,7 +118,6 @@ abstract class EditorTextView extends TextView
 
         buffer.connect(new TextBuffer.DeleteRange() {
             public void onDeleteRange(TextBuffer source, TextIter start, TextIter end) {
-                System.out.println("DeleteRange:\t" + user);
                 if (!user) {
                     return;
                 }
@@ -197,14 +208,19 @@ abstract class EditorTextView extends TextView
                 }
 
                 /*
-                 * Tab is a strange one. At first glance it is tempting to let
-                 * the TextView accept them and to have Tab change
+                 * Tab is a strange one. At first glance it is tempting to set
+                 * the TextView to not accept them and to have Tab change
                  * focus, but there is the case of program code in a
-                 * preformatted block which might need indent support.
+                 * preformatted block which might need indent support. So we
+                 * swollow it unless we're in a preformatted code block.
                  */
 
                 if (key == Keyval.Tab) {
-                    return false;
+                    if (isCodeBlock()) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
 
                 /*
