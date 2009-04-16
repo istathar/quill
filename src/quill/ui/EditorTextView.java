@@ -109,7 +109,11 @@ abstract class EditorTextView extends TextView
                     return;
                 }
 
-                span = new StringSpan(text, insertMarkup);
+                if (text.length() == 1) {
+                    span = new CharacterSpan(text, insertMarkup);
+                } else {
+                    span = new StringSpan(text, insertMarkup);
+                }
 
                 change = new InsertChange(pointer.getOffset(), span);
                 stack.apply(change);
