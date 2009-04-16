@@ -17,8 +17,12 @@ class PreformatEditorTextView extends EditorTextView
     public PreformatEditorTextView() {
         super();
 
-        super.modifyFont(fonts.mono);
+        view.modifyFont(fonts.mono);
 
-        super.setWrapMode(WrapMode.NONE);
+        view.setWrapMode(WrapMode.NONE);
+    }
+
+    protected boolean isCodeBlock() {
+        return true;
     }
 }

@@ -26,17 +26,33 @@ public class CharacterSpan extends Span
      */
     final String text;
 
+    public CharacterSpan(String str, Markup markup) {
+        super(markup);
+        if (str.length() != 1) {
+            throw new IllegalArgumentException();
+        }
+        this.ch = str.charAt(0);
+        this.text = cache(str, ch);
+
+    }
+
     public CharacterSpan(char ch, Markup markup) {
         super(markup);
         if (ch == 0) {
             throw new IllegalArgumentException();
         }
         this.ch = ch;
-        this.text = toString(ch);
+        this.text = cache(ch);
+    }
+
+    private CharacterSpan(char ch, String str, Markup markup) {
+        super(markup);
+        this.ch = ch;
+        this.text = str;
     }
 
     protected Span copy(Markup markup) {
-        return new CharacterSpan(this.ch, markup);
+        return new CharacterSpan(this.ch, this.text, markup);
     }
 
     /*
@@ -55,7 +71,7 @@ public class CharacterSpan extends Span
      * higher range numbers, we turn to the JVM's interning infrastructure for
      * Strings.
      */
-    private static String toString(char ch) {
+    private static String cache(char ch) {
         if (ch < 256) {
             if (cache[ch] == null) {
                 cache[ch] = String.valueOf(ch);
@@ -63,6 +79,17 @@ public class CharacterSpan extends Span
             return cache[ch];
         } else {
             return String.valueOf(ch).intern();
+        }
+    }
+
+    private static String cache(String str, char ch) {
+        if (ch < 256) {
+            if (cache[ch] == null) {
+                cache[ch] = str;
+            }
+            return str;
+        } else {
+            return str.intern();
         }
     }
 

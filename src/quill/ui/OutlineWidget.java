@@ -149,6 +149,9 @@ class CompressedLines extends DrawingArea
         j = 0;
 
         for (Extract extract : paras) {
+            if (extract == null) {
+                continue;
+            }
             line = extract.getText();
             i = -1;
             words = 0;
