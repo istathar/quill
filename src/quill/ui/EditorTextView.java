@@ -10,11 +10,15 @@
  */
 package quill.ui;
 
+import org.gnome.gdk.EventButton;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
+import org.gnome.gdk.MouseButton;
 import org.gnome.gdk.Rectangle;
 import org.gnome.gtk.Allocation;
+import org.gnome.gtk.Menu;
+import org.gnome.gtk.MenuItem;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
@@ -43,6 +47,8 @@ abstract class EditorTextView extends TextView
 {
     protected final TextView view;
 
+    private Menu split, context;
+
     private TextBuffer buffer;
 
     private TextMark selectionBound, insertBound;
@@ -61,6 +67,8 @@ abstract class EditorTextView extends TextView
         view = this;
 
         setupTextView();
+        setupInsertMenu();
+        setupContextMenu();
         setupInternalStack();
 
         hookupKeybindings();
@@ -169,8 +177,13 @@ abstract class EditorTextView extends TextView
                     return false;
                 }
 
-                if ((key == Keyval.Escape) || (key == Keyval.Insert)) {
+                if (key == Keyval.Escape) {
                     // deliberate no-op
+                    return true;
+                }
+
+                if (key == Keyval.Insert) {
+                    split.popup();
                     return true;
                 }
 
@@ -196,7 +209,7 @@ abstract class EditorTextView extends TextView
 
                 if (key == Keyval.Menu) {
                     // TODO
-                    return true;
+                    return false;
                 }
 
                 /*
@@ -771,5 +784,40 @@ abstract class EditorTextView extends TextView
             s = entire.get(i);
             buffer.insert(pointer, s.getText(), tagForMarkup(s.getMarkup()));
         }
+    }
+
+    private void setupInsertMenu() {
+        final MenuItem para, pre, sect;
+
+        split = new Menu();
+
+        para = new MenuItem("Normal _paragraph block");
+        pre = new MenuItem("Preformatted _code block", new MenuItem.Activate() {
+            public void onActivate(MenuItem source) {
+            // 
+            }
+        });
+        sect = new MenuItem("Section _heading");
+
+        split.append(para);
+        split.append(pre);
+        split.append(sect);
+
+        split.showAll();
+    }
+
+    private void setupContextMenu() {
+        // view.connect(new TextView.PopulatePopup() {
+        // public void onPopulatePopup(TextView source, Menu menu) { }}
+
+        view.connect(new Widget.ButtonPressEvent() {
+            public boolean onButtonPressEvent(Widget source, EventButton event) {
+                if (event.getButton() == MouseButton.RIGHT) {
+                    // context.popup();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 }
