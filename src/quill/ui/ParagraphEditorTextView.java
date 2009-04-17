@@ -15,9 +15,9 @@ class ParagraphEditorTextView extends EditorTextView
     public ParagraphEditorTextView() {
         super();
 
-        this.modifyFont(fonts.serif);
+        view.modifyFont(fonts.serif);
 
-        this.setPaddingAboveParagraph(0);
-        this.setPaddingBelowParagraph(10);
+        view.setPaddingAboveParagraph(0);
+        view.setPaddingBelowParagraph(10);
     }
 }

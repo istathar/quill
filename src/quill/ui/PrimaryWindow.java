@@ -15,6 +15,7 @@ import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gdk.WindowState;
+import org.gnome.gtk.Allocation;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Notebook;
 import org.gnome.gtk.VBox;
@@ -78,7 +79,7 @@ class PrimaryWindow extends Window
         top = new VBox(false, 0);
         window.add(top);
 
-        two = new HBox(false, 6);
+        two = new HBox(true, 0);
         top.packStart(two, true, true, 0);
     }
 
@@ -86,7 +87,7 @@ class PrimaryWindow extends Window
         left = new Notebook();
         left.setShowTabs(false);
         left.setShowBorder(false);
-        left.setSizeRequest(600, -1);
+        left.setSizeRequest(640, -1);
 
         editor = new ComponentEditorWidget();
         left.insertPage(editor, null, 0);
@@ -195,13 +196,17 @@ class PrimaryWindow extends Window
      * experience.
      */
     private void toggleRightSide() {
+        final Allocation alloc;
+
         if (showingRightSide) {
+            alloc = left.getAllocation();
             right.hide();
             window.setMaximize(false);
-            window.resize(600, 700);
+            window.resize(alloc.getWidth(), 720);
             showingRightSide = false;
         } else {
             right.show();
+            window.setMaximize(true);
             showingRightSide = true;
         }
     }
