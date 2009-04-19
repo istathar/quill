@@ -129,14 +129,17 @@ public abstract class RenderEngine
         headingFace = new Typeface(cr, new FontDescription("Linux Libertine C"), 0.0);
     }
 
+    /*
+     * 2 cm = 56.67 pt
+     */
     private void specifySize(final PaperSize paper) {
         pageWidth = paper.getWidth(Unit.POINTS);
         pageHeight = paper.getHeight(Unit.POINTS);
 
-        topMargin = 25;
-        bottomMargin = 25;
-        leftMargin = 45;
-        rightMargin = 30;
+        topMargin = 40.0;
+        bottomMargin = 30.0;
+        leftMargin = 56.67;
+        rightMargin = 45.0;
     }
 
     public void processSeries(final Context cr, final Series series) {
