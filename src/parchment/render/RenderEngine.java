@@ -23,6 +23,7 @@ import org.gnome.pango.FontDescriptionAttribute;
 import org.gnome.pango.ForegroundColorAttribute;
 import org.gnome.pango.Layout;
 import org.gnome.pango.LayoutLine;
+import org.gnome.pango.Rectangle;
 import org.gnome.pango.Style;
 import org.gnome.pango.StyleAttribute;
 import org.gnome.pango.Weight;
@@ -70,7 +71,16 @@ public abstract class RenderEngine
 
     private double rightMargin;
 
+    private double footerHeight;
+
     private double cursor;
+
+    /**
+     * Is there sufficient page area to keep drawing?
+     */
+    private boolean done;
+
+    private int pageNumber;
 
     private Series series;
 
@@ -119,14 +129,17 @@ public abstract class RenderEngine
         headingFace = new Typeface(cr, new FontDescription("Linux Libertine C"), 0.0);
     }
 
+    /*
+     * 2 cm = 56.67 pt
+     */
     private void specifySize(final PaperSize paper) {
         pageWidth = paper.getWidth(Unit.POINTS);
         pageHeight = paper.getHeight(Unit.POINTS);
 
-        topMargin = 25;
-        bottomMargin = 25;
-        leftMargin = 45;
-        rightMargin = 30;
+        topMargin = 40.0;
+        bottomMargin = 30.0;
+        leftMargin = 56.67;
+        rightMargin = 45.0;
     }
 
     public void processSeries(final Context cr, final Series series) {
@@ -136,7 +149,11 @@ public abstract class RenderEngine
         Extract[] paras;
 
         cursor = topMargin;
+        done = false;
+        pageNumber = 0;
+        footerHeight = serifFace.lineHeight;
 
+        drawFooter(cr);
         for (i = 0; i < series.size(); i++) {
             segment = series.get(i);
             text = segment.getText();
@@ -280,6 +297,10 @@ public abstract class RenderEngine
             return;
         }
 
+        if (done) {
+            return;
+        }
+
         layout = new Layout(cr);
 
         options = new FontOptions();
@@ -348,7 +369,8 @@ public abstract class RenderEngine
         cr.setSource(0.0, 0.0, 0.0);
 
         for (LayoutLine line : layout.getLinesReadonly()) {
-            if (!paginate(cr, face.lineHeight)) {
+            paginate(cr, face.lineHeight);
+            if (done) {
                 return;
             }
 
@@ -365,20 +387,21 @@ public abstract class RenderEngine
      * possible. Return false if the vertical cursor can't be restarted (which
      * is the case when drawing to PreviewWidget).
      */
-    private boolean paginate(Context cr, double requestedHeight) {
+    private void paginate(Context cr, double requestedHeight) {
         final Surface surface;
 
-        if ((cursor + requestedHeight) > (pageHeight - bottomMargin)) {
+        if ((cursor + requestedHeight) > (pageHeight - bottomMargin - footerHeight)) {
             surface = cr.getTarget();
             if (surface instanceof XlibSurface) {
-                return false;
+                done = true;
+                return;
             }
 
             surface.showPage();
             cursor = topMargin;
-        }
 
-        return true;
+            drawFooter(cr);
+        }
     }
 
     private static final Attribute[] empty = new Attribute[] {};
@@ -476,5 +499,21 @@ public abstract class RenderEngine
 
     public double getMarginBottom() {
         return bottomMargin;
+    }
+
+    protected void drawFooter(Context cr) {
+        final Layout layout;
+        final Rectangle ink;
+
+        pageNumber++;
+
+        layout = new Layout(cr);
+        layout.setFontDescription(serifFace.desc);
+        layout.setText(Integer.toString(pageNumber));
+        ink = layout.getExtentsInk();
+
+        cr.setSource(0.0, 0.0, 0.0);
+        cr.moveTo(pageWidth - rightMargin - ink.getWidth(), pageHeight - bottomMargin - footerHeight);
+        cr.showLayout(layout);
     }
 }
