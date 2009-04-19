@@ -137,8 +137,6 @@ public abstract class RenderEngine
         bottomMargin = 25;
         leftMargin = 45;
         rightMargin = 30;
-
-        footerHeight = 40;
     }
 
     public void processSeries(final Context cr, final Series series) {
@@ -150,6 +148,7 @@ public abstract class RenderEngine
         cursor = topMargin;
         done = false;
         pageNumber = 0;
+        footerHeight = serifFace.lineHeight;
 
         drawFooter(cr);
         for (i = 0; i < series.size(); i++) {
@@ -501,16 +500,17 @@ public abstract class RenderEngine
 
     protected void drawFooter(Context cr) {
         final Layout layout;
-        final Rectangle logical;
+        final Rectangle ink;
 
         pageNumber++;
 
         layout = new Layout(cr);
         layout.setFontDescription(serifFace.desc);
         layout.setText(Integer.toString(pageNumber));
-        logical = layout.getExtentsLogical();
+        ink = layout.getExtentsInk();
 
-        cr.moveTo(pageWidth - rightMargin - logical.getWidth(), pageHeight - bottomMargin - footerHeight);
+        cr.setSource(0.0, 0.0, 0.0);
+        cr.moveTo(pageWidth - rightMargin - ink.getWidth(), pageHeight - bottomMargin - footerHeight);
         cr.showLayout(layout);
     }
 }
