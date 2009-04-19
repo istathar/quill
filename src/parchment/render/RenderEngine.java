@@ -23,6 +23,7 @@ import org.gnome.pango.FontDescriptionAttribute;
 import org.gnome.pango.ForegroundColorAttribute;
 import org.gnome.pango.Layout;
 import org.gnome.pango.LayoutLine;
+import org.gnome.pango.Rectangle;
 import org.gnome.pango.Style;
 import org.gnome.pango.StyleAttribute;
 import org.gnome.pango.Weight;
@@ -70,7 +71,16 @@ public abstract class RenderEngine
 
     private double rightMargin;
 
+    private double footerHeight;
+
     private double cursor;
+
+    /**
+     * Is there sufficient page area to keep drawing?
+     */
+    private boolean done;
+
+    private int pageNumber;
 
     private Series series;
 
@@ -127,6 +137,8 @@ public abstract class RenderEngine
         bottomMargin = 25;
         leftMargin = 45;
         rightMargin = 30;
+
+        footerHeight = 40;
     }
 
     public void processSeries(final Context cr, final Series series) {
@@ -136,7 +148,10 @@ public abstract class RenderEngine
         Extract[] paras;
 
         cursor = topMargin;
+        done = false;
+        pageNumber = 0;
 
+        drawFooter(cr);
         for (i = 0; i < series.size(); i++) {
             segment = series.get(i);
             text = segment.getText();
@@ -280,6 +295,10 @@ public abstract class RenderEngine
             return;
         }
 
+        if (done) {
+            return;
+        }
+
         layout = new Layout(cr);
 
         options = new FontOptions();
@@ -348,7 +367,8 @@ public abstract class RenderEngine
         cr.setSource(0.0, 0.0, 0.0);
 
         for (LayoutLine line : layout.getLinesReadonly()) {
-            if (!paginate(cr, face.lineHeight)) {
+            paginate(cr, face.lineHeight);
+            if (done) {
                 return;
             }
 
@@ -365,20 +385,21 @@ public abstract class RenderEngine
      * possible. Return false if the vertical cursor can't be restarted (which
      * is the case when drawing to PreviewWidget).
      */
-    private boolean paginate(Context cr, double requestedHeight) {
+    private void paginate(Context cr, double requestedHeight) {
         final Surface surface;
 
-        if ((cursor + requestedHeight) > (pageHeight - bottomMargin)) {
+        if ((cursor + requestedHeight) > (pageHeight - bottomMargin - footerHeight)) {
             surface = cr.getTarget();
             if (surface instanceof XlibSurface) {
-                return false;
+                done = true;
+                return;
             }
 
             surface.showPage();
             cursor = topMargin;
-        }
 
-        return true;
+            drawFooter(cr);
+        }
     }
 
     private static final Attribute[] empty = new Attribute[] {};
@@ -476,5 +497,20 @@ public abstract class RenderEngine
 
     public double getMarginBottom() {
         return bottomMargin;
+    }
+
+    protected void drawFooter(Context cr) {
+        final Layout layout;
+        final Rectangle logical;
+
+        pageNumber++;
+
+        layout = new Layout(cr);
+        layout.setFontDescription(serifFace.desc);
+        layout.setText(Integer.toString(pageNumber));
+        logical = layout.getExtentsLogical();
+
+        cr.moveTo(pageWidth - rightMargin - logical.getWidth(), pageHeight - bottomMargin - footerHeight);
+        cr.showLayout(layout);
     }
 }
