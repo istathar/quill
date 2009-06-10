@@ -23,6 +23,7 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.pango.FontDescription;
 
+import quill.textbase.Segment;
 import quill.textbase.Series;
 
 import static quill.client.Quill.ui;
@@ -268,5 +269,16 @@ class PrimaryWindow extends Window
         editor.initializeSeries(series);
         preview.renderSeries(series);
         outline.renderSeries(series);
+    }
+
+    /**
+     * Splice a new Segment into the Series being displayed.
+     */
+    /*
+     * FIXME is this the right place for this? It's really a services layer
+     * call.
+     */
+    void spliceSeries(EditorTextView view, int offset, Segment segment) {
+        editor.spliceSeries(view, offset, segment);
     }
 }

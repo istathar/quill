@@ -35,6 +35,8 @@ import quill.textbase.Extract;
 import quill.textbase.FormatChange;
 import quill.textbase.InsertChange;
 import quill.textbase.Markup;
+import quill.textbase.PreformatSegment;
+import quill.textbase.Segment;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
 import quill.textbase.TextStack;
@@ -794,7 +796,7 @@ abstract class EditorTextView extends TextView
         para = new MenuItem("Normal _paragraph block");
         pre = new MenuItem("Preformatted _code block", new MenuItem.Activate() {
             public void onActivate(MenuItem source) {
-            // 
+                insertSegment(new PreformatSegment());
             }
         });
         sect = new MenuItem("Section _heading");
@@ -813,11 +815,44 @@ abstract class EditorTextView extends TextView
         view.connect(new Widget.ButtonPressEvent() {
             public boolean onButtonPressEvent(Widget source, EventButton event) {
                 if (event.getButton() == MouseButton.RIGHT) {
-                    // context.popup();
+                    context.popup();
                     return true;
                 }
                 return false;
             }
         });
+    }
+
+    /**
+     * Take the necessary actions to create a new Segment. If we're at the end
+     * of the view we're appending. Jump the logic to the UserInterface
+     * facade.
+     */
+    private void insertSegment(Segment segment) {
+        ui.primary.spliceSeries(this, insertOffset, segment);
+    }
+
+    /**
+     * Take the TextStack underlying this EditorTextView, chop it in half at
+     * offset, and return an Extract with the second half.
+     */
+    Extract chopInTwo(int offset) {
+        final int len;
+        final Change change;
+        final Extract range;
+
+        len = stack.length();
+
+        if (len == insertOffset) {
+            range = null;
+        } else {
+            range = stack.extractRange(insertOffset, len - insertOffset);
+        }
+
+        change = new DeleteChange(insertOffset, range);
+        stack.apply(change);
+        this.affect(change);
+
+        return range;
     }
 }

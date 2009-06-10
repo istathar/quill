@@ -36,6 +36,11 @@ public class TextStack extends Text
         pointer = 0;
     }
 
+    public TextStack(Extract entire) {
+        this();
+        super.insert(0, entire.range);
+    }
+
     public void apply(Change change) {
         while (pointer < stack.size()) {
             stack.removeLast();
