@@ -16,20 +16,20 @@ package quill.textbase;
  * 
  * @author Andrew Cowie
  */
-public class Text
+public class TextChain
 {
     Piece first;
 
-    protected Text() {
+    public TextChain() {
         first = null;
     }
 
-    Text(String str) {
+    TextChain(String str) {
         first = new Piece();
         first.span = new StringSpan(str, null);
     }
 
-    Text(Span initial) {
+    TextChain(Span initial) {
         first = new Piece();
         first.span = initial;
     }
