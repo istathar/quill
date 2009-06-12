@@ -1,5 +1,5 @@
 /*
- * InsertChange.java
+ * InsertTextualChange.java
  *
  * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,13 +10,13 @@
  */
 package quill.textbase;
 
-public class InsertChange extends Change
+public class InsertTextualChange extends TextualChange
 {
     /**
      * This is the usual case: you've created a single Span and want to insert
      * it.
      */
-    public InsertChange(int offset, Span span) {
+    public InsertTextualChange(int offset, Span span) {
         super(offset, null, new Extract(span));
     }
 
@@ -24,15 +24,15 @@ public class InsertChange extends Change
      * Alternately, you've been given a Range from somewhere and you want to
      * (re)insert it.
      */
-    public InsertChange(int offset, Extract added) {
+    public InsertTextualChange(int offset, Extract added) {
         super(offset, null, added);
     }
 
-    final void apply(Text text) {
+    final void apply(TextChain text) {
         text.insert(offset, added.range);
     }
 
-    final void undo(Text text) {
+    final void undo(TextChain text) {
         text.delete(offset, added.width);
     }
 }

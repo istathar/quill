@@ -15,7 +15,7 @@ package quill.textbase;
  * 
  * @author Andrew Cowie
  */
-public class FormatChange extends Change
+public class FormatTextualChange extends TextualChange
 {
     Markup format;
 
@@ -23,7 +23,7 @@ public class FormatChange extends Change
      * Toggle format in the given range. This means applying it, unless the
      * first Span in the Extract is that format, in which case toss it.
      */
-    public FormatChange(int offset, Extract range, Markup format) {
+    public FormatTextualChange(int offset, Extract range, Markup format) {
         super(offset, range, toggleMarkup(range, format));
         this.format = format;
     }
@@ -78,7 +78,7 @@ public class FormatChange extends Change
     /**
      * Clear all format in the given range.
      */
-    public FormatChange(int offset, Extract original) {
+    public FormatTextualChange(int offset, Extract original) {
         super(offset, original, clearMarkup(original));
         this.format = null;
     }
@@ -106,7 +106,7 @@ public class FormatChange extends Change
     /*
      * Doing clear() this way is cumbersome.
      */
-    void apply(Text text) {
+    void apply(TextChain text) {
         text.delete(offset, removed.width);
         text.insert(offset, added.range);
     }
@@ -116,7 +116,7 @@ public class FormatChange extends Change
      * Actually, this is wrong; if we're undoing we have the Span[] and should
      * be able to just "replace" with it.
      */
-    void undo(Text text) {
+    void undo(TextChain text) {
         text.delete(offset, added.width);
         text.insert(offset, removed.range);
     }

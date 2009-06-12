@@ -1,5 +1,5 @@
 /*
- * TextStack.java
+ * ChangeStack.java
  *
  * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -13,8 +13,8 @@ package quill.textbase;
 import java.util.LinkedList;
 
 /**
- * A Text clas that is mutated by applying Change instances, which in turn are
- * the basis of our undo/redo stack.
+ * An ordered list of Change instances which are the basis of our undo/redo
+ * stack.
  * 
  * @author Andrew Cowie
  */
@@ -24,24 +24,18 @@ import java.util.LinkedList;
  * something will need to act to limit its size. A Queue, perhaps? Or maybe
  * discarding older operations at certain defined lifecycle points?
  */
-public class TextStack extends Text
+public class ChangeStack
 {
-    private LinkedList<Change> stack;
+    private LinkedList<TextualChange> stack;
 
     private int pointer;
 
-    public TextStack() {
-        super();
-        stack = new LinkedList<Change>();
+    public ChangeStack() {
+        stack = new LinkedList<TextualChange>();
         pointer = 0;
     }
 
-    public TextStack(Extract entire) {
-        this();
-        super.insert(0, entire.range);
-    }
-
-    public void apply(Change change) {
+    public void apply(TextualChange change) {
         while (pointer < stack.size()) {
             stack.removeLast();
         }
@@ -49,11 +43,11 @@ public class TextStack extends Text
         stack.add(pointer, change);
         pointer++;
 
-        change.apply(this);
+        change.apply(fixme);
     }
 
-    public Change undo() {
-        final Change change;
+    public TextualChange undo() {
+        final TextualChange change;
 
         if (stack.size() == 0) {
             return null;
@@ -64,13 +58,13 @@ public class TextStack extends Text
         pointer--;
 
         change = stack.get(pointer);
-        change.undo(this);
+        change.undo(fixme);
 
         return change;
     }
 
-    public Change redo() {
-        final Change change;
+    public TextualChange redo() {
+        final TextualChange change;
 
         if (stack.size() == 0) {
             return null;
@@ -80,7 +74,7 @@ public class TextStack extends Text
         }
 
         change = stack.get(pointer);
-        change.apply(this);
+        change.apply(fixme);
 
         pointer++;
 
