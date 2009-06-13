@@ -8,7 +8,7 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package quill.textbase;
+package quill.client;
 
 import java.util.LinkedList;
 
@@ -26,16 +26,16 @@ import java.util.LinkedList;
  */
 public class ChangeStack
 {
-    private LinkedList<TextualChange> stack;
+    private LinkedList<Change> stack;
 
     private int pointer;
 
     public ChangeStack() {
-        stack = new LinkedList<TextualChange>();
+        stack = new LinkedList<Change>();
         pointer = 0;
     }
 
-    public void apply(TextualChange change) {
+    public void apply(Change change) {
         while (pointer < stack.size()) {
             stack.removeLast();
         }
@@ -43,11 +43,11 @@ public class ChangeStack
         stack.add(pointer, change);
         pointer++;
 
-        change.apply(fixme);
+        change.apply();
     }
 
-    public TextualChange undo() {
-        final TextualChange change;
+    public Change undo() {
+        final Change change;
 
         if (stack.size() == 0) {
             return null;
@@ -58,13 +58,13 @@ public class ChangeStack
         pointer--;
 
         change = stack.get(pointer);
-        change.undo(fixme);
+        change.undo();
 
         return change;
     }
 
-    public TextualChange redo() {
-        final TextualChange change;
+    public Change redo() {
+        final Change change;
 
         if (stack.size() == 0) {
             return null;
@@ -74,7 +74,7 @@ public class ChangeStack
         }
 
         change = stack.get(pointer);
-        change.apply(fixme);
+        change.apply();
 
         pointer++;
 

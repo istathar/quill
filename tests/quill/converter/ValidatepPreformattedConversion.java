@@ -13,20 +13,19 @@ package quill.converter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import quill.converter.DocBookConverter;
+import junit.framework.TestCase;
+import quill.client.Change;
+import quill.client.ChangeStack;
 import quill.docbook.Document;
-import quill.textbase.Change;
 import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
-import quill.textbase.InsertChange;
+import quill.textbase.InsertTextualChange;
 import quill.textbase.ParagraphSegment;
 import quill.textbase.Preformat;
 import quill.textbase.Segment;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
-import quill.textbase.TextStack;
-
-import junit.framework.TestCase;
+import quill.textbase.TextChain;
 
 /**
  * BROKEN
@@ -53,7 +52,8 @@ public class ValidatepPreformattedConversion extends TestCase
     }
 
     public final void testWritePreformatting() throws IOException {
-        final TextStack stack;
+        final ChangeStack stack;
+        final TextChain chain;
         final Span[] spans;
         int offset;
         Change change;
@@ -82,11 +82,12 @@ public class ValidatepPreformattedConversion extends TestCase
                 new StringSpan(" to a nice friendly programmer.", null),
         };
 
-        stack = new TextStack();
+        stack = new ChangeStack();
+        chain = new TextChain();
         offset = 0;
 
         for (Span span : spans) {
-            change = new InsertChange(offset, span);
+            change = new InsertTextualChange(chain, offset, span);
             stack.apply(change);
             offset += span.getWidth();
         }
@@ -96,7 +97,7 @@ public class ValidatepPreformattedConversion extends TestCase
          */
 
         segment = new ParagraphSegment();
-        segment.setText(stack);
+        segment.setText(chain);
 
         converter = new DocBookConverter();
         converter.append(segment);

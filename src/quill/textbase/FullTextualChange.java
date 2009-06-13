@@ -21,44 +21,44 @@ public class FullTextualChange extends TextualChange
     /**
      * Insert a Span[] at offset
      */
-    public FullTextualChange(int offset, Extract added) {
-        super(offset, null, added);
+    public FullTextualChange(TextChain chain, int offset, Extract added) {
+        super(chain, offset, null, added);
     }
 
     /**
      * Replace the text between offset and width with a new Span[].
      */
-    public FullTextualChange(int offset, Extract replaced, Extract added) {
-        super(offset, replaced, added);
+    public FullTextualChange(TextChain chain, int offset, Extract replaced, Extract added) {
+        super(chain, offset, replaced, added);
     }
 
     /**
      * Replace the text between offset and the width of replaced with the
      * given Span.
      */
-    public FullTextualChange(int offset, Extract replaced, Span span) {
-        super(offset, replaced, new Extract(span));
+    public FullTextualChange(TextChain chain, int offset, Extract replaced, Span span) {
+        super(chain, offset, replaced, new Extract(span));
     }
 
-    final void apply(TextChain text) {
+    protected void apply() {
         if (removed == null) {
-            text.insert(offset, added.range);
+            chain.insert(offset, added.range);
         } else if (added == null) {
-            text.delete(offset, removed.width);
+            chain.delete(offset, removed.width);
         } else {
-            text.delete(offset, removed.width);
-            text.insert(offset, added.range);
+            chain.delete(offset, removed.width);
+            chain.insert(offset, added.range);
         }
     }
 
-    final void undo(TextChain text) {
+    protected void undo() {
         if (removed == null) {
-            text.delete(offset, added.width);
+            chain.delete(offset, added.width);
         } else if (added == null) {
-            text.insert(offset, removed.range);
+            chain.insert(offset, removed.range);
         } else {
-            text.delete(offset, added.width);
-            text.insert(offset, removed.range);
+            chain.delete(offset, added.width);
+            chain.insert(offset, removed.range);
         }
     }
 }

@@ -54,7 +54,7 @@ public class EfficientNoNodeFactory extends NodeFactory
     /**
      * The current text body we are building up.
      */
-    private TextStack stack;
+    private TextChain chain;
 
     /**
      * Are we in a block where line endings and other whitespace is preserved?
@@ -69,7 +69,7 @@ public class EfficientNoNodeFactory extends NodeFactory
 
     public EfficientNoNodeFactory() {
         list = new ArrayList<Segment>(5);
-        stack = null;
+        chain = null;
     }
 
     public Series createSeries() {
@@ -82,8 +82,8 @@ public class EfficientNoNodeFactory extends NodeFactory
     }
 
     private void setSegment(Segment segment) {
-        stack = new TextStack();
-        segment.setText(stack);
+        chain = new TextChain();
+        segment.setText(chain);
         this.segment = segment;
         list.add(segment);
     }
@@ -133,7 +133,7 @@ public class EfficientNoNodeFactory extends NodeFactory
             text = text.substring(1);
             len--;
         } else if (space) {
-            stack.append(new CharacterSpan(' ', null));
+            chain.append(new CharacterSpan(' ', null));
         }
 
         /*
@@ -164,7 +164,7 @@ public class EfficientNoNodeFactory extends NodeFactory
             str = trim.replace('\n', ' ');
         }
 
-        stack.append(new StringSpan(str, markup));
+        chain.append(new StringSpan(str, markup));
 
         /*
          * And, having processed the inline, reset to normal.
@@ -195,7 +195,7 @@ public class EfficientNoNodeFactory extends NodeFactory
             block = true;
             preserve = false;
             if (segment instanceof ParagraphSegment) {
-                stack.append(new CharacterSpan('\n', null));
+                chain.append(new CharacterSpan('\n', null));
             } else {
                 setSegment(new ParagraphSegment());
             }
@@ -226,8 +226,8 @@ public class EfficientNoNodeFactory extends NodeFactory
             preserve = false;
             if (segment instanceof HeadingSegment) {
                 // kludge
-                stack = new TextStack();
-                segment.setText(stack);
+                chain = new TextChain();
+                segment.setText(chain);
             }
             return null;
         }

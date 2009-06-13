@@ -18,15 +18,15 @@ public class DeleteTextualChange extends TextualChange
      * Spans that are going to be removed so we can restore them later if an
      * undo happens.
      */
-    public DeleteTextualChange(int offset, Extract removed) {
-        super(offset, removed, null);
+    public DeleteTextualChange(TextChain chain, int offset, Extract removed) {
+        super(chain, offset, removed, null);
     }
 
-    final void apply(TextChain text) {
-        text.delete(offset, removed.width);
+    protected void apply() {
+        chain.delete(offset, removed.width);
     }
 
-    final void undo(TextChain text) {
-        text.insert(offset, removed.range);
+    protected void undo() {
+        chain.insert(offset, removed.range);
     }
 }

@@ -10,33 +10,29 @@
  */
 package quill.textbase;
 
+import quill.client.Change;
+
 /**
  * Discrete operations that can be applied to a TextChain.
  * 
  * @author Andrew Cowie
  */
-public abstract class TextualChange
+public abstract class TextualChange extends Change
 {
+    final TextChain chain;
+
     final int offset;
 
     final Extract removed;
 
     final Extract added;
 
-    TextualChange(int offset, Extract removed, Extract added) {
+    TextualChange(TextChain chain, int offset, Extract removed, Extract added) {
+        this.chain = chain;
         this.offset = offset;
         this.removed = removed;
         this.added = added;
     }
-
-    /*
-     * Interestingly (if somewhat by accident), by specifying Text here and
-     * not TextStack the undo stack methods on TextStack are not visible,
-     * which helps us resist the temptation to call its apply() from here :)
-     */
-    abstract void apply(TextChain text);
-
-    abstract void undo(TextChain text);
 
     public int getOffset() {
         return offset;
