@@ -41,7 +41,7 @@ import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
-import quill.textbase.Text;
+import quill.textbase.TextChain;
 
 import static org.freedesktop.cairo.HintMetrics.OFF;
 
@@ -132,7 +132,7 @@ public abstract class RenderEngine
     public void processSeries(final Context cr, final Series series) {
         int i;
         Segment segment;
-        Text text;
+        TextChain text;
         Extract[] paras;
 
         cursor = topMargin;

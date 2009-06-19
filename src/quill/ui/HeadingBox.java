@@ -15,13 +15,15 @@ import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
 
-import quill.textbase.Change;
-import quill.textbase.DeleteChange;
+import quill.textbase.DeleteTextualChange;
 import quill.textbase.Extract;
+import quill.textbase.FullTextualChange;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
-import quill.textbase.TextStack;
+import quill.textbase.TextChain;
 import quill.textbase.TextualChange;
+
+import static quill.client.Quill.stack;
 
 class HeadingBox extends HBox
 {
@@ -31,7 +33,7 @@ class HeadingBox extends HBox
 
     protected Label label;
 
-    private TextStack stack;
+    private TextChain chain;
 
     public HeadingBox() {
         super(false, 0);
@@ -59,31 +61,27 @@ class HeadingBox extends HBox
     private void hookupChangeHandler() {
         title.connect(new Entry.Changed() {
             public void onChanged(Editable source) {
-                Change change;
+                TextualChange change;
                 Extract entire;
                 Span span;
                 String str;
 
-                entire = stack.extractAll();
+                entire = chain.extractAll();
                 str = title.getText();
 
                 if (str.length() == 0) {
-                    change = new DeleteChange(0, entire);
+                    change = new DeleteTextualChange(chain, 0, entire);
                 } else {
                     span = new StringSpan(str, null);
-                    change = new TextualChange(0, entire, span);
+                    change = new FullTextualChange(chain, 0, entire, span);
                 }
                 stack.apply(change);
             }
         });
     }
 
-    void loadText(TextStack load) {
-        if (load.undo() != null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.stack = load;
+    void loadText(TextChain load) {
+        this.chain = load;
 
         /*
          * Should we change to rich markup in titles, we can use the logic in
