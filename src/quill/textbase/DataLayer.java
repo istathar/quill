@@ -121,14 +121,25 @@ public class DataLayer
         return null;
     }
 
+    /**
+     * Apply a Change to the data layer.
+     */
     public void apply(Change change) {
         stack.apply(change);
     }
 
+    /**
+     * Undo. Return the Change which represents the delta from current to one
+     * before.
+     */
     public Change undo() {
         return stack.undo();
     }
 
+    /**
+     * Redo a previous undo. Returns the Change which is the delta you will
+     * need to [re]apply.
+     */
     public Change redo() {
         return stack.redo();
     }

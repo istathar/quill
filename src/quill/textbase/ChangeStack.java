@@ -14,7 +14,7 @@ import java.util.LinkedList;
 
 /**
  * An ordered list of Change instances which are the basis of our undo/redo
- * stack.
+ * stack. This is delegated to by DataLayer.
  * 
  * @author Andrew Cowie
  */
@@ -24,18 +24,18 @@ import java.util.LinkedList;
  * something will need to act to limit its size. A Queue, perhaps? Or maybe
  * discarding older operations at certain defined lifecycle points?
  */
-public class ChangeStack
+class ChangeStack
 {
     private LinkedList<Change> stack;
 
     private int pointer;
 
-    public ChangeStack() {
+    ChangeStack() {
         stack = new LinkedList<Change>();
         pointer = 0;
     }
 
-    public void apply(Change change) {
+    void apply(Change change) {
         while (pointer < stack.size()) {
             stack.removeLast();
         }
@@ -46,7 +46,7 @@ public class ChangeStack
         change.apply();
     }
 
-    public Change undo() {
+    Change undo() {
         final Change change;
 
         if (stack.size() == 0) {
@@ -63,7 +63,7 @@ public class ChangeStack
         return change;
     }
 
-    public Change redo() {
+    Change redo() {
         final Change change;
 
         if (stack.size() == 0) {

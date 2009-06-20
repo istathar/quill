@@ -16,9 +16,9 @@ import java.io.IOException;
 import junit.framework.TestCase;
 import quill.docbook.Document;
 import quill.textbase.Change;
-import quill.textbase.ChangeStack;
 import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
+import quill.textbase.DataLayer;
 import quill.textbase.InsertTextualChange;
 import quill.textbase.ParagraphSegment;
 import quill.textbase.Preformat;
@@ -52,7 +52,7 @@ public class ValidatepPreformattedConversion extends TestCase
     }
 
     public final void testWritePreformatting() throws IOException {
-        final ChangeStack stack;
+        final DataLayer data;
         final TextChain chain;
         final Span[] spans;
         int offset;
@@ -82,13 +82,13 @@ public class ValidatepPreformattedConversion extends TestCase
                 new StringSpan(" to a nice friendly programmer.", null),
         };
 
-        stack = new ChangeStack();
+        data = new DataLayer();
         chain = new TextChain();
         offset = 0;
 
         for (Span span : spans) {
             change = new InsertTextualChange(chain, offset, span);
-            stack.apply(change);
+            data.apply(change);
             offset += span.getWidth();
         }
 

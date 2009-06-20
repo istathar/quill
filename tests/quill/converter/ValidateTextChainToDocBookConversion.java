@@ -1,5 +1,5 @@
 /*
- * ValidateBufferToMarkdownSerialization.java
+ * ValidateTextChainToDocBookConversion.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -18,7 +18,6 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.docbook.Document;
 import quill.textbase.Change;
-import quill.textbase.ChangeStack;
 import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
 import quill.textbase.DataLayer;
@@ -31,7 +30,7 @@ import quill.textbase.Span;
 import quill.textbase.StringSpan;
 import quill.textbase.TextChain;
 
-public class ValidateStackToDocBookConversion extends TestCase
+public class ValidateTextChainToDocBookConversion extends TestCase
 {
     public final void testLoadDocbook() throws IOException, ValidityException, ParsingException {
         final DataLayer data;
@@ -51,7 +50,7 @@ public class ValidateStackToDocBookConversion extends TestCase
 
     public final void testWritePlainParas() throws IOException {
         final TextChain chain;
-        final ChangeStack stack;
+        final DataLayer data;
         final Span span;
         final Change change;
         final Segment segment;
@@ -64,12 +63,12 @@ public class ValidateStackToDocBookConversion extends TestCase
          * Build up a trivial example
          */
 
-        stack = new ChangeStack();
+        data = new DataLayer();
         chain = new TextChain();
 
         span = new StringSpan("Hello\nWorld", null);
         change = new InsertTextualChange(chain, 0, span);
-        stack.apply(change);
+        data.apply(change);
 
         /*
          * Now run conversion process.
@@ -117,7 +116,7 @@ public class ValidateStackToDocBookConversion extends TestCase
     }
 
     public final void testWriteComplexPara() throws IOException {
-        final ChangeStack stack;
+        final DataLayer data;
         final TextChain chain;
         final Span[] spans;
         int offset;
@@ -149,13 +148,13 @@ public class ValidateStackToDocBookConversion extends TestCase
                 new StringSpan(" function.", null),
         };
 
-        stack = new ChangeStack();
+        data = new DataLayer();
         chain = new TextChain();
         offset = 0;
 
         for (Span span : spans) {
             change = new InsertTextualChange(chain, offset, span);
-            stack.apply(change);
+            data.apply(change);
             offset += span.getWidth();
         }
 
