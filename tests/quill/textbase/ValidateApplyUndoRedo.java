@@ -12,8 +12,6 @@
 package quill.textbase;
 
 import junit.framework.TestCase;
-import quill.client.Change;
-import quill.client.ChangeStack;
 
 /**
  * Test applying Change instances, and that undo and redo of them works

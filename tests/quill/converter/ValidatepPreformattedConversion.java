@@ -14,9 +14,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import junit.framework.TestCase;
-import quill.client.Change;
-import quill.client.ChangeStack;
 import quill.docbook.Document;
+import quill.textbase.Change;
+import quill.textbase.ChangeStack;
 import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
 import quill.textbase.InsertTextualChange;

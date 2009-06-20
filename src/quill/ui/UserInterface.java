@@ -29,7 +29,6 @@ import quill.textbase.Span;
 import quill.textbase.StringSpan;
 
 import static quill.client.Quill.data;
-import static quill.client.Quill.stack;
 import static quill.textbase.TextChain.extractFor;
 
 public class UserInterface
@@ -171,11 +170,11 @@ public class UserInterface
     }
 
     void undo() {
-        stack.undo();
+        data.undo();
     }
 
     void redo() {
-        stack.redo();
+        data.redo();
     }
 }
 

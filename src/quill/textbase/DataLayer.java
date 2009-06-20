@@ -29,9 +29,13 @@ import quill.docbook.Document;
  */
 public class DataLayer
 {
+    private ChangeStack stack;
+
     private Folio current;
 
     public DataLayer() {
+        stack = new ChangeStack(); // should this move into data?
+
         current = null;
     }
 
@@ -111,5 +115,21 @@ public class DataLayer
 
         doc = converter.result();
         doc.toXML(out);
+    }
+
+    public ChangeStack getStack() {
+        return null;
+    }
+
+    public void apply(Change change) {
+        stack.apply(change);
+    }
+
+    public Change undo() {
+        return stack.undo();
+    }
+
+    public Change redo() {
+        return stack.redo();
     }
 }

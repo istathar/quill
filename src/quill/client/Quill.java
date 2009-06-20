@@ -21,8 +21,6 @@ public class Quill
 
     public static DataLayer data;
 
-    public static ChangeStack stack;
-
     public static void main(String[] args) {
         initializeDataLayer();
         initializeUserInterface(args);
@@ -31,7 +29,6 @@ public class Quill
 
     static void initializeDataLayer() {
         data = new DataLayer();
-        stack = new ChangeStack(); // should this move into data?
     }
 
     static void initializeUserInterface(String[] args) {

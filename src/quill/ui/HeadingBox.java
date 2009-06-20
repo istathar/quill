@@ -23,7 +23,7 @@ import quill.textbase.StringSpan;
 import quill.textbase.TextChain;
 import quill.textbase.TextualChange;
 
-import static quill.client.Quill.stack;
+import static quill.client.Quill.data;
 
 class HeadingBox extends HBox
 {
@@ -75,7 +75,7 @@ class HeadingBox extends HBox
                     span = new StringSpan(str, null);
                     change = new FullTextualChange(chain, 0, entire, span);
                 }
-                stack.apply(change);
+                data.apply(change);
             }
         });
     }

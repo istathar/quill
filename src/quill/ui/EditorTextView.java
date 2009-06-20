@@ -42,7 +42,7 @@ import quill.textbase.StringSpan;
 import quill.textbase.TextChain;
 import quill.textbase.TextualChange;
 
-import static quill.client.Quill.stack;
+import static quill.client.Quill.data;
 import static quill.client.Quill.ui;
 import static quill.ui.Format.tagForMarkup;
 
@@ -72,7 +72,7 @@ abstract class EditorTextView extends TextView
         setupTextView();
         setupInsertMenu();
         setupContextMenu();
-        setupInternalStack();
+        setupInternalData();
 
         hookupKeybindings();
         hookupFormatManagement();
@@ -93,7 +93,7 @@ abstract class EditorTextView extends TextView
         view.setAcceptsTab(true);
     }
 
-    private void setupInternalStack() {
+    private void setupInternalData() {
         chain = new TextChain();
     }
 
@@ -127,7 +127,7 @@ abstract class EditorTextView extends TextView
                 }
 
                 change = new InsertTextualChange(chain, pointer.getOffset(), span);
-                stack.apply(change);
+                data.apply(change);
             }
         });
 
@@ -358,7 +358,7 @@ abstract class EditorTextView extends TextView
             change = new InsertTextualChange(chain, insertOffset, stash);
         }
 
-        stack.apply(change);
+        data.apply(change);
         this.affect(change);
     }
 
@@ -430,7 +430,7 @@ abstract class EditorTextView extends TextView
         range = chain.extractRange(offset, width);
         change = new DeleteTextualChange(chain, offset, range);
 
-        stack.apply(change);
+        data.apply(change);
     }
 
     private void toggleMarkup(Markup format) {
@@ -457,7 +457,7 @@ abstract class EditorTextView extends TextView
             original = chain.extractRange(offset, width);
 
             change = new FormatTextualChange(chain, offset, original, format);
-            stack.apply(change);
+            data.apply(change);
             this.affect(change);
 
         } else {
@@ -474,7 +474,7 @@ abstract class EditorTextView extends TextView
     private void undo() {
         final TextualChange change;
 
-        change = (TextualChange) stack.undo();
+        change = (TextualChange) data.undo();
         if (change == null) {
             return;
         }
@@ -485,7 +485,7 @@ abstract class EditorTextView extends TextView
     private void redo() {
         final TextualChange change;
 
-        change = (TextualChange) stack.redo();
+        change = (TextualChange) data.redo();
         if (change == null) {
             return;
         }
@@ -628,7 +628,7 @@ abstract class EditorTextView extends TextView
          */
 
         change = new DeleteTextualChange(chain, offset, ui.getClipboard());
-        stack.apply(change);
+        data.apply(change);
         this.affect(change);
     }
 
@@ -707,7 +707,7 @@ abstract class EditorTextView extends TextView
 
             original = chain.extractRange(offset, width);
             change = new FormatTextualChange(chain, offset, original);
-            stack.apply(change);
+            data.apply(change);
             this.affect(change);
         }
 
@@ -812,7 +812,7 @@ abstract class EditorTextView extends TextView
         }
 
         change = new DeleteTextualChange(chain, insertOffset, range);
-        stack.apply(change);
+        data.apply(change);
         this.affect(change);
 
         return range;

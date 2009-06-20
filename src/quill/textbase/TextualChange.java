@@ -10,7 +10,6 @@
  */
 package quill.textbase;
 
-import quill.client.Change;
 
 /**
  * Discrete operations that can be applied to a TextChain.

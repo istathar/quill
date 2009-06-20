@@ -8,13 +8,11 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package quill.client;
+package quill.textbase;
 
 public abstract class Change
 {
-    protected Change() {
-
-    }
+    protected Change() {}
 
     /*
      * This could take a context parameter, coming from ChangeStack, if
