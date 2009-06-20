@@ -23,7 +23,9 @@ import quill.converter.DocBookConverter;
 import quill.docbook.Document;
 
 /**
- * Mechanism for loading documents and getting at them in memory.
+ * Our in-memory intermediate representation. Provides access to mutate the
+ * textbase, along with mechanisms for loading documents and getting at them
+ * in memory.
  * 
  * @author Andrew Cowie
  */
@@ -34,7 +36,7 @@ public class DataLayer
     private Folio current;
 
     public DataLayer() {
-        stack = new ChangeStack(); // should this move into data?
+        stack = new ChangeStack();
 
         current = null;
     }
