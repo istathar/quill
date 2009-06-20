@@ -23,7 +23,7 @@ import quill.docbook.Block;
  * 
  * <p>
  * Segment itself does not provide a chaining or sequencing mechanism; impose
- * that with a Segment[] or a more complicated mechanism as necessary.
+ * that with a Segment[] or a more complicated data structure as necessary.
  * 
  * @author Andrew Cowie
  */
@@ -32,14 +32,14 @@ public abstract class Segment
     /**
      * The internal representation of the text body of this Segment.
      */
-    private TextStack stack;
+    private TextChain chain;
 
-    public TextStack getText() {
-        return stack;
+    public TextChain getText() {
+        return chain;
     }
 
-    public void setText(TextStack stack) {
-        this.stack = stack;
+    public void setText(TextChain stack) {
+        this.chain = stack;
     }
 
     public abstract Block createBlock();

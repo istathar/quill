@@ -41,7 +41,7 @@ import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
-import quill.textbase.TextStack;
+import quill.textbase.TextChain;
 
 /**
  * Build a DocBook XOM tree equivalent to the data in our textbase, ready for
@@ -90,7 +90,7 @@ public class DocBookConverter
      * Append a Segment.
      */
     public void append(final Segment segment) {
-        final TextStack text;
+        final TextChain text;
 
         this.segment = segment;
 
@@ -105,7 +105,7 @@ public class DocBookConverter
         append(text);
     }
 
-    private void append(final TextStack text) {
+    private void append(final TextChain chain) {
         final Extract entire;
         final int num;
         int i, j, len;
@@ -114,11 +114,11 @@ public class DocBookConverter
         char ch;
         Markup previous, markup;
 
-        if (text == null) {
+        if (chain == null) {
             return;
         }
 
-        entire = text.extractAll();
+        entire = chain.extractAll();
         if (entire == null) {
             return;
         }

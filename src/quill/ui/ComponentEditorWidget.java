@@ -23,7 +23,7 @@ import quill.textbase.ParagraphSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
-import quill.textbase.TextStack;
+import quill.textbase.TextChain;
 
 /**
  * Left hand side of a PrimaryWindow for editing a Component (Article or
@@ -139,7 +139,7 @@ class ComponentEditorWidget extends ScrolledWindow
         final Widget[] children;
         int i;
         final Extract extract;
-        final TextStack stack;
+        final TextChain chain;
         Widget widget;
 
         /*
@@ -174,8 +174,8 @@ class ComponentEditorWidget extends ScrolledWindow
 
         extract = view.chopInTwo(offset);
 
-        stack = new TextStack(extract);
-        segment.setText(stack);
+        chain = new TextChain(extract);
+        segment.setText(chain);
 
         widget = editorForSegment(segment);
     }

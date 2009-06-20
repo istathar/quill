@@ -29,7 +29,7 @@ import quill.textbase.Span;
 import quill.textbase.StringSpan;
 
 import static quill.client.Quill.data;
-import static quill.textbase.Text.extractFor;
+import static quill.textbase.TextChain.extractFor;
 
 public class UserInterface
 {
@@ -157,7 +157,7 @@ public class UserInterface
         primary.displaySeries(folio.get(0));
     }
 
-    public void saveDocument() {
+    void saveDocument() {
         final Dialog dialog;
         try {
             data.saveDocument("tmp/HardcodedSaveResult.xml");
@@ -167,6 +167,14 @@ public class UserInterface
             dialog.run();
             dialog.hide();
         }
+    }
+
+    void undo() {
+        data.undo();
+    }
+
+    void redo() {
+        data.redo();
     }
 }
 

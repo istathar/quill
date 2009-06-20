@@ -27,7 +27,7 @@ import quill.textbase.HeadingSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
-import quill.textbase.Text;
+import quill.textbase.TextChain;
 
 /**
  * A table of contents style interface to navigate the document. This could be
@@ -54,7 +54,7 @@ class OutlineWidget extends VBox
     private void buildOutline() {
         Segment segment;
         int i, num;
-        Text text;
+        TextChain text;
         StringBuilder str;
         Button button;
         Label label;
@@ -135,7 +135,7 @@ class CompressedLines extends DrawingArea
 
     private static final int SPACING = 3;
 
-    CompressedLines(Text text, boolean program) {
+    CompressedLines(TextChain text, boolean program) {
         super();
         final DrawingArea self;
         Extract[] paras;

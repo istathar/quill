@@ -11,13 +11,6 @@
 
 package quill.textbase;
 
-import quill.textbase.Change;
-import quill.textbase.DeleteChange;
-import quill.textbase.Extract;
-import quill.textbase.InsertChange;
-import quill.textbase.Span;
-import quill.textbase.StringSpan;
-import quill.textbase.TextStack;
 import junit.framework.TestCase;
 
 /**
@@ -32,60 +25,62 @@ import junit.framework.TestCase;
 public class ValidateApplyUndoRedo extends TestCase
 {
     public final void testInsertionAndDeletion() {
-        final TextStack text;
+        final ChangeStack stack;
+        final TextChain chain;
         Extract extract;
         Change change;
 
-        text = new TextStack();
+        stack = new ChangeStack();
+        chain = new TextChain();
 
-        change = new InsertChange(0, new Extract(new StringSpan("Hello World", null)));
-        text.apply(change);
-        assertEquals("Hello World", text.toString());
+        change = new InsertTextualChange(chain, 0, new Extract(new StringSpan("Hello World", null)));
+        stack.apply(change);
+        assertEquals("Hello World", chain.toString());
 
-        extract = text.extractRange(5, 6);
-        change = new DeleteChange(5, extract);
-        text.apply(change);
-        assertEquals("Hello", text.toString());
+        extract = chain.extractRange(5, 6);
+        change = new DeleteTextualChange(chain, 5, extract);
+        stack.apply(change);
+        assertEquals("Hello", chain.toString());
 
-        extract = text.extractRange(1, 3);
-        change = new DeleteChange(1, extract);
-        text.apply(change);
-        assertEquals("Ho", text.toString());
+        extract = chain.extractRange(1, 3);
+        change = new DeleteTextualChange(chain, 1, extract);
+        stack.apply(change);
+        assertEquals("Ho", chain.toString());
 
         /*
          * Now evaluate moving back and forth along the undo stack. redo at
          * the end should have no effect.
          */
 
-        text.redo();
-        assertEquals("Ho", text.toString());
+        stack.redo();
+        assertEquals("Ho", chain.toString());
 
-        text.undo();
-        assertEquals("Hello", text.toString());
+        stack.undo();
+        assertEquals("Hello", chain.toString());
 
-        text.redo();
-        assertEquals("Ho", text.toString());
+        stack.redo();
+        assertEquals("Ho", chain.toString());
 
         /*
          * Test going back to the beginning, and that overshooting is a no-op.
          */
 
-        text.undo();
-        text.undo();
-        assertEquals("Hello World", text.toString());
-        text.undo();
-        assertEquals("", text.toString());
-        text.undo();
-        assertEquals("", text.toString());
-        text.redo();
-        assertEquals("Hello World", text.toString());
+        stack.undo();
+        stack.undo();
+        assertEquals("Hello World", chain.toString());
+        stack.undo();
+        assertEquals("", chain.toString());
+        stack.undo();
+        assertEquals("", chain.toString());
+        stack.redo();
+        assertEquals("Hello World", chain.toString());
 
-        text.redo();
-        change = new InsertChange(5, new Extract(new Span[] {
+        stack.redo();
+        change = new InsertTextualChange(chain, 5, new Extract(new Span[] {
             new StringSpan(" Santa Claus", null),
         }));
-        text.apply(change);
-        assertEquals("Hello Santa Claus", text.toString());
+        stack.apply(change);
+        assertEquals("Hello Santa Claus", chain.toString());
 
         /*
          * This new Change is a divergence and so creates a new branch of the
@@ -93,7 +88,7 @@ public class ValidateApplyUndoRedo extends TestCase
          * have been discarded.
          */
 
-        text.redo();
-        assertEquals("Hello Santa Claus", text.toString());
+        stack.redo();
+        assertEquals("Hello Santa Claus", chain.toString());
     }
 }

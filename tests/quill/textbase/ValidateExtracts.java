@@ -22,10 +22,10 @@ import junit.framework.TestCase;
 public class ValidateExtracts extends TestCase
 {
     public final void testExtractRange() {
-        final Text text;
+        final TextChain text;
         Extract extract;
 
-        text = new Text();
+        text = new TextChain();
         text.append(new StringSpan("Hello World", null));
 
         extract = text.extractRange(1, 3);
@@ -47,10 +47,10 @@ public class ValidateExtracts extends TestCase
      * to get the correct offset value back.
      */
     public final void testWidthNegative() {
-        final Text text;
+        final TextChain text;
         Extract extract;
 
-        text = new Text();
+        text = new TextChain();
         text.append(new StringSpan("Hello World", null));
 
         try {
@@ -63,12 +63,12 @@ public class ValidateExtracts extends TestCase
     }
 
     public final void testExtractLines() {
-        final Text text;
+        final TextChain text;
         Extract[] lines;
         Extract extract;
         Span span;
 
-        text = new Text();
+        text = new TextChain();
         text.append(new StringSpan("Hello World", null));
         text.append(new CharacterSpan('\n', null));
         text.append(new StringSpan("Goodbye Eternity", null));
@@ -94,12 +94,12 @@ public class ValidateExtracts extends TestCase
      * Corner case: only a single span
      */
     public final void testExtractLinesSingle() {
-        final Text text;
+        final TextChain text;
         Extract[] lines;
         Extract extract;
         Span span;
 
-        text = new Text();
+        text = new TextChain();
         text.append(new StringSpan("Hello World", null));
 
         lines = text.extractParagraphs();
@@ -116,10 +116,10 @@ public class ValidateExtracts extends TestCase
      * Corner case: no content
      */
     public final void testExtractLinesNone() {
-        final Text text;
+        final TextChain text;
         Extract[] lines;
 
-        text = new Text();
+        text = new TextChain();
 
         lines = text.extractParagraphs();
         assertEquals(0, lines.length);
@@ -129,12 +129,12 @@ public class ValidateExtracts extends TestCase
      * Corner case: only a single CharacterSpan
      */
     public final void testExtractLinesChar() {
-        final Text text;
+        final TextChain text;
         Extract[] lines;
         Extract extract;
         Span span;
 
-        text = new Text();
+        text = new TextChain();
         text.append(new CharacterSpan('H', null));
 
         lines = text.extractParagraphs();
@@ -151,11 +151,11 @@ public class ValidateExtracts extends TestCase
      * Corner case: only a single span
      */
     public final void testExtractLinesTwoEmpty() {
-        final Text text;
+        final TextChain text;
         Extract[] lines;
         Extract extract;
 
-        text = new Text();
+        text = new TextChain();
         text.append(new CharacterSpan('\n', null));
 
         lines = text.extractParagraphs();
@@ -170,12 +170,12 @@ public class ValidateExtracts extends TestCase
     }
 
     public final void testExtractLinesEmbeddedNewline() {
-        final Text text;
+        final TextChain text;
         Extract[] lines;
         Extract extract;
         Span span;
 
-        text = new Text();
+        text = new TextChain();
         text.append(new StringSpan("Hello World\nGoodbye Eternity", null));
         assertEquals("Hello World\nGoodbye Eternity", text.toString());
 
@@ -199,12 +199,12 @@ public class ValidateExtracts extends TestCase
      * Same test again, but with leading and trailing newlines.
      */
     public final void testExtractLinesBoundaryConditions() {
-        Text text;
+        TextChain text;
         Extract[] lines;
         Extract extract;
         Span span;
 
-        text = new Text();
+        text = new TextChain();
         text.append(new StringSpan("H\nello World", null));
         assertEquals("H\nello World", text.toString());
 
@@ -223,7 +223,7 @@ public class ValidateExtracts extends TestCase
         span = extract.get(0);
         assertEquals("ello World", span.getText());
 
-        text = new Text();
+        text = new TextChain();
         text.append(new StringSpan("\nHello World", null));
         assertEquals("\nHello World", text.toString());
 
@@ -240,7 +240,7 @@ public class ValidateExtracts extends TestCase
         span = extract.get(0);
         assertEquals("Hello World", span.getText());
 
-        text = new Text();
+        text = new TextChain();
         text.append(new StringSpan("Hello World\n", null));
         assertEquals("Hello World\n", text.toString());
 
