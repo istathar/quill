@@ -474,7 +474,7 @@ abstract class EditorTextView extends TextView
     private void undo() {
         final TextualChange change;
 
-        change = (TextualChange) data.undo();
+        change = (TextualChange) ui.undo();
         if (change == null) {
             return;
         }

@@ -10,7 +10,6 @@
  */
 package quill.textbase;
 
-
 /**
  * Discrete operations that can be applied to a TextChain.
  * 

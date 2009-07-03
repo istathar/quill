@@ -23,6 +23,7 @@ import org.gnome.gtk.ErrorMessageDialog;
 import org.gnome.gtk.Gtk;
 import org.gnome.pango.FontDescription;
 
+import quill.textbase.Change;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.Span;
@@ -169,12 +170,12 @@ public class UserInterface
         }
     }
 
-    void undo() {
-        data.undo();
+    Change undo() {
+        return data.undo();
     }
 
-    void redo() {
-        data.redo();
+    Change redo() {
+        return data.redo();
     }
 }
 
