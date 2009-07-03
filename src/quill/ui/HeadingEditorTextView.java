@@ -1,5 +1,5 @@
 /*
- * PreformatEditorTextView.java
+ * HeadingEditorTextView.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,19 +10,19 @@
  */
 package quill.ui;
 
-import org.gnome.gtk.WrapMode;
+import org.gnome.pango.FontDescription;
 
-class PreformatEditorTextView extends EditorTextView
+class HeadingEditorTextView extends EditorTextView
 {
-    PreformatEditorTextView() {
-        super();
+    private static FontDescription desc;
 
-        view.modifyFont(fonts.mono);
-
-        view.setWrapMode(WrapMode.NONE);
+    static {
+        desc = fonts.serif.copy();
+        desc.setSize(14.0);
     }
 
-    protected boolean isCodeBlock() {
-        return true;
+    HeadingEditorTextView() {
+        super();
+        view.modifyFont(desc);
     }
 }

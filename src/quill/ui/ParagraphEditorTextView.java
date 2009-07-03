@@ -12,7 +12,7 @@ package quill.ui;
 
 class ParagraphEditorTextView extends EditorTextView
 {
-    public ParagraphEditorTextView() {
+    ParagraphEditorTextView() {
         super();
 
         view.modifyFont(fonts.serif);

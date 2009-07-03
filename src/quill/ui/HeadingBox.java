@@ -29,7 +29,7 @@ class HeadingBox extends HBox
 {
     private HBox box;
 
-    protected Entry title;
+    protected HeadingEditorTextView title;
 
     protected Label label;
 
@@ -45,13 +45,12 @@ class HeadingBox extends HBox
     private void setupBox() {
         box = this;
 
-        title = new Entry();
-        title.modifyFont(fonts.serif);
-        title.setHasFrame(true);
+        title = new HeadingEditorTextView();
         box.packStart(title, true, true, 0);
 
         label = new Label();
-        box.packEnd(label, true, true, 0);
+        label.setWidthChars(20);
+        box.packEnd(label, false, false, 0);
     }
 
     /*
@@ -59,7 +58,11 @@ class HeadingBox extends HBox
      * for entering title te
      */
     private void hookupChangeHandler() {
-        title.connect(new Entry.Changed() {
+        Entry junk;
+
+        junk = new Entry();
+
+        junk.connect(new Entry.Changed() {
             public void onChanged(Editable source) {
                 TextualChange change;
                 Extract entire;
@@ -67,7 +70,7 @@ class HeadingBox extends HBox
                 String str;
 
                 entire = chain.extractAll();
-                str = title.getText();
+                str = ((Entry) source).getText();
 
                 if (str.length() == 0) {
                     change = new DeleteTextualChange(chain, 0, entire);
@@ -89,6 +92,6 @@ class HeadingBox extends HBox
          * Widget here will have to be replaced with an EditorTextView].
          */
 
-        title.setText(load.toString());
+        title.loadText(load);
     }
 }
