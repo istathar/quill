@@ -14,6 +14,8 @@ package quill.ui;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.gnome.gdk.EventOwnerChange;
 import org.gnome.gdk.Pixbuf;
@@ -34,14 +36,21 @@ import static quill.textbase.TextChain.extractFor;
 
 public class UserInterface
 {
+    private Map<Change, Changeable> map;
+
     PrimaryWindow primary;
 
     public UserInterface() {
         loadImages();
         loadFonts();
+        setupUndoMap();
         setupApplication();
         setupWindows();
         hookupExternalClipboard();
+    }
+
+    private void setupUndoMap() {
+        map = new HashMap<Change, Changeable>(128);
     }
 
     private void setupWindows() {
@@ -170,12 +179,43 @@ public class UserInterface
         }
     }
 
-    Change undo() {
-        return data.undo();
+    void associate(Change change, Changeable widget) {
+        map.put(change, widget);
     }
 
-    Change redo() {
-        return data.redo();
+    /**
+     * Pick the latest Change off the ChangeStack, and then do something with
+     * it
+     */
+    void undo() {
+        final Change change;
+        final Changeable editor;
+
+        change = data.undo();
+
+        if (change == null) {
+            return;
+        }
+
+        editor = map.get(change);
+        editor.reverse(change);
+    }
+
+    /**
+     * Grab the Change that was most recently undone, and redo it.
+     */
+    void redo() {
+        final Change change;
+        final Changeable editor;
+
+        change = data.redo();
+
+        if (change == null) {
+            return;
+        }
+
+        editor = map.get(change);
+        editor.affect(change);
     }
 }
 

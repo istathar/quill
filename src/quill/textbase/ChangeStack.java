@@ -35,6 +35,9 @@ class ChangeStack
         pointer = 0;
     }
 
+    /**
+     * Apply a Change to the data layer.
+     */
     void apply(Change change) {
         while (pointer < stack.size()) {
             stack.removeLast();
@@ -46,6 +49,10 @@ class ChangeStack
         change.apply();
     }
 
+    /**
+     * Undo. Return the Change which represents the delta from current to one
+     * before.
+     */
     Change undo() {
         final Change change;
 
@@ -63,6 +70,10 @@ class ChangeStack
         return change;
     }
 
+    /**
+     * Redo a previous undo. Returns the Change which is the delta you will
+     * need to [re]apply.
+     */
     Change redo() {
         final Change change;
 

@@ -27,6 +27,7 @@ import org.gnome.gtk.TextView;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.WrapMode;
 
+import quill.textbase.Change;
 import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
 import quill.textbase.DeleteTextualChange;
@@ -46,7 +47,7 @@ import static quill.client.Quill.data;
 import static quill.client.Quill.ui;
 import static quill.ui.Format.tagForMarkup;
 
-abstract class EditorTextView extends TextView
+abstract class EditorTextView extends TextView implements Changeable
 {
     protected final TextView view;
 
@@ -127,7 +128,7 @@ abstract class EditorTextView extends TextView
                 }
 
                 change = new InsertTextualChange(chain, pointer.getOffset(), span);
-                data.apply(change);
+                register(change);
             }
         });
 
@@ -279,12 +280,6 @@ abstract class EditorTextView extends TextView
                     } else if (key == Keyval.x) {
                         cutText();
                         return true;
-                    } else if (key == Keyval.y) {
-                        redo();
-                        return true;
-                    } else if (key == Keyval.z) {
-                        undo();
-                        return true;
                     } else {
                         /*
                          * No keybinding in the editor, let PrimaryWindow
@@ -358,7 +353,6 @@ abstract class EditorTextView extends TextView
             change = new InsertTextualChange(chain, insertOffset, stash);
         }
 
-        data.apply(change);
         this.affect(change);
     }
 
@@ -430,7 +424,12 @@ abstract class EditorTextView extends TextView
         range = chain.extractRange(offset, width);
         change = new DeleteTextualChange(chain, offset, range);
 
+        register(change);
+    }
+
+    private void register(Change change) {
         data.apply(change);
+        ui.associate(change, this);
     }
 
     private void toggleMarkup(Markup format) {
@@ -471,39 +470,24 @@ abstract class EditorTextView extends TextView
 
     private void insertImage() {}
 
-    private void undo() {
-        final TextualChange change;
-
-        change = (TextualChange) ui.undo();
-        if (change == null) {
-            return;
-        }
-
-        reverse(change);
-    }
-
-    private void redo() {
-        final TextualChange change;
-
-        change = (TextualChange) data.redo();
-        if (change == null) {
-            return;
-        }
-
-        affect(change);
-    }
-
     /**
      * Cause the given Change to be reflected in the TextView. The assumption
      * is made that the backing TextBuffer is in a state where applying this
      * Change makes sense.
      */
-    private void affect(TextualChange change) {
+    public void affect(Change obj) {
+        TextualChange change;
         TextIter start, end;
         Extract r;
         int i, offset;
         Span s;
         TextTag tag;
+
+        change = (TextualChange) obj;
+
+        /*
+         * And now do what is necessary to reflect the change in this UI.
+         */
 
         start = buffer.getIter(change.getOffset());
 
@@ -557,11 +541,18 @@ abstract class EditorTextView extends TextView
      * Revert this Change, removing it's affect on the view. A
      * DeleteTextualChange will cause an insertion, etc.
      */
-    private void reverse(TextualChange change) {
+    public void reverse(Change obj) {
+        TextualChange change;
         final TextIter start, end;
         Extract r;
         int i;
         Span s;
+
+        change = (TextualChange) obj;
+
+        /*
+         * And now do what is necessary to reflect the change in this UI.
+         */
 
         start = buffer.getIter(change.getOffset());
 

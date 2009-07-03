@@ -164,6 +164,12 @@ class PrimaryWindow extends Window
                     if (key == Keyval.s) {
                         ui.saveDocument();
                         return true;
+                    } else if (key == Keyval.y) {
+                        ui.redo();
+                        return true;
+                    } else if (key == Keyval.z) {
+                        ui.undo();
+                        return true;
                     }
                 }
 

@@ -119,10 +119,6 @@ public class DataLayer
         doc.toXML(out);
     }
 
-    public ChangeStack getStack() {
-        return null;
-    }
-
     /**
      * Apply a Change to the data layer.
      */
