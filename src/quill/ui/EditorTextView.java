@@ -134,10 +134,24 @@ abstract class EditorTextView extends TextView implements Changeable
 
         buffer.connect(new TextBuffer.DeleteRange() {
             public void onDeleteRange(TextBuffer source, TextIter start, TextIter end) {
+                int alpha, omega, offset, width;
+                final Extract range;
+                final TextualChange change;
+
                 if (!user) {
                     return;
                 }
-                deleteRange(start, end);
+
+                alpha = start.getOffset();
+                omega = end.getOffset();
+
+                offset = normalizeOffset(alpha, omega);
+                width = normalizeWidth(alpha, omega);
+
+                range = chain.extractRange(offset, width);
+                change = new DeleteTextualChange(chain, offset, range);
+
+                register(change);
             }
         });
 
@@ -371,62 +385,6 @@ abstract class EditorTextView extends TextView implements Changeable
      * negative width.
      */
 
-    private void deleteBack() {
-        final TextIter start, end;
-
-        end = buffer.getIter(insertBound);
-
-        if (buffer.getHasSelection()) {
-            start = buffer.getIter(selectionBound);
-        } else {
-            if (end.isStart()) {
-                return;
-            }
-            start = end.copy();
-            start.backwardChar();
-        }
-
-        deleteRange(start, end);
-    }
-
-    private void deleteAt() {
-        final TextIter start, end;
-
-        start = buffer.getIter(insertBound);
-
-        if (buffer.getHasSelection()) {
-            end = buffer.getIter(selectionBound);
-        } else {
-            if (start.isEnd()) {
-                return;
-            }
-            end = start.copy();
-            end.forwardChar();
-        }
-
-        deleteRange(start, end);
-    }
-
-    /**
-     * Effect a deletion from start to end.
-     */
-    private void deleteRange(TextIter start, TextIter end) {
-        int alpha, omega, offset, width;
-        final Extract range;
-        final TextualChange change;
-
-        alpha = start.getOffset();
-        omega = end.getOffset();
-
-        offset = normalizeOffset(alpha, omega);
-        width = normalizeWidth(alpha, omega);
-
-        range = chain.extractRange(offset, width);
-        change = new DeleteTextualChange(chain, offset, range);
-
-        register(change);
-    }
-
     private void register(Change change) {
         data.apply(change);
         ui.associate(change, this);
@@ -456,7 +414,7 @@ abstract class EditorTextView extends TextView implements Changeable
             original = chain.extractRange(offset, width);
 
             change = new FormatTextualChange(chain, offset, original, format);
-            data.apply(change);
+            this.register(change);
             this.affect(change);
 
         } else {
@@ -698,6 +656,7 @@ abstract class EditorTextView extends TextView implements Changeable
 
             original = chain.extractRange(offset, width);
             change = new FormatTextualChange(chain, offset, original);
+            ui.associate(change, this);
             data.apply(change);
             this.affect(change);
         }

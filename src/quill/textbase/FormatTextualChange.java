@@ -100,10 +100,6 @@ public class FormatTextualChange extends TextualChange
     }
 
     /*
-     * Not using the returned Span[] for anything at the moment. What SHOULD
-     * we be using it for?
-     */
-    /*
      * Doing clear() this way is cumbersome.
      */
     protected void apply() {

@@ -15,7 +15,7 @@ public abstract class Change
     protected Change() {}
 
     /*
-     * This could take a context parameter, coming from ChangeStack, if
+     * These could take a context parameter, coming from ChangeStack, if
      * necessary.
      */
 
