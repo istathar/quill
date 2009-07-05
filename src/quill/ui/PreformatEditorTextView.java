@@ -25,4 +25,8 @@ class PreformatEditorTextView extends EditorTextView
     protected boolean isCodeBlock() {
         return true;
     }
+
+    protected boolean isSpellChecked() {
+        return false;
+    }
 }

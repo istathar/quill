@@ -10,11 +10,9 @@
  */
 package quill.ui;
 
-import org.gnome.gdk.EventButton;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
-import org.gnome.gdk.MouseButton;
 import org.gnome.gdk.Rectangle;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Menu;
@@ -92,6 +90,10 @@ abstract class EditorTextView extends TextView implements Changeable
         view.setBorderWidth(2);
 
         view.setAcceptsTab(true);
+
+        if (isSpellChecked()) {
+            view.attachSpell();
+        }
     }
 
     private void setupInternalData() {
@@ -109,6 +111,13 @@ abstract class EditorTextView extends TextView implements Changeable
      */
     protected boolean isCodeBlock() {
         return false;
+    }
+
+    /**
+     * Override this and return false if you want spell checking off
+     */
+    protected boolean isSpellChecked() {
+        return true;
     }
 
     private void hookupKeybindings() {
@@ -721,16 +730,30 @@ abstract class EditorTextView extends TextView implements Changeable
     }
 
     private void setupContextMenu() {
-        // view.connect(new TextView.PopulatePopup() {
-        // public void onPopulatePopup(TextView source, Menu menu) { }}
+        /*
+         * The default context menu created by TextView on a right click popup
+         * is annoying in that it contains stuff about input methods and
+         * unicode, all entirely unnecessary. The TextView API doesn't give us
+         * anything to inhibit this nonsense, but we can dig into the packing
+         * hierarchy and, as Widgets, remove them.
+         */
 
-        view.connect(new Widget.ButtonPressEvent() {
-            public boolean onButtonPressEvent(Widget source, EventButton event) {
-                if (event.getButton() == MouseButton.RIGHT) {
-                    context.popup();
-                    return true;
-                }
-                return false;
+        view.connect(new TextView.PopulatePopup() {
+            public void onPopulatePopup(TextView source, Menu menu) {
+                Widget[] items;
+                int i;
+
+                items = menu.getChildren();
+                i = items.length - 3;
+
+                // "[separator]"
+                menu.remove(items[i++]);
+
+                // "Input Methods"
+                menu.remove(items[i++]);
+
+                // "Insert Unicode Control Character"
+                menu.remove(items[i++]);
             }
         });
     }
