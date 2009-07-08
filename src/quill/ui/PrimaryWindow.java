@@ -267,7 +267,8 @@ class PrimaryWindow extends Window
     /*
      * FUTURE considerations: when we start dealing in multiple chapters,
      * we'll want to be able to navigate between them, which means this UI
-     * will need to be told what other Series are available.
+     * will need to be told what other Series are available. So be prepared to
+     * change this to accepting a Folio.
      */
     void displaySeries(Series series) {
         this.series = series;

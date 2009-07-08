@@ -492,6 +492,8 @@ abstract class EditorTextView extends TextView implements Changeable
                  * easy to express. To do this properly we'll have to get the
                  * individual Markup and whether it was added or removed from
                  * the FormatChange.
+                 * 
+                 * FIXME this clears the error underlining from GtkSpell!
                  */
 
                 buffer.removeAllTags(start, end);
@@ -586,7 +588,7 @@ abstract class EditorTextView extends TextView implements Changeable
          */
 
         change = new DeleteTextualChange(chain, offset, ui.getClipboard());
-        data.apply(change);
+        this.register(change);
         this.affect(change);
     }
 
@@ -665,8 +667,8 @@ abstract class EditorTextView extends TextView implements Changeable
 
             original = chain.extractRange(offset, width);
             change = new FormatTextualChange(chain, offset, original);
-            ui.associate(change, this);
-            data.apply(change);
+
+            this.register(change);
             this.affect(change);
         }
 
