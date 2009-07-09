@@ -18,7 +18,7 @@ package quill.textbase;
  */
 public class Series
 {
-    private final Segment[] segments;
+    private Segment[] segments;
 
     Series(Segment[] segments) {
         this.segments = segments;
@@ -35,28 +35,29 @@ public class Series
     /**
      * Create a new Series with the given Segment inserted at position.
      */
-    public Series insert(int position, Segment segment) {
-        final Series result;
+    void insert(int position, Segment segment) {
+        final Segment[] result;
 
-        result = new Series(new Segment[segments.length + 1]);
+        result = new Segment[segments.length + 1];
 
-        System.arraycopy(this.segments, 0, result.segments, 0, position);
-        result.segments[position] = segment;
-        System.arraycopy(this.segments, position, result.segments, position + 1, this.segments.length
-                - position);
+        System.arraycopy(segments, 0, result, 0, position);
+        result[position] = segment;
+        System.arraycopy(segments, position, result, position + 1, segments.length - position);
 
-        return result;
+        segments = result;
     }
 
-    public Series delete(int position) {
-        final Series result;
+    /**
+     * Remove the Segment at the given position.
+     */
+    void delete(int position) {
+        final Segment[] result;
 
-        result = new Series(new Segment[segments.length - 1]);
+        result = new Segment[segments.length - 1];
 
-        System.arraycopy(this.segments, 0, result.segments, 0, position);
-        System.arraycopy(this.segments, position + 1, result.segments, position, this.segments.length
-                - position - 1);
+        System.arraycopy(segments, 0, result, 0, position);
+        System.arraycopy(segments, position + 1, result, position, segments.length - position - 1);
 
-        return result;
+        segments = result;
     }
 }
