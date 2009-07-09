@@ -26,4 +26,8 @@ public final class ParagraphSegment extends Segment
     public Block createBlock() {
         return new Paragraph();
     }
+
+    Segment createSimilar() {
+        return new ParagraphSegment();
+    }
 }

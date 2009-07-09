@@ -21,4 +21,8 @@ public final class ComponentSegment extends Segment
     public Block createBlock() {
         return new Title();
     }
+
+    Segment createSimilar() {
+        return new ComponentSegment();
+    }
 }

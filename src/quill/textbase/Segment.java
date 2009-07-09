@@ -23,7 +23,8 @@ import quill.docbook.Block;
  * 
  * <p>
  * Segment itself does not provide a chaining or sequencing mechanism; impose
- * that with a Segment[] or a more complicated data structure as necessary.
+ * that locally with a Segment[] (or a more complicated data structure as
+ * necessary) locally, or if passing it further, wrapping it in a Series.
  * 
  * @author Andrew Cowie
  */
@@ -43,4 +44,6 @@ public abstract class Segment
     }
 
     public abstract Block createBlock();
+
+    abstract Segment createSimilar();
 }

@@ -26,4 +26,8 @@ public final class PreformatSegment extends Segment
     public Block createBlock() {
         return new ProgramListing();
     }
+
+    Segment createSimilar() {
+        return new PreformatSegment();
+    }
 }

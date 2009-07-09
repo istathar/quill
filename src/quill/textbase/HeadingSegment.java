@@ -21,4 +21,8 @@ public final class HeadingSegment extends Segment
     public Block createBlock() {
         return new Title();
     }
+
+    Segment createSimilar() {
+        return new HeadingSegment();
+    }
 }
