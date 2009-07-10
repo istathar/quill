@@ -77,4 +77,71 @@ public class ValidateStructuralChange extends TestCase
 
         assertEquals("Chapter 1The beginningHello cruel() World", str.toString());
     }
+
+    public final void testRevertStructuralChange() {
+        final Series series;
+        final Segment inserted;
+        TextChain chain;
+        final Change change;
+        final StringBuilder str;
+        int i;
+        Segment segment;
+
+        series = new Series(segments);
+        assertEquals(3, series.size());
+
+        inserted = new PreformatSegment();
+        chain = new TextChain("cruel() ");
+        inserted.setText(chain);
+
+        change = new SplitStructuralChange(series, segments[2], 6, inserted);
+        change.apply();
+
+        change.undo();
+
+        str = new StringBuilder();
+        for (i = 0; i < series.size(); i++) {
+            segment = series.get(i);
+            chain = segment.getText();
+            str.append(chain.toString());
+        }
+
+        assertEquals("Chapter 1The beginningHello World", str.toString());
+    }
+
+    public final void testSpliceSameSegmentEnd() {
+        final Series series;
+        final Segment inserted;
+        TextChain chain;
+        final Change change;
+        final StringBuilder str;
+        int i;
+        Segment segment;
+
+        series = new Series(segments);
+        assertEquals(3, series.size());
+
+        inserted = new PreformatSegment();
+        chain = new TextChain("save()");
+        inserted.setText(chain);
+
+        change = new SplitStructuralChange(series, segments[2], 11, inserted);
+        change.apply();
+
+        assertEquals(4, series.size());
+        assertSame(series.get(0), segments[0]);
+        assertSame(series.get(1), segments[1]);
+        assertSame(series.get(2), segments[2]);
+        assertTrue(series.get(3) instanceof PreformatSegment);
+
+        str = new StringBuilder();
+        for (i = 0; i < series.size(); i++) {
+            segment = series.get(i);
+            chain = segment.getText();
+            str.append(chain.toString());
+        }
+
+        assertEquals("Chapter 1The beginningHello Worldsave()", str.toString());
+    }
+
 }

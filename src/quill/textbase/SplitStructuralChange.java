@@ -18,17 +18,10 @@ public class SplitStructuralChange extends StructuralChange
     }
 
     protected void apply() {
-        int i;
         final Segment twin;
         final TextChain original, twain;
-        final Extract extract;
-        final int width;
-
-        for (i = 0; i < series.size(); i++) {
-            if (series.get(i) == into) {
-                break;
-            }
-        }
+        Extract extract;
+        final int i, width;
 
         /*
          * Grab the underlying TextChain, figure out an Extract with the
@@ -37,28 +30,33 @@ public class SplitStructuralChange extends StructuralChange
 
         original = into.getText();
         width = original.length() - offset;
-        extract = original.extractRange(offset, width);
 
-        original.delete(offset, width);
+        if (width != 0) {
+            extract = original.extractRange(offset, width);
+            original.delete(offset, width);
+        } else {
+            extract = null;
+        }
 
         /*
-         * Now create a second Segment, place the extracted Spans there, and
-         * then whack it into the Series.
+         * Now, if we're not appending but splitting, create a second Segment,
+         * place the extracted Spans there, and then whack it into the Series.
          */
 
-        twin = into.createSimilar();
+        i = index + 1;
 
-        twain = new TextChain();
-        twain.insert(0, extract.range);
-        twin.setText(twain);
+        if (width != 0) {
+            twin = into.createSimilar();
+            twain = new TextChain();
+            twain.insert(0, extract.range);
+            twin.setText(twain);
 
-        i++;
-
-        series.insert(i, twin);
+            series.insert(i, twin);
+        }
 
         /*
-         * Finally, insert our new Segment at the newly cleaved insertion
-         * point.
+         * Finally, insert our new Segment at the (newly cleaved if splitting)
+         * insertion point.
          */
 
         series.insert(i, added);
@@ -66,13 +64,35 @@ public class SplitStructuralChange extends StructuralChange
 
     protected void undo() {
         int i;
+        final Segment following;
+        final TextChain first, second, third;
+        final Extract extract;
+        final int width;
 
-        for (i = 0; i < series.size(); i++) {
-            if (series.get(i) == added) {
-                break;
-            }
-        }
+        /*
+         * Get the index of the second Segment
+         */
 
+        i = index + 1;
+
+        /*
+         * Get the contents of the third Segment, then empty it.
+         */
+
+        following = series.get(i + 1);
+        third = following.getText();
+        extract = third.extractAll();
+
+        third.delete(0, extract.width);
+
+        /*
+         * Add that content to the first Segment.
+         */
+
+        first = into.getText();
+        first.insert(offset, extract.range);
+
+        series.delete(i);
         series.delete(i);
     }
 }

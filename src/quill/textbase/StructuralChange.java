@@ -19,6 +19,8 @@ public abstract class StructuralChange extends Change
 {
     final Series series;
 
+    final int index;
+
     final Segment into;
 
     final int offset;
@@ -26,10 +28,21 @@ public abstract class StructuralChange extends Change
     final Segment added;
 
     StructuralChange(Series series, Segment into, int offset, Segment added) {
+        int i;
+
         this.series = series;
         this.into = into;
         this.offset = offset;
         this.added = added;
+
+        for (i = 0; i < series.size(); i++) {
+            if (series.get(i) == into) {
+                this.index = i;
+                return;
+            }
+        }
+
+        throw new IllegalStateException();
     }
 
     public int getOffset() {
