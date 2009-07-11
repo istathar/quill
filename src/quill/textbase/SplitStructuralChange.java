@@ -31,11 +31,16 @@ public class SplitStructuralChange extends StructuralChange
         original = into.getText();
         width = original.length() - offset;
 
-        if (width != 0) {
+        if (offset == 0) {
+            extract = null;
+            i = index;
+        } else if (width == 0) {
+            extract = null;
+            i = index + 1;
+        } else {
             extract = original.extractRange(offset, width);
             original.delete(offset, width);
-        } else {
-            extract = null;
+            i = index + 1;
         }
 
         /*
@@ -43,9 +48,7 @@ public class SplitStructuralChange extends StructuralChange
          * place the extracted Spans there, and then whack it into the Series.
          */
 
-        i = index + 1;
-
-        if (width != 0) {
+        if (extract != null) {
             twin = into.createSimilar();
             twain = new TextChain();
             twain.insert(0, extract.range);

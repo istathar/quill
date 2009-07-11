@@ -144,4 +144,38 @@ public class ValidateStructuralChange extends TestCase
         assertEquals("Chapter 1The beginningHello Worldsave()", str.toString());
     }
 
+    public final void testSpliceSameSegmentBegin() {
+        final Series series;
+        final Segment inserted;
+        TextChain chain;
+        final Change change;
+        final StringBuilder str;
+        int i;
+        Segment segment;
+
+        series = new Series(segments);
+        assertEquals(3, series.size());
+
+        inserted = new PreformatSegment();
+        chain = new TextChain("init()");
+        inserted.setText(chain);
+
+        change = new SplitStructuralChange(series, segments[0], 0, inserted);
+        change.apply();
+
+        assertEquals(4, series.size());
+        assertTrue(series.get(0) instanceof PreformatSegment);
+        assertSame(series.get(1), segments[0]);
+        assertSame(series.get(2), segments[1]);
+        assertSame(series.get(3), segments[2]);
+
+        str = new StringBuilder();
+        for (i = 0; i < series.size(); i++) {
+            segment = series.get(i);
+            chain = segment.getText();
+            str.append(chain.toString());
+        }
+
+        assertEquals("init()Chapter 1The beginningHello World", str.toString());
+    }
 }
