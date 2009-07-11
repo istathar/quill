@@ -42,14 +42,32 @@ public class ValidateStructuralChange extends TestCase
         assertEquals("Hello World", series.get(2).getText().toString());
     }
 
+    /**
+     * We don't really want this as a toString() on Series, so we just put it
+     * here as a utility method.
+     */
+    private static String concatonate(Series series) {
+        final StringBuilder str;
+        Segment segment;
+        int i;
+        TextChain chain;
+
+        str = new StringBuilder();
+
+        for (i = 0; i < series.size(); i++) {
+            segment = series.get(i);
+            chain = segment.getText();
+            str.append(chain.toString());
+        }
+
+        return str.toString();
+    }
+
     public final void testSpliceSameSegmentMiddle() {
         final Series series;
         final Segment inserted;
         TextChain chain;
         final Change change;
-        final StringBuilder str;
-        int i;
-        Segment segment;
 
         series = new Series(segments);
         assertEquals(3, series.size());
@@ -67,15 +85,7 @@ public class ValidateStructuralChange extends TestCase
         assertSame(series.get(2), segments[2]);
         assertTrue(series.get(3) instanceof PreformatSegment);
         assertTrue(series.get(4) instanceof ParagraphSegment);
-
-        str = new StringBuilder();
-        for (i = 0; i < series.size(); i++) {
-            segment = series.get(i);
-            chain = segment.getText();
-            str.append(chain.toString());
-        }
-
-        assertEquals("Chapter 1The beginningHello cruel() World", str.toString());
+        assertEquals("Chapter 1The beginningHello cruel() World", concatonate(series));
     }
 
     public final void testRevertStructuralChange() {
@@ -83,9 +93,6 @@ public class ValidateStructuralChange extends TestCase
         final Segment inserted;
         TextChain chain;
         final Change change;
-        final StringBuilder str;
-        int i;
-        Segment segment;
 
         series = new Series(segments);
         assertEquals(3, series.size());
@@ -99,14 +106,7 @@ public class ValidateStructuralChange extends TestCase
 
         change.undo();
 
-        str = new StringBuilder();
-        for (i = 0; i < series.size(); i++) {
-            segment = series.get(i);
-            chain = segment.getText();
-            str.append(chain.toString());
-        }
-
-        assertEquals("Chapter 1The beginningHello World", str.toString());
+        assertEquals("Chapter 1The beginningHello World", concatonate(series));
     }
 
     public final void testSpliceSameSegmentEnd() {
@@ -114,9 +114,6 @@ public class ValidateStructuralChange extends TestCase
         final Segment inserted;
         TextChain chain;
         final Change change;
-        final StringBuilder str;
-        int i;
-        Segment segment;
 
         series = new Series(segments);
         assertEquals(3, series.size());
@@ -133,25 +130,17 @@ public class ValidateStructuralChange extends TestCase
         assertSame(series.get(1), segments[1]);
         assertSame(series.get(2), segments[2]);
         assertTrue(series.get(3) instanceof PreformatSegment);
+        assertEquals("Chapter 1The beginningHello Worldsave()", concatonate(series));
 
-        str = new StringBuilder();
-        for (i = 0; i < series.size(); i++) {
-            segment = series.get(i);
-            chain = segment.getText();
-            str.append(chain.toString());
-        }
-
-        assertEquals("Chapter 1The beginningHello Worldsave()", str.toString());
+        change.undo();
+        assertEquals("Chapter 1The beginningHello World", concatonate(series));
     }
 
     public final void testSpliceSameSegmentBegin() {
         final Series series;
         final Segment inserted;
-        TextChain chain;
+        final TextChain chain;
         final Change change;
-        final StringBuilder str;
-        int i;
-        Segment segment;
 
         series = new Series(segments);
         assertEquals(3, series.size());
@@ -169,13 +158,9 @@ public class ValidateStructuralChange extends TestCase
         assertSame(series.get(2), segments[1]);
         assertSame(series.get(3), segments[2]);
 
-        str = new StringBuilder();
-        for (i = 0; i < series.size(); i++) {
-            segment = series.get(i);
-            chain = segment.getText();
-            str.append(chain.toString());
-        }
+        assertEquals("init()Chapter 1The beginningHello World", concatonate(series));
 
-        assertEquals("init()Chapter 1The beginningHello World", str.toString());
+        change.undo();
+        assertEquals("Chapter 1The beginningHello World", concatonate(series));
     }
 }

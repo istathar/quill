@@ -12,7 +12,6 @@ package quill.textbase;
 
 public class SplitStructuralChange extends StructuralChange
 {
-
     public SplitStructuralChange(Series series, Segment into, int offset, Segment added) {
         super(series, into, offset, added);
     }
@@ -66,36 +65,37 @@ public class SplitStructuralChange extends StructuralChange
     }
 
     protected void undo() {
+        TextChain original;
         int i;
         final Segment following;
         final TextChain first, second, third;
         final Extract extract;
-        final int width;
 
         /*
-         * Get the index of the second Segment
+         * Was this a splice or an insert? If a splice, then get the index of
+         * the second Segment. Then get the contents of the third Segment,
+         * then empty it.
          */
 
-        i = index + 1;
+        if (offset == 0) {
+            i = 0;
+        } else if (index + 2 == series.size()) {
+            i = index + 1;
+        } else {
+            i = index + 1;
 
-        /*
-         * Get the contents of the third Segment, then empty it.
-         */
+            following = series.get(i + 1);
+            third = following.getText();
+            extract = third.extractAll();
 
-        following = series.get(i + 1);
-        third = following.getText();
-        extract = third.extractAll();
+            third.delete(0, extract.width);
 
-        third.delete(0, extract.width);
+            first = into.getText();
+            first.insert(offset, extract.range);
 
-        /*
-         * Add that content to the first Segment.
-         */
+            series.delete(i);
+        }
 
-        first = into.getText();
-        first.insert(offset, extract.range);
-
-        series.delete(i);
         series.delete(i);
     }
 }
