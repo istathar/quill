@@ -82,9 +82,9 @@ public class SplitStructuralChange extends StructuralChange
         } else if (index + 2 == series.size()) {
             i = index + 1;
         } else {
-            i = index + 1;
+            i = index + 2;
 
-            following = series.get(i + 1);
+            following = series.get(i);
             third = following.getText();
             extract = third.extractAll();
 
@@ -94,6 +94,7 @@ public class SplitStructuralChange extends StructuralChange
             first.insert(offset, extract.range);
 
             series.delete(i);
+            i--;
         }
 
         series.delete(i);

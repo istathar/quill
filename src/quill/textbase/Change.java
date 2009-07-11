@@ -22,4 +22,13 @@ public abstract class Change
     protected abstract void apply();
 
     protected abstract void undo();
+
+    /**
+     * Get the Segment that this Change affects.
+     * 
+     * @return
+     */
+    public Segment affects() {
+        return null;
+    }
 }
