@@ -217,6 +217,10 @@ public class UserInterface
         editor = map.get(change);
         editor.affect(change);
     }
+
+    void affect(Change change) {
+        primary.affect(change);
+    }
 }
 
 class images

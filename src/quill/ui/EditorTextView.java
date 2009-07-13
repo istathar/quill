@@ -36,7 +36,9 @@ import quill.textbase.InsertTextualChange;
 import quill.textbase.Markup;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
+import quill.textbase.Series;
 import quill.textbase.Span;
+import quill.textbase.SplitStructuralChange;
 import quill.textbase.StringSpan;
 import quill.textbase.StructuralChange;
 import quill.textbase.TextChain;
@@ -786,7 +788,16 @@ abstract class EditorTextView extends TextView implements Changeable
      * UserInterface facade.
      */
     private void handleInsertSegment(Segment addition) {
+        final Series series;
+        final Change change;
+
+        series = data.getActiveDocument().get(0); // BAD
+
         addition.setText(new TextChain());
-        ui.primary.spliceInto(segment, insertOffset, addition);
+
+        change = new SplitStructuralChange(series, segment, insertOffset, addition);
+
+        data.apply(change);
+        ui.affect(change);
     }
 }

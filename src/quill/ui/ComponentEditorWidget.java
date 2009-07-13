@@ -26,11 +26,8 @@ import quill.textbase.ParagraphSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
-import quill.textbase.SplitStructuralChange;
 import quill.textbase.StructuralChange;
 import quill.textbase.TextChain;
-
-import static quill.client.Quill.data;
 
 /**
  * Left hand side of a PrimaryWindow for editing a Component (Article or
@@ -245,13 +242,5 @@ class ComponentEditorWidget extends ScrolledWindow
 
         editor = (EditorTextView) view;
         editor.affect(change);
-    }
-
-    void spliceInto(Segment into, int offset, Segment segment) {
-        final StructuralChange change;
-
-        change = new SplitStructuralChange(series, into, offset, segment);
-        data.apply(change);
-        this.affect(change);
     }
 }

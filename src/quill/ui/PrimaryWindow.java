@@ -23,8 +23,9 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.pango.FontDescription;
 
-import quill.textbase.Segment;
+import quill.textbase.Change;
 import quill.textbase.Series;
+import quill.textbase.StructuralChange;
 
 import static quill.client.Quill.ui;
 
@@ -278,14 +279,7 @@ class PrimaryWindow extends Window
         outline.renderSeries(series);
     }
 
-    /**
-     * Splice a new Segment into the Series being displayed.
-     */
-    /*
-     * FIXME is this the right place for this? It's really a services layer
-     * call.
-     */
-    void spliceInto(Segment into, int offset, Segment segment) {
-        editor.spliceInto(into, offset, segment);
+    void affect(Change change) {
+        editor.affect((StructuralChange) change);
     }
 }
