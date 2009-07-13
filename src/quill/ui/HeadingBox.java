@@ -18,6 +18,7 @@ import org.gnome.gtk.Label;
 import quill.textbase.DeleteTextualChange;
 import quill.textbase.Extract;
 import quill.textbase.FullTextualChange;
+import quill.textbase.Segment;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
 import quill.textbase.TextChain;
@@ -35,17 +36,17 @@ class HeadingBox extends HBox
 
     private TextChain chain;
 
-    public HeadingBox() {
+    public HeadingBox(Segment segment) {
         super(false, 0);
 
-        setupBox();
+        setupBox(segment);
         hookupChangeHandler();
     }
 
-    private void setupBox() {
+    private void setupBox(Segment segment) {
         box = this;
 
-        title = new HeadingEditorTextView();
+        title = new HeadingEditorTextView(segment);
         box.packStart(title, true, true, 0);
 
         label = new Label();
@@ -81,17 +82,5 @@ class HeadingBox extends HBox
                 data.apply(change);
             }
         });
-    }
-
-    void loadText(TextChain load) {
-        this.chain = load;
-
-        /*
-         * Should we change to rich markup in titles, we can use the logic in
-         * EditorTextView's loadText() [although in that case, the Entry
-         * Widget here will have to be replaced with an EditorTextView].
-         */
-
-        title.loadText(load);
     }
 }

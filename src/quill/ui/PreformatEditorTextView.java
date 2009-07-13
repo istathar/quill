@@ -12,10 +12,12 @@ package quill.ui;
 
 import org.gnome.gtk.WrapMode;
 
+import quill.textbase.Segment;
+
 class PreformatEditorTextView extends EditorTextView
 {
-    PreformatEditorTextView() {
-        super();
+    PreformatEditorTextView(Segment segment) {
+        super(segment);
 
         view.modifyFont(fonts.mono);
 

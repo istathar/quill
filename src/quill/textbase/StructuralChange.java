@@ -45,15 +45,29 @@ public abstract class StructuralChange extends Change
         throw new IllegalStateException();
     }
 
+    public Segment getInto() {
+        return into;
+    }
+
+    /**
+     * Offset into <code>into</code> that the split occured. Special cases are
+     * <code>0</code> which indicates an prepend at the beginning of the
+     * <code>into</code> Segment, and <code>-1</code> as the marker that an
+     * append after happened.
+     */
     public int getOffset() {
         return offset;
     }
 
-    public Series getOriginal() {
-        return null;
+    public Segment getAdded() {
+        return added;
     }
 
-    public Segment getAdded() {
-        return null;
+    public Series getSeries() {
+        return series;
     }
+
+    // public Segment getTwain() {
+    // return twain;
+    // }
 }

@@ -285,7 +285,7 @@ class PrimaryWindow extends Window
      * FIXME is this the right place for this? It's really a services layer
      * call.
      */
-    void spliceSeries(EditorTextView view, int offset, Segment segment) {
-        editor.spliceSeries(view, offset, segment);
+    void spliceInto(Segment into, int offset, Segment segment) {
+        editor.spliceInto(into, offset, segment);
     }
 }

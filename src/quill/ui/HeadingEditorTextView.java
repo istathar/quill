@@ -12,6 +12,8 @@ package quill.ui;
 
 import org.gnome.pango.FontDescription;
 
+import quill.textbase.Segment;
+
 class HeadingEditorTextView extends EditorTextView
 {
     private static FontDescription desc;
@@ -21,8 +23,8 @@ class HeadingEditorTextView extends EditorTextView
         desc.setSize(14.0);
     }
 
-    HeadingEditorTextView() {
-        super();
+    HeadingEditorTextView(Segment segment) {
+        super(segment);
         view.modifyFont(desc);
     }
 }

@@ -10,10 +10,12 @@
  */
 package quill.ui;
 
+import quill.textbase.Segment;
+
 public class ChapterHeadingBox extends HeadingBox
 {
-    public ChapterHeadingBox() {
-        super();
+    public ChapterHeadingBox(Segment segment) {
+        super(segment);
         label.setLabel("Chapter");
     }
 }

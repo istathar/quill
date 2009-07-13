@@ -38,6 +38,7 @@ import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
+import quill.textbase.StructuralChange;
 import quill.textbase.TextChain;
 import quill.textbase.TextualChange;
 
@@ -49,7 +50,7 @@ abstract class EditorTextView extends TextView implements Changeable
 {
     protected final TextView view;
 
-    private Menu split, context;
+    private Menu split;
 
     private TextBuffer buffer;
 
@@ -64,14 +65,21 @@ abstract class EditorTextView extends TextView implements Changeable
 
     private Markup insertMarkup;
 
-    EditorTextView() {
+    /**
+     * The model element that we are representing.
+     */
+    private Segment segment;
+
+    EditorTextView(Segment segment) {
         super();
-        view = this;
+        this.view = this;
+        this.segment = segment;
 
         setupTextView();
         setupInsertMenu();
         setupContextMenu();
-        setupInternalData();
+
+        displaySegment();
 
         hookupKeybindings();
         hookupFormatManagement();
@@ -94,10 +102,6 @@ abstract class EditorTextView extends TextView implements Changeable
         if (isSpellChecked()) {
             view.attachSpell();
         }
-    }
-
-    private void setupInternalData() {
-        chain = new TextChain();
     }
 
     /**
@@ -442,42 +446,54 @@ abstract class EditorTextView extends TextView implements Changeable
      * is made that the backing TextBuffer is in a state where applying this
      * Change makes sense.
      */
-    public void affect(Change obj) {
-        TextualChange change;
+    public void affect(Change change) {
+        final StructuralChange structural;
+        final TextualChange textual;
         TextIter start, end;
         Extract r;
         int i, offset;
         Span s;
         TextTag tag;
 
-        change = (TextualChange) obj;
+        if (change instanceof StructuralChange) {
+            structural = (StructuralChange) change;
+
+            offset = structural.getOffset();
+            start = buffer.getIter(offset);
+            end = buffer.getIterEnd();
+            buffer.delete(start, end);
+
+            return;
+        }
+
+        textual = (TextualChange) change;
 
         /*
          * And now do what is necessary to reflect the change in this UI.
          */
 
-        start = buffer.getIter(change.getOffset());
+        start = buffer.getIter(textual.getOffset());
 
-        if ((change instanceof InsertTextualChange) || (change instanceof DeleteTextualChange)
-                || (change instanceof FullTextualChange)) {
-            r = change.getRemoved();
+        if ((textual instanceof InsertTextualChange) || (textual instanceof DeleteTextualChange)
+                || (textual instanceof FullTextualChange)) {
+            r = textual.getRemoved();
             if (r != null) {
-                end = buffer.getIter(change.getOffset() + r.getWidth());
+                end = buffer.getIter(textual.getOffset() + r.getWidth());
                 buffer.delete(start, end);
                 start = end;
             }
 
-            r = change.getAdded();
+            r = textual.getAdded();
             if (r != null) {
-                r = change.getAdded();
+                r = textual.getAdded();
                 for (i = 0; i < r.size(); i++) {
                     s = r.get(i);
                     buffer.insert(start, s.getText(), tagForMarkup(s.getMarkup()));
                 }
             }
-        } else if (change instanceof FormatTextualChange) {
-            r = change.getAdded();
-            offset = change.getOffset();
+        } else if (textual instanceof FormatTextualChange) {
+            r = textual.getAdded();
+            offset = textual.getOffset();
 
             for (i = 0; i < r.size(); i++) {
                 s = r.get(i);
@@ -680,11 +696,10 @@ abstract class EditorTextView extends TextView implements Changeable
     }
 
     /**
-     * Given a newly created TextStack, make this EditorTextView reflect its
-     * contents. It must be a new TextStack, not one that's had Changes made
-     * to it.
+     * Make this EditorTextView reflect the contents of the Segment this
+     * EditorTextView was initialized with.
      */
-    void loadText(TextChain load) {
+    private void displaySegment() {
         final Extract entire;
         TextIter pointer;
         int i;
@@ -692,17 +707,21 @@ abstract class EditorTextView extends TextView implements Changeable
 
         /*
          * Easy enough to just set the internal TextStack backing this editor
-         * to the one passed in
+         * to the one belonging to the Segment passed in.
          */
 
-        chain = load;
+        chain = segment.getText();
 
         /*
          * But now we need to cycle over its Spans and place its content into
          * the view.
          */
 
-        entire = load.extractAll();
+        entire = chain.extractAll();
+        if (entire == null) {
+            return;
+        }
+
         pointer = buffer.getIterStart();
 
         for (i = 0; i < entire.size(); i++) {
@@ -717,9 +736,10 @@ abstract class EditorTextView extends TextView implements Changeable
         split = new Menu();
 
         para = new MenuItem("Normal _paragraph block");
+        para.setSensitive(false);
         pre = new MenuItem("Preformatted _code block", new MenuItem.Activate() {
             public void onActivate(MenuItem source) {
-                insertSegment(new PreformatSegment());
+                handleInsertSegment(new PreformatSegment());
             }
         });
         sect = new MenuItem("Section _heading");
@@ -761,35 +781,12 @@ abstract class EditorTextView extends TextView implements Changeable
     }
 
     /**
-     * Take the necessary actions to create a new Segment. If we're at the end
-     * of the view we're appending. Jump the logic to the UserInterface
-     * facade.
+     * Take the necessary actions to create a new Segment, which you pass in.
+     * If we're at the end of the view we're appending. Jump the logic to the
+     * UserInterface facade.
      */
-    private void insertSegment(Segment segment) {
-        ui.primary.spliceSeries(this, insertOffset, segment);
-    }
-
-    /**
-     * Take the TextStack underlying this EditorTextView, chop it in half at
-     * offset, and return an Extract with the second half.
-     */
-    Extract chopInTwo(int offset) {
-        final int len;
-        final TextualChange change;
-        final Extract range;
-
-        len = chain.length();
-
-        if (len == insertOffset) {
-            range = null;
-        } else {
-            range = chain.extractRange(insertOffset, len - insertOffset);
-        }
-
-        change = new DeleteTextualChange(chain, insertOffset, range);
-        data.apply(change);
-        this.affect(change);
-
-        return range;
+    private void handleInsertSegment(Segment addition) {
+        addition.setText(new TextChain());
+        ui.primary.spliceInto(segment, insertOffset, addition);
     }
 }

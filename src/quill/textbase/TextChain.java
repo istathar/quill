@@ -664,9 +664,9 @@ public class TextChain
      * ends - and greater than insertBound.
      */
     /*
-     * Having exposed this so that external APIs can get a Range to pass when
-     * constructing a DeleteChange, we probably end up duplicating a lot of
-     * work when actually calling delete() after this here.
+     * Having exposed this so that external APIs can get an Extract to pass
+     * when constructing a DeleteChange, we probably end up duplicating a lot
+     * of work when actually calling delete() after this here.
      */
     public Extract extractRange(int start, int width) {
         final Pair pair;
