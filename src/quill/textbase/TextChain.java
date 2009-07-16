@@ -612,7 +612,7 @@ public class TextChain
 
         while (piece != null) {
             if (start == offset) {
-                return last.span.getMarkup();
+                return piece.span.getMarkup();
             }
 
             /*

@@ -11,18 +11,9 @@
 
 package quill.textbase;
 
-import quill.textbase.CharacterSpan;
-import quill.textbase.Common;
-import quill.textbase.Pair;
-import quill.textbase.Piece;
-import quill.textbase.Span;
-import quill.textbase.StringSpan;
-import quill.textbase.TextChain;
-
-import static quill.textbase.TextChain.formArray;
-
 import junit.framework.TestCase;
 
+import static quill.textbase.TextChain.formArray;
 
 public class ValidateText extends TestCase
 {
@@ -559,6 +550,62 @@ public class ValidateText extends TestCase
         while (p != null) {
             assertNull(p.span.getMarkup());
             p = p.next;
+        }
+    }
+
+    public final void testGetMarkupFromChain() {
+        final TextChain text;
+        Piece p;
+
+        text = new TextChain("Hello Wor");
+        text.append(new StringSpan("ld", null));
+        text.format(0, 11, Common.FILENAME);
+        text.format(0, 5, Common.ITALICS);
+        text.format(6, 5, Common.BOLD);
+
+        assertSame(Common.ITALICS, text.getMarkupAt(0));
+        assertSame(Common.ITALICS, text.getMarkupAt(1));
+        assertSame(Common.ITALICS, text.getMarkupAt(2));
+        assertSame(Common.ITALICS, text.getMarkupAt(3));
+        assertSame(Common.ITALICS, text.getMarkupAt(4));
+        assertSame(Common.FILENAME, text.getMarkupAt(5));
+        assertSame(Common.BOLD, text.getMarkupAt(6));
+        assertSame(Common.BOLD, text.getMarkupAt(7));
+        assertSame(Common.BOLD, text.getMarkupAt(8));
+        assertSame(Common.BOLD, text.getMarkupAt(9));
+        assertSame(Common.BOLD, text.getMarkupAt(10));
+
+        // Hello_World
+        // 000000000011
+        // 012345678901
+
+        assertEquals(11, text.length());
+        try {
+            text.getMarkupAt(11);
+        } catch (IllegalArgumentException iae) {
+            // good
+        }
+
+        text.append(new StringSpan(" Goodbye", null));
+
+        // _Goodbye
+        // 111111111
+        // 123456789
+
+        assertSame(null, text.getMarkupAt(11));
+        assertSame(null, text.getMarkupAt(12));
+        assertSame(null, text.getMarkupAt(13));
+        assertSame(null, text.getMarkupAt(14));
+        assertSame(null, text.getMarkupAt(15));
+        assertSame(null, text.getMarkupAt(16));
+        assertSame(null, text.getMarkupAt(17));
+        assertSame(null, text.getMarkupAt(18));
+
+        assertEquals(19, text.length());
+        try {
+            text.getMarkupAt(19);
+        } catch (IllegalArgumentException iae) {
+            // good
         }
     }
 }

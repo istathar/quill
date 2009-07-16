@@ -382,6 +382,7 @@ abstract class EditorTextView extends TextView implements Changeable
             change = new InsertTextualChange(chain, insertOffset, stash);
         }
 
+        data.apply(change);
         this.affect(change);
     }
 
