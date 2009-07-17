@@ -19,15 +19,14 @@ import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
+import quill.textbase.Change;
 import quill.textbase.ComponentSegment;
-import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ParagraphSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.StructuralChange;
-import quill.textbase.TextChain;
 
 /**
  * Left hand side of a PrimaryWindow for editing a Component (Article or
@@ -35,7 +34,7 @@ import quill.textbase.TextChain;
  * 
  * @author Andrew Cowie
  */
-class ComponentEditorWidget extends ScrolledWindow
+class ComponentEditorWidget extends ScrolledWindow implements Changeable
 {
     private ScrolledWindow scroll;
 
@@ -181,20 +180,22 @@ class ComponentEditorWidget extends ScrolledWindow
      * Given a StructuralChange, figure out what it means in terms of the UI
      * in this ComponentEditorWidget.
      */
-    void affect(StructuralChange change) {
+    public void affect(Change obj) {
+        final StructuralChange change;
         final Segment first;
         final Segment added;
         final Segment third;
+        final Series series;
         final Widget[] children;
         int i;
         final Widget view;
-        final Extract extract;
-        final TextChain chain;
         Widget widget;
+        final EditorTextView editor;
 
         /*
          * Find the index of the view into the VBox.
          */
+        change = (StructuralChange) obj;
 
         first = change.getInto();
         added = change.getAdded();
@@ -227,7 +228,8 @@ class ComponentEditorWidget extends ScrolledWindow
          * piece.
          */
 
-        third = change.getSeries().get(i + 1);
+        series = first.getParent();
+        third = series.get(i + 1);
         widget = createEditorForSegment(third);
         box.packStart(widget, false, false, 0);
         i++;
@@ -238,9 +240,12 @@ class ComponentEditorWidget extends ScrolledWindow
          * Delete the third text out of the first.
          */
 
-        EditorTextView editor;
-
         editor = (EditorTextView) view;
         editor.affect(change);
+    }
+
+    public void reverse(Change change) {
+    // TODO Auto-generated method stub
+
     }
 }

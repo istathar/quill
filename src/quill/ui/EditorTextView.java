@@ -36,7 +36,6 @@ import quill.textbase.InsertTextualChange;
 import quill.textbase.Markup;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
-import quill.textbase.Series;
 import quill.textbase.Span;
 import quill.textbase.SplitStructuralChange;
 import quill.textbase.StringSpan;
@@ -44,7 +43,6 @@ import quill.textbase.StructuralChange;
 import quill.textbase.TextChain;
 import quill.textbase.TextualChange;
 
-import static quill.client.Quill.data;
 import static quill.client.Quill.ui;
 import static quill.ui.Format.tagForMarkup;
 
@@ -143,7 +141,7 @@ abstract class EditorTextView extends TextView implements Changeable
                 }
 
                 change = new InsertTextualChange(chain, pointer.getOffset(), span);
-                register(change);
+                ui.apply(change);
             }
         });
 
@@ -166,7 +164,7 @@ abstract class EditorTextView extends TextView implements Changeable
                 range = chain.extractRange(offset, width);
                 change = new DeleteTextualChange(chain, offset, range);
 
-                register(change);
+                ui.apply(change);
             }
         });
 
@@ -382,28 +380,8 @@ abstract class EditorTextView extends TextView implements Changeable
             change = new InsertTextualChange(chain, insertOffset, stash);
         }
 
-        data.apply(change);
+        ui.apply(change);
         this.affect(change);
-    }
-
-    /**
-     * <p>
-     * If width is negative, start will be decremented by that amount and the
-     * range will be
-     * 
-     * <pre>
-     * extractRange(start-width, |width|)
-     * </pre>
-     * 
-     * This accounts for the common but subtle bug that if you have selected
-     * moving backwards, selectionBound will be at a point where the range
-     * ends and have an offset greater than insertBound's, resulting in a
-     * negative width.
-     */
-
-    private void register(Change change) {
-        data.apply(change);
-        ui.associate(change, this);
     }
 
     private void toggleMarkup(Markup format) {
@@ -430,7 +408,7 @@ abstract class EditorTextView extends TextView implements Changeable
             original = chain.extractRange(offset, width);
 
             change = new FormatTextualChange(chain, offset, original, format);
-            this.register(change);
+            ui.apply(change);
             this.affect(change);
 
         } else {
@@ -607,7 +585,7 @@ abstract class EditorTextView extends TextView implements Changeable
          */
 
         change = new DeleteTextualChange(chain, offset, ui.getClipboard());
-        this.register(change);
+        ui.apply(change);
         this.affect(change);
     }
 
@@ -687,7 +665,7 @@ abstract class EditorTextView extends TextView implements Changeable
             original = chain.extractRange(offset, width);
             change = new FormatTextualChange(chain, offset, original);
 
-            this.register(change);
+            ui.apply(change);
             this.affect(change);
         }
 
@@ -789,16 +767,12 @@ abstract class EditorTextView extends TextView implements Changeable
      * UserInterface facade.
      */
     private void handleInsertSegment(Segment addition) {
-        final Series series;
         final Change change;
-
-        series = data.getActiveDocument().get(0); // BAD
 
         addition.setText(new TextChain());
 
-        change = new SplitStructuralChange(series, segment, insertOffset, addition);
+        change = new SplitStructuralChange(segment, insertOffset, addition);
 
-        data.apply(change);
-        ui.affect(change);
+        ui.apply(change);
     }
 }

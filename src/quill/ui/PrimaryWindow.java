@@ -25,7 +25,6 @@ import org.gnome.pango.FontDescription;
 
 import quill.textbase.Change;
 import quill.textbase.Series;
-import quill.textbase.StructuralChange;
 
 import static quill.client.Quill.ui;
 
@@ -280,6 +279,6 @@ class PrimaryWindow extends Window
     }
 
     void affect(Change change) {
-        editor.affect((StructuralChange) change);
+        editor.affect(change);
     }
 }
