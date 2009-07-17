@@ -17,8 +17,6 @@ package quill.textbase;
  */
 public abstract class StructuralChange extends Change
 {
-    final Series series;
-
     final int index;
 
     final Segment into;
@@ -27,10 +25,11 @@ public abstract class StructuralChange extends Change
 
     final Segment added;
 
-    StructuralChange(Series series, Segment into, int offset, Segment added) {
+    StructuralChange(Segment into, int offset, Segment added) {
+        final Series series;
         int i;
 
-        this.series = series;
+        series = into.getParent();
         this.into = into;
         this.offset = offset;
         this.added = added;
@@ -61,10 +60,6 @@ public abstract class StructuralChange extends Change
 
     public Segment getAdded() {
         return added;
-    }
-
-    public Series getSeries() {
-        return series;
     }
 
     // public Segment getTwain() {

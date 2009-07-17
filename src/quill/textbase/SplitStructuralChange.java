@@ -12,8 +12,8 @@ package quill.textbase;
 
 public class SplitStructuralChange extends StructuralChange
 {
-    public SplitStructuralChange(Series series, Segment into, int offset, Segment added) {
-        super(series, into, offset, added);
+    public SplitStructuralChange(Segment into, int offset, Segment added) {
+        super(into, offset, added);
     }
 
     protected void apply() {
@@ -21,6 +21,7 @@ public class SplitStructuralChange extends StructuralChange
         final TextChain original, twain;
         Extract extract;
         final int i, width;
+        final Series series;
 
         /*
          * Grab the underlying TextChain, figure out an Extract with the
@@ -47,6 +48,8 @@ public class SplitStructuralChange extends StructuralChange
          * place the extracted Spans there, and then whack it into the Series.
          */
 
+        series = into.getParent();
+
         if (extract != null) {
             twin = into.createSimilar();
             twain = new TextChain();
@@ -65,11 +68,14 @@ public class SplitStructuralChange extends StructuralChange
     }
 
     protected void undo() {
+        final Series series;
         TextChain original;
         int i;
         final Segment following;
         final TextChain first, second, third;
         final Extract extract;
+
+        series = into.getParent();
 
         /*
          * Was this a splice or an insert? If a splice, then get the index of

@@ -15,6 +15,10 @@ import quill.docbook.Title;
 
 public final class HeadingSegment extends Segment
 {
+    protected HeadingSegment() {
+        super();
+    }
+
     /*
      * We assume that a Section heading always has a title.
      */
@@ -23,6 +27,11 @@ public final class HeadingSegment extends Segment
     }
 
     Segment createSimilar() {
-        return new HeadingSegment();
+        final Segment result;
+
+        result = new HeadingSegment();
+        result.setParent(this.getParent());
+
+        return result;
     }
 }

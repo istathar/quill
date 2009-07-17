@@ -21,7 +21,13 @@ public class Series
     private Segment[] segments;
 
     Series(Segment[] segments) {
+        int i;
+
         this.segments = segments;
+
+        for (i = 0; i < segments.length; i++) {
+            segments[i].setParent(this);
+        }
     }
 
     public int size() {

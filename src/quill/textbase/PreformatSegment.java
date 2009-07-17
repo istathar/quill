@@ -23,11 +23,20 @@ import quill.docbook.ProgramListing;
  */
 public final class PreformatSegment extends Segment
 {
+    public PreformatSegment() {
+        super();
+    }
+
     public Block createBlock() {
         return new ProgramListing();
     }
 
     Segment createSimilar() {
-        return new PreformatSegment();
+        final Segment result;
+
+        result = new PreformatSegment();
+        result.setParent(this.getParent());
+
+        return result;
     }
 }

@@ -30,6 +30,18 @@ import quill.docbook.Block;
  */
 public abstract class Segment
 {
+    private Series parent;
+
+    protected Segment() {}
+
+    void setParent(Series series) {
+        this.parent = series;
+    }
+
+    public Series getParent() {
+        return parent;
+    }
+
     /**
      * The internal representation of the text body of this Segment.
      */

@@ -73,7 +73,7 @@ public class EfficientNoNodeFactory extends NodeFactory
     }
 
     public Series createSeries() {
-        Segment[] segments;
+        final Segment[] segments;
 
         segments = new Segment[list.size()];
         list.toArray(segments);
