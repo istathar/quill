@@ -10,16 +10,22 @@
  */
 package quill.client;
 
+import java.io.IOException;
+
+import nu.xom.ParsingException;
+import nu.xom.ValidityException;
+
 import org.gnome.gtk.Gtk;
 
 import quill.textbase.DataLayer;
+import quill.textbase.Folio;
 import quill.ui.UserInterface;
 
 public class Quill
 {
     public static UserInterface ui;
 
-    public static DataLayer data;
+    private static DataLayer data;
 
     public static void main(String[] args) {
         initializeDataLayer();
@@ -34,7 +40,15 @@ public class Quill
     static void initializeUserInterface(String[] args) {
         Gtk.init(args);
 
-        ui = new UserInterface();
+        ui = new UserInterface(data);
+    }
+
+    static void loadDocument(String filename) throws ValidityException, ParsingException, IOException {
+        final Folio folio;
+
+        data.loadDocument(filename);
+        folio = data.getActiveDocument();
+        ui.displayDocument(folio);
     }
 
     /**

@@ -14,13 +14,11 @@ import java.io.IOException;
 
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import quill.textbase.Folio;
 
-import static quill.client.Quill.data;
 import static quill.client.Quill.initializeDataLayer;
 import static quill.client.Quill.initializeUserInterface;
+import static quill.client.Quill.loadDocument;
 import static quill.client.Quill.runUserInterface;
-import static quill.client.Quill.ui;
 
 public class DevelopmentHarness
 {
@@ -32,10 +30,6 @@ public class DevelopmentHarness
     }
 
     private static void loadExampleDocument() throws ValidityException, ParsingException, IOException {
-        final Folio folio;
-
-        data.loadDocument("tests/ExampleProgram.xml");
-        folio = data.getActiveDocument();
-        ui.displayDocument(folio);
+        loadDocument("tests/ExampleProgram.xml");
     }
 }

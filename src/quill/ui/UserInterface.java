@@ -26,30 +26,33 @@ import org.gnome.gtk.Gtk;
 import org.gnome.pango.FontDescription;
 
 import quill.textbase.Change;
+import quill.textbase.DataLayer;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
 
-import static quill.client.Quill.data;
 import static quill.textbase.TextChain.extractFor;
 
 public class UserInterface
 {
     private Map<Change, Changeable> map;
 
+    private DataLayer data;
+
     PrimaryWindow primary;
 
-    public UserInterface() {
+    public UserInterface(DataLayer data) {
         loadImages();
         loadFonts();
-        setupUndoMap();
+        setupUndoCapability(data);
         setupApplication();
         setupWindows();
         hookupExternalClipboard();
     }
 
-    private void setupUndoMap() {
+    private void setupUndoCapability(final DataLayer layer) {
+        data = layer;
         map = new HashMap<Change, Changeable>(128);
     }
 
@@ -179,10 +182,6 @@ public class UserInterface
         }
     }
 
-    void associate(Change change, Changeable widget) {
-        map.put(change, widget);
-    }
-
     /**
      * Pick the latest Change off the ChangeStack, and then do something with
      * it
@@ -218,7 +217,11 @@ public class UserInterface
         editor.affect(change);
     }
 
-    void affect(Change change) {
+    /**
+     * Cause a Change to be forward applied to the in-memory representation.
+     */
+    void apply(Change change) {
+        data.apply(change);
         primary.affect(change);
     }
 }
