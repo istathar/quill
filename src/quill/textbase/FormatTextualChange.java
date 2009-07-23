@@ -15,7 +15,7 @@ package quill.textbase;
  * 
  * @author Andrew Cowie
  */
-public class FormatChange extends Change
+public class FormatTextualChange extends TextualChange
 {
     Markup format;
 
@@ -23,8 +23,8 @@ public class FormatChange extends Change
      * Toggle format in the given range. This means applying it, unless the
      * first Span in the Extract is that format, in which case toss it.
      */
-    public FormatChange(int offset, Extract range, Markup format) {
-        super(offset, range, toggleMarkup(range, format));
+    public FormatTextualChange(TextChain chain, int offset, Extract range, Markup format) {
+        super(chain, offset, range, toggleMarkup(range, format));
         this.format = format;
     }
 
@@ -78,8 +78,8 @@ public class FormatChange extends Change
     /**
      * Clear all format in the given range.
      */
-    public FormatChange(int offset, Extract original) {
-        super(offset, original, clearMarkup(original));
+    public FormatTextualChange(TextChain chain, int offset, Extract original) {
+        super(chain, offset, original, clearMarkup(original));
         this.format = null;
     }
 
@@ -100,15 +100,11 @@ public class FormatChange extends Change
     }
 
     /*
-     * Not using the returned Span[] for anything at the moment. What SHOULD
-     * we be using it for?
-     */
-    /*
      * Doing clear() this way is cumbersome.
      */
-    void apply(Text text) {
-        text.delete(offset, removed.width);
-        text.insert(offset, added.range);
+    protected void apply() {
+        chain.delete(offset, removed.width);
+        chain.insert(offset, added.range);
     }
 
     /*
@@ -116,8 +112,8 @@ public class FormatChange extends Change
      * Actually, this is wrong; if we're undoing we have the Span[] and should
      * be able to just "replace" with it.
      */
-    void undo(Text text) {
-        text.delete(offset, added.width);
-        text.insert(offset, removed.range);
+    protected void undo() {
+        chain.delete(offset, added.width);
+        chain.insert(offset, removed.range);
     }
 }

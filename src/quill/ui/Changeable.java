@@ -1,5 +1,5 @@
 /*
- * ChapterHeadingBox.java
+ * Changeable.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,12 +10,17 @@
  */
 package quill.ui;
 
-import quill.textbase.Segment;
+import quill.textbase.Change;
 
-public class ChapterHeadingBox extends HeadingBox
+/**
+ * Mark a user interface element as one whose underlying data structures can
+ * be mutated by Change objects.
+ * 
+ * @author Andrew Cowie
+ */
+interface Changeable
 {
-    public ChapterHeadingBox(Segment segment) {
-        super(segment);
-        label.setLabel("Chapter");
-    }
+    void affect(Change change);
+
+    void reverse(Change change);
 }

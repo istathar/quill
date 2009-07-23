@@ -23,7 +23,20 @@ import quill.docbook.Paragraph;
  */
 public final class ParagraphSegment extends Segment
 {
+    public ParagraphSegment() {
+        super();
+    }
+
     public Block createBlock() {
         return new Paragraph();
+    }
+
+    Segment createSimilar() {
+        final Segment result;
+
+        result = new ParagraphSegment();
+        result.setParent(this.getParent());
+
+        return result;
     }
 }

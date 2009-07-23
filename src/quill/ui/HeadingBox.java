@@ -15,41 +15,43 @@ import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
 
-import quill.textbase.Change;
-import quill.textbase.DeleteChange;
+import quill.textbase.DeleteTextualChange;
 import quill.textbase.Extract;
+import quill.textbase.FullTextualChange;
+import quill.textbase.Segment;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
-import quill.textbase.TextStack;
+import quill.textbase.TextChain;
 import quill.textbase.TextualChange;
+
+import static quill.client.Quill.data;
 
 class HeadingBox extends HBox
 {
     private HBox box;
 
-    protected Entry title;
+    protected HeadingEditorTextView title;
 
     protected Label label;
 
-    private TextStack stack;
+    private TextChain chain;
 
-    public HeadingBox() {
+    public HeadingBox(Segment segment) {
         super(false, 0);
 
-        setupBox();
+        setupBox(segment);
         hookupChangeHandler();
     }
 
-    private void setupBox() {
+    private void setupBox(Segment segment) {
         box = this;
 
-        title = new Entry();
-        title.modifyFont(fonts.serif);
-        title.setHasFrame(true);
+        title = new HeadingEditorTextView(segment);
         box.packStart(title, true, true, 0);
 
         label = new Label();
-        box.packEnd(label, true, true, 0);
+        label.setWidthChars(20);
+        box.packEnd(label, false, false, 0);
     }
 
     /*
@@ -57,40 +59,28 @@ class HeadingBox extends HBox
      * for entering title te
      */
     private void hookupChangeHandler() {
-        title.connect(new Entry.Changed() {
+        Entry junk;
+
+        junk = new Entry();
+
+        junk.connect(new Entry.Changed() {
             public void onChanged(Editable source) {
-                Change change;
+                TextualChange change;
                 Extract entire;
                 Span span;
                 String str;
 
-                entire = stack.extractAll();
-                str = title.getText();
+                entire = chain.extractAll();
+                str = ((Entry) source).getText();
 
                 if (str.length() == 0) {
-                    change = new DeleteChange(0, entire);
+                    change = new DeleteTextualChange(chain, 0, entire);
                 } else {
                     span = new StringSpan(str, null);
-                    change = new TextualChange(0, entire, span);
+                    change = new FullTextualChange(chain, 0, entire, span);
                 }
-                stack.apply(change);
+                data.apply(change);
             }
         });
-    }
-
-    void loadText(TextStack load) {
-        if (load.undo() != null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.stack = load;
-
-        /*
-         * Should we change to rich markup in titles, we can use the logic in
-         * EditorTextView's loadText() [although in that case, the Entry
-         * Widget here will have to be replaced with an EditorTextView].
-         */
-
-        title.setText(load.toString());
     }
 }

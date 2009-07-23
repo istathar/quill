@@ -10,10 +10,12 @@
  */
 package quill.ui;
 
+import quill.textbase.Segment;
+
 class SectionHeadingBox extends HeadingBox
 {
-    public SectionHeadingBox() {
-        super();
+    public SectionHeadingBox(Segment segment) {
+        super(segment);
         label.setLabel("Section");
     }
 }

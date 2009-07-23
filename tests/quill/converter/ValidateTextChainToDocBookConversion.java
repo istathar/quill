@@ -1,5 +1,5 @@
 /*
- * ValidateBufferToMarkdownSerialization.java
+ * ValidateTextChainToDocBookConversion.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -22,20 +22,20 @@ import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
 import quill.textbase.DataLayer;
 import quill.textbase.HeadingSegment;
-import quill.textbase.InsertChange;
+import quill.textbase.InsertTextualChange;
 import quill.textbase.ParagraphSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
-import quill.textbase.TextStack;
+import quill.textbase.TextChain;
 
-public class ValidateStackToDocBookConversion extends TestCase
+public class ValidateTextChainToDocBookConversion extends TestCase
 {
     public final void testLoadDocbook() throws IOException, ValidityException, ParsingException {
         final DataLayer data;
         final Series series;
-        final TextStack text;
+        final TextChain text;
 
         data = new DataLayer();
         data.loadDocument("tests/quill/converter/HelloWorld.xml");
@@ -49,7 +49,8 @@ public class ValidateStackToDocBookConversion extends TestCase
     }
 
     public final void testWritePlainParas() throws IOException {
-        final TextStack stack;
+        final TextChain chain;
+        final DataLayer data;
         final Span span;
         final Change change;
         final Segment segment;
@@ -62,17 +63,19 @@ public class ValidateStackToDocBookConversion extends TestCase
          * Build up a trivial example
          */
 
+        data = new DataLayer();
+        chain = new TextChain();
+
         span = new StringSpan("Hello\nWorld", null);
-        change = new InsertChange(0, span);
-        stack = new TextStack();
-        stack.apply(change);
+        change = new InsertTextualChange(chain, 0, span);
+        data.apply(change);
 
         /*
          * Now run conversion process.
          */
 
         segment = new ParagraphSegment();
-        segment.setText(stack);
+        segment.setText(chain);
 
         converter = new DocBookConverter();
         converter.append(segment);
@@ -113,7 +116,8 @@ public class ValidateStackToDocBookConversion extends TestCase
     }
 
     public final void testWriteComplexPara() throws IOException {
-        final TextStack stack;
+        final DataLayer data;
+        final TextChain chain;
         final Span[] spans;
         int offset;
         Change change;
@@ -144,12 +148,13 @@ public class ValidateStackToDocBookConversion extends TestCase
                 new StringSpan(" function.", null),
         };
 
-        stack = new TextStack();
+        data = new DataLayer();
+        chain = new TextChain();
         offset = 0;
 
         for (Span span : spans) {
-            change = new InsertChange(offset, span);
-            stack.apply(change);
+            change = new InsertTextualChange(chain, offset, span);
+            data.apply(change);
             offset += span.getWidth();
         }
 
@@ -162,7 +167,7 @@ public class ValidateStackToDocBookConversion extends TestCase
         converter.append(segment);
 
         segment = new ParagraphSegment();
-        segment.setText(stack);
+        segment.setText(chain);
         converter.append(segment);
         book = converter.result();
 
@@ -198,7 +203,7 @@ public class ValidateStackToDocBookConversion extends TestCase
     public final void testLoadComplexDocument() throws IOException, ValidityException, ParsingException {
         final DataLayer data;
         final Series series;
-        final TextStack text;
+        final TextChain chain;
 
         data = new DataLayer();
         data.loadDocument("tests/quill/converter/TemporaryFiles.xml");
@@ -206,11 +211,11 @@ public class ValidateStackToDocBookConversion extends TestCase
         series = data.getActiveDocument().get(0);
         assertEquals(3, series.size());
 
-        text = series.get(2).getText();
+        chain = series.get(2).getText();
 
-        assertNotNull(text);
+        assertNotNull(chain);
         assertEquals("Accessing the /tmp directory directly is fine, "
                 + "but you are often better off using File's createTempFile() function.",
-                text.toString());
+                chain.toString());
     }
 }

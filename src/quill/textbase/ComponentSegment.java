@@ -15,10 +15,23 @@ import quill.docbook.Title;
 
 public final class ComponentSegment extends Segment
 {
+    protected ComponentSegment() {
+        super();
+    }
+
     /*
      * We assume that a Chapter always has a title.
      */
     public Block createBlock() {
         return new Title();
+    }
+
+    Segment createSimilar() {
+        final Segment result;
+
+        result = new ComponentSegment();
+        result.setParent(this.getParent());
+
+        return result;
     }
 }

@@ -23,6 +23,7 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.pango.FontDescription;
 
+import quill.textbase.Change;
 import quill.textbase.Series;
 
 import static quill.client.Quill.ui;
@@ -163,6 +164,12 @@ class PrimaryWindow extends Window
                     if (key == Keyval.s) {
                         ui.saveDocument();
                         return true;
+                    } else if (key == Keyval.y) {
+                        ui.redo();
+                        return true;
+                    } else if (key == Keyval.z) {
+                        ui.undo();
+                        return true;
                     }
                 }
 
@@ -260,7 +267,8 @@ class PrimaryWindow extends Window
     /*
      * FUTURE considerations: when we start dealing in multiple chapters,
      * we'll want to be able to navigate between them, which means this UI
-     * will need to be told what other Series are available.
+     * will need to be told what other Series are available. So be prepared to
+     * change this to accepting a Folio.
      */
     void displaySeries(Series series) {
         this.series = series;
@@ -268,5 +276,9 @@ class PrimaryWindow extends Window
         editor.initializeSeries(series);
         preview.renderSeries(series);
         outline.renderSeries(series);
+    }
+
+    void affect(Change change) {
+        editor.affect(change);
     }
 }

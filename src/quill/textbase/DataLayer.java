@@ -1,5 +1,5 @@
 /*
- * DataStore.java
+ * DataLayer.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -23,15 +23,21 @@ import quill.converter.DocBookConverter;
 import quill.docbook.Document;
 
 /**
- * Mechanism for loading documents and getting at them in memory.
+ * Our in-memory intermediate representation. Provides access to mutate the
+ * textbase, along with mechanisms for loading documents and getting at them
+ * in memory.
  * 
  * @author Andrew Cowie
  */
 public class DataLayer
 {
+    private ChangeStack stack;
+
     private Folio current;
 
     public DataLayer() {
+        stack = new ChangeStack();
+
         current = null;
     }
 
@@ -111,5 +117,28 @@ public class DataLayer
 
         doc = converter.result();
         doc.toXML(out);
+    }
+
+    /**
+     * Apply a Change to the data layer.
+     */
+    public void apply(Change change) {
+        stack.apply(change);
+    }
+
+    /**
+     * Undo. Return the Change which represents the delta from current to one
+     * before.
+     */
+    public Change undo() {
+        return stack.undo();
+    }
+
+    /**
+     * Redo a previous undo. Returns the Change which is the delta you will
+     * need to [re]apply.
+     */
+    public Change redo() {
+        return stack.redo();
     }
 }

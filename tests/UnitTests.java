@@ -11,11 +11,13 @@
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import quill.converter.ValidateStackToDocBookConversion;
+import quill.converter.ValidateTextChainToDocBookConversion;
 import quill.textbase.ValidateApplyUndoRedo;
 import quill.textbase.ValidateExtracts;
 import quill.textbase.ValidateSpanOperations;
+import quill.textbase.ValidateStructuralChange;
 import quill.textbase.ValidateText;
+import quill.textbase.ValidateWrapperExpansions;
 
 import com.operationaldynamics.junit.VerboseTestRunner;
 
@@ -45,7 +47,9 @@ public class UnitTests
         suite.addTestSuite(ValidateText.class);
         suite.addTestSuite(ValidateExtracts.class);
         suite.addTestSuite(ValidateApplyUndoRedo.class);
-        suite.addTestSuite(ValidateStackToDocBookConversion.class);
+        suite.addTestSuite(ValidateTextChainToDocBookConversion.class);
+        suite.addTestSuite(ValidateWrapperExpansions.class);
+        suite.addTestSuite(ValidateStructuralChange.class);
 
         return suite;
     }

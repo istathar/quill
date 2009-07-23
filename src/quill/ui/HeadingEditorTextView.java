@@ -1,5 +1,5 @@
 /*
- * ChapterHeadingBox.java
+ * HeadingEditorTextView.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,12 +10,21 @@
  */
 package quill.ui;
 
+import org.gnome.pango.FontDescription;
+
 import quill.textbase.Segment;
 
-public class ChapterHeadingBox extends HeadingBox
+class HeadingEditorTextView extends EditorTextView
 {
-    public ChapterHeadingBox(Segment segment) {
+    private static FontDescription desc;
+
+    static {
+        desc = fonts.serif.copy();
+        desc.setSize(14.0);
+    }
+
+    HeadingEditorTextView(Segment segment) {
         super(segment);
-        label.setLabel("Chapter");
+        view.modifyFont(desc);
     }
 }

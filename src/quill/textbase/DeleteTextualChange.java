@@ -1,5 +1,5 @@
 /*
- * DeleteChange.java
+ * DeleteTextualChange.java
  *
  * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,7 +10,7 @@
  */
 package quill.textbase;
 
-public class DeleteChange extends Change
+public class DeleteTextualChange extends TextualChange
 {
     /**
      * While it would be nice to be able to say
@@ -18,15 +18,15 @@ public class DeleteChange extends Change
      * Spans that are going to be removed so we can restore them later if an
      * undo happens.
      */
-    public DeleteChange(int offset, Extract removed) {
-        super(offset, removed, null);
+    public DeleteTextualChange(TextChain chain, int offset, Extract removed) {
+        super(chain, offset, removed, null);
     }
 
-    final void apply(Text text) {
-        text.delete(offset, removed.width);
+    protected void apply() {
+        chain.delete(offset, removed.width);
     }
 
-    final void undo(Text text) {
-        text.insert(offset, removed.range);
+    protected void undo() {
+        chain.insert(offset, removed.range);
     }
 }

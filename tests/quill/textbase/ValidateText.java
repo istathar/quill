@@ -11,34 +11,25 @@
 
 package quill.textbase;
 
-import quill.textbase.CharacterSpan;
-import quill.textbase.Common;
-import quill.textbase.Pair;
-import quill.textbase.Piece;
-import quill.textbase.Span;
-import quill.textbase.StringSpan;
-import quill.textbase.Text;
-
-import static quill.textbase.Text.formArray;
-
 import junit.framework.TestCase;
 
+import static quill.textbase.TextChain.formArray;
 
 public class ValidateText extends TestCase
 {
     public final void testInitialText() {
-        final Text start;
+        final TextChain start;
 
-        start = new Text("Hello world");
+        start = new TextChain("Hello world");
 
         assertEquals("Hello world", start.toString());
     }
 
     public final void testTwoSequentialChunks() {
-        final Text text;
+        final TextChain text;
         final Span second;
 
-        text = new Text("Hello world");
+        text = new TextChain("Hello world");
 
         second = new StringSpan(" it is a sunny day", null);
         text.append(second);
@@ -47,7 +38,7 @@ public class ValidateText extends TestCase
     }
 
     public final void testExtractedChunks() {
-        final Text text;
+        final TextChain text;
         final Span one, two, three, space;
 
         one = new StringSpan("Emergency", null);
@@ -55,7 +46,7 @@ public class ValidateText extends TestCase
         three = new StringSpan("system", null);
         space = new CharacterSpan(' ', null);
 
-        text = new Text();
+        text = new TextChain();
         text.append(three);
         text.append(space);
         text.append(two);
@@ -66,12 +57,12 @@ public class ValidateText extends TestCase
     }
 
     public final void testSplittingAtPoint() {
-        final Text text;
+        final TextChain text;
         final Span initial;
         final Piece one, two;
 
         initial = new StringSpan("Concave", null);
-        text = new Text(initial);
+        text = new TextChain(initial);
         assertEquals("Concave", text.toString());
         assertNull(text.first.next);
         assertNull(text.first.prev);
@@ -90,14 +81,14 @@ public class ValidateText extends TestCase
     }
 
     public final void testSplittingAtPieceBoundary() {
-        final Text text;
+        final TextChain text;
         final Span a, b;
         final Piece first, one, two;
 
         a = new StringSpan("Alpha", null);
         b = new StringSpan("Bravo", null);
 
-        text = new Text(a);
+        text = new TextChain(a);
         text.append(b);
         assertEquals("AlphaBravo", text.toString());
 
@@ -120,16 +111,16 @@ public class ValidateText extends TestCase
     }
 
     public final void testSingleSplice() {
-        final Text text;
+        final TextChain text;
 
-        text = new Text("This Emergency Broadcast System");
+        text = new TextChain("This Emergency Broadcast System");
 
         text.insert(5, "is a test of the ");
         assertEquals("This is a test of the Emergency Broadcast System", text.toString());
     }
 
     public final void testMultipleSplice() {
-        final Text text;
+        final TextChain text;
         final Span one, two, three, four, space, addition;
         one = new StringSpan("One", null);
         space = new CharacterSpan(' ', null);
@@ -137,7 +128,7 @@ public class ValidateText extends TestCase
         three = new StringSpan("Three", null);
         four = new StringSpan("Four", null);
 
-        text = new Text(one);
+        text = new TextChain(one);
         text.append(space);
         text.append(two);
         text.append(space);
@@ -160,7 +151,7 @@ public class ValidateText extends TestCase
         assertEquals(9, calculateNumberPieces(text));
     }
 
-    private static int calculateNumberPieces(Text text) {
+    private static int calculateNumberPieces(TextChain text) {
         Piece p;
         int i;
 
@@ -174,13 +165,13 @@ public class ValidateText extends TestCase
     }
 
     public final void testTextLength() {
-        final Text text;
+        final TextChain text;
         final Span zero, one, two;
 
         zero = new StringSpan("Hello", null);
         assertEquals(5, zero.getWidth());
         assertEquals(5, zero.getText().length());
-        text = new Text(zero);
+        text = new TextChain(zero);
         assertEquals(5, text.length());
 
         one = new StringSpan("Happy", null);
@@ -192,7 +183,7 @@ public class ValidateText extends TestCase
     }
 
     public final void testInsertBetweenExistingChunks() {
-        final Text text;
+        final TextChain text;
         final Span zero, one, two, three;
 
         zero = new StringSpan("Zero", null);
@@ -200,7 +191,7 @@ public class ValidateText extends TestCase
         two = new StringSpan("Two", null);
         three = new StringSpan("Three", null);
 
-        text = new Text(one);
+        text = new TextChain(one);
         text.append(two);
         text.append(three);
 
@@ -223,11 +214,11 @@ public class ValidateText extends TestCase
      * work, which this tests.
      */
     public final void testInsertIntoEnd() {
-        final Text text;
+        final TextChain text;
         final String str;
 
         str = "All this has happened before";
-        text = new Text(str);
+        text = new TextChain(str);
 
         text.insert(str.length(), ", all this will happen again.");
         assertEquals("All this has happened before, all this will happen again.", text.toString());
@@ -256,7 +247,7 @@ public class ValidateText extends TestCase
     }
 
     public final void testExtractRange() {
-        final Text text;
+        final TextChain text;
         final Span zero, one, two, three;
         final Span[] range;
         final Pair pair;
@@ -266,7 +257,7 @@ public class ValidateText extends TestCase
         two = new StringSpan("Two", null);
         three = new StringSpan("Three", null);
 
-        text = new Text(zero);
+        text = new TextChain(zero);
         text.append(one);
         text.append(two);
         text.append(three);
@@ -283,7 +274,7 @@ public class ValidateText extends TestCase
     }
 
     public final void testExtractAll() {
-        final Text text;
+        final TextChain text;
         final Span zero, one, two;
         final Pair pair;
         final Span[] range;
@@ -292,7 +283,7 @@ public class ValidateText extends TestCase
         one = new StringSpan(" T. ", null);
         two = new StringSpan("Kirk", null);
 
-        text = new Text(zero);
+        text = new TextChain(zero);
         text.append(one);
         text.append(two);
 
@@ -308,7 +299,7 @@ public class ValidateText extends TestCase
     }
 
     public final void testDeleteRange() {
-        final Text text;
+        final TextChain text;
         final Span zero, one, two, three;
 
         zero = new StringSpan("Zero", null);
@@ -316,7 +307,7 @@ public class ValidateText extends TestCase
         two = new StringSpan("Two", null);
         three = new StringSpan("Three", null);
 
-        text = new Text(zero);
+        text = new TextChain(zero);
         text.append(one);
         text.append(two);
         text.append(three);
@@ -334,9 +325,9 @@ public class ValidateText extends TestCase
     }
 
     public final void testDeleteBoundaries() {
-        final Text text;
+        final TextChain text;
 
-        text = new Text("Hello World");
+        text = new TextChain("Hello World");
 
         text.delete(0, 6);
         assertEquals("World", text.toString());
@@ -348,9 +339,9 @@ public class ValidateText extends TestCase
     }
 
     public final void testDeleteAll() {
-        final Text text;
+        final TextChain text;
 
-        text = new Text("Magic");
+        text = new TextChain("Magic");
 
         text.delete(0, 5);
         assertEquals("", text.toString());
@@ -358,9 +349,9 @@ public class ValidateText extends TestCase
     }
 
     public final void testBoundsChecking() {
-        final Text text;
+        final TextChain text;
 
-        text = new Text("Magic");
+        text = new TextChain("Magic");
         try {
             text.insert(6, "ian");
             fail();
@@ -394,10 +385,10 @@ public class ValidateText extends TestCase
     }
 
     public final void testApplyFormatting() {
-        final Text text;
+        final TextChain text;
         Piece p;
 
-        text = new Text("Hello World");
+        text = new TextChain("Hello World");
 
         /*
          * Call format() on the first word. This will splice; the first Piece
@@ -457,10 +448,10 @@ public class ValidateText extends TestCase
     }
 
     public final void testRemovingFormatting() {
-        final Text text;
+        final TextChain text;
         Piece p;
 
-        text = new Text("Hello World");
+        text = new TextChain("Hello World");
         assertEquals("Hello World", text.toString());
 
         /*
@@ -525,10 +516,10 @@ public class ValidateText extends TestCase
     }
 
     public final void testRemovingFormatFromZero() {
-        final Text text;
+        final TextChain text;
         Piece p;
 
-        text = new Text("Yo!");
+        text = new TextChain("Yo!");
         assertEquals("Yo!", text.toString());
 
         p = text.first;
@@ -559,6 +550,62 @@ public class ValidateText extends TestCase
         while (p != null) {
             assertNull(p.span.getMarkup());
             p = p.next;
+        }
+    }
+
+    public final void testGetMarkupFromChain() {
+        final TextChain text;
+        Piece p;
+
+        text = new TextChain("Hello Wor");
+        text.append(new StringSpan("ld", null));
+        text.format(0, 11, Common.FILENAME);
+        text.format(0, 5, Common.ITALICS);
+        text.format(6, 5, Common.BOLD);
+
+        assertSame(Common.ITALICS, text.getMarkupAt(0));
+        assertSame(Common.ITALICS, text.getMarkupAt(1));
+        assertSame(Common.ITALICS, text.getMarkupAt(2));
+        assertSame(Common.ITALICS, text.getMarkupAt(3));
+        assertSame(Common.ITALICS, text.getMarkupAt(4));
+        assertSame(Common.FILENAME, text.getMarkupAt(5));
+        assertSame(Common.BOLD, text.getMarkupAt(6));
+        assertSame(Common.BOLD, text.getMarkupAt(7));
+        assertSame(Common.BOLD, text.getMarkupAt(8));
+        assertSame(Common.BOLD, text.getMarkupAt(9));
+        assertSame(Common.BOLD, text.getMarkupAt(10));
+
+        // Hello_World
+        // 000000000011
+        // 012345678901
+
+        assertEquals(11, text.length());
+        try {
+            text.getMarkupAt(11);
+        } catch (IllegalArgumentException iae) {
+            // good
+        }
+
+        text.append(new StringSpan(" Goodbye", null));
+
+        // _Goodbye
+        // 111111111
+        // 123456789
+
+        assertSame(null, text.getMarkupAt(11));
+        assertSame(null, text.getMarkupAt(12));
+        assertSame(null, text.getMarkupAt(13));
+        assertSame(null, text.getMarkupAt(14));
+        assertSame(null, text.getMarkupAt(15));
+        assertSame(null, text.getMarkupAt(16));
+        assertSame(null, text.getMarkupAt(17));
+        assertSame(null, text.getMarkupAt(18));
+
+        assertEquals(19, text.length());
+        try {
+            text.getMarkupAt(19);
+        } catch (IllegalArgumentException iae) {
+            // good
         }
     }
 }

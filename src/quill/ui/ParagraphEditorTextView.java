@@ -10,10 +10,12 @@
  */
 package quill.ui;
 
+import quill.textbase.Segment;
+
 class ParagraphEditorTextView extends EditorTextView
 {
-    public ParagraphEditorTextView() {
-        super();
+    ParagraphEditorTextView(Segment segment) {
+        super(segment);
 
         view.modifyFont(fonts.serif);
 

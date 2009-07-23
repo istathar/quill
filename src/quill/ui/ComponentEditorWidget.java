@@ -10,18 +10,23 @@
  */
 package quill.ui;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
+import quill.textbase.Change;
 import quill.textbase.ComponentSegment;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ParagraphSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
+import quill.textbase.StructuralChange;
 
 /**
  * Left hand side of a PrimaryWindow for editing a Component (Article or
@@ -29,7 +34,7 @@ import quill.textbase.Series;
  * 
  * @author Andrew Cowie
  */
-class ComponentEditorWidget extends ScrolledWindow
+class ComponentEditorWidget extends ScrolledWindow implements Changeable
 {
     private ScrolledWindow scroll;
 
@@ -37,11 +42,30 @@ class ComponentEditorWidget extends ScrolledWindow
 
     private VBox box;
 
+    /**
+     * A map going from user interface layer deeper into the internal
+     * representation layer.
+     */
+    private Map<Widget, Segment> deeper;
+
+    /**
+     * A map going from internal representations out to the corresponding user
+     * interface element; the opposite of deeper.
+     */
+    private Map<Segment, Widget> rising;
+
     ComponentEditorWidget() {
         super();
         scroll = this;
+        setupMaps();
+
         setupScrolling();
         hookupAdjustmentReactions();
+    }
+
+    private void setupMaps() {
+        deeper = new HashMap<Widget, Segment>(16);
+        rising = new HashMap<Segment, Widget>(16);
     }
 
     private void setupScrolling() {
@@ -78,49 +102,150 @@ class ComponentEditorWidget extends ScrolledWindow
         }
     }
 
+    private Series series;
+
     void initializeSeries(Series series) {
         Segment segment;
         int i;
-        EditorTextView editor;
-        HeadingBox heading;
         Widget widget;
-        ScrolledWindow wide;
+
+        this.series = series;
 
         for (i = 0; i < series.size(); i++) {
             segment = series.get(i);
 
-            if (segment instanceof ParagraphSegment) {
-                editor = new ParagraphEditorTextView();
-                editor.loadText(segment.getText());
-
-                widget = editor;
-            } else if (segment instanceof PreformatSegment) {
-                editor = new PreformatEditorTextView();
-                editor.loadText(segment.getText());
-
-                wide = new ScrolledWindow();
-                wide.setPolicy(PolicyType.AUTOMATIC, PolicyType.NEVER);
-                wide.add(editor);
-
-                widget = wide;
-            } else if (segment instanceof HeadingSegment) {
-                heading = new SectionHeadingBox();
-                heading.loadText(segment.getText());
-
-                widget = heading;
-            } else if (segment instanceof ComponentSegment) {
-                heading = new ChapterHeadingBox();
-                heading.loadText(segment.getText());
-
-                widget = heading;
-            } else {
-
-                throw new IllegalStateException("Unknown Segment type");
-            }
+            widget = createEditorForSegment(segment);
 
             box.packStart(widget, false, false, 0);
         }
 
         box.showAll();
+    }
+
+    private void associate(Segment segment, Widget widget) {
+        rising.put(segment, widget);
+        deeper.put(widget, segment);
+    }
+
+    private void disassociate(Segment segment, Widget widget) {
+        rising.remove(segment);
+        deeper.remove(widget);
+    }
+
+    private Segment lookup(Widget editor) {
+        return deeper.get(editor);
+    }
+
+    private Widget lookup(Segment segment) {
+        return rising.get(segment);
+    }
+
+    private Widget createEditorForSegment(Segment segment) {
+        Widget result;
+        EditorTextView editor;
+        HeadingBox heading;
+        ScrolledWindow wide;
+
+        if (segment instanceof ParagraphSegment) {
+            editor = new ParagraphEditorTextView(segment);
+
+            result = editor;
+        } else if (segment instanceof PreformatSegment) {
+            editor = new PreformatEditorTextView(segment);
+
+            wide = new ScrolledWindow();
+            wide.setPolicy(PolicyType.AUTOMATIC, PolicyType.NEVER);
+            wide.add(editor);
+
+            result = wide;
+        } else if (segment instanceof HeadingSegment) {
+            heading = new SectionHeadingBox(segment);
+
+            result = heading;
+        } else if (segment instanceof ComponentSegment) {
+            heading = new ChapterHeadingBox(segment);
+
+            result = heading;
+        } else {
+
+            throw new IllegalStateException("Unknown Segment type");
+        }
+
+        associate(segment, result);
+
+        return result;
+    }
+
+    /**
+     * Given a StructuralChange, figure out what it means in terms of the UI
+     * in this ComponentEditorWidget.
+     */
+    public void affect(Change obj) {
+        final StructuralChange change;
+        final Segment first;
+        final Segment added;
+        final Segment third;
+        final Series series;
+        final Widget[] children;
+        int i;
+        final Widget view;
+        Widget widget;
+        final EditorTextView editor;
+
+        /*
+         * Find the index of the view into the VBox.
+         */
+        change = (StructuralChange) obj;
+
+        first = change.getInto();
+        added = change.getAdded();
+
+        children = box.getChildren();
+        view = lookup(first);
+
+        for (i = 0; i < children.length; i++) {
+            if (children[i] == view) {
+                break;
+            }
+        }
+        if (i == children.length) {
+            throw new IllegalArgumentException("view not in this ComponentEditorWidget");
+        }
+
+        /*
+         * Create the new editor
+         */
+
+        widget = createEditorForSegment(added);
+
+        box.packStart(widget, false, false, 0);
+        i++;
+        box.reorderChild(widget, i);
+        widget.showAll();
+
+        /*
+         * Split the old one in two pieces, adding a new editor for the second
+         * piece.
+         */
+
+        series = first.getParent();
+        third = series.get(i + 1);
+        widget = createEditorForSegment(third);
+        box.packStart(widget, false, false, 0);
+        i++;
+        box.reorderChild(widget, i);
+        widget.showAll();
+
+        /*
+         * Delete the third text out of the first.
+         */
+
+        editor = (EditorTextView) view;
+        editor.affect(change);
+    }
+
+    public void reverse(Change change) {
+    // TODO Auto-generated method stub
+
     }
 }

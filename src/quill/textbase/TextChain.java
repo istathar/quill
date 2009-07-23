@@ -16,20 +16,20 @@ package quill.textbase;
  * 
  * @author Andrew Cowie
  */
-public class Text
+public class TextChain
 {
     Piece first;
 
-    protected Text() {
+    public TextChain() {
         first = null;
     }
 
-    Text(String str) {
+    TextChain(String str) {
         first = new Piece();
         first.span = new StringSpan(str, null);
     }
 
-    Text(Span initial) {
+    TextChain(Span initial) {
         first = new Piece();
         first.span = initial;
     }
@@ -612,7 +612,7 @@ public class Text
 
         while (piece != null) {
             if (start == offset) {
-                return last.span.getMarkup();
+                return piece.span.getMarkup();
             }
 
             /*
@@ -664,9 +664,9 @@ public class Text
      * ends - and greater than insertBound.
      */
     /*
-     * Having exposed this so that external APIs can get a Range to pass when
-     * constructing a DeleteChange, we probably end up duplicating a lot of
-     * work when actually calling delete() after this here.
+     * Having exposed this so that external APIs can get an Extract to pass
+     * when constructing a DeleteChange, we probably end up duplicating a lot
+     * of work when actually calling delete() after this here.
      */
     public Extract extractRange(int start, int width) {
         final Pair pair;

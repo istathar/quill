@@ -14,6 +14,8 @@ package quill.ui;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.gnome.gdk.EventOwnerChange;
 import org.gnome.gdk.Pixbuf;
@@ -23,24 +25,35 @@ import org.gnome.gtk.ErrorMessageDialog;
 import org.gnome.gtk.Gtk;
 import org.gnome.pango.FontDescription;
 
+import quill.textbase.Change;
+import quill.textbase.DataLayer;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
 
-import static quill.client.Quill.data;
-import static quill.textbase.Text.extractFor;
+import static quill.textbase.TextChain.extractFor;
 
 public class UserInterface
 {
+    private Map<Change, Changeable> map;
+
+    private DataLayer data;
+
     PrimaryWindow primary;
 
-    public UserInterface() {
+    public UserInterface(DataLayer data) {
         loadImages();
         loadFonts();
+        setupUndoCapability(data);
         setupApplication();
         setupWindows();
         hookupExternalClipboard();
+    }
+
+    private void setupUndoCapability(final DataLayer layer) {
+        data = layer;
+        map = new HashMap<Change, Changeable>(128);
     }
 
     private void setupWindows() {
@@ -157,7 +170,7 @@ public class UserInterface
         primary.displaySeries(folio.get(0));
     }
 
-    public void saveDocument() {
+    void saveDocument() {
         final Dialog dialog;
         try {
             data.saveDocument("tmp/HardcodedSaveResult.xml");
@@ -167,6 +180,49 @@ public class UserInterface
             dialog.run();
             dialog.hide();
         }
+    }
+
+    /**
+     * Pick the latest Change off the ChangeStack, and then do something with
+     * it
+     */
+    void undo() {
+        final Change change;
+        final Changeable editor;
+
+        change = data.undo();
+
+        if (change == null) {
+            return;
+        }
+
+        editor = map.get(change);
+        editor.reverse(change);
+    }
+
+    /**
+     * Grab the Change that was most recently undone, and redo it.
+     */
+    void redo() {
+        final Change change;
+        final Changeable editor;
+
+        change = data.redo();
+
+        if (change == null) {
+            return;
+        }
+
+        editor = map.get(change);
+        editor.affect(change);
+    }
+
+    /**
+     * Cause a Change to be forward applied to the in-memory representation.
+     */
+    void apply(Change change) {
+        data.apply(change);
+        primary.affect(change);
     }
 }
 
