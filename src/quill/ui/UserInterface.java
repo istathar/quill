@@ -14,8 +14,6 @@ package quill.ui;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.gnome.gdk.EventOwnerChange;
 import org.gnome.gdk.Pixbuf;
@@ -36,8 +34,6 @@ import static quill.textbase.TextChain.extractFor;
 
 public class UserInterface
 {
-    private Map<Change, Changeable> map;
-
     private DataLayer data;
 
     PrimaryWindow primary;
@@ -53,7 +49,6 @@ public class UserInterface
 
     private void setupUndoCapability(final DataLayer layer) {
         data = layer;
-        map = new HashMap<Change, Changeable>(128);
     }
 
     private void setupWindows() {
@@ -203,7 +198,6 @@ public class UserInterface
      */
     void redo() {
         final Change change;
-        final Changeable editor;
 
         change = data.redo();
 
