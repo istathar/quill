@@ -26,6 +26,7 @@ public abstract class TextualChange extends Change
     final Extract added;
 
     TextualChange(TextChain chain, int offset, Extract removed, Extract added) {
+        super(chain.getEnclosingSegment());
         this.chain = chain;
         this.offset = offset;
         this.removed = removed;

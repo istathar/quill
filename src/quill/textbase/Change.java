@@ -12,7 +12,11 @@ package quill.textbase;
 
 public abstract class Change
 {
-    protected Change() {}
+    private final Segment segment;
+
+    protected Change(Segment affects) {
+        this.segment = affects;
+    }
 
     /*
      * These could take a context parameter, coming from ChangeStack, if
@@ -25,10 +29,8 @@ public abstract class Change
 
     /**
      * Get the Segment that this Change affects.
-     * 
-     * @return
      */
     public Segment affects() {
-        return null;
+        return segment;
     }
 }
