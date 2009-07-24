@@ -15,7 +15,7 @@ import quill.docbook.Title;
 
 public final class HeadingSegment extends Segment
 {
-    protected HeadingSegment() {
+    public HeadingSegment() {
         super();
     }
 
