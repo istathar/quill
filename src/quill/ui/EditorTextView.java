@@ -46,7 +46,7 @@ import quill.textbase.TextualChange;
 import static quill.client.Quill.ui;
 import static quill.ui.Format.tagForMarkup;
 
-abstract class EditorTextView extends TextView implements Changeable
+abstract class EditorTextView extends TextView
 {
     protected final TextView view;
 
@@ -121,7 +121,7 @@ abstract class EditorTextView extends TextView implements Changeable
      * Override this and return false if you want spell checking off
      */
     protected boolean isSpellChecked() {
-        return true;
+        return false;
     }
 
     private void hookupKeybindings() {
@@ -427,7 +427,7 @@ abstract class EditorTextView extends TextView implements Changeable
      * is made that the backing TextBuffer is in a state where applying this
      * Change makes sense.
      */
-    public void affect(Change change) {
+    void affect(Change change) {
         final StructuralChange structural;
         final TextualChange textual;
         TextIter start, end;
@@ -435,6 +435,10 @@ abstract class EditorTextView extends TextView implements Changeable
         int i, offset;
         Span s;
         TextTag tag;
+
+        if (user) {
+            return;
+        }
 
         if (change instanceof StructuralChange) {
             structural = (StructuralChange) change;
@@ -444,61 +448,56 @@ abstract class EditorTextView extends TextView implements Changeable
             end = buffer.getIterEnd();
             buffer.delete(start, end);
 
-            return;
-        }
+        } else if (change instanceof TextualChange) {
+            textual = (TextualChange) change;
 
-        textual = (TextualChange) change;
+            start = buffer.getIter(textual.getOffset());
 
-        /*
-         * And now do what is necessary to reflect the change in this UI.
-         */
+            if ((textual instanceof InsertTextualChange) || (textual instanceof DeleteTextualChange)
+                    || (textual instanceof FullTextualChange)) {
+                r = textual.getRemoved();
+                if (r != null) {
+                    end = buffer.getIter(textual.getOffset() + r.getWidth());
+                    buffer.delete(start, end);
+                    start = end;
+                }
 
-        start = buffer.getIter(textual.getOffset());
-
-        if ((textual instanceof InsertTextualChange) || (textual instanceof DeleteTextualChange)
-                || (textual instanceof FullTextualChange)) {
-            r = textual.getRemoved();
-            if (r != null) {
-                end = buffer.getIter(textual.getOffset() + r.getWidth());
-                buffer.delete(start, end);
-                start = end;
-            }
-
-            r = textual.getAdded();
-            if (r != null) {
                 r = textual.getAdded();
+                if (r != null) {
+                    r = textual.getAdded();
+                    for (i = 0; i < r.size(); i++) {
+                        s = r.get(i);
+                        buffer.insert(start, s.getText(), tagForMarkup(s.getMarkup()));
+                    }
+                }
+            } else if (textual instanceof FormatTextualChange) {
+                r = textual.getAdded();
+                offset = textual.getOffset();
+
                 for (i = 0; i < r.size(); i++) {
                     s = r.get(i);
-                    buffer.insert(start, s.getText(), tagForMarkup(s.getMarkup()));
+
+                    start = buffer.getIter(offset);
+                    offset += s.getWidth();
+                    end = buffer.getIter(offset);
+
+                    /*
+                     * FUTURE this is horribly inefficient compared to just
+                     * adding or removing the tag that has changed. But it is
+                     * undeniably easy to express. To do this properly we'll
+                     * have to get the individual Markup and whether it was
+                     * added or removed from the FormatChange.
+                     * 
+                     * FIXME this clears the error underlining from GtkSpell!
+                     */
+
+                    buffer.removeAllTags(start, end);
+                    tag = tagForMarkup(s.getMarkup());
+                    if (tag == null) {
+                        continue;
+                    }
+                    buffer.applyTag(tag, start, end);
                 }
-            }
-        } else if (textual instanceof FormatTextualChange) {
-            r = textual.getAdded();
-            offset = textual.getOffset();
-
-            for (i = 0; i < r.size(); i++) {
-                s = r.get(i);
-
-                start = buffer.getIter(offset);
-                offset += s.getWidth();
-                end = buffer.getIter(offset);
-
-                /*
-                 * FUTURE this is horribly inefficient compared to just adding
-                 * or removing the tag that has changed. But it is undeniably
-                 * easy to express. To do this properly we'll have to get the
-                 * individual Markup and whether it was added or removed from
-                 * the FormatChange.
-                 * 
-                 * FIXME this clears the error underlining from GtkSpell!
-                 */
-
-                buffer.removeAllTags(start, end);
-                tag = tagForMarkup(s.getMarkup());
-                if (tag == null) {
-                    continue;
-                }
-                buffer.applyTag(tag, start, end);
             }
         }
     }
@@ -507,32 +506,44 @@ abstract class EditorTextView extends TextView implements Changeable
      * Revert this Change, removing it's affect on the view. A
      * DeleteTextualChange will cause an insertion, etc.
      */
-    public void reverse(Change obj) {
-        TextualChange change;
+    void reverse(Change obj) {
+        final StructuralChange structural;
+        final TextualChange textual;
         final TextIter start, end;
         Extract r;
         int i;
         Span s;
 
-        change = (TextualChange) obj;
-
-        /*
-         * And now do what is necessary to reflect the change in this UI.
-         */
-
-        start = buffer.getIter(change.getOffset());
-
-        r = change.getAdded();
-        if (r != null) {
-            end = buffer.getIter(change.getOffset() + r.getWidth());
-            buffer.delete(start, end);
+        if (user) {
+            return;
         }
 
-        r = change.getRemoved();
-        if (r != null) {
-            for (i = 0; i < r.size(); i++) {
-                s = r.get(i);
-                buffer.insert(start, s.getText(), tagForMarkup(s.getMarkup()));
+        if (obj instanceof StructuralChange) {
+            structural = (StructuralChange) obj;
+
+            throw new UnsupportedOperationException("Not yet implemented " + structural); // FIXME
+
+        } else if (obj instanceof TextualChange) {
+            textual = (TextualChange) obj;
+
+            /*
+             * And now do what is necessary to reflect the change in this UI.
+             */
+
+            start = buffer.getIter(textual.getOffset());
+
+            r = textual.getAdded();
+            if (r != null) {
+                end = buffer.getIter(textual.getOffset() + r.getWidth());
+                buffer.delete(start, end);
+            }
+
+            r = textual.getRemoved();
+            if (r != null) {
+                for (i = 0; i < r.size(); i++) {
+                    s = r.get(i);
+                    buffer.insert(start, s.getText(), tagForMarkup(s.getMarkup()));
+                }
             }
         }
     }

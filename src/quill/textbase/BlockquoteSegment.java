@@ -1,5 +1,5 @@
 /*
- * HeadingSegment.java
+ * BlockquoteSegment.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -11,25 +11,29 @@
 package quill.textbase;
 
 import quill.docbook.Block;
-import quill.docbook.Title;
+import quill.docbook.Blockquote;
 
-public final class HeadingSegment extends Segment
+/**
+ * A quote. A BlockquoteSegment may (and almost certainly will) contain more
+ * than one Paragraph block since EditorWindow can handle multiple paras with
+ * '\n' separators; no need for a different Widget per para.
+ * 
+ * @author Andrew Cowie
+ */
+public final class BlockquoteSegment extends Segment
 {
-    public HeadingSegment() {
+    public BlockquoteSegment() {
         super();
     }
 
-    /*
-     * We assume that a Section heading always has a title.
-     */
     public Block createBlock() {
-        return new Title();
+        return new Blockquote();
     }
 
     Segment createSimilar() {
         final Segment result;
 
-        result = new HeadingSegment();
+        result = new BlockquoteSegment();
         result.setParent(this.getParent());
 
         return result;

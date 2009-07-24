@@ -1,5 +1,5 @@
 /*
- * Changeable.java
+ * BlockquoteEditorTextView.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,17 +10,15 @@
  */
 package quill.ui;
 
-import quill.textbase.Change;
+import quill.textbase.Segment;
 
-/**
- * Mark a user interface element as one whose underlying data structures can
- * be mutated by Change objects.
- * 
- * @author Andrew Cowie
- */
-interface Changeable
+class BlockquoteEditorTextView extends EditorTextView
 {
-    void affect(Change change);
+    public BlockquoteEditorTextView(Segment segment) {
+        super(segment);
 
-    void reverse(Change change);
+        view.modifyFont(fonts.serif);
+        view.setPaddingBelowParagraph(0); // TODO verify
+        view.setLeftMargin(40);
+    }
 }

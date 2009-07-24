@@ -15,7 +15,7 @@ import quill.docbook.Title;
 
 public final class ComponentSegment extends Segment
 {
-    protected ComponentSegment() {
+    public ComponentSegment() {
         super();
     }
 

@@ -19,6 +19,7 @@ import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
+import quill.textbase.BlockquoteSegment;
 import quill.textbase.Change;
 import quill.textbase.ComponentSegment;
 import quill.textbase.HeadingSegment;
@@ -27,6 +28,7 @@ import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.StructuralChange;
+import quill.textbase.TextualChange;
 
 /**
  * Left hand side of a PrimaryWindow for editing a Component (Article or
@@ -34,7 +36,7 @@ import quill.textbase.StructuralChange;
  * 
  * @author Andrew Cowie
  */
-class ComponentEditorWidget extends ScrolledWindow implements Changeable
+class ComponentEditorWidget extends ScrolledWindow
 {
     private ScrolledWindow scroll;
 
@@ -150,6 +152,10 @@ class ComponentEditorWidget extends ScrolledWindow implements Changeable
             editor = new ParagraphEditorTextView(segment);
 
             result = editor;
+        } else if (segment instanceof BlockquoteSegment) {
+            editor = new BlockquoteEditorTextView(segment);
+
+            result = editor;
         } else if (segment instanceof PreformatSegment) {
             editor = new PreformatEditorTextView(segment);
 
@@ -180,8 +186,8 @@ class ComponentEditorWidget extends ScrolledWindow implements Changeable
      * Given a StructuralChange, figure out what it means in terms of the UI
      * in this ComponentEditorWidget.
      */
-    public void affect(Change obj) {
-        final StructuralChange change;
+    void affect(Change change) {
+        final StructuralChange structural;
         final Segment first;
         final Segment added;
         final Segment third;
@@ -192,60 +198,77 @@ class ComponentEditorWidget extends ScrolledWindow implements Changeable
         Widget widget;
         final EditorTextView editor;
 
-        /*
-         * Find the index of the view into the VBox.
-         */
-        change = (StructuralChange) obj;
+        if (change instanceof TextualChange) {
+            first = change.affects();
+            editor = (EditorTextView) lookup(first);
+            editor.affect(change);
 
-        first = change.getInto();
-        added = change.getAdded();
+        } else if (change instanceof StructuralChange) {
 
-        children = box.getChildren();
-        view = lookup(first);
+            /*
+             * Find the index of the view into the VBox.
+             */
+            structural = (StructuralChange) change;
 
-        for (i = 0; i < children.length; i++) {
-            if (children[i] == view) {
-                break;
+            first = structural.getInto();
+            added = structural.getAdded();
+
+            children = box.getChildren();
+            view = lookup(first);
+
+            for (i = 0; i < children.length; i++) {
+                if (children[i] == view) {
+                    break;
+                }
             }
+            if (i == children.length) {
+                throw new IllegalArgumentException("view not in this ComponentEditorWidget");
+            }
+
+            /*
+             * Create the new editor
+             */
+
+            widget = createEditorForSegment(added);
+
+            box.packStart(widget, false, false, 0);
+            i++;
+            box.reorderChild(widget, i);
+            widget.showAll();
+
+            /*
+             * Split the old one in two pieces, adding a new editor for the
+             * second piece.
+             */
+
+            series = first.getParent();
+            third = series.get(i + 1);
+            widget = createEditorForSegment(third);
+            box.packStart(widget, false, false, 0);
+            i++;
+            box.reorderChild(widget, i);
+            widget.showAll();
+
+            /*
+             * Delete the third text out of the first.
+             */
+
+            editor = (EditorTextView) view;
+            editor.affect(change);
         }
-        if (i == children.length) {
-            throw new IllegalArgumentException("view not in this ComponentEditorWidget");
-        }
-
-        /*
-         * Create the new editor
-         */
-
-        widget = createEditorForSegment(added);
-
-        box.packStart(widget, false, false, 0);
-        i++;
-        box.reorderChild(widget, i);
-        widget.showAll();
-
-        /*
-         * Split the old one in two pieces, adding a new editor for the second
-         * piece.
-         */
-
-        series = first.getParent();
-        third = series.get(i + 1);
-        widget = createEditorForSegment(third);
-        box.packStart(widget, false, false, 0);
-        i++;
-        box.reorderChild(widget, i);
-        widget.showAll();
-
-        /*
-         * Delete the third text out of the first.
-         */
-
-        editor = (EditorTextView) view;
-        editor.affect(change);
     }
 
-    public void reverse(Change change) {
-    // TODO Auto-generated method stub
+    void reverse(Change change) {
+        final Segment first;
+        final EditorTextView editor;
 
+        if (change instanceof TextualChange) {
+            first = change.affects();
+            editor = (EditorTextView) lookup(first);
+            editor.reverse(change);
+
+        } else if (change instanceof StructuralChange) {
+            throw new UnsupportedOperationException("Not yet implemented"); // FIXME
+        }
     }
 }

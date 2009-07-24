@@ -36,7 +36,7 @@ import quill.textbase.TextChain;
  * 
  * @author Andrew Cowie
  */
-public class ValidatepPreformattedConversion extends TestCase
+public class ValidatePreformattedConversion extends TestCase
 {
     private static String combine(String[] elements) {
         StringBuilder buf;

@@ -26,6 +26,8 @@ public abstract class StructuralChange extends Change
     final Segment added;
 
     StructuralChange(Segment into, int offset, Segment added) {
+        super(into);
+
         final Series series;
         int i;
 

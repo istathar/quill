@@ -53,6 +53,7 @@ public abstract class Segment
 
     public void setText(TextChain stack) {
         this.chain = stack;
+        stack.setEnclosingSegment(this);
     }
 
     public abstract Block createBlock();

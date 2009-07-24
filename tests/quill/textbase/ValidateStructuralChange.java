@@ -76,7 +76,7 @@ public class ValidateStructuralChange extends TestCase
         chain = new TextChain("cruel() ");
         inserted.setText(chain);
 
-        change = new SplitStructuralChange(series, segments[2], 6, inserted);
+        change = new SplitStructuralChange(segments[2], 6, inserted);
         change.apply();
 
         assertEquals(5, series.size());
@@ -101,7 +101,7 @@ public class ValidateStructuralChange extends TestCase
         chain = new TextChain("cruel() ");
         inserted.setText(chain);
 
-        change = new SplitStructuralChange(series, segments[2], 6, inserted);
+        change = new SplitStructuralChange(segments[2], 6, inserted);
         change.apply();
 
         change.undo();
@@ -122,7 +122,7 @@ public class ValidateStructuralChange extends TestCase
         chain = new TextChain("save()");
         inserted.setText(chain);
 
-        change = new SplitStructuralChange(series, segments[2], 11, inserted);
+        change = new SplitStructuralChange(segments[2], 11, inserted);
         change.apply();
 
         assertEquals(4, series.size());
@@ -149,7 +149,7 @@ public class ValidateStructuralChange extends TestCase
         chain = new TextChain("init()");
         inserted.setText(chain);
 
-        change = new SplitStructuralChange(series, segments[0], 0, inserted);
+        change = new SplitStructuralChange(segments[0], 0, inserted);
         change.apply();
 
         assertEquals(4, series.size());

@@ -196,6 +196,8 @@ public class EfficientNoNodeFactory extends NodeFactory
             preserve = false;
             if (segment instanceof ParagraphSegment) {
                 chain.append(new CharacterSpan('\n', null));
+            } else if (segment instanceof BlockquoteSegment) {
+                chain.append(new CharacterSpan('\n', null));
             } else {
                 setSegment(new ParagraphSegment());
             }
@@ -207,6 +209,12 @@ public class EfficientNoNodeFactory extends NodeFactory
             if (!(segment instanceof PreformatSegment)) {
                 setSegment(new PreformatSegment());
             }
+            return null;
+        } else if (name.equals("blockquote")) {
+            markup = null;
+            block = true;
+            preserve = false;
+            setSegment(new BlockquoteSegment());
             return null;
         } else if (name.equals("section")) {
             markup = null;

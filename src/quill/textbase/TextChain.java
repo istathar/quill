@@ -779,4 +779,20 @@ public class TextChain
 
         return result;
     }
+
+    private Segment belongs;
+
+    /**
+     * Tell this TextChain what Segment it belongs to
+     */
+    void setEnclosingSegment(Segment segment) {
+        this.belongs = segment;
+    }
+
+    /**
+     * Get the Segment that this TextChain is backing
+     */
+    Segment getEnclosingSegment() {
+        return belongs;
+    }
 }
