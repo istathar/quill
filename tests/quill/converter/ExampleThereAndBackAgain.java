@@ -41,7 +41,7 @@ public class ExampleThereAndBackAgain
         final DocBookConverter converter;
         final OutputStream out;
 
-        source = new File("tests/quill/converter/ExampleProgram.xml");
+        source = new File("tests/ExampleProgram.xml");
         assert (source.exists());
 
         factory = new EfficientNoNodeFactory();
