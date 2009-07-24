@@ -24,17 +24,21 @@ import org.gnome.gtk.Unit;
 
 import parchment.render.RenderEngine;
 import parchment.render.ReportRenderEngine;
+import quill.textbase.DataLayer;
 import quill.textbase.Folio;
-
-import static quill.client.Quill.data;
-import static quill.client.Quill.initializeDataLayer;
 
 public class RenderToPrintHarness
 {
+    private static DataLayer data;
+
     public static void main(String[] args) throws ValidityException, ParsingException, IOException {
         initializeDataLayer();
         loadExampleDocument();
         runRenderPipeline();
+    }
+
+    private static void initializeDataLayer() {
+        data = new DataLayer();
     }
 
     private static void loadExampleDocument() throws ValidityException, ParsingException, IOException {
