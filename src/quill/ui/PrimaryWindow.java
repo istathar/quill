@@ -281,4 +281,9 @@ class PrimaryWindow extends Window
     void affect(Change change) {
         editor.affect(change);
     }
+
+    void reverse(Change change) {
+        editor.reverse(change);
+    }
+
 }

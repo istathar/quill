@@ -188,7 +188,6 @@ public class UserInterface
      */
     void undo() {
         final Change change;
-        final Changeable editor;
 
         change = data.undo();
 
@@ -196,8 +195,7 @@ public class UserInterface
             return;
         }
 
-        editor = map.get(change);
-        editor.reverse(change);
+        primary.reverse(change);
     }
 
     /**
@@ -213,8 +211,7 @@ public class UserInterface
             return;
         }
 
-        editor = map.get(change);
-        editor.affect(change);
+        primary.affect(change);
     }
 
     /**
