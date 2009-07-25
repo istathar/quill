@@ -167,17 +167,19 @@ class ComponentEditorWidget extends ScrolledWindow
         } else if (segment instanceof HeadingSegment) {
             heading = new SectionHeadingBox(segment);
 
+            editor = heading.getEditor();
             result = heading;
         } else if (segment instanceof ComponentSegment) {
             heading = new ChapterHeadingBox(segment);
 
+            editor = heading.getEditor();
             result = heading;
         } else {
 
             throw new IllegalStateException("Unknown Segment type");
         }
 
-        associate(segment, result);
+        associate(segment, editor);
 
         return result;
     }
