@@ -42,4 +42,8 @@ class HeadingBox extends HBox
         label.setWidthChars(20);
         box.packEnd(label, false, false, 0);
     }
+
+    EditorTextView getEditor() {
+        return title;
+    }
 }
