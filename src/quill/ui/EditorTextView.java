@@ -380,8 +380,12 @@ abstract class EditorTextView extends TextView
             change = new InsertTextualChange(chain, insertOffset, stash);
         }
 
+        /*
+         * Propegate the change. After this wends its way though the layers,
+         * it will result in ComponentEditorWindow calling this.affect().
+         */
+
         ui.apply(change);
-        this.affect(change);
     }
 
     private void toggleMarkup(Markup format) {
