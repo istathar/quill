@@ -17,6 +17,7 @@ import quill.textbase.ValidateExtracts;
 import quill.textbase.ValidateSpanOperations;
 import quill.textbase.ValidateStructuralChange;
 import quill.textbase.ValidateText;
+import quill.textbase.ValidateUnicode;
 import quill.textbase.ValidateWrapperExpansions;
 
 import com.operationaldynamics.junit.VerboseTestRunner;
@@ -45,6 +46,7 @@ public class UnitTests
 
         suite.addTestSuite(ValidateSpanOperations.class);
         suite.addTestSuite(ValidateText.class);
+        suite.addTestSuite(ValidateUnicode.class);
         suite.addTestSuite(ValidateExtracts.class);
         suite.addTestSuite(ValidateApplyUndoRedo.class);
         suite.addTestSuite(ValidateTextChainToDocBookConversion.class);
