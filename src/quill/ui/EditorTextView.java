@@ -121,7 +121,7 @@ abstract class EditorTextView extends TextView
      * Override this and return false if you want spell checking off
      */
     protected boolean isSpellChecked() {
-        return false;
+        return false; // FIXME restore to true once we stop using lorum ipsum
     }
 
     private void hookupKeybindings() {
