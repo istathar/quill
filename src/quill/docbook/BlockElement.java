@@ -1,5 +1,5 @@
 /*
- * Application.java
+ * BlockElement.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -11,13 +11,21 @@
 package quill.docbook;
 
 /**
- * The name of a software project.
+ * Common code allowing subclasses to implement Block
  * 
  * @author Andrew Cowie
  */
-public class Application extends InlineElement implements Inline
+abstract class BlockElement extends DocBookElement
 {
-    public Application() {
-        super("application");
+    BlockElement(String name) {
+        super(name);
+    }
+
+    public void add(String text) {
+        super.add(text);
+    }
+
+    public void add(Inline markup) {
+        super.add(markup);
     }
 }

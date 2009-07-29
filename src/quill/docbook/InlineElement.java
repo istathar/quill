@@ -1,5 +1,5 @@
 /*
- * Command.java
+ * InlineElement.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -11,13 +11,17 @@
 package quill.docbook;
 
 /**
- * A command or program name, ie as you would run it from the command line.
+ * Common implementation of Inline
  * 
  * @author Andrew Cowie
  */
-public class Code extends Inline
+abstract class InlineElement extends DocBookElement
 {
-    public Code() {
-        super("code");
+    InlineElement(String name) {
+        super(name);
+    }
+
+    public void add(String text) {
+        super.add(text);
     }
 }

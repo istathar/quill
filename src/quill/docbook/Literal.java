@@ -1,5 +1,5 @@
 /*
- * Application.java
+ * Literal.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -11,13 +11,13 @@
 package quill.docbook;
 
 /**
- * The name of a software project.
+ * A code fragment.
  * 
  * @author Andrew Cowie
  */
-public class Application extends InlineElement implements Inline
+public class Literal extends InlineElement implements Inline
 {
-    public Application() {
-        super("application");
+    public Literal() {
+        super("literal");
     }
 }

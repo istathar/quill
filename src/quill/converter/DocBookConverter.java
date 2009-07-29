@@ -22,7 +22,7 @@ import quill.docbook.Block;
 import quill.docbook.Bold;
 import quill.docbook.Book;
 import quill.docbook.Chapter;
-import quill.docbook.Code;
+import quill.docbook.Literal;
 import quill.docbook.Command;
 import quill.docbook.Component;
 import quill.docbook.Filename;
@@ -195,7 +195,7 @@ public class DocBookConverter
             } else if (format == Common.BOLD) {
                 inline = new Bold();
             } else if (format == Common.CODE) {
-                inline = new Code();
+                inline = new Literal();
             } else if (format == Common.APPLICATION) {
                 inline = new Application();
             } else if (format == Common.COMMAND) {

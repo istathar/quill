@@ -15,7 +15,7 @@ package quill.docbook;
  * 
  * @author Andrew Cowie
  */
-public class Type extends Inline
+public class Type extends InlineElement implements Inline
 {
     public Type() {
         super("type");

@@ -15,7 +15,7 @@ package quill.docbook;
  * 
  * @author Andrew Cowie
  */
-public class Italics extends Inline
+public class Italics extends InlineElement implements Inline
 {
     public Italics() {
         super("emphasis");
@@ -23,6 +23,6 @@ public class Italics extends Inline
 
     public Italics(String str) {
         this();
-        super.addText(str);
+        super.add(str);
     }
 }

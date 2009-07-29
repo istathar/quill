@@ -17,6 +17,7 @@ import quill.docbook.Chapter;
 import quill.docbook.Italics;
 import quill.docbook.Paragraph;
 import quill.docbook.Section;
+import quill.docbook.Title;
 
 import static textview.LoremIpsum.text;
 
@@ -30,16 +31,20 @@ public class ExampleWritingDocBook
 
         book = new Book();
 
-        chapter = new Chapter("Chapter 1");
+        chapter = new Chapter();
+        chapter.add(new Title("Chapter 1"));
         book.add(chapter);
 
-        section = new Section("Start");
+        section = new Section();
+        section.add(new Title("Start"));
         chapter.add(section);
 
-        para = new Paragraph("In the beginning...");
+        para = new Paragraph();
+        para.add("In the beginning...");
         section.add(para);
 
-        para = new Paragraph("And then we indeed had a very ");
+        para = new Paragraph();
+        para.add("And then we indeed had a very ");
         para.add(new Italics("yummy"));
         para.add(" delicious absolutely brilliant delightful breakfast.");
         section.add(para);
@@ -49,7 +54,8 @@ public class ExampleWritingDocBook
         paras = text.split("\n");
 
         for (String blob : paras) {
-            para = new Paragraph(blob);
+            para = new Paragraph();
+            para.add(blob);
             section.add(para);
         }
 

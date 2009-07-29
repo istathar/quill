@@ -11,11 +11,11 @@
 package quill.docbook;
 
 /**
- * A filename
+ * A filename.
  * 
  * @author Andrew Cowie
  */
-public class Filename extends Inline
+public class Filename extends InlineElement implements Inline
 {
     public Filename() {
         super("filename");

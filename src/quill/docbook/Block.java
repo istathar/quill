@@ -1,7 +1,7 @@
 /*
- * BlockTag.java
+ * Block.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -11,25 +11,18 @@
 package quill.docbook;
 
 /**
- * Base class of tags that comprise the content of the document.
+ * Base class of tags that comprise the content of the document. These are
+ * sequenced within Components.
  * 
  * @author Andrew Cowie
  */
-public abstract class Block extends DocBookTag
+public interface Block extends Tag
 {
-    Block(String name) {
-        super(name);
-    }
-
     /*
      * Nothing wrong with packing normal text into a Block. Usually that'll be
      * Paragraph anyway.
      */
-    public void add(String str) {
-        super.addText(str);
-    }
+    public void add(String text);
 
-    public void add(Inline tag) {
-        super.addChild(tag);
-    }
+    public void add(Inline tag);
 }

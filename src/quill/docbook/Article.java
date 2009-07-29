@@ -16,14 +16,13 @@ package quill.docbook;
  * 
  * @author Andrew Cowie
  */
-/*
- * This could possibly be made public as it is indeed a peer of <component>,
- * although why you'd be packing a series of articles into a <book> I don't
- * know.
- */
-public class Article extends DocBookTag
+public class Article extends StructureElement implements Component
 {
     public Article() {
         super("article");
+    }
+
+    public void add(Division section) {
+        super.add(section);
     }
 }

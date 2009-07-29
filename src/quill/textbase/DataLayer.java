@@ -22,6 +22,7 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.converter.DocBookConverter;
 import quill.docbook.Book;
+import quill.docbook.DocBookNodeFactory;
 
 /**
  * Our in-memory intermediate representation. Provides access to mutate the

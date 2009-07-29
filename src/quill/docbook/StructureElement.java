@@ -1,5 +1,5 @@
 /*
- * Application.java
+ * StructureElement.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -11,13 +11,20 @@
 package quill.docbook;
 
 /**
- * The name of a software project.
+ * Structural elemtns are things you can add Blocks too.
  * 
  * @author Andrew Cowie
  */
-public class Application extends InlineElement implements Inline
+abstract class StructureElement extends DocBookElement
 {
-    public Application() {
-        super("application");
+    StructureElement(String name) {
+        super(name);
+    }
+
+    /**
+     * Blocks can be added to Components and Divisions.
+     */
+    public void add(Block block) {
+        super.add(block);
     }
 }

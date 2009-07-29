@@ -10,14 +10,18 @@
  */
 package quill.docbook;
 
-public class Chapter extends Component
+/**
+ * A chapter in a book. See also Article.
+ * 
+ * @author Andrew Cowie
+ */
+public class Chapter extends StructureElement implements Component
 {
     public Chapter() {
         super("chapter");
     }
 
-    public Chapter(String title) {
-        super("chapter");
-        super.addChild(new Title(title));
+    public void add(Division section) {
+        super.add(section);
     }
 }

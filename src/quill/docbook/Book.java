@@ -10,13 +10,22 @@
  */
 package quill.docbook;
 
-public class Book extends DocBookTag
+/**
+ * Top level element for a book document.
+ * 
+ * @author Andrew Cowie
+ */
+/*
+ * This may fade out, or at least be demoted, if we switch to one chapter or
+ * article per file max. Which seems likely.
+ */
+public class Book extends DocBookElement implements Tag
 {
     public Book() {
         super("book");
     }
 
     public void add(Component component) {
-        super.addChild(component);
+        super.add(component);
     }
 }

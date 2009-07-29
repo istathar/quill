@@ -1,5 +1,5 @@
 /*
- * ComponentTag.java
+ * Component.java
  *
  * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -13,21 +13,13 @@ package quill.docbook;
 /**
  * Components are the chapter-like elements.
  */
-public abstract class Component extends DocBookTag
+public interface Component extends Tag
 {
-    Component(String name) {
-        super(name);
-    }
-
-    public void add(Division section) {
-        super.addChild(section);
-    }
+    public void add(Division section);
 
     /**
      * Less common is adding block level elements to a Chapter. These occur
      * before the first Section. Mostly this is how a Title gets added.
      */
-    public void add(Block para) {
-        super.addChild(para);
-    }
+    public void add(Block block);
 }

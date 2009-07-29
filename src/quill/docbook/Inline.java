@@ -1,7 +1,7 @@
 /*
  * Inline.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -11,17 +11,12 @@
 package quill.docbook;
 
 /**
- * Tags that are presented as spans within Blocks.
+ * Tags that are presented as spans within Blocks. Note that we don't allow
+ * Inlines to be nested inside other Inlines.
  * 
  * @author Andrew Cowie
  */
-public abstract class Inline extends DocBookTag
+public interface Inline extends Tag
 {
-    Inline(String name) {
-        super(name);
-    }
-
-    public void add(String str) {
-        super.addText(str);
-    }
+    public void add(String str);
 }

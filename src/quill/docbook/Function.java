@@ -15,7 +15,7 @@ package quill.docbook;
  * 
  * @author Andrew Cowie
  */
-public class Function extends Inline
+public class Function extends InlineElement implements Inline
 {
     public Function() {
         super("function");

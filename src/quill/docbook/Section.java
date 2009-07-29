@@ -1,7 +1,7 @@
 /*
  * Section.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -15,18 +15,9 @@ package quill.docbook;
  * 
  * @author Andrew Cowie
  */
-public class Section extends Division
+public class Section extends StructureElement implements Division
 {
     public Section() {
         super("section");
-    }
-
-    public Section(String title) {
-        super("section");
-        super.addChild(new Title(title));
-    }
-
-    public void add(Block para) {
-        super.addChild(para);
     }
 }

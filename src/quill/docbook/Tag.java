@@ -1,5 +1,5 @@
 /*
- * Application.java
+ * DocBook.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -11,13 +11,10 @@
 package quill.docbook;
 
 /**
- * The name of a software project.
+ * Elements in our constrained subset of DocBook.
  * 
  * @author Andrew Cowie
  */
-public class Application extends InlineElement implements Inline
+public interface Tag
 {
-    public Application() {
-        super("application");
-    }
 }

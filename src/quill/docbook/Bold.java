@@ -1,7 +1,7 @@
 /*
  * Bold.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -15,7 +15,7 @@ package quill.docbook;
  * 
  * @author Andrew Cowie
  */
-public class Bold extends Inline
+public class Bold extends InlineElement implements Inline
 {
     public Bold() {
         super("emphasis");
@@ -24,6 +24,6 @@ public class Bold extends Inline
 
     public Bold(String str) {
         this();
-        super.addText(str);
+        super.add(str);
     }
 }
