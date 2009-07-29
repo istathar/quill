@@ -17,10 +17,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import nu.xom.Builder;
+import nu.xom.Document;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.converter.DocBookConverter;
-import quill.docbook.Document;
+import quill.docbook.Book;
 
 /**
  * Our in-memory intermediate representation. Provides access to mutate the
@@ -43,8 +44,9 @@ public class DataLayer
 
     public void loadDocument(String filename) throws ValidityException, ParsingException, IOException {
         final File source;
+        final DocBookNodeFactory factory;
         final Builder parser;
-        final EfficientNoNodeFactory factory;
+        final Document doc;
         final Series series;
         final Series[] collection;
 
@@ -53,17 +55,12 @@ public class DataLayer
             throw new FileNotFoundException();
         }
 
-        /*
-         * Call our custom machinery to use XOM to parse the documents and
-         * create arrays of Components containing TextStacks.
-         */
-
-        factory = new EfficientNoNodeFactory();
+        factory = new DocBookNodeFactory();
 
         parser = new Builder(factory);
-        parser.build(source);
+        doc = parser.build(source);
 
-        series = factory.createSeries();
+        series = FIXME;
 
         /*
          * For now, we assume we only read one Series
@@ -89,7 +86,7 @@ public class DataLayer
         final DocBookConverter converter;
         final OutputStream out;
         int i;
-        final Document doc;
+        final Book book;
 
         /*
          * On the temporary assumption that there's only one chapter being
@@ -115,8 +112,8 @@ public class DataLayer
 
         out = new FileOutputStream(filename);
 
-        doc = converter.result();
-        doc.toXML(out);
+        book = converter.createBook();
+        book.toXML(out);
     }
 
     /**

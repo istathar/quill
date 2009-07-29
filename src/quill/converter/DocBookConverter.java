@@ -17,14 +17,14 @@ package quill.converter;
  */
 
 import quill.docbook.Application;
+import quill.docbook.Article;
 import quill.docbook.Block;
 import quill.docbook.Bold;
-import quill.docbook.BookDocument;
+import quill.docbook.Book;
 import quill.docbook.Chapter;
 import quill.docbook.Code;
 import quill.docbook.Command;
 import quill.docbook.Component;
-import quill.docbook.Document;
 import quill.docbook.Filename;
 import quill.docbook.Function;
 import quill.docbook.Inline;
@@ -55,8 +55,6 @@ import quill.textbase.TextChain;
  */
 public class DocBookConverter
 {
-    private final Document book;
-
     private final Component chapter;
 
     private final StringBuilder buf;
@@ -79,11 +77,9 @@ public class DocBookConverter
     private Inline inline;
 
     public DocBookConverter() {
-        book = new BookDocument();
         buf = new StringBuilder();
 
         chapter = new Chapter();
-        book.add(chapter);
     }
 
     /**
@@ -156,10 +152,6 @@ public class DocBookConverter
          */
         this.segment = null;
         process('\n');
-    }
-
-    public Document result() {
-        return book;
     }
 
     /**
@@ -265,5 +257,23 @@ public class DocBookConverter
         } else {
             buf.append(ch);
         }
+    }
+
+    /**
+     * Create a <code>&lt;book&gt;</code> object based on what has been fed to
+     * the converter.
+     */
+    public Book createBook() {
+        final Book book;
+
+        book = new Book();
+        book.add(chapter);
+
+        return book;
+    }
+
+    public Article createArticle() {
+        // return chapter?
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

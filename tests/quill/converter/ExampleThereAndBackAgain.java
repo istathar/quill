@@ -18,7 +18,7 @@ import java.io.OutputStream;
 import nu.xom.Builder;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import quill.docbook.Document;
+import quill.docbook.Book;
 import quill.textbase.EfficientNoNodeFactory;
 import quill.textbase.Series;
 
@@ -37,7 +37,7 @@ public class ExampleThereAndBackAgain
         final EfficientNoNodeFactory factory;
         final Series series;
         int i;
-        final Document doc;
+        final Book book;
         final DocBookConverter converter;
         final OutputStream out;
 
@@ -61,7 +61,7 @@ public class ExampleThereAndBackAgain
             converter.append(series.get(i));
         }
 
-        doc = converter.result();
+        book = converter.createBook();
         if (true) {
             for (i = 1; i <= 70; i++) {
                 System.err.print(i / 10);
@@ -79,6 +79,6 @@ public class ExampleThereAndBackAgain
             target.getParentFile().mkdirs();
             out = new FileOutputStream(target);
         }
-        doc.toXML(out);
+        book.toXML(out);
     }
 }

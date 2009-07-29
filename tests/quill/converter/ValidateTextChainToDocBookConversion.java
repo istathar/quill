@@ -16,7 +16,7 @@ import java.io.IOException;
 import junit.framework.TestCase;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import quill.docbook.Document;
+import quill.docbook.Book;
 import quill.textbase.Change;
 import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
@@ -55,7 +55,7 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         final Change change;
         final Segment segment;
         final DocBookConverter converter;
-        final Document book;
+        final Book book;
         final ByteArrayOutputStream out;
         final String blob;
 
@@ -79,7 +79,8 @@ public class ValidateTextChainToDocBookConversion extends TestCase
 
         converter = new DocBookConverter();
         converter.append(segment);
-        book = converter.result();
+
+        book = converter.createBook();
 
         assertNotNull(book);
 
@@ -123,7 +124,7 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         Change change;
         Segment segment;
         final DocBookConverter converter;
-        final Document book;
+        final Book book;
         final ByteArrayOutputStream out;
         final String blob;
 
@@ -169,7 +170,7 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         segment = new ParagraphSegment();
         segment.setText(chain);
         converter.append(segment);
-        book = converter.result();
+        book = converter.createBook();
 
         assertNotNull(book);
 

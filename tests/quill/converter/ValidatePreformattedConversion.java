@@ -14,7 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import junit.framework.TestCase;
-import quill.docbook.Document;
+import quill.docbook.Book;
 import quill.textbase.Change;
 import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
@@ -59,7 +59,7 @@ public class ValidatePreformattedConversion extends TestCase
         Change change;
         final Segment segment;
         final DocBookConverter converter;
-        final Document book;
+        final Book book;
         final ByteArrayOutputStream out;
         final String blob;
 
@@ -101,7 +101,7 @@ public class ValidatePreformattedConversion extends TestCase
 
         converter = new DocBookConverter();
         converter.append(segment);
-        book = converter.result();
+        book = converter.createBook();
 
         assertNotNull(book);
 

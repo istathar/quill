@@ -1,7 +1,7 @@
 /*
- * ArticleDocument.java
+ * Article.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -10,21 +10,20 @@
  */
 package quill.docbook;
 
-public class ArticleDocument extends Document
-{
-    public ArticleDocument() {
-        super(new Article());
-    }
-}
-
+/**
+ * An <code>&lt;article&gt;</code> (which is equivalent to a single
+ * <code>&lt;chapter&gt;</code>).
+ * 
+ * @author Andrew Cowie
+ */
 /*
  * This could possibly be made public as it is indeed a peer of <component>,
  * although why you'd be packing a series of articles into a <book> I don't
  * know.
  */
-class Article extends Component
+public class Article extends DocBookTag
 {
-    Article() {
+    public Article() {
         super("article");
     }
 }

@@ -1,7 +1,7 @@
 /*
- * BookDocument.java
+ * Book.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -10,16 +10,13 @@
  */
 package quill.docbook;
 
-public class BookDocument extends Document
+public class Book extends DocBookTag
 {
-    public BookDocument() {
-        super(new Book());
-    }
-}
-
-class Book extends DocBookTag
-{
-    Book() {
+    public Book() {
         super("book");
+    }
+
+    public void add(Component component) {
+        super.addChild(component);
     }
 }

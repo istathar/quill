@@ -1,7 +1,7 @@
 /*
  * DocBookTag.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by the authors under the terms of the "GNU General Public Licence,
@@ -10,8 +10,13 @@
  */
 package quill.docbook;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import nu.xom.Attribute;
+import nu.xom.Document;
 import nu.xom.Element;
+import nu.xom.Serializer;
 
 /**
  * Internal root class for all DocBook tags. This is a wrapper around the
@@ -60,6 +65,26 @@ abstract class DocBookTag
     void setPreserveWhitespace() {
         element.addAttribute(new Attribute("xml:space", "http://www.w3.org/XML/1998/namespace",
                 "preserve"));
+    }
+
+    /**
+     * Serialize this document to XML.
+     */
+    public void toXML(OutputStream out) throws IOException {
+        final Document doc;
+        final Serializer s;
+
+        doc = new Document(this.element);
+
+        /*
+         * The top level element in a DocBook XML document has to have a
+         * version attribute.
+         */
+        this.setAttribute("version", "5.0");
+
+        s = new DocBookSerializer(out, this);
+        s.write(doc);
+        s.flush();
     }
 }
 

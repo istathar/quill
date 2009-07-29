@@ -12,28 +12,26 @@ package quill.converter;
 
 import java.io.IOException;
 
-import quill.docbook.BookDocument;
+import quill.docbook.Book;
 import quill.docbook.Chapter;
-import quill.docbook.Document;
 import quill.docbook.Italics;
 import quill.docbook.Paragraph;
 import quill.docbook.Section;
-
 
 import static textview.LoremIpsum.text;
 
 public class ExampleWritingDocBook
 {
     public static void main(String[] args) throws IOException {
-        final Document doc;
+        final Book book;
         final Chapter chapter;
         Section section;
         Paragraph para;
 
-        doc = new BookDocument();
+        book = new Book();
 
         chapter = new Chapter("Chapter 1");
-        doc.add(chapter);
+        book.add(chapter);
 
         section = new Section("Start");
         chapter.add(section);
@@ -67,6 +65,6 @@ public class ExampleWritingDocBook
             System.err.flush();
         }
 
-        doc.toXML(System.out);
+        book.toXML(System.out);
     }
 }
