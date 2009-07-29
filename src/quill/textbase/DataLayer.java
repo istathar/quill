@@ -34,6 +34,13 @@ public class DataLayer
 {
     private ChangeStack stack;
 
+    /**
+     * The document currently being worked on.
+     */
+    /*
+     * This assumes that Quill only edits one work at a time. That will want
+     * to change in due course.
+     */
     private Folio current;
 
     public DataLayer() {
@@ -47,6 +54,7 @@ public class DataLayer
         final DocBookNodeFactory factory;
         final Builder parser;
         final Document doc;
+        final DocBookLoader loader;
         final Series series;
         final Series[] collection;
 
@@ -56,23 +64,21 @@ public class DataLayer
         }
 
         factory = new DocBookNodeFactory();
-
         parser = new Builder(factory);
         doc = parser.build(source);
 
-        series = FIXME;
+        loader = new DocBookLoader();
+        series = loader.process(doc);
 
         /*
-         * For now, we assume we only read one Series
+         * TODO this only handles a work with a single component (chapter) per
+         * file. That's probably right, but overall this logic is insufficient
+         * to load a work with components spread across multiple files.
          */
 
         collection = new Series[] {
             series
         };
-
-        /*
-         * And we assume we're only managing one document.
-         */
 
         current = new Folio(collection);
     }

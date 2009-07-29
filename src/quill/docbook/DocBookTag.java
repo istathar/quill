@@ -70,6 +70,7 @@ abstract class DocBookTag
     /**
      * Serialize this document to XML.
      */
+    // move this to DocBookConverter?
     public void toXML(OutputStream out) throws IOException {
         final Document doc;
         final Serializer s;
