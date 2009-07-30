@@ -188,6 +188,8 @@ public class DocBookLoader
                 chain = new TextChain();
                 segment.setText(chain);
             }
+        } else {
+            throw new IllegalStateException("What kind of Block is " + block);
         }
 
         /*
@@ -206,9 +208,6 @@ public class DocBookLoader
         /*
          * Otherwise we're dealing with an inline spanning element.
          */
-
-        start = false;
-        preserve = false;
 
         if (span instanceof Function) {
             markup = Common.FUNCTION;
