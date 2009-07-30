@@ -119,89 +119,6 @@ public class DocBookLoader
         return new Series(segments);
     }
 
-    /*
-     * This will be the contiguous text body of the element until either a) an
-     * nested (inline) element starts, or b) the end of the element is
-     * reached. So we trim off the leading pretty-print whitespace then add a
-     * single StringSpan with this content.
-     */
-    public Nodes makeText(String text) {
-        final String trim, str;
-        int len;
-        char ch;
-
-        len = text.length();
-
-        /*
-         * These two cases are common for structure tags
-         */
-
-        if (len == 0) {
-            space = false;
-            return null; // empty
-        }
-
-        if (len == 1) {
-            if (text.charAt(0) == '\n') {
-                space = false;
-                return null; // empty
-            }
-        }
-
-        /*
-         * Do we think we're starting a block? If so, trim off the leading
-         * newline. If we're starting an inline and we swollowed a trailing
-         * space from the previous run of text, pad the inline with one space.
-         */
-
-        if (start) {
-            start = false;
-            space = false;
-            text = text.substring(1);
-            len--;
-        } else if (space) {
-            chain.append(new CharacterSpan(' ', null));
-        }
-
-        /*
-         * Trim the trailing newline (if there is one) as it could be the
-         * break before a close-element tag. We replace it with a space and
-         * prepend it if we find it is just a linebreak separator between a
-         * Text and an Inline when making the next Text node.
-         */
-
-        ch = text.charAt(len - 1);
-        if (ch == '\n') {
-            trim = text.substring(0, len - 1);
-            len--;
-            space = true;
-        } else {
-            trim = text;
-            space = false;
-        }
-
-        /*
-         * If not preformatted text, turn any interior newlines into spaces,
-         * then add.
-         */
-
-        if (preserve) {
-            str = trim;
-        } else {
-            str = trim.replace('\n', ' ');
-        }
-
-        chain.append(new StringSpan(str, markup));
-
-        /*
-         * And, having processed the inline, reset to normal.
-         */
-
-        markup = null;
-
-        return null;
-    }
-
     private void processBlock(Block block) {
         /*
          * Block elements are so common that we handle them first and bail out
@@ -285,6 +202,89 @@ public class DocBookLoader
         }
     }
 
+    /*
+     * This will be the contiguous text body of the element until either a) an
+     * nested (inline) element starts, or b) the end of the element is
+     * reached. So we trim off the leading pretty-print whitespace then add a
+     * single StringSpan with this content.
+     */
+    public Nodes makeText(String text) {
+        final String trim, str;
+        int len;
+        char ch;
+
+        len = text.length();
+
+        /*
+         * These two cases are common for structure tags
+         */
+
+        if (len == 0) {
+            space = false;
+            return null; // empty
+        }
+
+        if (len == 1) {
+            if (text.charAt(0) == '\n') {
+                space = false;
+                return null; // empty
+            }
+        }
+
+        /*
+         * Do we think we're starting a block? If so, trim off the leading
+         * newline. If we're starting an inline and we swollowed a trailing
+         * space from the previous run of text, pad the inline with one space.
+         */
+
+        if (start) {
+            start = false;
+            space = false;
+            text = text.substring(1);
+            len--;
+        } else if (space) {
+            chain.append(new CharacterSpan(' ', null));
+        }
+
+        /*
+         * Trim the trailing newline (if there is one) as it could be the
+         * break before a close-element tag. We replace it with a space and
+         * prepend it if we find it is just a linebreak separator between a
+         * Text and an Inline when making the next Text node.
+         */
+
+        ch = text.charAt(len - 1);
+        if (ch == '\n') {
+            trim = text.substring(0, len - 1);
+            len--;
+            space = true;
+        } else {
+            trim = text;
+            space = false;
+        }
+
+        /*
+         * If not preformatted text, turn any interior newlines into spaces,
+         * then add.
+         */
+
+        if (preserve) {
+            str = trim;
+        } else {
+            str = trim.replace('\n', ' ');
+        }
+
+        chain.append(new StringSpan(str, markup));
+
+        /*
+         * And, having processed the inline, reset to normal.
+         */
+
+        markup = null;
+
+        return null;
+    }
+
     private Nodes makeAttribute(String name, String URI, String value, Attribute.Type type) {
         if (markup == Common.ITALICS) {
             if (name.equals("role")) {
@@ -295,5 +295,4 @@ public class DocBookLoader
         }
         return null;
     }
-
 }
