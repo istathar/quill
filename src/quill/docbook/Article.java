@@ -10,6 +10,8 @@
  */
 package quill.docbook;
 
+import nu.xom.Elements;
+
 /**
  * An <code>&lt;article&gt;</code> (which is equivalent to a single
  * <code>&lt;chapter&gt;</code>).
@@ -24,5 +26,24 @@ public class Article extends StructureElement implements Component
 
     public void add(Division section) {
         super.add(section);
+    }
+
+    // TODO copied from Chapter; refactor up?
+    public Division[] getDivisions() {
+        final Elements sections;
+        int i;
+        final int num;
+        final Division[] result;
+
+        sections = super.getChildElements("section", "http://docbook.org/ns/docbook"); // ???
+
+        num = sections.size();
+        result = new Division[num];
+
+        for (i = 0; i < num; i++) {
+            result[i] = (Division) sections.get(i);
+        }
+
+        return result;
     }
 }

@@ -18,10 +18,12 @@ import nu.xom.Nodes;
 import quill.docbook.Block;
 import quill.docbook.Blockquote;
 import quill.docbook.Book;
+import quill.docbook.Chapter;
 import quill.docbook.Component;
 import quill.docbook.Division;
 import quill.docbook.Paragraph;
 import quill.docbook.ProgramListing;
+import quill.docbook.Section;
 import quill.docbook.Title;
 
 /**
@@ -98,10 +100,16 @@ public class DocBookLoader
 
         book = (Book) doc.getRootElement();
         chapter = book.getComponents()[0];
+
+        processComponent(chapter);
+
         sections = chapter.getDivisions();
 
         for (i = 0; i < sections.length; i++) {
+            processDivision(sections[i]);
+
             blocks = sections[i].getBlocks();
+
             for (j = 0; j < blocks.length; j++) {
                 processBlock(blocks[j]);
             }
@@ -117,6 +125,25 @@ public class DocBookLoader
         list.toArray(segments);
 
         return new Series(segments);
+    }
+
+    private void processComponent(Component component) {
+        if (component instanceof Chapter) {
+            markup = null;
+            start = true;
+            preserve = false;
+            setSegment(new ComponentSegment());
+        }
+        // TODO Article?
+    }
+
+    private void processDivision(Division division) {
+        if (division instanceof Section) {
+            markup = null;
+            start = true;
+            preserve = false;
+            setSegment(new HeadingSegment());
+        }
     }
 
     private void processBlock(Block block) {
@@ -148,16 +175,6 @@ public class DocBookLoader
             start = true;
             preserve = false;
             setSegment(new BlockquoteSegment());
-        } else if (name.equals("section")) {
-            markup = null;
-            start = true;
-            preserve = false;
-            setSegment(new HeadingSegment());
-        } else if (name.equals("chapter")) {
-            markup = null;
-            start = true;
-            preserve = false;
-            setSegment(new ComponentSegment());
         } else if (block instanceof Title) {
             markup = null;
             start = true;
@@ -168,6 +185,10 @@ public class DocBookLoader
                 segment.setText(chain);
             }
         }
+
+    }
+
+    private void handleSpans() {
 
         /*
          * Otherwise we're dealing with an inline spanning element.
