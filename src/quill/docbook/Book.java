@@ -10,6 +10,8 @@
  */
 package quill.docbook;
 
+import nu.xom.Elements;
+
 /**
  * Top level element for a book document.
  * 
@@ -27,5 +29,23 @@ public class Book extends DocBookElement implements Tag
 
     public void add(Component component) {
         super.add(component);
+    }
+
+    public Component[] getComponents() {
+        final Elements chapters;
+        int i;
+        final int num;
+        final Component[] result;
+
+        chapters = super.getChildElements("chapter", "http://docbook.org/ns/docbook");
+
+        num = chapters.size();
+        result = new Component[num];
+
+        for (i = 0; i < num; i++) {
+            result[i] = (Component) chapters.get(i);
+        }
+
+        return result;
     }
 }

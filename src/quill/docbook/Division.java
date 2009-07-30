@@ -23,4 +23,6 @@ package quill.docbook;
 public interface Division extends Tag
 {
     public void add(Block block);
+
+    public Block[] getBlocks();
 }

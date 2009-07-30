@@ -10,6 +10,8 @@
  */
 package quill.docbook;
 
+import nu.xom.Elements;
+
 /**
  * A chapter in a book. See also Article.
  * 
@@ -23,5 +25,23 @@ public class Chapter extends StructureElement implements Component
 
     public void add(Division section) {
         super.add(section);
+    }
+
+    public Division[] getDivisions() {
+        final Elements sections;
+        int i;
+        final int num;
+        final Division[] result;
+
+        sections = super.getChildElements("section", "http://docbook.org/ns/docbook"); // ???
+
+        num = sections.size();
+        result = new Division[num];
+
+        for (i = 0; i < num; i++) {
+            result[i] = (Division) sections.get(i);
+        }
+
+        return result;
     }
 }

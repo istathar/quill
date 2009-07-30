@@ -10,8 +10,10 @@
  */
 package quill.docbook;
 
+import nu.xom.Elements;
+
 /**
- * Structural elemtns are things you can add Blocks too.
+ * Structural elements are things you can add Blocks too.
  * 
  * @author Andrew Cowie
  */
@@ -26,5 +28,26 @@ abstract class StructureElement extends DocBookElement
      */
     public void add(Block block) {
         super.add(block);
+    }
+
+    /**
+     * Get the children Blocks as an array.
+     */
+    public Block[] getBlocks() {
+        final Elements children;
+        int i;
+        final int num;
+        final Block[] result;
+
+        children = super.getChildElements();
+
+        num = children.size();
+        result = new Block[num];
+
+        for (i = 0; i < num; i++) {
+            result[i] = (Block) children.get(i);
+        }
+
+        return result;
     }
 }

@@ -22,4 +22,6 @@ public interface Component extends Tag
      * before the first Section. Mostly this is how a Title gets added.
      */
     public void add(Block block);
+
+    public Division[] getDivisions();
 }

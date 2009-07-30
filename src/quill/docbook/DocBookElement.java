@@ -71,4 +71,8 @@ abstract class DocBookElement extends Element
         s.write(doc);
         s.flush();
     }
+
+    public String toString() {
+        return "<" + getQualifiedName() + ">";
+    }
 }

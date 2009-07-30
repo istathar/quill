@@ -14,10 +14,22 @@ import java.util.ArrayList;
 
 import nu.xom.Attribute;
 import nu.xom.Document;
-import nu.xom.Element;
 import nu.xom.Nodes;
+import quill.docbook.Block;
+import quill.docbook.Blockquote;
 import quill.docbook.Book;
+import quill.docbook.Component;
+import quill.docbook.Division;
+import quill.docbook.Paragraph;
+import quill.docbook.ProgramListing;
+import quill.docbook.Title;
 
+/**
+ * Process a XOM tree with our DocBookElements into our internal in-mempry
+ * textchain representation.
+ * 
+ * @author Andrew Cowie
+ */
 public class DocBookLoader
 {
     private final ArrayList<Segment> list;
@@ -30,7 +42,7 @@ public class DocBookLoader
     /**
      * Did we just enter a block level element?
      */
-    private boolean block;
+    private boolean start;
 
     /**
      * The current block level element wrapper
@@ -74,13 +86,26 @@ public class DocBookLoader
      * and we don't force instantiating a new DocBookLoader, then clear the
      * processor state here.
      */
+    /*
+     * FIXME what about the anonymous section leading a chapter?
+     */
     Series process(Document doc) {
-        final Element element;
-        final Book book;
+        final Book book; // FIXME change to an interface, or reject?
+        final Component chapter;
+        final Division[] sections;
+        int i, j;
+        Block[] blocks;
 
-        element = doc.getRootElement();
+        book = (Book) doc.getRootElement();
+        chapter = book.getComponents()[0];
+        sections = chapter.getDivisions();
 
-        // for (i = 0; i < element.getCh)
+        for (i = 0; i < sections.length; i++) {
+            blocks = sections[i].getBlocks();
+            for (j = 0; j < blocks.length; j++) {
+                processBlock(blocks[j]);
+            }
+        }
 
         throw new UnsupportedOperationException("Not yet implemented");
     }
@@ -129,8 +154,8 @@ public class DocBookLoader
          * space from the previous run of text, pad the inline with one space.
          */
 
-        if (block) {
-            block = false;
+        if (start) {
+            start = false;
             space = false;
             text = text.substring(1);
             len--;
@@ -177,20 +202,15 @@ public class DocBookLoader
         return null;
     }
 
-    /*
-     * The only state we carry around is what markup this element represents,
-     * and whether to convert line endings. So we set those two things, and
-     * then return.
-     */
-    public Element startMakingElement(String name, String namespace) {
+    private void processBlock(Block block) {
         /*
          * Block elements are so common that we handle them first and bail out
          * of here.
          */
 
-        if (name.equals("para")) {
+        if (block instanceof Paragraph) {
             markup = null;
-            block = true;
+            start = true;
             preserve = false;
             if (segment instanceof ParagraphSegment) {
                 chain.append(new CharacterSpan('\n', null));
@@ -199,50 +219,44 @@ public class DocBookLoader
             } else {
                 setSegment(new ParagraphSegment());
             }
-            return null;
-        } else if (name.equals("programlisting")) {
+        } else if (block instanceof ProgramListing) {
             markup = null;
-            block = true;
+            start = true;
             preserve = true;
             if (!(segment instanceof PreformatSegment)) {
                 setSegment(new PreformatSegment());
             }
-            return null;
-        } else if (name.equals("blockquote")) {
+        } else if (block instanceof Blockquote) {
             markup = null;
-            block = true;
+            start = true;
             preserve = false;
             setSegment(new BlockquoteSegment());
-            return null;
         } else if (name.equals("section")) {
             markup = null;
-            block = true;
+            start = true;
             preserve = false;
             setSegment(new HeadingSegment());
-            return null;
         } else if (name.equals("chapter")) {
             markup = null;
-            block = true;
+            start = true;
             preserve = false;
             setSegment(new ComponentSegment());
-            return null;
-        } else if (name.equals("title")) {
+        } else if (block instanceof Title) {
             markup = null;
-            block = true;
+            start = true;
             preserve = false;
             if (segment instanceof HeadingSegment) {
                 // kludge
                 chain = new TextChain();
                 segment.setText(chain);
             }
-            return null;
         }
 
         /*
          * Otherwise we're dealing with an inline spanning element.
          */
 
-        block = false;
+        start = false;
         preserve = false;
 
         if (name.equals("function")) {
@@ -269,12 +283,6 @@ public class DocBookLoader
              */
             markup = null;
         }
-
-        /*
-         * Annoyingly, we need to return an element after all, otherwise
-         * makeAttribute() never gets called.
-         */
-        return new Element("fake");
     }
 
     private Nodes makeAttribute(String name, String URI, String value, Attribute.Type type) {
@@ -287,4 +295,5 @@ public class DocBookLoader
         }
         return null;
     }
+
 }
