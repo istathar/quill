@@ -33,8 +33,9 @@ import quill.docbook.Title;
 import quill.docbook.Type;
 
 /**
- * Process a XOM tree with our DocBookElements into our internal in-mempry
- * textchain representation.
+ * Take a XOM tree (built using DocBookNodeFactory and so having our
+ * DocBookElements) and convert it into our internal in-memory textchain
+ * representation.
  * 
  * @author Andrew Cowie
  */
