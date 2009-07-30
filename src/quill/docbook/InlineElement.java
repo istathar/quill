@@ -10,6 +10,9 @@
  */
 package quill.docbook;
 
+import nu.xom.Node;
+import nu.xom.Text;
+
 /**
  * Common implementation of Inline
  * 
@@ -23,5 +26,24 @@ abstract class InlineElement extends DocBookElement
 
     public void add(String text) {
         super.add(text);
+    }
+
+    public String getText() {
+        final int num;
+        final Node child;
+        final Text text;
+
+        num = this.getChildCount();
+        if (num != 1) {
+            throw new IllegalStateException("How did you get an Inline without a single child?");
+        }
+
+        child = this.getChild(0);
+        if (!(child instanceof Text)) {
+            throw new IllegalStateException("How did you get an Inline without a text body?");
+        }
+        text = (Text) child;
+
+        return text.getValue();
     }
 }

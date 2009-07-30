@@ -19,4 +19,6 @@ package quill.docbook;
 public interface Inline extends Tag
 {
     public void add(String str);
+
+    public String getText();
 }

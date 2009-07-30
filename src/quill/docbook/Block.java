@@ -25,4 +25,6 @@ public interface Block extends Tag
     public void add(String text);
 
     public void add(Inline tag);
+
+    public Inline[] getSpans();
 }

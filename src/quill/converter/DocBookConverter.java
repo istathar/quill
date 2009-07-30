@@ -19,16 +19,15 @@ package quill.converter;
 import quill.docbook.Application;
 import quill.docbook.Article;
 import quill.docbook.Block;
-import quill.docbook.Bold;
 import quill.docbook.Book;
 import quill.docbook.Chapter;
-import quill.docbook.Literal;
 import quill.docbook.Command;
 import quill.docbook.Component;
+import quill.docbook.Emphasis;
 import quill.docbook.Filename;
 import quill.docbook.Function;
 import quill.docbook.Inline;
-import quill.docbook.Italics;
+import quill.docbook.Literal;
 import quill.docbook.Section;
 import quill.docbook.Type;
 import quill.textbase.CharacterSpan;
@@ -191,9 +190,14 @@ public class DocBookConverter
             } else if (format == Common.FUNCTION) {
                 inline = new Function();
             } else if (format == Common.ITALICS) {
-                inline = new Italics();
+                inline = new Emphasis();
             } else if (format == Common.BOLD) {
-                inline = new Bold();
+                final Emphasis element;
+
+                element = new Emphasis();
+                element.setBold();
+
+                inline = element;
             } else if (format == Common.CODE) {
                 inline = new Literal();
             } else if (format == Common.APPLICATION) {

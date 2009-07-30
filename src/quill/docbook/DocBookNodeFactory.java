@@ -31,12 +31,6 @@ public class DocBookNodeFactory extends NodeFactory
 
     private boolean space;
 
-    /*
-     * This will be the contiguous text body of the element until either a) an
-     * nested (inline) element starts, or b) the end of the element is
-     * reached. So we trim off the leading pretty-print whitespace then add a
-     * single StringSpan with this content.
-     */
     public Nodes makeText(String text) {
         return super.makeText(text);
     }
@@ -74,8 +68,7 @@ public class DocBookNodeFactory extends NodeFactory
         } else if (name.equals("userinput")) {
             throw new UnsupportedOperationException("Implement UserInput class");
         } else if (name.equals("emphasis")) {
-            return new Italics();
-            // TODO what about bold?
+            return new Emphasis();
         } else {
             /*
              * This is actually fairly serious; once our code is working

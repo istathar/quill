@@ -12,19 +12,25 @@ package quill.textbase;
 
 import java.util.ArrayList;
 
-import nu.xom.Attribute;
 import nu.xom.Document;
-import nu.xom.Nodes;
+import quill.docbook.Application;
 import quill.docbook.Block;
 import quill.docbook.Blockquote;
 import quill.docbook.Book;
 import quill.docbook.Chapter;
+import quill.docbook.Command;
 import quill.docbook.Component;
 import quill.docbook.Division;
+import quill.docbook.Emphasis;
+import quill.docbook.Filename;
+import quill.docbook.Function;
+import quill.docbook.Inline;
+import quill.docbook.Literal;
 import quill.docbook.Paragraph;
 import quill.docbook.ProgramListing;
 import quill.docbook.Section;
 import quill.docbook.Title;
+import quill.docbook.Type;
 
 /**
  * Process a XOM tree with our DocBookElements into our internal in-mempry
@@ -97,6 +103,7 @@ public class DocBookLoader
         final Division[] sections;
         int i, j;
         Block[] blocks;
+        final Segment[] result;
 
         book = (Book) doc.getRootElement();
         chapter = book.getComponents()[0];
@@ -115,16 +122,10 @@ public class DocBookLoader
             }
         }
 
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+        result = new Segment[list.size()];
+        list.toArray(result);
 
-    private Series createSeries() {
-        final Segment[] segments; // result
-
-        segments = new Segment[list.size()];
-        list.toArray(segments);
-
-        return new Series(segments);
+        return new Series(result);
     }
 
     private void processComponent(Component component) {
@@ -147,6 +148,9 @@ public class DocBookLoader
     }
 
     private void processBlock(Block block) {
+        Inline[] spans;
+        int i;
+
         /*
          * Block elements are so common that we handle them first and bail out
          * of here.
@@ -186,9 +190,18 @@ public class DocBookLoader
             }
         }
 
+        /*
+         * Now handle the bodies of the Elements
+         */
+
+        spans = block.getSpans();
+        for (i = 0; i < spans.length; i++) {
+            handleSpans(spans[i]);
+        }
+
     }
 
-    private void handleSpans() {
+    private void handleSpans(Inline span) {
 
         /*
          * Otherwise we're dealing with an inline spanning element.
@@ -197,23 +210,35 @@ public class DocBookLoader
         start = false;
         preserve = false;
 
-        if (name.equals("function")) {
+        if (span instanceof Function) {
             markup = Common.FUNCTION;
-        } else if (name.equals("filename")) {
+        } else if (span instanceof Filename) {
             markup = Common.FILENAME;
-        } else if (name.equals("type")) {
+        } else if (span instanceof Type) {
             markup = Common.TYPE;
-        } else if (name.equals("code")) {
+        } else if (span instanceof Literal) {
             markup = Common.CODE;
-        } else if (name.equals("command")) {
+        } else if (span instanceof Command) {
             markup = Common.COMMAND;
-        } else if (name.equals("application")) {
+        } else if (span instanceof Application) {
             markup = Common.APPLICATION;
-        } else if (name.equals("userinput")) {
-            markup = Preformat.USERINPUT;
-        } else if (name.equals("emphasis")) {
-            markup = Common.ITALICS;
-            // TODO what about bold?
+            // } else if (span instanceof UserInput) { // TODO
+            // markup = Preformat.USERINPUT;
+        } else if (span instanceof Emphasis) {
+            final Emphasis element;
+
+            /*
+             * Work out if this is italics or bold. This is not the cleanest
+             * code. Should isBold() move to the Inline interface?
+             */
+
+            element = (Emphasis) span;
+
+            if (element.isBold()) {
+                markup = Common.BOLD;
+            } else {
+                markup = Common.ITALICS;
+            }
         } else {
             /*
              * No need to warn, really. The structure tags don't count. But if
@@ -221,6 +246,8 @@ public class DocBookLoader
              */
             markup = null;
         }
+
+        processText(span.getText());
     }
 
     /*
@@ -229,7 +256,7 @@ public class DocBookLoader
      * reached. So we trim off the leading pretty-print whitespace then add a
      * single StringSpan with this content.
      */
-    public Nodes makeText(String text) {
+    public void processText(String text) {
         final String trim, str;
         int len;
         char ch;
@@ -242,13 +269,13 @@ public class DocBookLoader
 
         if (len == 0) {
             space = false;
-            return null; // empty
+            return; // empty
         }
 
         if (len == 1) {
             if (text.charAt(0) == '\n') {
                 space = false;
-                return null; // empty
+                return; // empty
             }
         }
 
@@ -302,18 +329,5 @@ public class DocBookLoader
          */
 
         markup = null;
-
-        return null;
-    }
-
-    private Nodes makeAttribute(String name, String URI, String value, Attribute.Type type) {
-        if (markup == Common.ITALICS) {
-            if (name.equals("role")) {
-                if (value.equals("bold")) {
-                    markup = Common.BOLD;
-                }
-            }
-        }
-        return null;
     }
 }
