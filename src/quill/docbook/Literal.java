@@ -1,7 +1,7 @@
 /*
- * BookDocument.java
+ * Literal.java
  *
- * Copyright (c) 2008 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -10,16 +10,14 @@
  */
 package quill.docbook;
 
-public class BookDocument extends Document
+/**
+ * A code fragment.
+ * 
+ * @author Andrew Cowie
+ */
+public class Literal extends InlineElement implements Inline
 {
-    public BookDocument() {
-        super(new Book());
-    }
-}
-
-class Book extends DocBookTag
-{
-    Book() {
-        super("book");
+    public Literal() {
+        super("literal");
     }
 }

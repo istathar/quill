@@ -17,18 +17,17 @@ package quill.converter;
  */
 
 import quill.docbook.Application;
+import quill.docbook.Article;
 import quill.docbook.Block;
-import quill.docbook.Bold;
-import quill.docbook.BookDocument;
+import quill.docbook.Book;
 import quill.docbook.Chapter;
-import quill.docbook.Code;
 import quill.docbook.Command;
 import quill.docbook.Component;
-import quill.docbook.Document;
+import quill.docbook.Emphasis;
 import quill.docbook.Filename;
 import quill.docbook.Function;
 import quill.docbook.Inline;
-import quill.docbook.Italics;
+import quill.docbook.Literal;
 import quill.docbook.Section;
 import quill.docbook.Type;
 import quill.textbase.CharacterSpan;
@@ -55,8 +54,6 @@ import quill.textbase.TextChain;
  */
 public class DocBookConverter
 {
-    private final Document book;
-
     private final Component chapter;
 
     private final StringBuilder buf;
@@ -79,11 +76,9 @@ public class DocBookConverter
     private Inline inline;
 
     public DocBookConverter() {
-        book = new BookDocument();
         buf = new StringBuilder();
 
         chapter = new Chapter();
-        book.add(chapter);
     }
 
     /**
@@ -158,10 +153,6 @@ public class DocBookConverter
         process('\n');
     }
 
-    public Document result() {
-        return book;
-    }
-
     /**
      * Start a new element. This is a somewhat complicated expression, as it
      * counts for the case of returning from Inline to Block as well as
@@ -199,11 +190,16 @@ public class DocBookConverter
             } else if (format == Common.FUNCTION) {
                 inline = new Function();
             } else if (format == Common.ITALICS) {
-                inline = new Italics();
+                inline = new Emphasis();
             } else if (format == Common.BOLD) {
-                inline = new Bold();
-            } else if (format == Common.CODE) {
-                inline = new Code();
+                final Emphasis element;
+
+                element = new Emphasis();
+                element.setBold();
+
+                inline = element;
+            } else if (format == Common.LITERAL) {
+                inline = new Literal();
             } else if (format == Common.APPLICATION) {
                 inline = new Application();
             } else if (format == Common.COMMAND) {
@@ -265,5 +261,23 @@ public class DocBookConverter
         } else {
             buf.append(ch);
         }
+    }
+
+    /**
+     * Create a <code>&lt;book&gt;</code> object based on what has been fed to
+     * the converter.
+     */
+    public Book createBook() {
+        final Book book;
+
+        book = new Book();
+        book.add(chapter);
+
+        return book;
+    }
+
+    public Article createArticle() {
+        // return chapter?
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

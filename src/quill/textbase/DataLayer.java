@@ -12,15 +12,16 @@ package quill.textbase;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
 import nu.xom.Builder;
+import nu.xom.Document;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.converter.DocBookConverter;
-import quill.docbook.Document;
+import quill.docbook.Book;
+import quill.docbook.DocBookNodeFactory;
 
 /**
  * Our in-memory intermediate representation. Provides access to mutate the
@@ -33,6 +34,13 @@ public class DataLayer
 {
     private ChangeStack stack;
 
+    /**
+     * The document currently being worked on.
+     */
+    /*
+     * This assumes that Quill only edits one work at a time. That will want
+     * to change in due course.
+     */
     private Folio current;
 
     public DataLayer() {
@@ -43,8 +51,10 @@ public class DataLayer
 
     public void loadDocument(String filename) throws ValidityException, ParsingException, IOException {
         final File source;
+        final DocBookNodeFactory factory;
         final Builder parser;
-        final EfficientNoNodeFactory factory;
+        final Document doc;
+        final DocBookLoader loader;
         final Series series;
         final Series[] collection;
 
@@ -53,29 +63,22 @@ public class DataLayer
             throw new FileNotFoundException();
         }
 
-        /*
-         * Call our custom machinery to use XOM to parse the documents and
-         * create arrays of Components containing TextStacks.
-         */
-
-        factory = new EfficientNoNodeFactory();
-
+        factory = new DocBookNodeFactory();
         parser = new Builder(factory);
-        parser.build(source);
+        doc = parser.build(source);
 
-        series = factory.createSeries();
+        loader = new DocBookLoader();
+        series = loader.process(doc);
 
         /*
-         * For now, we assume we only read one Series
+         * TODO this only handles a work with a single component (chapter) per
+         * file. That's probably right, but overall this logic is insufficient
+         * to load a work with components spread across multiple files.
          */
 
         collection = new Series[] {
             series
         };
-
-        /*
-         * And we assume we're only managing one document.
-         */
 
         current = new Folio(collection);
     }
@@ -84,12 +87,11 @@ public class DataLayer
         return current;
     }
 
-    public void saveDocument(String filename) throws IOException {
+    public void saveDocument(OutputStream out) throws IOException {
         final Series series;
         final DocBookConverter converter;
-        final OutputStream out;
         int i;
-        final Document doc;
+        final Book book;
 
         /*
          * On the temporary assumption that there's only one chapter being
@@ -113,10 +115,8 @@ public class DataLayer
          * Get the resultant top level Document and serialize it.
          */
 
-        out = new FileOutputStream(filename);
-
-        doc = converter.result();
-        doc.toXML(out);
+        book = converter.createBook();
+        book.toXML(out);
     }
 
     /**

@@ -10,7 +10,7 @@
  */
 package quill.docbook;
 
-public class ProgramListing extends Block
+public class ProgramListing extends BlockElement implements Block
 {
     public ProgramListing() {
         super("programlisting");

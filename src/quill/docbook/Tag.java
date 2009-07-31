@@ -1,5 +1,5 @@
 /*
- * Command.java
+ * DocBook.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -11,13 +11,10 @@
 package quill.docbook;
 
 /**
- * A command or program name, ie as you would run it from the command line.
+ * Elements in our constrained subset of DocBook.
  * 
  * @author Andrew Cowie
  */
-public class Code extends Inline
+public interface Tag
 {
-    public Code() {
-        super("code");
-    }
 }

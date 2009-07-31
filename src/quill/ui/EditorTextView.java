@@ -322,8 +322,8 @@ abstract class EditorTextView extends TextView
                     } else if (key == Keyval.A) {
                         toggleMarkup(Common.APPLICATION);
                         return true;
-                    } else if (key == Keyval.C) {
-                        toggleMarkup(Common.CODE);
+                    } else if (key == Keyval.L) {
+                        toggleMarkup(Common.LITERAL);
                         return true;
                     } else if (key == Keyval.F) {
                         toggleMarkup(Common.FILENAME);

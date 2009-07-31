@@ -329,7 +329,7 @@ public abstract class RenderEngine
 
             if (preformatted) {
                 code = true;
-            } else if ((format == Common.CODE) || (format == Common.FILENAME)) {
+            } else if ((format == Common.LITERAL) || (format == Common.FILENAME)) {
                 code = true;
             } else {
                 code = false;
@@ -435,7 +435,7 @@ public abstract class RenderEngine
                 return new Attribute[] {
                     new FontDescriptionAttribute(monoFace.desc),
                 };
-            } else if (m == Common.CODE) {
+            } else if (m == Common.LITERAL) {
                 return new Attribute[] {
                     new FontDescriptionAttribute(monoFace.desc),
                 };

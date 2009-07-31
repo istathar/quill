@@ -10,14 +10,24 @@
  */
 package quill.docbook;
 
-public class Blockquote extends Block
+/**
+ * A verse or quote as a passage.
+ * 
+ * @author Andrew Cowie
+ */
+/*
+ * TODO whitespace?
+ */
+public class Blockquote extends BlockElement implements Block
 {
     public Blockquote() {
         super("blockquote");
     }
 
-    public Blockquote(String str) {
-        super("blockquote");
-        super.addText(str);
+    /**
+     * The text body of a blockquote is a series of para elements.
+     */
+    public void add(Paragraph para) {
+        super.add(para);
     }
 }

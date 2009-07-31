@@ -10,7 +10,7 @@
  */
 package quill.docbook;
 
-public class Title extends Block
+public class Title extends BlockElement implements Block
 {
     public Title() {
         super("title");
@@ -18,6 +18,6 @@ public class Title extends Block
 
     public Title(String title) {
         super("title");
-        super.addText(title);
+        super.add(title);
     }
 }

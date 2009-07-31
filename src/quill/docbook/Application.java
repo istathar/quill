@@ -11,11 +11,11 @@
 package quill.docbook;
 
 /**
- * A method or function name.
+ * The name of a software project.
  * 
  * @author Andrew Cowie
  */
-public class Application extends Inline
+public class Application extends InlineElement implements Inline
 {
     public Application() {
         super("application");

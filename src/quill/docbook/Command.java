@@ -15,7 +15,7 @@ package quill.docbook;
  * 
  * @author Andrew Cowie
  */
-public class Command extends Inline
+public class Command extends InlineElement implements Inline
 {
     public Command() {
         super("command");

@@ -29,11 +29,11 @@ import nu.xom.Text;
  */
 class DocBookSerializer extends Serializer
 {
-    private final DocBookTag root;
+    private final DocBookElement root;
 
     private String swollowed;
 
-    DocBookSerializer(OutputStream out, DocBookTag root) {
+    DocBookSerializer(OutputStream out, DocBookElement root) {
         super(out);
         super.setLineSeparator("\n");
         super.setMaxLength(50);
@@ -42,12 +42,7 @@ class DocBookSerializer extends Serializer
     }
 
     protected void writeStartTag(Element e) throws IOException {
-        DocBookTag tag = null;
         String nested;
-
-        if (e instanceof DocBookElement) {
-            tag = ((DocBookElement) e).proxy;
-        }
 
         /*
          * We don't want inline tags pushing us past our word wrap margin if
@@ -59,7 +54,7 @@ class DocBookSerializer extends Serializer
          * figuring out whether we need to call the Element's toXML().
          */
 
-        if (tag instanceof Inline) {
+        if (e instanceof Inline) {
             nested = e.toXML();
 
             if (getColumnNumber() + firstBreakPoint(nested) + swollowed.length() > getMaxLength()) {
@@ -81,7 +76,7 @@ class DocBookSerializer extends Serializer
 
         super.writeStartTag(e);
 
-        if (tag instanceof Inline) {
+        if (e instanceof Inline) {
             return;
         }
         breakLine();
@@ -113,27 +108,21 @@ class DocBookSerializer extends Serializer
     }
 
     protected void writeEndTag(Element e) throws IOException {
-        DocBookTag tag = null;
-
-        if (e instanceof DocBookElement) {
-            tag = ((DocBookElement) e).proxy;
-        }
-
         if (swollowed != null) {
             writeEscaped(swollowed);
             swollowed = "";
         }
 
-        if (tag instanceof Block) {
+        if (e instanceof Block) {
             breakLine();
         }
 
         super.writeEndTag(e);
 
-        if (tag instanceof Inline) {
+        if (e instanceof Inline) {
             return;
         }
-        if (tag == root) {
+        if (e == root) {
             /*
              * Serializer does a line break between each piece of a Document.
              * So on the very last of our tags, we don't need to do a newline.
@@ -148,15 +137,9 @@ class DocBookSerializer extends Serializer
      * elements except that an empty block needs a trailing line break.
      */
     protected void writeEmptyElementTag(Element e) throws IOException {
-        DocBookTag tag = null;
-
-        if (e instanceof DocBookElement) {
-            tag = ((DocBookElement) e).proxy;
-        }
-
         super.writeEmptyElementTag(e);
 
-        if (tag instanceof Block) {
+        if (e instanceof Block) {
             breakLine();
         }
     }
