@@ -17,11 +17,13 @@ public interface Component extends Tag
 {
     public void add(Division section);
 
+    public Division[] getDivisions();
+
     /**
      * Less common is adding block level elements to a Chapter. These occur
      * before the first Section. Mostly this is how a Title gets added.
      */
     public void add(Block block);
 
-    public Division[] getDivisions();
+    public Block[] getBlocks();
 }

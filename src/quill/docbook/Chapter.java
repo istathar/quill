@@ -10,6 +10,7 @@
  */
 package quill.docbook;
 
+import nu.xom.Element;
 import nu.xom.Elements;
 
 /**
@@ -40,6 +41,40 @@ public class Chapter extends StructureElement implements Component
 
         for (i = 0; i < num; i++) {
             result[i] = (Division) sections.get(i);
+        }
+
+        return result;
+    }
+
+    /**
+     * Get the children Blocks as an array. Only retrieves those Blocks before
+     * the first Division. Of course, if there are no Sections, then this will
+     * be the entire Component.
+     */
+    public Block[] getBlocks() {
+        final Elements children;
+        Element child;
+        int i, num;
+        final Block[] result;
+
+        children = super.getChildElements();
+
+        num = children.size();
+
+        for (i = 0; i < num; i++) {
+            child = children.get(i);
+
+            if (child instanceof Division) {
+                num = i;
+                break;
+            }
+        }
+
+        result = new Block[i];
+
+        for (i = 0; i < num; i++) {
+            child = children.get(i);
+            result[i] = (Block) child;
         }
 
         return result;

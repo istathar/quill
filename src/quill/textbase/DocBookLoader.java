@@ -107,9 +107,23 @@ public class DocBookLoader
         final Segment[] result;
 
         book = (Book) doc.getRootElement();
-        chapter = book.getComponents()[0];
-
+        chapter = book.getComponents()[0]; // HARDCODE
         processComponent(chapter);
+
+        /*
+         * Handle the "anonymous" Blocks before the first Section, if any.
+         */
+
+        blocks = chapter.getBlocks();
+
+        for (j = 0; j < blocks.length; j++) {
+            processBlock(blocks[j]);
+        }
+
+        /*
+         * Now iterate over the Sections and then handle each Section's
+         * Blocks.
+         */
 
         sections = chapter.getDivisions();
 
@@ -122,6 +136,11 @@ public class DocBookLoader
                 processBlock(blocks[j]);
             }
         }
+
+        /*
+         * Finally, transpose the resultant collection of Segments into a
+         * Series, and return it.
+         */
 
         result = new Segment[list.size()];
         list.toArray(result);
@@ -190,7 +209,7 @@ public class DocBookLoader
                 segment.setText(chain);
             }
         } else {
-            throw new IllegalStateException("What kind of Block is " + block);
+            throw new IllegalStateException("\n" + "What kind of Block is " + block);
         }
 
         /*
