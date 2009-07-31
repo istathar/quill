@@ -1,5 +1,5 @@
 /*
- * ExampleThereAndBackAgain.java
+ * ValidateThereAndBackAgain.java
  *
  * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 

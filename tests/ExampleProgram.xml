@@ -48,7 +48,6 @@ call to <literal>Gtk.main()</literal> and
 instead just letting the program exit. Then
 just compile it with <command>javac</command>
 and you're on your way.
-
 </para>
 <para>
 The real question is whether or not you know
