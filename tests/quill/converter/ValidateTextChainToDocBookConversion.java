@@ -227,7 +227,7 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         final Change change;
         final Segment segment;
         final DocBookConverter converter;
-        final Document book;
+        final Book book;
         final ByteArrayOutputStream out;
         final String blob;
 
@@ -248,7 +248,7 @@ public class ValidateTextChainToDocBookConversion extends TestCase
 
         converter = new DocBookConverter();
         converter.append(segment);
-        book = converter.result();
+        book = converter.createBook();
 
         assertNotNull(book);
 
