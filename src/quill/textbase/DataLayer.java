@@ -12,7 +12,6 @@ package quill.textbase;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -86,13 +85,6 @@ public class DataLayer
 
     public Folio getActiveDocument() {
         return current;
-    }
-
-    public void saveDocument(String filename) throws IOException {
-        final OutputStream out;
-
-        out = new FileOutputStream(filename);
-        saveDocument(out);
     }
 
     public void saveDocument(OutputStream out) throws IOException {

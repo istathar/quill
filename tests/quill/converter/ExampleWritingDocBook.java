@@ -14,7 +14,7 @@ import java.io.IOException;
 
 import quill.docbook.Book;
 import quill.docbook.Chapter;
-import quill.docbook.Italics;
+import quill.docbook.Emphasis;
 import quill.docbook.Paragraph;
 import quill.docbook.Section;
 import quill.docbook.Title;
@@ -28,6 +28,7 @@ public class ExampleWritingDocBook
         final Chapter chapter;
         Section section;
         Paragraph para;
+        Emphasis span;
 
         book = new Book();
 
@@ -45,7 +46,9 @@ public class ExampleWritingDocBook
 
         para = new Paragraph();
         para.add("And then we indeed had a very ");
-        para.add(new Italics("yummy"));
+        span = new Emphasis();
+        span.add("yummy");
+        para.add(span);
         para.add(" delicious absolutely brilliant delightful breakfast.");
         section.add(para);
 

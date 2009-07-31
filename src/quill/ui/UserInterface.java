@@ -12,7 +12,9 @@
  */
 package quill.ui;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.gnome.gdk.EventOwnerChange;
@@ -167,8 +169,12 @@ public class UserInterface
 
     void saveDocument() {
         final Dialog dialog;
+        final File target;
+        final FileOutputStream out;
         try {
-            data.saveDocument("tmp/HardcodedSaveResult.xml");
+            target = new File("tmp/HardcodedSaveResult.xml");
+            out = new FileOutputStream(target);
+            data.saveDocument(out);
         } catch (IOException ioe) {
             dialog = new ErrorMessageDialog(primary, "Save failed", "There's some kind of I/O problem: "
                     + ioe.getMessage());
