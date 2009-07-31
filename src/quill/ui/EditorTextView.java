@@ -323,7 +323,7 @@ abstract class EditorTextView extends TextView
                         toggleMarkup(Common.APPLICATION);
                         return true;
                     } else if (key == Keyval.C) {
-                        toggleMarkup(Common.CODE);
+                        toggleMarkup(Common.LITERAL);
                         return true;
                     } else if (key == Keyval.F) {
                         toggleMarkup(Common.FILENAME);

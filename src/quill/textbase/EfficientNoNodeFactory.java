@@ -254,7 +254,7 @@ public class EfficientNoNodeFactory extends NodeFactory
         } else if (name.equals("type")) {
             markup = Common.TYPE;
         } else if (name.equals("code")) {
-            markup = Common.CODE;
+            markup = Common.LITERAL;
         } else if (name.equals("command")) {
             markup = Common.COMMAND;
         } else if (name.equals("application")) {

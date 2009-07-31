@@ -11,15 +11,18 @@
 package quill.converter;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
 import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.NodeFactory;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.docbook.Book;
-import quill.textbase.EfficientNoNodeFactory;
+import quill.docbook.DocBookNodeFactory;
+import quill.textbase.DataLayer;
+import quill.textbase.DocBookLoader;
 import quill.textbase.Series;
 
 /**
@@ -34,7 +37,10 @@ public class ExampleThereAndBackAgain
     public static void main(String[] args) throws IOException, ValidityException, ParsingException {
         final File source, target;
         final Builder parser;
-        final EfficientNoNodeFactory factory;
+        final NodeFactory factory;
+        final Document doc;
+        final DocBookLoader loader;
+        final DataLayer data;
         final Series series;
         int i;
         final Book book;
@@ -44,24 +50,16 @@ public class ExampleThereAndBackAgain
         source = new File("tests/ExampleProgram.xml");
         assert (source.exists());
 
-        factory = new EfficientNoNodeFactory();
-
+        factory = new DocBookNodeFactory();
         parser = new Builder(factory);
-        parser.build(source);
+        doc = parser.build(source);
 
-        series = factory.createSeries();
+        loader = new DocBookLoader();
+        series = loader.process(doc);
 
-        converter = new DocBookConverter();
+        data = new DataLayer();
+        data.loadDocument("tests/ExampleProgram.xml");
 
-        /*
-         * This logic is going to need to go somewhere else!
-         */
-
-        for (i = 0; i < series.size(); i++) {
-            converter.append(series.get(i));
-        }
-
-        book = converter.createBook();
         if (true) {
             for (i = 1; i <= 70; i++) {
                 System.err.print(i / 10);
@@ -73,12 +71,9 @@ public class ExampleThereAndBackAgain
             System.err.println("\n");
             System.err.flush();
 
-            out = System.out;
+            data.saveDocument(System.out);
         } else {
-            target = new File("tmp/unittests/markerpen/converter/ExampleProgram.xml");
-            target.getParentFile().mkdirs();
-            out = new FileOutputStream(target);
+            data.saveDocument("tmp/unittests/markerpen/converter/ExampleProgram.xml");
         }
-        book.toXML(out);
     }
 }

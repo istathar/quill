@@ -59,7 +59,7 @@ public class DocBookNodeFactory extends NodeFactory
             return new Filename();
         } else if (name.equals("type")) {
             return new Type();
-        } else if (name.equals("code")) {
+        } else if (name.equals("literal")) {
             return new Literal();
         } else if (name.equals("command")) {
             return new Command();

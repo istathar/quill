@@ -89,9 +89,15 @@ public class DataLayer
     }
 
     public void saveDocument(String filename) throws IOException {
+        final OutputStream out;
+
+        out = new FileOutputStream(filename);
+        saveDocument(out);
+    }
+
+    public void saveDocument(OutputStream out) throws IOException {
         final Series series;
         final DocBookConverter converter;
-        final OutputStream out;
         int i;
         final Book book;
 
@@ -116,8 +122,6 @@ public class DataLayer
         /*
          * Get the resultant top level Document and serialize it.
          */
-
-        out = new FileOutputStream(filename);
 
         book = converter.createBook();
         book.toXML(out);

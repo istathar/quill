@@ -198,7 +198,7 @@ public class DocBookConverter
                 element.setBold();
 
                 inline = element;
-            } else if (format == Common.CODE) {
+            } else if (format == Common.LITERAL) {
                 inline = new Literal();
             } else if (format == Common.APPLICATION) {
                 inline = new Application();

@@ -98,7 +98,7 @@ public class DocBookLoader
     /*
      * FIXME what about the anonymous section leading a chapter?
      */
-    Series process(Document doc) {
+    public Series process(Document doc) {
         final Book book; // FIXME change to an interface, or reject?
         final Component chapter;
         final Division[] sections;
@@ -217,7 +217,7 @@ public class DocBookLoader
         } else if (span instanceof Type) {
             markup = Common.TYPE;
         } else if (span instanceof Literal) {
-            markup = Common.CODE;
+            markup = Common.LITERAL;
         } else if (span instanceof Command) {
             markup = Common.COMMAND;
         } else if (span instanceof Application) {
@@ -247,6 +247,10 @@ public class DocBookLoader
             markup = null;
         }
 
+        if (markup != null) {
+            start = false;
+        }
+
         processText(span.getText());
     }
 
@@ -256,7 +260,7 @@ public class DocBookLoader
      * reached. So we trim off the leading pretty-print whitespace then add a
      * single StringSpan with this content.
      */
-    public void processText(String text) {
+    private void processText(String text) {
         final String trim, str;
         int len;
         char ch;

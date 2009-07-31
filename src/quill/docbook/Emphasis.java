@@ -21,7 +21,7 @@ import nu.xom.Attribute;
 public class Emphasis extends InlineElement implements Inline
 {
     public Emphasis() {
-        super("filename");
+        super("emphasis");
     }
 
     public void setBold() {
