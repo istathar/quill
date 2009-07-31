@@ -1,12 +1,14 @@
 /*
  * DocBookLoader.java
  *
- * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
+ * 
+ * Most of this logic came from a class called EfficientNoNodeFactory. 
  */
 package quill.textbase;
 
@@ -94,9 +96,6 @@ public class DocBookLoader
      * This kinda assumes we only load one Document; if that's not the case,
      * and we don't force instantiating a new DocBookLoader, then clear the
      * processor state here.
-     */
-    /*
-     * FIXME what about the anonymous section leading a chapter?
      */
     public Series process(Document doc) {
         final Book book; // FIXME change to an interface, or reject?
