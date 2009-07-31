@@ -171,6 +171,7 @@ public class UserInterface
         final Dialog dialog;
         final File target;
         final FileOutputStream out;
+
         try {
             target = new File("tmp/HardcodedSaveResult.xml");
             out = new FileOutputStream(target);
