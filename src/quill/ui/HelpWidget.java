@@ -122,9 +122,9 @@ class HelpWidget extends HBox
                         "The name of a c_ommand or program you'd run from the command line."
                 },
                 new String[] {
-                        "Ctrl+Shift+C",
+                        "Ctrl+Shift+L",
                         "Code fragment",
-                        "An inline source _code frament or literal value."
+                        "An inline source code frament or _literal value."
                 },
 
         };
