@@ -219,4 +219,53 @@ public class ValidateTextChainToDocBookConversion extends TestCase
                 + "but you are often better off using File's createTempFile() function.",
                 chain.toString());
     }
+
+    public final void testWriteUnicode() throws IOException {
+        final TextChain chain;
+        final DataLayer data;
+        final Span span;
+        final Change change;
+        final Segment segment;
+        final DocBookConverter converter;
+        final Document book;
+        final ByteArrayOutputStream out;
+        final String blob;
+
+        /*
+         * This verifies for us that XOM can handle UTF-16 surrogates, at
+         * least when they are expressed as Java escapes.
+         */
+
+        data = new DataLayer();
+        chain = new TextChain();
+
+        span = new StringSpan(":\ud835\udc5b:", null);
+        change = new InsertTextualChange(chain, 0, span);
+        data.apply(change);
+
+        segment = new ParagraphSegment();
+        segment.setText(chain);
+
+        converter = new DocBookConverter();
+        converter.append(segment);
+        book = converter.result();
+
+        assertNotNull(book);
+
+        out = new ByteArrayOutputStream();
+        book.toXML(out);
+
+        blob = combine(new String[] {
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+                "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
+                "<chapter>",
+                "<para>",
+                ":𝑛:",
+                "</para>",
+                "</chapter>",
+                "</book>"
+        });
+        assertEquals(blob, out.toString());
+    }
+
 }
