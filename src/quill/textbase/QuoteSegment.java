@@ -10,9 +10,6 @@
  */
 package quill.textbase;
 
-import quill.docbook.Block;
-import quill.docbook.Blockquote;
-
 /**
  * A quote. A BlockquoteSegment may (and almost certainly will) contain more
  * than one Paragraph block since EditorWindow can handle multiple paras with
@@ -20,20 +17,16 @@ import quill.docbook.Blockquote;
  * 
  * @author Andrew Cowie
  */
-public final class BlockquoteSegment extends Segment
+public final class QuoteSegment extends Segment
 {
-    public BlockquoteSegment() {
+    public QuoteSegment() {
         super();
-    }
-
-    public Block createBlock() {
-        return new Blockquote();
     }
 
     Segment createSimilar() {
         final Segment result;
 
-        result = new BlockquoteSegment();
+        result = new QuoteSegment();
         result.setParent(this.getParent());
 
         return result;

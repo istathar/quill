@@ -1,5 +1,5 @@
 /*
- * ParagraphEditorTextView.java
+ * QuoteEditorTextView.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -12,14 +12,14 @@ package quill.ui;
 
 import quill.textbase.Segment;
 
-class ParagraphEditorTextView extends EditorTextView
+class QuoteEditorTextView extends EditorTextView
 {
-    ParagraphEditorTextView(Segment segment) {
+    public QuoteEditorTextView(Segment segment) {
         super(segment);
 
         view.modifyFont(fonts.serif);
-
-        view.setPaddingAboveParagraph(0);
+        view.setMarginLeft(40);
+        view.setMarginRight(40);
         view.setPaddingBelowParagraph(10);
     }
 }

@@ -20,9 +20,6 @@ package quill.docbook;
  * The documentation sometimes refers to this as "element", but Element is
  * already horribly over used, so we'll use this as something out of the way.
  */
-public interface Division extends Tag
+public interface Division extends Structure
 {
-    public void add(Block block);
-
-    public Block[] getBlocks();
 }

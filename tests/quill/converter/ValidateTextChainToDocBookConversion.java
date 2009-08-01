@@ -20,10 +20,11 @@ import quill.docbook.Book;
 import quill.textbase.Change;
 import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
+import quill.textbase.ComponentSegment;
 import quill.textbase.DataLayer;
 import quill.textbase.HeadingSegment;
 import quill.textbase.InsertTextualChange;
-import quill.textbase.ParagraphSegment;
+import quill.textbase.NormalSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
@@ -74,10 +75,11 @@ public class ValidateTextChainToDocBookConversion extends TestCase
          * Now run conversion process.
          */
 
-        segment = new ParagraphSegment();
+        segment = new NormalSegment();
         segment.setText(chain);
 
         converter = new DocBookConverter();
+        converter.append(new ComponentSegment());
         converter.append(segment);
 
         book = converter.createBook();
@@ -164,10 +166,12 @@ public class ValidateTextChainToDocBookConversion extends TestCase
          */
         converter = new DocBookConverter();
 
+        segment = new ComponentSegment();
+        converter.append(segment);
         segment = new HeadingSegment();
         converter.append(segment);
 
-        segment = new ParagraphSegment();
+        segment = new NormalSegment();
         segment.setText(chain);
         converter.append(segment);
         book = converter.createBook();
@@ -225,7 +229,7 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         final DataLayer data;
         final Span span;
         final Change change;
-        final Segment segment;
+        Segment segment;
         final DocBookConverter converter;
         final Book book;
         final ByteArrayOutputStream out;
@@ -243,10 +247,13 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         change = new InsertTextualChange(chain, 0, span);
         data.apply(change);
 
-        segment = new ParagraphSegment();
-        segment.setText(chain);
-
         converter = new DocBookConverter();
+
+        segment = new ComponentSegment();
+        converter.append(segment);
+
+        segment = new NormalSegment();
+        segment.setText(chain);
         converter.append(segment);
         book = converter.createBook();
 

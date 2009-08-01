@@ -21,7 +21,7 @@ public class ValidateStructuralChange extends TestCase
         TextChain chain;
 
         segments = new Segment[] {
-                new ComponentSegment(), new HeadingSegment(), new ParagraphSegment(),
+                new ComponentSegment(), new HeadingSegment(), new NormalSegment(),
         };
 
         chain = new TextChain("Chapter 1");
@@ -84,7 +84,7 @@ public class ValidateStructuralChange extends TestCase
         assertSame(series.get(1), segments[1]);
         assertSame(series.get(2), segments[2]);
         assertTrue(series.get(3) instanceof PreformatSegment);
-        assertTrue(series.get(4) instanceof ParagraphSegment);
+        assertTrue(series.get(4) instanceof NormalSegment);
         assertEquals("Chapter 1The beginningHello cruel() World", concatonate(series));
     }
 

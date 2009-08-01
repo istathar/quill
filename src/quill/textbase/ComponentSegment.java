@@ -10,20 +10,10 @@
  */
 package quill.textbase;
 
-import quill.docbook.Block;
-import quill.docbook.Title;
-
 public final class ComponentSegment extends Segment
 {
     public ComponentSegment() {
         super();
-    }
-
-    /*
-     * We assume that a Chapter always has a title.
-     */
-    public Block createBlock() {
-        return new Title();
     }
 
     Segment createSimilar() {

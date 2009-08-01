@@ -10,9 +10,6 @@
  */
 package quill.textbase;
 
-import quill.docbook.Block;
-import quill.docbook.Paragraph;
-
 /**
  * Normal text paragraphs. A ParagraphSegment may (and almost certainly will)
  * correspond to more than one Paragraph block since EditorWindow can handle
@@ -21,20 +18,16 @@ import quill.docbook.Paragraph;
  * 
  * @author Andrew Cowie
  */
-public final class ParagraphSegment extends Segment
+public final class NormalSegment extends Segment
 {
-    public ParagraphSegment() {
+    public NormalSegment() {
         super();
-    }
-
-    public Block createBlock() {
-        return new Paragraph();
     }
 
     Segment createSimilar() {
         final Segment result;
 
-        result = new ParagraphSegment();
+        result = new NormalSegment();
         result.setParent(this.getParent());
 
         return result;

@@ -113,7 +113,13 @@ class DocBookSerializer extends Serializer
             swollowed = "";
         }
 
-        if (e instanceof Block) {
+        if ((e instanceof Block) && !(e instanceof Structure)) {
+            /*
+             * After writing a bunch of spans, take the cursor back to the
+             * beginning of the line before writing the end tag. The exception
+             * is tags like </blockquote>, because we're already at the line
+             * start due to the newline after the enclosed </para>.
+             */
             breakLine();
         }
 

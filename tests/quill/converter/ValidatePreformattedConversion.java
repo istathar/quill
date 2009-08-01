@@ -20,7 +20,7 @@ import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
 import quill.textbase.DataLayer;
 import quill.textbase.InsertTextualChange;
-import quill.textbase.ParagraphSegment;
+import quill.textbase.NormalSegment;
 import quill.textbase.Preformat;
 import quill.textbase.Segment;
 import quill.textbase.Span;
@@ -96,7 +96,7 @@ public class ValidatePreformattedConversion extends TestCase
          * Now run conversion process.
          */
 
-        segment = new ParagraphSegment();
+        segment = new NormalSegment();
         segment.setText(chain);
 
         converter = new DocBookConverter();

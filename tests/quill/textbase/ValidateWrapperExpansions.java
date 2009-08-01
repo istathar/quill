@@ -21,9 +21,9 @@ public class ValidateWrapperExpansions extends TestCase
         segments = new Segment[] {
                 new ComponentSegment(),
                 new HeadingSegment(),
-                new ParagraphSegment(),
+                new NormalSegment(),
                 new PreformatSegment(),
-                new ParagraphSegment(),
+                new NormalSegment(),
         };
     }
 
@@ -32,7 +32,7 @@ public class ValidateWrapperExpansions extends TestCase
 
         series = new Series(segments);
         assertEquals(5, series.size());
-        assertTrue(series.get(2) instanceof ParagraphSegment);
+        assertTrue(series.get(2) instanceof NormalSegment);
     }
 
     public final void testSeriesInsertMid() {
@@ -40,14 +40,14 @@ public class ValidateWrapperExpansions extends TestCase
 
         series = new Series(segments);
         assertEquals(5, series.size());
-        assertTrue(series.get(2) instanceof ParagraphSegment);
+        assertTrue(series.get(2) instanceof NormalSegment);
 
         series.insert(2, new PreformatSegment());
 
         assertEquals(6, series.size());
         assertTrue(series.get(1) instanceof HeadingSegment);
         assertTrue(series.get(2) instanceof PreformatSegment);
-        assertTrue(series.get(3) instanceof ParagraphSegment);
+        assertTrue(series.get(3) instanceof NormalSegment);
         assertSame(series.get(0), segments[0]);
         assertSame(series.get(1), segments[1]);
         assertSame(series.get(3), segments[2]);
@@ -60,7 +60,7 @@ public class ValidateWrapperExpansions extends TestCase
 
         series = new Series(segments);
         assertEquals(5, series.size());
-        assertTrue(series.get(4) instanceof ParagraphSegment);
+        assertTrue(series.get(4) instanceof NormalSegment);
 
         series.insert(5, new PreformatSegment());
 
