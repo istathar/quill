@@ -149,11 +149,11 @@ class ComponentEditorWidget extends ScrolledWindow
         ScrolledWindow wide;
 
         if (segment instanceof NormalSegment) {
-            editor = new ParagraphEditorTextView(segment);
+            editor = new NormalEditorTextView(segment);
 
             result = editor;
         } else if (segment instanceof QuoteSegment) {
-            editor = new BlockquoteEditorTextView(segment);
+            editor = new QuoteEditorTextView(segment);
 
             result = editor;
         } else if (segment instanceof PreformatSegment) {

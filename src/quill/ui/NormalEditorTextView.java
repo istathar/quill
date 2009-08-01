@@ -1,5 +1,5 @@
 /*
- * BlockquoteEditorTextView.java
+ * NormalEditorTextView.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -12,13 +12,14 @@ package quill.ui;
 
 import quill.textbase.Segment;
 
-class BlockquoteEditorTextView extends EditorTextView
+class NormalEditorTextView extends EditorTextView
 {
-    public BlockquoteEditorTextView(Segment segment) {
+    NormalEditorTextView(Segment segment) {
         super(segment);
 
         view.modifyFont(fonts.serif);
-        view.setPaddingBelowParagraph(0); // TODO verify
-        view.setLeftMargin(40);
+
+        view.setPaddingAboveParagraph(0);
+        view.setPaddingBelowParagraph(10);
     }
 }

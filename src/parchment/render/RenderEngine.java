@@ -38,6 +38,7 @@ import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.Preformat;
 import quill.textbase.PreformatSegment;
+import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
@@ -167,6 +168,12 @@ public abstract class RenderEngine
             } else if (segment instanceof PreformatSegment) {
                 drawProgramCode(cr, text.extractAll());
                 drawBlankLine(cr);
+            } else if (segment instanceof QuoteSegment) {
+                paras = text.extractParagraphs();
+                for (Extract extract : paras) {
+                    drawQuoteParagraph(cr, extract);
+                    drawBlankLine(cr);
+                }
             } else if (segment instanceof NormalSegment) {
                 paras = text.extractParagraphs();
                 for (Extract extract : paras) {
@@ -194,6 +201,21 @@ public abstract class RenderEngine
 
     protected void drawNormalParagraph(Context cr, Extract extract) {
         drawAreaText(cr, extract, serifFace, false);
+    }
+
+    protected void drawQuoteParagraph(Context cr, Extract extract) {
+        final double savedLeft, savedRight;
+
+        savedLeft = leftMargin;
+        savedRight = rightMargin;
+
+        leftMargin += 45.0;
+        rightMargin += 45.0;
+
+        drawAreaText(cr, extract, serifFace, false);
+
+        leftMargin = savedLeft;
+        rightMargin = savedRight;
     }
 
     protected void drawProgramCode(Context cr, Extract entire) {
