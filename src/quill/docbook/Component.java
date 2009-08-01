@@ -13,7 +13,7 @@ package quill.docbook;
 /**
  * Components are the chapter-like elements.
  */
-public interface Component extends Tag
+public interface Component extends Structure
 {
     public void add(Division section);
 
@@ -23,7 +23,5 @@ public interface Component extends Tag
      * Less common is adding block level elements to a Chapter. These occur
      * before the first Section. Mostly this is how a Title gets added.
      */
-    public void add(Block block);
-
-    public Block[] getBlocks();
+    // add(); see Structure.
 }

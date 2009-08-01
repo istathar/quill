@@ -1,5 +1,5 @@
 /*
- * HeadingSegment.java
+ * Structure.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,20 +8,17 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package quill.textbase;
+package quill.docbook;
 
-public final class HeadingSegment extends Segment
+/**
+ * Things you can add Blocks to.
+ * 
+ * @author Andrew Cowie
+ */
+public interface Structure extends Tag
 {
-    public HeadingSegment() {
-        super();
-    }
+    public void add(Block block);
 
-    Segment createSimilar() {
-        final Segment result;
+    public Block[] getBlocks();
 
-        result = new HeadingSegment();
-        result.setParent(this.getParent());
-
-        return result;
-    }
 }

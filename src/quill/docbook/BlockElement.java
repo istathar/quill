@@ -49,7 +49,7 @@ abstract class BlockElement extends DocBookElement
             } else if (child instanceof Inline) {
                 result[i] = (Inline) child;
             } else {
-                throw new IllegalStateException("What is " + child);
+                throw new IllegalStateException("\n" + "What is " + child);
             }
         }
 

@@ -19,11 +19,11 @@ import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
-import quill.textbase.BlockquoteSegment;
+import quill.textbase.QuoteSegment;
 import quill.textbase.Change;
 import quill.textbase.ComponentSegment;
 import quill.textbase.HeadingSegment;
-import quill.textbase.ParagraphSegment;
+import quill.textbase.NormalSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
@@ -148,11 +148,11 @@ class ComponentEditorWidget extends ScrolledWindow
         HeadingBox heading;
         ScrolledWindow wide;
 
-        if (segment instanceof ParagraphSegment) {
+        if (segment instanceof NormalSegment) {
             editor = new ParagraphEditorTextView(segment);
 
             result = editor;
-        } else if (segment instanceof BlockquoteSegment) {
+        } else if (segment instanceof QuoteSegment) {
             editor = new BlockquoteEditorTextView(segment);
 
             result = editor;

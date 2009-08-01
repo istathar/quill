@@ -10,7 +10,6 @@
  */
 package quill.textbase;
 
-import quill.docbook.Block;
 
 /**
  * Segments are the block level grouping mechanism in textbase. Concrete
@@ -19,7 +18,7 @@ import quill.docbook.Block;
  * 
  * <p>
  * Note that some of these logical structures may correspond to more than one
- * underlying DocBook block level element; see {@link ParagraphSegment}.
+ * underlying DocBook block level element; see {@link NormalSegment}.
  * 
  * <p>
  * Segment itself does not provide a chaining or sequencing mechanism; impose
@@ -55,8 +54,6 @@ public abstract class Segment
         this.chain = stack;
         stack.setEnclosingSegment(this);
     }
-
-    public abstract Block createBlock();
 
     abstract Segment createSimilar();
 }

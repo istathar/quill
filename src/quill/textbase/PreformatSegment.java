@@ -10,9 +10,6 @@
  */
 package quill.textbase;
 
-import quill.docbook.Block;
-import quill.docbook.ProgramListing;
-
 /**
  * A section of text edited as a constant width block. These are presented in
  * the UI as a text editor with constant width fonts. It will correspond 1:1
@@ -25,10 +22,6 @@ public final class PreformatSegment extends Segment
 {
     public PreformatSegment() {
         super();
-    }
-
-    public Block createBlock() {
-        return new ProgramListing();
     }
 
     Segment createSimilar() {

@@ -35,7 +35,7 @@ import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.Markup;
-import quill.textbase.ParagraphSegment;
+import quill.textbase.NormalSegment;
 import quill.textbase.Preformat;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
@@ -167,7 +167,7 @@ public abstract class RenderEngine
             } else if (segment instanceof PreformatSegment) {
                 drawProgramCode(cr, text.extractAll());
                 drawBlankLine(cr);
-            } else if (segment instanceof ParagraphSegment) {
+            } else if (segment instanceof NormalSegment) {
                 paras = text.extractParagraphs();
                 for (Extract extract : paras) {
                     drawNormalParagraph(cr, extract);

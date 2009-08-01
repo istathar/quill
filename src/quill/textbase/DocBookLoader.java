@@ -167,25 +167,19 @@ public class DocBookLoader
     }
 
     private void processBlock(Block block) {
-        Inline[] spans;
+        final Block[] blocks;
         int i;
-
-        /*
-         * Block elements are so common that we handle them first and bail out
-         * of here.
-         */
 
         if (block instanceof Paragraph) {
             markup = null;
             start = true;
             preserve = false;
-            if (segment instanceof ParagraphSegment) {
-                chain.append(new CharacterSpan('\n', null));
-            } else if (segment instanceof BlockquoteSegment) {
+            if (segment instanceof NormalSegment) {
                 chain.append(new CharacterSpan('\n', null));
             } else {
-                setSegment(new ParagraphSegment());
+                setSegment(new NormalSegment());
             }
+            processBody(block);
         } else if (block instanceof ProgramListing) {
             markup = null;
             start = true;
@@ -193,11 +187,21 @@ public class DocBookLoader
             if (!(segment instanceof PreformatSegment)) {
                 setSegment(new PreformatSegment());
             }
+            processBody(block);
         } else if (block instanceof Blockquote) {
             markup = null;
             start = true;
             preserve = false;
-            setSegment(new BlockquoteSegment());
+            setSegment(new QuoteSegment());
+
+            blocks = ((Blockquote) block).getBlocks(); // yuk
+            processBody(blocks[0]); // hm
+            for (i = 1; i < blocks.length; i++) {
+                chain.append(new CharacterSpan('\n', null));
+
+                start = true;
+                processBody(blocks[i]);
+            }
         } else if (block instanceof Title) {
             markup = null;
             start = true;
@@ -207,27 +211,23 @@ public class DocBookLoader
                 chain = new TextChain();
                 segment.setText(chain);
             }
+            processBody(block);
         } else {
             throw new IllegalStateException("\n" + "What kind of Block is " + block);
         }
+    }
 
-        /*
-         * Now handle the bodies of the Elements
-         */
+    private void processBody(Block block) {
+        Inline[] spans;
+        int i;
 
         spans = block.getSpans();
         for (i = 0; i < spans.length; i++) {
-            handleSpans(spans[i]);
+            handleSpan(spans[i]);
         }
-
     }
 
-    private void handleSpans(Inline span) {
-
-        /*
-         * Otherwise we're dealing with an inline spanning element.
-         */
-
+    private void handleSpan(Inline span) {
         if (span instanceof Function) {
             markup = Common.FUNCTION;
         } else if (span instanceof Filename) {

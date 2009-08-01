@@ -19,24 +19,33 @@ package quill.converter;
 import quill.docbook.Application;
 import quill.docbook.Article;
 import quill.docbook.Block;
+import quill.docbook.Blockquote;
 import quill.docbook.Book;
 import quill.docbook.Chapter;
 import quill.docbook.Command;
 import quill.docbook.Component;
+import quill.docbook.Division;
 import quill.docbook.Emphasis;
 import quill.docbook.Filename;
 import quill.docbook.Function;
 import quill.docbook.Inline;
 import quill.docbook.Literal;
+import quill.docbook.Paragraph;
+import quill.docbook.ProgramListing;
 import quill.docbook.Section;
+import quill.docbook.Structure;
+import quill.docbook.Title;
 import quill.docbook.Type;
 import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
+import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.Markup;
+import quill.textbase.NormalSegment;
 import quill.textbase.Preformat;
 import quill.textbase.PreformatSegment;
+import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Span;
 import quill.textbase.StringSpan;
@@ -54,31 +63,32 @@ import quill.textbase.TextChain;
  */
 public class DocBookConverter
 {
-    private final Component chapter;
+    private Component chapter;
 
     private final StringBuilder buf;
 
     /**
      * Current Section we are appending Paragraphs to
      */
-    private Section section;
+    private Division section;
 
     /**
      * The current internal block we are working through
      */
     private Segment segment;
 
+    private Structure parent;
+
     /**
      * Current output block we are building up.
      */
+
     private Block block;
 
     private Inline inline;
 
     public DocBookConverter() {
         buf = new StringBuilder();
-
-        chapter = new Chapter();
     }
 
     /**
@@ -86,18 +96,46 @@ public class DocBookConverter
      */
     public void append(final Segment segment) {
         final TextChain text;
+        final Blockquote quote;
 
         this.segment = segment;
 
-        if (segment instanceof HeadingSegment) {
+        if (segment instanceof ComponentSegment) {
+            chapter = new Chapter();
+            section = null;
+            parent = chapter;
+            block = new Title();
+        } else if (segment instanceof HeadingSegment) {
             section = new Section();
             chapter.add(section);
-            block = null;
+            parent = section;
+            block = new Title();
+        } else if (segment instanceof PreformatSegment) {
+            block = new ProgramListing();
+        } else if (segment instanceof QuoteSegment) {
+            quote = new Blockquote();
+            parent.add(quote);
+            parent = quote;
+            block = new Paragraph();
+        } else if (segment instanceof NormalSegment) {
+            block = new Paragraph();
         }
 
         text = segment.getText();
+        if ((text == null) || (text.length() == 0)) {
+            return;
+        }
 
+        parent.add(block);
         append(text);
+
+        if (parent instanceof Blockquote) {
+            if (section == null) {
+                parent = chapter;
+            } else {
+                parent = section;
+            }
+        }
     }
 
     private void append(final TextChain chain) {
@@ -149,8 +187,7 @@ public class DocBookConverter
          * TextBuffers they back) do not end with a paragraph separator, so we
          * need to act to close out the last block.
          */
-        this.segment = null;
-        process('\n');
+        finish();
     }
 
     /**
@@ -174,7 +211,6 @@ public class DocBookConverter
          */
 
         if (format == null) {
-            block = segment.createBlock();
             return;
         }
 
@@ -249,15 +285,11 @@ public class DocBookConverter
                 buf.append('\n');
                 return;
             }
-            if (section == null) {
-                chapter.add(block);
-            } else {
-                section.add(block);
+            if (block instanceof Title) {
+                throw new IllegalStateException("\n" + "Newlines aren't allowed in titles");
             }
-            if (segment == null) {
-                return;
-            }
-            block = segment.createBlock();
+            block = new Paragraph();
+            parent.add(block);
         } else {
             buf.append(ch);
         }
