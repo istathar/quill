@@ -60,7 +60,7 @@ public class DataLayer
 
         source = new File(filename);
         if (!source.exists()) {
-            throw new FileNotFoundException();
+            throw new FileNotFoundException("\n" + filename);
         }
 
         factory = new DocBookNodeFactory();
