@@ -84,7 +84,7 @@ class HelpWidget extends HBox
                 }, new String[] {
                         "Ctrl+Z", "Undo", ""
                 }, new String[] {
-                        "Ctrl+Y", "Redo", "You can undo and redo changes to editors independently."
+                        "Ctrl+Y", "Redo", ""
                 }
         };
 

@@ -94,7 +94,7 @@ abstract class EditorTextView extends TextView
         view.setBuffer(buffer);
         view.setWrapMode(WrapMode.WORD);
 
-        view.setLeftMargin(3);
+        view.setMarginLeft(3);
         view.setBorderWidth(2);
 
         view.setAcceptsTab(true);
@@ -601,7 +601,6 @@ abstract class EditorTextView extends TextView
 
         change = new DeleteTextualChange(chain, offset, ui.getClipboard());
         ui.apply(change);
-        this.affect(change);
     }
 
     private static int normalizeOffset(int alpha, int omega) {
