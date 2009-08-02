@@ -18,7 +18,7 @@ abstract class GraphicalTestCase extends TestCase
 {
     private static boolean initialized;
 
-    public void setUp() {
+    protected void setUp() {
         if (!initialized) {
             Gtk.init(null);
             initialized = true;

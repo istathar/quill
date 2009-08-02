@@ -29,6 +29,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         ui = new UserInterface(data);
 
         data.loadDocument("tests/ExampleProgram.xml");
+        data.createDocument();
         folio = data.getActiveDocument();
         ui.displayDocument(folio);
     }

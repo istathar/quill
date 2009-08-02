@@ -80,7 +80,7 @@ public class DataLayer
             series
         };
 
-        current = new Folio(collection);
+        loadDocument(new Folio(collection));
     }
 
     public Folio getActiveDocument() {
@@ -140,5 +140,37 @@ public class DataLayer
      */
     public Change redo() {
         return stack.redo();
+    }
+
+    void loadDocument(Folio folio) {
+        current = folio;
+    }
+
+    /**
+     * Create a new blank document with a single Component.
+     */
+    public void createDocument() {
+        final Segment heading, para;
+        TextChain chain;
+        final Series chapter1;
+        final Folio folio;
+
+        heading = new ComponentSegment();
+        chain = new TextChain();
+        heading.setText(chain);
+
+        para = new NormalSegment();
+        chain = new TextChain();
+        para.setText(chain);
+
+        chapter1 = new Series(new Segment[] {
+                heading, para
+        });
+
+        folio = new Folio(new Series[] {
+            chapter1
+        });
+
+        loadDocument(folio);
     }
 }
