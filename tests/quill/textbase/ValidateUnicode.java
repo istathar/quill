@@ -70,15 +70,15 @@ public class ValidateUnicode extends GraphicalTestCase
         assertEquals(0x1d45b, str.codePointAt(1));
         assertTrue(Character.isLetter(0x1d45b));
         assertEquals(Character.LOWERCASE_LETTER, Character.getType(0x1d45b));
+        assertTrue(Character.isHighSurrogate('\ud835'));
 
         /*
-         * Now the freaky code unit stuff
+         * Now the freaky stuff
          */
-
-        assertTrue(Character.isHighSurrogate('\ud835'));
-        assertTrue(!Character.isHighSurrogate('\udc5b'));
         assertEquals('\udc5b', str.charAt(2));
-        // assertEquals(???, str.codePointAt(2));
+        assertTrue(!Character.isHighSurrogate('\udc5b'));
+        assertTrue(Character.isLowSurrogate('\udc5b'));
+        assertEquals(0xdc5b, str.codePointAt(2));
 
         assertEquals('3', str.charAt(3));
         assertEquals('3', str.codePointAt(3));
