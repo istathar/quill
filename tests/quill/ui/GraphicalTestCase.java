@@ -14,7 +14,7 @@ import junit.framework.TestCase;
 
 import org.gnome.gtk.Gtk;
 
-abstract class GraphicalTestCase extends TestCase
+public abstract class GraphicalTestCase extends TestCase
 {
     private static boolean initialized;
 

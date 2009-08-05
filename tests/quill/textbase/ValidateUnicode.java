@@ -11,7 +11,9 @@
 
 package quill.textbase;
 
-import junit.framework.TestCase;
+import org.gnome.gtk.TextBuffer;
+
+import quill.ui.GraphicalTestCase;
 
 /**
  * Make sure textbase properly handles 2- and 3-byte characters.
@@ -25,7 +27,7 @@ import junit.framework.TestCase;
  * character, Bad Things™ happen. Presumably Eclipse's editor is making the
  * assumption that String.length() == number of displayed characters.
  */
-public class ValidateUnicode extends TestCase
+public class ValidateUnicode extends GraphicalTestCase
 {
     public final void testLatin1Supplement() {
         final TextChain chain;
@@ -80,5 +82,23 @@ public class ValidateUnicode extends TestCase
 
         assertEquals('3', str.charAt(3));
         assertEquals('3', str.codePointAt(3));
+    }
+
+    public final void testOffsetCorrosion() {
+        final TextBuffer buffer;
+        final TextChain chain;
+        final String str;
+
+        str = "Cru𝑛ch";
+        assertEquals(7, str.length());
+
+        buffer = new TextBuffer();
+        buffer.setText(str);
+        assertEquals(6, buffer.getCharCount());
+
+        chain = new TextChain(str);
+        assertNotSame(str, chain.toString());
+        assertEquals(str, chain.toString());
+        assertEquals(6, chain.length());
     }
 }
