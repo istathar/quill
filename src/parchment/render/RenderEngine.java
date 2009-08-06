@@ -222,14 +222,15 @@ public abstract class RenderEngine
         drawAreaText(cr, entire, monoFace, true);
     }
 
-    private char previous;
+    // character
+    private int previous;
 
     /**
      * Carry out smart typography replacements. Returns the number of
      * characters actually added, since some cases insert Unicode control
      * sequences.
      */
-    private int translateAndAppend(final StringBuilder buf, final char ch, final boolean code) {
+    private int translateAndAppend(final StringBuilder buf, final int ch, final boolean code) {
         int num, i;
 
         num = 0;
@@ -251,7 +252,7 @@ public abstract class RenderEngine
              * code blocks, it's U+00A0. Anyway, now add the character.
              */
 
-            buf.append(ch);
+            buf.appendCodePoint(ch);
             num++;
         } else if (ch == '"') {
             /*
@@ -291,7 +292,7 @@ public abstract class RenderEngine
              * Normal character. Just add it.
              */
 
-            buf.append(ch);
+            buf.appendCodePoint(ch);
             num++;
         }
 

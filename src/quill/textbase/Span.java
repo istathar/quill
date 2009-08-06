@@ -54,6 +54,9 @@ public abstract class Span
      */
     public abstract String getText();
 
+    /**
+     * Get the number of <b>characters</b> in this span.
+     */
     public abstract int getWidth();
 
     public Markup getMarkup() {

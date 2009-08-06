@@ -61,7 +61,14 @@ public class StringSpan extends Span
         return 0;
     }
 
+    /*
+     * If there are surrogate pairs lurking in the UTF-16 encoded char[], then
+     * this will properly reduce them to character count. Maybe we should
+     * cache this?
+     */
     public int getWidth() {
-        return data.length();
+        final int len;
+        len = data.length();
+        return data.codePointCount(0, len);
     }
 }

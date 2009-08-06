@@ -275,7 +275,7 @@ public class DocBookConverter
      * PreformatSegment then we create a new Block. Setting segment to null is
      * how we signal the end.
      */
-    private void process(char ch) {
+    private void process(int ch) {
         if (ch == '\n') {
             finish();
             if (inline != null) {
@@ -291,7 +291,7 @@ public class DocBookConverter
             block = new Paragraph();
             parent.add(block);
         } else {
-            buf.append(ch);
+            buf.appendCodePoint(ch);
         }
     }
 

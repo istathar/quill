@@ -33,13 +33,15 @@ public class CharacterSpan extends Span
         }
         this.ch = str.charAt(0);
         this.text = cache(str, ch);
-
     }
 
     public CharacterSpan(char ch, Markup markup) {
         super(markup);
         if (ch == 0) {
             throw new IllegalArgumentException();
+        }
+        if ((Character.isHighSurrogate(ch)) || (Character.isLowSurrogate(ch))) {
+            throw new IllegalStateException();
         }
         this.ch = ch;
         this.text = cache(ch);
