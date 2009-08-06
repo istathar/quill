@@ -12,6 +12,7 @@
 package quill.textbase;
 
 import org.gnome.gtk.TextBuffer;
+import org.gnome.gtk.TextIter;
 
 import quill.ui.GraphicalTestCase;
 
@@ -82,6 +83,28 @@ public class ValidateUnicode extends GraphicalTestCase
 
         assertEquals('3', str.charAt(3));
         assertEquals('3', str.codePointAt(3));
+    }
+
+    private int length;
+
+    /*
+     * Test that we're actually getting a UTF-16 encoded character like we
+     * thing we are.
+     */
+    public final void testBufferCharacters() {
+        final TextBuffer buffer;
+
+        buffer = new TextBuffer();
+        length = 0;
+
+        buffer.connect(new TextBuffer.InsertText() {
+            public void onInsertText(TextBuffer source, TextIter pointer, String text) {
+                length = text.length();
+            }
+        });
+
+        buffer.insertAtCursor("𝑛");
+        assertEquals(2, length);
     }
 
     public final void testOffsetCorrosion() {
