@@ -26,7 +26,6 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.WrapMode;
 
 import quill.textbase.Change;
-import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
 import quill.textbase.DeleteTextualChange;
 import quill.textbase.Extract;
@@ -38,7 +37,6 @@ import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 import quill.textbase.Span;
 import quill.textbase.SplitStructuralChange;
-import quill.textbase.StringSpan;
 import quill.textbase.StructuralChange;
 import quill.textbase.TextChain;
 import quill.textbase.TextualChange;
@@ -134,11 +132,7 @@ abstract class EditorTextView extends TextView
                     return;
                 }
 
-                if (text.length() == 1) {
-                    span = new CharacterSpan(text, insertMarkup);
-                } else {
-                    span = new StringSpan(text, insertMarkup);
-                }
+                span = new Span(text, insertMarkup);
 
                 change = new InsertTextualChange(chain, pointer.getOffset(), span);
                 ui.apply(change);

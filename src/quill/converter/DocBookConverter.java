@@ -36,7 +36,6 @@ import quill.docbook.Section;
 import quill.docbook.Structure;
 import quill.docbook.Title;
 import quill.docbook.Type;
-import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
@@ -48,7 +47,6 @@ import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Span;
-import quill.textbase.StringSpan;
 import quill.textbase.TextChain;
 
 /**
@@ -170,15 +168,9 @@ public class DocBookConverter
                 previous = markup;
             }
 
-            if (span instanceof CharacterSpan) {
-                ch = span.getChar();
-                process(ch);
-            } else if (span instanceof StringSpan) {
-                str = span.getText();
-                len = str.length();
-                for (j = 0; j < len; j++) {
-                    process(str.charAt(j));
-                }
+            len = span.getWidth();
+            for (j = 0; j < len; j++) {
+                process(span.getChar(j));
             }
         }
 

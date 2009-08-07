@@ -84,11 +84,7 @@ public class Extract
         str = new StringBuilder();
 
         for (i = 0; i < range.length; i++) {
-            if (range[i] instanceof CharacterSpan) {
-                str.append(range[i].getChar());
-            } else {
-                str.append(range[i].getText());
-            }
+            str.append(range[i].getText());
         }
 
         return str.toString();

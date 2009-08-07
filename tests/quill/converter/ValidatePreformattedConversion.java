@@ -16,7 +16,6 @@ import java.io.IOException;
 import junit.framework.TestCase;
 import quill.docbook.Book;
 import quill.textbase.Change;
-import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
 import quill.textbase.DataLayer;
 import quill.textbase.InsertTextualChange;
@@ -24,7 +23,6 @@ import quill.textbase.NormalSegment;
 import quill.textbase.Preformat;
 import quill.textbase.Segment;
 import quill.textbase.Span;
-import quill.textbase.StringSpan;
 import quill.textbase.TextChain;
 
 /**
@@ -68,18 +66,18 @@ public class ValidatePreformattedConversion extends TestCase
          */
 
         spans = new Span[] {
-                new StringSpan(
+                new Span(
                         "Consider the following simple and yet profound expression of quality program code:\n",
                         null),
-                new StringSpan("public class Hello {\u2028", Preformat.NORMAL),
-                new StringSpan("    public static void main(String[] args) {\u2028", Preformat.NORMAL),
-                new StringSpan("        System.out.println(\"Hello World\");\u2028", Preformat.NORMAL),
-                new StringSpan("    }\u2028", Preformat.NORMAL),
-                new StringSpan("}", Preformat.NORMAL),
-                new CharacterSpan('\n', null),
-                new StringSpan("There really isn't anything like saying ", null),
-                new StringSpan("Hello World", Common.ITALICS),
-                new StringSpan(" to a nice friendly programmer.", null),
+                new Span("public class Hello {\u2028", Preformat.NORMAL),
+                new Span("    public static void main(String[] args) {\u2028", Preformat.NORMAL),
+                new Span("        System.out.println(\"Hello World\");\u2028", Preformat.NORMAL),
+                new Span("    }\u2028", Preformat.NORMAL),
+                new Span("}", Preformat.NORMAL),
+                new Span('\n', null),
+                new Span("There really isn't anything like saying ", null),
+                new Span("Hello World", Common.ITALICS),
+                new Span(" to a nice friendly programmer.", null),
         };
 
         data = new DataLayer();

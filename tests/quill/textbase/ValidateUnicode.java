@@ -107,6 +107,23 @@ public class ValidateUnicode extends GraphicalTestCase
         assertEquals(2, length);
     }
 
+    public final void testUnicodeSpan() {
+        final String str;
+        final Span span;
+
+        str = "Cru𝑛ch";
+
+        span = new Span(str, null);
+
+        assertEquals(6, span.getWidth());
+        assertEquals('C', span.getChar(0));
+        assertEquals('r', span.getChar(1));
+        assertEquals('u', span.getChar(2));
+        assertEquals(0x1d45b, span.getChar(3));
+        assertEquals('c', span.getChar(4));
+        assertEquals('h', span.getChar(5));
+    }
+
     public final void testOffsetCorrosion() {
         final TextBuffer buffer;
         final TextChain chain;

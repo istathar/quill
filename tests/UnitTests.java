@@ -20,6 +20,7 @@ import quill.textbase.ValidateStructuralChange;
 import quill.textbase.ValidateText;
 import quill.textbase.ValidateUnicode;
 import quill.textbase.ValidateWrapperExpansions;
+import quill.ui.ValidateChangePropagation;
 
 import com.operationaldynamics.junit.VerboseTestRunner;
 
@@ -54,6 +55,7 @@ public class UnitTests
         suite.addTestSuite(ValidateWrapperExpansions.class);
         suite.addTestSuite(ValidateStructuralChange.class);
         suite.addTestSuite(ValidateThereAndBackAgain.class);
+        suite.addTestSuite(ValidateChangePropagation.class);
 
         return suite;
     }

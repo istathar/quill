@@ -18,7 +18,6 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.docbook.Book;
 import quill.textbase.Change;
-import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.DataLayer;
@@ -28,7 +27,6 @@ import quill.textbase.NormalSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
-import quill.textbase.StringSpan;
 import quill.textbase.TextChain;
 
 public class ValidateTextChainToDocBookConversion extends TestCase
@@ -67,7 +65,7 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         data = new DataLayer();
         chain = new TextChain();
 
-        span = new StringSpan("Hello\nWorld", null);
+        span = new Span("Hello\nWorld", null);
         change = new InsertTextualChange(chain, 0, span);
         data.apply(change);
 
@@ -135,20 +133,20 @@ public class ValidateTextChainToDocBookConversion extends TestCase
          */
 
         spans = new Span[] {
-                new StringSpan("Accessing the ", null),
-                new StringSpan("/tmp", Common.FILENAME),
-                new StringSpan(" directory directly is fine, but you are often better off using ", null),
-                new StringSpan("File", Common.TYPE),
-                new CharacterSpan('\'', null),
-                new CharacterSpan('s', null),
-                new CharacterSpan(' ', null),
-                new StringSpan("createTemp", Common.FUNCTION),
-                new CharacterSpan('F', Common.FUNCTION),
-                new CharacterSpan('i', Common.FUNCTION),
-                new CharacterSpan('l', Common.FUNCTION),
-                new CharacterSpan('e', Common.FUNCTION),
-                new StringSpan("()", Common.FUNCTION),
-                new StringSpan(" function.", null),
+                new Span("Accessing the ", null),
+                new Span("/tmp", Common.FILENAME),
+                new Span(" directory directly is fine, but you are often better off using ", null),
+                new Span("File", Common.TYPE),
+                new Span('\'', null),
+                new Span('s', null),
+                new Span(' ', null),
+                new Span("createTemp", Common.FUNCTION),
+                new Span('F', Common.FUNCTION),
+                new Span('i', Common.FUNCTION),
+                new Span('l', Common.FUNCTION),
+                new Span('e', Common.FUNCTION),
+                new Span("()", Common.FUNCTION),
+                new Span(" function.", null),
         };
 
         data = new DataLayer();
@@ -243,7 +241,7 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         data = new DataLayer();
         chain = new TextChain();
 
-        span = new StringSpan(":\ud835\udc5b:", null);
+        span = new Span(":\ud835\udc5b:", null);
         change = new InsertTextualChange(chain, 0, span);
         data.apply(change);
 

@@ -29,7 +29,6 @@ import org.gnome.pango.StyleAttribute;
 import org.gnome.pango.Weight;
 import org.gnome.pango.WeightAttribute;
 
-import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
@@ -42,7 +41,6 @@ import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
-import quill.textbase.StringSpan;
 import quill.textbase.TextChain;
 
 import static org.freedesktop.cairo.HintMetrics.OFF;
@@ -358,15 +356,11 @@ public abstract class RenderEngine
                 code = false;
             }
 
-            if (span instanceof CharacterSpan) {
-                width += translateAndAppend(buf, span.getChar(), code);
-            } else if (span instanceof StringSpan) {
-                str = span.getText();
-                len = str.length();
+            str = span.getText();
+            len = str.length();
 
-                for (j = 0; j < len; j++) {
-                    width += translateAndAppend(buf, str.charAt(j), code);
-                }
+            for (j = 0; j < len; j++) {
+                width += translateAndAppend(buf, str.charAt(j), code);
             }
 
             for (Attribute attr : attributesForMarkup(span.getMarkup())) {

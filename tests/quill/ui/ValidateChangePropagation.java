@@ -23,13 +23,11 @@ import org.gnome.gtk.TextIter;
 import org.gnome.gtk.Widget;
 
 import quill.textbase.Change;
-import quill.textbase.CharacterSpan;
 import quill.textbase.DataLayer;
 import quill.textbase.Folio;
 import quill.textbase.InsertTextualChange;
 import quill.textbase.Segment;
 import quill.textbase.Span;
-import quill.textbase.StringSpan;
 import quill.textbase.TextChain;
 
 import static quill.client.Quill.ui;
@@ -73,7 +71,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         segment = folio.get(0).get(1);
         chain = segment.getText();
-        span = new CharacterSpan('h', null);
+        span = new Span('h', null);
 
         change = new InsertTextualChange(chain, 0, span);
         ui.apply(change);
@@ -120,7 +118,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         segment = folio.get(0).get(1);
         chain = segment.getText();
-        span = new StringSpan("This is a test of the emergency broadcast system", null);
+        span = new Span("This is a test of the emergency broadcast system", null);
 
         change = new InsertTextualChange(chain, 0, span);
         ui.apply(change);
