@@ -23,8 +23,11 @@ import org.gnome.gtk.TextIter;
 import org.gnome.gtk.Widget;
 
 import quill.textbase.Change;
+import quill.textbase.Common;
 import quill.textbase.DataLayer;
+import quill.textbase.Extract;
 import quill.textbase.Folio;
+import quill.textbase.FormatTextualChange;
 import quill.textbase.InsertTextualChange;
 import quill.textbase.Segment;
 import quill.textbase.Span;
@@ -34,7 +37,6 @@ import static quill.client.Quill.ui;
 
 public class ValidateChangePropagation extends GraphicalTestCase
 {
-
     public final void testSetupBlank() throws ValidityException, ParsingException, IOException {
         final DataLayer data;
         final Folio folio1, folio2;
@@ -170,6 +172,98 @@ public class ValidateChangePropagation extends GraphicalTestCase
                 "<chapter>",
                 "<para>",
                 "This is an emergency broadcast system",
+                "</para>",
+                "</chapter>",
+                "</book>"
+        });
+        assertEquals(expected, out.toString());
+    }
+
+    public final void testFormatOnInsertion() throws ValidityException, ParsingException, IOException {
+        final DataLayer data;
+        final Folio folio;
+        final Segment segment;
+        final TextChain chain;
+        Change change;
+        Span span;
+        Extract extract;
+        OutputStream out;
+        String expected;
+        final EditorTextView editor;
+        final TextBuffer buffer;
+        final TextIter start, end;
+
+        data = new DataLayer();
+        ui = new UserInterface(data);
+
+        data.createDocument();
+        folio = data.getActiveDocument();
+        ui.displayDocument(folio);
+
+        /*
+         * Establish some starting text.
+         */
+
+        segment = folio.get(0).get(1);
+        chain = segment.getText();
+
+        span = new Span("This is a test of the emergency broadcast system", null);
+        change = new InsertTextualChange(chain, 0, span);
+        ui.apply(change);
+
+        span = new Span("emergency", null);
+        extract = TextChain.extractFor(span);
+        change = new FormatTextualChange(chain, 22, extract, Common.ITALICS);
+        ui.apply(change);
+
+        out = new ByteArrayOutputStream();
+        data.saveDocument(out);
+
+        expected = combine(new String[] {
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+                "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
+                "<chapter>",
+                "<para>",
+                "This is a test of the",
+                "<emphasis>emergency</emphasis> broadcast",
+                "system",
+                "</para>",
+                "</chapter>",
+                "</book>"
+        });
+        assertEquals(expected, out.toString());
+
+        /*
+         * Now attempt to simulate the user inserting text before. Moving the
+         * cursor first is important, as it fires off the logic that sets
+         * insertMarkup in EditorTextView.
+         */
+
+        editor = (EditorTextView) findEditor(ui.primary.getChild());
+
+        buffer = editor.getBuffer();
+        start = buffer.getIter(22);
+        assertEquals('e', start.getChar());
+
+        buffer.beginUserAction();
+        buffer.placeCursor(start);
+        buffer.endUserAction();
+
+        buffer.beginUserAction();
+        buffer.insertAtCursor("a");
+        buffer.endUserAction();
+
+        out = new ByteArrayOutputStream();
+        data.saveDocument(out);
+
+        expected = combine(new String[] {
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+                "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
+                "<chapter>",
+                "<para>",
+                "This is a test of the",
+                "a<emphasis>emergency</emphasis> broadcast",
+                "system",
                 "</para>",
                 "</chapter>",
                 "</book>"

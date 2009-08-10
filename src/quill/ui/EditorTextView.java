@@ -125,8 +125,8 @@ abstract class EditorTextView extends TextView
     private void hookupKeybindings() {
         buffer.connect(new TextBuffer.InsertText() {
             public void onInsertText(TextBuffer source, TextIter pointer, String text) {
-                Span span;
-                TextualChange change;
+                final Span span;
+                final TextualChange change;
 
                 if (!user) {
                     return;
@@ -462,7 +462,6 @@ abstract class EditorTextView extends TextView
 
                 r = textual.getAdded();
                 if (r != null) {
-                    r = textual.getAdded();
                     for (i = 0; i < r.size(); i++) {
                         s = r.get(i);
                         buffer.insert(start, s.getText(), tagForMarkup(s.getMarkup()));
