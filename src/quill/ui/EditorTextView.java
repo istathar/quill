@@ -31,9 +31,11 @@ import quill.textbase.DeleteTextualChange;
 import quill.textbase.Extract;
 import quill.textbase.FormatTextualChange;
 import quill.textbase.FullTextualChange;
+import quill.textbase.HeadingSegment;
 import quill.textbase.InsertTextualChange;
 import quill.textbase.Markup;
 import quill.textbase.PreformatSegment;
+import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Span;
 import quill.textbase.SplitStructuralChange;
@@ -657,8 +659,10 @@ abstract class EditorTextView extends TextView
                 offset = pointer.getOffset();
 
                 insertOffset = offset;
-
-                insertMarkup = chain.getMarkupAt(offset - 1);
+                if (offset != 0) {
+                    offset--;
+                }
+                insertMarkup = chain.getMarkupAt(offset);
 
                 rect = view.getLocation(pointer);
                 alloc = view.getAllocation();
@@ -740,22 +744,33 @@ abstract class EditorTextView extends TextView
     }
 
     private void setupInsertMenu() {
-        final MenuItem para, pre, sect;
+        final MenuItem norm, pre, block, sect;
 
         split = new Menu();
 
-        para = new MenuItem("Normal _paragraph block");
-        para.setSensitive(false);
+        norm = new MenuItem("Normal _paragraphs");
+        norm.setSensitive(false);
         pre = new MenuItem("Preformatted _code block", new MenuItem.Activate() {
             public void onActivate(MenuItem source) {
                 handleInsertSegment(new PreformatSegment());
             }
         });
-        sect = new MenuItem("Section _heading");
+        block = new MenuItem("Block _quote", new MenuItem.Activate() {
+            public void onActivate(MenuItem source) {
+                handleInsertSegment(new QuoteSegment());
+            }
+        });
 
-        split.append(para);
+        sect = new MenuItem("Section _heading", new MenuItem.Activate() {
+            public void onActivate(MenuItem source) {
+                handleInsertSegment(new HeadingSegment());
+            }
+        });
+
+        split.append(norm);
         split.append(pre);
         split.append(sect);
+        split.append(block);
 
         split.showAll();
     }
