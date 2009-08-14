@@ -191,7 +191,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         String expected;
         final EditorTextView editor;
         final TextBuffer buffer;
-        final TextIter start, end;
+        TextIter start;
 
         data = new DataLayer();
         ui = new UserInterface(data);
@@ -269,6 +269,39 @@ public class ValidateChangePropagation extends GraphicalTestCase
                 "</book>"
         });
         assertEquals(expected, out.toString());
+
+        /*
+         * And now, the other side.
+         */
+
+        start = buffer.getIter(32);
+        assertEquals(' ', start.getChar());
+
+        buffer.beginUserAction();
+        buffer.placeCursor(start);
+        buffer.endUserAction();
+
+        buffer.beginUserAction();
+        buffer.insertAtCursor("a");
+        buffer.endUserAction();
+
+        out = new ByteArrayOutputStream();
+        data.saveDocument(out);
+
+        expected = combine(new String[] {
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+                "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
+                "<chapter>",
+                "<para>",
+                "This is a test of the",
+                "a<emphasis>emergencya</emphasis> broadcast",
+                "system",
+                "</para>",
+                "</chapter>",
+                "</book>"
+        });
+        assertEquals(expected, out.toString());
+
     }
 
     // recursive

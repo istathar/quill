@@ -122,19 +122,26 @@ abstract class EditorTextView extends TextView
         return true;
     }
 
+    private boolean me;
+
     private void hookupKeybindings() {
         buffer.connect(new TextBuffer.InsertText() {
             public void onInsertText(TextBuffer source, TextIter pointer, String text) {
                 final Span span;
                 final TextualChange change;
+                final int offset;
 
                 if (!user) {
                     return;
                 }
+                user = false;
+
+                buffer.stopInsertText();
 
                 span = new Span(text, insertMarkup);
+                offset = pointer.getOffset();
 
-                change = new InsertTextualChange(chain, pointer.getOffset(), span);
+                change = new InsertTextualChange(chain, offset, span);
                 ui.apply(change);
             }
         });
@@ -148,6 +155,9 @@ abstract class EditorTextView extends TextView
                 if (!user) {
                     return;
                 }
+                user = false;
+
+                buffer.stopDeleteRange();
 
                 alpha = start.getOffset();
                 omega = end.getOffset();
@@ -157,7 +167,6 @@ abstract class EditorTextView extends TextView
 
                 range = chain.extractRange(offset, width);
                 change = new DeleteTextualChange(chain, offset, range);
-
                 ui.apply(change);
             }
         });
@@ -167,6 +176,8 @@ abstract class EditorTextView extends TextView
                 user = true;
             }
         });
+
+        // this may be unnecessary
         buffer.connect(new TextBuffer.EndUserAction() {
             public void onEndUserAction(TextBuffer source) {
                 user = false;
@@ -427,16 +438,8 @@ abstract class EditorTextView extends TextView
      */
     void affect(Change change) {
         final StructuralChange structural;
-        final TextualChange textual;
         TextIter start, end;
-        Extract r;
-        int i, offset;
-        Span s;
-        TextTag tag;
-
-        if (user) {
-            return;
-        }
+        int offset;
 
         if (change instanceof StructuralChange) {
             structural = (StructuralChange) change;
@@ -446,56 +449,76 @@ abstract class EditorTextView extends TextView
             end = buffer.getIterEnd();
             buffer.delete(start, end);
 
+        } else if (change instanceof FormatTextualChange) {
+            imposeFormatting((TextualChange) change);
         } else if (change instanceof TextualChange) {
-            textual = (TextualChange) change;
+            imposeInsertion((TextualChange) change);
+        } else {
+            throw new IllegalStateException("Unknown Change type");
+        }
+    }
 
-            start = buffer.getIter(textual.getOffset());
+    private void imposeInsertion(TextualChange change) {
+        TextIter start, end;
+        Extract r;
+        int i;
+        Span s;
 
-            if ((textual instanceof InsertTextualChange) || (textual instanceof DeleteTextualChange)
-                    || (textual instanceof FullTextualChange)) {
-                r = textual.getRemoved();
-                if (r != null) {
-                    end = buffer.getIter(textual.getOffset() + r.getWidth());
-                    buffer.delete(start, end);
-                    start = end;
-                }
+        start = buffer.getIter(change.getOffset());
 
-                r = textual.getAdded();
-                if (r != null) {
-                    for (i = 0; i < r.size(); i++) {
-                        s = r.get(i);
-                        buffer.insert(start, s.getText(), tagForMarkup(s.getMarkup()));
-                    }
-                }
-            } else if (textual instanceof FormatTextualChange) {
-                r = textual.getAdded();
-                offset = textual.getOffset();
+        r = change.getRemoved();
+        if (r != null) {
+            end = buffer.getIter(change.getOffset() + r.getWidth());
+            buffer.delete(start, end);
+            start = end;
+        }
 
-                for (i = 0; i < r.size(); i++) {
-                    s = r.get(i);
-
-                    start = buffer.getIter(offset);
-                    offset += s.getWidth();
-                    end = buffer.getIter(offset);
-
-                    /*
-                     * FUTURE this is horribly inefficient compared to just
-                     * adding or removing the tag that has changed. But it is
-                     * undeniably easy to express. To do this properly we'll
-                     * have to get the individual Markup and whether it was
-                     * added or removed from the FormatChange.
-                     * 
-                     * FIXME this clears the error underlining from GtkSpell!
-                     */
-
-                    buffer.removeAllTags(start, end);
-                    tag = tagForMarkup(s.getMarkup());
-                    if (tag == null) {
-                        continue;
-                    }
-                    buffer.applyTag(tag, start, end);
-                }
+        r = change.getAdded();
+        if (r != null) {
+            for (i = 0; i < r.size(); i++) {
+                s = r.get(i);
+                buffer.insert(start, s.getText(), tagForMarkup(s.getMarkup()));
             }
+        }
+    }
+
+    private void imposeFormatting(TextualChange change) {
+        TextIter start, end;
+        Extract r;
+        int i, offset;
+        Span s;
+        TextTag tag;
+
+        r = change.getAdded();
+        if (r == null) {
+            return;
+        }
+
+        offset = change.getOffset();
+
+        for (i = 0; i < r.size(); i++) {
+            s = r.get(i);
+
+            start = buffer.getIter(offset);
+            offset += s.getWidth();
+            end = buffer.getIter(offset);
+
+            /*
+             * FUTURE this is horribly inefficient compared to just adding or
+             * removing the tag that has changed. But it is undeniably easy to
+             * express. To do this properly we'll have to get the individual
+             * Markup and whether it was added or removed from the
+             * FormatChange.
+             * 
+             * FIXME this clears the error underlining from GtkSpell!
+             */
+
+            buffer.removeAllTags(start, end);
+            tag = tagForMarkup(s.getMarkup());
+            if (tag == null) {
+                continue;
+            }
+            buffer.applyTag(tag, start, end);
         }
     }
 
@@ -637,7 +660,7 @@ abstract class EditorTextView extends TextView
 
                 insertOffset = offset;
 
-                insertMarkup = chain.getMarkupAt(offset);
+                insertMarkup = chain.getMarkupAt(offset - 1);
 
                 rect = view.getLocation(pointer);
                 alloc = view.getAllocation();
