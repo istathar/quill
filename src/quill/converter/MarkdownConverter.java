@@ -42,7 +42,7 @@ public class MarkdownConverter
     public static String extractToFile(TextBuffer buffer) {
         StringBuilder str;
         TextIter pointer;
-        char ch;
+        int ch;
 
         str = new StringBuilder();
 
@@ -107,7 +107,7 @@ public class MarkdownConverter
                 while (pointer.forwardChar()) {
                     if (pointer.hasTag(hidden)) {
                         ch = pointer.getChar();
-                        str.append(ch);
+                        str.appendCodePoint(ch);
                     } else {
                         break;
                     }
@@ -116,7 +116,7 @@ public class MarkdownConverter
                 str.append(')');
                 continue;
             } else {
-                str.append(ch);
+                str.appendCodePoint(ch);
             }
 
             pointer.forwardChar();
