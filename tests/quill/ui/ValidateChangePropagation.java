@@ -105,7 +105,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         String expected;
         final EditorTextView editor;
         final TextBuffer buffer;
-        final TextIter start, end;
+        TextIter start, end;
 
         data = new DataLayer();
         ui = new UserInterface(data);
@@ -160,6 +160,12 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         buffer.beginUserAction();
         buffer.delete(start, end);
+
+        /*
+         * Have to revalidate the TextIter. Hm. This may be a bug in our
+         * blocking logic. At the very least it's an inelegance.
+         */
+        start = buffer.getIter(9);
         buffer.insert(start, "n");
         buffer.endUserAction();
 

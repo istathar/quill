@@ -122,8 +122,6 @@ abstract class EditorTextView extends TextView
         return true;
     }
 
-    private boolean me;
-
     private void hookupKeybindings() {
         buffer.connect(new TextBuffer.InsertText() {
             public void onInsertText(TextBuffer source, TextIter pointer, String text) {
@@ -143,6 +141,8 @@ abstract class EditorTextView extends TextView
 
                 change = new InsertTextualChange(chain, offset, span);
                 ui.apply(change);
+
+                user = true;
             }
         });
 
@@ -168,6 +168,8 @@ abstract class EditorTextView extends TextView
                 range = chain.extractRange(offset, width);
                 change = new DeleteTextualChange(chain, offset, range);
                 ui.apply(change);
+
+                user = true;
             }
         });
 
@@ -450,15 +452,15 @@ abstract class EditorTextView extends TextView
             buffer.delete(start, end);
 
         } else if (change instanceof FormatTextualChange) {
-            imposeFormatting((TextualChange) change);
+            imposeFormatChange((TextualChange) change);
         } else if (change instanceof TextualChange) {
-            imposeInsertion((TextualChange) change);
+            imposeTextualChange((TextualChange) change);
         } else {
             throw new IllegalStateException("Unknown Change type");
         }
     }
 
-    private void imposeInsertion(TextualChange change) {
+    private void imposeTextualChange(TextualChange change) {
         TextIter start, end;
         Extract r;
         int i;
@@ -482,7 +484,7 @@ abstract class EditorTextView extends TextView
         }
     }
 
-    private void imposeFormatting(TextualChange change) {
+    private void imposeFormatChange(TextualChange change) {
         TextIter start, end;
         Extract r;
         int i, offset;
@@ -533,10 +535,6 @@ abstract class EditorTextView extends TextView
         Extract r;
         int i;
         Span s;
-
-        if (user) {
-            return;
-        }
 
         if (obj instanceof StructuralChange) {
             structural = (StructuralChange) obj;
