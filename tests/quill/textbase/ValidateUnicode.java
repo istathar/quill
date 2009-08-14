@@ -11,7 +11,10 @@
 
 package quill.textbase;
 
-import junit.framework.TestCase;
+import org.gnome.gtk.TextBuffer;
+import org.gnome.gtk.TextIter;
+
+import quill.ui.GraphicalTestCase;
 
 /**
  * Make sure textbase properly handles 2- and 3-byte characters.
@@ -25,7 +28,7 @@ import junit.framework.TestCase;
  * character, Bad Things™ happen. Presumably Eclipse's editor is making the
  * assumption that String.length() == number of displayed characters.
  */
-public class ValidateUnicode extends TestCase
+public class ValidateUnicode extends GraphicalTestCase
 {
     public final void testLatin1Supplement() {
         final TextChain chain;
@@ -68,17 +71,74 @@ public class ValidateUnicode extends TestCase
         assertEquals(0x1d45b, str.codePointAt(1));
         assertTrue(Character.isLetter(0x1d45b));
         assertEquals(Character.LOWERCASE_LETTER, Character.getType(0x1d45b));
+        assertTrue(Character.isHighSurrogate('\ud835'));
 
         /*
-         * Now the freaky code unit stuff
+         * Now the freaky stuff
          */
-
-        assertTrue(Character.isHighSurrogate('\ud835'));
-        assertTrue(!Character.isHighSurrogate('\udc5b'));
         assertEquals('\udc5b', str.charAt(2));
-        // assertEquals(???, str.codePointAt(2));
+        assertTrue(!Character.isHighSurrogate('\udc5b'));
+        assertTrue(Character.isLowSurrogate('\udc5b'));
+        assertEquals(0xdc5b, str.codePointAt(2));
 
         assertEquals('3', str.charAt(3));
         assertEquals('3', str.codePointAt(3));
+    }
+
+    private int length;
+
+    /*
+     * Test that we're actually getting a UTF-16 encoded character like we
+     * thing we are.
+     */
+    public final void testBufferCharacters() {
+        final TextBuffer buffer;
+
+        buffer = new TextBuffer();
+        length = 0;
+
+        buffer.connect(new TextBuffer.InsertText() {
+            public void onInsertText(TextBuffer source, TextIter pointer, String text) {
+                length = text.length();
+            }
+        });
+
+        buffer.insertAtCursor("𝑛");
+        assertEquals(2, length);
+    }
+
+    public final void testUnicodeSpan() {
+        final String str;
+        final Span span;
+
+        str = "Cru𝑛ch";
+
+        span = new Span(str, null);
+
+        assertEquals(6, span.getWidth());
+        assertEquals('C', span.getChar(0));
+        assertEquals('r', span.getChar(1));
+        assertEquals('u', span.getChar(2));
+        assertEquals(0x1d45b, span.getChar(3));
+        assertEquals('c', span.getChar(4));
+        assertEquals('h', span.getChar(5));
+    }
+
+    public final void testOffsetCorrosion() {
+        final TextBuffer buffer;
+        final TextChain chain;
+        final String str;
+
+        str = "Cru𝑛ch";
+        assertEquals(7, str.length());
+
+        buffer = new TextBuffer();
+        buffer.setText(str);
+        assertEquals(6, buffer.getCharCount());
+
+        chain = new TextChain(str);
+        assertNotSame(str, chain.toString());
+        assertEquals(str, chain.toString());
+        assertEquals(6, chain.length());
     }
 }

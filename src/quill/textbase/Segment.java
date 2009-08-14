@@ -10,7 +10,6 @@
  */
 package quill.textbase;
 
-
 /**
  * Segments are the block level grouping mechanism in textbase. Concrete
  * instances of this represent the entities we model as UI blocks each with
@@ -50,9 +49,9 @@ public abstract class Segment
         return chain;
     }
 
-    public void setText(TextChain stack) {
-        this.chain = stack;
-        stack.setEnclosingSegment(this);
+    public void setText(TextChain chain) {
+        this.chain = chain;
+        chain.setEnclosingSegment(this);
     }
 
     abstract Segment createSimilar();

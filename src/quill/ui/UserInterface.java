@@ -30,7 +30,6 @@ import quill.textbase.DataLayer;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.Span;
-import quill.textbase.StringSpan;
 
 import static quill.textbase.TextChain.extractFor;
 
@@ -124,7 +123,7 @@ public class UserInterface
                          */
                         return;
                     }
-                    span = new StringSpan(str, null);
+                    span = new Span(str, null);
                     stash = extractFor(span);
                 }
             }

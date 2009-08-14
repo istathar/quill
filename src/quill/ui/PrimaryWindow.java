@@ -285,5 +285,4 @@ class PrimaryWindow extends Window
     void reverse(Change change) {
         editor.reverse(change);
     }
-
 }

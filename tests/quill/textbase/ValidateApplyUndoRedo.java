@@ -33,7 +33,7 @@ public class ValidateApplyUndoRedo extends TestCase
         stack = new ChangeStack();
         chain = new TextChain();
 
-        change = new InsertTextualChange(chain, 0, new Extract(new StringSpan("Hello World", null)));
+        change = new InsertTextualChange(chain, 0, new Extract(new Span("Hello World", null)));
         stack.apply(change);
         assertEquals("Hello World", chain.toString());
 
@@ -77,7 +77,7 @@ public class ValidateApplyUndoRedo extends TestCase
 
         stack.redo();
         change = new InsertTextualChange(chain, 5, new Extract(new Span[] {
-            new StringSpan(" Santa Claus", null),
+            new Span(" Santa Claus", null),
         }));
         stack.apply(change);
         assertEquals("Hello Santa Claus", chain.toString());

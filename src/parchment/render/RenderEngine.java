@@ -29,7 +29,6 @@ import org.gnome.pango.StyleAttribute;
 import org.gnome.pango.Weight;
 import org.gnome.pango.WeightAttribute;
 
-import quill.textbase.CharacterSpan;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
@@ -42,7 +41,6 @@ import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
-import quill.textbase.StringSpan;
 import quill.textbase.TextChain;
 
 import static org.freedesktop.cairo.HintMetrics.OFF;
@@ -222,14 +220,15 @@ public abstract class RenderEngine
         drawAreaText(cr, entire, monoFace, true);
     }
 
-    private char previous;
+    // character
+    private int previous;
 
     /**
      * Carry out smart typography replacements. Returns the number of
      * characters actually added, since some cases insert Unicode control
      * sequences.
      */
-    private int translateAndAppend(final StringBuilder buf, final char ch, final boolean code) {
+    private int translateAndAppend(final StringBuilder buf, final int ch, final boolean code) {
         int num, i;
 
         num = 0;
@@ -251,7 +250,7 @@ public abstract class RenderEngine
              * code blocks, it's U+00A0. Anyway, now add the character.
              */
 
-            buf.append(ch);
+            buf.appendCodePoint(ch);
             num++;
         } else if (ch == '"') {
             /*
@@ -291,7 +290,7 @@ public abstract class RenderEngine
              * Normal character. Just add it.
              */
 
-            buf.append(ch);
+            buf.appendCodePoint(ch);
             num++;
         }
 
@@ -357,15 +356,11 @@ public abstract class RenderEngine
                 code = false;
             }
 
-            if (span instanceof CharacterSpan) {
-                width += translateAndAppend(buf, span.getChar(), code);
-            } else if (span instanceof StringSpan) {
-                str = span.getText();
-                len = str.length();
+            str = span.getText();
+            len = str.length();
 
-                for (j = 0; j < len; j++) {
-                    width += translateAndAppend(buf, str.charAt(j), code);
-                }
+            for (j = 0; j < len; j++) {
+                width += translateAndAppend(buf, str.charAt(j), code);
             }
 
             for (Attribute attr : attributesForMarkup(span.getMarkup())) {

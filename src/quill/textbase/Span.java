@@ -24,7 +24,7 @@ package quill.textbase;
  * @author Andrew Cowie
  * @author Devdas Bhagat
  */
-public abstract class Span
+public class Span
 {
     /**
      * The formatting applicable on this span. Will be null for the common
@@ -32,49 +32,182 @@ public abstract class Span
      */
     private final Markup markup;
 
-    protected Span(Markup markup) {
+    /**
+     * Cached copy of the String this Span came from.
+     */
+    private final String data;
+
+    /**
+     * Because Strings can contain Unicode surrogate pairs, we also need the
+     * backing data in code point form.
+     */
+    final int[] points;
+
+    /**
+     * width must be the number of code points, but this is only called from
+     * Span.
+     */
+    public Span(String str, Markup markup) {
+        final int len, width;
+        int i, j;
+        char ch;
+
+        len = str.length();
+
+        width = str.codePointCount(0, len);
+
+        this.points = new int[width];
+
+        j = 0;
+        for (i = 0; i < len; i++) {
+            ch = str.charAt(i);
+
+            if (Character.isHighSurrogate(ch)) {
+                this.points[j] = str.codePointAt(i);
+                i++;
+            } else if (Character.isLowSurrogate(ch)) {
+                throw new IllegalStateException();
+            } else {
+                this.points[j] = ch;
+            }
+            j++;
+        }
+
+        this.data = str;
         this.markup = markup;
+    }
+
+    public Span(char ch, Markup markup) {
+        if ((Character.isHighSurrogate(ch)) || (Character.isLowSurrogate(ch))) {
+            throw new IllegalArgumentException();
+        }
+
+        this.data = cache(ch);
+        this.points = new int[1];
+        this.points[0] = ch;
+        this.markup = markup;
+    }
+
+    /*
+     * This can be tuned, obviously.
+     */
+
+    private static String[] cache;
+
+    static {
+        cache = new String[256];
+    }
+
+    /**
+     * Implement the same caching approach as is used in places like
+     * Integer.valueOf() for low range common characters. In the case of
+     * higher range numbers, we turn to the JVM's interning infrastructure for
+     * Strings.
+     */
+    private static String cache(char ch) {
+        if (ch < 256) {
+            if (cache[ch] == null) {
+                cache[ch] = String.valueOf(ch);
+            }
+            return cache[ch];
+        } else {
+            return String.valueOf(ch).intern();
+        }
     }
 
     /**
      * Create a copy of this Span but with different Markup applying to it.
      */
-    protected abstract Span copy(Markup markup);
+    private Span(String data, int[] points, Markup markup) {
+        this.data = data;
+        this.points = points;
+        this.markup = markup;
+    }
+
+    Span copy(Markup markup) {
+        return new Span(this.data, this.points, markup);
+    }
 
     /**
-     * Get the char this Span represents, if it is only one character wide.
-     * Will return 0x0 if the Span is wider than a single character.
+     * Get the character this Span represents, if it is only one character
+     * wide. Position is from 0 to width.
      */
-    public abstract char getChar();
+    public int getChar(int position) {
+        return this.points[position];
+    }
 
     /**
      * Get the text behind this Span for representation in the GUI. Since many
-     * spans are only one character wide, use {@link #getChar()} directly if
-     * building up Strings to pass populate Element bodies.
+     * spans are only one character wide, use {@link #getChar(int) getChar()}
+     * directly if building up Strings to pass populate Element bodies.
      */
-    public abstract String getText();
+    public String getText() {
+        return this.data;
+    }
 
-    public abstract int getWidth();
+    /**
+     * Get the number of <b>characters</b> in this span.
+     */
+    public int getWidth() {
+        return this.points.length;
+    }
 
     public Markup getMarkup() {
-        return markup;
+        return this.markup;
     }
 
     Span applyMarkup(Markup format) {
         if (format == markup) {
             return this;
         } else {
-            return this.copy(format);
+            return new Span(this.data, this.points, format);
         }
     }
 
     // TODO combine or revove!
     Span removeMarkup(Markup format) {
-        if (format == markup) {
-            return this.copy(null);
+        if (format == this.markup) {
+            return new Span(this.data, this.points, null);
         } else {
             return this;
         }
+    }
+
+    /**
+     * Create a new String by taking a subset of the existing one.
+     * <code>begin</code> and <code>end</code> are character offsets.
+     */
+    Span split(int begin, int end) {
+        final int[] subset;
+        final int width;
+        final StringBuilder str;
+        int i;
+
+        width = end - begin;
+        subset = new int[width];
+
+        System.arraycopy(this.points, begin, subset, 0, width);
+
+        /*
+         * We're not done, however: we need to create a new Java String to be
+         * cached by the Span. I wonder if this will be a hot spot, but I'm
+         * not sure what a better approach will be.
+         */
+
+        str = new StringBuilder();
+
+        for (i = 0; i < subset.length; i++) {
+            str.appendCodePoint(subset[i]);
+        }
+
+        return new Span(str.toString(), subset, this.markup);
+    }
+
+    /**
+     * Get a new Span from <code>begin</code> to end.
+     */
+    Span split(int begin) {
+        return this.split(begin, this.points.length);
     }
 
     /**
@@ -89,11 +222,11 @@ public abstract class Span
         str.append(getText());
         str.append('"');
 
-        if (markup == null) {
+        if (this.markup == null) {
             str.append(", paragraph");
         } else {
             str.append(", ");
-            str.append(markup.toString());
+            str.append(this.markup.toString());
         }
 
         return str.toString();

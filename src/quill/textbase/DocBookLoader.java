@@ -175,7 +175,7 @@ public class DocBookLoader
             start = true;
             preserve = false;
             if (segment instanceof NormalSegment) {
-                chain.append(new CharacterSpan('\n', null));
+                chain.append(new Span('\n', null));
             } else {
                 setSegment(new NormalSegment());
             }
@@ -197,7 +197,7 @@ public class DocBookLoader
             blocks = ((Blockquote) block).getBlocks(); // yuk
             processBody(blocks[0]); // hm
             for (i = 1; i < blocks.length; i++) {
-                chain.append(new CharacterSpan('\n', null));
+                chain.append(new Span('\n', null));
 
                 start = true;
                 processBody(blocks[i]);
@@ -313,7 +313,7 @@ public class DocBookLoader
             text = text.substring(1);
             len--;
         } else if (space) {
-            chain.append(new CharacterSpan(' ', null));
+            chain.append(new Span(' ', null));
         }
 
         /*
@@ -344,7 +344,7 @@ public class DocBookLoader
             str = trim.replace('\n', ' ');
         }
 
-        chain.append(new StringSpan(str, markup));
+        chain.append(new Span(str, markup));
 
         /*
          * And, having processed the inline, reset to normal.

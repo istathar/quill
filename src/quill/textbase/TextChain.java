@@ -26,7 +26,7 @@ public class TextChain
 
     TextChain(String str) {
         first = new Piece();
-        first.span = new StringSpan(str, null);
+        first.span = new Span(str, null);
     }
 
     TextChain(Span initial) {
@@ -63,11 +63,7 @@ public class TextChain
         piece = first;
 
         while (piece != null) {
-            if (piece.span instanceof CharacterSpan) {
-                str.append(piece.span.getChar());
-            } else {
-                str.append(piece.span.getText());
-            }
+            str.append(piece.span.getText());
             piece = piece.next;
         }
 
@@ -112,7 +108,7 @@ public class TextChain
      * Insert the given Java String at the specified offset.
      */
     protected void insert(int offset, String what) {
-        insert(offset, new StringSpan(what, null));
+        insert(offset, new Span(what, null));
     }
 
     /**
@@ -200,16 +196,8 @@ public class TextChain
          * this gives us newlines isolated in their own CharacterSpans.
          */
 
-        if (point == 1) {
-            before = new CharacterSpan(from.span.getText().charAt(0), from.span.getMarkup());
-        } else {
-            before = new StringSpan(from.span, 0, point);
-        }
-        if (from.span.getWidth() - point == 1) {
-            after = new CharacterSpan(from.span.getText().charAt(point), from.span.getMarkup());
-        } else {
-            after = new StringSpan(from.span, point);
-        }
+        before = from.span.split(0, point);
+        after = from.span.split(point);
 
         /*
          * and wrap Pieces around them.
@@ -704,9 +692,7 @@ public class TextChain
 
         /*
          * First work out how many lines are in this Text as it stands right
-         * now. And, since we need paragraph breaks to be isolated into
-         * individual CharacterSpans, which we achieve between logic here and
-         * splitAt() making width one spans CharacterSpans.
+         * now.
          */
 
         num = 1;
@@ -715,23 +701,16 @@ public class TextChain
         while (p != null) {
             s = p.span;
 
-            if (s instanceof CharacterSpan) {
-                if (s.getChar() == '\n') {
-                    num++;
-                }
-            } else if (s instanceof StringSpan) {
-                delta = s.getText().indexOf('\n');
-                if (delta == 0) {
-                    p = splitAt(p, 1);
-                    num++;
-                } else if (delta > 0) {
-                    p = splitAt(p, delta);
-                    p = p.next;
-                    p = splitAt(p, 1);
-                    num++;
-                }
+            delta = s.getText().indexOf('\n'); // FIXME WRONG
+            if (delta == 0) {
+                p = splitAt(p, 1);
+                num++;
+            } else if (delta > 0) {
+                p = splitAt(p, delta);
+                p = p.next;
+                p = splitAt(p, 1);
+                num++;
             }
-
             p = p.next;
         }
 
@@ -751,7 +730,7 @@ public class TextChain
         while (p != null) {
             s = p.span;
 
-            if (s.getChar() == '\n') {
+            if (s.getChar(0) == '\n') { // FIXME use of 0
                 if (alpha == p) {
                     /*
                      * blank paragraph
@@ -771,7 +750,7 @@ public class TextChain
 
             p = p.next;
         }
-        if (s.getChar() == '\n') {
+        if (s.getChar(0) == '\n') {
             result[i] = new Extract();
         } else {
             result[i] = new Extract(formArray(alpha, omega));
