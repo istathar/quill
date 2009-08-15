@@ -34,6 +34,7 @@ import quill.textbase.FullTextualChange;
 import quill.textbase.HeadingSegment;
 import quill.textbase.InsertTextualChange;
 import quill.textbase.Markup;
+import quill.textbase.NormalSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
@@ -76,7 +77,6 @@ abstract class EditorTextView extends TextView
         this.segment = segment;
 
         setupTextView();
-        setupInsertMenu();
         setupContextMenu();
 
         displaySegment();
@@ -223,7 +223,7 @@ abstract class EditorTextView extends TextView
                 }
 
                 if (key == Keyval.Insert) {
-                    split.popup();
+                    popupInsertMenu();
                     return true;
                 }
 
@@ -743,29 +743,50 @@ abstract class EditorTextView extends TextView
         }
     }
 
-    private void setupInsertMenu() {
+    /*
+     * This is a bit hideous.
+     */
+    private void popupInsertMenu() {
+        final Menu split;
         final MenuItem norm, pre, block, sect;
 
         split = new Menu();
 
-        norm = new MenuItem("Normal _paragraphs");
-        norm.setSensitive(false);
+        norm = new MenuItem("Normal _paragraphs", new MenuItem.Activate() {
+            public void onActivate(MenuItem source) {
+                handleInsertSegment(new NormalSegment());
+            }
+        });
+        if (segment instanceof NormalSegment) {
+            norm.setSensitive(false);
+        }
+
         pre = new MenuItem("Preformatted _code block", new MenuItem.Activate() {
             public void onActivate(MenuItem source) {
                 handleInsertSegment(new PreformatSegment());
             }
         });
+        if (segment instanceof PreformatSegment) {
+            pre.setSensitive(false);
+        }
+
         block = new MenuItem("Block _quote", new MenuItem.Activate() {
             public void onActivate(MenuItem source) {
                 handleInsertSegment(new QuoteSegment());
             }
         });
+        if (segment instanceof QuoteSegment) {
+            block.setSensitive(false);
+        }
 
         sect = new MenuItem("Section _heading", new MenuItem.Activate() {
             public void onActivate(MenuItem source) {
                 handleInsertSegment(new HeadingSegment());
             }
         });
+        if (segment instanceof HeadingSegment) {
+            sect.setSensitive(false);
+        }
 
         split.append(norm);
         split.append(pre);
@@ -773,6 +794,8 @@ abstract class EditorTextView extends TextView
         split.append(block);
 
         split.showAll();
+
+        split.popup();
     }
 
     private void setupContextMenu() {

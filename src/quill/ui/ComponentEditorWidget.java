@@ -19,12 +19,12 @@ import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
-import quill.textbase.QuoteSegment;
 import quill.textbase.Change;
 import quill.textbase.ComponentSegment;
 import quill.textbase.HeadingSegment;
 import quill.textbase.NormalSegment;
 import quill.textbase.PreformatSegment;
+import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.StructuralChange;
@@ -224,7 +224,7 @@ class ComponentEditorWidget extends ScrolledWindow
                 }
             }
             if (i == children.length) {
-                throw new IllegalArgumentException("view not in this ComponentEditorWidget");
+                throw new IllegalArgumentException("\n" + "view not in this ComponentEditorWidget");
             }
 
             /*
