@@ -51,8 +51,6 @@ abstract class EditorTextView extends TextView
 {
     protected final TextView view;
 
-    private Menu split;
-
     private TextBuffer buffer;
 
     private TextMark selectionBound, insertBound;
@@ -236,10 +234,8 @@ abstract class EditorTextView extends TextView
                     insertMarkup = null;
                     return false;
                 } else if (key == Keyval.Delete) {
-                    // deleteAt();
                     return false;
                 } else if (key == Keyval.BackSpace) {
-                    // deleteBack();
                     return false;
                 }
 
@@ -353,6 +349,11 @@ abstract class EditorTextView extends TextView
                          */
                         return true;
                     }
+                } else if (mod == ModifierType.LOCK_MASK) {
+                    /*
+                     * No keybinding needed.
+                     */
+                    return false;
                 }
 
                 /*

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gnome.gtk.Adjustment;
+import org.gnome.gtk.Container;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
@@ -184,6 +185,32 @@ class ComponentEditorWidget extends ScrolledWindow
         return result;
     }
 
+    private static boolean doesContainerHaveChild(Widget widget, Widget target) {
+        final Widget[] children;
+        Container parent;
+        int i;
+
+        if (widget instanceof Container) {
+            parent = (Container) widget;
+            children = parent.getChildren();
+        } else {
+            return false;
+        }
+
+        for (i = 0; i < children.length; i++) {
+            if (children[i] == target) {
+                return true;
+            }
+            if (children[i] instanceof Container) {
+                if (doesContainerHaveChild(children[i], target)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Given a StructuralChange, figure out what it means in terms of the UI
      * in this ComponentEditorWidget.
@@ -215,14 +242,16 @@ class ComponentEditorWidget extends ScrolledWindow
             first = structural.getInto();
             added = structural.getAdded();
 
-            children = box.getChildren();
             view = lookup(first);
 
+            children = box.getChildren();
+
             for (i = 0; i < children.length; i++) {
-                if (children[i] == view) {
+                if (doesContainerHaveChild(children[i], view)) {
                     break;
                 }
             }
+
             if (i == children.length) {
                 throw new IllegalArgumentException("\n" + "view not in this ComponentEditorWidget");
             }
