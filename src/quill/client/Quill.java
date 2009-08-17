@@ -30,6 +30,7 @@ public class Quill
     public static void main(String[] args) {
         initializeDataLayer();
         initializeUserInterface(args);
+        loadDocumentBlank();
         runUserInterface(); // blocks
     }
 
@@ -43,10 +44,21 @@ public class Quill
         ui = new UserInterface(data);
     }
 
-    static void loadDocument(String filename) throws ValidityException, ParsingException, IOException {
+    static void loadDocumentFile(String filename) throws ValidityException, ParsingException, IOException {
         final Folio folio;
 
         data.loadDocument(filename);
+        folio = data.getActiveDocument();
+        ui.displayDocument(folio);
+    }
+
+    static void loadDocumentBlank() {
+        final Folio folio;
+
+        // sets active
+        data.createDocument();
+
+        // there a cleaner way to do this?
         folio = data.getActiveDocument();
         ui.displayDocument(folio);
     }

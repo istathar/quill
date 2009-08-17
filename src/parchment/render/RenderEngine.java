@@ -106,6 +106,10 @@ public abstract class RenderEngine
      * to the constructor, or b) has been scaled to that size.
      */
     public void render(final Context cr) {
+        if (series == null) {
+            return;
+        }
+
         /*
          * An instance of this class can only do one render at a time.
          */

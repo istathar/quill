@@ -190,6 +190,10 @@ class ComponentEditorWidget extends ScrolledWindow
         Container parent;
         int i;
 
+        if (widget == target) {
+            return true;
+        }
+
         if (widget instanceof Container) {
             parent = (Container) widget;
             children = parent.getChildren();
@@ -269,10 +273,16 @@ class ComponentEditorWidget extends ScrolledWindow
 
             /*
              * Split the old one in two pieces, adding a new editor for the
-             * second piece.
+             * second piece... unless we did the split at the end of the last
+             * segment.
              */
 
             series = first.getParent();
+
+            if (i + 1 == series.size()) {
+                return;
+            }
+
             third = series.get(i + 1);
             widget = createEditorForSegment(third);
             box.packStart(widget, false, false, 0);
@@ -299,7 +309,8 @@ class ComponentEditorWidget extends ScrolledWindow
             editor.reverse(change);
 
         } else if (change instanceof StructuralChange) {
-            throw new UnsupportedOperationException("Not yet implemented"); // FIXME
+            // FIXME
+            throw new UnsupportedOperationException("\n" + "Not yet implemented");
         }
     }
 }
