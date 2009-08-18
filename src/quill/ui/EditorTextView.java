@@ -38,6 +38,7 @@ import quill.textbase.NormalSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
+import quill.textbase.Series;
 import quill.textbase.Span;
 import quill.textbase.SplitStructuralChange;
 import quill.textbase.StructuralChange;
@@ -75,6 +76,7 @@ abstract class EditorTextView extends TextView
         this.segment = segment;
 
         setupTextView();
+        setupInsertMenu();
         setupContextMenu();
 
         displaySegment();
@@ -744,57 +746,101 @@ abstract class EditorTextView extends TextView
         }
     }
 
+    private Menu split;
+
+    private Class<?>[] types;
+
+    private String[] texts;
+
+    private MenuItem createMenuItem(final String label, final Class<?> type) {
+        final MenuItem result;
+
+        result = new MenuItem(label, new MenuItem.Activate() {
+            public void onActivate(MenuItem source) {
+                try {
+                    handleInsertSegment((Segment) type.newInstance());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        return result;
+    }
+
+    /*
+     * Yes it would be "better" to write this such that the two arrays weren't
+     * coupled but instead strongly typed objects with two+ fields.
+     */
+    private void setupInsertMenu() {
+        int i;
+        MenuItem item;
+
+        split = new Menu();
+
+        types = new Class<?>[] {
+                NormalSegment.class, PreformatSegment.class, QuoteSegment.class, HeadingSegment.class
+        };
+
+        texts = new String[] {
+                "Normal _paragraphs", "Preformatted _code block", "Block _quote", "Section _heading"
+        };
+
+        for (i = 0; i < types.length; i++) {
+            item = createMenuItem(texts[i], types[i]);
+            split.append(item);
+        }
+
+        split.showAll();
+    }
+
     /*
      * This is a bit hideous.
      */
     private void popupInsertMenu() {
-        final Menu split;
-        final MenuItem norm, pre, block, sect;
+        final Widget[] children;
+        int i;
+        final Series series;
+        final int len;
+        final Segment next;
 
-        split = new Menu();
+        /*
+         * Reset
+         */
 
-        norm = new MenuItem("Normal _paragraphs", new MenuItem.Activate() {
-            public void onActivate(MenuItem source) {
-                handleInsertSegment(new NormalSegment());
+        split.setSensitive(true);
+
+        /*
+         * Turn off the type that the current Segment is
+         */
+
+        children = split.getChildren();
+
+        for (i = 0; i < types.length; i++) {
+            if (types[i].isInstance(segment)) {
+                children[i].setSensitive(false);
             }
-        });
-        if (segment instanceof NormalSegment) {
-            norm.setSensitive(false);
         }
 
-        pre = new MenuItem("Preformatted _code block", new MenuItem.Activate() {
-            public void onActivate(MenuItem source) {
-                handleInsertSegment(new PreformatSegment());
+        /*
+         * Find position of this segment in enclosing series, and then turn
+         * off the type that's already following if there is one.
+         */
+
+        series = segment.getParent();
+        i = series.indexOf(segment);
+        len = series.size();
+
+        if (i < len - 1) {
+            i++;
+            next = series.get(i);
+
+            for (i = 0; i < types.length; i++) {
+                if (types[i].isInstance(next)) {
+                    children[i].setSensitive(false);
+                }
             }
-        });
-        if (segment instanceof PreformatSegment) {
-            pre.setSensitive(false);
         }
-
-        block = new MenuItem("Block _quote", new MenuItem.Activate() {
-            public void onActivate(MenuItem source) {
-                handleInsertSegment(new QuoteSegment());
-            }
-        });
-        if (segment instanceof QuoteSegment) {
-            block.setSensitive(false);
-        }
-
-        sect = new MenuItem("Section _heading", new MenuItem.Activate() {
-            public void onActivate(MenuItem source) {
-                handleInsertSegment(new HeadingSegment());
-            }
-        });
-        if (segment instanceof HeadingSegment) {
-            sect.setSensitive(false);
-        }
-
-        split.append(norm);
-        split.append(pre);
-        split.append(sect);
-        split.append(block);
-
-        split.showAll();
 
         split.popup();
     }

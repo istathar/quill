@@ -66,4 +66,16 @@ public class Series
 
         segments = result;
     }
+
+    public int indexOf(Segment segment) {
+        int i;
+
+        for (i = 0; i < segments.length; i++) {
+            if (segment == segments[i]) {
+                return i;
+            }
+        }
+
+        throw new IllegalArgumentException("\n" + "Segment not in this Series");
+    }
 }
