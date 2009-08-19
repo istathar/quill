@@ -805,12 +805,6 @@ abstract class EditorTextView extends TextView
         final Segment next;
 
         /*
-         * Reset
-         */
-
-        split.setSensitive(true);
-
-        /*
          * Turn off the type that the current Segment is
          */
 
@@ -819,7 +813,8 @@ abstract class EditorTextView extends TextView
         for (i = 0; i < types.length; i++) {
             if (types[i].isInstance(segment)) {
                 children[i].setSensitive(false);
-                break;
+            } else {
+                children[i].setSensitive(true);
             }
         }
 
