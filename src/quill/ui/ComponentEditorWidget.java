@@ -279,6 +279,10 @@ class ComponentEditorWidget extends ScrolledWindow
 
             series = first.getParent();
 
+            if (children.length + 1 == series.size()) {
+                return;
+            }
+
             if (i + 1 == series.size()) {
                 return;
             }

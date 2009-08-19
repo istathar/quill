@@ -39,7 +39,7 @@ public class Series
     }
 
     /**
-     * Create a new Series with the given Segment inserted at position.
+     * Update the Series with the given Segment inserted at position.
      */
     void insert(int position, Segment segment) {
         final Segment[] result;

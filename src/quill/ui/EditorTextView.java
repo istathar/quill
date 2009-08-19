@@ -819,29 +819,33 @@ abstract class EditorTextView extends TextView
         for (i = 0; i < types.length; i++) {
             if (types[i].isInstance(segment)) {
                 children[i].setSensitive(false);
+                break;
             }
         }
 
         /*
-         * Find position of this segment in enclosing series, and then turn
-         * off the type that's already following if there is one.
+         * if we're at the last character of an existing Segment, then turn
+         * off the type that's already following
          */
 
-        series = segment.getParent();
-        i = series.indexOf(segment);
-        len = series.size();
+        if (insertOffset == chain.length()) {
+            series = segment.getParent();
+            i = series.indexOf(segment);
+            len = series.size();
 
-        if (i < len - 1) {
-            i++;
-            next = series.get(i);
+            if (i < len - 1) {
+                i++;
+                next = series.get(i);
 
-            for (i = 0; i < types.length; i++) {
-                if (types[i].isInstance(next)) {
-                    children[i].setSensitive(false);
+                for (i = 0; i < types.length; i++) {
+                    if (types[i].isInstance(next)) {
+                        children[i].setSensitive(false);
+                        break;
+                    }
                 }
             }
-        }
 
+        }
         split.popup();
     }
 
