@@ -34,6 +34,8 @@ public abstract class StructuralChange extends Change
         series = into.getParent();
         this.into = into;
         this.offset = offset;
+
+        added.setParent(series);
         this.added = added;
 
         for (i = 0; i < series.size(); i++) {

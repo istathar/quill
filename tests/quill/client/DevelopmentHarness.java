@@ -17,7 +17,7 @@ import nu.xom.ValidityException;
 
 import static quill.client.Quill.initializeDataLayer;
 import static quill.client.Quill.initializeUserInterface;
-import static quill.client.Quill.loadDocument;
+import static quill.client.Quill.loadDocumentFile;
 import static quill.client.Quill.runUserInterface;
 
 public class DevelopmentHarness
@@ -30,6 +30,6 @@ public class DevelopmentHarness
     }
 
     private static void loadExampleDocument() throws ValidityException, ParsingException, IOException {
-        loadDocument("tests/ExampleProgram.xml");
+        loadDocumentFile("tests/ExampleProgram.xml");
     }
 }

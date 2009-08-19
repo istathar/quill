@@ -39,7 +39,7 @@ public class Series
     }
 
     /**
-     * Create a new Series with the given Segment inserted at position.
+     * Update the Series with the given Segment inserted at position.
      */
     void insert(int position, Segment segment) {
         final Segment[] result;
@@ -65,5 +65,17 @@ public class Series
         System.arraycopy(segments, position + 1, result, position, segments.length - position - 1);
 
         segments = result;
+    }
+
+    public int indexOf(Segment segment) {
+        int i;
+
+        for (i = 0; i < segments.length; i++) {
+            if (segment == segments[i]) {
+                return i;
+            }
+        }
+
+        throw new IllegalArgumentException("\n" + "Segment not in this Series");
     }
 }

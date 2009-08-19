@@ -31,10 +31,14 @@ import quill.textbase.DeleteTextualChange;
 import quill.textbase.Extract;
 import quill.textbase.FormatTextualChange;
 import quill.textbase.FullTextualChange;
+import quill.textbase.HeadingSegment;
 import quill.textbase.InsertTextualChange;
 import quill.textbase.Markup;
+import quill.textbase.NormalSegment;
 import quill.textbase.PreformatSegment;
+import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
+import quill.textbase.Series;
 import quill.textbase.Span;
 import quill.textbase.SplitStructuralChange;
 import quill.textbase.StructuralChange;
@@ -47,8 +51,6 @@ import static quill.ui.Format.tagForMarkup;
 abstract class EditorTextView extends TextView
 {
     protected final TextView view;
-
-    private Menu split;
 
     private TextBuffer buffer;
 
@@ -221,7 +223,7 @@ abstract class EditorTextView extends TextView
                 }
 
                 if (key == Keyval.Insert) {
-                    split.popup();
+                    popupInsertMenu();
                     return true;
                 }
 
@@ -234,10 +236,8 @@ abstract class EditorTextView extends TextView
                     insertMarkup = null;
                     return false;
                 } else if (key == Keyval.Delete) {
-                    // deleteAt();
                     return false;
                 } else if (key == Keyval.BackSpace) {
-                    // deleteBack();
                     return false;
                 }
 
@@ -351,6 +351,11 @@ abstract class EditorTextView extends TextView
                          */
                         return true;
                     }
+                } else if (mod == ModifierType.LOCK_MASK) {
+                    /*
+                     * No keybinding needed.
+                     */
+                    return false;
                 }
 
                 /*
@@ -657,8 +662,10 @@ abstract class EditorTextView extends TextView
                 offset = pointer.getOffset();
 
                 insertOffset = offset;
-
-                insertMarkup = chain.getMarkupAt(offset - 1);
+                if (offset != 0) {
+                    offset--;
+                }
+                insertMarkup = chain.getMarkupAt(offset);
 
                 rect = view.getLocation(pointer);
                 alloc = view.getAllocation();
@@ -739,25 +746,102 @@ abstract class EditorTextView extends TextView
         }
     }
 
+    private Menu split;
+
+    private Class<?>[] types;
+
+    private String[] texts;
+
+    private MenuItem createMenuItem(final String label, final Class<?> type) {
+        final MenuItem result;
+
+        result = new MenuItem(label, new MenuItem.Activate() {
+            public void onActivate(MenuItem source) {
+                try {
+                    handleInsertSegment((Segment) type.newInstance());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        return result;
+    }
+
+    /*
+     * Yes it would be "better" to write this such that the two arrays weren't
+     * coupled but instead strongly typed objects with two+ fields.
+     */
     private void setupInsertMenu() {
-        final MenuItem para, pre, sect;
+        int i;
+        MenuItem item;
 
         split = new Menu();
 
-        para = new MenuItem("Normal _paragraph block");
-        para.setSensitive(false);
-        pre = new MenuItem("Preformatted _code block", new MenuItem.Activate() {
-            public void onActivate(MenuItem source) {
-                handleInsertSegment(new PreformatSegment());
-            }
-        });
-        sect = new MenuItem("Section _heading");
+        types = new Class<?>[] {
+                NormalSegment.class, PreformatSegment.class, QuoteSegment.class, HeadingSegment.class
+        };
 
-        split.append(para);
-        split.append(pre);
-        split.append(sect);
+        texts = new String[] {
+                "Normal _paragraphs", "Preformatted _code block", "Block _quote", "Section _heading"
+        };
+
+        for (i = 0; i < types.length; i++) {
+            item = createMenuItem(texts[i], types[i]);
+            split.append(item);
+        }
 
         split.showAll();
+    }
+
+    /*
+     * This is a bit hideous.
+     */
+    private void popupInsertMenu() {
+        final Widget[] children;
+        int i;
+        final Series series;
+        final int len;
+        final Segment next;
+
+        /*
+         * Turn off the type that the current Segment is
+         */
+
+        children = split.getChildren();
+
+        for (i = 0; i < types.length; i++) {
+            if (types[i].isInstance(segment)) {
+                children[i].setSensitive(false);
+            } else {
+                children[i].setSensitive(true);
+            }
+        }
+
+        /*
+         * if we're at the last character of an existing Segment, then turn
+         * off the type that's already following
+         */
+
+        if (insertOffset == chain.length()) {
+            series = segment.getParent();
+            i = series.indexOf(segment);
+            len = series.size();
+
+            if (i < len - 1) {
+                i++;
+                next = series.get(i);
+
+                for (i = 0; i < types.length; i++) {
+                    if (types[i].isInstance(next)) {
+                        children[i].setSensitive(false);
+                        break;
+                    }
+                }
+            }
+
+        }
+        split.popup();
     }
 
     private void setupContextMenu() {

@@ -14,17 +14,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gnome.gtk.Adjustment;
+import org.gnome.gtk.Container;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
-import quill.textbase.QuoteSegment;
 import quill.textbase.Change;
 import quill.textbase.ComponentSegment;
 import quill.textbase.HeadingSegment;
 import quill.textbase.NormalSegment;
 import quill.textbase.PreformatSegment;
+import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.StructuralChange;
@@ -184,6 +185,36 @@ class ComponentEditorWidget extends ScrolledWindow
         return result;
     }
 
+    private static boolean doesContainerHaveChild(Widget widget, Widget target) {
+        final Widget[] children;
+        Container parent;
+        int i;
+
+        if (widget == target) {
+            return true;
+        }
+
+        if (widget instanceof Container) {
+            parent = (Container) widget;
+            children = parent.getChildren();
+        } else {
+            return false;
+        }
+
+        for (i = 0; i < children.length; i++) {
+            if (children[i] == target) {
+                return true;
+            }
+            if (children[i] instanceof Container) {
+                if (doesContainerHaveChild(children[i], target)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Given a StructuralChange, figure out what it means in terms of the UI
      * in this ComponentEditorWidget.
@@ -215,16 +246,18 @@ class ComponentEditorWidget extends ScrolledWindow
             first = structural.getInto();
             added = structural.getAdded();
 
-            children = box.getChildren();
             view = lookup(first);
 
+            children = box.getChildren();
+
             for (i = 0; i < children.length; i++) {
-                if (children[i] == view) {
+                if (doesContainerHaveChild(children[i], view)) {
                     break;
                 }
             }
+
             if (i == children.length) {
-                throw new IllegalArgumentException("view not in this ComponentEditorWidget");
+                throw new IllegalArgumentException("\n" + "view not in this ComponentEditorWidget");
             }
 
             /*
@@ -240,10 +273,20 @@ class ComponentEditorWidget extends ScrolledWindow
 
             /*
              * Split the old one in two pieces, adding a new editor for the
-             * second piece.
+             * second piece... unless we did the split at the end of the last
+             * segment.
              */
 
             series = first.getParent();
+
+            if (children.length + 1 == series.size()) {
+                return;
+            }
+
+            if (i + 1 == series.size()) {
+                return;
+            }
+
             third = series.get(i + 1);
             widget = createEditorForSegment(third);
             box.packStart(widget, false, false, 0);
@@ -270,7 +313,8 @@ class ComponentEditorWidget extends ScrolledWindow
             editor.reverse(change);
 
         } else if (change instanceof StructuralChange) {
-            throw new UnsupportedOperationException("Not yet implemented"); // FIXME
+            // FIXME
+            throw new UnsupportedOperationException("\n" + "Not yet implemented");
         }
     }
 }
