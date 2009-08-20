@@ -22,7 +22,7 @@ public class Quill
 
     private static DataLayer data;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         initializeDataLayer();
         initializeUserInterface(args);
         parseCommandLine(args);
@@ -45,7 +45,7 @@ public class Quill
      * 
      * TODO parse arguments properly here.
      */
-    static void parseCommandLine(String[] args) {
+    static void parseCommandLine(String[] args) throws Exception {
         if (args.length > 0) {
             loadDocumentFile(args[0]);
         } else {
@@ -53,16 +53,12 @@ public class Quill
         }
     }
 
-    static void loadDocumentFile(String filename) {
+    static void loadDocumentFile(String filename) throws Exception {
         final Folio folio;
 
-        try {
-            data.loadDocument(filename);
-            folio = data.getActiveDocument();
-            ui.displayDocument(folio);
-        } catch (Exception e) {
-            ui.error(e);
-        }
+        data.loadDocument(filename);
+        folio = data.getActiveDocument();
+        ui.displayDocument(folio);
     }
 
     static void loadDocumentBlank() {

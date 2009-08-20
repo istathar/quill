@@ -226,10 +226,14 @@ public class UserInterface
      * Change the UI to report a (fatal) error condition.
      */
     /*
-     * TODO this is rather weak
+     * TODO in development, frankly, I just need the stack trace. So we're
+     * actually skipping calling this crash dialog for now. Maybe we should
+     * attempt an autosave here, though?
      */
     public void error(Exception e) {
         Dialog d;
+
+        e.printStackTrace();
 
         d = new ErrorMessageDialog(null, "Problem", e.getMessage());
         d.run();

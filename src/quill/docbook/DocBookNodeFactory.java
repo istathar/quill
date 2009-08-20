@@ -77,7 +77,7 @@ public class DocBookNodeFactory extends NodeFactory
              * deals with).
              */
             // FIXME this needs a far more comprehensive message
-            throw new IllegalStateException("Invalid document");
+            throw new IllegalStateException("Unknown element " + name);
         }
     }
 
