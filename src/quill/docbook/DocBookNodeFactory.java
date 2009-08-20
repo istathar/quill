@@ -29,8 +29,6 @@ public class DocBookNodeFactory extends NodeFactory
         empty = new Nodes();
     }
 
-    private boolean space;
-
     public Nodes makeText(String text) {
         return super.makeText(text);
     }
