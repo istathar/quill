@@ -10,11 +10,6 @@
  */
 package quill.client;
 
-import java.io.IOException;
-
-import nu.xom.ParsingException;
-import nu.xom.ValidityException;
-
 import org.gnome.gtk.Gtk;
 
 import quill.textbase.DataLayer;
@@ -30,7 +25,7 @@ public class Quill
     public static void main(String[] args) {
         initializeDataLayer();
         initializeUserInterface(args);
-        loadDocumentBlank();
+        parseCommandLine(args);
         runUserInterface(); // blocks
     }
 
@@ -44,12 +39,30 @@ public class Quill
         ui = new UserInterface(data);
     }
 
-    static void loadDocumentFile(String filename) throws ValidityException, ParsingException, IOException {
+    /*
+     * TODO parsing problems are going to be insanely difficult to present to
+     * the user. And this is before the main loop is running.
+     * 
+     * TODO parse arguments properly here.
+     */
+    static void parseCommandLine(String[] args) {
+        if (args.length > 0) {
+            loadDocumentFile(args[0]);
+        } else {
+            loadDocumentBlank();
+        }
+    }
+
+    static void loadDocumentFile(String filename) {
         final Folio folio;
 
-        data.loadDocument(filename);
-        folio = data.getActiveDocument();
-        ui.displayDocument(folio);
+        try {
+            data.loadDocument(filename);
+            folio = data.getActiveDocument();
+            ui.displayDocument(folio);
+        } catch (Exception e) {
+            ui.error(e);
+        }
     }
 
     static void loadDocumentBlank() {

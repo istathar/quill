@@ -221,6 +221,22 @@ public class UserInterface
         data.apply(change);
         primary.affect(change);
     }
+
+    /**
+     * Change the UI to report a (fatal) error condition.
+     */
+    /*
+     * TODO this is rather weak
+     */
+    public void error(Exception e) {
+        Dialog d;
+
+        d = new ErrorMessageDialog(null, "Problem", e.getMessage());
+        d.run();
+        d.hide();
+
+        System.exit(1);
+    }
 }
 
 class images
