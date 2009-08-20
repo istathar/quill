@@ -29,8 +29,6 @@ public class DocBookNodeFactory extends NodeFactory
         empty = new Nodes();
     }
 
-    private boolean space;
-
     public Nodes makeText(String text) {
         return super.makeText(text);
     }
@@ -77,7 +75,7 @@ public class DocBookNodeFactory extends NodeFactory
              * deals with).
              */
             // FIXME this needs a far more comprehensive message
-            throw new IllegalStateException("Invalid document");
+            throw new IllegalStateException("Unknown element " + name);
         }
     }
 
