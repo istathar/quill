@@ -270,6 +270,7 @@ class ComponentEditorWidget extends ScrolledWindow
             i++;
             box.reorderChild(widget, i);
             widget.showAll();
+            widget.grabFocus();
 
             /*
              * Split the old one in two pieces, adding a new editor for the
