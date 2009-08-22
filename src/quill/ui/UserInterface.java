@@ -172,9 +172,7 @@ public class UserInterface
         final FileOutputStream out;
 
         try {
-            target = new File("tmp/HardcodedSaveResult.xml");
-            out = new FileOutputStream(target);
-            data.saveDocument(out);
+            data.saveDocument();
         } catch (IOException ioe) {
             dialog = new ErrorMessageDialog(primary, "Save failed", "There's some kind of I/O problem: "
                     + ioe.getMessage());

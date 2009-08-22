@@ -10,6 +10,8 @@
  */
 package quill.client;
 
+import java.io.FileNotFoundException;
+
 import org.gnome.gtk.Gtk;
 
 import quill.textbase.DataLayer;
@@ -56,7 +58,12 @@ public class Quill
     static void loadDocumentFile(String filename) throws Exception {
         final Folio folio;
 
-        data.loadDocument(filename);
+        try {
+            data.loadDocument(filename);
+        } catch (FileNotFoundException fnfe) {
+            data.createDocument();
+            data.setFilename(filename);
+        }
         folio = data.getActiveDocument();
         ui.displayDocument(folio);
     }

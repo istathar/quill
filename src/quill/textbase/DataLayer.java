@@ -12,6 +12,7 @@ package quill.textbase;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -43,6 +44,8 @@ public class DataLayer
      */
     private Folio current;
 
+    private File file;
+
     public DataLayer() {
         stack = new ChangeStack();
 
@@ -58,7 +61,7 @@ public class DataLayer
         final Series series;
         final Series[] collection;
 
-        source = new File(filename);
+        source = new File(filename).getAbsoluteFile();
         if (!source.exists()) {
             throw new FileNotFoundException("\n" + filename);
         }
@@ -80,7 +83,7 @@ public class DataLayer
             series
         };
 
-        loadDocument(new Folio(collection));
+        loadDocument(source, new Folio(collection));
     }
 
     public Folio getActiveDocument() {
@@ -142,7 +145,8 @@ public class DataLayer
         return stack.redo();
     }
 
-    void loadDocument(Folio folio) {
+    void loadDocument(File name, Folio folio) {
+        file = name;
         current = folio;
     }
 
@@ -171,6 +175,29 @@ public class DataLayer
             chapter1
         });
 
-        loadDocument(folio);
+        loadDocument(null, folio);
+    }
+
+    public void setFilename(String filename) {
+        final File proposed;
+
+        proposed = new File(filename).getAbsoluteFile();
+
+        if (proposed.exists()) {
+            throw new IllegalArgumentException(filename);
+        }
+
+        file = proposed;
+    }
+
+    public void saveDocument() throws IOException {
+        final FileOutputStream out;
+
+        if (file == null) {
+            throw new IllegalStateException("save filename not set");
+        }
+
+        out = new FileOutputStream(file);
+        saveDocument(out);
     }
 }
