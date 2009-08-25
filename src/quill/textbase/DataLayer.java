@@ -31,6 +31,10 @@ import quill.docbook.DocBookNodeFactory;
  * 
  * @author Andrew Cowie
  */
+/*
+ * Interestingly, this has evolved towards looking less like a "layer" and
+ * more like the wrapper object around a "document".
+ */
 public class DataLayer
 {
     private ChangeStack stack;
@@ -44,7 +48,7 @@ public class DataLayer
      */
     private Folio current;
 
-    private File file;
+    private File name;
 
     public DataLayer() {
         stack = new ChangeStack();
@@ -146,8 +150,8 @@ public class DataLayer
     }
 
     void loadDocument(File name, Folio folio) {
-        file = name;
-        current = folio;
+        this.name = name;
+        this.current = folio;
     }
 
     /**
@@ -178,7 +182,11 @@ public class DataLayer
         loadDocument(null, folio);
     }
 
-    public void setFilename(String filename) {
+    /**
+     * Returns the File probed allowing you to figure out if this was
+     * successful.
+     */
+    public File setFilename(String filename) {
         final File proposed;
 
         proposed = new File(filename).getAbsoluteFile();
@@ -187,17 +195,22 @@ public class DataLayer
             throw new IllegalArgumentException(filename);
         }
 
-        file = proposed;
+        name = proposed;
+        return proposed;
+    }
+
+    public File getFilename() {
+        return name;
     }
 
     public void saveDocument() throws IOException {
         final FileOutputStream out;
 
-        if (file == null) {
+        if (name == null) {
             throw new IllegalStateException("save filename not set");
         }
 
-        out = new FileOutputStream(file);
+        out = new FileOutputStream(name);
         saveDocument(out);
     }
 }

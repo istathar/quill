@@ -83,6 +83,7 @@ public class Quill
      * Run the GTK main loop. This call blocks.
      */
     static void runUserInterface() {
+        ui.focusEditor();
         Gtk.main();
     }
 }

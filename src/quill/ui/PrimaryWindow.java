@@ -285,4 +285,8 @@ class PrimaryWindow extends Window
     void reverse(Change change) {
         editor.reverse(change);
     }
+
+    public void grabFocus() {
+        editor.grabFocus();
+    }
 }

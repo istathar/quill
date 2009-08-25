@@ -14,7 +14,6 @@ package quill.ui;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.gnome.gdk.EventOwnerChange;
@@ -22,7 +21,9 @@ import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.Clipboard;
 import org.gnome.gtk.Dialog;
 import org.gnome.gtk.ErrorMessageDialog;
+import org.gnome.gtk.FileChooserDialog;
 import org.gnome.gtk.Gtk;
+import org.gnome.gtk.ResponseType;
 import org.gnome.pango.FontDescription;
 
 import quill.textbase.Change;
@@ -31,6 +32,7 @@ import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.Span;
 
+import static org.gnome.gtk.FileChooserAction.SAVE;
 import static quill.textbase.TextChain.extractFor;
 
 public class UserInterface
@@ -166,10 +168,62 @@ public class UserInterface
         primary.displaySeries(folio.get(0));
     }
 
+    void saveAs() {
+        requestFilename();
+
+        saveDocument();
+    }
+
+    /**
+     * This WILL set the filename in the DataLayer. However, you can check the
+     * return value to find out whether or not something useful happened.
+     */
+    /*
+     * This is a bit messy. There is confusion of responsibilities here
+     * between who owns the filename, who is responsible for carrying out IO,
+     * and who drives the process.
+     */
+    File requestFilename() {
+        final FileChooserDialog dialog;
+        String filename;
+        ResponseType response;
+        File result;
+
+        dialog = new FileChooserDialog("Save As...", primary, SAVE);
+
+        while (true) {
+            response = dialog.run();
+            dialog.hide();
+
+            if (response != ResponseType.OK) {
+                return null;
+            }
+
+            filename = dialog.getFilename();
+
+            try {
+                result = data.setFilename(filename);
+                if (result != null) {
+                    return result;
+                }
+            } finally {
+                // try again
+            }
+        }
+    }
+
     void saveDocument() {
         final Dialog dialog;
-        final File target;
-        final FileOutputStream out;
+        File target;
+
+        target = data.getFilename();
+
+        if (target == null) {
+            target = requestFilename();
+            if (target == null) {
+                return; // cancelled by user
+            }
+        }
 
         try {
             data.saveDocument();
@@ -238,6 +292,10 @@ public class UserInterface
         d.hide();
 
         System.exit(1);
+    }
+
+    public void focusEditor() {
+        primary.grabFocus();
     }
 }
 

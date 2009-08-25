@@ -229,7 +229,7 @@ class ComponentEditorWidget extends ScrolledWindow
         int i;
         final Widget view;
         Widget widget;
-        final EditorTextView editor;
+        EditorTextView editor;
 
         if (change instanceof TextualChange) {
             first = change.affects();
@@ -270,7 +270,8 @@ class ComponentEditorWidget extends ScrolledWindow
             i++;
             box.reorderChild(widget, i);
             widget.showAll();
-            widget.grabFocus();
+            editor = (EditorTextView) lookup(added);
+            editor.grabFocus();
 
             /*
              * Split the old one in two pieces, adding a new editor for the
@@ -317,5 +318,12 @@ class ComponentEditorWidget extends ScrolledWindow
             // FIXME
             throw new UnsupportedOperationException("\n" + "Not yet implemented");
         }
+    }
+
+    public void grabFocus() {
+        final Widget first;
+
+        first = lookup(series.get(0));
+        first.grabFocus();
     }
 }
