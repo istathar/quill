@@ -11,16 +11,9 @@
 package quill.converter;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
-import junit.framework.TestCase;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.textbase.DataLayer;
@@ -32,7 +25,7 @@ import quill.textbase.DataLayer;
  * 
  * @author Andrew Cowie
  */
-public class ValidateThereAndBackAgain extends TestCase
+public class ValidateThereAndBackAgain extends IOTestCase
 {
     public void testRoundTrip() throws IOException, ValidityException, ParsingException {
         final DataLayer data;
@@ -84,42 +77,5 @@ public class ValidateThereAndBackAgain extends TestCase
         System.err.flush();
 
         data.saveDocument(System.out);
-    }
-
-    /**
-     * Take the md5 sum of the given file.
-     */
-    /*
-     * Output conversion code from http://www.spiration.co.uk/post/1199
-     */
-    static String hash(File file) throws FileNotFoundException, IOException {
-        final MessageDigest md;
-        final FileInputStream in;
-        final StringWriter str;
-        final PrintWriter out;
-        byte buf[];
-
-        try {
-            md = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException nsae) {
-            throw new Error("How can there be no md5 algorithm?");
-        }
-        md.reset();
-
-        buf = new byte[1024];
-
-        in = new FileInputStream(file);
-        while (in.read(buf) != -1) {
-            md.update(buf);
-        }
-        in.close();
-
-        str = new StringWriter();
-        out = new PrintWriter(str);
-
-        for (byte b : md.digest()) {
-            out.printf("%02x", 0xFF & b);
-        }
-        return str.toString();
     }
 }
