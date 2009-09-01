@@ -109,11 +109,6 @@ abstract class EditorTextView extends TextView
     }
 
     /**
-     * Is a user initiated input action in progress?
-     */
-    private boolean user;
-
-    /**
      * Override this and return true if you want TAB characters to be inserted
      * rather than swollowed.
      */
@@ -133,55 +128,7 @@ abstract class EditorTextView extends TextView
 
         input.connect(new InputMethod.Commit() {
             public void onCommit(InputMethod source, String text) {
-                final Span span;
-                final TextualChange change;
-                final int offset;
-
-                span = new Span(text, insertMarkup);
-                offset = buffer.getCursorPosition();
-
-                change = new InsertTextualChange(chain, offset, span);
-                ui.apply(change);
-            }
-        });
-
-        buffer.connect(new TextBuffer.DeleteRange() {
-            public void onDeleteRange(TextBuffer source, TextIter start, TextIter end) {
-                int alpha, omega, offset, width;
-                final Extract range;
-                final TextualChange change;
-
-                if (!user) {
-                    return;
-                }
-                user = false;
-
-                buffer.stopDeleteRange();
-
-                alpha = start.getOffset();
-                omega = end.getOffset();
-
-                offset = normalizeOffset(alpha, omega);
-                width = normalizeWidth(alpha, omega);
-
-                range = chain.extractRange(offset, width);
-                change = new DeleteTextualChange(chain, offset, range);
-                ui.apply(change);
-
-                user = true;
-            }
-        });
-
-        buffer.connect(new TextBuffer.BeginUserAction() {
-            public void onBeginUserAction(TextBuffer source) {
-                user = true;
-            }
-        });
-
-        // this may be unnecessary
-        buffer.connect(new TextBuffer.EndUserAction() {
-            public void onEndUserAction(TextBuffer source) {
-                user = false;
+                insertText(text);
             }
         });
 
@@ -261,9 +208,11 @@ abstract class EditorTextView extends TextView
                     insertMarkup = null;
                     return false;
                 } else if (key == Keyval.Delete) {
-                    return false;
+                    deleteAt();
+                    return true;
                 } else if (key == Keyval.BackSpace) {
-                    return false;
+                    deleteBack();
+                    return true;
                 }
 
                 /*
@@ -407,6 +356,31 @@ abstract class EditorTextView extends TextView
         });
     }
 
+    private void insertText(String text) {
+        final Extract removed;
+        final Span span;
+        final TextualChange change;
+        final TextIter selection;
+        final int selectionOffset, offset, width;
+
+        span = new Span(text, insertMarkup);
+
+        if (buffer.getHasSelection()) {
+            selection = buffer.getIter(selectionBound);
+            selectionOffset = selection.getOffset();
+
+            offset = normalizeOffset(insertOffset, selectionOffset);
+            width = normalizeWidth(insertOffset, selectionOffset);
+
+            removed = chain.extractRange(offset, width);
+            change = new FullTextualChange(chain, offset, removed, span);
+        } else {
+            change = new InsertTextualChange(chain, insertOffset, span);
+        }
+
+        ui.apply(change);
+    }
+
     private void pasteText() {
         final Extract stash, removed;
         final TextualChange change;
@@ -435,6 +409,62 @@ abstract class EditorTextView extends TextView
          * Propegate the change. After this wends its way though the layers,
          * it will result in ComponentEditorWindow calling this.affect().
          */
+
+        ui.apply(change);
+    }
+
+    private void deleteBack() {
+        final TextIter start, end;
+
+        end = buffer.getIter(insertBound);
+
+        if (buffer.getHasSelection()) {
+            start = buffer.getIter(selectionBound);
+        } else {
+            if (end.isStart()) {
+                return;
+            }
+            start = end.copy();
+            start.backwardChar();
+        }
+
+        deleteRange(start, end);
+    }
+
+    private void deleteAt() {
+        final TextIter start, end;
+
+        start = buffer.getIter(insertBound);
+
+        if (buffer.getHasSelection()) {
+            end = buffer.getIter(selectionBound);
+        } else {
+            if (start.isEnd()) {
+                return;
+            }
+            end = start.copy();
+            end.forwardChar();
+        }
+
+        deleteRange(start, end);
+    }
+
+    /**
+     * Effect a deletion from start to end.
+     */
+    private void deleteRange(TextIter start, TextIter end) {
+        int alpha, omega, offset, width;
+        final Extract range;
+        final TextualChange change;
+
+        alpha = start.getOffset();
+        omega = end.getOffset();
+
+        offset = normalizeOffset(alpha, omega);
+        width = normalizeWidth(alpha, omega);
+
+        range = chain.extractRange(offset, width);
+        change = new DeleteTextualChange(chain, offset, range);
 
         ui.apply(change);
     }
