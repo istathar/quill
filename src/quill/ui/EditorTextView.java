@@ -15,8 +15,10 @@ import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gdk.Rectangle;
 import org.gnome.gtk.Allocation;
+import org.gnome.gtk.InputMethod;
 import org.gnome.gtk.Menu;
 import org.gnome.gtk.MenuItem;
+import org.gnome.gtk.SimpleInputMethod;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
@@ -53,6 +55,8 @@ abstract class EditorTextView extends TextView
     protected final TextView view;
 
     private TextBuffer buffer;
+
+    private InputMethod input;
 
     private TextMark selectionBound, insertBound;
 
@@ -125,26 +129,19 @@ abstract class EditorTextView extends TextView
     }
 
     private void hookupKeybindings() {
-        buffer.connect(new TextBuffer.InsertText() {
-            public void onInsertText(TextBuffer source, TextIter pointer, String text) {
+        input = new SimpleInputMethod();
+
+        input.connect(new InputMethod.Commit() {
+            public void onCommit(InputMethod source, String text) {
                 final Span span;
                 final TextualChange change;
                 final int offset;
 
-                if (!user) {
-                    return;
-                }
-                user = false;
-
-                buffer.stopInsertText();
-
                 span = new Span(text, insertMarkup);
-                offset = pointer.getOffset();
+                offset = buffer.getCursorPosition();
 
                 change = new InsertTextualChange(chain, offset, span);
                 ui.apply(change);
-
-                user = true;
             }
         });
 
@@ -192,6 +189,21 @@ abstract class EditorTextView extends TextView
             public boolean onKeyPressEvent(Widget source, EventKey event) {
                 final Keyval key;
                 final ModifierType mod;
+
+                /*
+                 * This is magic, actually. Both normal keystrokes and
+                 * composed sequences will be delivered to us above in the
+                 * InputMethod.Commit handler.
+                 */
+
+                if (input.filterKeypress(event)) {
+                    return true;
+                }
+
+                /*
+                 * Otherwise, we begin the logic to check and see if we're
+                 * going to handle it ourselves.
+                 */
 
                 key = event.getKeyval();
 
@@ -264,15 +276,15 @@ abstract class EditorTextView extends TextView
                 }
 
                 /*
-                 * Ignore initial press of modifier keys (for now)
+                 * Let modifier keys through; input methods, cursor movement,
+                 * and selection seems to depend on this.
                  */
 
                 if ((key == Keyval.ShiftLeft) || (key == Keyval.ShiftRight) || (key == Keyval.AltLeft)
                         || (key == Keyval.AltRight) || (key == Keyval.ControlLeft)
                         || (key == Keyval.ControlRight) || (key == Keyval.SuperLeft)
                         || (key == Keyval.SuperRight)) {
-                    // deliberate no-op
-                    return true;
+                    return false;
                 }
 
                 /*
@@ -299,9 +311,8 @@ abstract class EditorTextView extends TextView
 
                 if ((mod == ModifierType.NONE) || (mod == ModifierType.SHIFT_MASK)) {
                     /*
-                     * Normal keystroke; let the current input method take
-                     * care of things (and then we react to
-                     * TextBuffer.InsertText when it occurs).
+                     * Normal keystroke. Chances are we probably don't get
+                     * here that often.
                      */
                     return false;
                 }
@@ -329,8 +340,8 @@ abstract class EditorTextView extends TextView
                         return true;
                     } else {
                         /*
-                         * No keybinding in the editor, let PrimaryWindow
-                         * handle it.
+                         * No keybinding in the editor, but PrimaryWindow will
+                         * handle program wide accelerators.
                          */
                         return false;
                     }
@@ -358,15 +369,21 @@ abstract class EditorTextView extends TextView
                     } else if (key == Keyval.T) {
                         toggleMarkup(Common.TYPE);
                         return true;
+                    } else if (key == Keyval.U) {
+                        /*
+                         * Special to GTK's default input method, so pass
+                         * through!
+                         */
+                        return false;
                     } else {
                         /*
-                         * No keybinding
+                         * Nothing special, pass through.
                          */
-                        return true;
+                        return false;
                     }
                 } else if (mod == ModifierType.LOCK_MASK) {
                     /*
-                     * No keybinding needed.
+                     * No keybinding needed, pass through.
                      */
                     return false;
                 }
@@ -377,6 +394,15 @@ abstract class EditorTextView extends TextView
                  */
 
                 throw new IllegalStateException("\n" + "Unhandled " + key + " with " + mod);
+            }
+        });
+
+        view.connect(new Widget.KeyReleaseEvent() {
+            public boolean onKeyReleaseEvent(Widget source, EventKey event) {
+                if (input.filterKeypress(event)) {
+                    return true;
+                }
+                return false;
             }
         });
     }
