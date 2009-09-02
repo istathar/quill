@@ -12,6 +12,7 @@ package quill.textbase;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -30,6 +31,10 @@ import quill.docbook.DocBookNodeFactory;
  * 
  * @author Andrew Cowie
  */
+/*
+ * Interestingly, this has evolved towards looking less like a "layer" and
+ * more like the wrapper object around a "document".
+ */
 public class DataLayer
 {
     private ChangeStack stack;
@@ -42,6 +47,8 @@ public class DataLayer
      * to change in due course.
      */
     private Folio current;
+
+    private File name;
 
     public DataLayer() {
         stack = new ChangeStack();
@@ -58,7 +65,7 @@ public class DataLayer
         final Series series;
         final Series[] collection;
 
-        source = new File(filename);
+        source = new File(filename).getAbsoluteFile();
         if (!source.exists()) {
             throw new FileNotFoundException("\n" + filename);
         }
@@ -80,7 +87,7 @@ public class DataLayer
             series
         };
 
-        loadDocument(new Folio(collection));
+        loadDocument(source, new Folio(collection));
     }
 
     public Folio getActiveDocument() {
@@ -142,8 +149,9 @@ public class DataLayer
         return stack.redo();
     }
 
-    void loadDocument(Folio folio) {
-        current = folio;
+    void loadDocument(File name, Folio folio) {
+        this.name = name;
+        this.current = folio;
     }
 
     /**
@@ -171,6 +179,38 @@ public class DataLayer
             chapter1
         });
 
-        loadDocument(folio);
+        loadDocument(null, folio);
+    }
+
+    /**
+     * Returns the File probed allowing you to figure out if this was
+     * successful.
+     */
+    public File setFilename(String filename) {
+        final File proposed;
+
+        proposed = new File(filename).getAbsoluteFile();
+
+        if (proposed.exists()) {
+            throw new IllegalArgumentException(filename);
+        }
+
+        name = proposed;
+        return proposed;
+    }
+
+    public File getFilename() {
+        return name;
+    }
+
+    public void saveDocument() throws IOException {
+        final FileOutputStream out;
+
+        if (name == null) {
+            throw new IllegalStateException("save filename not set");
+        }
+
+        out = new FileOutputStream(name);
+        saveDocument(out);
     }
 }

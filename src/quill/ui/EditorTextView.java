@@ -200,9 +200,22 @@ abstract class EditorTextView extends TextView
                  * a few other special keys we don't need to handle.
                  */
 
-                if ((key == Keyval.Up) || (key == Keyval.Down) || (key == Keyval.Left)
-                        || (key == Keyval.Right) || (key == Keyval.Home) || (key == Keyval.End)
-                        || (key == Keyval.PageUp) || (key == Keyval.PageDown) || (key == Keyval.Compose)) {
+                if ((key == Keyval.Up) || (key == Keyval.Right)) {
+                    if (insertOffset == 0) {
+                        // ui.primary.moveCursorBack();
+                        return false;
+                    }
+                }
+
+                if ((key == Keyval.Down) || (key == Keyval.Left)) {
+                    if (insertOffset == chain.length()) {
+                        // ui.primary.moveCursorNext();
+                        return false;
+                    }
+                }
+
+                if ((key == Keyval.Home) || (key == Keyval.End) || (key == Keyval.PageUp)
+                        || (key == Keyval.PageDown) || (key == Keyval.Compose)) {
                     return false;
                 }
 

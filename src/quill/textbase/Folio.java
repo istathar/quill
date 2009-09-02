@@ -21,7 +21,7 @@ package quill.textbase;
  */
 public class Folio
 {
-    private Series[] collection;
+    private final Series[] collection;
 
     Folio(Series[] components) {
         this.collection = components;

@@ -11,6 +11,7 @@
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import quill.converter.ValidateFileNaming;
 import quill.converter.ValidateTextChainToDocBookConversion;
 import quill.converter.ValidateThereAndBackAgain;
 import quill.textbase.ValidateApplyUndoRedo;
@@ -55,6 +56,7 @@ public class UnitTests
         suite.addTestSuite(ValidateWrapperExpansions.class);
         suite.addTestSuite(ValidateStructuralChange.class);
         suite.addTestSuite(ValidateThereAndBackAgain.class);
+        suite.addTestSuite(ValidateFileNaming.class);
         suite.addTestSuite(ValidateChangePropagation.class);
 
         return suite;
