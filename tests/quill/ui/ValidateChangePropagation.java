@@ -83,13 +83,11 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
-                "<chapter>",
+                "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
                 "<para>",
                 "h",
                 "</para>",
-                "</chapter>",
-                "</book>"
+                "</chapter>"
         });
         assertEquals(expected, out.toString());
     }
@@ -130,14 +128,12 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
-                "<chapter>",
+                "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
                 "<para>",
                 "This is a test of the emergency broadcast",
                 "system",
                 "</para>",
-                "</chapter>",
-                "</book>"
+                "</chapter>"
         });
         assertEquals(expected, out.toString());
 
@@ -174,13 +170,11 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
-                "<chapter>",
+                "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
                 "<para>",
                 "This is an emergency broadcast system",
                 "</para>",
-                "</chapter>",
-                "</book>"
+                "</chapter>"
         });
         assertEquals(expected, out.toString());
     }
@@ -227,15 +221,13 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
-                "<chapter>",
+                "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
                 "<para>",
                 "This is a test of the",
                 "<emphasis>emergency</emphasis> broadcast",
                 "system",
                 "</para>",
                 "</chapter>",
-                "</book>"
         });
         assertEquals(expected, out.toString());
 
@@ -264,15 +256,13 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
-                "<chapter>",
+                "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
                 "<para>",
                 "This is a test of the",
                 "a<emphasis>emergency</emphasis> broadcast",
                 "system",
                 "</para>",
-                "</chapter>",
-                "</book>"
+                "</chapter>"
         });
         assertEquals(expected, out.toString());
 
@@ -296,15 +286,13 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
-                "<chapter>",
+                "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
                 "<para>",
                 "This is a test of the",
                 "a<emphasis>emergencya</emphasis> broadcast",
                 "system",
                 "</para>",
-                "</chapter>",
-                "</book>"
+                "</chapter>"
         });
         assertEquals(expected, out.toString());
 
