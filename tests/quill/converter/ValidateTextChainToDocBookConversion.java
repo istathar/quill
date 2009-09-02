@@ -16,7 +16,6 @@ import java.io.IOException;
 import junit.framework.TestCase;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import quill.docbook.Book;
 import quill.textbase.Change;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
@@ -54,7 +53,6 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         final Change change;
         final Segment segment;
         final DocBookConverter converter;
-        final Book book;
         final ByteArrayOutputStream out;
         final String blob;
 
@@ -80,25 +78,19 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         converter.append(new ComponentSegment());
         converter.append(segment);
 
-        book = converter.createBook();
-
-        assertNotNull(book);
-
         out = new ByteArrayOutputStream();
-        book.toXML(out);
+        converter.writeChapter(out);
 
         blob = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
-                "<chapter>",
+                "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
                 "<para>",
                 "Hello",
                 "</para>",
                 "<para>",
                 "World",
                 "</para>",
-                "</chapter>",
-                "</book>"
+                "</chapter>"
         });
         assertEquals(blob, out.toString());
     }
@@ -124,7 +116,6 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         Change change;
         Segment segment;
         final DocBookConverter converter;
-        final Book book;
         final ByteArrayOutputStream out;
         final String blob;
 
@@ -172,17 +163,13 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         segment = new NormalSegment();
         segment.setText(chain);
         converter.append(segment);
-        book = converter.createBook();
-
-        assertNotNull(book);
 
         out = new ByteArrayOutputStream();
-        book.toXML(out);
+        converter.writeChapter(out);
 
         blob = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
-                "<chapter>",
+                "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
                 "<section>",
                 "<para>",
                 "Accessing the " + "<filename>/tmp</filename>" + " directory",
@@ -191,8 +178,7 @@ public class ValidateTextChainToDocBookConversion extends TestCase
                 "<function>" + "createTempFile()" + "</function> function.",
                 "</para>",
                 "</section>",
-                "</chapter>",
-                "</book>"
+                "</chapter>"
         });
 
         /*
@@ -229,7 +215,6 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         final Change change;
         Segment segment;
         final DocBookConverter converter;
-        final Book book;
         final ByteArrayOutputStream out;
         final String blob;
 
@@ -253,22 +238,17 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         segment = new NormalSegment();
         segment.setText(chain);
         converter.append(segment);
-        book = converter.createBook();
-
-        assertNotNull(book);
 
         out = new ByteArrayOutputStream();
-        book.toXML(out);
+        converter.writeChapter(out);
 
         blob = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
-                "<chapter>",
+                "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
                 "<para>",
                 ":𝑛:",
                 "</para>",
-                "</chapter>",
-                "</book>"
+                "</chapter>"
         });
         assertEquals(blob, out.toString());
     }

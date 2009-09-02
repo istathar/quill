@@ -18,7 +18,6 @@ import nu.xom.Document;
 import quill.docbook.Application;
 import quill.docbook.Block;
 import quill.docbook.Blockquote;
-import quill.docbook.Book;
 import quill.docbook.Chapter;
 import quill.docbook.Command;
 import quill.docbook.Component;
@@ -98,15 +97,13 @@ public class DocBookLoader
      * processor state here.
      */
     public Series process(Document doc) {
-        final Book book; // FIXME change to an interface, or reject?
         final Component chapter;
         final Division[] sections;
         int i, j;
         Block[] blocks;
         final Segment[] result;
 
-        book = (Book) doc.getRootElement();
-        chapter = book.getComponents()[0]; // HARDCODE
+        chapter = (Component) doc.getRootElement();
         processComponent(chapter);
 
         /*

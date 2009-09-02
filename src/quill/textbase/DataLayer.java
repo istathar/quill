@@ -21,7 +21,6 @@ import nu.xom.Document;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.converter.DocBookConverter;
-import quill.docbook.Book;
 import quill.docbook.DocBookNodeFactory;
 
 /**
@@ -98,7 +97,6 @@ public class DataLayer
         final Series series;
         final DocBookConverter converter;
         int i;
-        final Book book;
 
         /*
          * On the temporary assumption that there's only one chapter being
@@ -119,11 +117,10 @@ public class DataLayer
         }
 
         /*
-         * Get the resultant top level Document and serialize it.
+         * Finally, serialize the resultant top level.
          */
 
-        book = converter.createBook();
-        book.toXML(out);
+        converter.writeChapter(out);
     }
 
     /**

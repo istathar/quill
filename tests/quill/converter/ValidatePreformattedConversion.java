@@ -14,7 +14,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import junit.framework.TestCase;
-import quill.docbook.Book;
 import quill.textbase.Change;
 import quill.textbase.Common;
 import quill.textbase.DataLayer;
@@ -57,7 +56,6 @@ public class ValidatePreformattedConversion extends TestCase
         Change change;
         final Segment segment;
         final DocBookConverter converter;
-        final Book book;
         final ByteArrayOutputStream out;
         final String blob;
 
@@ -99,17 +97,13 @@ public class ValidatePreformattedConversion extends TestCase
 
         converter = new DocBookConverter();
         converter.append(segment);
-        book = converter.createBook();
-
-        assertNotNull(book);
 
         out = new ByteArrayOutputStream();
-        book.toXML(out);
+        converter.writeChapter(out);
 
         blob = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<book version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
-                "<chapter>",
+                "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
                 "<section>",
                 "<para>",
                 "Consider the following simple and yet profound",
@@ -128,8 +122,7 @@ public class ValidatePreformattedConversion extends TestCase
                 "friendly programmer.",
                 "</para>",
                 "</section>",
-                "</chapter>",
-                "</book>"
+                "</chapter>"
         });
 
         /*

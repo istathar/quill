@@ -97,8 +97,8 @@ public class DocBookNodeFactory extends NodeFactory
      */
 
     public Element makeRootElement(String name, String namespace) {
-        if (name.equals("book")) {
-            return new Book();
+        if (name.equals("chapter")) {
+            return new Chapter();
         } else if (name.equals("article")) {
             return new Article();
         } else {
