@@ -16,11 +16,12 @@ package quill.converter;
  * output formats grow up, this will be the place their converters can live.
  */
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import quill.docbook.Application;
-import quill.docbook.Article;
 import quill.docbook.Block;
 import quill.docbook.Blockquote;
-import quill.docbook.Book;
 import quill.docbook.Chapter;
 import quill.docbook.Command;
 import quill.docbook.Component;
@@ -61,7 +62,7 @@ import quill.textbase.TextChain;
  */
 public class DocBookConverter
 {
-    private Component chapter;
+    private Component component;
 
     private final StringBuilder buf;
 
@@ -99,13 +100,13 @@ public class DocBookConverter
         this.segment = segment;
 
         if (segment instanceof ComponentSegment) {
-            chapter = new Chapter();
+            component = new Chapter();
             section = null;
-            parent = chapter;
+            parent = component;
             block = new Title();
         } else if (segment instanceof HeadingSegment) {
             section = new Section();
-            chapter.add(section);
+            component.add(section);
             parent = section;
             block = new Title();
         } else if (segment instanceof PreformatSegment) {
@@ -129,7 +130,7 @@ public class DocBookConverter
 
         if (parent instanceof Blockquote) {
             if (section == null) {
-                parent = chapter;
+                parent = component;
             } else {
                 parent = section;
             }
@@ -288,20 +289,17 @@ public class DocBookConverter
     }
 
     /**
-     * Create a <code>&lt;book&gt;</code> object based on what has been fed to
-     * the converter.
+     * Create a <code>&lt;chapter&gt;</code> object based on what has been fed
+     * to the converter, and write it to the given stream.
      */
-    public Book createBook() {
-        final Book book;
+    public void writeChapter(OutputStream out) throws IOException {
+        final Chapter chapter;
 
-        book = new Book();
-        book.add(chapter);
-
-        return book;
+        chapter = (Chapter) component;
+        chapter.toXML(out);
     }
 
-    public Article createArticle() {
-        // return chapter?
+    public void writeArticle(OutputStream out) throws IOException {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 }
