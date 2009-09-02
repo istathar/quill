@@ -16,7 +16,6 @@ import java.io.IOException;
 import junit.framework.TestCase;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import quill.docbook.Book;
 import quill.textbase.Change;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
@@ -216,7 +215,6 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         final Change change;
         Segment segment;
         final DocBookConverter converter;
-        final Book book;
         final ByteArrayOutputStream out;
         final String blob;
 

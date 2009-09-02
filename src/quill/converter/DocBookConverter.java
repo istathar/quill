@@ -142,8 +142,6 @@ public class DocBookConverter
         final int num;
         int i, j, len;
         Span span;
-        String str;
-        char ch;
         Markup previous, markup;
 
         if (chain == null) {
