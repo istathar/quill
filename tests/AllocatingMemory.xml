@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<book version="5.0" xmlns="http://docbook.org/ns/docbook">
-<chapter>
+<chapter version="5.0" xmlns="http://docbook.org/ns/docbook">
 <title>
 Allocating Memory
 </title>
@@ -205,4 +204,3 @@ these topics in Chapter 15.
 </para>
 </section>
 </chapter>
-</book>

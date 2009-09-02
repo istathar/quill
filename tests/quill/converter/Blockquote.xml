@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<book version="5.0" xmlns="http://docbook.org/ns/docbook">
-<chapter>
+<chapter version="5.0" xmlns="http://docbook.org/ns/docbook">
 <section>
 <para>
 First line
@@ -24,4 +23,3 @@ Fourth line
 </para>
 </section>
 </chapter>
-</book>
