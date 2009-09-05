@@ -206,7 +206,8 @@ abstract class EditorTextView extends TextView
                  */
                 if (key == Keyval.Return) {
                     insertMarkup = null;
-                    return false;
+                    insertText("\n");
+                    return true;
                 } else if (key == Keyval.Delete) {
                     deleteAt();
                     return true;
