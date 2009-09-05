@@ -19,7 +19,7 @@ class NormalEditorTextView extends EditorTextView
 
         view.modifyFont(fonts.serif);
 
-        view.setPaddingAboveParagraph(0);
-        view.setPaddingBelowParagraph(10);
+        view.setPaddingAboveParagraph(4);
+        view.setPaddingBelowParagraph(6);
     }
 }
