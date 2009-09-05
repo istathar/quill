@@ -44,8 +44,8 @@ public class Span
     final int[] points;
 
     /**
-     * width must be the number of code points, but this is only called from
-     * Span.
+     * Construct a new Span with the given String. If it is width 1, a cached
+     * String reference will be used instead.
      */
     public Span(String str, Markup markup) {
         final int len, width;
@@ -55,6 +55,12 @@ public class Span
         len = str.length();
 
         width = str.codePointCount(0, len);
+
+        if ((len == 1) && (width == 1)) {
+            this.data = cache(str.charAt(0));
+        } else {
+            this.data = str;
+        }
 
         this.points = new int[width];
 
@@ -73,7 +79,6 @@ public class Span
             j++;
         }
 
-        this.data = str;
         this.markup = markup;
     }
 
