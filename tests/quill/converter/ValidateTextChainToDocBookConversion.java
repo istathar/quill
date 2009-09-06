@@ -28,6 +28,8 @@ import quill.textbase.Series;
 import quill.textbase.Span;
 import quill.textbase.TextChain;
 
+import static quill.textbase.Span.createSpan;
+
 public class ValidateTextChainToDocBookConversion extends TestCase
 {
     public final void testLoadDocbook() throws IOException, ValidityException, ParsingException {
@@ -63,7 +65,7 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         data = new DataLayer();
         chain = new TextChain();
 
-        span = new Span("Hello\nWorld", null);
+        span = createSpan("Hello\nWorld", null);
         change = new InsertTextualChange(chain, 0, span);
         data.apply(change);
 
@@ -124,20 +126,20 @@ public class ValidateTextChainToDocBookConversion extends TestCase
          */
 
         spans = new Span[] {
-                new Span("Accessing the ", null),
-                new Span("/tmp", Common.FILENAME),
-                new Span(" directory directly is fine, but you are often better off using ", null),
-                new Span("File", Common.TYPE),
-                new Span('\'', null),
-                new Span('s', null),
-                new Span(' ', null),
-                new Span("createTemp", Common.FUNCTION),
-                new Span('F', Common.FUNCTION),
-                new Span('i', Common.FUNCTION),
-                new Span('l', Common.FUNCTION),
-                new Span('e', Common.FUNCTION),
-                new Span("()", Common.FUNCTION),
-                new Span(" function.", null),
+                createSpan("Accessing the ", null),
+                createSpan("/tmp", Common.FILENAME),
+                createSpan(" directory directly is fine, but you are often better off using ", null),
+                createSpan("File", Common.TYPE),
+                createSpan('\'', null),
+                createSpan('s', null),
+                createSpan(' ', null),
+                createSpan("createTemp", Common.FUNCTION),
+                createSpan('F', Common.FUNCTION),
+                createSpan('i', Common.FUNCTION),
+                createSpan('l', Common.FUNCTION),
+                createSpan('e', Common.FUNCTION),
+                createSpan("()", Common.FUNCTION),
+                createSpan(" function.", null),
         };
 
         data = new DataLayer();
@@ -226,7 +228,7 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         data = new DataLayer();
         chain = new TextChain();
 
-        span = new Span(":\ud835\udc5b:", null);
+        span = createSpan(":\ud835\udc5b:", null);
         change = new InsertTextualChange(chain, 0, span);
         data.apply(change);
 

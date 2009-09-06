@@ -24,6 +24,8 @@ import quill.textbase.Segment;
 import quill.textbase.Span;
 import quill.textbase.TextChain;
 
+import static quill.textbase.Span.createSpan;
+
 /**
  * BROKEN
  * 
@@ -64,18 +66,18 @@ public class ValidatePreformattedConversion extends TestCase
          */
 
         spans = new Span[] {
-                new Span(
+                createSpan(
                         "Consider the following simple and yet profound expression of quality program code:\n",
                         null),
-                new Span("public class Hello {\u2028", Preformat.NORMAL),
-                new Span("    public static void main(String[] args) {\u2028", Preformat.NORMAL),
-                new Span("        System.out.println(\"Hello World\");\u2028", Preformat.NORMAL),
-                new Span("    }\u2028", Preformat.NORMAL),
-                new Span("}", Preformat.NORMAL),
-                new Span('\n', null),
-                new Span("There really isn't anything like saying ", null),
-                new Span("Hello World", Common.ITALICS),
-                new Span(" to a nice friendly programmer.", null),
+                createSpan("public class Hello {\u2028", Preformat.NORMAL),
+                createSpan("    public static void main(String[] args) {\u2028", Preformat.NORMAL),
+                createSpan("        System.out.println(\"Hello World\");\u2028", Preformat.NORMAL),
+                createSpan("    }\u2028", Preformat.NORMAL),
+                createSpan("}", Preformat.NORMAL),
+                createSpan('\n', null),
+                createSpan("There really isn't anything like saying ", null),
+                createSpan("Hello World", Common.ITALICS),
+                createSpan(" to a nice friendly programmer.", null),
         };
 
         data = new DataLayer();

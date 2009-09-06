@@ -364,7 +364,7 @@ abstract class EditorTextView extends TextView
         final TextIter selection;
         final int selectionOffset, offset, width;
 
-        span = new Span(text, insertMarkup);
+        span = Span.createSpan(text, insertMarkup);
 
         if (buffer.getHasSelection()) {
             selection = buffer.getIter(selectionBound);

@@ -13,6 +13,8 @@ package quill.textbase;
 
 import junit.framework.TestCase;
 
+import static quill.textbase.Span.createSpan;
+
 /**
  * Make sure the extraction and reversing properties of Extract and the
  * extractRange() which creates them hold.
@@ -26,7 +28,7 @@ public class ValidateExtracts extends TestCase
         Extract extract;
 
         text = new TextChain();
-        text.append(new Span("Hello World", null));
+        text.append(createSpan("Hello World", null));
 
         extract = text.extractRange(1, 3);
         assertEquals("Hello World", text.toString());
@@ -51,7 +53,7 @@ public class ValidateExtracts extends TestCase
         Extract extract;
 
         text = new TextChain();
-        text.append(new Span("Hello World", null));
+        text.append(createSpan("Hello World", null));
 
         try {
             extract = text.extractRange(9, -2);
@@ -69,9 +71,9 @@ public class ValidateExtracts extends TestCase
         Span span;
 
         text = new TextChain();
-        text.append(new Span("Hello World", null));
-        text.append(new Span('\n', null));
-        text.append(new Span("Goodbye Eternity", null));
+        text.append(createSpan("Hello World", null));
+        text.append(createSpan('\n', null));
+        text.append(createSpan("Goodbye Eternity", null));
         assertEquals("Hello World\nGoodbye Eternity", text.toString());
 
         lines = text.extractParagraphs();
@@ -100,7 +102,7 @@ public class ValidateExtracts extends TestCase
         Span span;
 
         text = new TextChain();
-        text.append(new Span("Hello World", null));
+        text.append(createSpan("Hello World", null));
 
         lines = text.extractParagraphs();
         assertEquals(1, lines.length);
@@ -135,7 +137,7 @@ public class ValidateExtracts extends TestCase
         Span span;
 
         text = new TextChain();
-        text.append(new Span('H', null));
+        text.append(createSpan('H', null));
 
         lines = text.extractParagraphs();
         assertEquals(1, lines.length);
@@ -156,7 +158,7 @@ public class ValidateExtracts extends TestCase
         Extract extract;
 
         text = new TextChain();
-        text.append(new Span('\n', null));
+        text.append(createSpan('\n', null));
 
         lines = text.extractParagraphs();
         assertEquals(2, lines.length);
@@ -176,7 +178,7 @@ public class ValidateExtracts extends TestCase
         Span span;
 
         text = new TextChain();
-        text.append(new Span("Hello World\nGoodbye Eternity", null));
+        text.append(createSpan("Hello World\nGoodbye Eternity", null));
         assertEquals("Hello World\nGoodbye Eternity", text.toString());
 
         lines = text.extractParagraphs();
@@ -205,7 +207,7 @@ public class ValidateExtracts extends TestCase
         Span span;
 
         text = new TextChain();
-        text.append(new Span("H\nello World", null));
+        text.append(createSpan("H\nello World", null));
         assertEquals("H\nello World", text.toString());
 
         lines = text.extractParagraphs();
@@ -224,7 +226,7 @@ public class ValidateExtracts extends TestCase
         assertEquals("ello World", span.getText());
 
         text = new TextChain();
-        text.append(new Span("\nHello World", null));
+        text.append(createSpan("\nHello World", null));
         assertEquals("\nHello World", text.toString());
 
         lines = text.extractParagraphs();
@@ -241,7 +243,7 @@ public class ValidateExtracts extends TestCase
         assertEquals("Hello World", span.getText());
 
         text = new TextChain();
-        text.append(new Span("Hello World\n", null));
+        text.append(createSpan("Hello World\n", null));
         assertEquals("Hello World\n", text.toString());
 
         lines = text.extractParagraphs();

@@ -37,6 +37,7 @@ import quill.textbase.Span;
 import quill.textbase.TextChain;
 
 import static quill.client.Quill.ui;
+import static quill.textbase.Span.createSpan;
 
 public class ValidateChangePropagation extends GraphicalTestCase
 {
@@ -76,7 +77,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         segment = folio.get(0).get(1);
         chain = segment.getText();
-        span = new Span('h', null);
+        span = createSpan('h', null);
 
         change = new InsertTextualChange(chain, 0, span);
         ui.apply(change);
@@ -107,7 +108,6 @@ public class ValidateChangePropagation extends GraphicalTestCase
         final EditorTextView editor;
         final TextBuffer buffer;
         TextIter start, end;
-        boolean result;
 
         data = new DataLayer();
         ui = new UserInterface(data);
@@ -122,7 +122,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         segment = folio.get(0).get(1);
         chain = segment.getText();
-        span = new Span("This is a test of the emergency broadcast system", null);
+        span = createSpan("This is a test of the emergency broadcast system", null);
 
         change = new InsertTextualChange(chain, 0, span);
         ui.apply(change);
@@ -203,11 +203,11 @@ public class ValidateChangePropagation extends GraphicalTestCase
         segment = folio.get(0).get(1);
         chain = segment.getText();
 
-        span = new Span("This is a test of the emergency broadcast system", null);
+        span = createSpan("This is a test of the emergency broadcast system", null);
         change = new InsertTextualChange(chain, 0, span);
         ui.apply(change);
 
-        span = new Span("emergency", null);
+        span = createSpan("emergency", null);
         extract = TextChain.extractFor(span);
         change = new FormatTextualChange(chain, 22, extract, Common.ITALICS);
         ui.apply(change);

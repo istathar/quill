@@ -33,6 +33,7 @@ import quill.textbase.Folio;
 import quill.textbase.Span;
 
 import static org.gnome.gtk.FileChooserAction.SAVE;
+import static quill.textbase.Span.createSpan;
 import static quill.textbase.TextChain.extractFor;
 
 public class UserInterface
@@ -125,7 +126,7 @@ public class UserInterface
                          */
                         return;
                     }
-                    span = new Span(str, null);
+                    span = createSpan(str, null);
                     stash = extractFor(span);
                 }
             }

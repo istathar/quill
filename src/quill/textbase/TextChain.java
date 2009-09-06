@@ -26,7 +26,7 @@ public class TextChain
 
     TextChain(String str) {
         first = new Piece();
-        first.span = new Span(str, null);
+        first.span = Span.createSpan(str, null);
     }
 
     TextChain(Span initial) {
@@ -108,7 +108,7 @@ public class TextChain
      * Insert the given Java String at the specified offset.
      */
     protected void insert(int offset, String what) {
-        insert(offset, new Span(what, null));
+        insert(offset, Span.createSpan(what, null));
     }
 
     /**

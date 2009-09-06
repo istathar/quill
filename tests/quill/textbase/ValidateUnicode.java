@@ -16,6 +16,8 @@ import org.gnome.gtk.TextIter;
 
 import quill.ui.GraphicalTestCase;
 
+import static quill.textbase.Span.createSpan;
+
 /**
  * Make sure textbase properly handles 2- and 3-byte characters.
  * 
@@ -113,7 +115,7 @@ public class ValidateUnicode extends GraphicalTestCase
 
         str = "Cru𝑛ch";
 
-        span = new Span(str, null);
+        span = createSpan(str, null);
 
         assertEquals(6, span.getWidth());
         assertEquals('C', span.getChar(0));
