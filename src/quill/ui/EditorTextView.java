@@ -15,8 +15,10 @@ import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gdk.Rectangle;
 import org.gnome.gtk.Allocation;
+import org.gnome.gtk.InputMethod;
 import org.gnome.gtk.Menu;
 import org.gnome.gtk.MenuItem;
+import org.gnome.gtk.SimpleInputMethod;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
@@ -53,6 +55,8 @@ abstract class EditorTextView extends TextView
     protected final TextView view;
 
     private TextBuffer buffer;
+
+    private InputMethod input;
 
     private TextMark selectionBound, insertBound;
 
@@ -105,11 +109,6 @@ abstract class EditorTextView extends TextView
     }
 
     /**
-     * Is a user initiated input action in progress?
-     */
-    private boolean user;
-
-    /**
      * Override this and return true if you want TAB characters to be inserted
      * rather than swollowed.
      */
@@ -125,66 +124,11 @@ abstract class EditorTextView extends TextView
     }
 
     private void hookupKeybindings() {
-        buffer.connect(new TextBuffer.InsertText() {
-            public void onInsertText(TextBuffer source, TextIter pointer, String text) {
-                final Span span;
-                final TextualChange change;
-                final int offset;
+        input = new SimpleInputMethod();
 
-                if (!user) {
-                    return;
-                }
-                user = false;
-
-                buffer.stopInsertText();
-
-                span = new Span(text, insertMarkup);
-                offset = pointer.getOffset();
-
-                change = new InsertTextualChange(chain, offset, span);
-                ui.apply(change);
-
-                user = true;
-            }
-        });
-
-        buffer.connect(new TextBuffer.DeleteRange() {
-            public void onDeleteRange(TextBuffer source, TextIter start, TextIter end) {
-                int alpha, omega, offset, width;
-                final Extract range;
-                final TextualChange change;
-
-                if (!user) {
-                    return;
-                }
-                user = false;
-
-                buffer.stopDeleteRange();
-
-                alpha = start.getOffset();
-                omega = end.getOffset();
-
-                offset = normalizeOffset(alpha, omega);
-                width = normalizeWidth(alpha, omega);
-
-                range = chain.extractRange(offset, width);
-                change = new DeleteTextualChange(chain, offset, range);
-                ui.apply(change);
-
-                user = true;
-            }
-        });
-
-        buffer.connect(new TextBuffer.BeginUserAction() {
-            public void onBeginUserAction(TextBuffer source) {
-                user = true;
-            }
-        });
-
-        // this may be unnecessary
-        buffer.connect(new TextBuffer.EndUserAction() {
-            public void onEndUserAction(TextBuffer source) {
-                user = false;
+        input.connect(new InputMethod.Commit() {
+            public void onCommit(InputMethod source, String text) {
+                insertText(text);
             }
         });
 
@@ -192,6 +136,21 @@ abstract class EditorTextView extends TextView
             public boolean onKeyPressEvent(Widget source, EventKey event) {
                 final Keyval key;
                 final ModifierType mod;
+
+                /*
+                 * This is magic, actually. Both normal keystrokes and
+                 * composed sequences will be delivered to us above in the
+                 * InputMethod.Commit handler.
+                 */
+
+                if (input.filterKeypress(event)) {
+                    return true;
+                }
+
+                /*
+                 * Otherwise, we begin the logic to check and see if we're
+                 * going to handle it ourselves.
+                 */
 
                 key = event.getKeyval();
 
@@ -247,11 +206,14 @@ abstract class EditorTextView extends TextView
                  */
                 if (key == Keyval.Return) {
                     insertMarkup = null;
-                    return false;
+                    insertText("\n");
+                    return true;
                 } else if (key == Keyval.Delete) {
-                    return false;
+                    deleteAt();
+                    return true;
                 } else if (key == Keyval.BackSpace) {
-                    return false;
+                    deleteBack();
+                    return true;
                 }
 
                 /*
@@ -264,15 +226,15 @@ abstract class EditorTextView extends TextView
                 }
 
                 /*
-                 * Ignore initial press of modifier keys (for now)
+                 * Let modifier keys through; input methods, cursor movement,
+                 * and selection seems to depend on this.
                  */
 
                 if ((key == Keyval.ShiftLeft) || (key == Keyval.ShiftRight) || (key == Keyval.AltLeft)
                         || (key == Keyval.AltRight) || (key == Keyval.ControlLeft)
                         || (key == Keyval.ControlRight) || (key == Keyval.SuperLeft)
                         || (key == Keyval.SuperRight)) {
-                    // deliberate no-op
-                    return true;
+                    return false;
                 }
 
                 /*
@@ -299,9 +261,8 @@ abstract class EditorTextView extends TextView
 
                 if ((mod == ModifierType.NONE) || (mod == ModifierType.SHIFT_MASK)) {
                     /*
-                     * Normal keystroke; let the current input method take
-                     * care of things (and then we react to
-                     * TextBuffer.InsertText when it occurs).
+                     * Normal keystroke. Chances are we probably don't get
+                     * here that often.
                      */
                     return false;
                 }
@@ -329,8 +290,8 @@ abstract class EditorTextView extends TextView
                         return true;
                     } else {
                         /*
-                         * No keybinding in the editor, let PrimaryWindow
-                         * handle it.
+                         * No keybinding in the editor, but PrimaryWindow will
+                         * handle program wide accelerators.
                          */
                         return false;
                     }
@@ -358,15 +319,21 @@ abstract class EditorTextView extends TextView
                     } else if (key == Keyval.T) {
                         toggleMarkup(Common.TYPE);
                         return true;
+                    } else if (key == Keyval.U) {
+                        /*
+                         * Special to GTK's default input method, so pass
+                         * through!
+                         */
+                        return false;
                     } else {
                         /*
-                         * No keybinding
+                         * Nothing special, pass through.
                          */
-                        return true;
+                        return false;
                     }
                 } else if (mod == ModifierType.LOCK_MASK) {
                     /*
-                     * No keybinding needed.
+                     * No keybinding needed, pass through.
                      */
                     return false;
                 }
@@ -379,6 +346,40 @@ abstract class EditorTextView extends TextView
                 throw new IllegalStateException("\n" + "Unhandled " + key + " with " + mod);
             }
         });
+
+        view.connect(new Widget.KeyReleaseEvent() {
+            public boolean onKeyReleaseEvent(Widget source, EventKey event) {
+                if (input.filterKeypress(event)) {
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void insertText(String text) {
+        final Extract removed;
+        final Span span;
+        final TextualChange change;
+        final TextIter selection;
+        final int selectionOffset, offset, width;
+
+        span = new Span(text, insertMarkup);
+
+        if (buffer.getHasSelection()) {
+            selection = buffer.getIter(selectionBound);
+            selectionOffset = selection.getOffset();
+
+            offset = normalizeOffset(insertOffset, selectionOffset);
+            width = normalizeWidth(insertOffset, selectionOffset);
+
+            removed = chain.extractRange(offset, width);
+            change = new FullTextualChange(chain, offset, removed, span);
+        } else {
+            change = new InsertTextualChange(chain, insertOffset, span);
+        }
+
+        ui.apply(change);
     }
 
     private void pasteText() {
@@ -409,6 +410,62 @@ abstract class EditorTextView extends TextView
          * Propegate the change. After this wends its way though the layers,
          * it will result in ComponentEditorWindow calling this.affect().
          */
+
+        ui.apply(change);
+    }
+
+    private void deleteBack() {
+        final TextIter start, end;
+
+        end = buffer.getIter(insertBound);
+
+        if (buffer.getHasSelection()) {
+            start = buffer.getIter(selectionBound);
+        } else {
+            if (end.isStart()) {
+                return;
+            }
+            start = end.copy();
+            start.backwardChar();
+        }
+
+        deleteRange(start, end);
+    }
+
+    private void deleteAt() {
+        final TextIter start, end;
+
+        start = buffer.getIter(insertBound);
+
+        if (buffer.getHasSelection()) {
+            end = buffer.getIter(selectionBound);
+        } else {
+            if (start.isEnd()) {
+                return;
+            }
+            end = start.copy();
+            end.forwardChar();
+        }
+
+        deleteRange(start, end);
+    }
+
+    /**
+     * Effect a deletion from start to end.
+     */
+    private void deleteRange(TextIter start, TextIter end) {
+        int alpha, omega, offset, width;
+        final Extract range;
+        final TextualChange change;
+
+        alpha = start.getOffset();
+        omega = end.getOffset();
+
+        offset = normalizeOffset(alpha, omega);
+        width = normalizeWidth(alpha, omega);
+
+        range = chain.extractRange(offset, width);
+        change = new DeleteTextualChange(chain, offset, range);
 
         ui.apply(change);
     }

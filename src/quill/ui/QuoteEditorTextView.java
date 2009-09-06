@@ -20,6 +20,7 @@ class QuoteEditorTextView extends EditorTextView
         view.modifyFont(fonts.serif);
         view.setMarginLeft(40);
         view.setMarginRight(40);
-        view.setPaddingBelowParagraph(10);
+        view.setPaddingAboveParagraph(4);
+        view.setPaddingBelowParagraph(6);
     }
 }

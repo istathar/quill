@@ -16,9 +16,10 @@
 #
 
 JAVAC=/opt/icedtea6-bin-1.4.1/bin/javac -g
+JAVA=/opt/icedtea6-bin-1.4.1/bin/java -ea -client
 GTK_JAR=/home/andrew/workspace/java-gnome/tmp/gtk-4.0.jar
 XOM_JAR=/home/andrew/workspace/xom/tmp/classes
-JUNIT_JAR=/usr/share/junit/lib/junit.jar:/home/andrew/workspace/java-gnome/tmp/tests
+JUNIT_JAR=/usr/share/junit/lib/junit.jar
 
 all: build
 
@@ -39,10 +40,16 @@ compile-tests: dirs list
 	@tmp/list-tests
 
 list: dirs
-	find src -type f -name '*.java' > tmp/list-core
-	find tests -type f -name '*.java' > tmp/list-tests
+	@find src -type f -name '*.java' > tmp/list-core
+	@find tests -type f -name '*.java' > tmp/list-tests
 
 dirs: tmp/classes
 
 tmp/classes:
 	mkdir -p tmp/classes
+
+test: build
+	$(JAVA) \
+	-classpath $(GTK_JAR):$(XOM_JAR):$(JUNIT_JAR):tmp/classes \
+	UnitTests
+

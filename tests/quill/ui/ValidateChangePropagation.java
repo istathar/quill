@@ -17,7 +17,10 @@ import java.io.OutputStream;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 
+import org.gnome.gdk.Keyval;
+import org.gnome.gdk.ModifierType;
 import org.gnome.gtk.Container;
+import org.gnome.gtk.Test;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.Widget;
@@ -104,6 +107,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         final EditorTextView editor;
         final TextBuffer buffer;
         TextIter start, end;
+        boolean result;
 
         data = new DataLayer();
         ui = new UserInterface(data);
@@ -153,17 +157,9 @@ public class ValidateChangePropagation extends GraphicalTestCase
         end = buffer.getIter(21);
         buffer.selectRange(start, end);
         assertEquals(" test of the", buffer.getText(start, end, true));
-
-        buffer.beginUserAction();
-        buffer.delete(start, end);
-
-        /*
-         * Have to revalidate the TextIter. Hm. This may be a bug in our
-         * blocking logic. At the very least it's an inelegance.
-         */
-        start = buffer.getIter(9);
-        buffer.insert(start, "n");
-        buffer.endUserAction();
+        Test.cycleMainLoop();
+        Test.sendKey(editor, Keyval.n, ModifierType.NONE);
+        Test.cycleMainLoop();
 
         out = new ByteArrayOutputStream();
         data.saveDocument(out);

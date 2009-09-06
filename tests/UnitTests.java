@@ -23,8 +23,6 @@ import quill.textbase.ValidateUnicode;
 import quill.textbase.ValidateWrapperExpansions;
 import quill.ui.ValidateChangePropagation;
 
-import com.operationaldynamics.junit.VerboseTestRunner;
-
 public class UnitTests
 {
     /**
