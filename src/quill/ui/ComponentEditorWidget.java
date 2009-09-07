@@ -336,7 +336,7 @@ class ComponentEditorWidget extends ScrolledWindow
         segment = lookup(from);
         i = series.indexOf(segment);
 
-        if (i < 0) {
+        if (i < 1) {
             return;
         }
         i--;
@@ -362,10 +362,10 @@ class ComponentEditorWidget extends ScrolledWindow
         segment = lookup(from);
         i = series.indexOf(segment);
 
-        if (i - 1 == series.size()) {
+        i++;
+        if (i == series.size()) {
             return;
         }
-        i++;
 
         segment = series.get(i);
         below = lookup(segment);
