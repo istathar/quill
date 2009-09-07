@@ -327,7 +327,7 @@ class ComponentEditorWidget extends ScrolledWindow
         first.grabFocus();
     }
 
-    void moveCursorUp(final Widget from, int position) {
+    void moveCursorUp(final Widget from, final int position) {
         int i;
         final Widget above;
         Segment segment;
@@ -343,10 +343,6 @@ class ComponentEditorWidget extends ScrolledWindow
 
         segment = series.get(i);
         above = lookup(segment);
-
-        if (position == -1) {
-            position = segment.getText().length();
-        }
 
         editor = (EditorTextView) above;
         editor.placeCursorLastLine(position);

@@ -982,22 +982,33 @@ abstract class EditorTextView extends TextView
         ui.apply(change);
     }
 
-    void placeCursorFirstLine(int position) {
-        final TextIter pointer;
+    void placeCursorFirstLine(int requested) {
+        final TextIter pointer, end;
+        int position;
 
-        pointer = buffer.getIter(position);
-        buffer.placeCursor(pointer);
+        pointer = buffer.getIter(requested);
+        end = buffer.getIterStart();
+        end.forwardDisplayLineEnd(view);
+        position = end.getOffset();
+
+        if (requested > position) {
+            buffer.placeCursor(end);
+        } else {
+            buffer.placeCursor(pointer);
+        }
     }
 
-    void placeCursorLastLine(int position) {
+    void placeCursorLastLine(int requested) {
         final int length;
         final TextIter pointer;
 
         length = chain.length();
-
         pointer = buffer.getIter(length);
-        pointer.backwardDisplayLineStart(view);
-        pointer.forwardChars(position);
+
+        if (requested != -1) {
+            pointer.backwardDisplayLineStart(view);
+            pointer.forwardChars(requested);
+        }
 
         buffer.placeCursor(pointer);
     }
