@@ -155,22 +155,22 @@ abstract class EditorTextView extends TextView
                 key = event.getKeyval();
 
                 /*
-                 * Let default keybindings handle cursor movement keys and for
-                 * a few other special keys we don't need to handle.
+                 * Special cases in cursor movement (otherwise, let default
+                 * handler do its thing).
                  */
 
-                if ((key == Keyval.Up) || (key == Keyval.Right)) {
-                    if (insertOffset == 0) {
-                        // ui.primary.moveCursorBack();
-                        return false;
-                    }
+                if (key == Keyval.Up) {
+                    return handleCursorUp();
+                }
+                if (key == Keyval.Left) {
+                    return handleCursorLeft();
                 }
 
-                if ((key == Keyval.Down) || (key == Keyval.Left)) {
-                    if (insertOffset == chain.length()) {
-                        // ui.primary.moveCursorNext();
-                        return false;
-                    }
+                if (key == Keyval.Down) {
+                    return handleCursorDown();
+                }
+                if (key == Keyval.Right) {
+                    return handleCursorRight();
                 }
 
                 if ((key == Keyval.Home) || (key == Keyval.End) || (key == Keyval.PageUp)
@@ -355,6 +355,18 @@ abstract class EditorTextView extends TextView
                 return false;
             }
         });
+    }
+
+    // recursive
+    private static ComponentEditorWidget findComponentEditor(Widget widget) {
+        final Widget parent;
+
+        parent = widget.getParent();
+        if (parent instanceof ComponentEditorWidget) {
+            return (ComponentEditorWidget) parent;
+        } else {
+            return findComponentEditor(parent);
+        }
     }
 
     private void insertText(String text) {
@@ -956,5 +968,88 @@ abstract class EditorTextView extends TextView
         change = new SplitStructuralChange(segment, insertOffset, addition);
 
         ui.apply(change);
+    }
+
+    void placeCursorFirstLine(int position) {
+        final TextIter pointer;
+
+        pointer = buffer.getIter(position);
+        buffer.placeCursor(pointer);
+    }
+
+    void placeCursorLastLine(int position) {
+        final int length;
+        final TextIter pointer;
+
+        length = chain.length();
+
+        pointer = buffer.getIter(length);
+        pointer.backwardDisplayLineStart(view);
+        pointer.forwardChars(position);
+
+        buffer.placeCursor(pointer);
+    }
+
+    private boolean handleCursorUp() {
+        final TextIter pointer;
+        final ComponentEditorWidget parent;
+
+        pointer = buffer.getIter(insertOffset);
+
+        if (pointer.backwardDisplayLine(view)) {
+            return false;
+        } else {
+            parent = findComponentEditor(view);
+            parent.moveCursorUp(view, insertOffset);
+            return true;
+        }
+    }
+
+    private boolean handleCursorLeft() {
+        final ComponentEditorWidget parent;
+
+        if (insertOffset == 0) {
+            parent = findComponentEditor(view);
+            parent.moveCursorUp(view, -1);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean handleCursorDown() {
+        final TextIter pointer, start;
+        int position;
+        final ComponentEditorWidget parent;
+
+        pointer = buffer.getIter(insertOffset);
+
+        if (pointer.forwardDisplayLine(view)) {
+            return false;
+        } else {
+            start = pointer.copy();
+            start.backwardDisplayLineStart(view);
+
+            position = insertOffset - start.getOffset();
+
+            parent = findComponentEditor(view);
+            parent.moveCursorDown(view, position);
+            return true;
+        }
+    }
+
+    private boolean handleCursorRight() {
+        final ComponentEditorWidget parent;
+        final int len;
+
+        len = chain.length();
+
+        if (insertOffset == len) {
+            parent = findComponentEditor(view);
+            parent.moveCursorDown(view, 0);
+            return true;
+        } else {
+            return false;
+        }
     }
 }
