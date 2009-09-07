@@ -155,15 +155,15 @@ abstract class EditorTextView extends TextView
                 key = event.getKeyval();
 
                 /*
-                 * Let default keybindings handle cursor movement keys and for
-                 * a few other special keys we don't need to handle.
+                 * Special cases in cursor movement (otherwise, let default
+                 * handler do its thing).
                  */
 
-                if ((key == Keyval.Up) || (key == Keyval.Left)) {
-                    if (insertOffset == 0) {
-                        findComponentEditor(view).moveCursorUp(view);
-                        return true;
-                    }
+                if (key == Keyval.Up) {
+                    return handleCursorUp();
+                }
+                if (key == Keyval.Left) {
+                    return handleCursorLeft();
                 }
 
                 if ((key == Keyval.Down) || (key == Keyval.Right)) {
@@ -975,5 +975,45 @@ abstract class EditorTextView extends TextView
 
         pointer = buffer.getIter(offset);
         buffer.placeCursor(pointer);
+    }
+
+    void setCursorLast(int pos) {
+        final int len;
+        final TextIter pointer;
+
+        len = chain.length();
+
+        pointer = buffer.getIter(len);
+        pointer.backwardDisplayLineStart(view);
+        pointer.forwardChars(pos);
+
+        buffer.placeCursor(pointer);
+    }
+
+    private boolean handleCursorUp() {
+        final TextIter pointer;
+        final ComponentEditorWidget parent;
+
+        pointer = buffer.getIter(insertOffset);
+
+        if (pointer.backwardDisplayLine(view)) {
+            return false;
+        } else {
+            parent = findComponentEditor(view);
+            parent.moveCursorUp(view, insertOffset);
+            return true;
+        }
+    }
+
+    private boolean handleCursorLeft() {
+        final ComponentEditorWidget parent;
+
+        if (insertOffset == 0) {
+            parent = findComponentEditor(view);
+            parent.moveCursorUp(view, -1);
+            return true;
+        } else {
+            return false;
+        }
     }
 }
