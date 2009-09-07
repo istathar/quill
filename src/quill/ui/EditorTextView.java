@@ -159,17 +159,17 @@ abstract class EditorTextView extends TextView
                  * a few other special keys we don't need to handle.
                  */
 
-                if ((key == Keyval.Up) || (key == Keyval.Right)) {
+                if ((key == Keyval.Up) || (key == Keyval.Left)) {
                     if (insertOffset == 0) {
-                        // ui.primary.moveCursorBack();
-                        return false;
+                        findComponentEditor(view).moveCursorUp(view);
+                        return true;
                     }
                 }
 
-                if ((key == Keyval.Down) || (key == Keyval.Left)) {
+                if ((key == Keyval.Down) || (key == Keyval.Right)) {
                     if (insertOffset == chain.length()) {
-                        // ui.primary.moveCursorNext();
-                        return false;
+                        findComponentEditor(view).moveCursorDown(view);
+                        return true;
                     }
                 }
 
@@ -355,6 +355,18 @@ abstract class EditorTextView extends TextView
                 return false;
             }
         });
+    }
+
+    // recursive
+    private static ComponentEditorWidget findComponentEditor(Widget widget) {
+        final Widget parent;
+
+        parent = widget.getParent();
+        if (parent instanceof ComponentEditorWidget) {
+            return (ComponentEditorWidget) parent;
+        } else {
+            return findComponentEditor(parent);
+        }
     }
 
     private void insertText(String text) {
@@ -956,5 +968,12 @@ abstract class EditorTextView extends TextView
         change = new SplitStructuralChange(segment, insertOffset, addition);
 
         ui.apply(change);
+    }
+
+    void setCursorAt(int offset) {
+        final TextIter pointer;
+
+        pointer = buffer.getIter(offset);
+        buffer.placeCursor(pointer);
     }
 }
