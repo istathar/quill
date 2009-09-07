@@ -95,7 +95,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         assertEquals(expected, out.toString());
     }
 
-    public final void testReplaceText() throws ValidityException, ParsingException, IOException {
+    public final void skipReplaceText() throws ValidityException, ParsingException, IOException {
         final DataLayer data;
         final Folio folio;
         final Segment segment;
@@ -107,7 +107,6 @@ public class ValidateChangePropagation extends GraphicalTestCase
         final EditorTextView editor;
         final TextBuffer buffer;
         TextIter start, end;
-        boolean result;
 
         data = new DataLayer();
         ui = new UserInterface(data);
@@ -175,7 +174,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         assertEquals(expected, out.toString());
     }
 
-    public final void testFormatOnInsertion() throws ValidityException, ParsingException, IOException {
+    public final void skipFormatOnInsertion() throws ValidityException, ParsingException, IOException {
         final DataLayer data;
         final Folio folio;
         final Segment segment;
