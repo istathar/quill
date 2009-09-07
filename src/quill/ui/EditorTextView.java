@@ -154,25 +154,6 @@ abstract class EditorTextView extends TextView
 
                 key = event.getKeyval();
 
-                /*
-                 * Special cases in cursor movement (otherwise, let default
-                 * handler do its thing).
-                 */
-
-                if (key == Keyval.Up) {
-                    return handleCursorUp();
-                }
-                if (key == Keyval.Left) {
-                    return handleCursorLeft();
-                }
-
-                if (key == Keyval.Down) {
-                    return handleCursorDown();
-                }
-                if (key == Keyval.Right) {
-                    return handleCursorRight();
-                }
-
                 if ((key == Keyval.Home) || (key == Keyval.End) || (key == Keyval.PageUp)
                         || (key == Keyval.PageDown) || (key == Keyval.Compose)) {
                     return false;
@@ -254,18 +235,46 @@ abstract class EditorTextView extends TextView
                 }
 
                 /*
-                 * Now on to processing normal keystrokes.
+                 * Now on to processing special keystrokes.
                  */
 
                 mod = event.getState();
 
-                if ((mod == ModifierType.NONE) || (mod == ModifierType.SHIFT_MASK)) {
+                if (mod == ModifierType.NONE) {
                     /*
-                     * Normal keystroke. Chances are we probably don't get
-                     * here that often.
+                     * Special cases in cursor movement, but only if
+                     * unmodified (otherwise, let default handler do its
+                     * thing, and constrain it to this TextView.
+                     */
+
+                    if (key == Keyval.Up) {
+                        return handleCursorUp();
+                    }
+                    if (key == Keyval.Left) {
+                        return handleCursorLeft();
+                    }
+                    if (key == Keyval.Down) {
+                        return handleCursorDown();
+                    }
+                    if (key == Keyval.Right) {
+                        return handleCursorRight();
+                    }
+
+                    /*
+                     * We're not really supposed to get here, but (deep
+                     * breath) let the TextView handle it. This had better not
+                     * mutate the TextBuffer.
                      */
                     return false;
                 }
+
+                if (mod == ModifierType.SHIFT_MASK) {
+                    /*
+                     * Nothing special, pass through.
+                     */
+                    return false;
+                }
+
                 if (mod == ModifierType.CONTROL_MASK) {
                     if (key == Keyval.a) {
                         // select all; pass through
@@ -295,8 +304,9 @@ abstract class EditorTextView extends TextView
                          */
                         return false;
                     }
-                } else if (mod.contains(ModifierType.CONTROL_MASK)
-                        && mod.contains(ModifierType.SHIFT_MASK)) {
+                }
+
+                if (mod.contains(ModifierType.CONTROL_MASK) && mod.contains(ModifierType.SHIFT_MASK)) {
                     if (key == Keyval.Space) {
                         clearFormat();
                         return true;
@@ -331,7 +341,9 @@ abstract class EditorTextView extends TextView
                          */
                         return false;
                     }
-                } else if (mod == ModifierType.LOCK_MASK) {
+                }
+
+                if (mod == ModifierType.LOCK_MASK) {
                     /*
                      * No keybinding needed, pass through.
                      */
