@@ -349,16 +349,15 @@ class ComponentEditorWidget extends ScrolledWindow
         }
 
         editor = (EditorTextView) above;
-        editor.setCursorLast(position);
+        editor.placeCursorLastLine(position);
         editor.grabFocus();
     }
 
-    void moveCursorDown(final Widget from) {
+    void moveCursorDown(final Widget from, final int position) {
         int i;
         final Widget below;
         Segment segment;
         final EditorTextView editor;
-        final int offset;
 
         segment = lookup(from);
         i = series.indexOf(segment);
@@ -371,10 +370,8 @@ class ComponentEditorWidget extends ScrolledWindow
         segment = series.get(i);
         below = lookup(segment);
 
-        offset = 0;
-
         editor = (EditorTextView) below;
-        editor.setCursorAt(offset);
+        editor.placeCursorFirstLine(position);
         editor.grabFocus();
     }
 }
