@@ -326,4 +326,48 @@ class ComponentEditorWidget extends ScrolledWindow
         first = lookup(series.get(0));
         first.grabFocus();
     }
+
+    void moveCursorUp(final Widget from, final int position) {
+        int i;
+        final Widget above;
+        Segment segment;
+        final EditorTextView editor;
+
+        segment = lookup(from);
+        i = series.indexOf(segment);
+
+        if (i < 1) {
+            return;
+        }
+        i--;
+
+        segment = series.get(i);
+        above = lookup(segment);
+
+        editor = (EditorTextView) above;
+        editor.placeCursorLastLine(position);
+        editor.grabFocus();
+    }
+
+    void moveCursorDown(final Widget from, final int position) {
+        int i;
+        final Widget below;
+        Segment segment;
+        final EditorTextView editor;
+
+        segment = lookup(from);
+        i = series.indexOf(segment);
+
+        i++;
+        if (i == series.size()) {
+            return;
+        }
+
+        segment = series.get(i);
+        below = lookup(segment);
+
+        editor = (EditorTextView) below;
+        editor.placeCursorFirstLine(position);
+        editor.grabFocus();
+    }
 }
