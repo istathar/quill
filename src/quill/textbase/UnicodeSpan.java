@@ -50,11 +50,11 @@ public class UnicodeSpan extends Span
         int i, j;
         char ch;
 
-        this.data = str;
-
         if (width == 1) {
-            this.points = lookup(str);
+            this.data = lookupString(str);
+            this.points = lookupPoints(str);
         } else {
+            this.data = str;
             this.points = new int[width];
         }
 
@@ -88,19 +88,22 @@ public class UnicodeSpan extends Span
         this.length = length;
     }
 
-    private static WeakHashMap<String, WeakReference<int[]>> cache;
+    private static WeakHashMap<String, WeakReference<int[]>> cachePoints;
+
+    private static WeakHashMap<String, WeakReference<String>> cacheString;
 
     static {
-        cache = new WeakHashMap<String, WeakReference<int[]>>(2);
+        cachePoints = new WeakHashMap<String, WeakReference<int[]>>(8);
+        cacheString = new WeakHashMap<String, WeakReference<String>>(8);
     }
 
-    private static synchronized int[] lookup(final String str) {
+    private static synchronized int[] lookupPoints(final String str) {
         WeakReference<int[]> ref;
         int[] result;
 
         result = null;
 
-        ref = cache.get(str);
+        ref = cachePoints.get(str);
         if (ref != null) {
             result = ref.get();
         }
@@ -108,8 +111,28 @@ public class UnicodeSpan extends Span
         if (result == null) {
             result = new int[1];
             ref = new WeakReference<int[]>(result);
-            cache.put(str, ref);
+            cachePoints.put(str, ref);
             return result;
+        } else {
+            return result;
+        }
+    }
+
+    private static synchronized String lookupString(final String str) {
+        WeakReference<String> ref;
+        String result;
+
+        result = null;
+
+        ref = cacheString.get(str);
+        if (ref != null) {
+            result = ref.get();
+        }
+
+        if (result == null) {
+            ref = new WeakReference<String>(str);
+            cacheString.put(str, ref);
+            return str;
         } else {
             return result;
         }

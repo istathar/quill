@@ -175,18 +175,22 @@ public class ValidateUnicode extends GraphicalTestCase
         final UnicodeSpan t1, t2, w1, w2;
 
         /*
-         * Will be cached.
+         * Both int[] and String will be cached.
          */
         t1 = (UnicodeSpan) createSpan("𝌐", null);
         t2 = (UnicodeSpan) createSpan("𝌐", null);
 
-        /*
-         * Won't be cached
-         */
-        w1 = (UnicodeSpan) createSpan("The 𝌐 symbol is divergence", null);
-        w2 = (UnicodeSpan) createSpan("The 𝌐 symbol is divergence", null);
-
         assertSame(t1.getPoints(), t2.getPoints());
+        assertSame(t1.getText(), t2.getText());
+
+        /*
+         * Won't be cached, and nor will the String data [here, force separate
+         * String objects.
+         */
+        w1 = (UnicodeSpan) createSpan(new String("The 𝌐 symbol is divergence"), null);
+        w2 = (UnicodeSpan) createSpan(new String("The 𝌐 symbol is divergence"), null);
+
         assertNotSame(w1.getPoints(), w2.getPoints());
+        assertNotSame(w1.getText(), w2.getText());
     }
 }
