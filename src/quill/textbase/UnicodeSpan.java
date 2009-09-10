@@ -26,11 +26,19 @@ public class UnicodeSpan extends Span
      * Because Strings can contain Unicode surrogate pairs, we also need the
      * backing data in code point form.
      */
-    final int[] points;
+    private final int[] points;
+
+    private final int start;
+
+    private final int length;
 
     /**
      * Construct a new Span with the given String. If it is width 1, a cached
      * String reference will be used instead.
+     */
+    /*
+     * Assumes width in characters was correctly calculated by the calling
+     * factory method up in Span.
      */
     UnicodeSpan(String str, int width, Markup markup) {
         super(markup);
@@ -44,6 +52,8 @@ public class UnicodeSpan extends Span
         this.data = str;
 
         this.points = new int[width];
+        this.start = 0;
+        this.length = width;
 
         j = 0;
         for (i = 0; i < len; i++) {
@@ -64,14 +74,16 @@ public class UnicodeSpan extends Span
     /**
      * Create a copy of this Span but with different Markup applying to it.
      */
-    private UnicodeSpan(String data, int[] points, Markup markup) {
+    private UnicodeSpan(String data, int[] points, int start, int length, Markup markup) {
         super(markup);
         this.data = data;
         this.points = points;
+        this.start = start;
+        this.length = length;
     }
 
     Span copy(Markup markup) {
-        return new UnicodeSpan(this.data, this.points, markup);
+        return new UnicodeSpan(this.data, this.points, this.start, this.length, markup);
     }
 
     /**
@@ -103,35 +115,31 @@ public class UnicodeSpan extends Span
      * <code>begin</code> and <code>end</code> are character offsets.
      */
     Span split(int begin, int end) {
-        final int[] subset;
-        final int width;
+        final int origin, width, first;
         final StringBuilder str;
         int i;
 
         width = end - begin;
+        origin = start + begin;
 
         if (width == 1) {
-            if (!(Character.isSupplementaryCodePoint(points[begin]))) {
-                return new CharacterSpan((char) points[begin], getMarkup());
+            first = points[origin];
+            if (!(Character.isSupplementaryCodePoint(first))) {
+                return new CharacterSpan((char) first, getMarkup());
             }
         }
 
-        subset = new int[width];
-
-        System.arraycopy(this.points, begin, subset, 0, width);
-
         /*
-         * We're not done, however: we need to create a new Java String to be
-         * cached by the Span. I wonder if this will be a hot spot, but I'm
-         * not sure what a better approach will be.
+         * We need to create a new Java String to be cached by the Span. TODO
+         * calculate range in UTF-16 chars and reuse via String's substring().
          */
 
         str = new StringBuilder();
 
-        for (i = 0; i < subset.length; i++) {
-            str.appendCodePoint(subset[i]);
+        for (i = start + begin; i < start + begin + end; i++) {
+            str.appendCodePoint(points[i]);
         }
 
-        return new UnicodeSpan(str.toString(), subset, this.getMarkup());
+        return new UnicodeSpan(str.toString(), points, start + begin, width, this.getMarkup());
     }
 }
