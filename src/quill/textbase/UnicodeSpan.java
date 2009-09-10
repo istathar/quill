@@ -109,6 +109,13 @@ public class UnicodeSpan extends Span
         int i;
 
         width = end - begin;
+
+        if (width == 1) {
+            if (!(Character.isSupplementaryCodePoint(points[begin]))) {
+                return new CharacterSpan((char) points[begin], getMarkup());
+            }
+        }
+
         subset = new int[width];
 
         System.arraycopy(this.points, begin, subset, 0, width);

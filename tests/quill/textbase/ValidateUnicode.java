@@ -32,6 +32,33 @@ import static quill.textbase.Span.createSpan;
  */
 public class ValidateUnicode extends GraphicalTestCase
 {
+    public final void testSurrogageIdentification() {
+        assertTrue(Character.MIN_HIGH_SURROGATE == Character.MIN_SURROGATE);
+        assertTrue(Character.MAX_HIGH_SURROGATE > Character.MIN_SURROGATE);
+        assertTrue(Character.MAX_HIGH_SURROGATE < Character.MAX_SURROGATE);
+
+        assertTrue(Character.MIN_LOW_SURROGATE > Character.MIN_SURROGATE);
+        assertTrue(Character.MIN_LOW_SURROGATE < Character.MAX_SURROGATE);
+        assertTrue(Character.MAX_LOW_SURROGATE == Character.MAX_SURROGATE);
+
+        assertTrue(isSurrogate(Character.MAX_SURROGATE));
+
+        // but
+        assertTrue(Character.isSupplementaryCodePoint(0x1d45b));
+    }
+
+    /*
+     * It turned out we didn't need this after all. So the code is moved here
+     * from UnicodeSpan for safe keeping.
+     */
+    private static final boolean isSurrogate(int point) {
+        if ((point >= Character.MIN_SURROGATE) && (point <= Character.MAX_SURROGATE)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public final void testLatin1Supplement() {
         final TextChain chain;
 

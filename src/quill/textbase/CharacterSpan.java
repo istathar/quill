@@ -44,7 +44,7 @@ public class CharacterSpan extends Span
             throw new IllegalStateException();
         }
         this.ch = ch;
-        this.text = cache(ch);
+        this.text = lookup(ch);
     }
 
     private CharacterSpan(char ch, String str, Markup markup) {
@@ -73,7 +73,7 @@ public class CharacterSpan extends Span
      * higher range numbers, we turn to the JVM's interning infrastructure for
      * Strings.
      */
-    private static String cache(char ch) {
+    private static String lookup(char ch) {
         if (ch < 256) {
             if (cache[ch] == null) {
                 cache[ch] = String.valueOf(ch);
