@@ -243,7 +243,8 @@ public class ValidateExtracts extends TestCase
         assertEquals("Hello World", span.getText());
 
         text = new TextChain();
-        text.append(createSpan("Hello World\n", null));
+        span = createSpan("Hello World\n", null);
+        text.append(span);
         assertEquals("Hello World\n", text.toString());
 
         lines = text.extractParagraphs();

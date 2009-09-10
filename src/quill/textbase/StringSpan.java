@@ -71,7 +71,7 @@ public class StringSpan extends Span
 
     Span split(int begin, int end) {
         if ((end - begin) == 1) {
-            return new CharacterSpan((char) getChar(0), getMarkup());
+            return new CharacterSpan((char) getChar(begin), getMarkup());
         } else {
             return new StringSpan(this, begin, end);
         }
