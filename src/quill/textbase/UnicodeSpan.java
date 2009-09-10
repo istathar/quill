@@ -33,21 +33,19 @@ public class UnicodeSpan extends Span
     private final int length;
 
     /**
-     * Construct a new Span with the given String. If it is width 1, a cached
-     * String reference will be used instead.
+     * Construct a new UnicodeSpan based on the given UTF-16 String,
+     * previously calculated to be width characters wide. If it is width 1, a
+     * cached String reference will be used instead.
      */
     /*
      * Assumes width in characters was correctly calculated by the calling
      * factory method up in Span.
      */
-    UnicodeSpan(String str, int width, Markup markup) {
+    UnicodeSpan(String str, int length, int width, Markup markup) {
         super(markup);
 
-        final int len;
         int i, j;
         char ch;
-
-        len = str.length();
 
         this.data = str;
 
@@ -56,7 +54,7 @@ public class UnicodeSpan extends Span
         this.length = width;
 
         j = 0;
-        for (i = 0; i < len; i++) {
+        for (i = 0; i < length; i++) {
             ch = str.charAt(i);
 
             if (Character.isHighSurrogate(ch)) {

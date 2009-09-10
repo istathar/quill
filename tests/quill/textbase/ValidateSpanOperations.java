@@ -34,8 +34,30 @@ public class ValidateSpanOperations extends TestCase
         c = createSpan('A', null);
         s = createSpan("Hello World", null);
 
+        assertTrue(c instanceof CharacterSpan);
         assertEquals(1, c.getWidth());
+
+        assertTrue(s instanceof StringSpan);
         assertEquals(11, s.getWidth());
+    }
+
+    public final void testInhibitZeroLengthSpans() {
+        final Span c, s, z;
+
+        try {
+            c = createSpan("", null);
+            fail(c.toString());
+        } catch (IllegalArgumentException iae) {
+            // good
+        }
+
+        s = createSpan("Hello World", null);
+        try {
+            z = s.split(4, 4);
+            fail(z.toString());
+        } catch (IllegalArgumentException iae) {
+            // good
+        }
     }
 
     public final void testCharacterSpanStringCaching() {

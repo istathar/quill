@@ -15,21 +15,17 @@ package quill.textbase;
  * 
  * @author Andrew Cowie
  */
-/*
- * Relies on Span.createSpan() to ensure there are no surrogates in the
- * String; we could perhaps put a check for that here.
- */
 public class StringSpan extends Span
 {
     private final String data;
 
+    /*
+     * Relies on Span.createSpan() to ensure there are no surrogates in the
+     * String; it's already checked it, and should only be calling this if
+     * it's ok to do so. Sure, we could check it, but...
+     */
     StringSpan(String str, Markup markup) {
         super(markup);
-
-        if (str.length() == 0) {
-            throw new IllegalArgumentException();
-        }
-
         data = str;
     }
 
@@ -37,30 +33,10 @@ public class StringSpan extends Span
         return new StringSpan(this.data, markup);
     }
 
-    /*
-     * The OpenJava implementation reuses the underlying character array, so
-     * this is all good.
-     */
-
-    private StringSpan(Span span, int begin, int end) {
-        super(span.getMarkup());
-
-        if (begin == end) {
-            throw new IllegalArgumentException();
-        }
-
-        data = span.getText().substring(begin, end);
-    }
-
     public String getText() {
         return data;
     }
 
-    /*
-     * If there are surrogate pairs lurking in the UTF-16 encoded char[], then
-     * this will properly reduce them to character count. Maybe we should
-     * cache this?
-     */
     public int getWidth() {
         return data.length();
     }
@@ -69,11 +45,22 @@ public class StringSpan extends Span
         return data.charAt(position);
     }
 
+    /*
+     * The OpenJava implementation of substring() reuses the underlying
+     * character array, so this is all good.
+     */
     Span split(int begin, int end) {
-        if ((end - begin) == 1) {
-            return new CharacterSpan((char) getChar(begin), getMarkup());
+        int width;
+
+        width = end - begin;
+        if (width == 0) {
+            throw new IllegalArgumentException("zero width StringSpans not allowed");
+        }
+
+        if (width == 1) {
+            return new CharacterSpan(data.charAt(begin), getMarkup());
         } else {
-            return new StringSpan(this, begin, end);
+            return new StringSpan(data.substring(begin, end), getMarkup());
         }
     }
 }

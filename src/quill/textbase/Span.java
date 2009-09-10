@@ -42,17 +42,19 @@ public abstract class Span
      */
     public static Span createSpan(String str, Markup markup) {
         final int len, width;
-        int i, j;
-        char ch;
 
         len = str.length();
+
+        if (len == 0) {
+            throw new IllegalArgumentException("zero width Spans not allowed");
+        }
 
         width = str.codePointCount(0, len);
 
         if ((len == 1) && (width == 1)) {
             return new CharacterSpan(str, markup);
         } else if (len != width) {
-            return new UnicodeSpan(str, width, markup);
+            return new UnicodeSpan(str, len, width, markup);
         } else {
             return new StringSpan(str, markup);
         }
