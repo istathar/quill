@@ -170,4 +170,23 @@ public class ValidateUnicode extends GraphicalTestCase
         assertEquals(str, chain.toString());
         assertEquals(6, chain.length());
     }
+
+    public final void testUnicodeSpanArrayCaching() {
+        final UnicodeSpan t1, t2, w1, w2;
+
+        /*
+         * Will be cached.
+         */
+        t1 = (UnicodeSpan) createSpan("𝌐", null);
+        t2 = (UnicodeSpan) createSpan("𝌐", null);
+
+        /*
+         * Won't be cached
+         */
+        w1 = (UnicodeSpan) createSpan("The 𝌐 symbol is divergence", null);
+        w2 = (UnicodeSpan) createSpan("The 𝌐 symbol is divergence", null);
+
+        assertSame(t1.getPoints(), t2.getPoints());
+        assertNotSame(w1.getPoints(), w2.getPoints());
+    }
 }

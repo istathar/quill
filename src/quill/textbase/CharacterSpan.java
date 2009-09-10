@@ -32,7 +32,7 @@ public class CharacterSpan extends Span
             throw new IllegalArgumentException();
         }
         this.ch = str.charAt(0);
-        this.text = cache(str, ch);
+        this.text = lookup(str, ch);
     }
 
     public CharacterSpan(char ch, Markup markup) {
@@ -84,7 +84,7 @@ public class CharacterSpan extends Span
         }
     }
 
-    private static String cache(String str, char ch) {
+    private static String lookup(String str, char ch) {
         if (ch < 256) {
             if (cache[ch] == null) {
                 cache[ch] = str;

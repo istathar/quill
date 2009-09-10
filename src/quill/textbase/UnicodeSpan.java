@@ -10,6 +10,9 @@
  */
 package quill.textbase;
 
+import java.lang.ref.WeakReference;
+import java.util.WeakHashMap;
+
 /**
  * A contigiously formatted span of unicode text.
  * 
@@ -49,7 +52,12 @@ public class UnicodeSpan extends Span
 
         this.data = str;
 
-        this.points = new int[width];
+        if (width == 1) {
+            this.points = lookup(str);
+        } else {
+            this.points = new int[width];
+        }
+
         this.start = 0;
         this.length = width;
 
@@ -78,6 +86,33 @@ public class UnicodeSpan extends Span
         this.points = points;
         this.start = start;
         this.length = length;
+    }
+
+    private static WeakHashMap<String, WeakReference<int[]>> cache;
+
+    static {
+        cache = new WeakHashMap<String, WeakReference<int[]>>(2);
+    }
+
+    private static synchronized int[] lookup(final String str) {
+        WeakReference<int[]> ref;
+        int[] result;
+
+        result = null;
+
+        ref = cache.get(str);
+        if (ref != null) {
+            result = ref.get();
+        }
+
+        if (result == null) {
+            result = new int[1];
+            ref = new WeakReference<int[]>(result);
+            cache.put(str, ref);
+            return result;
+        } else {
+            return result;
+        }
     }
 
     Span copy(Markup markup) {
@@ -139,5 +174,10 @@ public class UnicodeSpan extends Span
         }
 
         return new UnicodeSpan(str.toString(), points, start + begin, width, this.getMarkup());
+    }
+
+    // unit testing only!
+    int[] getPoints() {
+        return points;
     }
 }
