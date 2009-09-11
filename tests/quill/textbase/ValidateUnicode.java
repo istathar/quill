@@ -16,6 +16,8 @@ import org.gnome.gtk.TextIter;
 
 import quill.ui.GraphicalTestCase;
 
+import static quill.textbase.Span.createSpan;
+
 /**
  * Make sure textbase properly handles 2- and 3-byte characters.
  * 
@@ -30,6 +32,33 @@ import quill.ui.GraphicalTestCase;
  */
 public class ValidateUnicode extends GraphicalTestCase
 {
+    public final void testSurrogageIdentification() {
+        assertTrue(Character.MIN_HIGH_SURROGATE == Character.MIN_SURROGATE);
+        assertTrue(Character.MAX_HIGH_SURROGATE > Character.MIN_SURROGATE);
+        assertTrue(Character.MAX_HIGH_SURROGATE < Character.MAX_SURROGATE);
+
+        assertTrue(Character.MIN_LOW_SURROGATE > Character.MIN_SURROGATE);
+        assertTrue(Character.MIN_LOW_SURROGATE < Character.MAX_SURROGATE);
+        assertTrue(Character.MAX_LOW_SURROGATE == Character.MAX_SURROGATE);
+
+        assertTrue(isSurrogate(Character.MAX_SURROGATE));
+
+        // but
+        assertTrue(Character.isSupplementaryCodePoint(0x1d45b));
+    }
+
+    /*
+     * It turned out we didn't need this after all. So the code is moved here
+     * from UnicodeSpan for safe keeping.
+     */
+    private static final boolean isSurrogate(int point) {
+        if ((point >= Character.MIN_SURROGATE) && (point <= Character.MAX_SURROGATE)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public final void testLatin1Supplement() {
         final TextChain chain;
 
@@ -113,7 +142,7 @@ public class ValidateUnicode extends GraphicalTestCase
 
         str = "Cru𝑛ch";
 
-        span = new Span(str, null);
+        span = createSpan(str, null);
 
         assertEquals(6, span.getWidth());
         assertEquals('C', span.getChar(0));
@@ -140,5 +169,49 @@ public class ValidateUnicode extends GraphicalTestCase
         assertNotSame(str, chain.toString());
         assertEquals(str, chain.toString());
         assertEquals(6, chain.length());
+    }
+
+    public final void testUnicodeSpanArrayCaching() {
+        final UnicodeSpan t1, t2, w1, w2;
+
+        /*
+         * Both int[] and String will be cached.
+         */
+        t1 = (UnicodeSpan) createSpan("𝌐", null);
+        t2 = (UnicodeSpan) createSpan("𝌐", null);
+
+        assertSame(t1.getPoints(), t2.getPoints());
+        assertSame(t1.getText(), t2.getText());
+
+        /*
+         * Won't be cached, and nor will the String data [here, force separate
+         * String objects.
+         */
+        w1 = (UnicodeSpan) createSpan(new String("The 𝌐 symbol is divergence"), null);
+        w2 = (UnicodeSpan) createSpan(new String("The 𝌐 symbol is divergence"), null);
+
+        assertNotSame(w1.getPoints(), w2.getPoints());
+        assertNotSame(w1.getText(), w2.getText());
+    }
+
+    public final void testUnicodeSplitting() {
+        final UnicodeSpan u1, u2;
+        final Span c1, s1, u3;
+
+        u1 = (UnicodeSpan) createSpan(new String("The 𝌤 symbol is packing"), null);
+        u2 = (UnicodeSpan) u1.split(4, 5);
+        assertSame(u1.getPoints(), u2.getPoints());
+
+        c1 = u1.split(6, 7);
+        assertTrue(c1 instanceof CharacterSpan);
+        assertEquals('s', c1.getChar(0));
+
+        s1 = u1.split(16);
+        assertTrue(s1 instanceof StringSpan);
+        assertEquals("packing", s1.getText());
+
+        u3 = u1.split(0, 12);
+        assertTrue(u3 instanceof UnicodeSpan);
+        assertEquals("The 𝌤 symbol", u3.getText());
     }
 }

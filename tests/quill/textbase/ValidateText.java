@@ -13,6 +13,7 @@ package quill.textbase;
 
 import junit.framework.TestCase;
 
+import static quill.textbase.Span.createSpan;
 import static quill.textbase.TextChain.formArray;
 
 public class ValidateText extends TestCase
@@ -31,7 +32,7 @@ public class ValidateText extends TestCase
 
         text = new TextChain("Hello world");
 
-        second = new Span(" it is a sunny day", null);
+        second = createSpan(" it is a sunny day", null);
         text.append(second);
 
         assertEquals("Hello world it is a sunny day", text.toString());
@@ -41,10 +42,10 @@ public class ValidateText extends TestCase
         final TextChain text;
         final Span one, two, three, space;
 
-        one = new Span("Emergency", null);
-        two = new Span("broadcast", null);
-        three = new Span("system", null);
-        space = new Span(' ', null);
+        one = createSpan("Emergency", null);
+        two = createSpan("broadcast", null);
+        three = createSpan("system", null);
+        space = createSpan(' ', null);
 
         text = new TextChain();
         text.append(three);
@@ -61,7 +62,7 @@ public class ValidateText extends TestCase
         final Span initial;
         final Piece one, two;
 
-        initial = new Span("Concave", null);
+        initial = createSpan("Concave", null);
         text = new TextChain(initial);
         assertEquals("Concave", text.toString());
         assertNull(text.first.next);
@@ -85,8 +86,8 @@ public class ValidateText extends TestCase
         final Span a, b;
         final Piece first, one, two;
 
-        a = new Span("Alpha", null);
-        b = new Span("Bravo", null);
+        a = createSpan("Alpha", null);
+        b = createSpan("Bravo", null);
 
         text = new TextChain(a);
         text.append(b);
@@ -122,11 +123,11 @@ public class ValidateText extends TestCase
     public final void testMultipleSplice() {
         final TextChain text;
         final Span one, two, three, four, space, addition;
-        one = new Span("One", null);
-        space = new Span(' ', null);
-        two = new Span("Two", null);
-        three = new Span("Three", null);
-        four = new Span("Four", null);
+        one = createSpan("One", null);
+        space = createSpan(' ', null);
+        two = createSpan("Two", null);
+        three = createSpan("Three", null);
+        four = createSpan("Four", null);
 
         text = new TextChain(one);
         text.append(space);
@@ -144,7 +145,7 @@ public class ValidateText extends TestCase
          * Now, try splicing something in
          */
 
-        addition = new Span("wentyT", null);
+        addition = createSpan("wentyT", null);
         text.insert(5, addition);
         assertEquals("One TwentyTwo Three Four", text.toString());
 
@@ -168,14 +169,14 @@ public class ValidateText extends TestCase
         final TextChain text;
         final Span zero, one, two;
 
-        zero = new Span("Hello", null);
+        zero = createSpan("Hello", null);
         assertEquals(5, zero.getWidth());
         assertEquals(5, zero.getText().length());
         text = new TextChain(zero);
         assertEquals(5, text.length());
 
-        one = new Span("Happy", null);
-        two = new Span("Days", null);
+        one = createSpan("Happy", null);
+        two = createSpan("Days", null);
 
         text.append(one);
         text.append(two);
@@ -186,10 +187,10 @@ public class ValidateText extends TestCase
         final TextChain text;
         final Span zero, one, two, three;
 
-        zero = new Span("Zero", null);
-        one = new Span("One", null);
-        two = new Span("Two", null);
-        three = new Span("Three", null);
+        zero = createSpan("Zero", null);
+        one = createSpan("One", null);
+        two = createSpan("Two", null);
+        three = createSpan("Three", null);
 
         text = new TextChain(one);
         text.append(two);
@@ -252,10 +253,10 @@ public class ValidateText extends TestCase
         final Span[] range;
         final Pair pair;
 
-        zero = new Span("Zero", null);
-        one = new Span("One", null);
-        two = new Span("Two", null);
-        three = new Span("Three", null);
+        zero = createSpan("Zero", null);
+        one = createSpan("One", null);
+        two = createSpan("Two", null);
+        three = createSpan("Three", null);
 
         text = new TextChain(zero);
         text.append(one);
@@ -279,9 +280,9 @@ public class ValidateText extends TestCase
         final Pair pair;
         final Span[] range;
 
-        zero = new Span("James", null);
-        one = new Span(" T. ", null);
-        two = new Span("Kirk", null);
+        zero = createSpan("James", null);
+        one = createSpan(" T. ", null);
+        two = createSpan("Kirk", null);
 
         text = new TextChain(zero);
         text.append(one);
@@ -302,10 +303,10 @@ public class ValidateText extends TestCase
         final TextChain text;
         final Span zero, one, two, three;
 
-        zero = new Span("Zero", null);
-        one = new Span("One", null);
-        two = new Span("Two", null);
-        three = new Span("Three", null);
+        zero = createSpan("Zero", null);
+        one = createSpan("One", null);
+        two = createSpan("Two", null);
+        three = createSpan("Three", null);
 
         text = new TextChain(zero);
         text.append(one);
@@ -557,7 +558,7 @@ public class ValidateText extends TestCase
         final TextChain text;
 
         text = new TextChain("Hello Wor");
-        text.append(new Span("ld", null));
+        text.append(createSpan("ld", null));
         text.format(0, 11, Common.FILENAME);
         text.format(0, 5, Common.ITALICS);
         text.format(6, 5, Common.BOLD);
@@ -585,7 +586,7 @@ public class ValidateText extends TestCase
             // good
         }
 
-        text.append(new Span(" Goodbye", null));
+        text.append(createSpan(" Goodbye", null));
 
         // _Goodbye
         // 111111111

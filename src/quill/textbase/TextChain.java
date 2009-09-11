@@ -26,7 +26,7 @@ public class TextChain
 
     TextChain(String str) {
         first = new Piece();
-        first.span = new Span(str, null);
+        first.span = Span.createSpan(str, null);
     }
 
     TextChain(Span initial) {
@@ -108,7 +108,7 @@ public class TextChain
      * Insert the given Java String at the specified offset.
      */
     protected void insert(int offset, String what) {
-        insert(offset, new Span(what, null));
+        insert(offset, Span.createSpan(what, null));
     }
 
     /**
@@ -684,7 +684,7 @@ public class TextChain
         Extract[] result;
         Piece p, alpha, omega;
         Span s;
-        int num, i, delta;
+        int num, len, i, delta;
 
         if (first == null) {
             return new Extract[] {};
@@ -700,8 +700,16 @@ public class TextChain
 
         while (p != null) {
             s = p.span;
+            len = s.getWidth();
 
-            delta = s.getText().indexOf('\n'); // FIXME WRONG
+            delta = -1;
+            for (i = 0; i < len; i++) {
+                if (s.getChar(i) == '\n') {
+                    delta = i;
+                    break;
+                }
+            }
+
             if (delta == 0) {
                 p = splitAt(p, 1);
                 num++;
@@ -718,7 +726,7 @@ public class TextChain
 
         /*
          * This relies rather heavily on the assumption that there is not a
-         * newline character at the end of the Text.
+         * newline character at the end of the TextChain.
          */
 
         i = 0;

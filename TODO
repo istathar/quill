@@ -21,10 +21,9 @@ User interface
 Cursor movement
 ---------------
 
-Need to handle cursor being in first or last cell of an EditorTextView and
-have it move to the preceeding or following Segment if the up/down key is
-pressed.
-
+We should refine the positioning algorithm. At present now you get drifted to
+the left rather than it remembering where (column? x?) you were recently and
+returning there when back on a longer line.
 
 Preview and Output
 ==================

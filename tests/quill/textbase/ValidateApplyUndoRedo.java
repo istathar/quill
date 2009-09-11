@@ -13,6 +13,8 @@ package quill.textbase;
 
 import junit.framework.TestCase;
 
+import static quill.textbase.Span.createSpan;
+
 /**
  * Test applying Change instances, and that undo and redo of them works
  * satisfactorily.
@@ -33,7 +35,7 @@ public class ValidateApplyUndoRedo extends TestCase
         stack = new ChangeStack();
         chain = new TextChain();
 
-        change = new InsertTextualChange(chain, 0, new Extract(new Span("Hello World", null)));
+        change = new InsertTextualChange(chain, 0, new Extract(createSpan("Hello World", null)));
         stack.apply(change);
         assertEquals("Hello World", chain.toString());
 
@@ -77,7 +79,7 @@ public class ValidateApplyUndoRedo extends TestCase
 
         stack.redo();
         change = new InsertTextualChange(chain, 5, new Extract(new Span[] {
-            new Span(" Santa Claus", null),
+            createSpan(" Santa Claus", null),
         }));
         stack.apply(change);
         assertEquals("Hello Santa Claus", chain.toString());
