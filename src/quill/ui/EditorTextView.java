@@ -10,6 +10,7 @@
  */
 package quill.ui;
 
+import org.gnome.gdk.EventButton;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
@@ -24,6 +25,7 @@ import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
 import org.gnome.gtk.TextTag;
 import org.gnome.gtk.TextView;
+import org.gnome.gtk.TextWindowType;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.WrapMode;
 
@@ -47,6 +49,7 @@ import quill.textbase.StructuralChange;
 import quill.textbase.TextChain;
 import quill.textbase.TextualChange;
 
+import static org.gnome.gtk.TextWindowType.TEXT;
 import static quill.client.Quill.ui;
 import static quill.ui.Format.tagForMarkup;
 
@@ -129,6 +132,13 @@ abstract class EditorTextView extends TextView
         input.connect(new InputMethod.Commit() {
             public void onCommit(InputMethod source, String text) {
                 insertText(text);
+            }
+        });
+
+        view.connect(new Widget.ButtonPressEvent() {
+            public boolean onButtonPressEvent(Widget source, EventButton event) {
+                x = -1;
+                return false;
             }
         });
 
@@ -259,6 +269,7 @@ abstract class EditorTextView extends TextView
                     if (key == Keyval.Right) {
                         return handleCursorRight();
                     }
+                    x = -1;
 
                     /*
                      * We're not really supposed to get here, but (deep
@@ -982,54 +993,106 @@ abstract class EditorTextView extends TextView
         ui.apply(change);
     }
 
+    /*
+     * Cursor key handling
+     */
+
+    /**
+     * Horizontal position to place the cursor at when scrolling vertically,
+     * in window co-ordinates. A value of -1 means unset.
+     */
+    /*
+     * This is, potentially, rather poorly named, but so far it's the only
+     * usage, and while I am reluctant to consume a single letter utility
+     * variable name, lower case x is the window co-ordinates compliment of
+     * upper case X which is the buffer co-ordinate we get and send in the
+     * following methods.
+     */
+    private int x;
+
     void placeCursorFirstLine(int requested) {
-        final TextIter pointer, end;
-        int position;
+        TextIter pointer;
+        Rectangle position;
+        int X, Y;
 
-        pointer = buffer.getIter(requested);
-        end = buffer.getIterStart();
-        end.forwardDisplayLineEnd(view);
-        position = end.getOffset();
+        pointer = buffer.getIterStart();
 
-        if (requested > position) {
-            buffer.placeCursor(end);
-        } else {
-            buffer.placeCursor(pointer);
+        if (requested != 0) {
+            position = view.getLocation(pointer);
+            X = view.convertWindowToBufferCoordsX(TEXT, requested);
+
+            Y = position.getY();
+
+            pointer = view.getIterAtLocation(X, Y);
         }
+        x = requested;
+
+        buffer.placeCursor(pointer);
     }
 
+    /*
+     * The value of -1 is overloaded here in the "moved left" case, and
+     * interpreted to mean go to the last character of the last line. It works
+     * out nicely because during left movement we would need to reset to -1
+     * anyway.
+     */
     void placeCursorLastLine(int requested) {
         final int length;
-        final TextIter pointer;
+        TextIter pointer;
+        final Rectangle position;
+        int X, Y;
 
         length = chain.length();
         pointer = buffer.getIter(length);
 
         if (requested != -1) {
-            pointer.backwardDisplayLineStart(view);
-            pointer.forwardChars(requested);
+            position = view.getLocation(pointer);
+            X = view.convertWindowToBufferCoordsX(TEXT, requested);
+
+            Y = position.getY();
+
+            pointer = view.getIterAtLocation(X, Y);
         }
+        x = requested;
 
         buffer.placeCursor(pointer);
     }
 
     private boolean handleCursorUp() {
-        final TextIter pointer;
+        TextIter pointer;
         final ComponentEditorWidget parent;
+        Rectangle position;
+        int X, Y;
 
         pointer = buffer.getIter(insertOffset);
 
+        if (x == -1) {
+            position = view.getLocation(pointer);
+            X = position.getX();
+            x = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X);
+        }
+
         if (pointer.backwardDisplayLine(view)) {
-            return false;
+            X = view.convertWindowToBufferCoordsX(TEXT, x);
+
+            position = view.getLocation(pointer);
+            Y = position.getY();
+
+            pointer = view.getIterAtLocation(X, Y);
+
+            buffer.placeCursor(pointer);
+            return true;
         } else {
             parent = findComponentEditor(view);
-            parent.moveCursorUp(view, insertOffset);
+            parent.moveCursorUp(view, x);
             return true;
         }
     }
 
     private boolean handleCursorLeft() {
         final ComponentEditorWidget parent;
+
+        x = -1;
 
         if (insertOffset == 0) {
             parent = findComponentEditor(view);
@@ -1041,22 +1104,32 @@ abstract class EditorTextView extends TextView
     }
 
     private boolean handleCursorDown() {
-        final TextIter pointer, start;
-        int position;
+        TextIter pointer;
         final ComponentEditorWidget parent;
+        Rectangle position;
+        int X, Y;
 
         pointer = buffer.getIter(insertOffset);
 
+        if (x == -1) {
+            position = view.getLocation(pointer);
+            X = position.getX();
+            x = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X);
+        }
+
         if (pointer.forwardDisplayLine(view)) {
-            return false;
+            X = view.convertWindowToBufferCoordsX(TEXT, x);
+
+            position = view.getLocation(pointer);
+            Y = position.getY();
+
+            pointer = view.getIterAtLocation(X, Y);
+
+            buffer.placeCursor(pointer);
+            return true;
         } else {
-            start = pointer.copy();
-            start.backwardDisplayLineStart(view);
-
-            position = insertOffset - start.getOffset();
-
             parent = findComponentEditor(view);
-            parent.moveCursorDown(view, position);
+            parent.moveCursorDown(view, x);
             return true;
         }
     }
@@ -1064,6 +1137,8 @@ abstract class EditorTextView extends TextView
     private boolean handleCursorRight() {
         final ComponentEditorWidget parent;
         final int len;
+
+        x = -1;
 
         len = chain.length();
 

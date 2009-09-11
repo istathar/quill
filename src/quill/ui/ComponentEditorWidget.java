@@ -321,9 +321,10 @@ class ComponentEditorWidget extends ScrolledWindow
     }
 
     public void grabFocus() {
-        final Widget first;
+        final EditorTextView first;
 
-        first = lookup(series.get(0));
+        first = (EditorTextView) lookup(series.get(0));
+        first.placeCursorFirstLine(0);
         first.grabFocus();
     }
 
