@@ -999,7 +999,7 @@ abstract class EditorTextView extends TextView
 
     /**
      * Horizontal position to place the cursor at when scrolling vertically,
-     * in window co-ordinates.
+     * in window co-ordinates. A value of -1 means unset.
      */
     /*
      * This is, potentially, rather poorly named, but so far it's the only
@@ -1030,6 +1030,12 @@ abstract class EditorTextView extends TextView
         buffer.placeCursor(pointer);
     }
 
+    /*
+     * The value of -1 is overloaded here in the "moved left" case, and
+     * interpreted to mean go to the last character of the last line. It works
+     * out nicely because during left movement we would need to reset to -1
+     * anyway.
+     */
     void placeCursorLastLine(int requested) {
         final int length;
         TextIter pointer;
