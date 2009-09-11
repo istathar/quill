@@ -193,4 +193,25 @@ public class ValidateUnicode extends GraphicalTestCase
         assertNotSame(w1.getPoints(), w2.getPoints());
         assertNotSame(w1.getText(), w2.getText());
     }
+
+    public final void testUnicodeSplitting() {
+        final UnicodeSpan u1, u2;
+        final Span c1, s1, u3;
+
+        u1 = (UnicodeSpan) createSpan(new String("The 𝌤 symbol is packing"), null);
+        u2 = (UnicodeSpan) u1.split(4, 5);
+        assertSame(u1.getPoints(), u2.getPoints());
+
+        c1 = u1.split(6, 7);
+        assertTrue(c1 instanceof CharacterSpan);
+        assertEquals('s', c1.getChar(0));
+
+        s1 = u1.split(16);
+        assertTrue(s1 instanceof StringSpan);
+        assertEquals("packing", s1.getText());
+
+        u3 = u1.split(0, 12);
+        assertTrue(u3 instanceof UnicodeSpan);
+        assertEquals("The 𝌤 symbol", u3.getText());
+    }
 }

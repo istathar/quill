@@ -173,7 +173,8 @@ public class UnicodeSpan extends Span
     Span split(int begin, int end) {
         final int origin, width, first;
         final StringBuilder str;
-        int i;
+        int i, point;
+        boolean high;
 
         width = end - begin;
         origin = start + begin;
@@ -191,12 +192,23 @@ public class UnicodeSpan extends Span
          */
 
         str = new StringBuilder();
+        high = false;
 
-        for (i = start + begin; i < start + begin + end; i++) {
-            str.appendCodePoint(points[i]);
+        for (i = start + begin; i < start + end; i++) {
+            point = points[i];
+
+            if (Character.isSupplementaryCodePoint(point)) {
+                high = true;
+            }
+
+            str.appendCodePoint(point);
         }
 
-        return new UnicodeSpan(str.toString(), points, start + begin, width, this.getMarkup());
+        if (high) {
+            return new UnicodeSpan(str.toString(), points, start + begin, width, this.getMarkup());
+        } else {
+            return new StringSpan(str.toString(), this.getMarkup());
+        }
     }
 
     // unit testing only!
