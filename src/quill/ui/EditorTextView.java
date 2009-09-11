@@ -134,7 +134,7 @@ abstract class EditorTextView extends TextView
             }
         });
 
-        placement = -1;
+        x = -1;
 
         view.connect(new Widget.KeyPressEvent() {
             public boolean onKeyPressEvent(Widget source, EventKey event) {
@@ -263,7 +263,7 @@ abstract class EditorTextView extends TextView
                     if (key == Keyval.Right) {
                         return handleCursorRight();
                     }
-                    placement = -1;
+                    x = -1;
 
                     /*
                      * We're not really supposed to get here, but (deep
@@ -991,22 +991,37 @@ abstract class EditorTextView extends TextView
      * Cursor key handling
      */
 
-    private int placement;
+    /**
+     * Horizontal position to place the cursor at when scrolling vertically,
+     * in window co-ordinates.
+     */
+    /*
+     * This is, potentially, rather poorly named, but so far it's the only
+     * usage, and while I am reluctant to consume a single letter utility
+     * variable name, lower case x is the window co-ordinates compliment of
+     * upper case X which is the buffer co-ordinate we get and send in the
+     * following methods.
+     */
+    private int x;
 
     void placeCursorFirstLine(int requested) {
-        final TextIter pointer, end;
-        int position;
+        TextIter pointer;
+        Rectangle position;
+        int X, Y;
 
-        pointer = buffer.getIter(requested);
-        end = buffer.getIterStart();
-        end.forwardDisplayLineEnd(view);
-        position = end.getOffset();
+        pointer = buffer.getIterStart();
 
-        if (requested > position) {
-            buffer.placeCursor(end);
-        } else {
-            buffer.placeCursor(pointer);
+        if (requested != 0) {
+            position = view.getLocation(pointer);
+            X = view.convertWindowToBufferCoordsX(TEXT, requested);
+
+            Y = position.getY();
+
+            pointer = view.getIterAtLocation(X, Y);
         }
+        x = requested;
+
+        buffer.placeCursor(pointer);
     }
 
     void placeCursorLastLine(int requested) {
@@ -1020,12 +1035,13 @@ abstract class EditorTextView extends TextView
 
         if (requested != -1) {
             position = view.getLocation(pointer);
-            Y = position.getY();
             X = view.convertWindowToBufferCoordsX(TEXT, requested);
+
+            Y = position.getY();
 
             pointer = view.getIterAtLocation(X, Y);
         }
-        placement = requested;
+        x = requested;
 
         buffer.placeCursor(pointer);
     }
@@ -1038,22 +1054,25 @@ abstract class EditorTextView extends TextView
 
         pointer = buffer.getIter(insertOffset);
 
-        if (placement == -1) {
+        if (x == -1) {
             position = view.getLocation(pointer);
             X = position.getX();
-            placement = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X); // FIXME
+            x = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X);
         }
 
         if (pointer.backwardDisplayLine(view)) {
+            X = view.convertWindowToBufferCoordsX(TEXT, x);
+
             position = view.getLocation(pointer);
             Y = position.getY();
-            X = view.convertWindowToBufferCoordsX(TEXT, placement);
+
             pointer = view.getIterAtLocation(X, Y);
+
             buffer.placeCursor(pointer);
             return true;
         } else {
             parent = findComponentEditor(view);
-            parent.moveCursorUp(view, placement);
+            parent.moveCursorUp(view, x);
             return true;
         }
     }
@@ -1061,7 +1080,7 @@ abstract class EditorTextView extends TextView
     private boolean handleCursorLeft() {
         final ComponentEditorWidget parent;
 
-        placement = -1;
+        x = -1;
 
         if (insertOffset == 0) {
             parent = findComponentEditor(view);
@@ -1073,22 +1092,32 @@ abstract class EditorTextView extends TextView
     }
 
     private boolean handleCursorDown() {
-        final TextIter pointer, start;
-        int position;
+        TextIter pointer;
         final ComponentEditorWidget parent;
+        Rectangle position;
+        int X, Y;
 
         pointer = buffer.getIter(insertOffset);
 
+        if (x == -1) {
+            position = view.getLocation(pointer);
+            X = position.getX();
+            x = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X);
+        }
+
         if (pointer.forwardDisplayLine(view)) {
-            return false;
+            X = view.convertWindowToBufferCoordsX(TEXT, x);
+
+            position = view.getLocation(pointer);
+            Y = position.getY();
+
+            pointer = view.getIterAtLocation(X, Y);
+
+            buffer.placeCursor(pointer);
+            return true;
         } else {
-            start = pointer.copy();
-            start.backwardDisplayLineStart(view);
-
-            position = insertOffset - start.getOffset();
-
             parent = findComponentEditor(view);
-            parent.moveCursorDown(view, position);
+            parent.moveCursorDown(view, x);
             return true;
         }
     }
@@ -1097,7 +1126,7 @@ abstract class EditorTextView extends TextView
         final ComponentEditorWidget parent;
         final int len;
 
-        placement = -1;
+        x = -1;
 
         len = chain.length();
 
