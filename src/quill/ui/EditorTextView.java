@@ -10,6 +10,7 @@
  */
 package quill.ui;
 
+import org.gnome.gdk.EventButton;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
@@ -134,7 +135,12 @@ abstract class EditorTextView extends TextView
             }
         });
 
-        x = -1;
+        view.connect(new Widget.ButtonPressEvent() {
+            public boolean onButtonPressEvent(Widget source, EventButton event) {
+                x = -1;
+                return false;
+            }
+        });
 
         view.connect(new Widget.KeyPressEvent() {
             public boolean onKeyPressEvent(Widget source, EventKey event) {
@@ -1137,5 +1143,10 @@ abstract class EditorTextView extends TextView
         } else {
             return false;
         }
+    }
+
+    public void grabFocus() {
+        super.grabFocus();
+        placeCursorFirstLine(0);
     }
 }
