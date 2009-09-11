@@ -1150,9 +1150,4 @@ abstract class EditorTextView extends TextView
             return false;
         }
     }
-
-    public void grabFocus() {
-        super.grabFocus();
-        placeCursorFirstLine(0);
-    }
 }
