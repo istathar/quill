@@ -24,6 +24,7 @@ import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
 import org.gnome.gtk.TextTag;
 import org.gnome.gtk.TextView;
+import org.gnome.gtk.TextWindowType;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.WrapMode;
 
@@ -47,6 +48,7 @@ import quill.textbase.StructuralChange;
 import quill.textbase.TextChain;
 import quill.textbase.TextualChange;
 
+import static org.gnome.gtk.TextWindowType.TEXT;
 import static quill.client.Quill.ui;
 import static quill.ui.Format.tagForMarkup;
 
@@ -131,6 +133,8 @@ abstract class EditorTextView extends TextView
                 insertText(text);
             }
         });
+
+        placement = -1;
 
         view.connect(new Widget.KeyPressEvent() {
             public boolean onKeyPressEvent(Widget source, EventKey event) {
@@ -259,6 +263,7 @@ abstract class EditorTextView extends TextView
                     if (key == Keyval.Right) {
                         return handleCursorRight();
                     }
+                    placement = -1;
 
                     /*
                      * We're not really supposed to get here, but (deep
@@ -982,6 +987,12 @@ abstract class EditorTextView extends TextView
         ui.apply(change);
     }
 
+    /*
+     * Cursor key handling
+     */
+
+    private int placement;
+
     void placeCursorFirstLine(int requested) {
         final TextIter pointer, end;
         int position;
@@ -1000,36 +1011,57 @@ abstract class EditorTextView extends TextView
 
     void placeCursorLastLine(int requested) {
         final int length;
-        final TextIter pointer;
+        TextIter pointer;
+        final Rectangle position;
+        int X, Y;
 
         length = chain.length();
         pointer = buffer.getIter(length);
 
         if (requested != -1) {
-            pointer.backwardDisplayLineStart(view);
-            pointer.forwardChars(requested);
+            position = view.getLocation(pointer);
+            Y = position.getY();
+            X = view.convertWindowToBufferCoordsX(TEXT, requested);
+
+            pointer = view.getIterAtLocation(X, Y);
         }
+        placement = requested;
 
         buffer.placeCursor(pointer);
     }
 
     private boolean handleCursorUp() {
-        final TextIter pointer;
+        TextIter pointer;
         final ComponentEditorWidget parent;
+        Rectangle position;
+        int X, Y;
 
         pointer = buffer.getIter(insertOffset);
 
+        if (placement == -1) {
+            position = view.getLocation(pointer);
+            X = position.getX();
+            placement = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X); // FIXME
+        }
+
         if (pointer.backwardDisplayLine(view)) {
-            return false;
+            position = view.getLocation(pointer);
+            Y = position.getY();
+            X = view.convertWindowToBufferCoordsX(TEXT, placement);
+            pointer = view.getIterAtLocation(X, Y);
+            buffer.placeCursor(pointer);
+            return true;
         } else {
             parent = findComponentEditor(view);
-            parent.moveCursorUp(view, insertOffset);
+            parent.moveCursorUp(view, placement);
             return true;
         }
     }
 
     private boolean handleCursorLeft() {
         final ComponentEditorWidget parent;
+
+        placement = -1;
 
         if (insertOffset == 0) {
             parent = findComponentEditor(view);
@@ -1064,6 +1096,8 @@ abstract class EditorTextView extends TextView
     private boolean handleCursorRight() {
         final ComponentEditorWidget parent;
         final int len;
+
+        placement = -1;
 
         len = chain.length();
 
