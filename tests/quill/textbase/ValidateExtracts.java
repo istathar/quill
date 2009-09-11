@@ -260,4 +260,44 @@ public class ValidateExtracts extends TestCase
         assertNotNull(extract);
         assertEquals(0, extract.size());
     }
+
+    public final void testExtractParagraphBoundaryAfterUnicode() {
+        TextChain text;
+        Extract[] lines;
+        Extract extract;
+        Span span;
+
+        text = new TextChain();
+        text.append(createSpan("Pro𝑛to\nSurprise", null));
+        assertEquals("Pro𝑛to\nSurprise", text.toString());
+        extract = text.extractAll();
+        assertEquals(1, extract.size());
+
+        lines = text.extractParagraphs();
+
+        extract = text.extractAll();
+        assertEquals(3, extract.size());
+        span = extract.get(0);
+        assertEquals("Pro𝑛to", span.getText());
+        span = extract.get(1);
+        assertEquals("\n", span.getText());
+        span = extract.get(2);
+        assertEquals("Surprise", span.getText());
+
+        assertEquals(2, lines.length);
+
+        extract = lines[0];
+        assertNotNull(extract);
+        assertEquals(1, extract.size());
+        span = extract.get(0);
+        assertTrue(span instanceof UnicodeSpan);
+        assertEquals("Pro𝑛to", span.getText());
+
+        extract = lines[1];
+        assertNotNull(extract);
+        assertEquals(1, extract.size());
+        span = extract.get(0);
+        assertTrue(span instanceof StringSpan);
+        assertEquals("Surprise", span.getText());
+    }
 }
