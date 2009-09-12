@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import junit.framework.TestCase;
+import quill.docbook.DocBookConverter;
 import quill.textbase.Change;
 import quill.textbase.Common;
 import quill.textbase.DataLayer;

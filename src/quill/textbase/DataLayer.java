@@ -20,7 +20,7 @@ import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import quill.converter.DocBookConverter;
+import quill.docbook.DocBookConverter;
 import quill.docbook.DocBookNodeFactory;
 
 /**

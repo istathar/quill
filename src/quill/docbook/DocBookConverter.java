@@ -8,35 +8,11 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package quill.converter;
-
-/*
- * A big reason to have this in its own package is so that we are using only
- * the public interface of our docbook module. Secondarily is that if other
- * output formats grow up, this will be the place their converters can live.
- */
+package quill.docbook;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-import quill.docbook.Application;
-import quill.docbook.Block;
-import quill.docbook.Blockquote;
-import quill.docbook.Chapter;
-import quill.docbook.Command;
-import quill.docbook.Component;
-import quill.docbook.Division;
-import quill.docbook.Emphasis;
-import quill.docbook.Filename;
-import quill.docbook.Function;
-import quill.docbook.Inline;
-import quill.docbook.Literal;
-import quill.docbook.Paragraph;
-import quill.docbook.ProgramListing;
-import quill.docbook.Section;
-import quill.docbook.Structure;
-import quill.docbook.Title;
-import quill.docbook.Type;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;

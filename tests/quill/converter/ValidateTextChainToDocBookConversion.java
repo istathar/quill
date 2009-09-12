@@ -16,6 +16,7 @@ import java.io.IOException;
 import junit.framework.TestCase;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import quill.docbook.DocBookConverter;
 import quill.textbase.Change;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
