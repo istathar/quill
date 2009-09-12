@@ -1,0 +1,77 @@
+<!--
+
+  quack.dtd
+
+  Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd 
+
+  This is the public schema for "Quack", the file format used for storing text
+  documents created by the Quill and Parchment suite of programs.
+  
+  As such, this file forms an integral part of the source code of the program
+  it accompanies, and is made available to you by its authors under the terms
+  of the "GNU General Public Licence, version 2". See the LICENCE file for the
+  terms governing usage, copying and redistribution.
+  
+  Although you have the full freedom to use this file as you see fit, the
+  schema it describes is controlled by the XML Standards Team at Operational
+  Dynamics. Changes will only be made after public consultation and in
+  correlation with support in "Quill and Parchment" for such new schema
+  versions so that we can ensure that the program remains forward and
+  backwards compatible with documents created by it.
+
+-->
+
+<!ELEMENT chapter (title?,(heading | text | code | quote)*,(endnote*),(reference)*)>
+<!ATTLIST chapter schema CDATA #REQUIRED>
+<!ATTLIST chapter xmlns CDATA #REQUIRED>
+
+<!-- block level  -->
+
+<!ELEMENT title (paragraph)>
+
+<!ELEMENT heading (paragraph)>
+
+<!ELEMENT text (paragraph)+>
+
+<!ELEMENT code (preformat)+>
+
+<!ELEMENT quote (paragraph)+>
+
+<!ELEMENT endnote (paragraph)+>
+<!ATTLIST endnote name CDATA #REQUIRED>
+
+<!ELEMENT reference (paragraph)+>
+<!ATTLIST reference name CDATA #REQUIRED>
+
+
+<!-- text containers -->
+
+<!ELEMENT paragraph (#PCDATA | italics | bold | application | type | function | literal | filename | command | note)*>
+
+<!ELEMENT preformat (#PCDATA | bold | note)*>
+<!ATTLIST preformat xml:space CDATA #REQUIRED>
+
+<!-- inline spans -->
+
+<!ELEMENT italics (#PCDATA)>
+
+<!ELEMENT bold (#PCDATA)>
+
+<!ELEMENT application (#PCDATA)>
+
+<!ELEMENT type (#PCDATA)>
+
+<!ELEMENT function (#PCDATA)>
+
+<!ELEMENT literal (#PCDATA)>
+
+<!ELEMENT filename (#PCDATA)>
+
+<!ELEMENT command (#PCDATA)>
+
+<!ELEMENT note EMPTY>
+<!ATTLIST note ref CDATA #REQUIRED>
+
+<!--
+  vim: set textwidth=78 nowrap:
+-->
