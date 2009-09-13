@@ -20,35 +20,28 @@
 
 -->
 
-<!ELEMENT chapter (title?,(heading | text | code | quote)*,(endnote*),(reference)*)>
+<!ELEMENT chapter (title?,(heading | text | code | quote)*,endnote*,reference*)>
 <!ATTLIST chapter schema CDATA #FIXED "0.1">
 <!ATTLIST chapter xmlns CDATA #FIXED "http://operationaldynamics.com/quack">
 
 <!-- block level  -->
 
-<!ELEMENT title (paragraph)>
+<!ELEMENT title (#PCDATA)>
 
-<!ELEMENT heading (paragraph)>
+<!ELEMENT heading (#PCDATA)>
 
-<!ELEMENT text (paragraph)+>
+<!ELEMENT text (#PCDATA | italics | bold | application | type | function | literal | filename | command | note)*>
 
-<!ELEMENT code (preformat)+>
+<!ELEMENT code (#PCDATA | bold | note)*>
+<!ATTLIST code xml:space CDATA #REQUIRED>
 
-<!ELEMENT quote (paragraph)+>
+<!ELEMENT quote (#PCDATA | italics | bold | application | type | function | literal | filename | command | note)*>
 
-<!ELEMENT endnote (paragraph)+>
+<!ELEMENT endnote (#PCDATA | italics | bold | application | type | function | literal | filename | command | note)*>
 <!ATTLIST endnote name CDATA #REQUIRED>
 
-<!ELEMENT reference (paragraph)+>
+<!ELEMENT reference (#PCDATA | italics | bold | application | type | function | literal | filename | command)*>
 <!ATTLIST reference name CDATA #REQUIRED>
-
-
-<!-- text containers -->
-
-<!ELEMENT paragraph (#PCDATA | italics | bold | application | type | function | literal | filename | command | note)*>
-
-<!ELEMENT preformat (#PCDATA | bold | note)*>
-<!ATTLIST preformat xml:space CDATA #REQUIRED>
 
 <!-- inline spans -->
 

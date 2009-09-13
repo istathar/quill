@@ -1,65 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter schema="0.1" xmlns="http://operationaldynamics.com/quack">
 <title>
-<paragraph>
 Chapter 1
-</paragraph>
 </title>
 <text>
-<paragraph>
 This is not a real document. This is a series
 of unrelated fragments that are assembled
 here to exercise the different features of
 Quill and Parchment that are implemented
 so far. So if it looks like nonsense, that's
 because it is. <literal>:)</literal>
-</paragraph>
 </text>
 <heading>
-<paragraph>
 Getting started
-</paragraph>
 </heading>
 <text>
-<paragraph>
 This is a simple
 <application>java-gnome</application> program
 with 𝑛-way permutations.
-</paragraph>
-<paragraph>
+</text>
+<text>
 As you will see in the following definition
 of <type>GtkButton</type>'s
 <function>setLabel()</function> there's really
 nothing to it that you need to be worried
 about:
-</paragraph>
 </text>
-<code>
-<preformat xml:space="preserve">
+<code xml:space="preserve">
 public class Example {
     public static void main(String[] args) {
         Gtk.init(args);
         Gtk.main();
     }
 }
-</preformat>
 </code>
 <text>
-<paragraph>
 Place this code in
 <filename>Example.java</filename> and compile
 it.
-</paragraph>
-<paragraph>
+</text>
+<text>
 This program has the drawback of
 <italics>not</italics> doing very much
 and even worse,
 <bold>not</bold> telling
 you that that's not what it's doing.
-</paragraph>
 </text>
 <quote>
-<paragraph>
 <italics>The potential problem with the
 PM:</italics> Like all inhabitants of 10
 Downing Street, he wants to take his place
@@ -69,30 +56,28 @@ to do is look plausible, stay sober, and
 say the lines they are given in the right
 order. Those who try to make up their own
 lines generally do not last long.
-</paragraph>
-<paragraph>
+</quote>
+<quote>
 <italics>The Foreign Office solution:</italics>
 The PM must realize that as far as Foreign
 Affairs are concerned his job is to confine
 himself to the hospitality and ceremonial
 role.<note ref="1"/>
-</paragraph>
 </quote>
 <text>
-<paragraph>
 The way you fix that is by not making the
 call to <literal>Gtk.main()</literal> and
 instead just letting the program exit. Then
 just compile it with <command>javac</command>
 and you're on your way.
-</paragraph>
-<paragraph>
+</text>
+<text>
 The real question is whether or not you know
 enough to <italics>run</italics> the program,
 or if you'd rather just "run away screaming"
 now...
-</paragraph>
-<paragraph>
+</text>
+<text>
 <italics>Lor</italics>em
 ip<italics>sum</italics><note ref="2"/> sit amet,
 consectetuer adipiscing elit. Proin adipiscing
@@ -113,8 +98,8 @@ massa pulvinar dapibus. Suspendisse at sapien.
 Sed lobortis, nisi non tempor consequat,
 nisl ante lobortis dolor, ut hendrerit tortor
 "quam id augue."
-</paragraph>
-<paragraph>
+</text>
+<text>
 "Phasellus mollis", ante quis tincidunt rutrum,
 augue nisl malesuada ipsum, sit amet condimentum
 dolor felis nec lorem. Nulla ante. Etiam
@@ -134,8 +119,8 @@ volutpat lorem eget pede. Proin dapibus,
 ornare suscipit, magna nunc pharetra lorem,
 eget ornare velit sem vel tortor. Ut dolor.
 Fusce tincidunt.
-</paragraph>
-<paragraph>
+</text>
+<text>
 Curabitur viverra. Proin lectus nunc, elementum
 a, consequat vel, interdum non, mauris. Cras
 diam. Maecenas magna augue, tristique sed,
@@ -149,22 +134,18 @@ Suspendisse congue odio sit amet ligula.
 Donec rhoncus eleifend nisl. Fusce congue
 nunc quis lectus. Quisque vel nisl ornare
 magna interdum convallis.
-</paragraph>
 </text>
 <heading>
-<paragraph>
 And continuing
-</paragraph>
 </heading>
 <text>
-<paragraph>
 We mentioned <function>setLabel()</function>.
 In general you'll probably call it in code
 like this <literal>button.setLabel("Hello
 World");</literal> which isn't terribly original
 but is very important as a starting point.
-</paragraph>
-<paragraph>
+</text>
+<text>
 In tincidunt nunc a leo. In id sem vitae
 lectus feugiat veh. Donec nisl justo, aliquet
 lobortis, dignissim non, sagittis eget, orci.
@@ -177,8 +158,8 @@ Donec ante lectus, ullamcorper id, egestas
 et, ultricies lacinia, nibh, non tincidunt
 nibh purus sit amet dui. Congue dictum augue.
 Donec sit amet velit quis augue aliquam pulvinar.
-</paragraph>
-<paragraph>
+</text>
+<text>
 Etiam rutrum velit in nunc porta auctor.
 Nullam fringilla velit volutpat felis. Etiam
 vestibulum condimentum augue. In ante quis
@@ -188,42 +169,31 @@ commodo nunc. Sed suscipit, elit quis condimentum
 malesuada, erat arcu pulvinar tortor, vitae
 rhoncus justo est ut ipsum. Sed sagittis
 mi sit amet mauris.
-</paragraph>
 </text>
 <endnote name="1">
-<paragraph>
 From "A Victory For Democracy", an episode of the
 popular television series <italics>Yes Prime
 Minister</italics>. This passage taken from the
 book version <note ref="[2]"/>, page 165.
-</paragraph>
 </endnote>
 <endnote name="2">
-<paragraph>
 Typesetting text (the fake latin verse) known as
 "Lorum Ipsum" created by an online generator
 program available at <note ref="[3]"/>.
-</paragraph>
 </endnote>
 <reference name="[1]">
-<paragraph>
 Andrew Cowie, "Surviving Change" in
 <italics>Proceedings of the 12th Australian
 Systems Administrators Conference</italics>
 (Brisbane: SAGE-AU, 2004), pages 23-40.
-</paragraph>
 </reference>
 <reference name="[2]">
-<paragraph>
 Antony Jay and Jonathan Lynn, <italics>The
 Complete Yes Prime Minister</italics> (London:
 BBC Books, 1989). ISBN 0563207736.
-</paragraph>
 </reference>
 <reference name="[3]">
-<paragraph>
 <filename>http://www.lipsum.com</filename>
-</paragraph>
 </reference>
 </chapter>
 <!--
