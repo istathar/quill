@@ -1,5 +1,5 @@
 /*
- * Tag.java
+ * Blockquote.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,13 +8,20 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package quill.docbook;
+package quill.quack;
+
 
 /**
- * Elements in our constrained subset of DocBook.
+ * A verse or quote as a passage.
  * 
  * @author Andrew Cowie
  */
-public interface Tag
+/*
+ * TODO whitespace?
+ */
+public class Quote extends BlockElement implements Block
 {
+    public Quote() {
+        super("quote");
+    }
 }

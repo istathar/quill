@@ -22,6 +22,7 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.docbook.DocBookConverter;
 import quill.docbook.DocBookNodeFactory;
+import quill.quack.QuackConverter;
 
 /**
  * Our in-memory intermediate representation. Provides access to mutate the
@@ -110,7 +111,7 @@ public class DataLayer
          * them into DocBook elements.
          */
 
-        converter = new DocBookConverter();
+        converter = new QuackConverter();
 
         for (i = 0; i < series.size(); i++) {
             converter.append(series.get(i));
