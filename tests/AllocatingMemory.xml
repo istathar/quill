@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xmlns="http://docbook.org/ns/docbook">
+<chapter schema="0.1" xmlns="http://operationaldynamics.com/quack">
 <title>
 Allocating Memory
 </title>
-<para>
+<text>
 Thus far, we have used
 <function>kmalloc</function> and 
 <function>kfree</function> for the allocation
@@ -20,12 +20,11 @@ memory management interface to the drivers.
 In addition, we won't describe the internal
 details of memory management in this chapter,
 but defer it to Chapter 15.
-</para>
-<section>
-<title>
+</text>
+<heading>
 The Real Story of kmalloc
-</title>
-<para>
+</heading>
+<text>
 The <function>kmalloc</function> allocation
 engine is a powerful tool and easily learned
 because of its similarity to 
@@ -33,8 +32,8 @@ because of its similarity to
 is fast (unless it blocks) and doesn't clear
 the memory it obtains; the allocated region
 still holds its previous content.
-</para>
-<para>
+</text>
+<text>
 Among other things, this implies that you
 should explicitly clear any memory that might
 be exposed to user space or written to a
@@ -45,30 +44,28 @@ In the next few sections, we talk in detail
 about <function>kmalloc</function>, so you
 can compare it with the memory allocation
 techniques that we discuss later.
-</para>
-</section>
-<section>
-<title>
+</text>
+<heading>
 The Flags Argument
-</title>
-<para>
+</heading>
+<text>
 Remember that the prototype for
 <function>kmalloc</function> is:
-</para>
-<programlisting xml:space="preserve">
+</text>
+<code xml:space="preserve">
 #include &lt;linux/slab.h&gt;
 
 void *kmalloc(size_t size, int flags);
-</programlisting>
-<para>
+</code>
+<text>
 The first argument to <function>kmalloc</function>
 is the size of the block to be allocated.
 The second argument, the allocation flags,
 is much more interesting, because it controls
 the behaviour of <function>kmalloc</function>
 in a number of ways.
-</para>
-<para>
+</text>
+<text>
 The most commonly used flag,
 <literal>GFP_KERNEL</literal> , means that
 the allocation (internally performed by calling,
@@ -90,8 +87,8 @@ the kernel takes proper action to locate
 some free memory, either by flushing buffers
 to disk or by swapping out memory from a
 user process.
-</para>
-<para>
+</text>
+<text>
 <literal>GFP_KERNEL</literal> isn't always
 the right allocation flag to use; sometimes
 <function>kmalloc</function> is called from
@@ -108,8 +105,8 @@ When <literal>GFP_ATOMIC</literal> is used,
 <function>kmalloc</function> can use even
 the last free page. If that last page does
 not exist, however, the allocation fails.
-</para>
-<para>
+</text>
+<text>
 Other flags can be used in place of or in
 addition to <literal>GFP_KERNEL</literal>
 and <literal>GFP_ATOMIC</literal>, although
@@ -121,34 +118,32 @@ such as <literal>__GFP_DMA</literal>. In
 addition, there are symbols that represent
 frequently used combinations of flags; these
 lack the prefix and are sometimes called
-<emphasis>allocation priorities</emphasis>.
-</para>
-</section>
-<section>
-<title>
+<italics>allocation priorities</italics>.
+</text>
+<heading>
 Memory zones
-</title>
-<para>
+</heading>
+<text>
 Both <literal>__GFP_DMA</literal> and
 <literal>__GFP_HIGHMEM</literal> have a platform-dependent
 role, although their use is valid for all
 platforms.
-</para>
-<para>
+</text>
+<text>
 The Linux kernel knows about a minimum of
-three <emphasis>memory zones</emphasis> :
+three <italics>memory zones</italics> :
 DMA-capable memory, normal memory, and high
 memory. While allocation normally happens
-in the <emphasis>normal</emphasis> zone,
+in the <italics>normal</italics> zone,
 setting either of the bits just mentioned
 requires memory to be allocated from a different
 zone. The idea is that every computer platform
 that must know about special memory ranges
 (instead of considering all RAM equivalents)
 will fall into this abstraction.
-</para>
-<para>
-<emphasis>DMA-capable memory</emphasis> is
+</text>
+<text>
+<italics>DMA-capable memory</italics> is
 memory that lives in a preferential address
 range, where peripherals can perform DMA
 access. On most sane platforms, all memory
@@ -156,9 +151,9 @@ lives in this zone. On the x86, the DMA zone
 is used for the first 16 MB of RAM, where
 legacy ISA devices can perform DMA; PCI devices
 have no such limit.
-</para>
-<para>
-<emphasis>High memory</emphasis> is a mechanism
+</text>
+<text>
+<italics>High memory</italics> is a mechanism
 used to allow access to (relatively) large
 amounts of memory on 32-bit platforms. This
 memory cannot be directly accessed from the
@@ -169,8 +164,8 @@ however, it will work better on large systems
 if it can use high memory. See the Section
 1.8 in Chapter 15 for a detailed description
 of how high memory works and how to use it.
-</para>
-<para>
+</text>
+<text>
 Whenever a new page is allocated to fulfil
 a memory allocation request, the kernel builds
 a list of zones that can be used in the search.
@@ -184,16 +179,16 @@ all three zones are used to search a free
 page. (Note, however, that
 <function>kmalloc</function> cannot allocate
 high memory.)
-</para>
-<para>
+</text>
+<text>
 The situation is more complicated on nonuniform
 memory access (NUMA) systems. As a general
 rule, the allocator attempts to locate memory
 local to the processor performing the allocation,
 although there are ways of changing that
 behaviour.
-</para>
-<para>
+</text>
+<text>
 The mechanism behind memory zones is implemented
 in <filename>mm/page_alloc.c</filename>,
 while initialization of the zone resides
@@ -201,6 +196,5 @@ in platform-specific files, usually in
 <filename>mm/init.c</filename> within the
 <filename>arch</filename> tree. We'll revisit
 these topics in Chapter 15.
-</para>
-</section>
+</text>
 </chapter>

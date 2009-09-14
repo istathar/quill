@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xmlns="http://docbook.org/ns/docbook">
-<section>
-<para>
+<chapter schema="0.1" xmlns="http://operationaldynamics.com/quack">
+<text>
 First line
-</para>
-<para>
+</text>
+<text>
 Second line
-</para>
-<blockquote>
-<para>
+</text>
+<quote>
 Premier ligne
-</para>
-<para>
+</quote>
+<quote>
 Deuxième ligne
-</para>
-</blockquote>
-<para>
+</quote>
+<text>
 Third line
-</para>
-<para>
+</text>
+<text>
 Fourth line
-</para>
-</section>
+</text>
 </chapter>

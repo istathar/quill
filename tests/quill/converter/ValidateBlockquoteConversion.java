@@ -15,6 +15,7 @@ import java.io.IOException;
 import junit.framework.TestCase;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import quill.textbase.ComponentSegment;
 import quill.textbase.DataLayer;
 import quill.textbase.NormalSegment;
 import quill.textbase.QuoteSegment;
@@ -32,17 +33,15 @@ public class ValidateBlockquoteConversion extends TestCase
         data.loadDocument("tests/quill/converter/Blockquote.xml");
 
         series = data.getActiveDocument().get(0);
-        assertEquals(5, series.size());
+        assertEquals(4, series.size());
 
         segment = series.get(0);
-        assertTrue(segment instanceof NormalSegment);
+        assertTrue(segment instanceof ComponentSegment);
         segment = series.get(1);
-        assertTrue(segment instanceof QuoteSegment);
-        segment = series.get(2);
         assertTrue(segment instanceof NormalSegment);
-        segment = series.get(3);
+        segment = series.get(2);
         assertTrue(segment instanceof QuoteSegment);
-        segment = series.get(4);
+        segment = series.get(3);
         assertTrue(segment instanceof NormalSegment);
     }
 }
