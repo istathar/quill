@@ -15,11 +15,7 @@ package quill.quack;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import quill.docbook.Blockquote;
 import quill.docbook.DocBookConverter;
-import quill.docbook.Emphasis;
-import quill.docbook.Filename;
-import quill.docbook.Literal;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
@@ -71,7 +67,6 @@ public class QuackConverter extends DocBookConverter
      */
     public void append(final Segment segment) {
         final TextChain text;
-        final Blockquote quote;
 
         this.segment = segment;
 
@@ -177,14 +172,9 @@ public class QuackConverter extends DocBookConverter
             } else if (format == Common.FUNCTION) {
                 inline = new Function();
             } else if (format == Common.ITALICS) {
-                inline = new Emphasis();
+                inline = new Italics();
             } else if (format == Common.BOLD) {
-                final Emphasis element;
-
-                element = new Emphasis();
-                element.setBold();
-
-                inline = element;
+                inline = new Bold();
             } else if (format == Common.LITERAL) {
                 inline = new Literal();
             } else if (format == Common.APPLICATION) {
