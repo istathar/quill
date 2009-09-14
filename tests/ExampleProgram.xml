@@ -1,108 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xmlns="http://docbook.org/ns/docbook">
+<chapter schema="0.1" xmlns="http://operationaldynamics.com/quack">
 <title>
 Chapter 1
 </title>
-<para>
+<text>
 This is not a real document. This is a series
 of unrelated fragments that are assembled
 here to exercise the different features of
 Quill and Parchment that are implemented
 so far. So if it looks like nonsense, that's
 because it is. <literal>:)</literal>
-</para>
-<section>
-<title>
+</text>
+<heading>
 Getting started
-</title>
-<para>
+</heading>
+<text>
 This is a simple
 <application>java-gnome</application> program
 with 𝑛-way permutations.
-</para>
-<para>
+</text>
+<text>
 As you will see in the following definition
 of <type>GtkButton</type>'s
 <function>setLabel()</function> there's really
 nothing to it that you need to be worried
 about:
-</para>
-<programlisting xml:space="preserve">
+</text>
+<code xml:space="preserve">
 public class Example {
     public static void main(String[] args) {
         Gtk.init(args);
         Gtk.main();
     }
 }
-</programlisting>
-<para>
+</code>
+<text>
 Place this code in
 <filename>Example.java</filename> and compile
 it.
-</para>
-<para>
+</text>
+<text>
 This program has the drawback of
-<emphasis>not</emphasis> doing very much
-and even worse,
-<emphasis role="strong">not</emphasis> telling
-you that that's not what it's doing.
-</para>
-<blockquote>
-<para>
-<emphasis>The potential problem with the
-PM:</emphasis> Like all inhabitants of 10
-Downing Street, he wants to take his place
-on the world stage. But people on stages
-are called actors. All they are required
-to do is look plausible, stay sober, and
-say the lines they are given in the right
-order. Those who try to make up their own
-lines generally do not last long.
-</para>
-<para>
-<emphasis>The Foreign Office solution:</emphasis>
+<italics>not</italics> doing very much and
+even worse, <bold>not</bold> telling you
+that that's not what it's doing.
+</text>
+<quote>
+<italics>The potential problem with the PM:</italics>
+Like all inhabitants of 10 Downing Street,
+he wants to take his place on the world stage.
+But people on stages are called actors. All
+they are required to do is look plausible,
+stay sober, and say the lines they are given
+in the right order. Those who try to make
+up their own lines generally do not last
+long.
+</quote>
+<quote>
+<italics>The Foreign Office solution:</italics>
 The PM must realize that as far as Foreign
 Affairs are concerned his job is to confine
 himself to the hospitality and ceremonial
 role.
-</para>
-</blockquote>
-<para>
+</quote>
+<text>
 The way you fix that is by not making the
 call to <literal>Gtk.main()</literal> and
 instead just letting the program exit. Then
 just compile it with <command>javac</command>
 and you're on your way.
-</para>
-<para>
+</text>
+<text>
 The real question is whether or not you know
-enough to <emphasis>run</emphasis> the program,
+enough to <italics>run</italics> the program,
 or if you'd rather just "run away screaming"
 now...
-</para>
-<para>
-<emphasis>Lor</emphasis>em
-ip<emphasis>sum</emphasis> dolor sit amet,
-consectetuer adipiscing elit. Proin adipiscing
-locus est. Curabitur vel odio - morbi ipsum
-sem, viverra eget, tristique tincidunt -
-mollis vestibulum, nulla. Suspendisse blandit.
-Fuse bibendum neque at est. Mauris eget turpis.
-Sed erat. Class aptent taciti sociosqu ad
-litora torquent per conubia nostra, per inceptos
-himenaeos. Phasellus in diam. Donec felis.
-Pellentesque libero libero, interdum et,
-accumsan quis, interdum quis, odio. Vestibulum
-nec lacus. Etiam id lacus. Curabitur ornare,
-felis sit amet auctor iaculis, metus eros
-feugiat nisl, sed adipiscing nisl urna nec
-odio. Nam magna. Pellentesque sed ante non
-massa pulvinar dapibus. Suspendisse at sapien.
-Sed lobortis, nisi non tempor consequat,
-nisl ante lobortis dolor, ut hendrerit tortor
-"quam id augue."
-</para>
-<para>
+</text>
+<text>
+<italics>Lor</italics>em ip<italics>sum</italics>
+dolor sit amet, consectetuer adipiscing elit.
+Proin adipiscing locus est. Curabitur vel
+odio - morbi ipsum sem, viverra eget, tristique
+tincidunt - mollis vestibulum, nulla. Suspendisse
+blandit. Fuse bibendum neque at est. Mauris
+eget turpis. Sed erat. Class aptent taciti
+sociosqu ad litora torquent per conubia nostra,
+per inceptos himenaeos. Phasellus in diam.
+Donec felis. Pellentesque libero libero,
+interdum et, accumsan quis, interdum quis,
+odio. Vestibulum nec lacus. Etiam id lacus.
+Curabitur ornare, felis sit amet auctor iaculis,
+metus eros feugiat nisl, sed adipiscing nisl
+urna nec odio. Nam magna. Pellentesque sed
+ante non massa pulvinar dapibus. Suspendisse
+at sapien. Sed lobortis, nisi non tempor
+consequat, nisl ante lobortis dolor, ut hendrerit
+tortor "quam id augue."
+</text>
+<text>
 "Phasellus mollis", ante quis tincidunt rutrum,
 augue nisl malesuada ipsum, sit amet condimentum
 dolor felis nec lorem. Nulla ante. Etiam
@@ -122,8 +117,8 @@ volutpat lorem eget pede. Proin dapibus,
 ornare suscipit, magna nunc pharetra lorem,
 eget ornare velit sem vel tortor. Ut dolor.
 Fusce tincidunt.
-</para>
-<para>
+</text>
+<text>
 Curabitur viverra. Proin lectus nunc, elementum
 a, consequat vel, interdum non, mauris. Cras
 diam. Maecenas magna augue, tristique sed,
@@ -137,20 +132,18 @@ Suspendisse congue odio sit amet ligula.
 Donec rhoncus eleifend nisl. Fusce congue
 nunc quis lectus. Quisque vel nisl ornare
 magna interdum convallis.
-</para>
-</section>
-<section>
-<title>
+</text>
+<heading>
 And continuing
-</title>
-<para>
+</heading>
+<text>
 We mentioned <function>setLabel()</function>.
 In general you'll probably call it in code
 like this <literal>button.setLabel("Hello
 World");</literal> which isn't terribly original
 but is very important as a starting point.
-</para>
-<para>
+</text>
+<text>
 In tincidunt nunc a leo. In id sem vitae
 lectus feugiat veh. Donec nisl justo, aliquet
 lobortis, dignissim non, sagittis eget, orci.
@@ -163,8 +156,8 @@ Donec ante lectus, ullamcorper id, egestas
 et, ultricies lacinia, nibh, non tincidunt
 nibh purus sit amet dui. Congue dictum augue.
 Donec sit amet velit quis augue aliquam pulvinar.
-</para>
-<para>
+</text>
+<text>
 Etiam rutrum velit in nunc porta auctor.
 Nullam fringilla velit volutpat felis. Etiam
 vestibulum condimentum augue. In ante quis
@@ -174,6 +167,5 @@ commodo nunc. Sed suscipit, elit quis condimentum
 malesuada, erat arcu pulvinar tortor, vitae
 rhoncus justo est ut ipsum. Sed sagittis
 mi sit amet mauris.
-</para>
-</section>
+</text>
 </chapter>

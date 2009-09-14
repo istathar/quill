@@ -222,14 +222,16 @@ public class QuackConverter extends DocBookConverter
             if (inline != null) {
                 inline = null;
             }
-            if (segment instanceof PreformatSegment) {
+            if (segment instanceof NormalSegment) {
+                block = new Paragraph();
+            } else if (segment instanceof PreformatSegment) {
                 buf.append('\n');
                 return;
+            } else if (segment instanceof QuoteSegment) {
+                block = new Quote();
+            } else {
+                throw new IllegalStateException("\n" + "Newlines aren't allowed in " + block.toString());
             }
-            if (block instanceof Title) {
-                throw new IllegalStateException("\n" + "Newlines aren't allowed in titles");
-            }
-            block = new Paragraph();
             component.add(block);
         } else {
             buf.appendCodePoint(ch);

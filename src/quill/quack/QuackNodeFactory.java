@@ -50,6 +50,8 @@ public class QuackNodeFactory extends NodeFactory
             return new Quote();
         } else if (name.equals("title")) {
             return new Title();
+        } else if (name.equals("heading")) {
+            return new Heading();
         } else if (name.equals("function")) {
             return new Function();
         } else if (name.equals("filename")) {

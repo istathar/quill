@@ -142,7 +142,6 @@ public class QuackLoader
             } else {
                 setSegment(new NormalSegment());
             }
-            processBody(block);
         } else if (block instanceof Code) {
             markup = null;
             start = true;
@@ -150,7 +149,6 @@ public class QuackLoader
             if (!(segment instanceof PreformatSegment)) {
                 setSegment(new PreformatSegment());
             }
-            processBody(block);
         } else if (block instanceof Quote) {
             markup = null;
             start = true;
@@ -165,20 +163,19 @@ public class QuackLoader
             start = true;
             preserve = false;
             setSegment(new HeadingSegment());
-            processBody(block);
         } else if (block instanceof Title) {
             markup = null;
             start = true;
             preserve = false;
-            if (segment instanceof ComponentSegment) {
+            if (!(segment instanceof ComponentSegment)) {
                 throw new IllegalStateException("\n"
                         + "The <title> must be the first block in a Quack <chapter>");
             }
-            processBody(block);
-
         } else {
             throw new IllegalStateException("\n" + "What kind of Block is " + block);
         }
+
+        processBody(block);
     }
 
     private void processBody(Block block) {
@@ -192,7 +189,10 @@ public class QuackLoader
     }
 
     private void handleSpan(Inline span) {
-        if (span instanceof Function) {
+        final String str;
+        if (span instanceof Normal) {
+            markup = null;
+        } else if (span instanceof Function) {
             markup = Common.FUNCTION;
         } else if (span instanceof Filename) {
             markup = Common.FILENAME;
@@ -222,7 +222,8 @@ public class QuackLoader
             start = false;
         }
 
-        processText(span.getText());
+        str = span.getText();
+        processText(str);
     }
 
     /*

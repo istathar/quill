@@ -15,12 +15,11 @@ import java.io.IOException;
 import junit.framework.TestCase;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import quill.textbase.QuoteSegment;
 import quill.textbase.DataLayer;
 import quill.textbase.NormalSegment;
+import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
-import quill.textbase.TextChain;
 
 public class ValidateBlockquoteConversion extends TestCase
 {
@@ -28,7 +27,6 @@ public class ValidateBlockquoteConversion extends TestCase
         final DataLayer data;
         final Series series;
         Segment segment;
-        final TextChain text;
 
         data = new DataLayer();
         data.loadDocument("tests/quill/converter/Blockquote.xml");
