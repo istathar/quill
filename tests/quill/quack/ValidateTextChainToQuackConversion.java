@@ -40,12 +40,12 @@ public class ValidateTextChainToQuackConversion extends TestCase
         final TextChain text;
 
         data = new DataLayer();
-        data.loadDocument("tests/quill/converter/HelloWorld.xml");
+        data.loadDocument("tests/quill/quack/HelloWorld.xml");
 
         series = data.getActiveDocument().get(0);
-        assertEquals(3, series.size());
+        assertEquals(2, series.size());
 
-        text = series.get(2).getText();
+        text = series.get(1).getText();
         assertNotNull(text);
         assertEquals("Hello world", text.toString());
     }

@@ -70,7 +70,7 @@ public class TextChain
         return str.toString();
     }
 
-    void append(Span addition) {
+    public void append(Span addition) {
         Piece piece;
         final Piece last;
 

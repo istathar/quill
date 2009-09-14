@@ -18,11 +18,13 @@ import java.io.OutputStream;
 
 import nu.xom.Builder;
 import nu.xom.Document;
+import nu.xom.NodeFactory;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.docbook.DocBookConverter;
-import quill.docbook.DocBookNodeFactory;
 import quill.quack.QuackConverter;
+import quill.quack.QuackLoader;
+import quill.quack.QuackNodeFactory;
 
 /**
  * Our in-memory intermediate representation. Provides access to mutate the
@@ -58,10 +60,10 @@ public class DataLayer
 
     public void loadDocument(String filename) throws ValidityException, ParsingException, IOException {
         final File source;
-        final DocBookNodeFactory factory;
+        final NodeFactory factory;
         final Builder parser;
         final Document doc;
-        final DocBookLoader loader;
+        final QuackLoader loader; // change to interface or baseclass
         final Series series;
         final Series[] collection;
 
@@ -70,11 +72,11 @@ public class DataLayer
             throw new FileNotFoundException("\n" + filename);
         }
 
-        factory = new DocBookNodeFactory();
+        factory = new QuackNodeFactory();
         parser = new Builder(factory);
         doc = parser.build(source);
 
-        loader = new DocBookLoader();
+        loader = new QuackLoader();
         series = loader.process(doc);
 
         /*
