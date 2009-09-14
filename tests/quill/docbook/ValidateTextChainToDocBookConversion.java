@@ -8,7 +8,7 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package quill.converter;
+package quill.docbook;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

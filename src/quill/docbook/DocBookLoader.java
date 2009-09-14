@@ -10,28 +10,22 @@
  * 
  * Most of this logic came from a class called EfficientNoNodeFactory. 
  */
-package quill.textbase;
+package quill.docbook;
 
 import java.util.ArrayList;
 
 import nu.xom.Document;
-import quill.docbook.Application;
-import quill.docbook.Block;
-import quill.docbook.Blockquote;
-import quill.docbook.Chapter;
-import quill.docbook.Command;
-import quill.docbook.Component;
-import quill.docbook.Division;
-import quill.docbook.Emphasis;
-import quill.docbook.Filename;
-import quill.docbook.Function;
-import quill.docbook.Inline;
-import quill.docbook.Literal;
-import quill.docbook.Paragraph;
-import quill.docbook.ProgramListing;
-import quill.docbook.Section;
-import quill.docbook.Title;
-import quill.docbook.Type;
+import quill.textbase.Common;
+import quill.textbase.ComponentSegment;
+import quill.textbase.HeadingSegment;
+import quill.textbase.Markup;
+import quill.textbase.NormalSegment;
+import quill.textbase.PreformatSegment;
+import quill.textbase.QuoteSegment;
+import quill.textbase.Segment;
+import quill.textbase.Series;
+import quill.textbase.Span;
+import quill.textbase.TextChain;
 
 /**
  * Take a XOM tree (built using DocBookNodeFactory and so having our

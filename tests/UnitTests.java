@@ -12,8 +12,8 @@
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import quill.converter.ValidateFileNaming;
-import quill.converter.ValidateTextChainToDocBookConversion;
-import quill.converter.ValidateThereAndBackAgain;
+import quill.docbook.ValidateTextChainToDocBookConversion;
+import quill.quack.ValidateThereAndBackAgain;
 import quill.textbase.ValidateApplyUndoRedo;
 import quill.textbase.ValidateExtracts;
 import quill.textbase.ValidateSpanOperations;
