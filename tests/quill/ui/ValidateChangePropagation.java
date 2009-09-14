@@ -87,10 +87,10 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
-                "<para>",
+                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<text>",
                 "h",
-                "</para>",
+                "</text>",
                 "</chapter>"
         });
         assertEquals(expected, out.toString());
@@ -132,11 +132,11 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
-                "<para>",
+                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<text>",
                 "This is a test of the emergency broadcast",
                 "system",
-                "</para>",
+                "</text>",
                 "</chapter>"
         });
         assertEquals(expected, out.toString());
@@ -166,10 +166,10 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
-                "<para>",
+                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<text>",
                 "This is an emergency broadcast system",
-                "</para>",
+                "</text>",
                 "</chapter>"
         });
         assertEquals(expected, out.toString());
@@ -217,12 +217,12 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
-                "<para>",
+                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<text>",
                 "This is a test of the",
-                "<emphasis>emergency</emphasis> broadcast",
+                "<italics>emergency</italics> broadcast",
                 "system",
-                "</para>",
+                "</text>",
                 "</chapter>",
         });
         assertEquals(expected, out.toString());
@@ -252,12 +252,12 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
-                "<para>",
+                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<text>",
                 "This is a test of the",
-                "a<emphasis>emergency</emphasis> broadcast",
+                "a<italics>emergency</italics> broadcast",
                 "system",
-                "</para>",
+                "</text>",
                 "</chapter>"
         });
         assertEquals(expected, out.toString());
