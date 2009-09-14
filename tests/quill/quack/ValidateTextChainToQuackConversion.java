@@ -197,12 +197,12 @@ public class ValidateTextChainToQuackConversion extends TestCase
         final TextChain chain;
 
         data = new DataLayer();
-        data.loadDocument("tests/quill/converter/TemporaryFiles.xml");
+        data.loadDocument("tests/quill/quack/TemporaryFiles.xml");
 
         series = data.getActiveDocument().get(0);
-        assertEquals(3, series.size());
+        assertEquals(2, series.size());
 
-        chain = series.get(2).getText();
+        chain = series.get(1).getText();
 
         assertNotNull(chain);
         assertEquals("Accessing the /tmp directory directly is fine, "
