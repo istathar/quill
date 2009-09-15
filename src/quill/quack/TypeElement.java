@@ -1,5 +1,5 @@
 /*
- * Command.java
+ * TypeElement.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -11,13 +11,13 @@
 package quill.quack;
 
 /**
- * A command or program name, ie as you would run it from the command line.
+ * A type or class name.
  * 
  * @author Andrew Cowie
  */
-public class Command extends InlineElement implements Inline
+public class TypeElement extends InlineElement implements Inline
 {
-    public Command() {
-        super("command");
+    public TypeElement() {
+        super("type");
     }
 }

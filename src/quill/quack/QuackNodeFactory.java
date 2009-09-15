@@ -16,7 +16,6 @@ import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.NodeFactory;
 import nu.xom.Nodes;
-import quill.docbook.Article;
 
 /**
  * Use XOM as a front end to whatever XML parser and then work its callbacks
@@ -43,33 +42,33 @@ public class QuackNodeFactory extends NodeFactory
      */
     public Element startMakingElement(String name, String namespace) {
         if (name.equals("text")) {
-            return new Paragraph();
+            return new ParagraphElement();
         } else if (name.equals("code")) {
-            return new Code();
+            return new CodeElement();
         } else if (name.equals("quote")) {
-            return new Quote();
+            return new QuoteElement();
         } else if (name.equals("title")) {
-            return new Title();
+            return new TitleElement();
         } else if (name.equals("heading")) {
-            return new Heading();
+            return new HeadingElement();
         } else if (name.equals("function")) {
-            return new Function();
+            return new FunctionElement();
         } else if (name.equals("filename")) {
-            return new Filename();
+            return new FilenameElement();
         } else if (name.equals("type")) {
-            return new Type();
+            return new TypeElement();
         } else if (name.equals("literal")) {
-            return new Literal();
+            return new LiteralElement();
         } else if (name.equals("command")) {
-            return new Command();
+            return new CommandElement();
         } else if (name.equals("application")) {
-            return new Application();
+            return new ApplicationElement();
         } else if (name.equals("userinput")) {
-            throw new UnsupportedOperationException("Implement UserInput class");
+            throw new UnsupportedOperationException("Implement a UserInputElement class");
         } else if (name.equals("italics")) {
-            return new Italics();
+            return new ItalicsElement();
         } else if (name.equals("bold")) {
-            return new Bold();
+            return new BoldElement();
         } else {
             /*
              * This is actually fairly serious; once our code is working
@@ -100,9 +99,9 @@ public class QuackNodeFactory extends NodeFactory
 
     public Element makeRootElement(String name, String namespace) {
         if (name.equals("chapter")) {
-            return new Chapter();
+            return new ChapterElement();
         } else if (name.equals("article")) {
-            return new Article();
+            throw new UnsupportedOperationException("Implement ArticleElement?");
         } else {
             throw new IllegalStateException("Invalid document");
         }

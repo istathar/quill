@@ -71,16 +71,16 @@ public class QuackConverter extends DocBookConverter
         this.segment = segment;
 
         if (segment instanceof ComponentSegment) {
-            component = new Chapter();
-            block = new Title();
+            component = new ChapterElement();
+            block = new TitleElement();
         } else if (segment instanceof HeadingSegment) {
-            block = new Heading();
+            block = new HeadingElement();
         } else if (segment instanceof PreformatSegment) {
-            block = new Code();
+            block = new CodeElement();
         } else if (segment instanceof QuoteSegment) {
-            block = new Quote();
+            block = new QuoteElement();
         } else if (segment instanceof NormalSegment) {
-            block = new Paragraph();
+            block = new ParagraphElement();
         }
 
         text = segment.getText();
@@ -166,21 +166,21 @@ public class QuackConverter extends DocBookConverter
 
         if (inline == null) {
             if (format == Common.FILENAME) {
-                inline = new Filename();
+                inline = new FilenameElement();
             } else if (format == Common.TYPE) {
-                inline = new Type();
+                inline = new TypeElement();
             } else if (format == Common.FUNCTION) {
-                inline = new Function();
+                inline = new FunctionElement();
             } else if (format == Common.ITALICS) {
-                inline = new Italics();
+                inline = new ItalicsElement();
             } else if (format == Common.BOLD) {
-                inline = new Bold();
+                inline = new BoldElement();
             } else if (format == Common.LITERAL) {
-                inline = new Literal();
+                inline = new LiteralElement();
             } else if (format == Common.APPLICATION) {
-                inline = new Application();
+                inline = new ApplicationElement();
             } else if (format == Common.COMMAND) {
-                inline = new Command();
+                inline = new CommandElement();
             } else if (format == Preformat.USERINPUT) {
                 // boom?
             } else {
@@ -223,12 +223,12 @@ public class QuackConverter extends DocBookConverter
                 inline = null;
             }
             if (segment instanceof NormalSegment) {
-                block = new Paragraph();
+                block = new ParagraphElement();
             } else if (segment instanceof PreformatSegment) {
                 buf.append('\n');
                 return;
             } else if (segment instanceof QuoteSegment) {
-                block = new Quote();
+                block = new QuoteElement();
             } else {
                 throw new IllegalStateException("\n" + "Newlines aren't allowed in " + block.toString());
             }
@@ -243,9 +243,9 @@ public class QuackConverter extends DocBookConverter
      * to the converter, and write it to the given stream.
      */
     public void writeChapter(OutputStream out) throws IOException {
-        final Chapter chapter;
+        final ChapterElement chapter;
 
-        chapter = (Chapter) component;
+        chapter = (ChapterElement) component;
         chapter.toXML(out);
     }
 

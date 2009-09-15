@@ -1,5 +1,5 @@
 /*
- * ProgramListing.java
+ * BoldElement.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,10 +10,14 @@
  */
 package quill.quack;
 
-public class Code extends BlockElement implements Block
+/**
+ * Bold text.
+ * 
+ * @author Andrew Cowie
+ */
+public class BoldElement extends InlineElement implements Inline
 {
-    public Code() {
-        super("code");
-        super.setPreserveWhitespace();
+    public BoldElement() {
+        super("bold");
     }
 }

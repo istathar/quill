@@ -122,7 +122,7 @@ public class QuackLoader
     }
 
     private void processComponent(Component component) {
-        if (component instanceof Chapter) {
+        if (component instanceof ChapterElement) {
             markup = null;
             start = true;
             preserve = false;
@@ -133,7 +133,7 @@ public class QuackLoader
     }
 
     private void processBlock(Block block) {
-        if (block instanceof Paragraph) {
+        if (block instanceof ParagraphElement) {
             markup = null;
             start = true;
             preserve = false;
@@ -142,14 +142,14 @@ public class QuackLoader
             } else {
                 setSegment(new NormalSegment());
             }
-        } else if (block instanceof Code) {
+        } else if (block instanceof CodeElement) {
             markup = null;
             start = true;
             preserve = true;
             if (!(segment instanceof PreformatSegment)) {
                 setSegment(new PreformatSegment());
             }
-        } else if (block instanceof Quote) {
+        } else if (block instanceof QuoteElement) {
             markup = null;
             start = true;
             preserve = false;
@@ -158,12 +158,12 @@ public class QuackLoader
             } else {
                 setSegment(new QuoteSegment());
             }
-        } else if (block instanceof Heading) {
+        } else if (block instanceof HeadingElement) {
             markup = null;
             start = true;
             preserve = false;
             setSegment(new HeadingSegment());
-        } else if (block instanceof Title) {
+        } else if (block instanceof TitleElement) {
             markup = null;
             start = true;
             preserve = false;
@@ -192,23 +192,23 @@ public class QuackLoader
         final String str;
         if (span instanceof Normal) {
             markup = null;
-        } else if (span instanceof Function) {
+        } else if (span instanceof FunctionElement) {
             markup = Common.FUNCTION;
-        } else if (span instanceof Filename) {
+        } else if (span instanceof FilenameElement) {
             markup = Common.FILENAME;
-        } else if (span instanceof Type) {
+        } else if (span instanceof TypeElement) {
             markup = Common.TYPE;
-        } else if (span instanceof Literal) {
+        } else if (span instanceof LiteralElement) {
             markup = Common.LITERAL;
-        } else if (span instanceof Command) {
+        } else if (span instanceof CommandElement) {
             markup = Common.COMMAND;
-        } else if (span instanceof Application) {
+        } else if (span instanceof ApplicationElement) {
             markup = Common.APPLICATION;
             // } else if (span instanceof UserInput) { // TODO
             // markup = Preformat.USERINPUT;
-        } else if (span instanceof Italics) {
+        } else if (span instanceof ItalicsElement) {
             markup = Common.ITALICS;
-        } else if (span instanceof Bold) {
+        } else if (span instanceof BoldElement) {
             markup = Common.BOLD;
         } else {
             /*

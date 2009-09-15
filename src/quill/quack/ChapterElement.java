@@ -1,5 +1,5 @@
 /*
- * Chapter.java
+ * ChapterElement.java
  *
  * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -17,9 +17,9 @@ import nu.xom.Elements;
  * 
  * @author Andrew Cowie
  */
-public class Chapter extends QuackElement implements Component
+public class ChapterElement extends QuackElement implements Component
 {
-    public Chapter() {
+    public ChapterElement() {
         super("chapter");
     }
 

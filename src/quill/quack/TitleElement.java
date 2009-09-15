@@ -1,5 +1,5 @@
 /*
- * Title.java
+ * TitleElement.java
  *
  * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,13 +10,13 @@
  */
 package quill.quack;
 
-public class Title extends BlockElement implements Block
+public class TitleElement extends BlockElement implements Block
 {
-    public Title() {
+    public TitleElement() {
         super("title");
     }
 
-    public Title(String title) {
+    public TitleElement(String title) {
         super("title");
         super.add(title);
     }

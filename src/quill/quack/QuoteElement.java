@@ -1,7 +1,7 @@
 /*
- * Text.java
+ * QuoteElement.java
  *
- * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -10,14 +10,18 @@
  */
 package quill.quack;
 
+
 /**
- * A single paragraph of normal text.
+ * A verse or quote as a passage.
  * 
  * @author Andrew Cowie
  */
-public class Paragraph extends BlockElement implements Block
+/*
+ * TODO whitespace?
+ */
+public class QuoteElement extends BlockElement implements Block
 {
-    public Paragraph() {
-        super("text");
+    public QuoteElement() {
+        super("quote");
     }
 }

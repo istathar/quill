@@ -1,5 +1,5 @@
 /*
- * Filename.java
+ * HeadingElement.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,14 +10,14 @@
  */
 package quill.quack;
 
-/**
- * A filename.
- * 
- * @author Andrew Cowie
- */
-public class Filename extends InlineElement implements Inline
+public class HeadingElement extends BlockElement implements Block
 {
-    public Filename() {
-        super("filename");
+    public HeadingElement() {
+        super("heading");
+    }
+
+    public HeadingElement(String title) {
+        super("heading");
+        super.add(title);
     }
 }

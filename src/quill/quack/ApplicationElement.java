@@ -1,5 +1,5 @@
 /*
- * Type.java
+ * ApplicationElement.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -11,13 +11,13 @@
 package quill.quack;
 
 /**
- * A type or class name.
+ * The name of a software project.
  * 
  * @author Andrew Cowie
  */
-public class Type extends InlineElement implements Inline
+public class ApplicationElement extends InlineElement implements Inline
 {
-    public Type() {
-        super("type");
+    public ApplicationElement() {
+        super("application");
     }
 }

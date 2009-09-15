@@ -1,5 +1,5 @@
 /*
- * Literal.java
+ * ItalicsElement.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -11,13 +11,13 @@
 package quill.quack;
 
 /**
- * A code fragment.
+ * Italic text.
  * 
  * @author Andrew Cowie
  */
-public class Literal extends InlineElement implements Inline
+public class ItalicsElement extends InlineElement implements Inline
 {
-    public Literal() {
-        super("literal");
+    public ItalicsElement() {
+        super("italics");
     }
 }

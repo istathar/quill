@@ -1,5 +1,5 @@
 /*
- * Bold.java
+ * CodeElement.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,14 +10,10 @@
  */
 package quill.quack;
 
-/**
- * Bold text.
- * 
- * @author Andrew Cowie
- */
-public class Bold extends InlineElement implements Inline
+public class CodeElement extends BlockElement implements Block
 {
-    public Bold() {
-        super("bold");
+    public CodeElement() {
+        super("code");
+        super.setPreserveWhitespace();
     }
 }

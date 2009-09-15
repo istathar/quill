@@ -1,5 +1,5 @@
 /*
- * Italics.java
+ * CommandElement.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -11,13 +11,13 @@
 package quill.quack;
 
 /**
- * Italic text.
+ * A command or program name, ie as you would run it from the command line.
  * 
  * @author Andrew Cowie
  */
-public class Italics extends InlineElement implements Inline
+public class CommandElement extends InlineElement implements Inline
 {
-    public Italics() {
-        super("italics");
+    public CommandElement() {
+        super("command");
     }
 }

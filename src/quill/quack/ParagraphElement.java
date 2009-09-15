@@ -1,7 +1,7 @@
 /*
- * Function.java
+ * ParagraphElement.java
  *
- * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
@@ -11,13 +11,13 @@
 package quill.quack;
 
 /**
- * A method or function name.
+ * A single paragraph of normal text.
  * 
  * @author Andrew Cowie
  */
-public class Function extends InlineElement implements Inline
+public class ParagraphElement extends BlockElement implements Block
 {
-    public Function() {
-        super("function");
+    public ParagraphElement() {
+        super("text");
     }
 }

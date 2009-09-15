@@ -1,5 +1,5 @@
 /*
- * Application.java
+ * FilenameElement.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -11,13 +11,13 @@
 package quill.quack;
 
 /**
- * The name of a software project.
+ * A filename.
  * 
  * @author Andrew Cowie
  */
-public class Application extends InlineElement implements Inline
+public class FilenameElement extends InlineElement implements Inline
 {
-    public Application() {
-        super("application");
+    public FilenameElement() {
+        super("filename");
     }
 }

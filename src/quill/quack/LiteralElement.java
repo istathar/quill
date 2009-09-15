@@ -1,5 +1,5 @@
 /*
- * Blockquote.java
+ * LiteralElement.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,18 +10,14 @@
  */
 package quill.quack;
 
-
 /**
- * A verse or quote as a passage.
+ * A code fragment.
  * 
  * @author Andrew Cowie
  */
-/*
- * TODO whitespace?
- */
-public class Quote extends BlockElement implements Block
+public class LiteralElement extends InlineElement implements Inline
 {
-    public Quote() {
-        super("quote");
+    public LiteralElement() {
+        super("literal");
     }
 }

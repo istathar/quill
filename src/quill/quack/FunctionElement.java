@@ -1,5 +1,5 @@
 /*
- * Heading.java
+ * FunctionElement.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,14 +10,14 @@
  */
 package quill.quack;
 
-public class Heading extends BlockElement implements Block
+/**
+ * A method or function name.
+ * 
+ * @author Andrew Cowie
+ */
+public class FunctionElement extends InlineElement implements Inline
 {
-    public Heading() {
-        super("heading");
-    }
-
-    public Heading(String title) {
-        super("heading");
-        super.add(title);
+    public FunctionElement() {
+        super("function");
     }
 }
