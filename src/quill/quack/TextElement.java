@@ -1,5 +1,5 @@
 /*
- * ParagraphElement.java
+ * TextElement.java
  *
  * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -15,9 +15,15 @@ package quill.quack;
  * 
  * @author Andrew Cowie
  */
-public class ParagraphElement extends BlockElement implements Block
+/*
+ * This class is regretablly closely named to [nu.xom] Text which is used for
+ * Strings nodes in XOM. However, we've gone with <text> rather than <para> in
+ * Quack to emphasize that there are various ways to make paragraphs. So
+ * TextElement it is.
+ */
+public class TextElement extends BlockElement implements Block
 {
-    public ParagraphElement() {
+    public TextElement() {
         super("text");
     }
 }

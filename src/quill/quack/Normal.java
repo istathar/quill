@@ -20,6 +20,9 @@ import nu.xom.Text;
  * 
  * @author Andrew Cowie
  */
+/*
+ * This needs a better name.
+ */
 public class Normal implements Inline
 {
     private final Text text;

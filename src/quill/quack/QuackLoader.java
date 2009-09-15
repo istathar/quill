@@ -133,7 +133,7 @@ public class QuackLoader
     }
 
     private void processBlock(Block block) {
-        if (block instanceof ParagraphElement) {
+        if (block instanceof TextElement) {
             markup = null;
             start = true;
             preserve = false;

@@ -80,7 +80,7 @@ public class QuackConverter extends DocBookConverter
         } else if (segment instanceof QuoteSegment) {
             block = new QuoteElement();
         } else if (segment instanceof NormalSegment) {
-            block = new ParagraphElement();
+            block = new TextElement();
         }
 
         text = segment.getText();
@@ -223,7 +223,7 @@ public class QuackConverter extends DocBookConverter
                 inline = null;
             }
             if (segment instanceof NormalSegment) {
-                block = new ParagraphElement();
+                block = new TextElement();
             } else if (segment instanceof PreformatSegment) {
                 buf.append('\n');
                 return;

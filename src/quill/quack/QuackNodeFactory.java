@@ -42,7 +42,7 @@ public class QuackNodeFactory extends NodeFactory
      */
     public Element startMakingElement(String name, String namespace) {
         if (name.equals("text")) {
-            return new ParagraphElement();
+            return new TextElement();
         } else if (name.equals("code")) {
             return new CodeElement();
         } else if (name.equals("quote")) {
