@@ -8,7 +8,7 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package quill.converter;
+package quill.docbook;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         final TextChain text;
 
         data = new DataLayer();
-        data.loadDocument("tests/quill/converter/HelloWorld.xml");
+        data.loadDocument("tests/quill/docbook/HelloWorld.xml");
 
         series = data.getActiveDocument().get(0);
         assertEquals(3, series.size());
@@ -197,7 +197,7 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         final TextChain chain;
 
         data = new DataLayer();
-        data.loadDocument("tests/quill/converter/TemporaryFiles.xml");
+        data.loadDocument("tests/quill/docbook/TemporaryFiles.xml");
 
         series = data.getActiveDocument().get(0);
         assertEquals(3, series.size());

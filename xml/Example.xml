@@ -41,27 +41,28 @@ it.
 </text>
 <text>
 This program has the drawback of
-<italics>not</italics> doing very much and
-even worse, <bold>not</bold> telling you
-that that's not what it's doing.
+<italics>not</italics> doing very much
+and even worse,
+<bold>not</bold> telling
+you that that's not what it's doing.
 </text>
 <quote>
-<italics>The potential problem with the PM:</italics>
-Like all inhabitants of 10 Downing Street,
-he wants to take his place on the world stage.
-But people on stages are called actors. All
-they are required to do is look plausible,
-stay sober, and say the lines they are given
-in the right order. Those who try to make
-up their own lines generally do not last
-long.
+<italics>The potential problem with the
+PM:</italics> Like all inhabitants of 10
+Downing Street, he wants to take his place
+on the world stage. But people on stages
+are called actors. All they are required
+to do is look plausible, stay sober, and
+say the lines they are given in the right
+order. Those who try to make up their own
+lines generally do not last long.
 </quote>
 <quote>
 <italics>The Foreign Office solution:</italics>
 The PM must realize that as far as Foreign
 Affairs are concerned his job is to confine
 himself to the hospitality and ceremonial
-role.
+role.<note ref="1"/>
 </quote>
 <text>
 The way you fix that is by not making the
@@ -77,25 +78,26 @@ or if you'd rather just "run away screaming"
 now...
 </text>
 <text>
-<italics>Lor</italics>em ip<italics>sum</italics>
-dolor sit amet, consectetuer adipiscing elit.
-Proin adipiscing locus est. Curabitur vel
-odio - morbi ipsum sem, viverra eget, tristique
-tincidunt - mollis vestibulum, nulla. Suspendisse
-blandit. Fuse bibendum neque at est. Mauris
-eget turpis. Sed erat. Class aptent taciti
-sociosqu ad litora torquent per conubia nostra,
-per inceptos himenaeos. Phasellus in diam.
-Donec felis. Pellentesque libero libero,
-interdum et, accumsan quis, interdum quis,
-odio. Vestibulum nec lacus. Etiam id lacus.
-Curabitur ornare, felis sit amet auctor iaculis,
-metus eros feugiat nisl, sed adipiscing nisl
-urna nec odio. Nam magna. Pellentesque sed
-ante non massa pulvinar dapibus. Suspendisse
-at sapien. Sed lobortis, nisi non tempor
-consequat, nisl ante lobortis dolor, ut hendrerit
-tortor "quam id augue."
+<italics>Lor</italics>em
+ip<italics>sum</italics><note ref="2"/> sit amet,
+consectetuer adipiscing elit. Proin adipiscing
+locus est. Curabitur vel odio - morbi ipsum
+sem, viverra eget, tristique tincidunt -
+mollis vestibulum, nulla. Suspendisse blandit.
+Fuse bibendum neque at est. Mauris eget turpis.
+Sed erat. Class aptent taciti sociosqu ad
+litora torquent per conubia nostra, per inceptos
+himenaeos. Phasellus in diam. Donec felis.
+Pellentesque libero libero, interdum et,
+accumsan quis, interdum quis, odio. Vestibulum
+nec lacus. Etiam id lacus. Curabitur ornare,
+felis sit amet auctor iaculis, metus eros
+feugiat nisl, sed adipiscing nisl urna nec
+odio. Nam magna. Pellentesque sed ante non
+massa pulvinar dapibus. Suspendisse at sapien.
+Sed lobortis, nisi non tempor consequat,
+nisl ante lobortis dolor, ut hendrerit tortor
+"quam id augue."
 </text>
 <text>
 "Phasellus mollis", ante quis tincidunt rutrum,
@@ -168,4 +170,49 @@ malesuada, erat arcu pulvinar tortor, vitae
 rhoncus justo est ut ipsum. Sed sagittis
 mi sit amet mauris.
 </text>
+<endnote name="1">
+From "A Victory For Democracy", an episode of the
+popular television series <italics>Yes Prime
+Minister</italics>. This passage taken from the
+book version <note ref="[2]"/>, page 165.
+</endnote>
+<endnote name="2">
+Typesetting text (the fake latin verse) known as
+"Lorum Ipsum" created by an online generator
+program available at <note ref="[3]"/>.
+</endnote>
+<reference name="[1]">
+Andrew Cowie, "Surviving Change" in
+<italics>Proceedings of the 12th Australian
+Systems Administrators Conference</italics>
+(Brisbane: SAGE-AU, 2004), pages 23-40.
+</reference>
+<reference name="[2]">
+Antony Jay and Jonathan Lynn, <italics>The
+Complete Yes Prime Minister</italics> (London:
+BBC Books, 1989). ISBN 0563207736.
+</reference>
+<reference name="[3]">
+<filename>http://www.lipsum.com</filename>
+</reference>
 </chapter>
+<!--
+
+  Example.xml
+
+  Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
+
+  This is an example instance of a document following the Quack schema. As
+  such, this file forms an integral part of the source code of the program it
+  accompanies, and is made available to you by its authors under the terms of
+  the "GNU General Public Licence, version 2". See the LICENCE file for the
+  terms governing usage, copying and redistribution.
+  
+  The text demonstrating a quoted passage is taken from "Yes Prime Minister",
+
+  Copyright (c) 1986-1989 Jonathan Lynn and Anthony Jay
+
+  See endnote 1 and reference [2] above for full citation.
+
+  vim: set textwidth=78 nowrap:
+-->

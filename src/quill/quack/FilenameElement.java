@@ -1,5 +1,5 @@
 /*
- * Tag.java
+ * FilenameElement.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,13 +8,16 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package quill.docbook;
+package quill.quack;
 
 /**
- * Elements in our constrained subset of DocBook.
+ * A filename.
  * 
  * @author Andrew Cowie
  */
-public interface Tag
+public class FilenameElement extends InlineElement implements Inline
 {
+    public FilenameElement() {
+        super("filename");
+    }
 }

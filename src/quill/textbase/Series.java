@@ -20,7 +20,7 @@ public class Series
 {
     private Segment[] segments;
 
-    Series(Segment[] segments) {
+    public Series(Segment[] segments) {
         int i;
 
         this.segments = segments;

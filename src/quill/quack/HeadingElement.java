@@ -1,5 +1,5 @@
 /*
- * Tag.java
+ * HeadingElement.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,13 +8,16 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package quill.docbook;
+package quill.quack;
 
-/**
- * Elements in our constrained subset of DocBook.
- * 
- * @author Andrew Cowie
- */
-public interface Tag
+public class HeadingElement extends BlockElement implements Block
 {
+    public HeadingElement() {
+        super("heading");
+    }
+
+    public HeadingElement(String title) {
+        super("heading");
+        super.add(title);
+    }
 }

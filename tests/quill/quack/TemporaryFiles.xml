@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter schema="0.1" xmlns="http://operationaldynamics.com/quack">
+<text>
+Accessing the <filename>/tmp</filename> directory
+directly is fine, but you are often better
+off using <type>File</type>'s
+<function>createTempFile()</function> function.
+</text>
+</chapter>

@@ -1,42 +1,21 @@
 /*
- * DocBookConverter.java
+ * QuackConverter.java
  *
- * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
+ * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
  * The code in this file, and the program it is a part of, are made available
  * to you by its authors under the terms of the "GNU General Public Licence,
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
+ * 
+ * Forked from src/quill/docbook/DocBookConverter.java
  */
-package quill.converter;
-
-/*
- * A big reason to have this in its own package is so that we are using only
- * the public interface of our docbook module. Secondarily is that if other
- * output formats grow up, this will be the place their converters can live.
- */
+package quill.quack;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-import quill.docbook.Application;
-import quill.docbook.Block;
-import quill.docbook.Blockquote;
-import quill.docbook.Chapter;
-import quill.docbook.Command;
-import quill.docbook.Component;
-import quill.docbook.Division;
-import quill.docbook.Emphasis;
-import quill.docbook.Filename;
-import quill.docbook.Function;
-import quill.docbook.Inline;
-import quill.docbook.Literal;
-import quill.docbook.Paragraph;
-import quill.docbook.ProgramListing;
-import quill.docbook.Section;
-import quill.docbook.Structure;
-import quill.docbook.Title;
-import quill.docbook.Type;
+import quill.docbook.DocBookConverter;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
@@ -60,23 +39,16 @@ import quill.textbase.TextChain;
  * Build up Elements character by character. While somewhat plodding, this
  * allows us to create new Paragraphs etc as newlines are encountered.
  */
-public class DocBookConverter
+public class QuackConverter extends DocBookConverter
 {
     private Component component;
 
     private final StringBuilder buf;
 
     /**
-     * Current Section we are appending Paragraphs to
-     */
-    private Division section;
-
-    /**
      * The current internal block we are working through
      */
     private Segment segment;
-
-    private Structure parent;
 
     /**
      * Current output block we are building up.
@@ -86,7 +58,7 @@ public class DocBookConverter
 
     private Inline inline;
 
-    public DocBookConverter() {
+    public QuackConverter() {
         buf = new StringBuilder();
     }
 
@@ -95,29 +67,20 @@ public class DocBookConverter
      */
     public void append(final Segment segment) {
         final TextChain text;
-        final Blockquote quote;
 
         this.segment = segment;
 
         if (segment instanceof ComponentSegment) {
-            component = new Chapter();
-            section = null;
-            parent = component;
-            block = new Title();
+            component = new ChapterElement();
+            block = new TitleElement();
         } else if (segment instanceof HeadingSegment) {
-            section = new Section();
-            component.add(section);
-            parent = section;
-            block = new Title();
+            block = new HeadingElement();
         } else if (segment instanceof PreformatSegment) {
-            block = new ProgramListing();
+            block = new CodeElement();
         } else if (segment instanceof QuoteSegment) {
-            quote = new Blockquote();
-            parent.add(quote);
-            parent = quote;
-            block = new Paragraph();
+            block = new QuoteElement();
         } else if (segment instanceof NormalSegment) {
-            block = new Paragraph();
+            block = new TextElement();
         }
 
         text = segment.getText();
@@ -125,16 +88,8 @@ public class DocBookConverter
             return;
         }
 
-        parent.add(block);
+        component.add(block);
         append(text);
-
-        if (parent instanceof Blockquote) {
-            if (section == null) {
-                parent = component;
-            } else {
-                parent = section;
-            }
-        }
     }
 
     private void append(final TextChain chain) {
@@ -211,26 +166,21 @@ public class DocBookConverter
 
         if (inline == null) {
             if (format == Common.FILENAME) {
-                inline = new Filename();
+                inline = new FilenameElement();
             } else if (format == Common.TYPE) {
-                inline = new Type();
+                inline = new TypeElement();
             } else if (format == Common.FUNCTION) {
-                inline = new Function();
+                inline = new FunctionElement();
             } else if (format == Common.ITALICS) {
-                inline = new Emphasis();
+                inline = new ItalicsElement();
             } else if (format == Common.BOLD) {
-                final Emphasis element;
-
-                element = new Emphasis();
-                element.setBold();
-
-                inline = element;
+                inline = new BoldElement();
             } else if (format == Common.LITERAL) {
-                inline = new Literal();
+                inline = new LiteralElement();
             } else if (format == Common.APPLICATION) {
-                inline = new Application();
+                inline = new ApplicationElement();
             } else if (format == Common.COMMAND) {
-                inline = new Command();
+                inline = new CommandElement();
             } else if (format == Preformat.USERINPUT) {
                 // boom?
             } else {
@@ -272,15 +222,17 @@ public class DocBookConverter
             if (inline != null) {
                 inline = null;
             }
-            if (segment instanceof PreformatSegment) {
+            if (segment instanceof NormalSegment) {
+                block = new TextElement();
+            } else if (segment instanceof PreformatSegment) {
                 buf.append('\n');
                 return;
+            } else if (segment instanceof QuoteSegment) {
+                block = new QuoteElement();
+            } else {
+                throw new IllegalStateException("\n" + "Newlines aren't allowed in " + block.toString());
             }
-            if (block instanceof Title) {
-                throw new IllegalStateException("\n" + "Newlines aren't allowed in titles");
-            }
-            block = new Paragraph();
-            parent.add(block);
+            component.add(block);
         } else {
             buf.appendCodePoint(ch);
         }
@@ -291,9 +243,9 @@ public class DocBookConverter
      * to the converter, and write it to the given stream.
      */
     public void writeChapter(OutputStream out) throws IOException {
-        final Chapter chapter;
+        final ChapterElement chapter;
 
-        chapter = (Chapter) component;
+        chapter = (ChapterElement) component;
         chapter.toXML(out);
     }
 

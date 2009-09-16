@@ -1,5 +1,5 @@
 /*
- * DocBookLoader.java
+ * QuackLoader.java
  *
  * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,39 +8,34 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  * 
- * Most of this logic came from a class called EfficientNoNodeFactory. 
+ * Most of this logic came from a class called EfficientNoNodeFactory, and
+ * was later forked from quill.textbase.DocBookLoader  
  */
-package quill.textbase;
+package quill.quack;
 
 import java.util.ArrayList;
 
 import nu.xom.Document;
-import quill.docbook.Application;
-import quill.docbook.Block;
-import quill.docbook.Blockquote;
-import quill.docbook.Chapter;
-import quill.docbook.Command;
-import quill.docbook.Component;
-import quill.docbook.Division;
-import quill.docbook.Emphasis;
-import quill.docbook.Filename;
-import quill.docbook.Function;
-import quill.docbook.Inline;
-import quill.docbook.Literal;
-import quill.docbook.Paragraph;
-import quill.docbook.ProgramListing;
-import quill.docbook.Section;
-import quill.docbook.Title;
-import quill.docbook.Type;
+import quill.textbase.Common;
+import quill.textbase.ComponentSegment;
+import quill.textbase.HeadingSegment;
+import quill.textbase.Markup;
+import quill.textbase.NormalSegment;
+import quill.textbase.PreformatSegment;
+import quill.textbase.QuoteSegment;
+import quill.textbase.Segment;
+import quill.textbase.Series;
+import quill.textbase.Span;
+import quill.textbase.TextChain;
 
 /**
- * Take a XOM tree (built using DocBookNodeFactory and so having our
- * DocBookElements) and convert it into our internal in-memory textchain
+ * Take a XOM tree (built using QuackNodeFactory and so having our
+ * QuackElements) and convert it into our internal in-memory textchain
  * representation.
  * 
  * @author Andrew Cowie
  */
-public class DocBookLoader
+public class QuackLoader
 {
     private final ArrayList<Segment> list;
 
@@ -75,7 +70,7 @@ public class DocBookLoader
      */
     private boolean space;
 
-    public DocBookLoader() {
+    public QuackLoader() {
         list = new ArrayList<Segment>(5);
         chain = null;
     }
@@ -93,13 +88,12 @@ public class DocBookLoader
      */
     /*
      * This kinda assumes we only load one Document; if that's not the case,
-     * and we don't force instantiating a new DocBookLoader, then clear the
+     * and we don't force instantiating a new QuackLoader, then clear the
      * processor state here.
      */
     public Series process(Document doc) {
         final Component chapter;
-        final Division[] sections;
-        int i, j;
+        int j;
         Block[] blocks;
         final Segment[] result;
 
@@ -107,30 +101,13 @@ public class DocBookLoader
         processComponent(chapter);
 
         /*
-         * Handle the "anonymous" Blocks before the first Section, if any.
+         * Now iterate over the Blocks.
          */
 
         blocks = chapter.getBlocks();
 
         for (j = 0; j < blocks.length; j++) {
             processBlock(blocks[j]);
-        }
-
-        /*
-         * Now iterate over the Sections and then handle each Section's
-         * Blocks.
-         */
-
-        sections = chapter.getDivisions();
-
-        for (i = 0; i < sections.length; i++) {
-            processDivision(sections[i]);
-
-            blocks = sections[i].getBlocks();
-
-            for (j = 0; j < blocks.length; j++) {
-                processBlock(blocks[j]);
-            }
         }
 
         /*
@@ -145,29 +122,18 @@ public class DocBookLoader
     }
 
     private void processComponent(Component component) {
-        if (component instanceof Chapter) {
+        if (component instanceof ChapterElement) {
             markup = null;
             start = true;
             preserve = false;
             setSegment(new ComponentSegment());
-        }
-        // TODO Article?
-    }
-
-    private void processDivision(Division division) {
-        if (division instanceof Section) {
-            markup = null;
-            start = true;
-            preserve = false;
-            setSegment(new HeadingSegment());
+        } else {
+            throw new UnsupportedOperationException("Implement support for <article>?");
         }
     }
 
     private void processBlock(Block block) {
-        final Block[] blocks;
-        int i;
-
-        if (block instanceof Paragraph) {
+        if (block instanceof TextElement) {
             markup = null;
             start = true;
             preserve = false;
@@ -176,42 +142,40 @@ public class DocBookLoader
             } else {
                 setSegment(new NormalSegment());
             }
-            processBody(block);
-        } else if (block instanceof ProgramListing) {
+        } else if (block instanceof CodeElement) {
             markup = null;
             start = true;
             preserve = true;
             if (!(segment instanceof PreformatSegment)) {
                 setSegment(new PreformatSegment());
             }
-            processBody(block);
-        } else if (block instanceof Blockquote) {
+        } else if (block instanceof QuoteElement) {
             markup = null;
             start = true;
             preserve = false;
-            setSegment(new QuoteSegment());
-
-            blocks = ((Blockquote) block).getBlocks(); // yuk
-            processBody(blocks[0]); // hm
-            for (i = 1; i < blocks.length; i++) {
+            if (segment instanceof QuoteSegment) {
                 chain.append(Span.createSpan('\n', null));
-
-                start = true;
-                processBody(blocks[i]);
+            } else {
+                setSegment(new QuoteSegment());
             }
-        } else if (block instanceof Title) {
+        } else if (block instanceof HeadingElement) {
             markup = null;
             start = true;
             preserve = false;
-            if (segment instanceof HeadingSegment) {
-                // kludge
-                chain = new TextChain();
-                segment.setText(chain);
+            setSegment(new HeadingSegment());
+        } else if (block instanceof TitleElement) {
+            markup = null;
+            start = true;
+            preserve = false;
+            if (!(segment instanceof ComponentSegment)) {
+                throw new IllegalStateException("\n"
+                        + "The <title> must be the first block in a Quack <chapter>");
             }
-            processBody(block);
         } else {
             throw new IllegalStateException("\n" + "What kind of Block is " + block);
         }
+
+        processBody(block);
     }
 
     private void processBody(Block block) {
@@ -225,35 +189,27 @@ public class DocBookLoader
     }
 
     private void handleSpan(Inline span) {
-        if (span instanceof Function) {
+        final String str;
+        if (span instanceof Normal) {
+            markup = null;
+        } else if (span instanceof FunctionElement) {
             markup = Common.FUNCTION;
-        } else if (span instanceof Filename) {
+        } else if (span instanceof FilenameElement) {
             markup = Common.FILENAME;
-        } else if (span instanceof Type) {
+        } else if (span instanceof TypeElement) {
             markup = Common.TYPE;
-        } else if (span instanceof Literal) {
+        } else if (span instanceof LiteralElement) {
             markup = Common.LITERAL;
-        } else if (span instanceof Command) {
+        } else if (span instanceof CommandElement) {
             markup = Common.COMMAND;
-        } else if (span instanceof Application) {
+        } else if (span instanceof ApplicationElement) {
             markup = Common.APPLICATION;
             // } else if (span instanceof UserInput) { // TODO
             // markup = Preformat.USERINPUT;
-        } else if (span instanceof Emphasis) {
-            final Emphasis element;
-
-            /*
-             * Work out if this is italics or bold. This is not the cleanest
-             * code. Should isBold() move to the Inline interface?
-             */
-
-            element = (Emphasis) span;
-
-            if (element.isBold()) {
-                markup = Common.BOLD;
-            } else {
-                markup = Common.ITALICS;
-            }
+        } else if (span instanceof ItalicsElement) {
+            markup = Common.ITALICS;
+        } else if (span instanceof BoldElement) {
+            markup = Common.BOLD;
         } else {
             /*
              * No need to warn, really. The structure tags don't count. But if
@@ -266,7 +222,8 @@ public class DocBookLoader
             start = false;
         }
 
-        processText(span.getText());
+        str = span.getText();
+        processText(str);
     }
 
     /*

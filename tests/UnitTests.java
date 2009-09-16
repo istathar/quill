@@ -11,9 +11,10 @@
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import quill.converter.ValidateFileNaming;
-import quill.converter.ValidateTextChainToDocBookConversion;
-import quill.converter.ValidateThereAndBackAgain;
+import quill.client.ValidateFileNaming;
+import quill.quack.ValidateBlockquoteConversion;
+import quill.quack.ValidateTextChainToQuackConversion;
+import quill.quack.ValidateThereAndBackAgain;
 import quill.textbase.ValidateApplyUndoRedo;
 import quill.textbase.ValidateExtracts;
 import quill.textbase.ValidateSpanOperations;
@@ -50,7 +51,8 @@ public class UnitTests
         suite.addTestSuite(ValidateUnicode.class);
         suite.addTestSuite(ValidateExtracts.class);
         suite.addTestSuite(ValidateApplyUndoRedo.class);
-        suite.addTestSuite(ValidateTextChainToDocBookConversion.class);
+        suite.addTestSuite(ValidateTextChainToQuackConversion.class);
+        suite.addTestSuite(ValidateBlockquoteConversion.class);
         suite.addTestSuite(ValidateWrapperExpansions.class);
         suite.addTestSuite(ValidateStructuralChange.class);
         suite.addTestSuite(ValidateThereAndBackAgain.class);

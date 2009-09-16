@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter schema="0.1" xmlns="http://operationaldynamics.com/quack">
+<text>
+First line
+</text>
+<text>
+Second line
+</text>
+<quote>
+Premier ligne
+</quote>
+<quote>
+Deuxième ligne
+</quote>
+<text>
+Third line
+</text>
+<text>
+Fourth line
+</text>
+</chapter>

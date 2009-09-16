@@ -8,7 +8,7 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package quill.converter;
+package quill.quack;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,6 +16,7 @@ import java.io.IOException;
 
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import quill.client.IOTestCase;
 import quill.textbase.DataLayer;
 
 /**
@@ -40,7 +41,7 @@ public class ValidateThereAndBackAgain extends IOTestCase
         data = new DataLayer();
         data.loadDocument(source.getPath());
 
-        target = new File("tmp/unittests/quill/converter/ValidateThereAndBackAgain.xml");
+        target = new File("tmp/unittests/quill/quack/ValidateThereAndBackAgain.xml");
         target.getParentFile().mkdirs();
         out = new FileOutputStream(target);
         data.saveDocument(out);

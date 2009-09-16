@@ -1,5 +1,5 @@
 /*
- * Tag.java
+ * DocBook.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,7 +8,7 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package quill.docbook;
+package quill.quack;
 
 /**
  * Elements in our constrained subset of DocBook.

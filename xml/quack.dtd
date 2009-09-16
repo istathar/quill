@@ -1,0 +1,69 @@
+<!--
+
+  quack.dtd
+
+  Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
+
+  This is the public schema for "Quack", the file format used for storing text
+  documents created by the Quill and Parchment suite of programs.
+
+  As such, this file forms an integral part of the source code of the program
+  it accompanies, and is made available to you by its authors under the terms
+  of the "GNU General Public Licence, version 2". See the LICENCE file for the
+  terms governing usage, copying and redistribution.
+
+  Although you have the freedom to use this file in accordance with this
+  licence, the schema it describes is controlled by the XML Standards Team at
+  Operational Dynamics. Changes will only be made after public consultation
+  and in correlation with support in the "Quill and Parchment" application for
+  such new schema versions to ensure forward and backwards compatibility.
+
+-->
+
+<!ELEMENT chapter (title?,(heading | text | code | quote)*,endnote*,reference*)>
+<!ATTLIST chapter schema CDATA #FIXED "0.1">
+<!ATTLIST chapter xmlns CDATA #FIXED "http://operationaldynamics.com/quack">
+
+<!-- block level  -->
+
+<!ELEMENT title (#PCDATA)>
+
+<!ELEMENT heading (#PCDATA)>
+
+<!ELEMENT text (#PCDATA | italics | bold | application | type | function | literal | filename | command | note)*>
+
+<!ELEMENT code (#PCDATA | bold | note)*>
+<!ATTLIST code xml:space CDATA #REQUIRED>
+
+<!ELEMENT quote (#PCDATA | italics | bold | application | type | function | literal | filename | command | note)*>
+
+<!ELEMENT endnote (#PCDATA | italics | bold | application | type | function | literal | filename | command | note)*>
+<!ATTLIST endnote name CDATA #REQUIRED>
+
+<!ELEMENT reference (#PCDATA | italics | bold | application | type | function | literal | filename | command)*>
+<!ATTLIST reference name CDATA #REQUIRED>
+
+<!-- inline spans -->
+
+<!ELEMENT italics (#PCDATA)>
+
+<!ELEMENT bold (#PCDATA)>
+
+<!ELEMENT application (#PCDATA)>
+
+<!ELEMENT type (#PCDATA)>
+
+<!ELEMENT function (#PCDATA)>
+
+<!ELEMENT literal (#PCDATA)>
+
+<!ELEMENT filename (#PCDATA)>
+
+<!ELEMENT command (#PCDATA)>
+
+<!ELEMENT note EMPTY>
+<!ATTLIST note ref CDATA #REQUIRED>
+
+<!--
+  vim: set textwidth=78 nowrap:
+-->
