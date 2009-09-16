@@ -1,9 +1,6 @@
 
-XERCES_JARS=/usr/share/xerces-2/lib/xercesImpl.jar
-GNOME_JARS=/home/andrew/workspace/java-gnome/tmp/gtk-4.0.jar
-XOM_JARS=/home/andrew/workspace/xom/tmp/classes/
-JUNIT_JARS=/usr/share/junit/lib/junit.jar
+source .config
 
 exec /opt/icedtea6-bin-1.4.1/bin/java -client -ea -Djava.awt.headless=true \
-	-classpath ${XERCES_JARS}:${GNOME_JARS}:${XOM_JARS}:${JUNIT_JARS}:tmp/classes/ \
+	-classpath ${GNOME_JARS}:${XOM_JARS}:${JUNIT_JARS}:tmp/classes/ \
 	quill.client.Quill $*
