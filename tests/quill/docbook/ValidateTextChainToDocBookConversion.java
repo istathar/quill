@@ -16,7 +16,6 @@ import java.io.IOException;
 import junit.framework.TestCase;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import quill.docbook.DocBookConverter;
 import quill.textbase.Change;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
@@ -39,7 +38,7 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         final TextChain text;
 
         data = new DataLayer();
-        data.loadDocument("tests/quill/converter/HelloWorld.xml");
+        data.loadDocument("tests/quill/docbook/HelloWorld.xml");
 
         series = data.getActiveDocument().get(0);
         assertEquals(3, series.size());
@@ -198,7 +197,7 @@ public class ValidateTextChainToDocBookConversion extends TestCase
         final TextChain chain;
 
         data = new DataLayer();
-        data.loadDocument("tests/quill/converter/TemporaryFiles.xml");
+        data.loadDocument("tests/quill/docbook/TemporaryFiles.xml");
 
         series = data.getActiveDocument().get(0);
         assertEquals(3, series.size());

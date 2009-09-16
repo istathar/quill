@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import quill.converter.IOTestCase;
+import quill.client.IOTestCase;
 import quill.textbase.DataLayer;
 
 /**

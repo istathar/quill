@@ -11,8 +11,8 @@
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import quill.converter.ValidateBlockquoteConversion;
-import quill.converter.ValidateFileNaming;
+import quill.client.ValidateFileNaming;
+import quill.quack.ValidateBlockquoteConversion;
 import quill.quack.ValidateTextChainToQuackConversion;
 import quill.quack.ValidateThereAndBackAgain;
 import quill.textbase.ValidateApplyUndoRedo;
