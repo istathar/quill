@@ -1,3 +1,4 @@
-exec /opt/icedtea6-bin-1.4.1/bin/java -client -ea -Djava.awt.headless=true \
-	-classpath /home/andrew/workspace/java-gnome/tmp/gtk-4.0.jar:/home/andrew/workspace/xom/tmp/classes/:tmp/classes/:/usr/share/junit/lib/junit.jar \
-	quill.client.RenderToPrintHarness
+eval `cat .config | sed -e '/^#/d' -e '/^$/d' -e 's/=/="/' -e 's/$/"/'`
+exec ${JAVA} \
+	-classpath ${GNOME_JARS}:${XOM_JARS}:tmp/classes/ \
+	quill.client.RenderToPrintHarness $*
