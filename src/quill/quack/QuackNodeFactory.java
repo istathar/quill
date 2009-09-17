@@ -69,6 +69,8 @@ public class QuackNodeFactory extends NodeFactory
             return new ItalicsElement();
         } else if (name.equals("bold")) {
             return new BoldElement();
+        } else if (name.equals("note")) {
+            return new NoteElement();
         } else {
             /*
              * This is actually fairly serious; once our code is working
@@ -87,7 +89,7 @@ public class QuackNodeFactory extends NodeFactory
         /*
          * The one attribute we work with is emphasis's bold. Do we need to do
          * anything special there for that, or is that logic properly in
-         * DocBookLoader?
+         * QuackLoader?
          */
         return super.makeAttribute(name, URI, value, type);
     }
