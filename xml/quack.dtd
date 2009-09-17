@@ -37,7 +37,7 @@
 
 <!ELEMENT quote (#PCDATA | italics | bold | application | type | function | literal | filename | command | note)*>
 
-<!ELEMENT endnote (#PCDATA | italics | bold | application | type | function | literal | filename | command | note)*>
+<!ELEMENT endnote (#PCDATA | italics | bold | application | type | function | literal | filename | command | cite)*>
 <!ATTLIST endnote name CDATA #REQUIRED>
 
 <!ELEMENT reference (#PCDATA | italics | bold | application | type | function | literal | filename | command)*>
@@ -63,6 +63,9 @@
 
 <!ELEMENT note EMPTY>
 <!ATTLIST note ref CDATA #REQUIRED>
+
+<!ELEMENT cite EMPTY>
+<!ATTLIST cite ref CDATA #REQUIRED>
 
 <!--
   vim: set textwidth=78 nowrap:
