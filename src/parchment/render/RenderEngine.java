@@ -24,6 +24,8 @@ import org.gnome.pango.ForegroundColorAttribute;
 import org.gnome.pango.Layout;
 import org.gnome.pango.LayoutLine;
 import org.gnome.pango.Rectangle;
+import org.gnome.pango.RiseAttribute;
+import org.gnome.pango.SizeAttribute;
 import org.gnome.pango.Style;
 import org.gnome.pango.StyleAttribute;
 import org.gnome.pango.Weight;
@@ -41,6 +43,7 @@ import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
+import quill.textbase.Special;
 import quill.textbase.TextChain;
 
 import static org.freedesktop.cairo.HintMetrics.OFF;
@@ -475,6 +478,12 @@ public abstract class RenderEngine
         } else if (m instanceof Preformat) {
             if (m == Preformat.USERINPUT) {
                 return empty;
+            }
+        } else if (m instanceof Special) {
+            if (m == Special.NOTE) {
+                return new Attribute[] {
+                        new SizeAttribute(4.0), new RiseAttribute(4.5),
+                };
             }
         }
         // else TODO

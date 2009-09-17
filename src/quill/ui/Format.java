@@ -17,6 +17,7 @@ import org.gnome.pango.Weight;
 import quill.textbase.Common;
 import quill.textbase.Markup;
 import quill.textbase.Preformat;
+import quill.textbase.Special;
 
 /**
  * Format TextTags that can be applied to a TextBuffer which represent the
@@ -135,6 +136,10 @@ class Format
         } else if (m instanceof Preformat) {
             if (m == Preformat.USERINPUT) {
                 return userinput;
+            }
+        } else if (m instanceof Special) {
+            if (m == Special.NOTE) {
+                return null;
             }
         }
         // else TODO
