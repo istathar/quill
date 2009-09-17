@@ -64,6 +64,10 @@ public abstract class Span
         return new CharacterSpan(ch, markup);
     }
 
+    public static Span createSpan(String reference) {
+        return new MarkerSpan(reference);
+    }
+
     abstract Span copy(Markup markup);
 
     /**
@@ -138,5 +142,10 @@ public abstract class Span
         }
 
         return str.toString();
+    }
+
+    public boolean isSpecial() {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

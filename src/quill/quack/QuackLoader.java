@@ -210,6 +210,9 @@ public class QuackLoader
             markup = Common.ITALICS;
         } else if (span instanceof BoldElement) {
             markup = Common.BOLD;
+        } else if (span instanceof NoteElement) {
+            processMarker(span);
+            return;
         } else {
             /*
              * No need to warn, really. The structure tags don't count. But if
@@ -305,5 +308,13 @@ public class QuackLoader
          */
 
         markup = null;
+    }
+
+    private void processMarker(Inline span) {
+        final String str;
+
+        str = span.getText();
+
+        chain.append(Span.createSpan(str));
     }
 }

@@ -10,13 +10,17 @@
  */
 package quill.ui;
 
+import org.gnome.gdk.Cursor;
 import org.gnome.gdk.EventButton;
+import org.gnome.gdk.EventCrossing;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gdk.Rectangle;
 import org.gnome.gtk.Allocation;
+import org.gnome.gtk.EventBox;
 import org.gnome.gtk.InputMethod;
+import org.gnome.gtk.Label;
 import org.gnome.gtk.Menu;
 import org.gnome.gtk.MenuItem;
 import org.gnome.gtk.SimpleInputMethod;
@@ -37,6 +41,7 @@ import quill.textbase.FormatTextualChange;
 import quill.textbase.FullTextualChange;
 import quill.textbase.HeadingSegment;
 import quill.textbase.InsertTextualChange;
+import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.PreformatSegment;
@@ -847,8 +852,46 @@ abstract class EditorTextView extends TextView
 
         for (i = 0; i < entire.size(); i++) {
             s = entire.get(i);
-            buffer.insert(pointer, s.getText(), tagForMarkup(s.getMarkup()));
+            if (s instanceof MarkerSpan) {
+                buffer.insert(pointer, createEndnote(s), view);
+            } else {
+                buffer.insert(pointer, s.getText(), tagForMarkup(s.getMarkup()));
+            }
         }
+    }
+
+    private static Widget createEndnote(Span span) {
+        final String ref;
+        final Label label;
+        final EventBox box;
+
+        ref = span.getText();
+        label = new Label(ref);
+
+        box = new EventBox();
+        box.setVisibleWindow(false);
+        box.add(label);
+
+        box.connect(new Widget.ButtonPressEvent() {
+            public boolean onButtonPressEvent(Widget source, EventButton event) {
+                // TODO
+                return false;
+            }
+        });
+        box.connect(new Widget.EnterNotifyEvent() {
+            public boolean onEnterNotifyEvent(Widget source, EventCrossing event) {
+                box.getWindow().setCursor(Cursor.LINK);
+                return false;
+            }
+        });
+        box.connect(new Widget.LeaveNotifyEvent() {
+            public boolean onLeaveNotifyEvent(Widget source, EventCrossing event) {
+                box.getWindow().setCursor(Cursor.TEXT);
+                return false;
+            }
+        });
+
+        return box;
     }
 
     private Menu split;
