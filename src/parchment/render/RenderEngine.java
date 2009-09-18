@@ -484,6 +484,8 @@ public abstract class RenderEngine
                 return new Attribute[] {
                         new SizeAttribute(4.0), new RiseAttribute(4.5),
                 };
+            } else if (m == Special.CITE) {
+                return empty;
             }
         }
         // else TODO

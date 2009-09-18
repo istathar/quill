@@ -220,7 +220,7 @@ public class QuackLoader
             start = false;
             processText(str);
         } else if (span instanceof MarkerElement) {
-            processMarker(span);
+            processMarker(str);
         }
     }
 
@@ -305,11 +305,7 @@ public class QuackLoader
         markup = null;
     }
 
-    private void processMarker(Inline span) {
-        final String str;
-
-        str = span.getText();
-
+    private void processMarker(String str) {
         chain.append(Span.createMarker(str, markup));
     }
 }

@@ -11,7 +11,7 @@
 package quill.textbase;
 
 /**
- * Special [system] markup cases.
+ * Special markup cases used to indicate Markers.
  * 
  * @author Andrew Cowie
  */
@@ -22,4 +22,6 @@ public class Special extends Markup
     }
 
     public static final Special NOTE = new Special("NOTE");
+
+    public static final Special CITE = new Special("CITE");
 }

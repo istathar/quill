@@ -140,6 +140,8 @@ class Format
         } else if (m instanceof Special) {
             if (m == Special.NOTE) {
                 return null;
+            } else if (m == Special.CITE) {
+                return null;
             }
         }
         // else TODO
