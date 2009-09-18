@@ -179,54 +179,49 @@ public class QuackLoader
     }
 
     private void processBody(Block block) {
-        Inline[] spans;
+        Inline[] elements;
         int i;
 
-        spans = block.getSpans();
-        for (i = 0; i < spans.length; i++) {
-            handleSpan(spans[i]);
+        elements = block.getBody();
+        for (i = 0; i < elements.length; i++) {
+            processInline(elements[i]);
         }
     }
 
-    private void handleSpan(Inline span) {
+    private void processInline(Inline span) {
         final String str;
-        if (span instanceof Normal) {
-            markup = null;
-        } else if (span instanceof FunctionElement) {
-            markup = Common.FUNCTION;
-        } else if (span instanceof FilenameElement) {
-            markup = Common.FILENAME;
-        } else if (span instanceof TypeElement) {
-            markup = Common.TYPE;
-        } else if (span instanceof LiteralElement) {
-            markup = Common.LITERAL;
-        } else if (span instanceof CommandElement) {
-            markup = Common.COMMAND;
-        } else if (span instanceof ApplicationElement) {
-            markup = Common.APPLICATION;
-            // } else if (span instanceof UserInput) { // TODO
-            // markup = Preformat.USERINPUT;
-        } else if (span instanceof ItalicsElement) {
-            markup = Common.ITALICS;
-        } else if (span instanceof BoldElement) {
-            markup = Common.BOLD;
-        } else if (span instanceof NoteElement) {
-            processMarker(span);
-            return;
-        } else {
-            /*
-             * No need to warn, really. The structure tags don't count. But if
-             * we're losing semantic data, this is where its happening.
-             */
-            markup = null;
-        }
-
-        if (markup != null) {
-            start = false;
-        }
 
         str = span.getText();
-        processText(str);
+
+        if (span instanceof Normal) {
+            markup = null;
+            processText(str);
+        } else if (span instanceof InlineElement) {
+            if (span instanceof FunctionElement) {
+                markup = Common.FUNCTION;
+            } else if (span instanceof FilenameElement) {
+                markup = Common.FILENAME;
+            } else if (span instanceof TypeElement) {
+                markup = Common.TYPE;
+            } else if (span instanceof LiteralElement) {
+                markup = Common.LITERAL;
+            } else if (span instanceof CommandElement) {
+                markup = Common.COMMAND;
+            } else if (span instanceof ApplicationElement) {
+                markup = Common.APPLICATION;
+            } else if (span instanceof ItalicsElement) {
+                markup = Common.ITALICS;
+            } else if (span instanceof BoldElement) {
+                markup = Common.BOLD;
+            } else {
+                throw new IllegalStateException("Unknown Element type");
+            }
+
+            start = false;
+            processText(str);
+        } else if (span instanceof MarkerElement) {
+            processMarker(span);
+        }
     }
 
     /*
@@ -315,6 +310,6 @@ public class QuackLoader
 
         str = span.getText();
 
-        chain.append(Span.createSpan(str));
+        chain.append(Span.createMarker(str, markup));
     }
 }

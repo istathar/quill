@@ -19,8 +19,8 @@ public class MarkerSpan extends Span
 {
     final String reference;
 
-    public MarkerSpan(String reference) {
-        super(Special.NOTE); // ?
+    public MarkerSpan(String reference, Markup markup) {
+        super(markup);
         this.reference = reference;
     }
 
@@ -43,6 +43,7 @@ public class MarkerSpan extends Span
         return 1;
     }
 
+    // does this matter?
     Span split(int begin, int end) {
         if ((begin != 0) || (end != 1)) {
             throw new IllegalArgumentException();

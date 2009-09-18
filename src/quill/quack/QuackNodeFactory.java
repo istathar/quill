@@ -71,6 +71,8 @@ public class QuackNodeFactory extends NodeFactory
             return new BoldElement();
         } else if (name.equals("note")) {
             return new NoteElement();
+        } else if (name.equals("cite")) {
+            return new CiteElement();
         } else {
             /*
              * This is actually fairly serious; once our code is working

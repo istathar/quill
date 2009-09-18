@@ -16,7 +16,7 @@ import nu.xom.Text;
 /**
  * Normal text, modelled as an Inline. This is a delegate wrapper around XOM's
  * Text, but unlike Element subclasses we do not insert these into the tree.
- * It's just here so we can use it in Block's getSpans().
+ * It's just here so we can use it in Block's getBody().
  * 
  * @author Andrew Cowie
  */
