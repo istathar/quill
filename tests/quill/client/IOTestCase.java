@@ -73,4 +73,24 @@ public abstract class IOTestCase extends TestCase
         return str.toString();
     }
 
+    protected static String loadFileIntoString(String filename) {
+        final StringBuilder str;
+        final FileInputStream in;
+        int b;
+
+        str = new StringBuilder(1024);
+
+        try {
+            in = new FileInputStream(filename);
+            while ((b = in.read()) != -1) {
+                str.append((char) b);
+            }
+            in.close();
+        } catch (IOException ioe) {
+            fail(ioe.getMessage());
+            return null;
+        }
+
+        return str.toString();
+    }
 }

@@ -30,7 +30,9 @@ public class ValidateEndnoteConversion extends IOTestCase
         Segment segment;
         final QuackConverter converter;
         final ByteArrayOutputStream out;
-        final String blob;
+        final String original, result;
+
+        original = loadFileIntoString("tests/quill/quack/Endnote.xml");
 
         data = new DataLayer();
         data.loadDocument("tests/quill/quack/Endnote.xml");
@@ -50,14 +52,7 @@ public class ValidateEndnoteConversion extends IOTestCase
         out = new ByteArrayOutputStream();
         converter.writeChapter(out);
 
-        blob = combine(new String[] {
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
-                "<quote>",
-                "In the beginning...",
-                "</quote>",
-                "</chapter>"
-        });
-        assertEquals(blob, out.toString());
+        result = out.toString();
+        assertEquals(original, result);
     }
 }

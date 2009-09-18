@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter schema="0.1" xmlns="http://operationaldynamics.com/quack">
 <quote>
-In the beginning...
+In the beginning...<note ref="1"/>
 </quote>
 </chapter>
