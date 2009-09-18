@@ -15,9 +15,9 @@ package quill.quack;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import junit.framework.TestCase;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import quill.client.IOTestCase;
 import quill.textbase.Change;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
@@ -32,7 +32,7 @@ import quill.textbase.TextChain;
 
 import static quill.textbase.Span.createSpan;
 
-public class ValidateTextChainToQuackConversion extends TestCase
+public class ValidateTextChainToQuackConversion extends IOTestCase
 {
     public final void testLoadQuack() throws IOException, ValidityException, ParsingException {
         final DataLayer data;
@@ -97,19 +97,6 @@ public class ValidateTextChainToQuackConversion extends TestCase
                 "</chapter>"
         });
         assertEquals(blob, out.toString());
-    }
-
-    private static String combine(String[] elements) {
-        StringBuilder buf;
-
-        buf = new StringBuilder(128);
-
-        for (String element : elements) {
-            buf.append(element);
-            buf.append('\n');
-        }
-
-        return buf.toString();
     }
 
     public final void testWriteComplexPara() throws IOException {
@@ -254,5 +241,4 @@ public class ValidateTextChainToQuackConversion extends TestCase
         });
         assertEquals(blob, out.toString());
     }
-
 }

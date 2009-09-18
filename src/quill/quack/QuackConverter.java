@@ -27,6 +27,7 @@ import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Span;
+import quill.textbase.Special;
 import quill.textbase.TextChain;
 
 /**
@@ -183,6 +184,10 @@ public class QuackConverter extends DocBookConverter
                 inline = new CommandElement();
             } else if (format == Preformat.USERINPUT) {
                 // boom?
+            } else if (format == Special.NOTE) {
+                inline = new NoteElement();
+            } else if (format == Special.CITE) {
+                inline = new CiteElement();
             } else {
                 // boom!
             }
