@@ -139,10 +139,32 @@ class QuackSerializer extends Serializer
     }
 
     /*
-     * There's no real reason for there to do anything special with empty
-     * elements except that an empty block needs a trailing line break.
+     * TODO The swollowed logic is duplicated from writeStartTag() and should
+     * be extracted into a function.
      */
     protected void writeEmptyElementTag(Element e) throws IOException {
+        String nested;
+
+        if (e instanceof Inline) {
+            nested = e.toXML();
+
+            if (getColumnNumber() + firstBreakPoint(nested) + swollowed.length() > getMaxLength()) {
+                breakLine();
+                if (swollowed != "") {
+                    if (swollowed == " ") {
+                        swollowed = "";
+                    } else {
+                        swollowed = swollowed.substring(1, swollowed.length());
+                    }
+
+                }
+            }
+        }
+        if (swollowed != "") {
+            writeEscaped(swollowed);
+            swollowed = "";
+        }
+
         super.writeEmptyElementTag(e);
 
         if (e instanceof Block) {

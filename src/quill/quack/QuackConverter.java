@@ -209,7 +209,7 @@ public class QuackConverter extends DocBookConverter
              * cause us to flush something with no content. When we do, we'll
              * handle it here.
              */
-            throw new IllegalStateException();
+            return;
         }
 
         if (inline != null) {

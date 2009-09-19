@@ -35,10 +35,7 @@ public class MarkerSpan extends Span
     }
 
     public int getChar(int position) {
-        if (position != 0) {
-            throw new IllegalArgumentException();
-        }
-        return '†';
+        throw new UnsupportedOperationException();
     }
 
     public int getWidth() {
