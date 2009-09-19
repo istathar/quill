@@ -11,7 +11,9 @@
 package quill.textbase;
 
 /**
- * A special Span marking the position of a "marker"
+ * A special Span marking the position of a "marker", presented in the UI as
+ * something 1 character wide but actually displayed by a heavy Widget and not
+ * a character in the TextView.
  * 
  * @author Andrew Cowie
  */

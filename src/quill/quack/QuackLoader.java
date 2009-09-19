@@ -26,7 +26,10 @@ import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
+import quill.textbase.Special;
 import quill.textbase.TextChain;
+
+import static quill.textbase.Span.createSpan;
 
 /**
  * Take a XOM tree (built using QuackNodeFactory and so having our
@@ -220,6 +223,11 @@ public class QuackLoader
             start = false;
             processText(str);
         } else if (span instanceof MarkerElement) {
+            if (span instanceof NoteElement) {
+                markup = Special.NOTE;
+            } else if (span instanceof NoteElement) {
+                markup = Special.CITE;
+            }
             processMarker(str);
         }
     }
@@ -296,7 +304,7 @@ public class QuackLoader
             str = trim.replace('\n', ' ');
         }
 
-        chain.append(Span.createSpan(str, markup));
+        chain.append(createSpan(str, markup));
 
         /*
          * And, having processed the inline, reset to normal.

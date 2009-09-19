@@ -20,6 +20,7 @@ import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
+import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.Preformat;
@@ -67,7 +68,7 @@ public class QuackConverter extends DocBookConverter
      * Append a Segment.
      */
     public void append(final Segment segment) {
-        final TextChain text;
+        final TextChain chain;
 
         this.segment = segment;
 
@@ -84,13 +85,13 @@ public class QuackConverter extends DocBookConverter
             block = new TextElement();
         }
 
-        text = segment.getText();
-        if ((text == null) || (text.length() == 0)) {
+        chain = segment.getText();
+        if ((chain == null) || (chain.length() == 0)) {
             return;
         }
 
         component.add(block);
-        append(text);
+        append(chain);
     }
 
     private void append(final TextChain chain) {
@@ -123,9 +124,13 @@ public class QuackConverter extends DocBookConverter
                 previous = markup;
             }
 
-            len = span.getWidth();
-            for (j = 0; j < len; j++) {
-                process(span.getChar(j));
+            if (span instanceof MarkerSpan) {
+                process(span.getText());
+            } else {
+                len = span.getWidth();
+                for (j = 0; j < len; j++) {
+                    process(span.getChar(j));
+                }
             }
         }
 
@@ -189,7 +194,7 @@ public class QuackConverter extends DocBookConverter
             } else if (format == Special.CITE) {
                 inline = new CiteElement();
             } else {
-                // boom!
+                throw new IllegalStateException();
             }
         }
     }
@@ -204,7 +209,7 @@ public class QuackConverter extends DocBookConverter
              * cause us to flush something with no content. When we do, we'll
              * handle it here.
              */
-            return;
+            throw new IllegalStateException();
         }
 
         if (inline != null) {
@@ -241,6 +246,14 @@ public class QuackConverter extends DocBookConverter
         } else {
             buf.appendCodePoint(ch);
         }
+    }
+
+    /**
+     * Special case for handling the bodies of MarkerSpans -> empty Elements'
+     * attributes.
+     */
+    private void process(String str) {
+        buf.append(str);
     }
 
     /**

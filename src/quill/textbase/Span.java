@@ -143,9 +143,4 @@ public abstract class Span
 
         return str.toString();
     }
-
-    public boolean isSpecial() {
-        // TODO Auto-generated method stub
-        return false;
-    }
 }

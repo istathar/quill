@@ -18,16 +18,34 @@ import nu.xom.ValidityException;
 import quill.client.IOTestCase;
 import quill.textbase.ComponentSegment;
 import quill.textbase.DataLayer;
+import quill.textbase.Extract;
+import quill.textbase.MarkerSpan;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
+import quill.textbase.Span;
+import quill.textbase.Special;
+import quill.textbase.StringSpan;
+import quill.textbase.TextChain;
 
 public class ValidateEndnoteConversion extends IOTestCase
 {
+    public final void testMarkerSpan() {
+        Span span;
+
+        span = Span.createMarker("1", Special.NOTE);
+        assertTrue(span instanceof MarkerSpan);
+        assertEquals("1", span.getText());
+        assertEquals(Special.NOTE, span.getMarkup());
+    }
+
     public final void testInlineNote() throws IOException, ValidityException, ParsingException {
         final DataLayer data;
         final Series series;
         Segment segment;
+        final TextChain chain;
+        final Extract entire;
+        Span span;
         final QuackConverter converter;
         final ByteArrayOutputStream out;
         final String original, result;
@@ -44,6 +62,15 @@ public class ValidateEndnoteConversion extends IOTestCase
         assertTrue(segment instanceof ComponentSegment);
         segment = series.get(1);
         assertTrue(segment instanceof QuoteSegment);
+
+        chain = segment.getText();
+        entire = chain.extractAll();
+        assertEquals(2, entire.size());
+        span = entire.get(0);
+        assertTrue(span instanceof StringSpan);
+        span = entire.get(1);
+        assertTrue(span instanceof MarkerSpan);
+        assertEquals(Special.NOTE, span.getMarkup());
 
         converter = new QuackConverter();
         converter.append(new ComponentSegment());
