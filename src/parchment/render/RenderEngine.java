@@ -132,7 +132,7 @@ public abstract class RenderEngine
 
         sansFace = new Typeface(cr, new FontDescription("Liberation Sans, 7.3"), 0.0);
 
-        headingFace = new Typeface(cr, new FontDescription("Linux Libertine C"), 0.0);
+        headingFace = new Typeface(cr, new FontDescription("Linux Libertine O C"), 0.0);
     }
 
     /*
