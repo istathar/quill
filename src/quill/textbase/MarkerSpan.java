@@ -35,7 +35,7 @@ public class MarkerSpan extends Span
     }
 
     public int getChar(int position) {
-        throw new UnsupportedOperationException();
+        return '☢';
     }
 
     public int getWidth() {
