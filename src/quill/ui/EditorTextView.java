@@ -49,6 +49,7 @@ import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
+import quill.textbase.Special;
 import quill.textbase.SplitStructuralChange;
 import quill.textbase.StructuralChange;
 import quill.textbase.TextChain;
@@ -768,6 +769,11 @@ abstract class EditorTextView extends TextView
                 final Rectangle rect;
                 final Allocation alloc;
 
+                /*
+                 * Find out the styling appropriate to the proceeding
+                 * character.
+                 */
+
                 pointer = buffer.getIter(insertBound);
                 offset = pointer.getOffset();
 
@@ -776,6 +782,20 @@ abstract class EditorTextView extends TextView
                     offset--;
                 }
                 insertMarkup = chain.getMarkupAt(offset);
+
+                /*
+                 * Except, that if we're beside a footnote, then we need to
+                 * not be inheriting that styling. Otherwise we extend the
+                 * note ref, which is bad!
+                 */
+
+                if (insertMarkup instanceof Special) {
+                    insertMarkup = null;
+                }
+
+                /*
+                 * Now, make sure the complete line is on screen.
+                 */
 
                 rect = view.getLocation(pointer);
                 alloc = view.getAllocation();
@@ -859,6 +879,11 @@ abstract class EditorTextView extends TextView
     private void insertSpan(TextIter pointer, Span span) {
         if (span instanceof MarkerSpan) {
             buffer.insert(pointer, createEndnote(span), view);
+            /*
+             * Strangely, adding a child Widget doesn't seem to result in a
+             * cursor notification. So force it.
+             */
+            buffer.placeCursor(pointer);
         } else {
             buffer.insert(pointer, span.getText(), tagForMarkup(span.getMarkup()));
         }
