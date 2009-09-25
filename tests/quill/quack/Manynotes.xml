@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter schema="0.1" xmlns="http://operationaldynamics.com/quack">
+<text>
+The first book says this:
+</text>
+<quote>
+In the beginning...<note ref="42"/>
+</quote>
+<text>
+And that's what it said!
+</text>
+</chapter>

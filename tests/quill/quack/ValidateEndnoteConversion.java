@@ -20,6 +20,7 @@ import quill.textbase.ComponentSegment;
 import quill.textbase.DataLayer;
 import quill.textbase.Extract;
 import quill.textbase.MarkerSpan;
+import quill.textbase.NormalSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
@@ -75,6 +76,70 @@ public class ValidateEndnoteConversion extends IOTestCase
         converter = new QuackConverter();
         converter.append(new ComponentSegment());
         converter.append(segment);
+
+        out = new ByteArrayOutputStream();
+        converter.writeChapter(out);
+
+        result = out.toString();
+        assertEquals(original, result);
+    }
+
+    public final void testTwoBlockWithNote() throws IOException, ValidityException, ParsingException {
+        final String FILE;
+        final DataLayer data;
+        final Series series;
+        Segment segment;
+        final TextChain chain;
+        final Extract entire;
+        Span span;
+        final QuackConverter converter;
+        final ByteArrayOutputStream out;
+        final String original, result;
+        int i;
+
+        FILE = "tests/quill/quack/Manynotes.xml";
+
+        original = loadFileIntoString(FILE);
+
+        data = new DataLayer();
+        data.loadDocument(FILE);
+
+        /*
+         * Check the state is what we think it is
+         */
+
+        series = data.getActiveDocument().get(0);
+        assertEquals(4, series.size());
+
+        segment = series.get(0);
+        assertTrue(segment instanceof ComponentSegment);
+        segment = series.get(1);
+        assertTrue(segment instanceof NormalSegment);
+        segment = series.get(2);
+        assertTrue(segment instanceof QuoteSegment);
+        segment = series.get(3);
+        assertTrue(segment instanceof NormalSegment);
+
+        segment = series.get(2);
+        chain = segment.getText();
+        entire = chain.extractAll();
+        assertEquals(2, entire.size());
+        span = entire.get(0);
+        assertTrue(span instanceof StringSpan);
+        span = entire.get(1);
+        assertTrue(span instanceof MarkerSpan);
+        assertEquals(Special.NOTE, span.getMarkup());
+
+        /*
+         * Now, write out, and test.
+         */
+
+        converter = new QuackConverter();
+        converter.append(new ComponentSegment());
+
+        for (i = 1; i < series.size(); i++) {
+            converter.append(series.get(i));
+        }
 
         out = new ByteArrayOutputStream();
         converter.writeChapter(out);
