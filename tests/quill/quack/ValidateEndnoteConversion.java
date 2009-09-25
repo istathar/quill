@@ -20,6 +20,7 @@ import quill.textbase.ComponentSegment;
 import quill.textbase.DataLayer;
 import quill.textbase.Extract;
 import quill.textbase.MarkerSpan;
+import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
@@ -84,7 +85,7 @@ public class ValidateEndnoteConversion extends IOTestCase
         assertEquals(original, result);
     }
 
-    public final void testTwoBlockWithNote() throws IOException, ValidityException, ParsingException {
+    public final void testManyNotes() throws IOException, ValidityException, ParsingException {
         final String FILE;
         final DataLayer data;
         final Series series;
@@ -133,5 +134,89 @@ public class ValidateEndnoteConversion extends IOTestCase
 
         result = out.toString();
         assertEquals(original, result);
+    }
+
+    /*
+     * Bug: for some reason, markup at the beginning of a following block is
+     * being lost. This test demonstrates the problem.
+     */
+    public final void testTwoBlockWithNote() throws IOException, ValidityException, ParsingException {
+        final String FILE1, FILE2;
+        final DataLayer data;
+        final Series series;
+        Segment segment;
+        final TextChain chain;
+        Span span;
+        final int offset;
+        final Markup markup;
+        final Extract extract;
+        final QuackConverter converter;
+        final ByteArrayOutputStream out;
+        final String expected, result;
+        int i;
+
+        FILE1 = "tests/quill/quack/Manynotes.xml";
+        FILE2 = "tests/quill/quack/Manynotes2.xml";
+
+        expected = loadFileIntoString(FILE2);
+
+        data = new DataLayer();
+        data.loadDocument(FILE1);
+
+        /*
+         * Check the state is what we think it is
+         */
+
+        series = data.getActiveDocument().get(0);
+        assertEquals(4, series.size());
+
+        segment = series.get(0);
+        assertTrue(segment instanceof ComponentSegment);
+        segment = series.get(1);
+        assertTrue(segment instanceof NormalSegment);
+        segment = series.get(2);
+        assertTrue(segment instanceof QuoteSegment);
+        segment = series.get(3);
+        assertTrue(segment instanceof NormalSegment);
+
+        /*
+         * Append a <note> to the end of the first NormalSegment
+         */
+
+        segment = series.get(1);
+        chain = segment.getText();
+
+        span = Span.createMarker("[Einstein, 1905]", Special.NOTE);
+        chain.append(span);
+
+        /*
+         * Make sure it got added
+         */
+
+        offset = chain.length();
+        markup = chain.getMarkupAt(offset - 1);
+        assertEquals(Special.NOTE, markup);
+
+        extract = chain.extractRange(offset - 1, 1);
+        assertEquals(1, extract.getWidth());
+        span = extract.get(0);
+        assertTrue(span instanceof MarkerSpan);
+
+        /*
+         * Now, write out, and test. We shouldn't have lost any markup.
+         */
+
+        converter = new QuackConverter();
+        converter.append(new ComponentSegment());
+
+        for (i = 1; i < series.size(); i++) {
+            converter.append(series.get(i));
+        }
+
+        out = new ByteArrayOutputStream();
+        converter.writeChapter(out);
+
+        result = out.toString();
+        assertEquals(expected, result);
     }
 }
