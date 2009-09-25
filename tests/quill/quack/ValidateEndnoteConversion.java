@@ -89,9 +89,6 @@ public class ValidateEndnoteConversion extends IOTestCase
         final DataLayer data;
         final Series series;
         Segment segment;
-        final TextChain chain;
-        final Extract entire;
-        Span span;
         final QuackConverter converter;
         final ByteArrayOutputStream out;
         final String original, result;
@@ -119,17 +116,6 @@ public class ValidateEndnoteConversion extends IOTestCase
         assertTrue(segment instanceof QuoteSegment);
         segment = series.get(3);
         assertTrue(segment instanceof NormalSegment);
-
-        segment = series.get(2);
-        chain = segment.getText();
-        entire = chain.extractAll();
-        assertEquals(2, entire.size());
-        span = entire.get(0);
-        assertTrue(span instanceof StringSpan);
-        span = entire.get(1);
-        assertTrue(span instanceof MarkerSpan);
-        assertEquals(Special.NOTE, span.getMarkup());
-        assertEquals("2", span.getText());
 
         /*
          * Now, write out, and test.
