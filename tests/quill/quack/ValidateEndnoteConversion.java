@@ -129,6 +129,7 @@ public class ValidateEndnoteConversion extends IOTestCase
         span = entire.get(1);
         assertTrue(span instanceof MarkerSpan);
         assertEquals(Special.NOTE, span.getMarkup());
+        assertEquals("2", span.getText());
 
         /*
          * Now, write out, and test.
