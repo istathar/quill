@@ -225,7 +225,7 @@ public class QuackLoader
         } else if (span instanceof MarkerElement) {
             if (span instanceof NoteElement) {
                 markup = Special.NOTE;
-            } else if (span instanceof NoteElement) {
+            } else if (span instanceof CiteElement) {
                 markup = Special.CITE;
             }
             processMarker(str);
