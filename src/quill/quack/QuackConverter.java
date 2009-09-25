@@ -83,6 +83,7 @@ public class QuackConverter
         } else if (segment instanceof NormalSegment) {
             block = new TextElement();
         }
+        inline = null;
 
         chain = segment.getText();
         if ((chain == null) || (chain.length() == 0)) {
