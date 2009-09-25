@@ -23,5 +23,5 @@ public interface Block extends Tag
 
     public void add(Inline tag);
 
-    public Inline[] getSpans();
+    public Inline[] getBody();
 }

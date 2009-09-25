@@ -37,8 +37,16 @@ abstract class QuackElement extends Element
         super.appendChild(str);
     }
 
-    void setAttribute(String name, String value) {
+    void setValue(String name, String value) {
         super.addAttribute(new Attribute(name, value));
+    }
+
+    String getValue(String name) {
+        final Attribute a;
+
+        a = super.getAttribute(name);
+
+        return a.getValue();
     }
 
     /**
@@ -65,7 +73,7 @@ abstract class QuackElement extends Element
          * The top level element in a DocBook XML document has to have a
          * version attribute.
          */
-        this.setAttribute("schema", "0.1");
+        this.setValue("schema", "0.1");
 
         s = new QuackSerializer(out, this);
         s.write(doc);

@@ -15,11 +15,11 @@ package quill.quack;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import quill.docbook.DocBookConverter;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
+import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.Preformat;
@@ -27,6 +27,7 @@ import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Span;
+import quill.textbase.Special;
 import quill.textbase.TextChain;
 
 /**
@@ -39,7 +40,7 @@ import quill.textbase.TextChain;
  * Build up Elements character by character. While somewhat plodding, this
  * allows us to create new Paragraphs etc as newlines are encountered.
  */
-public class QuackConverter extends DocBookConverter
+public class QuackConverter
 {
     private Component component;
 
@@ -66,7 +67,7 @@ public class QuackConverter extends DocBookConverter
      * Append a Segment.
      */
     public void append(final Segment segment) {
-        final TextChain text;
+        final TextChain chain;
 
         this.segment = segment;
 
@@ -82,14 +83,15 @@ public class QuackConverter extends DocBookConverter
         } else if (segment instanceof NormalSegment) {
             block = new TextElement();
         }
+        inline = null;
 
-        text = segment.getText();
-        if ((text == null) || (text.length() == 0)) {
+        chain = segment.getText();
+        if ((chain == null) || (chain.length() == 0)) {
             return;
         }
 
         component.add(block);
-        append(text);
+        append(chain);
     }
 
     private void append(final TextChain chain) {
@@ -122,9 +124,13 @@ public class QuackConverter extends DocBookConverter
                 previous = markup;
             }
 
-            len = span.getWidth();
-            for (j = 0; j < len; j++) {
-                process(span.getChar(j));
+            if (span instanceof MarkerSpan) {
+                process(span.getText());
+            } else {
+                len = span.getWidth();
+                for (j = 0; j < len; j++) {
+                    process(span.getChar(j));
+                }
             }
         }
 
@@ -183,8 +189,12 @@ public class QuackConverter extends DocBookConverter
                 inline = new CommandElement();
             } else if (format == Preformat.USERINPUT) {
                 // boom?
+            } else if (format == Special.NOTE) {
+                inline = new NoteElement();
+            } else if (format == Special.CITE) {
+                inline = new CiteElement();
             } else {
-                // boom!
+                throw new IllegalStateException();
             }
         }
     }
@@ -236,6 +246,14 @@ public class QuackConverter extends DocBookConverter
         } else {
             buf.appendCodePoint(ch);
         }
+    }
+
+    /**
+     * Special case for handling the bodies of MarkerSpans -> empty Elements'
+     * attributes.
+     */
+    private void process(String str) {
+        buf.append(str);
     }
 
     /**

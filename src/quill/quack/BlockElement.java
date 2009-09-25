@@ -32,7 +32,7 @@ abstract class BlockElement extends QuackElement
         super.add(markup);
     }
 
-    public Inline[] getSpans() {
+    public Inline[] getBody() {
         final int num;
         final Inline[] result;
         int i;

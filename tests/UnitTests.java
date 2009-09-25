@@ -13,6 +13,8 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import quill.client.ValidateFileNaming;
 import quill.quack.ValidateBlockquoteConversion;
+import quill.quack.ValidateCitationConversion;
+import quill.quack.ValidateEndnoteConversion;
 import quill.quack.ValidateTextChainToQuackConversion;
 import quill.quack.ValidateThereAndBackAgain;
 import quill.textbase.ValidateApplyUndoRedo;
@@ -53,6 +55,8 @@ public class UnitTests
         suite.addTestSuite(ValidateApplyUndoRedo.class);
         suite.addTestSuite(ValidateTextChainToQuackConversion.class);
         suite.addTestSuite(ValidateBlockquoteConversion.class);
+        suite.addTestSuite(ValidateEndnoteConversion.class);
+        suite.addTestSuite(ValidateCitationConversion.class);
         suite.addTestSuite(ValidateWrapperExpansions.class);
         suite.addTestSuite(ValidateStructuralChange.class);
         suite.addTestSuite(ValidateThereAndBackAgain.class);

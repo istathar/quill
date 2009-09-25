@@ -21,7 +21,6 @@ import nu.xom.Document;
 import nu.xom.NodeFactory;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import quill.docbook.DocBookConverter;
 import quill.quack.QuackConverter;
 import quill.quack.QuackLoader;
 import quill.quack.QuackNodeFactory;
@@ -98,7 +97,7 @@ public class DataLayer
 
     public void saveDocument(OutputStream out) throws IOException {
         final Series series;
-        final DocBookConverter converter;
+        final QuackConverter converter;
         int i;
 
         /*

@@ -64,6 +64,10 @@ public abstract class Span
         return new CharacterSpan(ch, markup);
     }
 
+    public static Span createMarker(String reference, Markup markup) {
+        return new MarkerSpan(reference, markup);
+    }
+
     abstract Span copy(Markup markup);
 
     /**

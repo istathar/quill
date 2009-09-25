@@ -26,7 +26,10 @@ import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
+import quill.textbase.Special;
 import quill.textbase.TextChain;
+
+import static quill.textbase.Span.createSpan;
 
 /**
  * Take a XOM tree (built using QuackNodeFactory and so having our
@@ -179,51 +182,54 @@ public class QuackLoader
     }
 
     private void processBody(Block block) {
-        Inline[] spans;
+        Inline[] elements;
         int i;
 
-        spans = block.getSpans();
-        for (i = 0; i < spans.length; i++) {
-            handleSpan(spans[i]);
+        elements = block.getBody();
+        for (i = 0; i < elements.length; i++) {
+            processInline(elements[i]);
         }
     }
 
-    private void handleSpan(Inline span) {
+    private void processInline(Inline span) {
         final String str;
-        if (span instanceof Normal) {
-            markup = null;
-        } else if (span instanceof FunctionElement) {
-            markup = Common.FUNCTION;
-        } else if (span instanceof FilenameElement) {
-            markup = Common.FILENAME;
-        } else if (span instanceof TypeElement) {
-            markup = Common.TYPE;
-        } else if (span instanceof LiteralElement) {
-            markup = Common.LITERAL;
-        } else if (span instanceof CommandElement) {
-            markup = Common.COMMAND;
-        } else if (span instanceof ApplicationElement) {
-            markup = Common.APPLICATION;
-            // } else if (span instanceof UserInput) { // TODO
-            // markup = Preformat.USERINPUT;
-        } else if (span instanceof ItalicsElement) {
-            markup = Common.ITALICS;
-        } else if (span instanceof BoldElement) {
-            markup = Common.BOLD;
-        } else {
-            /*
-             * No need to warn, really. The structure tags don't count. But if
-             * we're losing semantic data, this is where its happening.
-             */
-            markup = null;
-        }
-
-        if (markup != null) {
-            start = false;
-        }
 
         str = span.getText();
-        processText(str);
+
+        if (span instanceof Normal) {
+            markup = null;
+            processText(str);
+        } else if (span instanceof InlineElement) {
+            if (span instanceof FunctionElement) {
+                markup = Common.FUNCTION;
+            } else if (span instanceof FilenameElement) {
+                markup = Common.FILENAME;
+            } else if (span instanceof TypeElement) {
+                markup = Common.TYPE;
+            } else if (span instanceof LiteralElement) {
+                markup = Common.LITERAL;
+            } else if (span instanceof CommandElement) {
+                markup = Common.COMMAND;
+            } else if (span instanceof ApplicationElement) {
+                markup = Common.APPLICATION;
+            } else if (span instanceof ItalicsElement) {
+                markup = Common.ITALICS;
+            } else if (span instanceof BoldElement) {
+                markup = Common.BOLD;
+            } else {
+                throw new IllegalStateException("Unknown Element type");
+            }
+
+            start = false;
+            processText(str);
+        } else if (span instanceof MarkerElement) {
+            if (span instanceof NoteElement) {
+                markup = Special.NOTE;
+            } else if (span instanceof CiteElement) {
+                markup = Special.CITE;
+            }
+            processMarker(str);
+        }
     }
 
     /*
@@ -298,12 +304,16 @@ public class QuackLoader
             str = trim.replace('\n', ' ');
         }
 
-        chain.append(Span.createSpan(str, markup));
+        chain.append(createSpan(str, markup));
 
         /*
          * And, having processed the inline, reset to normal.
          */
 
         markup = null;
+    }
+
+    private void processMarker(String str) {
+        chain.append(Span.createMarker(str, markup));
     }
 }

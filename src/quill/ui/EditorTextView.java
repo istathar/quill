@@ -10,13 +10,17 @@
  */
 package quill.ui;
 
+import org.gnome.gdk.Cursor;
 import org.gnome.gdk.EventButton;
+import org.gnome.gdk.EventCrossing;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gdk.Rectangle;
 import org.gnome.gtk.Allocation;
+import org.gnome.gtk.EventBox;
 import org.gnome.gtk.InputMethod;
+import org.gnome.gtk.Label;
 import org.gnome.gtk.Menu;
 import org.gnome.gtk.MenuItem;
 import org.gnome.gtk.SimpleInputMethod;
@@ -37,6 +41,7 @@ import quill.textbase.FormatTextualChange;
 import quill.textbase.FullTextualChange;
 import quill.textbase.HeadingSegment;
 import quill.textbase.InsertTextualChange;
+import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.PreformatSegment;
@@ -44,6 +49,7 @@ import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
+import quill.textbase.Special;
 import quill.textbase.SplitStructuralChange;
 import quill.textbase.StructuralChange;
 import quill.textbase.TextChain;
@@ -589,7 +595,7 @@ abstract class EditorTextView extends TextView
         if (r != null) {
             for (i = 0; i < r.size(); i++) {
                 s = r.get(i);
-                buffer.insert(start, s.getText(), tagForMarkup(s.getMarkup()));
+                insertSpan(start, s);
             }
         }
     }
@@ -670,7 +676,7 @@ abstract class EditorTextView extends TextView
             if (r != null) {
                 for (i = 0; i < r.size(); i++) {
                     s = r.get(i);
-                    buffer.insert(start, s.getText(), tagForMarkup(s.getMarkup()));
+                    insertSpan(start, s);
                 }
             }
         }
@@ -763,6 +769,11 @@ abstract class EditorTextView extends TextView
                 final Rectangle rect;
                 final Allocation alloc;
 
+                /*
+                 * Find out the styling appropriate to the proceeding
+                 * character.
+                 */
+
                 pointer = buffer.getIter(insertBound);
                 offset = pointer.getOffset();
 
@@ -771,6 +782,20 @@ abstract class EditorTextView extends TextView
                     offset--;
                 }
                 insertMarkup = chain.getMarkupAt(offset);
+
+                /*
+                 * Except, that if we're beside a footnote, then we need to
+                 * not be inheriting that styling. Otherwise we extend the
+                 * note ref, which is bad!
+                 */
+
+                if (insertMarkup instanceof Special) {
+                    insertMarkup = null;
+                }
+
+                /*
+                 * Now, make sure the complete line is on screen.
+                 */
 
                 rect = view.getLocation(pointer);
                 alloc = view.getAllocation();
@@ -847,8 +872,56 @@ abstract class EditorTextView extends TextView
 
         for (i = 0; i < entire.size(); i++) {
             s = entire.get(i);
-            buffer.insert(pointer, s.getText(), tagForMarkup(s.getMarkup()));
+            insertSpan(pointer, s);
         }
+    }
+
+    private void insertSpan(TextIter pointer, Span span) {
+        if (span instanceof MarkerSpan) {
+            buffer.insert(pointer, createEndnote(span), view);
+            /*
+             * Strangely, adding a child Widget doesn't seem to result in a
+             * cursor notification. So force it.
+             */
+            buffer.placeCursor(pointer);
+        } else {
+            buffer.insert(pointer, span.getText(), tagForMarkup(span.getMarkup()));
+        }
+    }
+
+    private static Widget createEndnote(Span span) {
+        final String ref;
+        final Label label;
+        final EventBox box;
+
+        ref = span.getText();
+        label = new Label(ref);
+
+        box = new EventBox();
+        box.setVisibleWindow(false);
+        box.add(label);
+
+        box.connect(new Widget.ButtonPressEvent() {
+            public boolean onButtonPressEvent(Widget source, EventButton event) {
+                // TODO
+                return false;
+            }
+        });
+        box.connect(new Widget.EnterNotifyEvent() {
+            public boolean onEnterNotifyEvent(Widget source, EventCrossing event) {
+                box.getWindow().setCursor(Cursor.LINK);
+                return false;
+            }
+        });
+        box.connect(new Widget.LeaveNotifyEvent() {
+            public boolean onLeaveNotifyEvent(Widget source, EventCrossing event) {
+                box.getWindow().setCursor(Cursor.TEXT);
+                return false;
+            }
+        });
+
+        box.showAll();
+        return box;
     }
 
     private Menu split;
