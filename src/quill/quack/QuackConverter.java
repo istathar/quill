@@ -15,7 +15,6 @@ package quill.quack;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import quill.docbook.DocBookConverter;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
@@ -41,7 +40,7 @@ import quill.textbase.TextChain;
  * Build up Elements character by character. While somewhat plodding, this
  * allows us to create new Paragraphs etc as newlines are encountered.
  */
-public class QuackConverter extends DocBookConverter
+public class QuackConverter
 {
     private Component component;
 
