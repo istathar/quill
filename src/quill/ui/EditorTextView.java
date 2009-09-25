@@ -594,7 +594,7 @@ abstract class EditorTextView extends TextView
         if (r != null) {
             for (i = 0; i < r.size(); i++) {
                 s = r.get(i);
-                buffer.insert(start, s.getText(), tagForMarkup(s.getMarkup()));
+                insertSpan(start, s);
             }
         }
     }
@@ -675,7 +675,7 @@ abstract class EditorTextView extends TextView
             if (r != null) {
                 for (i = 0; i < r.size(); i++) {
                     s = r.get(i);
-                    buffer.insert(start, s.getText(), tagForMarkup(s.getMarkup()));
+                    insertSpan(start, s);
                 }
             }
         }
@@ -852,11 +852,15 @@ abstract class EditorTextView extends TextView
 
         for (i = 0; i < entire.size(); i++) {
             s = entire.get(i);
-            if (s instanceof MarkerSpan) {
-                buffer.insert(pointer, createEndnote(s), view);
-            } else {
-                buffer.insert(pointer, s.getText(), tagForMarkup(s.getMarkup()));
-            }
+            insertSpan(pointer, s);
+        }
+    }
+
+    private void insertSpan(TextIter pointer, Span span) {
+        if (span instanceof MarkerSpan) {
+            buffer.insert(pointer, createEndnote(span), view);
+        } else {
+            buffer.insert(pointer, span.getText(), tagForMarkup(span.getMarkup()));
         }
     }
 
@@ -891,6 +895,7 @@ abstract class EditorTextView extends TextView
             }
         });
 
+        box.showAll();
         return box;
     }
 
