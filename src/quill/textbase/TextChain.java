@@ -232,14 +232,72 @@ public class TextChain
     }
 
     /**
+     * Find the Piece enclosing offset. This is used to then subdivide by
+     * splitAt()
+     */
+    /*
+     * TODO Initial implementation of this is an ugly linear search; replace
+     * this with an offset cache in the Pieces.
+     */
+    Piece pieceAt(int offset) {
+        Piece piece, last;
+        int start, following;
+
+        if (offset == 0) {
+            return null;
+        }
+
+        piece = first;
+        last = first;
+
+        start = 0;
+
+        while (piece != null) {
+            /*
+             * Are we already at a Piece boundary?
+             */
+
+            if (start == offset) {
+                return last;
+            }
+
+            /*
+             * Failing that, then let's see if this Piece contains the offset
+             * point. If it does, return it.
+             */
+
+            following = start + piece.span.getWidth();
+
+            if (following > offset) {
+                return piece;
+            }
+            start = following;
+
+            last = piece;
+            piece = piece.next;
+        }
+
+        /*
+         * Reached the end; so long as there is nothing left we're in an
+         * append situation and no problem, otherwise out of bounds.
+         */
+
+        if (start == offset) {
+            return last;
+        }
+
+        throw new IndexOutOfBoundsException();
+    }
+
+    /**
      * Find the Piece containing offset, and split it into two. Handle the
      * boundary cases of an offset at a Piece boundary. Returns a Pair around
      * the two Pieces. null will be set if there is no Piece before (or after)
      * this point.
      */
     /*
-     * TODO Initial implementation of this is an ugly linear search; replace
-     * this with an offset cache in the Pieces.
+     * FIXME this code was copied to pieceAt(), and should call that method
+     * instead of doing the same work here.
      */
     Piece splitAt(int offset) {
         Piece piece, last;
@@ -781,5 +839,43 @@ public class TextChain
      */
     Segment getEnclosingSegment() {
         return belongs;
+    }
+
+    /**
+     * Given a cursor location in offset, work backwards to find a word
+     * boundary, and then forwards to the next word boundary, and return the
+     * word contained between those two points.
+     */
+    public String getWordAt(int offset) {
+        Piece p, alpha, omega;
+        int start, end;
+        Pair pair;
+        StringBuilder str;
+        Span s;
+
+        p = pieceAt(offset);
+
+        /*
+         * TODO caculate word boundaries, place in start & end.
+         */
+        start = 10;
+        end = 14;
+
+        pair = extractFrom(start, end - start);
+        alpha = pair.one;
+        omega = pair.two;
+
+        str = new StringBuilder();
+
+        p = alpha;
+        while (p != null) {
+            str.append(p.span.getText());
+            if (p == omega) {
+                break;
+            }
+            p = p.next;
+        }
+
+        return str.toString();
     }
 }
