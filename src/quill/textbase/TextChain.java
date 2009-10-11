@@ -20,6 +20,11 @@ public class TextChain
 {
     Piece first;
 
+    /**
+     * cache of the length of this TextChain, in characters.
+     */
+    private int length = -1;
+
     public TextChain() {
         first = null;
     }
@@ -34,6 +39,10 @@ public class TextChain
         first.span = initial;
     }
 
+    private void invalidateCache() {
+        length = -1;
+    }
+
     /**
      * The length of this Text, in characters.
      */
@@ -44,6 +53,10 @@ public class TextChain
         Piece piece;
         int result;
 
+        if (length > -1) {
+            return length;
+        }
+
         piece = first;
         result = 0;
 
@@ -52,6 +65,7 @@ public class TextChain
             piece = piece.next;
         }
 
+        length = result;
         return result;
     }
 
@@ -77,6 +91,7 @@ public class TextChain
         if (addition == null) {
             throw new IllegalArgumentException();
         }
+        invalidateCache();
 
         /*
          * Handle empty Text case
@@ -121,6 +136,7 @@ public class TextChain
         if (offset < 0) {
             throw new IllegalArgumentException();
         }
+        invalidateCache();
 
         /*
          * Create the insertion point
@@ -361,6 +377,7 @@ public class TextChain
         if (offset < 0) {
             throw new IllegalArgumentException();
         }
+        invalidateCache();
 
         piece = new Piece();
         piece.span = addition;
@@ -534,6 +551,8 @@ public class TextChain
          * first pointer), and the very special case of deleting everything
          * (in which case we put in an "empty" Piece with a zero length Span).
          */
+
+        invalidateCache();
 
         preceeding = pair.one.prev;
         following = pair.two.next;
