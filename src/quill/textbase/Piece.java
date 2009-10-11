@@ -30,7 +30,7 @@ class Piece
      * For debugging, only!
      */
     public String toString() {
-        StringBuilder str;
+        final StringBuilder str;
         Piece p;
         int i;
 
@@ -45,9 +45,27 @@ class Piece
 
         str.append("«");
         str.append(span.toString());
-        str.append("» at ");
+        str.append("» at the ");
         str.append(i);
+        str.append(getOrdinalSuffix(i));
+        str.append(" position");
 
         return str.toString();
+    }
+
+    private static String getOrdinalSuffix(int num) {
+        final int dec;
+
+        dec = num % 10;
+
+        if (dec == 1) {
+            return "st";
+        } else if (dec == 2) {
+            return "nd";
+        } else if (dec == 3) {
+            return "rd";
+        } else {
+            return "th";
+        }
     }
 }
