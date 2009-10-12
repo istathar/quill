@@ -256,8 +256,8 @@ public class TextChain
      * splitAt()
      */
     /*
-     * TODO Initial implementation of this is an ugly linear search; replace
-     * this with an offset cache in the Pieces.
+     * TODO implementation is an ugly linear search. Now that the offsets are
+     * cached in the Pieces, perhaps we can be smarter about hunting.
      */
     Piece pieceAt(final int offset) {
         Piece piece, last;
