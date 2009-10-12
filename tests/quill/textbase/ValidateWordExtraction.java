@@ -18,8 +18,23 @@ import junit.framework.TestCase;
  * 
  * @author Andrew Cowie
  */
+/*
+ * The pieceAt() tests were written long after ValidateText, although that
+ * code increasingly uses this code path. Leave it here; we created this when
+ * we wore working out iterating by words.
+ */
 public class ValidateWordExtraction extends TestCase
 {
+    public final void testEmptyChain() {
+        final TextChain chain;
+        Piece piece;
+
+        chain = new TextChain();
+
+        piece = chain.pieceAt(0);
+        assertNull(piece);
+    }
+
     private static TextChain sampleData() {
         final TextChain result;
 
@@ -68,7 +83,7 @@ public class ValidateWordExtraction extends TestCase
         assertEquals("Three", piece.span.getText());
     }
 
-    public final void testEndCases() {
+    public final void testEndPiece() {
         final TextChain chain;
         Piece piece;
 
@@ -77,7 +92,7 @@ public class ValidateWordExtraction extends TestCase
         piece = chain.pieceAt(17);
         assertEquals("Four", piece.span.getText());
 
-        // Not sure about this. Should it be null?
+        // Not entirely sure about this. Should it be null?
         piece = chain.pieceAt(18);
         assertNotNull(piece);
         assertEquals("Four", piece.span.getText());

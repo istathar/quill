@@ -652,54 +652,15 @@ public class TextChain
         }
     }
 
-    /*
-     * FIXME This is another case where we linear search through the offsets.
-     * We should probably be caching this? Also, this is essentially the same
-     * code as splitAt(), so something probably needs to be abstracted out
-     * here.
-     */
     public Markup getMarkupAt(int offset) {
-        Piece piece, last;
-        int start, following;
+        final Piece piece;
 
-        piece = first;
-        last = first;
-        start = 0;
-
-        while (piece != null) {
-            if (start == offset) {
-                return piece.span.getMarkup();
-            }
-
-            /*
-             * Failing that, then let's see if this Piece contains the offset
-             * point.
-             */
-
-            following = start + piece.span.getWidth();
-
-            if (following > offset) {
-                return piece.span.getMarkup();
-            }
-            start = following;
-
-            last = piece;
-            piece = piece.next;
+        piece = pieceAt(offset);
+        if (piece == null) {
+            return null;
+        } else {
+            return piece.span.getMarkup();
         }
-
-        /*
-         * Reached the end
-         */
-
-        if (start == offset) {
-            if (first == null) {
-                return null;
-            } else {
-                return last.span.getMarkup();
-            }
-        }
-
-        throw new IllegalArgumentException();
     }
 
     /**
