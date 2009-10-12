@@ -96,15 +96,48 @@ public class ValidateWordExtraction extends TestCase
         piece = chain.pieceAt(18);
         assertNotNull(piece);
         assertEquals("Four", piece.span.getText());
+
+        try {
+            piece = chain.pieceAt(19);
+            fail();
+        } catch (IndexOutOfBoundsException ioobe) {
+            // good
+        }
     }
 
     public final void testWordAt() {
         final TextChain chain;
 
         chain = new TextChain("This is a test of the emergency broadcast system.");
-        assertSame(chain.first, chain.pieceAt(12));
 
         assertEquals("test", chain.getWordAt(12));
+        assertEquals("emergency", chain.getWordAt(25));
     }
 
+    public final void testBoundaryConditions() {
+        final TextChain chain;
+
+        chain = new TextChain("This is a test of the emergency broadcast system.");
+
+        assertEquals("test", chain.getWordAt(10));
+        assertEquals("a", chain.getWordAt(9));
+        assertEquals("a", chain.getWordAt(8));
+        assertEquals("is", chain.getWordAt(7));
+        assertEquals("is", chain.getWordAt(6));
+        assertEquals("is", chain.getWordAt(5));
+        assertEquals("This", chain.getWordAt(4));
+        assertEquals("This", chain.getWordAt(3));
+        assertEquals("This", chain.getWordAt(2));
+        assertEquals("This", chain.getWordAt(1));
+        assertEquals("This", chain.getWordAt(0));
+
+        assertEquals("test", chain.getWordAt(13));
+        assertEquals("test", chain.getWordAt(14));
+        assertEquals("of", chain.getWordAt(15));
+        assertEquals("of", chain.getWordAt(16));
+        assertEquals("of", chain.getWordAt(17));
+        assertEquals("the", chain.getWordAt(18));
+
+        assertEquals("system.", chain.getWordAt(43));
+    }
 }

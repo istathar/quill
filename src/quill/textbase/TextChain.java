@@ -431,6 +431,7 @@ public class TextChain
 
         preceeding = splitAt(offset);
         omega = splitAt(offset + width);
+        invalidateCache();
 
         if (preceeding == null) {
             if (omega.prev == null) {
@@ -817,23 +818,101 @@ public class TextChain
      * boundary, and then forwards to the next word boundary, and return the
      * word contained between those two points.
      */
-    public String getWordAt(int offset) {
-        Piece p, alpha, omega;
-        int start, end;
+    public String getWordAt(final int offset) {
+        final Piece origin, alpha, omega;
+        int start, end, len;
+        Piece p;
+        int i;
+        boolean found;
         Pair pair;
         StringBuilder str;
+        Span s;
+        char ch; // FIXME int
 
-        p = pieceAt(offset);
+        origin = pieceAt(offset);
 
         /*
-         * TODO caculate word boundaries, place in start & end.
+         * Calculate start by seeking backwards to find whitespace
          */
-        start = 10;
-        end = 14;
+
+        p = origin;
+        start = offset;
+        i = -1;
+        found = false;
+
+        while (p != null) {
+            i = start - p.offset;
+
+            while (i > 0) {
+                i--;
+                ch = (char) p.span.getChar(i);
+                if (Character.isWhitespace(ch)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                break;
+            }
+
+            start = p.offset;
+            p = p.prev;
+        }
+
+        if (!found) {
+            start = 0;
+        } else {
+            start = p.offset + i + 1;
+        }
+
+        /*
+         * Calculate end by seeking forwards to find whitespace
+         */
+
+        p = origin;
+        end = offset;
+        i = end - p.offset;
+        found = false;
+
+        while (p != null) {
+            len = p.span.getWidth();
+
+            while (i < len) {
+                ch = (char) p.span.getChar(i);
+                if (Character.isWhitespace(ch)) {
+                    found = true;
+                    break;
+                }
+                i++;
+            }
+
+            if (found) {
+                break;
+            }
+
+            p = p.next;
+            i = 0;
+        }
+
+        if (p == null) {
+            end = length;
+        } else {
+            end = p.offset + i;
+        }
+
+        /*
+         * Now pull out the word
+         */
 
         pair = extractFrom(start, end - start);
         alpha = pair.one;
         omega = pair.two;
+
+        /*
+         * FIXME this is BAD! We need to return a Span? Or maybe concatonate
+         * in order to return a new Span's getText()?
+         */
 
         str = new StringBuilder();
 
