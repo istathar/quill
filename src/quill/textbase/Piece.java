@@ -24,6 +24,12 @@ class Piece
 
     Piece next;
 
+    /**
+     * A cache of the offset that the beginning of the Span is within the
+     * parent TextChain.
+     */
+    int offset;
+
     Piece() {}
 
     /**
@@ -45,7 +51,9 @@ class Piece
 
         str.append("«");
         str.append(span.toString());
-        str.append("» at the ");
+        str.append("» offset ");
+        str.append(offset);
+        str.append(" at the ");
         str.append(i);
         str.append(getOrdinalSuffix(i));
         str.append(" position");

@@ -20,11 +20,41 @@ import junit.framework.TestCase;
  */
 public class ValidateWordExtraction extends TestCase
 {
+    public final void testPieceAt() {
+        final TextChain chain;
+        Piece piece;
 
-    public final void testBasic() {
+        chain = new TextChain();
+        chain.append(Span.createSpan("One", null));
+        chain.append(Span.createSpan(' ', null));
+        chain.append(Span.createSpan("Two", null));
+        chain.append(Span.createSpan(' ', null));
+        chain.append(Span.createSpan("Three", null));
+        chain.append(Span.createSpan(' ', null));
+        chain.append(Span.createSpan("Four", null));
+
+        piece = chain.pieceAt(0);
+        assertEquals("One", piece.span.getText());
+        piece = chain.pieceAt(1);
+        assertEquals("One", piece.span.getText());
+        piece = chain.pieceAt(2);
+        assertEquals("One", piece.span.getText());
+        piece = chain.pieceAt(3);
+        assertEquals(" ", piece.span.getText());
+        piece = chain.pieceAt(4);
+        assertEquals("Two", piece.span.getText());
+
+        piece = chain.pieceAt(12);
+        assertEquals("Three", piece.span.getText());
+    }
+
+    public final void testWordAt() {
         final TextChain chain;
 
         chain = new TextChain("This is a test of the emergency broadcast system.");
+        assertSame(chain.first, chain.pieceAt(12));
+
         assertEquals("test", chain.getWordAt(12));
     }
+
 }

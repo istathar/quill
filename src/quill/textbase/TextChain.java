@@ -44,29 +44,33 @@ public class TextChain
     }
 
     /**
-     * The length of this Text, in characters.
+     * Update the offset cache [stored in the Pieces] in the process of
+     * calculating and storing the length of the TextChain.
      */
-    /*
-     * TODO cache this when we cache the offsets!
-     */
-    public int length() {
+    private void cacheOffsets() {
         Piece piece;
         int result;
-
-        if (length > -1) {
-            return length;
-        }
 
         piece = first;
         result = 0;
 
         while (piece != null) {
+            piece.offset = result;
             result += piece.span.getWidth();
             piece = piece.next;
         }
 
         length = result;
-        return result;
+    }
+
+    /**
+     * The length of this Text, in characters.
+     */
+    public int length() {
+        if (length == -1) {
+            cacheOffsets();
+        }
+        return length;
     }
 
     public String toString() {
@@ -255,54 +259,41 @@ public class TextChain
      * TODO Initial implementation of this is an ugly linear search; replace
      * this with an offset cache in the Pieces.
      */
-    Piece pieceAt(int offset) {
+    Piece pieceAt(final int offset) {
         Piece piece, last;
-        int start, following;
+        int start;
 
         if (offset == 0) {
-            return null;
+            return first;
+        }
+
+        if (length == -1) {
+            cacheOffsets();
+        }
+
+        if (offset > length) {
+            throw new IndexOutOfBoundsException();
         }
 
         piece = first;
         last = first;
-
         start = 0;
 
         while (piece != null) {
-            /*
-             * Are we already at a Piece boundary?
-             */
+            start = piece.offset;
 
-            if (start == offset) {
+            if (start > offset) {
                 return last;
             }
-
-            /*
-             * Failing that, then let's see if this Piece contains the offset
-             * point. If it does, return it.
-             */
-
-            following = start + piece.span.getWidth();
-
-            if (following > offset) {
+            if (start == offset) {
                 return piece;
             }
-            start = following;
 
             last = piece;
             piece = piece.next;
         }
 
-        /*
-         * Reached the end; so long as there is nothing left we're in an
-         * append situation and no problem, otherwise out of bounds.
-         */
-
-        if (start == offset) {
-            return last;
-        }
-
-        throw new IndexOutOfBoundsException();
+        return last;
     }
 
     /**
@@ -870,7 +861,6 @@ public class TextChain
         int start, end;
         Pair pair;
         StringBuilder str;
-        Span s;
 
         p = pieceAt(offset);
 
