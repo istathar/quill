@@ -835,7 +835,7 @@ public class TextChain
         boolean found;
         Pair pair;
         StringBuilder str;
-        char ch; // FIXME int
+        int ch; // switch to char if you're debugging.
 
         if (length == -1) {
             calculateOffsets();
@@ -848,7 +848,7 @@ public class TextChain
         origin = pieceAt(offset);
 
         i = offset - origin.offset;
-        ch = (char) origin.span.getChar(i);
+        ch = origin.span.getChar(i);
         if (!Character.isLetter(ch)) {
             return null;
         }
@@ -867,12 +867,10 @@ public class TextChain
 
             while (i > 0) {
                 i--;
-                ch = (char) p.span.getChar(i);
-                if (!Character.isLetter(ch)) {
-                    if (ch != '\'') {
-                        found = true;
-                        break;
-                    }
+                ch = p.span.getChar(i);
+                if (!(Character.isLetter(ch) || (ch == '\''))) {
+                    found = true;
+                    break;
                 }
             }
 
@@ -903,12 +901,10 @@ public class TextChain
             len = p.span.getWidth();
 
             while (i < len) {
-                ch = (char) p.span.getChar(i);
-                if (!Character.isLetter(ch)) {
-                    if (ch != '\'') {
-                        found = true;
-                        break;
-                    }
+                ch = p.span.getChar(i);
+                if (!(Character.isLetter(ch) || (ch == '\''))) {
+                    found = true;
+                    break;
                 }
                 i++;
             }
