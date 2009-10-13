@@ -99,6 +99,8 @@ public class ValidateText extends TestCase
         Piece piece;
 
         chain = sampleData();
+        // force cache
+        chain.length();
 
         piece = chain.pieceAt(0);
         assertEquals("One", piece.span.getText());
@@ -120,14 +122,13 @@ public class ValidateText extends TestCase
         Piece piece;
 
         chain = sampleData();
+        chain.length();
 
         piece = chain.pieceAt(17);
         assertEquals("Four", piece.span.getText());
 
-        // TODO Not entirely sure about this. Should it be null?
         piece = chain.pieceAt(18);
-        assertNotNull(piece);
-        assertEquals("Four", piece.span.getText());
+        assertNull(piece);
 
         try {
             piece = chain.pieceAt(19);

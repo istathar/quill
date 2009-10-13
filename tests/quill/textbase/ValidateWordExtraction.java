@@ -180,4 +180,27 @@ public class ValidateWordExtraction extends TestCase
         assertEquals("rstuvwxyz", chain.getWordAt(25));
         assertEquals(null, chain.getWordAt(26));
     }
+
+    public final void testContractions() {
+        final TextChain chain;
+
+        chain = new TextChain("Don't Panic");
+
+        assertEquals("Panic", chain.getWordAt(7));
+        assertEquals("Panic", chain.getWordAt(6));
+        assertEquals(null, chain.getWordAt(5));
+
+        assertEquals("Don't", chain.getWordAt(0));
+        assertEquals("Don't", chain.getWordAt(1));
+
+        assertEquals("Don't", chain.getWordAt(4));
+    }
+
+    public final void testQuotationMarksDouble() {
+        final TextChain chain;
+
+        chain = new TextChain("In \"Addiction\" the author writes clearly.");
+
+        assertEquals("Addiction", chain.getWordAt(8));
+    }
 }

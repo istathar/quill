@@ -869,8 +869,10 @@ public class TextChain
                 i--;
                 ch = (char) p.span.getChar(i);
                 if (!Character.isLetter(ch)) {
-                    found = true;
-                    break;
+                    if (ch != '\'') {
+                        found = true;
+                        break;
+                    }
                 }
             }
 
@@ -903,8 +905,10 @@ public class TextChain
             while (i < len) {
                 ch = (char) p.span.getChar(i);
                 if (!Character.isLetter(ch)) {
-                    found = true;
-                    break;
+                    if (ch != '\'') {
+                        found = true;
+                        break;
+                    }
                 }
                 i++;
             }
