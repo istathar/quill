@@ -47,7 +47,7 @@ public class TextChain
      * Update the offset cache [stored in the Pieces] in the process of
      * calculating and storing the length of the TextChain.
      */
-    private void cacheOffsets() {
+    private void calculateOffsets() {
         Piece piece;
         int result;
 
@@ -68,7 +68,7 @@ public class TextChain
      */
     public int length() {
         if (length == -1) {
-            cacheOffsets();
+            calculateOffsets();
         }
         return length;
     }
@@ -268,7 +268,12 @@ public class TextChain
         }
 
         if (length == -1) {
-            cacheOffsets();
+            throw new IllegalStateException("\n"
+                    + "You must to ensure offsets are calculated before calling this");
+        }
+
+        if (offset == length) {
+            return null;
         }
 
         if (offset > length) {
@@ -656,6 +661,10 @@ public class TextChain
     public Markup getMarkupAt(int offset) {
         final Piece piece;
 
+        if (length == -1) {
+            calculateOffsets();
+        }
+
         piece = pieceAt(offset);
         if (piece == null) {
             return null;
@@ -828,13 +837,17 @@ public class TextChain
         StringBuilder str;
         char ch; // FIXME int
 
-        origin = pieceAt(offset);
+        if (length == -1) {
+            calculateOffsets();
+        }
 
-        i = offset - origin.offset;
-        if (i == origin.span.getWidth()) {
+        if (offset == length) {
             return null;
         }
 
+        origin = pieceAt(offset);
+
+        i = offset - origin.offset;
         ch = (char) origin.span.getChar(i);
         if (!Character.isLetter(ch)) {
             return null;

@@ -109,5 +109,75 @@ public class ValidateWordExtraction extends TestCase
         assertEquals("world", chain.getWordAt(33));
         assertEquals(null, chain.getWordAt(34));
         assertEquals(null, chain.getWordAt(35));
+        try {
+            assertEquals(null, chain.getWordAt(36));
+            fail();
+        } catch (IndexOutOfBoundsException ioobe) {
+            // good
+        }
+    }
+
+    public final void testManyPieces() {
+        final String str;
+        final TextChain chain;
+
+        chain = new TextChain();
+        chain.append(Span.createSpan('a', null));
+        chain.append(Span.createSpan('b', null));
+        chain.append(Span.createSpan('c', null));
+        chain.append(Span.createSpan(' ', null));
+        chain.append(Span.createSpan('e', null));
+        chain.append(Span.createSpan('f', null));
+        chain.append(Span.createSpan('g', null));
+        chain.append(Span.createSpan(' ', null));
+        chain.append(Span.createSpan('i', null));
+        chain.append(Span.createSpan('j', null));
+        chain.append(Span.createSpan('k', null));
+        chain.append(Span.createSpan('.', null));
+        chain.append(Span.createSpan(' ', null));
+        chain.append(Span.createSpan('n', null));
+        chain.append(Span.createSpan('o', null));
+        chain.append(Span.createSpan('p', null));
+        chain.append(Span.createSpan(' ', null));
+        chain.append(Span.createSpan('r', null));
+        chain.append(Span.createSpan('s', null));
+        chain.append(Span.createSpan('t', null));
+        chain.append(Span.createSpan('u', null));
+        chain.append(Span.createSpan('v', null));
+        chain.append(Span.createSpan('w', null));
+        chain.append(Span.createSpan('x', null));
+        chain.append(Span.createSpan('y', null));
+        chain.append(Span.createSpan('z', null));
+
+        assertEquals(26, chain.length());
+        assertEquals('z', chain.toString().charAt(25));
+
+        assertEquals("abc", chain.getWordAt(0));
+        assertEquals("abc", chain.getWordAt(1));
+        assertEquals("abc", chain.getWordAt(2));
+        assertEquals(null, chain.getWordAt(3));
+        assertEquals("efg", chain.getWordAt(4));
+        assertEquals("efg", chain.getWordAt(5));
+        assertEquals("efg", chain.getWordAt(6));
+        assertEquals(null, chain.getWordAt(7));
+        assertEquals("ijk", chain.getWordAt(8));
+        assertEquals("ijk", chain.getWordAt(9));
+        assertEquals("ijk", chain.getWordAt(10));
+        assertEquals(null, chain.getWordAt(11));
+        assertEquals(null, chain.getWordAt(12));
+        assertEquals("nop", chain.getWordAt(13));
+        assertEquals("nop", chain.getWordAt(14));
+        assertEquals("nop", chain.getWordAt(15));
+        assertEquals(null, chain.getWordAt(16));
+        assertEquals("rstuvwxyz", chain.getWordAt(17));
+        assertEquals("rstuvwxyz", chain.getWordAt(18));
+        assertEquals("rstuvwxyz", chain.getWordAt(19));
+        assertEquals("rstuvwxyz", chain.getWordAt(20));
+        assertEquals("rstuvwxyz", chain.getWordAt(21));
+        assertEquals("rstuvwxyz", chain.getWordAt(22));
+        assertEquals("rstuvwxyz", chain.getWordAt(23));
+        assertEquals("rstuvwxyz", chain.getWordAt(24));
+        assertEquals("rstuvwxyz", chain.getWordAt(25));
+        assertEquals(null, chain.getWordAt(26));
     }
 }
