@@ -826,10 +826,19 @@ public class TextChain
         boolean found;
         Pair pair;
         StringBuilder str;
-        Span s;
         char ch; // FIXME int
 
         origin = pieceAt(offset);
+
+        i = offset - origin.offset;
+        if (i == origin.span.getWidth()) {
+            return null;
+        }
+
+        ch = (char) origin.span.getChar(i);
+        if (!Character.isLetter(ch)) {
+            return null;
+        }
 
         /*
          * Calculate start by seeking backwards to find whitespace
@@ -846,7 +855,7 @@ public class TextChain
             while (i > 0) {
                 i--;
                 ch = (char) p.span.getChar(i);
-                if (Character.isWhitespace(ch)) {
+                if (!Character.isLetter(ch)) {
                     found = true;
                     break;
                 }
@@ -880,7 +889,7 @@ public class TextChain
 
             while (i < len) {
                 ch = (char) p.span.getChar(i);
-                if (Character.isWhitespace(ch)) {
+                if (!Character.isLetter(ch)) {
                     found = true;
                     break;
                 }
