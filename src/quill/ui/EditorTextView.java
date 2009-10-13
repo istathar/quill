@@ -57,6 +57,7 @@ import quill.textbase.TextualChange;
 
 import static org.gnome.gtk.TextWindowType.TEXT;
 import static quill.client.Quill.ui;
+import static quill.ui.Format.spelling;
 import static quill.ui.Format.tagForMarkup;
 
 abstract class EditorTextView extends TextView
@@ -1221,16 +1222,54 @@ abstract class EditorTextView extends TextView
         }
     }
 
+    private String makeWordFromSpans(Extract extract) {
+        final StringBuilder str;
+        int i, I, j, J;
+        Span s;
+
+        I = extract.size();
+
+        if (I == 1) {
+            return extract.get(0).getText();
+        } else {
+            str = new StringBuilder();
+
+            for (i = 0; i < I; i++) {
+                s = extract.get(i);
+
+                J = s.getWidth();
+
+                for (j = 0; j < J; j++) {
+                    str.appendCodePoint(s.getChar(j));
+                }
+            }
+
+            return str.toString();
+        }
+    }
+
     /*
      * Primative placeholder while we explore spelling issues
      */
     private void checkSpellingAt(int offset) {
+        final Extract extract;
+        final int alpha, omega;
         final String word;
+        final TextIter start, end;
 
-        word = chain.getWordAt(offset);
+        alpha = chain.wordBoundaryBefore(offset);
+        omega = chain.wordBoundaryAfter(offset);
 
-        if (!ui.dict.check(word)) {
-            System.out.println(word);
+        extract = chain.extractRange(alpha, omega - alpha);
+        word = makeWordFromSpans(extract);
+
+        start = buffer.getIter(alpha);
+        end = buffer.getIter(omega);
+
+        if (ui.dict.check(word)) {
+            buffer.removeTag(spelling, start, end);
+        } else {
+            buffer.applyTag(spelling, start, end);
         }
     }
 }

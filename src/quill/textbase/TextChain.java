@@ -436,7 +436,7 @@ public class TextChain
 
         preceeding = splitAt(offset);
         omega = splitAt(offset + width);
-        invalidateCache();
+        calculateOffsets();
 
         if (preceeding == null) {
             if (omega.prev == null) {
@@ -452,7 +452,11 @@ public class TextChain
     }
 
     static Span[] formArray(Pair pair) {
-        return formArray(pair.one, pair.two);
+        if (pair.one.offset < pair.two.offset) {
+            return formArray(pair.one, pair.two);
+        } else {
+            return formArray(pair.two, pair.one);
+        }
     }
 
     /**
@@ -822,36 +826,27 @@ public class TextChain
         return belongs;
     }
 
-    /**
-     * Given a cursor location in offset, work backwards to find a word
-     * boundary, and then forwards to the next word boundary, and return the
-     * word contained between those two points.
-     */
-    public String getWordAt(final int offset) {
-        final Piece origin, alpha, omega;
-        int start, end, len;
-        Piece p;
-        int i;
-        boolean found;
-        Pair pair;
-        StringBuilder str;
-        int ch; // switch to char if you're debugging.
+    public int wordBoundaryBefore(final int offset) {
+        final Piece origin;
 
         if (length == -1) {
             calculateOffsets();
         }
 
-        if (offset == length) {
-            return null;
-        }
-
         origin = pieceAt(offset);
-
-        i = offset - origin.offset;
-        ch = origin.span.getChar(i);
-        if (!Character.isLetter(ch)) {
-            return null;
+        if (origin == null) {
+            return 0;
         }
+
+        return wordBoundaryBefore(origin, offset);
+    }
+
+    private int wordBoundaryBefore(final Piece origin, final int offset) {
+        int start;
+        Piece p;
+        int i;
+        boolean found;
+        int ch; // switch to char if you're debugging.
 
         /*
          * Calculate start by seeking backwards to find whitespace
@@ -888,6 +883,34 @@ public class TextChain
             start = p.offset + i + 1;
         }
 
+        return start;
+    }
+
+    /*
+     * It would be nice to remove this
+     */
+    public int wordBoundaryAfter(final int offset) {
+        final Piece origin;
+
+        if (length == -1) {
+            calculateOffsets();
+        }
+
+        origin = pieceAt(offset);
+        if (origin == null) {
+            return length;
+        }
+
+        return wordBoundaryAfter(origin, offset);
+    }
+
+    private int wordBoundaryAfter(final Piece origin, final int offset) {
+        int end;
+        Piece p;
+        int i, len;
+        boolean found;
+        int ch;
+
         /*
          * Calculate end by seeking forwards to find whitespace
          */
@@ -923,30 +946,117 @@ public class TextChain
             end = p.offset + i;
         }
 
+        return end;
+    }
+
+    /*
+     * unused, but good code.
+     */
+    static String makeWordFromSpans(Extract extract) {
+        final StringBuilder str;
+        int i, I, j, J;
+        Span s;
+
+        I = extract.size();
+
+        if (I == 1) {
+            return extract.get(0).getText();
+        } else {
+            str = new StringBuilder();
+
+            for (i = 0; i < I; i++) {
+                s = extract.get(i);
+
+                J = s.getWidth();
+
+                for (j = 0; j < J; j++) {
+                    str.appendCodePoint(s.getChar(j));
+                }
+            }
+
+            return str.toString();
+        }
+    }
+
+    /*
+     * this could well become the basis of a public API
+     */
+    static String makeWordFromSpans(Pair pair) {
+        final Piece alpha, omega;
+        final StringBuilder str;
+        int j, J;
+        Piece p;
+        Span s;
+
+        alpha = pair.one;
+        omega = pair.two;
+
+        if (alpha == omega) {
+            return alpha.span.getText();
+        } else {
+            str = new StringBuilder();
+
+            p = alpha;
+            while (p != null) {
+                s = p.span;
+                J = s.getWidth();
+
+                for (j = 0; j < J; j++) {
+                    str.appendCodePoint(s.getChar(j));
+                }
+
+                if (p == omega) {
+                    break;
+                }
+                p = p.next;
+            }
+
+            return str.toString();
+        }
+    }
+
+    /**
+     * Given a cursor location in offset, work backwards to find a word
+     * boundary, and then forwards to the next word boundary, and return the
+     * word contained between those two points.
+     */
+    /*
+     * After a huge amount of work, the current implementation in
+     * EditorTextView doesn't call this, but exercises a similar algorithm.
+     * Nevertheless this is heavily tested code, and we will probably return
+     * to this "pick word from offset" soon.
+     */
+    String getWordAt(final int offset) {
+        final Piece origin;
+        int start, end;
+        int i;
+        Pair pair;
+        int ch;
+
+        if (length == -1) {
+            calculateOffsets();
+        }
+
+        if (offset == length) {
+            return null;
+        }
+
+        origin = pieceAt(offset);
+
+        i = offset - origin.offset;
+        ch = origin.span.getChar(i);
+        if (!Character.isLetter(ch)) {
+            return null;
+        }
+
+        start = wordBoundaryBefore(origin, offset);
+        end = wordBoundaryAfter(origin, offset);
+
         /*
          * Now pull out the word
          */
 
         pair = extractFrom(start, end - start);
-        alpha = pair.one;
-        omega = pair.two;
-
-        /*
-         * FIXME this is BAD! We need to return a Span? Or maybe concatonate
-         * in order to return a new Span's getText()?
-         */
-
-        str = new StringBuilder();
-
-        p = alpha;
-        while (p != null) {
-            str.append(p.span.getText());
-            if (p == omega) {
-                break;
-            }
-            p = p.next;
-        }
-
-        return str.toString();
+        return makeWordFromSpans(pair);
     }
 }

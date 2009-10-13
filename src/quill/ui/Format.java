@@ -12,6 +12,7 @@ package quill.ui;
 
 import org.gnome.gtk.TextTag;
 import org.gnome.pango.Style;
+import org.gnome.pango.Underline;
 import org.gnome.pango.Weight;
 
 import quill.textbase.Common;
@@ -48,6 +49,8 @@ class Format
     static final TextTag hidden;
 
     static final TextTag userinput;
+
+    static final TextTag spelling;
 
     static {
         filename = new TextTag();
@@ -87,6 +90,9 @@ class Format
 
         userinput = new TextTag();
         userinput.setWeight(Weight.BOLD);
+
+        spelling = new TextTag();
+        spelling.setUnderline(Underline.ERROR);
     }
 
     /**
