@@ -10,6 +10,8 @@
  */
 package quill.textbase;
 
+import static java.lang.System.arraycopy;
+
 /**
  * A mutable buffer of unicode text which manages a linked list of Spans in
  * order to maximize sharing of character array storage.
@@ -18,25 +20,28 @@ package quill.textbase;
  */
 public class TextChain
 {
-    Piece first;
+    private Span[] spans;
+
+    private int[] offsets;
 
     /**
-     * cache of the length of this TextChain, in characters.
+     * cached length of this TextChain, in characters. A value of -1 means it
+     * needs to be recalculated.
      */
     private int length = -1;
 
     public TextChain() {
-        first = null;
+        spans = new Span[0];
     }
 
     TextChain(String str) {
-        first = new Piece();
-        first.span = Span.createSpan(str, null);
+        spans = new Span[1];
+        spans[0] = Span.createSpan(str, null);
     }
 
     TextChain(Span initial) {
-        first = new Piece();
-        first.span = initial;
+        spans = new Span[1];
+        spans[0] = initial;
     }
 
     private void invalidateCache() {
@@ -44,20 +49,18 @@ public class TextChain
     }
 
     /**
-     * Update the offset cache [stored in the Pieces] in the process of
-     * calculating and storing the length of the TextChain.
+     * Update the offset cache. Assumes the spans array has been set.
      */
     private void calculateOffsets() {
-        Piece piece;
         int result;
+        int i;
 
-        piece = first;
+        offsets = new int[spans.length];
+
         result = 0;
-
-        while (piece != null) {
-            piece.offset = result;
-            result += piece.span.getWidth();
-            piece = piece.next;
+        for (i = 0; i < spans.length; i++) {
+            offsets[i] = result;
+            result += spans[i].getWidth();
         }
 
         length = result;
@@ -75,22 +78,26 @@ public class TextChain
 
     public String toString() {
         final StringBuilder str;
-        Piece piece;
+        Span s;
+        int i, j, J;
 
         str = new StringBuilder();
-        piece = first;
 
-        while (piece != null) {
-            str.append(piece.span.getText());
-            piece = piece.next;
+        for (i = 0; i < spans.length; i++) {
+            s = spans[i];
+            J = s.getWidth();
+
+            for (j = 0; j < J; j++) {
+                str.appendCodePoint(s.getChar(j));
+            }
         }
 
         return str.toString();
     }
 
     public void append(Span addition) {
-        Piece piece;
-        final Piece last;
+        final Span[] replacement;
+        final int len;
 
         if (addition == null) {
             throw new IllegalArgumentException();
@@ -100,99 +107,123 @@ public class TextChain
         /*
          * Handle empty Text case
          */
+        len = spans.length;
 
-        if (first == null) {
-            first = new Piece();
-            first.span = addition;
+        if (len == 0) {
+            spans = new Span[1];
+            spans[0] = addition;
             return;
         }
 
         /*
-         * Otherwise, we are appending. Hop to the end.
+         * Otherwise, we are appending.
          */
 
-        piece = first;
+        replacement = new Span[len + 1];
 
-        while (piece.next != null) {
-            piece = piece.next;
-        }
-
-        last = new Piece();
-        last.prev = piece;
-        piece.next = last;
-        last.span = addition;
+        arraycopy(spans, 0, replacement, 0, len);
+        replacement[len] = addition;
+        spans = replacement;
     }
 
     /**
      * Insert the given Java String at the specified offset.
      */
-    protected void insert(int offset, String what) {
-        insert(offset, Span.createSpan(what, null));
+    void insert(int offset, String what) {
+        insert(offset, new Span[] {
+            Span.createSpan(what, null)
+        });
     }
 
     /**
      * Insert the given range of Spans at the specified offset.
      */
-    protected void insert(int offset, Span[] range) {
-        final Piece one, two;
-        Piece p, last;
+    void insert(final int offset, final Span[] addition) {
+        int i, j, num;
+        final Span original, before, after;
+        final int point;
+        final Span[] replacement;
 
         if (offset < 0) {
             throw new IllegalArgumentException();
         }
-        invalidateCache();
 
-        /*
-         * Create the insertion point
-         */
+        i = indexOfSpan(offset);
 
-        one = splitAt(offset);
-        if (one == null) {
-            two = first;
+        if (i == spans.length) {
+            // appending
+            point = 0;
         } else {
-            two = one.next;
+            // inserting
+            point = offset - offsets[i];
+        }
+
+        if (point == 0) {
+            replacement = new Span[spans.length + addition.length];
+        } else {
+            replacement = new Span[spans.length + addition.length + 1];
         }
 
         /*
-         * Create and insert Pieces wrapping the Spans.
+         * Copy portion of old array up to but not including index Span
          */
 
-        last = one;
-
-        for (Span s : range) {
-            p = new Piece();
-            p.span = s;
-            p.prev = last;
-            last = p;
+        num = i;
+        if (num > 0) {
+            arraycopy(spans, 0, replacement, 0, num);
         }
 
         /*
-         * And correct the linkages in the reverse direction
+         * Copy portion of old array after index Span
          */
 
-        last.next = two;
-        if (two != null) {
-            two.prev = last;
+        num = spans.length - (i + 1);
+        if (num > 0) {
+            j = replacement.length - num;
+            arraycopy(spans, i + 1, replacement, j, num);
         }
 
-        p = last;
+        /*
+         * Either insert (added Spans) if at a boundary [ie point == 0] or
+         * clove index Span in two, and insert (before Span, added Spans,
+         * after Span).
+         */
 
-        do {
-            p = p.prev;
-            if (p == null) {
-                first = last;
-                break;
-            }
-            p.next = last;
-            last = p;
-        } while (p != one);
+        if (point == 0) {
+            num = addition.length;
+            arraycopy(addition, 0, replacement, i, num);
+            i += num;
+        } else {
+            original = spans[i];
+            before = original.split(0, point);
+            after = original.split(point);
+
+            replacement[i] = before;
+            i++;
+
+            num = addition.length;
+            arraycopy(addition, 0, replacement, i, num);
+            i += num;
+
+            replacement[i] = after;
+        }
+
+        spans = replacement;
+
+        /*
+         * FUTURE Since we know the point up to which we didn't change the
+         * offsets, we could only invalidate from the index span, and use
+         * arraycopy to clone the offsets array up to that point.
+         */
+
+        invalidateCache();
     }
 
     /**
      * Cut a Piece in two at point. Amend the linkages so that overall Text is
      * the same after the operation.
      */
-    Piece splitAt(Piece from, int point) {
+    Piece splitAt(int index, int point) {
         Piece preceeding, one, two, following;
         Span before, after;
 
@@ -216,8 +247,8 @@ public class TextChain
          * this gives us newlines isolated in their own CharacterSpans.
          */
 
-        before = from.span.split(0, point);
-        after = from.span.split(point);
+        before = span.split(0, point);
+        after = span.split(point);
 
         /*
          * and wrap Pieces around them.
@@ -252,71 +283,82 @@ public class TextChain
     }
 
     /**
-     * Find the Piece enclosing offset. This is used to then subdivide by
-     * splitAt()
+     * Find the Span beginning at or enclosing offset.
+     */
+    Span spanAt(final int offset) {
+        final int index;
+
+        if (spans.length == 0) {
+            return null;
+        } else {
+            index = indexOfSpan(offset);
+            if (index > -1) {
+                return spans[index];
+            } else {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Get the array index of the Span commencing or enclosing offset. Returns
+     * <code>-1</code> if the offset represents the end of the TextChain.
      */
     /*
-     * TODO implementation is an ugly linear search. Now that the offsets are
-     * cached in the Pieces, perhaps we can be smarter about hunting.
+     * TODO implementation is an ugly linear search.
      */
-    Piece pieceAt(final int offset) {
-        Piece piece, last;
+    private int indexOfSpan(final int offset) {
         int start;
+        int i, I;
 
         if (offset == 0) {
-            return first;
+            return 0;
         }
 
         if (length == -1) {
-            throw new IllegalStateException("\n"
-                    + "You must to ensure offsets are calculated before calling this");
+            calculateOffsets();
+        }
+
+        I = spans.length;
+
+        if (I == 1) {
+            return 0;
         }
 
         if (offset == length) {
-            return null;
+            return I;
         }
 
         if (offset > length) {
             throw new IndexOutOfBoundsException();
         }
 
-        piece = first;
-        last = first;
         start = 0;
 
-        while (piece != null) {
-            start = piece.offset;
+        for (i = 1; i < I; i++) {
+            start = offsets[i];
 
             if (start > offset) {
-                return last;
+                return i - 1;
             }
             if (start == offset) {
-                return piece;
+                return i;
             }
-
-            last = piece;
-            piece = piece.next;
         }
 
-        return last;
+        return I - 1;
     }
 
     /**
-     * Find the Piece containing offset, and split it into two. Handle the
-     * boundary cases of an offset at a Piece boundary. Returns a Pair around
-     * the two Pieces. null will be set if there is no Piece before (or after)
-     * this point.
+     * Find the Span containing offset, and split it into two. Handle the
+     * [common] boundary cases of an offset at a Span boundary. Returns the
+     * index of the Span where the new insertion point is.
      */
-    /*
-     * FIXME this code was copied to pieceAt(), and should call that method
-     * instead of doing the same work here.
-     */
-    Piece splitAt(int offset) {
-        Piece piece, last;
+    int splitAt(int offset) {
         int start, following;
 
         if (offset == 0) {
-            return null;
+            return 0;
         }
 
         piece = first;
@@ -363,37 +405,12 @@ public class TextChain
     }
 
     /**
-     * Splice a Chunk into the Text. The result of doing this is three Pieces;
-     * a new Piece before and after, and a Piece wrapping the Chunk and linked
-     * between them. This is the workhorse of this class.
+     * Splice a Chunk into the Text.
      */
     void insert(int offset, Span addition) {
-        Piece one, two, piece;
-
-        if (offset < 0) {
-            throw new IllegalArgumentException();
-        }
-        invalidateCache();
-
-        piece = new Piece();
-        piece.span = addition;
-
-        if (offset == 0) {
-            piece.next = first;
-            first.prev = piece;
-            first = piece;
-            return;
-        }
-
-        one = splitAt(offset);
-        two = one.next;
-
-        if (two != null) {
-            piece.next = two;
-            two.prev = piece;
-        }
-        one.next = piece;
-        piece.prev = one;
+        insert(offset, new Span[] {
+            addition
+        });
     }
 
     /**
