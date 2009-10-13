@@ -111,10 +111,6 @@ abstract class EditorTextView extends TextView
         view.setBorderWidth(2);
 
         view.setAcceptsTab(true);
-
-        if (isSpellChecked()) {
-            view.attachSpell();
-        }
     }
 
     /**
@@ -571,6 +567,7 @@ abstract class EditorTextView extends TextView
             imposeFormatChange((TextualChange) change);
         } else if (change instanceof TextualChange) {
             imposeTextualChange((TextualChange) change);
+            checkSpellingAt(insertOffset);
         } else {
             throw new IllegalStateException("Unknown Change type");
         }
@@ -1221,6 +1218,19 @@ abstract class EditorTextView extends TextView
             return true;
         } else {
             return false;
+        }
+    }
+
+    /*
+     * Primative placeholder while we explore spelling issues
+     */
+    private void checkSpellingAt(int offset) {
+        final String word;
+
+        word = chain.getWordAt(offset);
+
+        if (!ui.dict.check(word)) {
+            System.out.println(word);
         }
     }
 }
