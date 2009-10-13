@@ -57,6 +57,86 @@ public class ValidateText extends TestCase
         assertEquals("system broadcast Emergency", text.toString());
     }
 
+    public final void testEmptyChain() {
+        final TextChain chain;
+        Piece piece;
+
+        chain = new TextChain();
+
+        piece = chain.pieceAt(0);
+        assertNull(piece);
+    }
+
+    private static TextChain sampleData() {
+        final TextChain result;
+
+        result = new TextChain();
+        result.append(Span.createSpan("One", null));
+        result.append(Span.createSpan(' ', null));
+        result.append(Span.createSpan("Two", null));
+        result.append(Span.createSpan(' ', null));
+        result.append(Span.createSpan("Three", null));
+        result.append(Span.createSpan(' ', null));
+        result.append(Span.createSpan("Four", null));
+
+        return result;
+    }
+
+    public final void testCheckSamplePieces() {
+        final String expected;
+        final TextChain chain;
+
+        expected = "One Two Three Four";
+        chain = sampleData();
+
+        assertEquals(18, expected.length());
+        assertEquals(18, chain.length());
+        assertEquals(expected, chain.toString());
+    }
+
+    public final void testPieceAt() {
+        final TextChain chain;
+        Piece piece;
+
+        chain = sampleData();
+
+        piece = chain.pieceAt(0);
+        assertEquals("One", piece.span.getText());
+        piece = chain.pieceAt(1);
+        assertEquals("One", piece.span.getText());
+        piece = chain.pieceAt(2);
+        assertEquals("One", piece.span.getText());
+        piece = chain.pieceAt(3);
+        assertEquals(" ", piece.span.getText());
+        piece = chain.pieceAt(4);
+        assertEquals("Two", piece.span.getText());
+
+        piece = chain.pieceAt(12);
+        assertEquals("Three", piece.span.getText());
+    }
+
+    public final void testPieceAtEnd() {
+        final TextChain chain;
+        Piece piece;
+
+        chain = sampleData();
+
+        piece = chain.pieceAt(17);
+        assertEquals("Four", piece.span.getText());
+
+        // TODO Not entirely sure about this. Should it be null?
+        piece = chain.pieceAt(18);
+        assertNotNull(piece);
+        assertEquals("Four", piece.span.getText());
+
+        try {
+            piece = chain.pieceAt(19);
+            fail();
+        } catch (IndexOutOfBoundsException ioobe) {
+            // good
+        }
+    }
+
     public final void testSplittingAtPoint() {
         final TextChain text;
         final Span initial;
