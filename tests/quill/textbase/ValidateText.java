@@ -270,6 +270,28 @@ public class ValidateText extends TestCase
         assertEquals(14, text.length());
     }
 
+    public final void testInsertBeginning() {
+        final TextChain text;
+        final Span zero, one, two, three;
+
+        zero = createSpan("Zero", null);
+        one = createSpan("One", null);
+        two = createSpan("Two", null);
+        three = createSpan("Three", null);
+
+        text = new TextChain();
+        text.append(one);
+        text.append(two);
+        text.append(three);
+
+        assertEquals("OneTwoThree", text.toString());
+        assertEquals(11, text.length());
+
+        text.insert(0, zero);
+        assertEquals("ZeroOneTwoThree", text.toString());
+        assertEquals(15, text.length());
+    }
+
     public final void testInsertBetweenExistingSpans() {
         final TextChain text;
         final Span zero, one, two, three;
@@ -279,14 +301,16 @@ public class ValidateText extends TestCase
         two = createSpan("Two", null);
         three = createSpan("Three", null);
 
-        text = new TextChain(one);
+        text = new TextChain(zero);
         text.append(two);
         text.append(three);
 
-        assertEquals("OneTwoThree", text.toString());
+        assertEquals("ZeroTwoThree", text.toString());
+        assertEquals(12, text.length());
 
-        text.insert(0, zero);
+        text.insert(4, one);
         assertEquals("ZeroOneTwoThree", text.toString());
+        assertEquals(15, text.length());
 
         text.insert(15, zero);
         assertEquals("ZeroOneTwoThreeZero", text.toString());

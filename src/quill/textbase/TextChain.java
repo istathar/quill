@@ -34,6 +34,8 @@ public class TextChain
         spans = new Span[0];
 
         offsets = new int[0];
+
+        length = 0;
     }
 
     TextChain(String str) {
@@ -42,6 +44,8 @@ public class TextChain
 
         offsets = new int[1];
         offsets[0] = 0;
+
+        length = spans[0].getWidth();
     }
 
     TextChain(Span initial) {
@@ -50,10 +54,8 @@ public class TextChain
 
         offsets = new int[1];
         offsets[0] = 0;
-    }
 
-    private void invalidateCache() {
-        length = -1;
+        length = initial.getWidth();
     }
 
     /**
@@ -106,7 +108,7 @@ public class TextChain
     public void append(Span addition) {
         final Span[] replacement;
         final int[] cache;
-        final int len, width;
+        final int len;
 
         if (addition == null) {
             throw new IllegalArgumentException();
@@ -141,10 +143,9 @@ public class TextChain
 
         cache = new int[len + 1];
         arraycopy(offsets, 0, cache, 0, len);
-        width = addition.getWidth();
-        cache[len] = cache[len - 1] + width;
+        cache[len] = cache[len - 1] + spans[len - 1].getWidth();
         offsets = cache;
-        length += width;
+        length += addition.getWidth();
     }
 
     /**
@@ -173,13 +174,13 @@ public class TextChain
 
         if (i == spans.length) {
             // appending
-            point = 0;
+            point = -1;
         } else {
             // inserting
             point = offset - offsets[i];
         }
 
-        if (point == 0) {
+        if (point < 1) {
             replacement = new Span[spans.length + addition.length];
         } else {
             replacement = new Span[spans.length + addition.length + 1];
@@ -198,10 +199,17 @@ public class TextChain
          * Copy portion of old array after index Span
          */
 
-        num = spans.length - (i + 1);
+        num = spans.length - i;
+        if (point > 0) {
+            num--;
+            i++;
+        }
         if (num > 0) {
             j = replacement.length - num;
-            arraycopy(spans, i + 1, replacement, j, num);
+            arraycopy(spans, i, replacement, j, num);
+        }
+        if (point > 0) {
+            i--;
         }
 
         /*
@@ -211,6 +219,10 @@ public class TextChain
          */
 
         if (point == 0) {
+            num = addition.length;
+            arraycopy(addition, 0, replacement, i, num);
+            i += num;
+        } else if (point == -1) {
             num = addition.length;
             arraycopy(addition, 0, replacement, i, num);
             i += num;
@@ -237,7 +249,7 @@ public class TextChain
          * arraycopy to clone the offsets array up to that point.
          */
 
-        invalidateCache();
+        calculateOffsets();
     }
 
     /**
@@ -332,22 +344,18 @@ public class TextChain
         int start;
         int i, I;
 
-        if (length == -1) {
-            calculateOffsets();
-        }
-
         if (offset == 0) {
             return 0;
         }
 
         I = spans.length;
 
-        if (I == 1) {
-            return 0;
-        }
-
         if (offset == length) {
             return I;
+        }
+
+        if (I == 1) {
+            return 0;
         }
 
         if (offset > length) {
