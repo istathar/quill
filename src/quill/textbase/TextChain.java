@@ -32,16 +32,24 @@ public class TextChain
 
     public TextChain() {
         spans = new Span[0];
+
+        offsets = new int[0];
     }
 
     TextChain(String str) {
         spans = new Span[1];
         spans[0] = Span.createSpan(str, null);
+
+        offsets = new int[1];
+        offsets[0] = 0;
     }
 
     TextChain(Span initial) {
         spans = new Span[1];
         spans[0] = initial;
+
+        offsets = new int[1];
+        offsets[0] = 0;
     }
 
     private void invalidateCache() {
@@ -97,26 +105,32 @@ public class TextChain
 
     public void append(Span addition) {
         final Span[] replacement;
-        final int len;
+        final int[] cache;
+        final int len, width;
 
         if (addition == null) {
             throw new IllegalArgumentException();
         }
-        invalidateCache();
+
+        len = spans.length;
 
         /*
-         * Handle empty Text case
+         * Handle empty TextChain case
          */
-        len = spans.length;
 
         if (len == 0) {
             spans = new Span[1];
             spans[0] = addition;
+
+            offsets = new int[1];
+            offsets[0] = 0;
+            length = addition.getWidth();
+
             return;
         }
 
         /*
-         * Otherwise, we are appending.
+         * Otherwise, we are indeed appending.
          */
 
         replacement = new Span[len + 1];
@@ -124,6 +138,13 @@ public class TextChain
         arraycopy(spans, 0, replacement, 0, len);
         replacement[len] = addition;
         spans = replacement;
+
+        cache = new int[len + 1];
+        arraycopy(offsets, 0, cache, 0, len);
+        width = addition.getWidth();
+        cache[len] = cache[len - 1] + width;
+        offsets = cache;
+        length += width;
     }
 
     /**
@@ -311,12 +332,12 @@ public class TextChain
         int start;
         int i, I;
 
-        if (offset == 0) {
-            return 0;
-        }
-
         if (length == -1) {
             calculateOffsets();
+        }
+
+        if (offset == 0) {
+            return 0;
         }
 
         I = spans.length;

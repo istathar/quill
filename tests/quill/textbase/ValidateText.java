@@ -102,8 +102,6 @@ public class ValidateText extends TestCase
         Span span;
 
         chain = sampleData();
-        // force cache
-        chain.length();
 
         span = chain.spanAt(0);
         assertEquals("One", span.getText());
@@ -125,7 +123,6 @@ public class ValidateText extends TestCase
         Span span;
 
         chain = sampleData();
-        chain.length();
 
         span = chain.spanAt(17);
         assertEquals("Four", span.getText());
