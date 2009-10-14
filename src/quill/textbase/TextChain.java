@@ -292,7 +292,7 @@ public class TextChain
             return null;
         } else {
             index = indexOfSpan(offset);
-            if (index > -1) {
+            if (index < spans.length) {
                 return spans[index];
             } else {
                 return null;

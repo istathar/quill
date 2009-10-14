@@ -11,6 +11,9 @@
 
 package quill.textbase;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+
 import junit.framework.TestCase;
 
 import static quill.textbase.Span.createSpan;
@@ -219,7 +222,7 @@ public class ValidateText extends TestCase
 
         assertEquals("One Two Three Four", text.toString());
 
-        assertEquals(7, calculateNumberPieces(text));
+        assertEquals(7, introspectNumberOfSpans(text));
 
         /*
          * Now, try splicing something in
@@ -229,20 +232,27 @@ public class ValidateText extends TestCase
         text.insert(5, addition);
         assertEquals("One TwentyTwo Three Four", text.toString());
 
-        assertEquals(9, calculateNumberPieces(text));
+        assertEquals(9, introspectNumberOfSpans(text));
     }
 
-    private static int calculateNumberPieces(TextChain text) {
-        Piece p;
-        int i;
+    private static int introspectNumberOfSpans(TextChain chain) {
+        final Field field;
+        Object spans;
+        Span s;
+        final int result;
 
-        i = 0;
-        p = text.first;
-        while (p != null) {
-            p = p.next;
-            i++;
+        try {
+            field = TextChain.class.getDeclaredField("spans");
+            field.setAccessible(true);
+            spans = field.get(chain);
+            result = Array.getLength(spans);
+
+            return result;
+
+        } catch (Exception e) {
+            fail(e.toString());
+            return -1;
         }
-        return i;
     }
 
     public final void testTextLength() {
@@ -396,13 +406,13 @@ public class ValidateText extends TestCase
 
         text.delete(2, 11);
         assertEquals("Zeee", text.toString());
-        assertEquals(2, calculateNumberPieces(text));
+        assertEquals(2, introspectNumberOfSpans(text));
         assertEquals("Ze", text.first.span.getText());
         assertEquals("ee", text.first.next.span.getText());
 
         text.delete(1, 2);
         assertEquals("Ze", text.toString());
-        assertEquals(2, calculateNumberPieces(text));
+        assertEquals(2, introspectNumberOfSpans(text));
     }
 
     public final void testDeleteBoundaries() {
@@ -412,11 +422,11 @@ public class ValidateText extends TestCase
 
         text.delete(0, 6);
         assertEquals("World", text.toString());
-        assertEquals(1, calculateNumberPieces(text));
+        assertEquals(1, introspectNumberOfSpans(text));
 
         text.delete(3, 2);
         assertEquals("Wor", text.toString());
-        assertEquals(1, calculateNumberPieces(text));
+        assertEquals(1, introspectNumberOfSpans(text));
     }
 
     public final void testDeleteAll() {
@@ -426,7 +436,7 @@ public class ValidateText extends TestCase
 
         text.delete(0, 5);
         assertEquals("", text.toString());
-        assertEquals(0, calculateNumberPieces(text));
+        assertEquals(0, introspectNumberOfSpans(text));
     }
 
     public final void testBoundsChecking() {
@@ -441,7 +451,7 @@ public class ValidateText extends TestCase
         }
 
         assertEquals("Magic", text.toString());
-        assertEquals(1, calculateNumberPieces(text));
+        assertEquals(1, introspectNumberOfSpans(text));
 
         try {
             text.delete(7, 3);
@@ -451,7 +461,7 @@ public class ValidateText extends TestCase
         }
 
         assertEquals("Magic", text.toString());
-        assertEquals(1, calculateNumberPieces(text));
+        assertEquals(1, introspectNumberOfSpans(text));
 
         try {
             text.delete(2, 6);
@@ -461,7 +471,7 @@ public class ValidateText extends TestCase
         }
 
         assertEquals("Magic", text.toString());
-        assertEquals(2, calculateNumberPieces(text));
+        assertEquals(2, introspectNumberOfSpans(text));
         // is ok
     }
 
@@ -478,7 +488,7 @@ public class ValidateText extends TestCase
 
         text.format(0, 5, Common.ITALICS);
 
-        assertEquals(2, calculateNumberPieces(text));
+        assertEquals(2, introspectNumberOfSpans(text));
         p = text.first;
         assertSame(p.span.getMarkup(), Common.ITALICS);
         p = p.next;
@@ -491,7 +501,7 @@ public class ValidateText extends TestCase
 
         text.format(6, 5, Common.BOLD);
 
-        assertEquals(3, calculateNumberPieces(text));
+        assertEquals(3, introspectNumberOfSpans(text));
         p = text.first;
         assertSame(p.span.getMarkup(), Common.ITALICS);
         p = p.next;
@@ -510,7 +520,7 @@ public class ValidateText extends TestCase
         text.format(0, 11, Common.FILENAME);
 
         // NEW: will replace all
-        assertEquals(3, calculateNumberPieces(text));
+        assertEquals(3, introspectNumberOfSpans(text));
         p = text.first;
         assertSame(p.span.getMarkup(), Common.FILENAME);
         p = p.next;
@@ -549,7 +559,7 @@ public class ValidateText extends TestCase
 
         text.clear(0, 11, Common.ITALICS);
 
-        assertEquals(3, calculateNumberPieces(text));
+        assertEquals(3, introspectNumberOfSpans(text));
         p = text.first;
         assertEquals(null, p.span.getMarkup());
         p = p.next;
@@ -563,7 +573,7 @@ public class ValidateText extends TestCase
 
         text.clear(0, 11, Common.ITALICS);
 
-        assertEquals(3, calculateNumberPieces(text));
+        assertEquals(3, introspectNumberOfSpans(text));
         p = text.first;
         assertEquals(null, p.span.getMarkup());
         p = p.next;
@@ -573,7 +583,7 @@ public class ValidateText extends TestCase
 
         text.clear(3, 5, Common.FILENAME);
 
-        assertEquals(5, calculateNumberPieces(text));
+        assertEquals(5, introspectNumberOfSpans(text));
 
         // Hel
         p = text.first;
