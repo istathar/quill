@@ -1260,6 +1260,10 @@ abstract class EditorTextView extends TextView
         alpha = chain.wordBoundaryBefore(offset);
         omega = chain.wordBoundaryAfter(offset);
 
+        if (omega - alpha == 0) {
+            return;
+        }
+
         extract = chain.extractRange(alpha, omega - alpha);
         word = makeWordFromSpans(extract);
 

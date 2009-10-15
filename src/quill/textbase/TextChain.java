@@ -420,6 +420,9 @@ public class TextChain
         if (width < 0) {
             throw new IllegalArgumentException();
         }
+        if (width == 0) {
+            return null;
+        }
 
         /*
          * TODO guard the other end, ie test for conditions
@@ -706,6 +709,9 @@ public class TextChain
         if (width < 0) {
             throw new IllegalArgumentException();
         }
+        if (width == 0) {
+            return new Extract();
+        }
 
         pair = extractFrom(start, width);
         spans = formArray(pair);
@@ -835,7 +841,7 @@ public class TextChain
 
         origin = pieceAt(offset);
         if (origin == null) {
-            return 0;
+            return length;
         }
 
         return wordBoundaryBefore(origin, offset);

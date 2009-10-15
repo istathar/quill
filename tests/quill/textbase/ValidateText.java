@@ -328,6 +328,20 @@ public class ValidateText extends TestCase
         return str.toString();
     }
 
+    public final void testExtractNothing() {
+        final TextChain text;
+        Pair pair;
+
+        text = new TextChain("All good people");
+
+        pair = text.extractFrom(2, 0);
+        assertNull(pair);
+        pair = text.extractFrom(0, 0);
+        assertNull(pair);
+        pair = text.extractFrom(15, 0);
+        assertNull(pair);
+    }
+
     public final void testExtractRange() {
         final TextChain text;
         final Span zero, one, two, three;
