@@ -1222,7 +1222,7 @@ abstract class EditorTextView extends TextView
         }
     }
 
-    private String makeWordFromSpans(Extract extract) {
+    private static String makeWordFromSpans(Extract extract) {
         final StringBuilder str;
         int i, I, j, J;
         Span s;
@@ -1257,12 +1257,12 @@ abstract class EditorTextView extends TextView
         final String word;
         final TextIter start, end;
 
+        if (offset > 0) {
+            offset--;
+        }
+
         alpha = chain.wordBoundaryBefore(offset);
         omega = chain.wordBoundaryAfter(offset);
-
-        if (omega - alpha == 0) {
-            return;
-        }
 
         extract = chain.extractRange(alpha, omega - alpha);
         word = makeWordFromSpans(extract);
