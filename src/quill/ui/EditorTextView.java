@@ -241,10 +241,10 @@ abstract class EditorTextView extends TextView
 
                 if (key == Keyval.Tab) {
                     if (isCodeBlock()) {
-                        return false;
-                    } else {
-                        return true;
+                        insertText("\t");
+
                     }
+                    return true;
                 }
 
                 /*
