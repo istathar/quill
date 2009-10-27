@@ -220,18 +220,6 @@ abstract class EditorTextView extends TextView
                 }
 
                 /*
-                 * Let modifier keys through; input methods, cursor movement,
-                 * and selection seems to depend on this.
-                 */
-
-                if ((key == Keyval.ShiftLeft) || (key == Keyval.ShiftRight) || (key == Keyval.AltLeft)
-                        || (key == Keyval.AltRight) || (key == Keyval.ControlLeft)
-                        || (key == Keyval.ControlRight) || (key == Keyval.SuperLeft)
-                        || (key == Keyval.SuperRight)) {
-                    return false;
-                }
-
-                /*
                  * Tab is a strange one. At first glance it is tempting to set
                  * the TextView to not accept them and to have Tab change
                  * focus, but there is the case of program code in a
@@ -245,6 +233,18 @@ abstract class EditorTextView extends TextView
 
                     }
                     return true;
+                }
+
+                /*
+                 * Let modifier keys through; input methods, cursor movement,
+                 * and selection seems to depend on this.
+                 */
+
+                if ((key == Keyval.ShiftLeft) || (key == Keyval.ShiftRight) || (key == Keyval.AltLeft)
+                        || (key == Keyval.AltRight) || (key == Keyval.ControlLeft)
+                        || (key == Keyval.ControlRight) || (key == Keyval.SuperLeft)
+                        || (key == Keyval.SuperRight)) {
+                    return false;
                 }
 
                 /*
