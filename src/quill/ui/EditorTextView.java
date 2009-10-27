@@ -645,7 +645,8 @@ abstract class EditorTextView extends TextView
     void reverse(Change obj) {
         final StructuralChange structural;
         final TextualChange textual;
-        final TextIter start, end;
+        final TextIter start, finish;
+        int alpha, omega;
         Extract r;
         int i;
         Span s;
@@ -662,12 +663,15 @@ abstract class EditorTextView extends TextView
              * And now do what is necessary to reflect the change in this UI.
              */
 
-            start = buffer.getIter(textual.getOffset());
+            alpha = textual.getOffset();
+            omega = alpha;
+
+            start = buffer.getIter(alpha);
 
             r = textual.getAdded();
             if (r != null) {
-                end = buffer.getIter(textual.getOffset() + r.getWidth());
-                buffer.delete(start, end);
+                finish = buffer.getIter(alpha + r.getWidth());
+                buffer.delete(start, finish);
             }
 
             r = textual.getRemoved();
@@ -676,7 +680,10 @@ abstract class EditorTextView extends TextView
                     s = r.get(i);
                     insertSpan(start, s);
                 }
+                omega += r.getWidth();
             }
+
+            checkSpellingRange(alpha, omega);
         }
     }
 
@@ -1249,46 +1256,52 @@ abstract class EditorTextView extends TextView
     }
 
     private void checkSpellingOf(final TextualChange change) {
-        final int start, end;
-        final Extract extract;
+        int start, end;
+        final Extract added, removed;
 
         start = change.getOffset();
 
-        extract = change.getAdded();
-        if (extract == null) {
-            end = start;
-        } else {
-            end = start + extract.getWidth();
+        added = change.getAdded();
+        removed = change.getRemoved();
+
+        end = start;
+        if (removed != null) {
+            start--;
+        }
+        if (added != null) {
+            end += added.getWidth();
         }
 
         checkSpellingRange(start, end);
     }
 
-    /*
-     * Iterate over words from before(alpha) to after(omega)
+    /**
+     * Iterate over words from before(begin) to after(end)
      */
-    private void checkSpellingRange(final int from, final int to) {
-        Extract extract;
+    private void checkSpellingRange(final int begin, final int end) {
+        final int done;
         int alpha, omega;
+        Extract extract;
         String word;
-        TextIter start, end;
+        TextIter start, finish;
 
-        alpha = chain.wordBoundaryBefore(from);
-        omega = from;
+        alpha = chain.wordBoundaryBefore(begin);
+        omega = begin;
+        done = chain.wordBoundaryAfter(end);
 
-        while (omega < to) {
+        while (omega < done) {
             omega = chain.wordBoundaryAfter(alpha);
 
             extract = chain.extractRange(alpha, omega - alpha);
             word = makeWordFromSpans(extract);
 
             start = buffer.getIter(alpha);
-            end = buffer.getIter(omega);
+            finish = buffer.getIter(omega);
 
             if (ui.dict.check(word)) {
-                buffer.removeTag(spelling, start, end);
+                buffer.removeTag(spelling, start, finish);
             } else {
-                buffer.applyTag(spelling, start, end);
+                buffer.applyTag(spelling, start, finish);
             }
 
             omega++;
