@@ -253,7 +253,11 @@ public class TextChain
 
     /**
      * Find the Piece enclosing offset. This is used to then subdivide by
-     * splitAt()
+     * splitAt().
+     * 
+     * Returns null if the offset is the end of the Chain. The end of the
+     * chain is null if the length of the Chain is zero, the null Piece is
+     * still the "end".
      */
     /*
      * TODO implementation is an ugly linear search. Now that the offsets are
