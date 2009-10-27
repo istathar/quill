@@ -568,7 +568,7 @@ abstract class EditorTextView extends TextView
             imposeFormatChange((TextualChange) change);
         } else if (change instanceof TextualChange) {
             imposeTextualChange((TextualChange) change);
-            checkSpellingAt(insertOffset);
+            checkSpellingOf((TextualChange) change);
         } else {
             throw new IllegalStateException("Unknown Change type");
         }
@@ -1245,6 +1245,54 @@ abstract class EditorTextView extends TextView
             }
 
             return str.toString();
+        }
+    }
+
+    private void checkSpellingOf(final TextualChange change) {
+        final int start, end;
+        final Extract extract;
+
+        start = change.getOffset();
+
+        extract = change.getAdded();
+        if (extract == null) {
+            end = start;
+        } else {
+            end = start + extract.getWidth();
+        }
+
+        checkSpellingRange(start, end);
+    }
+
+    /*
+     * Iterate over words from before(alpha) to after(omega)
+     */
+    private void checkSpellingRange(final int from, final int to) {
+        Extract extract;
+        int alpha, omega;
+        String word;
+        TextIter start, end;
+
+        alpha = chain.wordBoundaryBefore(from);
+        omega = from;
+
+        while (omega < to) {
+            omega = chain.wordBoundaryAfter(alpha);
+
+            extract = chain.extractRange(alpha, omega - alpha);
+            word = makeWordFromSpans(extract);
+
+            start = buffer.getIter(alpha);
+            end = buffer.getIter(omega);
+
+            if (ui.dict.check(word)) {
+                buffer.removeTag(spelling, start, end);
+            } else {
+                buffer.applyTag(spelling, start, end);
+            }
+
+            omega++;
+            alpha = omega;
         }
     }
 
