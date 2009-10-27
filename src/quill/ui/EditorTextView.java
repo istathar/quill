@@ -553,88 +553,82 @@ abstract class EditorTextView extends TextView
      */
     void affect(Change change) {
         final StructuralChange structural;
-        TextIter start, end;
+        final TextualChange textual;
+        TextIter start, finish;
         int offset;
+        int alpha, omega;
+        Extract r;
+        int i;
+        Span s;
+        TextTag tag;
 
         if (change instanceof StructuralChange) {
             structural = (StructuralChange) change;
 
             offset = structural.getOffset();
             start = buffer.getIter(offset);
-            end = buffer.getIterEnd();
-            buffer.delete(start, end);
+            finish = buffer.getIterEnd();
+            buffer.delete(start, finish);
 
         } else if (change instanceof FormatTextualChange) {
-            imposeFormatChange((TextualChange) change);
-        } else if (change instanceof TextualChange) {
-            imposeTextualChange((TextualChange) change);
-            checkSpellingOf((TextualChange) change);
-        } else {
-            throw new IllegalStateException("Unknown Change type");
-        }
-    }
+            textual = (TextualChange) change;
 
-    private void imposeTextualChange(TextualChange change) {
-        TextIter start, end;
-        Extract r;
-        int i;
-        Span s;
+            r = textual.getAdded();
+            if (r == null) {
+                return;
+            }
 
-        start = buffer.getIter(change.getOffset());
+            offset = textual.getOffset();
 
-        r = change.getRemoved();
-        if (r != null) {
-            end = buffer.getIter(change.getOffset() + r.getWidth());
-            buffer.delete(start, end);
-            start = end;
-        }
-
-        r = change.getAdded();
-        if (r != null) {
             for (i = 0; i < r.size(); i++) {
                 s = r.get(i);
-                insertSpan(start, s);
+
+                start = buffer.getIter(offset);
+                offset += s.getWidth();
+                finish = buffer.getIter(offset);
+
+                /*
+                 * FUTURE this is horribly inefficient compared to just adding
+                 * or removing the tag that has changed. But it is undeniably
+                 * easy to express. To do this properly we'll have to get the
+                 * individual Markup and whether it was added or removed from
+                 * the FormatChange.
+                 */
+
+                buffer.removeAllTags(start, finish);
+                tag = tagForMarkup(s.getMarkup());
+                if (tag == null) {
+                    continue;
+                }
+                buffer.applyTag(tag, start, finish);
             }
-        }
-    }
+        } else if (change instanceof TextualChange) {
+            textual = (TextualChange) change;
 
-    private void imposeFormatChange(TextualChange change) {
-        TextIter start, end;
-        Extract r;
-        int i, offset;
-        Span s;
-        TextTag tag;
+            alpha = textual.getOffset();
+            omega = alpha;
 
-        r = change.getAdded();
-        if (r == null) {
-            return;
-        }
+            start = buffer.getIter(textual.getOffset());
 
-        offset = change.getOffset();
-
-        for (i = 0; i < r.size(); i++) {
-            s = r.get(i);
-
-            start = buffer.getIter(offset);
-            offset += s.getWidth();
-            end = buffer.getIter(offset);
-
-            /*
-             * FUTURE this is horribly inefficient compared to just adding or
-             * removing the tag that has changed. But it is undeniably easy to
-             * express. To do this properly we'll have to get the individual
-             * Markup and whether it was added or removed from the
-             * FormatChange.
-             * 
-             * FIXME this clears the error underlining from GtkSpell!
-             */
-
-            buffer.removeAllTags(start, end);
-            tag = tagForMarkup(s.getMarkup());
-            if (tag == null) {
-                continue;
+            r = textual.getRemoved();
+            if (r != null) {
+                finish = buffer.getIter(textual.getOffset() + r.getWidth());
+                buffer.delete(start, finish);
+                start = finish;
             }
-            buffer.applyTag(tag, start, end);
+
+            r = textual.getAdded();
+            if (r != null) {
+                for (i = 0; i < r.size(); i++) {
+                    s = r.get(i);
+                    insertSpan(start, s);
+                }
+                omega += r.getWidth();
+            }
+
+            checkSpellingRange(alpha, omega);
+        } else {
+            throw new IllegalStateException("Unknown Change type");
         }
     }
 
@@ -1253,26 +1247,6 @@ abstract class EditorTextView extends TextView
 
             return str.toString();
         }
-    }
-
-    private void checkSpellingOf(final TextualChange change) {
-        int start, end;
-        final Extract added, removed;
-
-        start = change.getOffset();
-
-        added = change.getAdded();
-        removed = change.getRemoved();
-
-        end = start;
-        if (removed != null) {
-            start--;
-        }
-        if (added != null) {
-            end += added.getWidth();
-        }
-
-        checkSpellingRange(start, end);
     }
 
     /**
