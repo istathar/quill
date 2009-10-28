@@ -57,6 +57,7 @@ import quill.textbase.TextualChange;
 
 import static org.gnome.gtk.TextWindowType.TEXT;
 import static quill.client.Quill.ui;
+import static quill.ui.Format.spelling;
 import static quill.ui.Format.tagForMarkup;
 
 abstract class EditorTextView extends TextView
@@ -111,10 +112,6 @@ abstract class EditorTextView extends TextView
         view.setBorderWidth(2);
 
         view.setAcceptsTab(true);
-
-        if (isSpellChecked()) {
-            view.attachSpell();
-        }
     }
 
     /**
@@ -235,22 +232,6 @@ abstract class EditorTextView extends TextView
                 }
 
                 /*
-                 * Tab is a strange one. At first glance it is tempting to set
-                 * the TextView to not accept them and to have Tab change
-                 * focus, but there is the case of program code in a
-                 * preformatted block which might need indent support. So we
-                 * swollow it unless we're in a preformatted code block.
-                 */
-
-                if (key == Keyval.Tab) {
-                    if (isCodeBlock()) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                }
-
-                /*
                  * Now on to processing special keystrokes.
                  */
 
@@ -278,6 +259,22 @@ abstract class EditorTextView extends TextView
                     x = -1;
 
                     /*
+                     * Tab is a strange one. At first glance it is tempting to
+                     * set the TextView to not accept them and to have Tab
+                     * change focus, but there is the case of program code in
+                     * a preformatted block which might need indent support.
+                     * So we swollow it unless we're in a preformatted code
+                     * block.
+                     */
+
+                    if (key == Keyval.Tab) {
+                        if (isCodeBlock()) {
+                            insertText("\t");
+                        }
+                        return true;
+                    }
+
+                    /*
                      * We're not really supposed to get here, but (deep
                      * breath) let the TextView handle it. This had better not
                      * mutate the TextBuffer.
@@ -286,8 +283,13 @@ abstract class EditorTextView extends TextView
                 }
 
                 if (mod == ModifierType.SHIFT_MASK) {
+                    if (key == Keyval.BackTab) {
+                        return true;
+                    }
+
                     /*
-                     * Nothing special, pass through.
+                     * Other mutating keystrokes should have been absorbed, so
+                     * pass through.
                      */
                     return false;
                 }
@@ -556,87 +558,86 @@ abstract class EditorTextView extends TextView
      */
     void affect(Change change) {
         final StructuralChange structural;
-        TextIter start, end;
+        final TextualChange textual;
+        TextIter start, finish;
         int offset;
+        int alpha, omega;
+        Extract r;
+        int i;
+        Span s;
+        TextTag tag;
 
         if (change instanceof StructuralChange) {
             structural = (StructuralChange) change;
 
             offset = structural.getOffset();
             start = buffer.getIter(offset);
-            end = buffer.getIterEnd();
-            buffer.delete(start, end);
+            finish = buffer.getIterEnd();
+            buffer.delete(start, finish);
 
         } else if (change instanceof FormatTextualChange) {
-            imposeFormatChange((TextualChange) change);
-        } else if (change instanceof TextualChange) {
-            imposeTextualChange((TextualChange) change);
-        } else {
-            throw new IllegalStateException("Unknown Change type");
-        }
-    }
+            textual = (TextualChange) change;
 
-    private void imposeTextualChange(TextualChange change) {
-        TextIter start, end;
-        Extract r;
-        int i;
-        Span s;
+            r = textual.getAdded();
+            if (r == null) {
+                return;
+            }
 
-        start = buffer.getIter(change.getOffset());
+            offset = textual.getOffset();
+            alpha = offset;
 
-        r = change.getRemoved();
-        if (r != null) {
-            end = buffer.getIter(change.getOffset() + r.getWidth());
-            buffer.delete(start, end);
-            start = end;
-        }
-
-        r = change.getAdded();
-        if (r != null) {
             for (i = 0; i < r.size(); i++) {
                 s = r.get(i);
-                insertSpan(start, s);
+
+                start = buffer.getIter(offset);
+                offset += s.getWidth();
+                finish = buffer.getIter(offset);
+
+                /*
+                 * FUTURE this is horribly inefficient compared to just adding
+                 * or removing the tag that has changed. But it is undeniably
+                 * easy to express. To do this properly we'll have to get the
+                 * individual Markup and whether it was added or removed from
+                 * the FormatChange.
+                 */
+
+                buffer.removeAllTags(start, finish);
+                tag = tagForMarkup(s.getMarkup());
+                if (tag == null) {
+                    continue;
+                }
+                buffer.applyTag(tag, start, finish);
             }
-        }
-    }
+            omega = offset;
 
-    private void imposeFormatChange(TextualChange change) {
-        TextIter start, end;
-        Extract r;
-        int i, offset;
-        Span s;
-        TextTag tag;
+            checkSpellingRange(alpha, omega);
+        } else if (change instanceof TextualChange) {
+            textual = (TextualChange) change;
 
-        r = change.getAdded();
-        if (r == null) {
-            return;
-        }
+            alpha = textual.getOffset();
+            omega = alpha;
 
-        offset = change.getOffset();
+            start = buffer.getIter(textual.getOffset());
 
-        for (i = 0; i < r.size(); i++) {
-            s = r.get(i);
-
-            start = buffer.getIter(offset);
-            offset += s.getWidth();
-            end = buffer.getIter(offset);
-
-            /*
-             * FUTURE this is horribly inefficient compared to just adding or
-             * removing the tag that has changed. But it is undeniably easy to
-             * express. To do this properly we'll have to get the individual
-             * Markup and whether it was added or removed from the
-             * FormatChange.
-             * 
-             * FIXME this clears the error underlining from GtkSpell!
-             */
-
-            buffer.removeAllTags(start, end);
-            tag = tagForMarkup(s.getMarkup());
-            if (tag == null) {
-                continue;
+            r = textual.getRemoved();
+            if (r != null) {
+                finish = buffer.getIter(textual.getOffset() + r.getWidth());
+                buffer.delete(start, finish);
+                start = finish;
             }
-            buffer.applyTag(tag, start, end);
+
+            r = textual.getAdded();
+            if (r != null) {
+                for (i = 0; i < r.size(); i++) {
+                    s = r.get(i);
+                    insertSpan(start, s);
+                }
+                omega += r.getWidth();
+            }
+
+            checkSpellingRange(alpha, omega);
+        } else {
+            throw new IllegalStateException("Unknown Change type");
         }
     }
 
@@ -647,7 +648,8 @@ abstract class EditorTextView extends TextView
     void reverse(Change obj) {
         final StructuralChange structural;
         final TextualChange textual;
-        final TextIter start, end;
+        final TextIter start, finish;
+        int alpha, omega;
         Extract r;
         int i;
         Span s;
@@ -664,12 +666,15 @@ abstract class EditorTextView extends TextView
              * And now do what is necessary to reflect the change in this UI.
              */
 
-            start = buffer.getIter(textual.getOffset());
+            alpha = textual.getOffset();
+            omega = alpha;
+
+            start = buffer.getIter(alpha);
 
             r = textual.getAdded();
             if (r != null) {
-                end = buffer.getIter(textual.getOffset() + r.getWidth());
-                buffer.delete(start, end);
+                finish = buffer.getIter(alpha + r.getWidth());
+                buffer.delete(start, finish);
             }
 
             r = textual.getRemoved();
@@ -678,7 +683,10 @@ abstract class EditorTextView extends TextView
                     s = r.get(i);
                     insertSpan(start, s);
                 }
+                omega += r.getWidth();
             }
+
+            checkSpellingRange(alpha, omega);
         }
     }
 
@@ -1221,6 +1229,105 @@ abstract class EditorTextView extends TextView
             return true;
         } else {
             return false;
+        }
+    }
+
+    private static String makeWordFromSpans(Extract extract) {
+        final StringBuilder str;
+        int i, I, j, J;
+        Span s;
+
+        I = extract.size();
+
+        if (I == 1) {
+            return extract.get(0).getText();
+        } else {
+            str = new StringBuilder();
+
+            for (i = 0; i < I; i++) {
+                s = extract.get(i);
+
+                J = s.getWidth();
+
+                for (j = 0; j < J; j++) {
+                    str.appendCodePoint(s.getChar(j));
+                }
+            }
+
+            return str.toString();
+        }
+    }
+
+    /**
+     * Iterate over words from before(begin) to after(end)
+     */
+    private void checkSpellingRange(final int begin, final int end) {
+        final int done;
+        int alpha, omega;
+        Extract extract;
+        String word;
+        TextIter start, finish;
+
+        alpha = chain.wordBoundaryBefore(begin);
+        omega = begin;
+        done = chain.wordBoundaryAfter(end);
+
+        /*
+         * There's an annoying bug whereby if you type Space in the middle of
+         * a mispelled word the space ends up being marked as misspelled,
+         * likely just a result of the TextTag being propegated with right
+         * gravity. Work around this by just nuking all the error markup along
+         * the range being checked, and then only [re]highlighting words that
+         * need it.
+         */
+        start = buffer.getIter(alpha);
+        finish = buffer.getIter(done);
+        buffer.removeTag(spelling, start, finish);
+
+        while (omega < done) {
+            omega = chain.wordBoundaryAfter(alpha);
+
+            extract = chain.extractRange(alpha, omega - alpha);
+            word = makeWordFromSpans(extract);
+
+            start = buffer.getIter(alpha);
+            finish = buffer.getIter(omega);
+
+            if (!ui.dict.check(word)) {
+                buffer.applyTag(spelling, start, finish);
+            }
+
+            omega++;
+            alpha = omega;
+        }
+    }
+
+    /*
+     * Primative placeholder while we explore spelling issues
+     */
+    private void checkSpellingAt(int offset) {
+        final Extract extract;
+        final int alpha, omega;
+        final String word;
+        final TextIter start, end;
+
+        if (offset > 0) {
+            offset--;
+        }
+
+        alpha = chain.wordBoundaryBefore(offset);
+        omega = chain.wordBoundaryAfter(offset);
+
+        extract = chain.extractRange(alpha, omega - alpha);
+        word = makeWordFromSpans(extract);
+
+        start = buffer.getIter(alpha);
+        end = buffer.getIter(omega);
+
+        if (ui.dict.check(word)) {
+            buffer.removeTag(spelling, start, end);
+        } else {
+            buffer.applyTag(spelling, start, end);
         }
     }
 }

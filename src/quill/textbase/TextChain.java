@@ -20,6 +20,11 @@ public class TextChain
 {
     Piece first;
 
+    /**
+     * cache of the length of this TextChain, in characters.
+     */
+    private int length = -1;
+
     public TextChain() {
         first = null;
     }
@@ -34,13 +39,15 @@ public class TextChain
         first.span = initial;
     }
 
+    private void invalidateCache() {
+        length = -1;
+    }
+
     /**
-     * The length of this Text, in characters.
+     * Update the offset cache [stored in the Pieces] in the process of
+     * calculating and storing the length of the TextChain.
      */
-    /*
-     * TODO cache this when we cache the offsets!
-     */
-    public int length() {
+    private void calculateOffsets() {
         Piece piece;
         int result;
 
@@ -48,11 +55,22 @@ public class TextChain
         result = 0;
 
         while (piece != null) {
+            piece.offset = result;
             result += piece.span.getWidth();
             piece = piece.next;
         }
 
-        return result;
+        length = result;
+    }
+
+    /**
+     * The length of this Text, in characters.
+     */
+    public int length() {
+        if (length == -1) {
+            calculateOffsets();
+        }
+        return length;
     }
 
     public String toString() {
@@ -77,6 +95,7 @@ public class TextChain
         if (addition == null) {
             throw new IllegalArgumentException();
         }
+        invalidateCache();
 
         /*
          * Handle empty Text case
@@ -121,6 +140,7 @@ public class TextChain
         if (offset < 0) {
             throw new IllegalArgumentException();
         }
+        invalidateCache();
 
         /*
          * Create the insertion point
@@ -232,14 +252,68 @@ public class TextChain
     }
 
     /**
+     * Find the Piece enclosing offset. This is used to then subdivide by
+     * splitAt().
+     * 
+     * Returns null if the offset is the end of the Chain. The end of the
+     * chain is null if the length of the Chain is zero, the null Piece is
+     * still the "end".
+     */
+    /*
+     * TODO implementation is an ugly linear search. Now that the offsets are
+     * cached in the Pieces, perhaps we can be smarter about hunting.
+     */
+    Piece pieceAt(final int offset) {
+        Piece piece, last;
+        int start;
+
+        if (offset == 0) {
+            return first;
+        }
+
+        if (length == -1) {
+            throw new IllegalStateException("\n"
+                    + "You must to ensure offsets are calculated before calling this");
+        }
+
+        if (offset == length) {
+            return null;
+        }
+
+        if (offset > length) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        piece = first;
+        last = first;
+        start = 0;
+
+        while (piece != null) {
+            start = piece.offset;
+
+            if (start > offset) {
+                return last;
+            }
+            if (start == offset) {
+                return piece;
+            }
+
+            last = piece;
+            piece = piece.next;
+        }
+
+        return last;
+    }
+
+    /**
      * Find the Piece containing offset, and split it into two. Handle the
      * boundary cases of an offset at a Piece boundary. Returns a Pair around
      * the two Pieces. null will be set if there is no Piece before (or after)
      * this point.
      */
     /*
-     * TODO Initial implementation of this is an ugly linear search; replace
-     * this with an offset cache in the Pieces.
+     * FIXME this code was copied to pieceAt(), and should call that method
+     * instead of doing the same work here.
      */
     Piece splitAt(int offset) {
         Piece piece, last;
@@ -303,6 +377,7 @@ public class TextChain
         if (offset < 0) {
             throw new IllegalArgumentException();
         }
+        invalidateCache();
 
         piece = new Piece();
         piece.span = addition;
@@ -349,6 +424,9 @@ public class TextChain
         if (width < 0) {
             throw new IllegalArgumentException();
         }
+        if (width == 0) {
+            return null;
+        }
 
         /*
          * TODO guard the other end, ie test for conditions
@@ -365,6 +443,7 @@ public class TextChain
 
         preceeding = splitAt(offset);
         omega = splitAt(offset + width);
+        calculateOffsets();
 
         if (preceeding == null) {
             if (omega.prev == null) {
@@ -380,7 +459,11 @@ public class TextChain
     }
 
     static Span[] formArray(Pair pair) {
-        return formArray(pair.one, pair.two);
+        if (pair.one.offset < pair.two.offset) {
+            return formArray(pair.one, pair.two);
+        } else {
+            return formArray(pair.two, pair.one);
+        }
     }
 
     /**
@@ -476,6 +559,8 @@ public class TextChain
          * first pointer), and the very special case of deleting everything
          * (in which case we put in an "empty" Piece with a zero length Span).
          */
+
+        invalidateCache();
 
         preceeding = pair.one.prev;
         following = pair.two.next;
@@ -584,54 +669,19 @@ public class TextChain
         }
     }
 
-    /*
-     * FIXME This is another case where we linear search through the offsets.
-     * We should probably be caching this? Also, this is essentially the same
-     * code as splitAt(), so something probably needs to be abstracted out
-     * here.
-     */
     public Markup getMarkupAt(int offset) {
-        Piece piece, last;
-        int start, following;
+        final Piece piece;
 
-        piece = first;
-        last = first;
-        start = 0;
-
-        while (piece != null) {
-            if (start == offset) {
-                return piece.span.getMarkup();
-            }
-
-            /*
-             * Failing that, then let's see if this Piece contains the offset
-             * point.
-             */
-
-            following = start + piece.span.getWidth();
-
-            if (following > offset) {
-                return piece.span.getMarkup();
-            }
-            start = following;
-
-            last = piece;
-            piece = piece.next;
+        if (length == -1) {
+            calculateOffsets();
         }
 
-        /*
-         * Reached the end
-         */
-
-        if (start == offset) {
-            if (first == null) {
-                return null;
-            } else {
-                return last.span.getMarkup();
-            }
+        piece = pieceAt(offset);
+        if (piece == null) {
+            return null;
+        } else {
+            return piece.span.getMarkup();
         }
-
-        throw new IllegalArgumentException();
     }
 
     /**
@@ -662,6 +712,9 @@ public class TextChain
 
         if (width < 0) {
             throw new IllegalArgumentException();
+        }
+        if (width == 0) {
+            return new Extract();
         }
 
         pair = extractFrom(start, width);
@@ -781,5 +834,239 @@ public class TextChain
      */
     Segment getEnclosingSegment() {
         return belongs;
+    }
+
+    public int wordBoundaryBefore(final int offset) {
+        final Piece origin;
+
+        if (length == -1) {
+            calculateOffsets();
+        }
+
+        origin = pieceAt(offset);
+        if (origin == null) {
+            return length;
+        }
+
+        return wordBoundaryBefore(origin, offset);
+    }
+
+    private int wordBoundaryBefore(final Piece origin, final int offset) {
+        int start;
+        Piece p;
+        int i;
+        boolean found;
+        int ch; // switch to char if you're debugging.
+
+        /*
+         * Calculate start by seeking backwards to find whitespace
+         */
+
+        p = origin;
+        start = offset;
+        i = -1;
+        found = false;
+
+        while (p != null) {
+            i = start - p.offset;
+
+            while (i > 0) {
+                i--;
+                ch = p.span.getChar(i);
+                if (!(Character.isLetter(ch) || (ch == '\''))) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                break;
+            }
+
+            start = p.offset;
+            p = p.prev;
+        }
+
+        if (!found) {
+            start = 0;
+        } else {
+            start = p.offset + i + 1;
+        }
+
+        return start;
+    }
+
+    /*
+     * It would be nice to remove this
+     */
+    public int wordBoundaryAfter(final int offset) {
+        final Piece origin;
+
+        if (length == -1) {
+            calculateOffsets();
+        }
+
+        origin = pieceAt(offset);
+        if (origin == null) {
+            return length;
+        }
+
+        return wordBoundaryAfter(origin, offset);
+    }
+
+    private int wordBoundaryAfter(final Piece origin, final int offset) {
+        int end;
+        Piece p;
+        int i, len;
+        boolean found;
+        int ch;
+
+        /*
+         * Calculate end by seeking forwards to find whitespace
+         */
+
+        p = origin;
+        end = offset;
+        i = end - p.offset;
+        found = false;
+
+        while (p != null) {
+            len = p.span.getWidth();
+
+            while (i < len) {
+                ch = p.span.getChar(i);
+                if (!(Character.isLetter(ch) || (ch == '\''))) {
+                    found = true;
+                    break;
+                }
+                i++;
+            }
+
+            if (found) {
+                break;
+            }
+
+            p = p.next;
+            i = 0;
+        }
+
+        if (p == null) {
+            end = length;
+        } else {
+            end = p.offset + i;
+        }
+
+        return end;
+    }
+
+    /*
+     * unused, but good code.
+     */
+    static String makeWordFromSpans(Extract extract) {
+        final StringBuilder str;
+        int i, I, j, J;
+        Span s;
+
+        I = extract.size();
+
+        if (I == 1) {
+            return extract.get(0).getText();
+        } else {
+            str = new StringBuilder();
+
+            for (i = 0; i < I; i++) {
+                s = extract.get(i);
+
+                J = s.getWidth();
+
+                for (j = 0; j < J; j++) {
+                    str.appendCodePoint(s.getChar(j));
+                }
+            }
+
+            return str.toString();
+        }
+    }
+
+    /*
+     * this could well become the basis of a public API
+     */
+    static String makeWordFromSpans(Pair pair) {
+        final Piece alpha, omega;
+        final StringBuilder str;
+        int j, J;
+        Piece p;
+        Span s;
+
+        alpha = pair.one;
+        omega = pair.two;
+
+        if (alpha == omega) {
+            return alpha.span.getText();
+        } else {
+            str = new StringBuilder();
+
+            p = alpha;
+            while (p != null) {
+                s = p.span;
+                J = s.getWidth();
+
+                for (j = 0; j < J; j++) {
+                    str.appendCodePoint(s.getChar(j));
+                }
+
+                if (p == omega) {
+                    break;
+                }
+                p = p.next;
+            }
+
+            return str.toString();
+        }
+    }
+
+    /**
+     * Given a cursor location in offset, work backwards to find a word
+     * boundary, and then forwards to the next word boundary, and return the
+     * word contained between those two points.
+     */
+    /*
+     * After a huge amount of work, the current implementation in
+     * EditorTextView doesn't call this, but exercises a similar algorithm.
+     * Nevertheless this is heavily tested code, and we will probably return
+     * to this "pick word from offset" soon.
+     */
+    String getWordAt(final int offset) {
+        final Piece origin;
+        int start, end;
+        int i;
+        Pair pair;
+        int ch;
+
+        if (length == -1) {
+            calculateOffsets();
+        }
+
+        if (offset == length) {
+            return null;
+        }
+
+        origin = pieceAt(offset);
+
+        i = offset - origin.offset;
+        ch = origin.span.getChar(i);
+        if (!Character.isLetter(ch)) {
+            return null;
+        }
+
+        start = wordBoundaryBefore(origin, offset);
+        end = wordBoundaryAfter(origin, offset);
+
+        /*
+         * Now pull out the word
+         */
+
+        pair = extractFrom(start, end - start);
+        return makeWordFromSpans(pair);
     }
 }

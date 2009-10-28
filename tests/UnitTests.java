@@ -23,6 +23,7 @@ import quill.textbase.ValidateSpanOperations;
 import quill.textbase.ValidateStructuralChange;
 import quill.textbase.ValidateText;
 import quill.textbase.ValidateUnicode;
+import quill.textbase.ValidateWordExtraction;
 import quill.textbase.ValidateWrapperExpansions;
 import quill.ui.ValidateChangePropagation;
 
@@ -62,6 +63,7 @@ public class UnitTests
         suite.addTestSuite(ValidateThereAndBackAgain.class);
         suite.addTestSuite(ValidateFileNaming.class);
         suite.addTestSuite(ValidateChangePropagation.class);
+        suite.addTestSuite(ValidateWordExtraction.class);
 
         return suite;
     }

@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.freedesktop.enchant.Dictionary;
+import org.freedesktop.enchant.Enchant;
 import org.gnome.gdk.EventOwnerChange;
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.Clipboard;
@@ -42,6 +44,8 @@ public class UserInterface
 
     PrimaryWindow primary;
 
+    Dictionary dict;
+
     public UserInterface(DataLayer data) {
         loadImages();
         loadFonts();
@@ -49,6 +53,7 @@ public class UserInterface
         setupApplication();
         setupWindows();
         hookupExternalClipboard();
+        loadDictionary();
     }
 
     private void setupUndoCapability(final DataLayer layer) {
@@ -297,6 +302,11 @@ public class UserInterface
 
     public void focusEditor() {
         primary.grabFocus();
+    }
+
+    private void loadDictionary() {
+        Enchant.init();
+        dict = Enchant.requestDictionary("en_CA");
     }
 }
 
