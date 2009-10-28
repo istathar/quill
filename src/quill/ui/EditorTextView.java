@@ -584,6 +584,7 @@ abstract class EditorTextView extends TextView
             }
 
             offset = textual.getOffset();
+            alpha = offset;
 
             for (i = 0; i < r.size(); i++) {
                 s = r.get(i);
@@ -607,6 +608,9 @@ abstract class EditorTextView extends TextView
                 }
                 buffer.applyTag(tag, start, finish);
             }
+            omega = offset;
+
+            checkSpellingRange(alpha, omega);
         } else if (change instanceof TextualChange) {
             textual = (TextualChange) change;
 
@@ -1268,6 +1272,18 @@ abstract class EditorTextView extends TextView
         omega = begin;
         done = chain.wordBoundaryAfter(end);
 
+        /*
+         * There's an annoying bug whereby if you type Space in the middle of
+         * a mispelled word the space ends up being marked as misspelled,
+         * likely just a result of the TextTag being propegated with right
+         * gravity. Work around this by just nuking all the error markup along
+         * the range being checked, and then only [re]highlighting words that
+         * need it.
+         */
+        start = buffer.getIter(alpha);
+        finish = buffer.getIter(done);
+        buffer.removeTag(spelling, start, finish);
+
         while (omega < done) {
             omega = chain.wordBoundaryAfter(alpha);
 
@@ -1277,9 +1293,7 @@ abstract class EditorTextView extends TextView
             start = buffer.getIter(alpha);
             finish = buffer.getIter(omega);
 
-            if (ui.dict.check(word)) {
-                buffer.removeTag(spelling, start, finish);
-            } else {
+            if (!ui.dict.check(word)) {
                 buffer.applyTag(spelling, start, finish);
             }
 
