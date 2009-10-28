@@ -220,22 +220,6 @@ abstract class EditorTextView extends TextView
                 }
 
                 /*
-                 * Tab is a strange one. At first glance it is tempting to set
-                 * the TextView to not accept them and to have Tab change
-                 * focus, but there is the case of program code in a
-                 * preformatted block which might need indent support. So we
-                 * swollow it unless we're in a preformatted code block.
-                 */
-
-                if (key == Keyval.Tab) {
-                    if (isCodeBlock()) {
-                        insertText("\t");
-
-                    }
-                    return true;
-                }
-
-                /*
                  * Let modifier keys through; input methods, cursor movement,
                  * and selection seems to depend on this.
                  */
@@ -275,6 +259,22 @@ abstract class EditorTextView extends TextView
                     x = -1;
 
                     /*
+                     * Tab is a strange one. At first glance it is tempting to
+                     * set the TextView to not accept them and to have Tab
+                     * change focus, but there is the case of program code in
+                     * a preformatted block which might need indent support.
+                     * So we swollow it unless we're in a preformatted code
+                     * block.
+                     */
+
+                    if (key == Keyval.Tab) {
+                        if (isCodeBlock()) {
+                            insertText("\t");
+                        }
+                        return true;
+                    }
+
+                    /*
                      * We're not really supposed to get here, but (deep
                      * breath) let the TextView handle it. This had better not
                      * mutate the TextBuffer.
@@ -283,8 +283,13 @@ abstract class EditorTextView extends TextView
                 }
 
                 if (mod == ModifierType.SHIFT_MASK) {
+                    if (key == Keyval.BackTab) {
+                        return true;
+                    }
+
                     /*
-                     * Nothing special, pass through.
+                     * Other mutating keystrokes should have been absorbed, so
+                     * pass through.
                      */
                     return false;
                 }
