@@ -210,9 +210,4 @@ public class UnicodeSpan extends Span
             return new StringSpan(str.toString(), this.getMarkup());
         }
     }
-
-    // unit testing only!
-    int[] getPoints() {
-        return points;
-    }
 }

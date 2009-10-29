@@ -11,6 +11,8 @@
 
 package quill.textbase;
 
+import java.lang.reflect.Field;
+
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 
@@ -180,7 +182,7 @@ public class ValidateUnicode extends GraphicalTestCase
         t1 = (UnicodeSpan) createSpan("𝌐", null);
         t2 = (UnicodeSpan) createSpan("𝌐", null);
 
-        assertSame(t1.getPoints(), t2.getPoints());
+        assertSame(introspectPointsArray(t1), introspectPointsArray(t2));
         assertSame(t1.getText(), t2.getText());
 
         /*
@@ -190,17 +192,17 @@ public class ValidateUnicode extends GraphicalTestCase
         w1 = (UnicodeSpan) createSpan(new String("The 𝌐 symbol is divergence"), null);
         w2 = (UnicodeSpan) createSpan(new String("The 𝌐 symbol is divergence"), null);
 
-        assertNotSame(w1.getPoints(), w2.getPoints());
+        assertNotSame(introspectPointsArray(w1), introspectPointsArray(w2));
         assertNotSame(w1.getText(), w2.getText());
     }
 
     public final void testUnicodeSplitting() {
         final UnicodeSpan u1, u2;
-        final Span c1, s1, u3;
+        final Span c1, s1, u3, u4, u5;
 
         u1 = (UnicodeSpan) createSpan(new String("The 𝌤 symbol is packing"), null);
         u2 = (UnicodeSpan) u1.split(4, 5);
-        assertSame(u1.getPoints(), u2.getPoints());
+        assertSame(introspectPointsArray(u1), introspectPointsArray(u2));
 
         c1 = u1.split(6, 7);
         assertTrue(c1 instanceof CharacterSpan);
@@ -213,5 +215,34 @@ public class ValidateUnicode extends GraphicalTestCase
         u3 = u1.split(0, 12);
         assertTrue(u3 instanceof UnicodeSpan);
         assertEquals("The 𝌤 symbol", u3.getText());
+
+        u4 = u1.split(1, 9);
+        assertEquals("he 𝌤 sym", u4.getText());
+
+        u5 = u4.split(1, 6);
+        assertEquals("e 𝌤 s", u5.getText());
+        assertSame(introspectPointsArray(u5), introspectPointsArray(u4));
+    }
+
+    private static int[] introspectPointsArray(Span span) {
+        final Field field;
+        Object points;
+        final int[] result;
+
+        assertTrue(span instanceof UnicodeSpan);
+
+        try {
+            field = UnicodeSpan.class.getDeclaredField("points");
+            field.setAccessible(true);
+            points = field.get(span);
+            result = (int[]) points;
+
+            assertNotNull(result);
+
+            return result;
+        } catch (Exception e) {
+            fail(e.toString());
+            return null;
+        }
     }
 }
