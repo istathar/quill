@@ -147,7 +147,7 @@ public class UnicodeSpan extends Span
      * wide. Position is from 0 to width.
      */
     public int getChar(int position) {
-        return this.points[position];
+        return this.points[start + position];
     }
 
     /**
@@ -163,7 +163,7 @@ public class UnicodeSpan extends Span
      * Get the number of <b>characters</b> in this span.
      */
     public int getWidth() {
-        return this.points.length;
+        return length;
     }
 
     /**
@@ -209,10 +209,5 @@ public class UnicodeSpan extends Span
         } else {
             return new StringSpan(str.toString(), this.getMarkup());
         }
-    }
-
-    // unit testing only!
-    int[] getPoints() {
-        return points;
     }
 }

@@ -19,11 +19,9 @@ import nu.xom.ValidityException;
 
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
-import org.gnome.gtk.Container;
 import org.gnome.gtk.Test;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
-import org.gnome.gtk.Widget;
 
 import quill.textbase.Change;
 import quill.textbase.Common;
@@ -161,6 +159,19 @@ public class ValidateChangePropagation extends GraphicalTestCase
         Test.sendKey(editor, Keyval.n, ModifierType.NONE);
         Test.cycleMainLoop();
 
+        /*
+         * We've still got the TextChain backing the Segment of this
+         * EditorTextView, so first check to make sure it actually did what we
+         * want (thereby passing this test fixture)
+         */
+
+        assertEquals("This is an emergency broadcast system", chain.toString());
+
+        /*
+         * Finally, just check the rest of the stack; the code was already
+         * here.
+         */
+
         out = new ByteArrayOutputStream();
         data.saveDocument(out);
 
@@ -219,9 +230,8 @@ public class ValidateChangePropagation extends GraphicalTestCase
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
                 "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
                 "<text>",
-                "This is a test of the",
-                "<italics>emergency</italics> broadcast",
-                "system",
+                "This is a test of the <italics>emergency</italics>",
+                "broadcast system",
                 "</text>",
                 "</chapter>",
         });
@@ -292,47 +302,5 @@ public class ValidateChangePropagation extends GraphicalTestCase
         });
         assertEquals(expected, out.toString());
 
-    }
-
-    // recursive
-    private static Widget findEditor(Widget widget) {
-        final Container container;
-        final Widget[] children;
-        Widget child, result;
-        int i;
-
-        assertTrue(widget instanceof Container);
-        container = (Container) widget;
-        children = container.getChildren();
-
-        for (i = 0; i < children.length; i++) {
-            child = children[i];
-
-            if (child instanceof NormalEditorTextView) {
-                return child;
-            }
-
-            if (child instanceof Container) {
-                result = findEditor(child);
-                if (result != null) {
-                    return result;
-                }
-            }
-
-        }
-        return null;
-    }
-
-    private static String combine(String[] elements) {
-        StringBuilder buf;
-
-        buf = new StringBuilder(128);
-
-        for (String element : elements) {
-            buf.append(element);
-            buf.append('\n');
-        }
-
-        return buf.toString();
     }
 }

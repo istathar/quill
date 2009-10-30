@@ -118,7 +118,6 @@ public class ValidateWordExtraction extends TestCase
     }
 
     public final void testManyPieces() {
-        final String str;
         final TextChain chain;
 
         chain = new TextChain();
@@ -202,5 +201,39 @@ public class ValidateWordExtraction extends TestCase
         chain = new TextChain("In \"Addiction\" the author writes clearly.");
 
         assertEquals("Addiction", chain.getWordAt(8));
+    }
+
+    /*
+     * This string the same as used in ValidateSpellingOperations, but which
+     * was giving us trouble. The bug turned out to be in UnicodeSpan's
+     * getChar() implementation.
+     */
+    public final void testWordsWithHighRangeUnicode() {
+        final TextChain chain;
+        String word;
+        int i;
+
+        chain = new TextChain("Test emrgency bro𝑎dcast system");
+
+        word = chain.getWordAt(0);
+        assertEquals("Test", word);
+        word = chain.getWordAt(1);
+        assertEquals("Test", word);
+
+        for (i = 0; i < 4; i++) {
+            assertEquals("Test", chain.getWordAt(i));
+        }
+        assertEquals(null, chain.getWordAt(4));
+        for (i = 5; i < 13; i++) {
+            assertEquals("emrgency", chain.getWordAt(i));
+        }
+        assertEquals(null, chain.getWordAt(13));
+        for (i = 14; i < 23; i++) {
+            assertEquals("bro𝑎dcast", chain.getWordAt(i));
+        }
+        assertEquals(null, chain.getWordAt(23));
+        for (i = 24; i < 30; i++) {
+            assertEquals("system", chain.getWordAt(i));
+        }
     }
 }
