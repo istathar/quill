@@ -163,7 +163,7 @@ public class UnicodeSpan extends Span
      * Get the number of <b>characters</b> in this span.
      */
     public int getWidth() {
-        return this.points.length;
+        return length;
     }
 
     /**
