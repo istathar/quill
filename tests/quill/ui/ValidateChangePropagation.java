@@ -161,6 +161,19 @@ public class ValidateChangePropagation extends GraphicalTestCase
         Test.sendKey(editor, Keyval.n, ModifierType.NONE);
         Test.cycleMainLoop();
 
+        /*
+         * We've still got the TextChain backing the Segment of this
+         * EditorTextView, so first check to make sure it actually did what we
+         * want (thereby passing this test fixture)
+         */
+
+        assertEquals("This is an emergency broadcast system", chain.toString());
+
+        /*
+         * Finally, just check the rest of the stack; the code was already
+         * here.
+         */
+
         out = new ByteArrayOutputStream();
         data.saveDocument(out);
 
@@ -219,9 +232,8 @@ public class ValidateChangePropagation extends GraphicalTestCase
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
                 "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
                 "<text>",
-                "This is a test of the",
-                "<italics>emergency</italics> broadcast",
-                "system",
+                "This is a test of the <italics>emergency</italics>",
+                "broadcast system",
                 "</text>",
                 "</chapter>",
         });
