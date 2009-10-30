@@ -173,14 +173,15 @@ abstract class EditorTextView extends TextView
                 }
 
                 /*
-                 * Let function keys be handled by PrimaryWindow.
+                 * Function are already handled by PrimaryWindow; once it has
+                 * all Fn for all modifiers we shouldn't see this.
                  */
 
                 if ((key == Keyval.F1) || (key == Keyval.F2) || (key == Keyval.F3) || (key == Keyval.F4)
                         || (key == Keyval.F5) || (key == Keyval.F6) || (key == Keyval.F7)
                         || (key == Keyval.F8) || (key == Keyval.F9) || (key == Keyval.F10)
                         || ((key == Keyval.F11) || (key == Keyval.F12))) {
-                    return false;
+                    return true;
                 }
 
                 if (key == Keyval.Escape) {
@@ -882,6 +883,8 @@ abstract class EditorTextView extends TextView
             s = entire.get(i);
             insertSpan(pointer, s);
         }
+
+        checkSpellingRange(0, chain.length());
     }
 
     private void insertSpan(TextIter pointer, Span span) {

@@ -147,7 +147,7 @@ public class UnicodeSpan extends Span
      * wide. Position is from 0 to width.
      */
     public int getChar(int position) {
-        return this.points[position];
+        return this.points[start + position];
     }
 
     /**

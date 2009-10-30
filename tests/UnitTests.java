@@ -26,6 +26,7 @@ import quill.textbase.ValidateUnicode;
 import quill.textbase.ValidateWordExtraction;
 import quill.textbase.ValidateWrapperExpansions;
 import quill.ui.ValidateChangePropagation;
+import quill.ui.ValidateSpellingOperations;
 
 public class UnitTests
 {
@@ -64,6 +65,7 @@ public class UnitTests
         suite.addTestSuite(ValidateFileNaming.class);
         suite.addTestSuite(ValidateChangePropagation.class);
         suite.addTestSuite(ValidateWordExtraction.class);
+        suite.addTestSuite(ValidateSpellingOperations.class);
 
         return suite;
     }

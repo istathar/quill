@@ -15,7 +15,9 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
+import org.gnome.gtk.Container;
 import org.gnome.gtk.Gtk;
+import org.gnome.gtk.Widget;
 
 import static java.lang.Thread.sleep;
 
@@ -136,5 +138,47 @@ public abstract class GraphicalTestCase extends TestCase
         } catch (IllegalThreadStateException itse) {
             // good
         }
+    }
+
+    // recursive
+    protected static Widget findEditor(Widget widget) {
+        final Container container;
+        final Widget[] children;
+        Widget child, result;
+        int i;
+
+        assertTrue(widget instanceof Container);
+        container = (Container) widget;
+        children = container.getChildren();
+
+        for (i = 0; i < children.length; i++) {
+            child = children[i];
+
+            if (child instanceof NormalEditorTextView) {
+                return child;
+            }
+
+            if (child instanceof Container) {
+                result = findEditor(child);
+                if (result != null) {
+                    return result;
+                }
+            }
+
+        }
+        return null;
+    }
+
+    protected static String combine(String[] elements) {
+        StringBuilder buf;
+
+        buf = new StringBuilder(128);
+
+        for (String element : elements) {
+            buf.append(element);
+            buf.append('\n');
+        }
+
+        return buf.toString();
     }
 }
