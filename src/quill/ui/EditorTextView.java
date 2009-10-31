@@ -118,7 +118,7 @@ abstract class EditorTextView extends TextView
      * Override this and return true if you want TAB characters to be inserted
      * rather than swollowed.
      */
-    protected boolean isCodeBlock() {
+    protected boolean isTabAllowed() {
         return false;
     }
 
@@ -269,7 +269,7 @@ abstract class EditorTextView extends TextView
                      */
 
                     if (key == Keyval.Tab) {
-                        if (isCodeBlock()) {
+                        if (isTabAllowed()) {
                             insertText("\t");
                         }
                         return true;
