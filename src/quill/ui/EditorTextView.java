@@ -1304,33 +1304,4 @@ abstract class EditorTextView extends TextView
             alpha = omega;
         }
     }
-
-    /*
-     * Primative placeholder while we explore spelling issues
-     */
-    private void checkSpellingAt(int offset) {
-        final Extract extract;
-        final int alpha, omega;
-        final String word;
-        final TextIter start, end;
-
-        if (offset > 0) {
-            offset--;
-        }
-
-        alpha = chain.wordBoundaryBefore(offset);
-        omega = chain.wordBoundaryAfter(offset);
-
-        extract = chain.extractRange(alpha, omega - alpha);
-        word = makeWordFromSpans(extract);
-
-        start = buffer.getIter(alpha);
-        end = buffer.getIter(omega);
-
-        if (ui.dict.check(word)) {
-            buffer.removeTag(spelling, start, end);
-        } else {
-            buffer.applyTag(spelling, start, end);
-        }
-    }
 }
