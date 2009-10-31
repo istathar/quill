@@ -22,8 +22,14 @@ public abstract class Markup
      */
     private final String name;
 
-    protected Markup(String name) {
+    /**
+     * Should text with this markup be spell checked?
+     */
+    private final boolean spellCheck;
+
+    protected Markup(String name, boolean spellCheck) {
         this.name = name;
+        this.spellCheck = spellCheck;
     }
 
     public String toString() {
@@ -105,4 +111,10 @@ public abstract class Markup
         return false;
     }
 
+    /**
+     * Should a Span with this Markup be spell checked?
+     */
+    public boolean isSpellCheckable() {
+        return spellCheck;
+    }
 }

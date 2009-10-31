@@ -20,23 +20,23 @@ package quill.textbase;
  */
 public class Common extends Markup
 {
-    private Common(String variant) {
-        super("Common." + variant);
+    private Common(String variant, boolean spellCheck) {
+        super("Common." + variant, spellCheck);
     }
 
-    public static final Common ITALICS = new Common("ITALICS");
+    public static final Common ITALICS = new Common("ITALICS", true);
 
-    public static final Common BOLD = new Common("BOLD");
+    public static final Common BOLD = new Common("BOLD", true);
 
-    public static final Common FILENAME = new Common("FILENAME");
+    public static final Common FILENAME = new Common("FILENAME", false);
 
-    public static final Common TYPE = new Common("TYPE");
+    public static final Common TYPE = new Common("TYPE", false);
 
-    public static final Common LITERAL = new Common("CODE");
+    public static final Common LITERAL = new Common("CODE", false);
 
-    public static final Common FUNCTION = new Common("FUNCTION");
+    public static final Common FUNCTION = new Common("FUNCTION", false);
 
-    public static final Common APPLICATION = new Common("APPLICATION");
+    public static final Common APPLICATION = new Common("APPLICATION", true);
 
-    public static final Common COMMAND = new Common("COMMAND");
+    public static final Common COMMAND = new Common("COMMAND", false);
 }

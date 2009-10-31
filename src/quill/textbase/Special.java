@@ -17,11 +17,11 @@ package quill.textbase;
  */
 public class Special extends Markup
 {
-    private Special(String variant) {
-        super("Special." + variant);
+    private Special(String variant, boolean spellCheck) {
+        super("Special." + variant, spellCheck);
     }
 
-    public static final Special NOTE = new Special("NOTE");
+    public static final Special NOTE = new Special("NOTE", false);
 
-    public static final Special CITE = new Special("CITE");
+    public static final Special CITE = new Special("CITE", false);
 }
