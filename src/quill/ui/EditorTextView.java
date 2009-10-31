@@ -1300,6 +1300,16 @@ abstract class EditorTextView extends TextView
         String word;
         TextIter start, finish;
 
+        /*
+         * Some blocks (ie PreformatSegment as presented by
+         * PreformatEditorTextView) are, by design, entirely unchecked, so
+         * bail out if so.
+         */
+
+        if (!isSpellChecked()) {
+            return;
+        }
+
         alpha = chain.wordBoundaryBefore(begin);
         omega = begin;
         done = chain.wordBoundaryAfter(end);
