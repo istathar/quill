@@ -363,16 +363,26 @@ abstract class EditorTextView extends TextView
                     }
                 }
 
-                if (mod == ModifierType.LOCK_MASK) {
+                /*
+                 * Going through this is a big excessive, but it gives us a
+                 * differentiator for debugging.
+                 */
+
+                if (mod.contains(ModifierType.LOCK_MASK) || mod.contains(ModifierType.WINDOW_MASK)
+                        || mod.contains(ModifierType.ALT_MASK)
+                        || mod.contains(ModifierType.BUTTON_LEFT_MASK)
+                        || mod.contains(ModifierType.BUTTON_MIDDLE_MASK)
+                        || mod.contains(ModifierType.BUTTON_RIGHT_MASK)) {
                     /*
-                     * No keybinding needed, pass through.
+                     * Absorb as a defensive measure.
                      */
-                    return false;
+                    return true;
                 }
 
                 /*
                  * We didn't handle it, and are assuming we're capable of
-                 * handing all keyboard input. Boom :(
+                 * handing all keyboard input. If something that gets through
+                 * mutates the buffer it will cause a crash.
                  */
 
                 throw new IllegalStateException("\n" + "Unhandled " + key + " with " + mod);
