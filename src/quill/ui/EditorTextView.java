@@ -118,7 +118,7 @@ abstract class EditorTextView extends TextView
      * Override this and return true if you want TAB characters to be inserted
      * rather than swollowed.
      */
-    protected boolean isCodeBlock() {
+    protected boolean isTabAllowed() {
         return false;
     }
 
@@ -269,7 +269,7 @@ abstract class EditorTextView extends TextView
                      */
 
                     if (key == Keyval.Tab) {
-                        if (isCodeBlock()) {
+                        if (isTabAllowed()) {
                             insertText("\t");
                         }
                         return true;
@@ -1235,6 +1235,21 @@ abstract class EditorTextView extends TextView
         }
     }
 
+    /*
+     * If a word has any range of non-spell checkable markup, then the whole
+     * word is not to be checkable.
+     */
+    private static boolean skipSpellCheck(Markup markup) {
+        if (markup == null) {
+            return false; // normal
+        }
+        if (markup.isSpellCheckable()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     private static String makeWordFromSpans(Extract extract) {
         final StringBuilder str;
         int i, I, j, J;
@@ -1242,13 +1257,27 @@ abstract class EditorTextView extends TextView
 
         I = extract.size();
 
+        if (I == 0) {
+            return "";
+        }
+
+        s = extract.get(0);
+
         if (I == 1) {
-            return extract.get(0).getText();
+            if (skipSpellCheck(s.getMarkup())) {
+                return "";
+            } else {
+                return s.getText();
+            }
         } else {
             str = new StringBuilder();
 
             for (i = 0; i < I; i++) {
                 s = extract.get(i);
+
+                if (skipSpellCheck(s.getMarkup())) {
+                    return "";
+                }
 
                 J = s.getWidth();
 
@@ -1270,6 +1299,16 @@ abstract class EditorTextView extends TextView
         Extract extract;
         String word;
         TextIter start, finish;
+
+        /*
+         * Some blocks (ie PreformatSegment as presented by
+         * PreformatEditorTextView) are, by design, entirely unchecked, so
+         * bail out if so.
+         */
+
+        if (!isSpellChecked()) {
+            return;
+        }
 
         alpha = chain.wordBoundaryBefore(begin);
         omega = begin;
@@ -1293,44 +1332,14 @@ abstract class EditorTextView extends TextView
             extract = chain.extractRange(alpha, omega - alpha);
             word = makeWordFromSpans(extract);
 
-            start = buffer.getIter(alpha);
-            finish = buffer.getIter(omega);
-
             if (!ui.dict.check(word)) {
+                start = buffer.getIter(alpha);
+                finish = buffer.getIter(omega);
                 buffer.applyTag(spelling, start, finish);
             }
 
             omega++;
             alpha = omega;
-        }
-    }
-
-    /*
-     * Primative placeholder while we explore spelling issues
-     */
-    private void checkSpellingAt(int offset) {
-        final Extract extract;
-        final int alpha, omega;
-        final String word;
-        final TextIter start, end;
-
-        if (offset > 0) {
-            offset--;
-        }
-
-        alpha = chain.wordBoundaryBefore(offset);
-        omega = chain.wordBoundaryAfter(offset);
-
-        extract = chain.extractRange(alpha, omega - alpha);
-        word = makeWordFromSpans(extract);
-
-        start = buffer.getIter(alpha);
-        end = buffer.getIter(omega);
-
-        if (ui.dict.check(word)) {
-            buffer.removeTag(spelling, start, end);
-        } else {
-            buffer.applyTag(spelling, start, end);
         }
     }
 }

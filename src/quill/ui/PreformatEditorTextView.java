@@ -24,7 +24,7 @@ class PreformatEditorTextView extends EditorTextView
         view.setWrapMode(WrapMode.NONE);
     }
 
-    protected boolean isCodeBlock() {
+    protected boolean isTabAllowed() {
         return true;
     }
 

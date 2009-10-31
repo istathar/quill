@@ -19,7 +19,7 @@ package quill.textbase;
 public class Frame extends Markup
 {
     public Frame() {
-        super("Frame.FIXME");
+        super("Frame.FIXME", false);
     }
 
     /*

@@ -22,15 +22,9 @@ package quill.textbase;
  */
 public class Preformat extends Markup
 {
-    private Preformat(String variant) {
-        super("Preformat." + variant);
+    private Preformat(String variant, boolean spellCheck) {
+        super("Preformat." + variant, spellCheck);
     }
 
-    /*
-     * Unlike the Parapgraph case which is currently assumed for markup =
-     * null, we need a way to signal ProgramListing blocks.
-     */
-    public static final Preformat NORMAL = new Preformat("NORMAL");
-
-    public static final Preformat USERINPUT = new Preformat("USERINPUT");
+    public static final Preformat USERINPUT = new Preformat("USERINPUT", false);
 }
