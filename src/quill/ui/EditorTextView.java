@@ -167,8 +167,7 @@ abstract class EditorTextView extends TextView
 
                 key = event.getKeyval();
 
-                if ((key == Keyval.Home) || (key == Keyval.End) || (key == Keyval.PageUp)
-                        || (key == Keyval.PageDown) || (key == Keyval.Compose)) {
+                if ((key == Keyval.Home) || (key == Keyval.End) || (key == Keyval.Compose)) {
                     return false;
                 }
 
@@ -257,6 +256,14 @@ abstract class EditorTextView extends TextView
                     if (key == Keyval.Right) {
                         return handleCursorRight();
                     }
+
+                    if (key == Keyval.PageUp) {
+                        return handlePageUp();
+                    }
+                    if (key == Keyval.PageDown) {
+                        return handlePageDown();
+                    }
+
                     x = -1;
 
                     /*
@@ -1243,6 +1250,19 @@ abstract class EditorTextView extends TextView
         } else {
             return false;
         }
+    }
+
+    private boolean handlePageUp() {
+        return false;
+    }
+
+    private boolean handlePageDown() {
+        final ComponentEditorWidget parent;
+        final int len;
+
+        parent = findComponentEditor(view);
+        parent.movePageDown();
+        return true;
     }
 
     /*

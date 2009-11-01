@@ -371,4 +371,18 @@ class ComponentEditorWidget extends ScrolledWindow
         editor.placeCursorFirstLine(position);
         editor.grabFocus();
     }
+
+    void movePageDown() {
+        int v, h, H;
+
+        v = (int) adj.getValue();
+        h = (int) adj.getPageSize();
+        H = (int) adj.getUpper();
+
+        if (v + h > H - h) {
+            adj.setValue(H - h);
+        } else {
+            adj.setValue(v + h);
+        }
+    }
 }
