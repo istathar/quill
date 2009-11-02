@@ -384,33 +384,41 @@ class ComponentEditorWidget extends ScrolledWindow
 
         max = H - h;
 
-        if (v == max) {
-            /*
-             * If we're already on the last pagefull, we jump to the last
-             * character of the last editor.
-             */
+        /*
+         * If we're already on the last pagefull, we jump to the last
+         * character of the last editor. Otherwise we add a page size. If
+         * that's greater than the maximum available, then place us on the
+         * last page.
+         */
 
+        if (v == max) {
             editor = findEditorLast();
             editor.placeCursorLastLine(-1);
         } else {
-            /*
-             * Otherwise we add a page size. If that's greater than the max,
-             * then set it to upper - page size.
-             */
 
             aim = v + h;
 
             if (aim > max) {
                 adj.setValue(max);
                 t = max;
+                /*
+                 * In the case where y - v is 0 (or small), the cursor doesn't
+                 * always make it onto a full line, and this causes the
+                 * ScrolledWindow to jump back (care of the CursorPosition
+                 * handler), inhibiting us from paging down to the end. This
+                 * forces the cursor down far enough that its corresponding
+                 * row is completely on screen, so no jump. This probably
+                 * should be calculated based on font sizes, not hardcoded.
+                 */
+                t += 15;
             } else {
                 adj.setValue(aim);
                 t = aim;
             }
 
             /*
-             * Now find the Editor at the vertical co-ordinate corresponding
-             * to where the cursor was previously.
+             * Now find the Editor at the coordinate corresponding to where
+             * the cursor was previously, and send the cursor there.
              */
 
             t += y - v;
@@ -431,7 +439,7 @@ class ComponentEditorWidget extends ScrolledWindow
      * Copied from GraphicalTestCase.
      */
     // recursive
-    static Widget findEditorIn(Widget widget) {
+    private static Widget findEditorIn(Widget widget) {
         final Container container;
         final Widget[] children;
         Widget child, result;
@@ -462,7 +470,7 @@ class ComponentEditorWidget extends ScrolledWindow
         return null;
     }
 
-    EditorTextView findEditorAt(int y) {
+    private EditorTextView findEditorAt(int y) {
         final Widget[] children;
         int i, Y;
         Widget child;
@@ -484,7 +492,7 @@ class ComponentEditorWidget extends ScrolledWindow
         return (EditorTextView) findEditorIn(child);
     }
 
-    EditorTextView findEditorLast() {
+    private EditorTextView findEditorLast() {
         final Widget[] children;
         final int i;
 
