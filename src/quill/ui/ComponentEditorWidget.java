@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gnome.gtk.Adjustment;
+import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Container;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ScrolledWindow;
@@ -372,17 +373,100 @@ class ComponentEditorWidget extends ScrolledWindow
         editor.grabFocus();
     }
 
-    void movePageDown() {
-        int v, h, H;
+    void movePageDown(final int x, final int y) {
+        final int v, h, H;
+        int t;
+        final EditorTextView editor;
 
         v = (int) adj.getValue();
         h = (int) adj.getPageSize();
         H = (int) adj.getUpper();
 
         if (v + h > H - h) {
-            adj.setValue(H - h);
+            t = H - h;
         } else {
-            adj.setValue(v + h);
+            t = v + h;
         }
+
+        adj.setValue(t);
+
+        /*
+         * Now find the Editor at the vertical co-ordinate corresponding to
+         * where the cursor was previously.
+         */
+
+        t += y - v;
+
+        editor = findEditorAt(t);
+
+        if (t > H) {
+            editor.placeCursorLastLine(-1);
+        } else {
+            editor.placeCursorAtLocation(x, t);
+        }
+        editor.grabFocus();
+    }
+
+    /**
+     * Some EditorTextViews are nested in other containers (notably
+     * ScrolledWindows) to provide desired UI effects. So given a Widget that
+     * is either a Container or an Editor, descend down the hierarchy until we
+     * find the actual EditorTextView.
+     */
+    /*
+     * Copied from GraphicalTestCase.
+     */
+    // recursive
+    static Widget findEditorIn(Widget widget) {
+        final Container container;
+        final Widget[] children;
+        Widget child, result;
+        int i;
+
+        if (widget instanceof EditorTextView) {
+            return widget;
+        }
+
+        container = (Container) widget;
+        children = container.getChildren();
+
+        for (i = 0; i < children.length; i++) {
+            child = children[i];
+
+            if (child instanceof EditorTextView) {
+                return child;
+            }
+
+            if (child instanceof Container) {
+                result = findEditorIn(child);
+                if (result != null) {
+                    return result;
+                }
+            }
+
+        }
+        return null;
+    }
+
+    EditorTextView findEditorAt(int y) {
+        final Widget[] children;
+        int i, Y;
+        Widget child;
+        Allocation alloc;
+
+        children = box.getChildren();
+        child = null;
+
+        for (i = 0; i < children.length; i++) {
+            child = children[i];
+            alloc = child.getAllocation();
+            Y = alloc.getY() + alloc.getHeight();
+
+            if (Y > y) {
+                break;
+            }
+        }
+
+        return (EditorTextView) findEditorIn(child);
     }
 }

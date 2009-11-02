@@ -1159,6 +1159,23 @@ abstract class EditorTextView extends TextView
         buffer.placeCursor(pointer);
     }
 
+    void placeCursorAtLocation(final int requested, final int target) {
+        final Allocation alloc;
+        final TextIter pointer;
+        final int X, Y, y;
+
+        X = view.convertWindowToBufferCoordsX(TEXT, requested);
+        x = requested;
+
+        alloc = this.getAllocation();
+        y = target - alloc.getY();
+        Y = view.convertWindowToBufferCoordsY(TEXT, y);
+
+        pointer = view.getIterAtLocation(X, Y);
+
+        buffer.placeCursor(pointer);
+    }
+
     private boolean handleCursorUp() {
         TextIter pointer;
         final ComponentEditorWidget parent;
@@ -1257,11 +1274,27 @@ abstract class EditorTextView extends TextView
     }
 
     private boolean handlePageDown() {
+        final TextIter pointer;
+        final Rectangle rect;
+        final Allocation alloc;
         final ComponentEditorWidget parent;
-        final int len;
+        final int y, Y, X;
+
+        pointer = buffer.getIter(insertOffset);
+        rect = view.getLocation(pointer);
+        alloc = view.getAllocation();
+
+        if (x == -1) {
+            X = rect.getX();
+            x = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X);
+        }
+
+        Y = alloc.getY() + rect.getY();
+        y = view.convertBufferToWindowCoordsY(TEXT, Y);
 
         parent = findComponentEditor(view);
-        parent.movePageDown();
+        parent.movePageDown(x, y);
+
         return true;
     }
 
