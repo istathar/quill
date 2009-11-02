@@ -374,7 +374,7 @@ class ComponentEditorWidget extends ScrolledWindow
     }
 
     void movePageDown(final int x, final int y) {
-        final int v, h, H;
+        final int v, h, H, max, aim;
         int t;
         final EditorTextView editor;
 
@@ -382,26 +382,40 @@ class ComponentEditorWidget extends ScrolledWindow
         h = (int) adj.getPageSize();
         H = (int) adj.getUpper();
 
-        if (v + h > H - h) {
-            t = H - h;
-        } else {
-            t = v + h;
-        }
+        max = H - h;
 
-        adj.setValue(t);
+        if (v == max) {
+            /*
+             * If we're already on the last pagefull, we jump to the last
+             * character of the last editor.
+             */
 
-        /*
-         * Now find the Editor at the vertical co-ordinate corresponding to
-         * where the cursor was previously.
-         */
-
-        t += y - v;
-
-        editor = findEditorAt(t);
-
-        if (t > H) {
+            editor = findEditorLast();
             editor.placeCursorLastLine(-1);
         } else {
+            /*
+             * Otherwise we add a page size. If that's greater than the max,
+             * then set it to upper - page size.
+             */
+
+            aim = v + h;
+
+            if (aim > max) {
+                adj.setValue(max);
+                t = max;
+            } else {
+                adj.setValue(aim);
+                t = aim;
+            }
+
+            /*
+             * Now find the Editor at the vertical co-ordinate corresponding
+             * to where the cursor was previously.
+             */
+
+            t += y - v;
+
+            editor = findEditorAt(t);
             editor.placeCursorAtLocation(x, t);
         }
         editor.grabFocus();
@@ -468,5 +482,14 @@ class ComponentEditorWidget extends ScrolledWindow
         }
 
         return (EditorTextView) findEditorIn(child);
+    }
+
+    EditorTextView findEditorLast() {
+        final Widget[] children;
+        final int i;
+
+        children = box.getChildren();
+        i = children.length - 1;
+        return (EditorTextView) children[i];
     }
 }
