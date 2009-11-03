@@ -167,8 +167,7 @@ abstract class EditorTextView extends TextView
 
                 key = event.getKeyval();
 
-                if ((key == Keyval.Home) || (key == Keyval.End) || (key == Keyval.PageUp)
-                        || (key == Keyval.PageDown) || (key == Keyval.Compose)) {
+                if ((key == Keyval.Home) || (key == Keyval.End) || (key == Keyval.Compose)) {
                     return false;
                 }
 
@@ -257,6 +256,14 @@ abstract class EditorTextView extends TextView
                     if (key == Keyval.Right) {
                         return handleCursorRight();
                     }
+
+                    if (key == Keyval.PageUp) {
+                        return handlePageUp();
+                    }
+                    if (key == Keyval.PageDown) {
+                        return handlePageDown();
+                    }
+
                     x = -1;
 
                     /*
@@ -363,16 +370,26 @@ abstract class EditorTextView extends TextView
                     }
                 }
 
-                if (mod == ModifierType.LOCK_MASK) {
+                /*
+                 * Going through this is a big excessive, but it gives us a
+                 * differentiator for debugging.
+                 */
+
+                if (mod.contains(ModifierType.LOCK_MASK) || mod.contains(ModifierType.WINDOW_MASK)
+                        || mod.contains(ModifierType.ALT_MASK)
+                        || mod.contains(ModifierType.BUTTON_LEFT_MASK)
+                        || mod.contains(ModifierType.BUTTON_MIDDLE_MASK)
+                        || mod.contains(ModifierType.BUTTON_RIGHT_MASK)) {
                     /*
-                     * No keybinding needed, pass through.
+                     * Absorb as a defensive measure.
                      */
-                    return false;
+                    return true;
                 }
 
                 /*
                  * We didn't handle it, and are assuming we're capable of
-                 * handing all keyboard input. Boom :(
+                 * handing all keyboard input. If something that gets through
+                 * mutates the buffer it will cause a crash.
                  */
 
                 throw new IllegalStateException("\n" + "Unhandled " + key + " with " + mod);
@@ -1142,6 +1159,23 @@ abstract class EditorTextView extends TextView
         buffer.placeCursor(pointer);
     }
 
+    void placeCursorAtLocation(final int requested, final int target) {
+        final Allocation alloc;
+        final TextIter pointer;
+        final int X, Y, y;
+
+        X = view.convertWindowToBufferCoordsX(TEXT, requested);
+        x = requested;
+
+        alloc = this.getAllocation();
+        y = target - alloc.getY();
+        Y = view.convertWindowToBufferCoordsY(TEXT, y);
+
+        pointer = view.getIterAtLocation(X, Y);
+
+        buffer.placeCursor(pointer);
+    }
+
     private boolean handleCursorUp() {
         TextIter pointer;
         final ComponentEditorWidget parent;
@@ -1233,6 +1267,57 @@ abstract class EditorTextView extends TextView
         } else {
             return false;
         }
+    }
+
+    // duplicate of page down
+    private boolean handlePageUp() {
+        final TextIter pointer;
+        final Rectangle rect;
+        final Allocation alloc;
+        final ComponentEditorWidget parent;
+        final int y, Y, X;
+
+        pointer = buffer.getIter(insertOffset);
+        rect = view.getLocation(pointer);
+        alloc = view.getAllocation();
+
+        if (x == -1) {
+            X = rect.getX();
+            x = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X);
+        }
+
+        Y = alloc.getY() + rect.getY();
+        y = view.convertBufferToWindowCoordsY(TEXT, Y);
+
+        parent = findComponentEditor(view);
+        parent.movePageUp(x, y);
+
+        return true;
+    }
+
+    private boolean handlePageDown() {
+        final TextIter pointer;
+        final Rectangle rect;
+        final Allocation alloc;
+        final ComponentEditorWidget parent;
+        final int y, Y, X;
+
+        pointer = buffer.getIter(insertOffset);
+        rect = view.getLocation(pointer);
+        alloc = view.getAllocation();
+
+        if (x == -1) {
+            X = rect.getX();
+            x = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X);
+        }
+
+        Y = alloc.getY() + rect.getY();
+        y = view.convertBufferToWindowCoordsY(TEXT, Y);
+
+        parent = findComponentEditor(view);
+        parent.movePageDown(x, y);
+
+        return true;
     }
 
     /*

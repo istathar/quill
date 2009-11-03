@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gnome.gtk.Adjustment;
+import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Container;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ScrolledWindow;
@@ -370,5 +371,172 @@ class ComponentEditorWidget extends ScrolledWindow
         editor = (EditorTextView) below;
         editor.placeCursorFirstLine(position);
         editor.grabFocus();
+    }
+
+    // page down written first. See there.
+    void movePageUp(final int x, final int y) {
+        final int v, h, H, min, max, aim;
+        int t;
+        final EditorTextView editor;
+
+        v = (int) adj.getValue();
+        h = (int) adj.getPageSize();
+        H = (int) adj.getUpper();
+
+        min = 0;
+
+        if (v == 0) {
+            editor = findEditorFirst();
+            editor.placeCursorFirstLine(0);
+        } else {
+            aim = v - h;
+
+            if (aim < 0) {
+                adj.setValue(0);
+                t = 0;
+            } else {
+                adj.setValue(aim);
+                t = aim;
+            }
+
+            t += y - v;
+
+            editor = findEditorAt(t);
+            editor.placeCursorAtLocation(x, t);
+        }
+        editor.grabFocus();
+    }
+
+    void movePageDown(final int x, final int y) {
+        final int v, h, H, max, aim;
+        int t;
+        final EditorTextView editor;
+
+        v = (int) adj.getValue();
+        h = (int) adj.getPageSize();
+        H = (int) adj.getUpper();
+
+        max = H - h;
+
+        /*
+         * If we're already on the last page, we jump to the last character of
+         * the last editor. Otherwise we add a page size. If that's greater
+         * than the maximum available, then place us on the last page.
+         */
+
+        if (v == max) {
+            editor = findEditorLast();
+            editor.placeCursorLastLine(-1);
+        } else {
+
+            aim = v + h;
+
+            if (aim > max) {
+                adj.setValue(max);
+                /*
+                 * In the case where y - v is 0 (or small), the cursor doesn't
+                 * always make it onto a full line, and this causes the
+                 * ScrolledWindow to jump back (care of the CursorPosition
+                 * handler), inhibiting us from paging down to the end. This
+                 * forces the cursor down far enough that its corresponding
+                 * row is completely on screen, so no jump. This probably
+                 * should be calculated based on font sizes, not hardcoded.
+                 */
+                t = max + 15;
+            } else {
+                adj.setValue(aim);
+                t = aim;
+            }
+
+            /*
+             * Now find the Editor at the coordinate corresponding to where
+             * the cursor was previously, and send the cursor there.
+             */
+
+            t += y - v;
+
+            editor = findEditorAt(t);
+            editor.placeCursorAtLocation(x, t);
+        }
+        editor.grabFocus();
+    }
+
+    /**
+     * Some EditorTextViews are nested in other containers (notably
+     * ScrolledWindows) to provide desired UI effects. So given a Widget that
+     * is either a Container or an Editor, descend down the hierarchy until we
+     * find the actual EditorTextView.
+     */
+    /*
+     * Copied from GraphicalTestCase.
+     */
+    // recursive
+    private static Widget findEditorIn(Widget widget) {
+        final Container container;
+        final Widget[] children;
+        Widget child, result;
+        int i;
+
+        if (widget instanceof EditorTextView) {
+            return widget;
+        }
+
+        container = (Container) widget;
+        children = container.getChildren();
+
+        for (i = 0; i < children.length; i++) {
+            child = children[i];
+
+            if (child instanceof EditorTextView) {
+                return child;
+            }
+
+            if (child instanceof Container) {
+                result = findEditorIn(child);
+                if (result != null) {
+                    return result;
+                }
+            }
+
+        }
+        return null;
+    }
+
+    private EditorTextView findEditorAt(int y) {
+        final Widget[] children;
+        int i, Y;
+        Widget child;
+        Allocation alloc;
+
+        children = box.getChildren();
+        child = null;
+
+        for (i = 0; i < children.length; i++) {
+            child = children[i];
+            alloc = child.getAllocation();
+            Y = alloc.getY() + alloc.getHeight();
+
+            if (Y > y) {
+                break;
+            }
+        }
+
+        return (EditorTextView) findEditorIn(child);
+    }
+
+    private EditorTextView findEditorFirst() {
+        final Widget[] children;
+
+        children = box.getChildren();
+        return (EditorTextView) findEditorIn(children[0]);
+    }
+
+    private EditorTextView findEditorLast() {
+        final Widget[] children;
+        final int i;
+
+        children = box.getChildren();
+        i = children.length - 1;
+        return (EditorTextView) findEditorIn(children[i]);
     }
 }
