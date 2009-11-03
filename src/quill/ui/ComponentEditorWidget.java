@@ -373,6 +373,40 @@ class ComponentEditorWidget extends ScrolledWindow
         editor.grabFocus();
     }
 
+    // page down written first. See there.
+    void movePageUp(final int x, final int y) {
+        final int v, h, H, min, max, aim;
+        int t;
+        final EditorTextView editor;
+
+        v = (int) adj.getValue();
+        h = (int) adj.getPageSize();
+        H = (int) adj.getUpper();
+
+        min = 0;
+
+        if (v == 0) {
+            editor = findEditorFirst();
+            editor.placeCursorFirstLine(0);
+        } else {
+            aim = v - h;
+
+            if (aim < 0) {
+                adj.setValue(0);
+                t = 0;
+            } else {
+                adj.setValue(aim);
+                t = aim;
+            }
+
+            t += y - v;
+
+            editor = findEditorAt(t);
+            editor.placeCursorAtLocation(x, t);
+        }
+        editor.grabFocus();
+    }
+
     void movePageDown(final int x, final int y) {
         final int v, h, H, max, aim;
         int t;
@@ -385,10 +419,9 @@ class ComponentEditorWidget extends ScrolledWindow
         max = H - h;
 
         /*
-         * If we're already on the last pagefull, we jump to the last
-         * character of the last editor. Otherwise we add a page size. If
-         * that's greater than the maximum available, then place us on the
-         * last page.
+         * If we're already on the last page, we jump to the last character of
+         * the last editor. Otherwise we add a page size. If that's greater
+         * than the maximum available, then place us on the last page.
          */
 
         if (v == max) {
@@ -400,7 +433,6 @@ class ComponentEditorWidget extends ScrolledWindow
 
             if (aim > max) {
                 adj.setValue(max);
-                t = max;
                 /*
                  * In the case where y - v is 0 (or small), the cursor doesn't
                  * always make it onto a full line, and this causes the
@@ -410,7 +442,7 @@ class ComponentEditorWidget extends ScrolledWindow
                  * row is completely on screen, so no jump. This probably
                  * should be calculated based on font sizes, not hardcoded.
                  */
-                t += 15;
+                t = max + 15;
             } else {
                 adj.setValue(aim);
                 t = aim;
@@ -492,12 +524,19 @@ class ComponentEditorWidget extends ScrolledWindow
         return (EditorTextView) findEditorIn(child);
     }
 
+    private EditorTextView findEditorFirst() {
+        final Widget[] children;
+
+        children = box.getChildren();
+        return (EditorTextView) findEditorIn(children[0]);
+    }
+
     private EditorTextView findEditorLast() {
         final Widget[] children;
         final int i;
 
         children = box.getChildren();
         i = children.length - 1;
-        return (EditorTextView) children[i];
+        return (EditorTextView) findEditorIn(children[i]);
     }
 }

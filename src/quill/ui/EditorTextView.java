@@ -1269,8 +1269,30 @@ abstract class EditorTextView extends TextView
         }
     }
 
+    // duplicate of page down
     private boolean handlePageUp() {
-        return false;
+        final TextIter pointer;
+        final Rectangle rect;
+        final Allocation alloc;
+        final ComponentEditorWidget parent;
+        final int y, Y, X;
+
+        pointer = buffer.getIter(insertOffset);
+        rect = view.getLocation(pointer);
+        alloc = view.getAllocation();
+
+        if (x == -1) {
+            X = rect.getX();
+            x = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X);
+        }
+
+        Y = alloc.getY() + rect.getY();
+        y = view.convertBufferToWindowCoordsY(TEXT, Y);
+
+        parent = findComponentEditor(view);
+        parent.movePageUp(x, y);
+
+        return true;
     }
 
     private boolean handlePageDown() {
