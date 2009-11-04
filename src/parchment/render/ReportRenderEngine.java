@@ -17,6 +17,6 @@ import quill.textbase.Series;
 public class ReportRenderEngine extends RenderEngine
 {
     public ReportRenderEngine(PaperSize paper, Series series) {
-        super(PaperSize.A4, series);
+        super(paper, series);
     }
 }
