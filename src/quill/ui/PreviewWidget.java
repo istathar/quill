@@ -14,8 +14,10 @@ import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Matrix;
 import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Allocation;
+import org.gnome.gtk.CustomPaperSize;
 import org.gnome.gtk.DrawingArea;
 import org.gnome.gtk.PaperSize;
+import org.gnome.gtk.Unit;
 import org.gnome.gtk.Widget;
 
 import parchment.render.RenderEngine;
@@ -62,10 +64,14 @@ class PreviewWidget extends DrawingArea
 
         this.connect(new Widget.ExposeEvent() {
             public boolean onExposeEvent(Widget source, EventExpose event) {
+                final PaperSize paper;
                 final RenderEngine engine;
                 final Context cr;
 
-                engine = new ReportRenderEngine(PaperSize.A4, series);
+                // engine = new ReportRenderEngine(PaperSize.A4, series);
+
+                paper = new CustomPaperSize("Widescreen", 400, 300, Unit.MM);
+                engine = new ReportRenderEngine(paper, series);
 
                 cr = new Context(source.getWindow());
 

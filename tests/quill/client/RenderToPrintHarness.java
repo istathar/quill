@@ -50,19 +50,24 @@ public class RenderToPrintHarness
         final Context cr;
         final Surface surface;
         final Folio folio;
+        final PaperSize paper;
         final RenderEngine engine;
 
         /*
          * Setup a bogus target surface
          */
 
-        surface = new PdfSurface("tmp/Render.pdf", PaperSize.A4.getWidth(Unit.POINTS),
-                PaperSize.A4.getHeight(Unit.POINTS));
+        paper = PaperSize.A4;
+        // paper = new CustomPaperSize("Widescreen", 200.0, 150.0, Unit.MM);
+
+        surface = new PdfSurface("tmp/Render.pdf", paper.getWidth(Unit.POINTS),
+                paper.getHeight(Unit.POINTS));
         cr = new Context(surface);
 
         folio = data.getActiveDocument();
 
-        engine = new ReportRenderEngine(PaperSize.A4, folio.get(0));
+        engine = new ReportRenderEngine(paper, folio.get(0));
+        // engine = new ScreenRenderEngine(paper, folio.get(0));
         engine.render(cr);
 
         surface.finish();
