@@ -126,7 +126,7 @@ public abstract class RenderEngine
      * This will move to the actual RenderEngine subclass, I expect.
      */
     protected void specifyFonts(final Context cr) {
-        serifFace = new Typeface(cr, new FontDescription("Charis SIL, 8.0"), -4.5);
+        serifFace = new Typeface(cr, new FontDescription("Linux Libertine O, 9.0"), 0.2);
 
         monoFace = new Typeface(cr, new FontDescription("Inconsolata, 8.3"), 0.0);
 
