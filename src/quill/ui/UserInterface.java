@@ -241,6 +241,8 @@ public class UserInterface
         }
     }
 
+    public void printDocument() {}
+
     /**
      * Pick the latest Change off the ChangeStack, and then do something with
      * it
