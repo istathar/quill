@@ -62,10 +62,16 @@ class PreviewWidget extends DrawingArea
 
         this.connect(new Widget.ExposeEvent() {
             public boolean onExposeEvent(Widget source, EventExpose event) {
+                final PaperSize paper;
                 final RenderEngine engine;
                 final Context cr;
 
-                engine = new ReportRenderEngine(PaperSize.A4, series);
+                // paper = new CustomPaperSize("Widescreen", 400, 300,
+                // Unit.MM);
+                paper = PaperSize.A4;
+
+                // engine = new ReportRenderEngine(PaperSize.A4, series);
+                engine = new ReportRenderEngine(paper, series);
 
                 cr = new Context(source.getWindow());
 

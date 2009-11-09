@@ -67,7 +67,7 @@ in a number of ways.
 </text>
 <text>
 The most commonly used flag,
-<literal>GFP_KERNEL</literal> , means that
+<literal>GFP_KERNEL</literal>, means that
 the allocation (internally performed by calling,
 eventually, <function>__get_free_pages</function>,
 which is the source of the <literal>GFP_</literal>
@@ -131,16 +131,16 @@ platforms.
 </text>
 <text>
 The Linux kernel knows about a minimum of
-three <italics>memory zones</italics> :
-DMA-capable memory, normal memory, and high
-memory. While allocation normally happens
-in the <italics>normal</italics> zone,
-setting either of the bits just mentioned
-requires memory to be allocated from a different
-zone. The idea is that every computer platform
-that must know about special memory ranges
-(instead of considering all RAM equivalents)
-will fall into this abstraction.
+three <italics>memory zones</italics>: DMA-capable
+memory, normal memory, and high memory. While
+allocation normally happens in the
+<italics>normal</italics> zone, setting either
+of the bits just mentioned requires memory
+to be allocated from a different zone. The
+idea is that every computer platform that
+must know about special memory ranges (instead
+of considering all RAM equivalents) will
+fall into this abstraction.
 </text>
 <text>
 <italics>DMA-capable memory</italics> is
