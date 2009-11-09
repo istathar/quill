@@ -16,6 +16,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.freedesktop.cairo.Context;
+import org.freedesktop.cairo.PdfSurface;
+import org.freedesktop.cairo.Surface;
 import org.freedesktop.enchant.Dictionary;
 import org.freedesktop.enchant.Enchant;
 import org.gnome.gdk.EventOwnerChange;
@@ -25,9 +28,13 @@ import org.gnome.gtk.Dialog;
 import org.gnome.gtk.ErrorMessageDialog;
 import org.gnome.gtk.FileChooserDialog;
 import org.gnome.gtk.Gtk;
+import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.ResponseType;
+import org.gnome.gtk.Unit;
 import org.gnome.pango.FontDescription;
 
+import parchment.render.RenderEngine;
+import parchment.render.ReportRenderEngine;
 import quill.textbase.Change;
 import quill.textbase.DataLayer;
 import quill.textbase.Extract;
@@ -241,7 +248,48 @@ public class UserInterface
         }
     }
 
-    public void printDocument() {}
+    /**
+     * Cause the document to be printed
+     */
+    /*
+     * Passing a target filename in from here is either correct, or should be
+     * sourced from the DataLayer. The code driving the renderer probably
+     * shouldn't be here. Should it be in RenderEngine instead? Improving this
+     * will also have to wait on our establishing a proper abstraction for
+     * documents as a whole, containing settings relating to publishing. This
+     * code copied from what is presently our command line driven
+     * RenderToPrintHarness.
+     */
+    public void printDocument() {
+        final Dialog dialog;
+        final Context cr;
+        final Surface surface;
+        final Folio folio;
+        final PaperSize paper;
+        final RenderEngine engine;
+
+        try {
+            paper = PaperSize.A4;
+
+            // HARDCODE
+            surface = new PdfSurface("tmp/Render.pdf", paper.getWidth(Unit.POINTS),
+                    paper.getHeight(Unit.POINTS));
+            cr = new Context(surface);
+
+            folio = data.getActiveDocument();
+
+            // HARDCODE
+            engine = new ReportRenderEngine(paper, folio.get(0));
+            engine.render(cr);
+
+            surface.finish();
+        } catch (IOException ioe) {
+            dialog = new ErrorMessageDialog(primary, "Print failed",
+                    "There's some kind of I/O problem: " + ioe.getMessage());
+            dialog.run();
+            dialog.hide();
+        }
+    }
 
     /**
      * Pick the latest Change off the ChangeStack, and then do something with
