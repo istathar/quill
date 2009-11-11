@@ -161,6 +161,10 @@ class PrimaryWindow extends Window
                         return true;
                     }
                 } else if (mod == ModifierType.CONTROL_MASK) {
+                    if (key == Keyval.p) {
+                        ui.printDocument();
+                        return true;
+                    }
                     if (key == Keyval.s) {
                         ui.saveDocument();
                         return true;
