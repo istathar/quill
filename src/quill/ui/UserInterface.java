@@ -28,6 +28,8 @@ import org.gnome.gtk.Dialog;
 import org.gnome.gtk.ErrorMessageDialog;
 import org.gnome.gtk.FileChooserDialog;
 import org.gnome.gtk.Gtk;
+import org.gnome.gtk.InfoMessageDialog;
+import org.gnome.gtk.MessageDialog;
 import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.ResponseType;
 import org.gnome.gtk.Unit;
@@ -261,7 +263,10 @@ public class UserInterface
      * RenderToPrintHarness.
      */
     public void printDocument() {
-        final Dialog dialog;
+        final File save;
+        final String fullname, basename, targetname;
+        int i;
+        MessageDialog dialog;
         final Context cr;
         final Surface surface;
         final Folio folio;
@@ -271,8 +276,30 @@ public class UserInterface
         try {
             paper = PaperSize.A4;
 
-            // HARDCODE
-            surface = new PdfSurface("tmp/Render.pdf", paper.getWidth(Unit.POINTS),
+            save = data.getFilename();
+            if (save == null) {
+                dialog = new InfoMessageDialog(primary, "Set filename first",
+                        "You can't print the document (to PDF) until you've set the filename of this document. "
+                                + "Choose <b>Save As...</b>, then come back and try again!");
+                dialog.setSecondaryUseMarkup(true);
+                dialog.run();
+                dialog.hide();
+                return;
+            }
+
+            fullname = save.getAbsolutePath();
+
+            /*
+             * Work out the basename of the current [save] filename, then
+             * instantiate the Cairo Surface we're going to be drawing to with
+             * that basename.pdf as the target.
+             */
+
+            i = fullname.indexOf(".xml");
+            basename = fullname.substring(0, i);
+            targetname = basename + ".pdf";
+
+            surface = new PdfSurface(targetname, paper.getWidth(Unit.POINTS),
                     paper.getHeight(Unit.POINTS));
             cr = new Context(surface);
 
