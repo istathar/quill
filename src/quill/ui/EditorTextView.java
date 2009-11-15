@@ -64,7 +64,7 @@ abstract class EditorTextView extends TextView
 {
     protected final TextView view;
 
-    private TextBuffer buffer;
+    protected TextBuffer buffer;
 
     private InputMethod input;
 
