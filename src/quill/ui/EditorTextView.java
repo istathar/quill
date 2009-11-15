@@ -171,18 +171,6 @@ abstract class EditorTextView extends TextView
                     return false;
                 }
 
-                /*
-                 * Function are already handled by PrimaryWindow; once it has
-                 * all Fn for all modifiers we shouldn't see this.
-                 */
-
-                if ((key == Keyval.F1) || (key == Keyval.F2) || (key == Keyval.F3) || (key == Keyval.F4)
-                        || (key == Keyval.F5) || (key == Keyval.F6) || (key == Keyval.F7)
-                        || (key == Keyval.F8) || (key == Keyval.F9) || (key == Keyval.F10)
-                        || ((key == Keyval.F11) || (key == Keyval.F12))) {
-                    return true;
-                }
-
                 if (key == Keyval.Escape) {
                     // deliberate no-op
                     return true;
@@ -339,8 +327,9 @@ abstract class EditorTextView extends TextView
                         return handleJumpEnd();
                     } else {
                         /*
-                         * No keybinding in the editor, but PrimaryWindow will
-                         * handle program wide accelerators.
+                         * No special keybinding in the editor; PrimaryWindow
+                         * has already handled program wide accelerators. pass
+                         * through Ctrl+navigation for word-wise movement.
                          */
                         return false;
                     }
