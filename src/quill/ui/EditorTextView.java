@@ -325,6 +325,10 @@ abstract class EditorTextView extends TextView
                         return handleJumpHome();
                     } else if (key == Keyval.End) {
                         return handleJumpEnd();
+                    } else if (key == Keyval.Up) {
+                        return handleJumpUp();
+                    } else if (key == Keyval.Down) {
+                        return handleJumpDown();
                     } else {
                         /*
                          * No special keybinding in the editor; PrimaryWindow
@@ -1336,6 +1340,60 @@ abstract class EditorTextView extends TextView
 
         parent = findComponentEditor(view);
         parent.moveCursorEnd();
+
+        return true;
+    }
+
+    private boolean handleJumpUp() {
+        final TextIter pointer;
+        final ComponentEditorWidget parent;
+
+        if (insertOffset == 0) {
+            /*
+             * TODO. It would be cool to place the cursor at the start of the
+             * preceeding editor's last paragraph.
+             */
+            parent = findComponentEditor(view);
+            parent.moveCursorUp(view, -1);
+        } else {
+            pointer = buffer.getIter(insertOffset);
+
+            if (pointer.startsLine()) {
+                pointer.backwardLine();
+            }
+            while (!pointer.startsLine()) {
+                pointer.backwardChar();
+            }
+
+            buffer.placeCursor(pointer);
+        }
+
+        return true;
+    }
+
+    private boolean handleJumpDown() {
+        final TextIter pointer;
+        final ComponentEditorWidget parent;
+
+        if (insertOffset == chain.length()) {
+            /*
+             * TODO. It would be cool to place the cursor at the end of the
+             * following editor's first paragraph.
+             */
+            parent = findComponentEditor(view);
+            parent.moveCursorDown(view, 0);
+        } else {
+            pointer = buffer.getIter(insertOffset);
+
+            if (pointer.endsLine()) {
+                pointer.forwardLine();
+            }
+            while (!pointer.endsLine()) {
+                pointer.forwardChar();
+            }
+
+            buffer.placeCursor(pointer);
+        }
 
         return true;
     }
