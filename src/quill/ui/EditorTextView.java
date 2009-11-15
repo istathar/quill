@@ -167,7 +167,7 @@ abstract class EditorTextView extends TextView
 
                 key = event.getKeyval();
 
-                if ((key == Keyval.Home) || (key == Keyval.End) || (key == Keyval.Compose)) {
+                if (key == Keyval.Compose) {
                     return false;
                 }
 
@@ -264,7 +264,16 @@ abstract class EditorTextView extends TextView
                         return handlePageDown();
                     }
 
+                    /*
+                     * Other than those, we [cancel] the vertical movement
+                     * cache, and continue.
+                     */
+
                     x = -1;
+
+                    if ((key == Keyval.Home) || (key == Keyval.End)) {
+                        return false;
+                    }
 
                     /*
                      * Tab is a strange one. At first glance it is tempting to
@@ -324,6 +333,10 @@ abstract class EditorTextView extends TextView
                     } else if (key == Keyval.x) {
                         cutText();
                         return true;
+                    } else if (key == Keyval.Home) {
+                        return handleJumpHome();
+                    } else if (key == Keyval.End) {
+                        return handleJumpEnd();
                     } else {
                         /*
                          * No keybinding in the editor, but PrimaryWindow will
@@ -1316,6 +1329,24 @@ abstract class EditorTextView extends TextView
 
         parent = findComponentEditor(view);
         parent.movePageDown(x, y);
+
+        return true;
+    }
+
+    private boolean handleJumpHome() {
+        final ComponentEditorWidget parent;
+
+        parent = findComponentEditor(view);
+        parent.moveCursorStart();
+
+        return true;
+    }
+
+    private boolean handleJumpEnd() {
+        final ComponentEditorWidget parent;
+
+        parent = findComponentEditor(view);
+        parent.moveCursorEnd();
 
         return true;
     }

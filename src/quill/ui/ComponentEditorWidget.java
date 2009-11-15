@@ -539,4 +539,20 @@ class ComponentEditorWidget extends ScrolledWindow
         i = children.length - 1;
         return (EditorTextView) findEditorIn(children[i]);
     }
+
+    void moveCursorStart() {
+        final EditorTextView editor;
+
+        editor = findEditorFirst();
+        editor.placeCursorFirstLine(0);
+        editor.grabFocus();
+    }
+
+    void moveCursorEnd() {
+        final EditorTextView editor;
+
+        editor = findEditorLast();
+        editor.placeCursorLastLine(-1);
+        editor.grabFocus();
+    }
 }
