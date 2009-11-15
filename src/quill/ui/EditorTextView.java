@@ -167,20 +167,8 @@ abstract class EditorTextView extends TextView
 
                 key = event.getKeyval();
 
-                if ((key == Keyval.Home) || (key == Keyval.End) || (key == Keyval.Compose)) {
+                if (key == Keyval.Compose) {
                     return false;
-                }
-
-                /*
-                 * Function are already handled by PrimaryWindow; once it has
-                 * all Fn for all modifiers we shouldn't see this.
-                 */
-
-                if ((key == Keyval.F1) || (key == Keyval.F2) || (key == Keyval.F3) || (key == Keyval.F4)
-                        || (key == Keyval.F5) || (key == Keyval.F6) || (key == Keyval.F7)
-                        || (key == Keyval.F8) || (key == Keyval.F9) || (key == Keyval.F10)
-                        || ((key == Keyval.F11) || (key == Keyval.F12))) {
-                    return true;
                 }
 
                 if (key == Keyval.Escape) {
@@ -264,7 +252,16 @@ abstract class EditorTextView extends TextView
                         return handlePageDown();
                     }
 
+                    /*
+                     * Other than those, we [cancel] the vertical movement
+                     * cache, and continue.
+                     */
+
                     x = -1;
+
+                    if ((key == Keyval.Home) || (key == Keyval.End)) {
+                        return false;
+                    }
 
                     /*
                      * Tab is a strange one. At first glance it is tempting to
@@ -324,10 +321,19 @@ abstract class EditorTextView extends TextView
                     } else if (key == Keyval.x) {
                         cutText();
                         return true;
+                    } else if (key == Keyval.Home) {
+                        return handleJumpHome();
+                    } else if (key == Keyval.End) {
+                        return handleJumpEnd();
+                    } else if (key == Keyval.Up) {
+                        return handleJumpUp();
+                    } else if (key == Keyval.Down) {
+                        return handleJumpDown();
                     } else {
                         /*
-                         * No keybinding in the editor, but PrimaryWindow will
-                         * handle program wide accelerators.
+                         * No special keybinding in the editor; PrimaryWindow
+                         * has already handled program wide accelerators. pass
+                         * through Ctrl+navigation for word-wise movement.
                          */
                         return false;
                     }
@@ -1316,6 +1322,78 @@ abstract class EditorTextView extends TextView
 
         parent = findComponentEditor(view);
         parent.movePageDown(x, y);
+
+        return true;
+    }
+
+    private boolean handleJumpHome() {
+        final ComponentEditorWidget parent;
+
+        parent = findComponentEditor(view);
+        parent.moveCursorStart();
+
+        return true;
+    }
+
+    private boolean handleJumpEnd() {
+        final ComponentEditorWidget parent;
+
+        parent = findComponentEditor(view);
+        parent.moveCursorEnd();
+
+        return true;
+    }
+
+    private boolean handleJumpUp() {
+        final TextIter pointer;
+        final ComponentEditorWidget parent;
+
+        if (insertOffset == 0) {
+            /*
+             * TODO. It would be cool to place the cursor at the start of the
+             * preceeding editor's last paragraph.
+             */
+            parent = findComponentEditor(view);
+            parent.moveCursorUp(view, -1);
+        } else {
+            pointer = buffer.getIter(insertOffset);
+
+            if (pointer.startsLine()) {
+                pointer.backwardLine();
+            }
+            while (!pointer.startsLine()) {
+                pointer.backwardChar();
+            }
+
+            buffer.placeCursor(pointer);
+        }
+
+        return true;
+    }
+
+    private boolean handleJumpDown() {
+        final TextIter pointer;
+        final ComponentEditorWidget parent;
+
+        if (insertOffset == chain.length()) {
+            /*
+             * TODO. It would be cool to place the cursor at the end of the
+             * following editor's first paragraph.
+             */
+            parent = findComponentEditor(view);
+            parent.moveCursorDown(view, 0);
+        } else {
+            pointer = buffer.getIter(insertOffset);
+
+            if (pointer.endsLine()) {
+                pointer.forwardLine();
+            }
+            while (!pointer.endsLine()) {
+                pointer.forwardChar();
+            }
+
+            buffer.placeCursor(pointer);
+        }
 
         return true;
     }

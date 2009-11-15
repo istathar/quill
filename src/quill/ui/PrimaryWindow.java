@@ -138,11 +138,6 @@ class PrimaryWindow extends Window
                 key = event.getKeyval();
                 mod = event.getState();
 
-                /*
-                 * Let default keybindings handle cursor movement keys and for
-                 * a few other special keys we don't need to handle.
-                 */
-
                 if (mod == ModifierType.NONE) {
                     if (key == Keyval.F1) {
                         switchToHelp();
@@ -154,7 +149,14 @@ class PrimaryWindow extends Window
                         switchToOutline();
                         return true;
                     }
-                    // ...
+
+                    if ((key == Keyval.F4) || (key == Keyval.F5) || (key == Keyval.F6)
+                            || (key == Keyval.F7) || (key == Keyval.F8) || (key == Keyval.F9)
+                            || (key == Keyval.F10)) {
+                        // nothing yet
+                        return true;
+                    }
+
                     else if (key == Keyval.F11) {
                         toggleFullscreen();
                         return true;
