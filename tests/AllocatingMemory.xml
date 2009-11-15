@@ -5,7 +5,7 @@ Allocating Memory
 </title>
 <text>
 Thus far, we have used
-<function>kmalloc</function> and 
+<function>kmalloc</function> and
 <function>kfree</function> for the allocation
 and freeing of memory. The Linux kernel offers
 a richer set of memory allocation primitives,

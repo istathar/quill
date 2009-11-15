@@ -10,12 +10,24 @@
  */
 package quill.ui;
 
+import org.gnome.gtk.TextBuffer;
+
 import quill.textbase.Segment;
+
+import static quill.client.Quill.ui;
 
 public class ChapterHeadingBox extends HeadingBox
 {
     public ChapterHeadingBox(Segment segment) {
         super(segment);
+        final EditorTextView editor;
         label.setLabel("Chapter");
+
+        editor = this.getEditor();
+        editor.buffer.connect(new TextBuffer.Changed() {
+            public void onChanged(TextBuffer source) {
+                ui.primary.updateTitle();
+            }
+        });
     }
 }

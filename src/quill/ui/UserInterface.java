@@ -41,6 +41,7 @@ import quill.textbase.Change;
 import quill.textbase.DataLayer;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
+import quill.textbase.Series;
 import quill.textbase.Span;
 
 import static org.gnome.gtk.FileChooserAction.SAVE;
@@ -176,11 +177,14 @@ public class UserInterface
      * the Folio?
      */
     public void displayDocument(Folio folio) {
+        final Series series;
+
         if (folio.size() == 0) {
             throw new IllegalStateException();
         }
 
-        primary.displaySeries(folio.get(0));
+        series = folio.get(0);
+        primary.displaySeries(series);
     }
 
     void saveAs() {

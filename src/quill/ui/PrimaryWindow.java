@@ -24,6 +24,7 @@ import org.gnome.gtk.Window;
 import org.gnome.pango.FontDescription;
 
 import quill.textbase.Change;
+import quill.textbase.Segment;
 import quill.textbase.Series;
 
 import static quill.client.Quill.ui;
@@ -73,6 +74,7 @@ class PrimaryWindow extends Window
 
         window = this;
         window.setMaximize(true);
+        window.setTitle("Quill");
 
         desc = new FontDescription("Deja Vu Serif, 11");
         window.modifyFont(desc);
@@ -280,6 +282,37 @@ class PrimaryWindow extends Window
         editor.initializeSeries(series);
         preview.renderSeries(series);
         outline.renderSeries(series);
+        this.updateTitle();
+    }
+
+    /**
+     * Set or reset the Window title based on the text of the first Segment of
+     * the currently dipslayed Series (which will be the ComponentSegment
+     * leading this chapter with the chapter title).
+     */
+    /*
+     * There is a HIG question here, as to whether the application name should
+     * be in the window title. Since Open Office, Firefox, Evolution, Eclipse,
+     * and Inkscape all put their titles in, we will too. In always having
+     * "Quill" in the title, we do manage to avoid the transient ugliness that
+     * occurs when you are just entering the chapter title for the first time
+     * and have a window title with only one letter in it as you type.
+     */
+    void updateTitle() {
+        final Segment first;
+        final String title;
+        final String str;
+
+        first = series.get(0);
+        title = first.getText().toString();
+
+        if ((title == null) || (title.equals(""))) {
+            str = "Quill";
+        } else {
+            str = title + " - Quill";
+        }
+
+        super.setTitle(str);
     }
 
     void affect(Change change) {
