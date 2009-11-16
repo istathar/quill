@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -264,32 +265,42 @@ public class DataLayer
      */
     public void emergencySave() {
         final String fullname, savename;
-        final File target;
+        File target = null;
         final OutputStream out;
+        final PrintStream err;
 
-        System.err.flush();
-        System.err.print("Attempting emergency save... ");
-        System.err.flush();
+        err = System.err;
+        err.flush();
+        err.print("Attempting emergency save... ");
+        err.flush();
 
-        fullname = name.getAbsolutePath();
-        savename = fullname + ".RESCUED";
-        target = new File(savename);
+        if (name == null) {
+            fullname = "Untitled.xml"; // gotta call it something
+        } else {
+            fullname = name.getAbsolutePath();
+        }
 
         try {
+            savename = fullname + ".RESCUED";
+            target = new File(savename);
             out = new FileOutputStream(target);
             saveDocument(out);
             out.close();
         } catch (Throwable t) {
             // well, we tried
-            target.delete();
-            System.err.println("failed.");
-            System.err.flush();
-            t.printStackTrace();
+            err.println("failed.");
+            err.flush();
+
+            if (target != null) {
+                target.delete();
+            }
+
+            t.printStackTrace(err);
             return;
         }
 
-        System.err.println("done. Wrote:");
-        System.err.println(savename);
-        System.err.flush();
+        err.println("done. Wrote:");
+        err.println(savename);
+        err.flush();
     }
 }
