@@ -59,7 +59,7 @@ public class DataLayer
     }
 
     public void loadDocument(String filename) throws ValidityException, ParsingException, IOException {
-        final File source;
+        final File source, probe;
         final NodeFactory factory;
         final Builder parser;
         final Document doc;
@@ -70,6 +70,14 @@ public class DataLayer
         source = new File(filename).getAbsoluteFile();
         if (!source.exists()) {
             throw new FileNotFoundException("\n" + filename);
+        }
+
+        probe = new File(filename + ".RESCUED");
+        if (probe.exists()) {
+            throw new IllegalStateException("\n" + "A recovery file named:" + "\n" + probe.toString()
+                    + "\n" + "exists. It may contain what you were working on before Quill crashed."
+                    + "\n" + "Review it against your actual document, then move or remove the" + "\n"
+                    + "rescue file to continue.");
         }
 
         factory = new QuackNodeFactory();

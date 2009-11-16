@@ -380,6 +380,9 @@ public class UserInterface
     public void error(Exception e) {
         Dialog d;
 
+        if (primary != null) {
+            primary.hide();
+        }
         e.printStackTrace();
 
         d = new ErrorMessageDialog(null, "Problem", e.getMessage());
