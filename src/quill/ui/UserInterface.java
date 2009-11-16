@@ -232,7 +232,7 @@ public class UserInterface
     }
 
     void saveDocument() {
-        final Dialog dialog;
+        MessageDialog dialog;
         File target;
 
         target = data.getFilename();
@@ -246,9 +246,14 @@ public class UserInterface
 
         try {
             data.saveDocument();
+        } catch (IllegalStateException ise) {
+            dialog = new ErrorMessageDialog(primary, "Save failed",
+                    "You have a problem in the structure or data of your document: " + ise.getMessage());
+            dialog.run();
+            dialog.hide();
         } catch (IOException ioe) {
-            dialog = new ErrorMessageDialog(primary, "Save failed", "There's some kind of I/O problem: "
-                    + ioe.getMessage());
+            dialog = new ErrorMessageDialog(primary, "Save failed", ioe.getMessage());
+            dialog.setSecondaryUseMarkup(true);
             dialog.run();
             dialog.hide();
         }
