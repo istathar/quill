@@ -63,6 +63,8 @@ public class Quill
         } catch (FileNotFoundException fnfe) {
             data.createDocument();
             data.setFilename(filename);
+        } catch (RecoveryFileExistsException rfee) {
+            ui.warning(rfee);
         }
         folio = data.getActiveDocument();
         ui.displayDocument(folio);

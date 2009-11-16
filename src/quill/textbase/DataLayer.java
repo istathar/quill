@@ -22,6 +22,7 @@ import nu.xom.Document;
 import nu.xom.NodeFactory;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import quill.client.RecoveryFileExistsException;
 import quill.quack.QuackConverter;
 import quill.quack.QuackLoader;
 import quill.quack.QuackNodeFactory;
@@ -58,7 +59,8 @@ public class DataLayer
         current = null;
     }
 
-    public void loadDocument(String filename) throws ValidityException, ParsingException, IOException {
+    public void loadDocument(String filename) throws ValidityException, ParsingException, IOException,
+            RecoveryFileExistsException {
         final File source, probe;
         final NodeFactory factory;
         final Builder parser;
@@ -74,10 +76,7 @@ public class DataLayer
 
         probe = new File(filename + ".RESCUED");
         if (probe.exists()) {
-            throw new IllegalStateException("\n" + "A recovery file named:" + "\n" + probe.toString()
-                    + "\n" + "exists. It may contain what you were working on before Quill crashed."
-                    + "\n" + "Review it against your actual document, then move or remove the" + "\n"
-                    + "rescue file to continue.");
+            throw new RecoveryFileExistsException(probe.toString());
         }
 
         factory = new QuackNodeFactory();

@@ -33,10 +33,13 @@ import org.gnome.gtk.MessageDialog;
 import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.ResponseType;
 import org.gnome.gtk.Unit;
+import org.gnome.gtk.WarningMessageDialog;
 import org.gnome.pango.FontDescription;
 
 import parchment.render.RenderEngine;
 import parchment.render.ReportRenderEngine;
+import quill.client.ApplicationException;
+import quill.client.RecoveryFileExistsException;
 import quill.textbase.Change;
 import quill.textbase.DataLayer;
 import quill.textbase.Extract;
@@ -399,6 +402,31 @@ public class UserInterface
     private void loadDictionary() {
         Enchant.init();
         dict = Enchant.requestDictionary("en_CA");
+    }
+
+    public void warning(ApplicationException ae) {
+        final MessageDialog dialog;
+        final ResponseType response;
+
+        if (ae instanceof RecoveryFileExistsException) {
+            dialog = new WarningMessageDialog(
+                    primary,
+                    "Crash recovery file exists",
+                    "A recovery file named:"
+                            + "\n\n<tt>"
+                            + ae.getMessage()
+                            + "</tt>\n\n"
+                            + "exists. It <i>may</i> contain what you were working on before Quill crashed."
+                            + "You should quit and review it against your actual document. Or, if you're sure"
+                            + "the rescue file doesn't contain anything you need, you can delete it.");
+            dialog.setSecondaryUseMarkup(true);
+            response = dialog.run();
+            dialog.hide();
+
+            if (response == ResponseType.CANCEL) {
+                throw new UnsupportedOperationException("\n" + "(do something constructive with Cancel!"); // FIXME
+            }
+        }
     }
 }
 
