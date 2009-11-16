@@ -212,6 +212,10 @@ public class DataLayer
             throw new IllegalStateException("save filename not set");
         }
 
+        if (name.exists() && (!name.canWrite())) {
+            throw new IOException("Can't write to document file!\n\n" + "<i>Check permissions?</i>");
+        }
+
         /*
          * We need a temporary file to write to, since writing is descructive
          * and we don't want to blow away the existing file if something goes
