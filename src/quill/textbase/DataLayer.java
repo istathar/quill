@@ -203,13 +203,51 @@ public class DataLayer
     }
 
     public void saveDocument() throws IOException {
+        final File tmp;
         final FileOutputStream out;
+        boolean result;
+        String dir, path;
 
         if (name == null) {
             throw new IllegalStateException("save filename not set");
         }
 
-        out = new FileOutputStream(name);
-        saveDocument(out);
+        /*
+         * We need a temporary file to write to, since writing is descructive
+         * and we don't want to blow away the existing file if something goes
+         * wrong.
+         */
+
+        tmp = new File(name.getAbsolutePath() + ".tmp");
+        if (tmp.exists()) {
+            tmp.delete();
+        }
+        result = tmp.createNewFile();
+        if (!result) {
+            dir = new File(".").getAbsolutePath();
+            dir = dir.substring(0, dir.length() - 1);
+            path = tmp.toString().substring(dir.length());
+            throw new IOException("Can't create temporary file for saving.\n\n"
+                    + "<i>Assuming all is well otherwise, remove</i>\n" + "<tt>" + path
+                    + "</tt>\n<i>and try again?</i>");
+        }
+
+        try {
+            out = new FileOutputStream(tmp);
+            saveDocument(out);
+        } catch (IOException ioe) {
+            tmp.delete();
+            throw ioe;
+        }
+
+        /*
+         * And now replace the temp file over the actual document.
+         */
+
+        result = tmp.renameTo(name);
+        if (!result) {
+            tmp.delete();
+            throw new IOException("Unbale to rename temporary file to target document!");
+        }
     }
 }
