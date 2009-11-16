@@ -59,15 +59,8 @@ public class DataLayer
         current = null;
     }
 
-    public void loadDocument(String filename) throws ValidityException, ParsingException, IOException,
-            RecoveryFileExistsException {
+    public File checkDocument(String filename) throws FileNotFoundException, RecoveryFileExistsException {
         final File source, probe;
-        final NodeFactory factory;
-        final Builder parser;
-        final Document doc;
-        final QuackLoader loader; // change to interface or baseclass
-        final Series series;
-        final Series[] collection;
 
         source = new File(filename).getAbsoluteFile();
         if (!source.exists()) {
@@ -78,6 +71,20 @@ public class DataLayer
         if (probe.exists()) {
             throw new RecoveryFileExistsException(probe.toString());
         }
+
+        return source;
+    }
+
+    public void loadDocument(String filename) throws ValidityException, ParsingException, IOException {
+        final File source;
+        final NodeFactory factory;
+        final Builder parser;
+        final Document doc;
+        final QuackLoader loader; // change to interface or baseclass
+        final Series series;
+        final Series[] collection;
+
+        source = new File(filename).getAbsoluteFile();
 
         factory = new QuackNodeFactory();
         parser = new Builder(factory);

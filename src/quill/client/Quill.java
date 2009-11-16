@@ -25,10 +25,15 @@ public class Quill
     private static DataLayer data;
 
     public static void main(String[] args) throws Exception {
-        initializeDataLayer();
-        initializeUserInterface(args);
-        parseCommandLine(args);
-        runUserInterface(); // blocks
+        try {
+            initializeDataLayer();
+            initializeUserInterface(args);
+            parseCommandLine(args);
+            runUserInterface();
+        } catch (SafelyTerminateException ste) {
+            // quietly supress
+            return;
+        }
     }
 
     static void initializeDataLayer() {
@@ -59,13 +64,16 @@ public class Quill
         final Folio folio;
 
         try {
+            data.checkDocument(filename);
             data.loadDocument(filename);
         } catch (FileNotFoundException fnfe) {
             data.createDocument();
             data.setFilename(filename);
         } catch (RecoveryFileExistsException rfee) {
             ui.warning(rfee);
+            data.loadDocument(filename);
         }
+
         folio = data.getActiveDocument();
         ui.displayDocument(folio);
     }

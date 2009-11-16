@@ -23,23 +23,29 @@ import org.freedesktop.enchant.Dictionary;
 import org.freedesktop.enchant.Enchant;
 import org.gnome.gdk.EventOwnerChange;
 import org.gnome.gdk.Pixbuf;
+import org.gnome.gtk.Button;
+import org.gnome.gtk.ButtonsType;
 import org.gnome.gtk.Clipboard;
 import org.gnome.gtk.Dialog;
 import org.gnome.gtk.ErrorMessageDialog;
 import org.gnome.gtk.FileChooserDialog;
 import org.gnome.gtk.Gtk;
+import org.gnome.gtk.IconSize;
+import org.gnome.gtk.Image;
 import org.gnome.gtk.InfoMessageDialog;
 import org.gnome.gtk.MessageDialog;
+import org.gnome.gtk.MessageType;
 import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.ResponseType;
+import org.gnome.gtk.Stock;
 import org.gnome.gtk.Unit;
-import org.gnome.gtk.WarningMessageDialog;
 import org.gnome.pango.FontDescription;
 
 import parchment.render.RenderEngine;
 import parchment.render.ReportRenderEngine;
 import quill.client.ApplicationException;
 import quill.client.RecoveryFileExistsException;
+import quill.client.SafelyTerminateException;
 import quill.textbase.Change;
 import quill.textbase.DataLayer;
 import quill.textbase.Extract;
@@ -404,27 +410,39 @@ public class UserInterface
         dict = Enchant.requestDictionary("en_CA");
     }
 
-    public void warning(ApplicationException ae) {
+    public void warning(ApplicationException ae) throws SafelyTerminateException {
         final MessageDialog dialog;
+        final Button cancel, ok;
         final ResponseType response;
 
         if (ae instanceof RecoveryFileExistsException) {
-            dialog = new WarningMessageDialog(
-                    primary,
-                    "Crash recovery file exists",
-                    "A recovery file named:"
-                            + "\n\n<tt>"
-                            + ae.getMessage()
-                            + "</tt>\n\n"
-                            + "exists. It <i>may</i> contain what you were working on before Quill crashed."
-                            + "You should quit and review it against your actual document. Or, if you're sure"
-                            + "the rescue file doesn't contain anything you need, you can delete it.");
-            dialog.setSecondaryUseMarkup(true);
+            dialog = new MessageDialog(primary, true, MessageType.WARNING, ButtonsType.NONE,
+                    "Crash recovery file exists");
+            cancel = new Button();
+            cancel.setImage(new Image(Stock.CANCEL, IconSize.BUTTON));
+            cancel.setLabel("Cancel loading and Quit");
+            dialog.addButton(cancel, ResponseType.CANCEL);
+
+            ok = new Button();
+            ok.setImage(new Image(Stock.OK, IconSize.BUTTON));
+            ok.setLabel("Load original anyway");
+            dialog.addButton(ok, ResponseType.OK);
+
+            dialog.setSecondaryText("A recovery file exists:" + "\n<tt>" + ae.getMessage() + "</tt>\n\n"
+                    + "It <i>may</i> contain what you were working on before Quill crashed. "
+                    + "You should quit and review it against your actual document. Once you're sure "
+                    + "the rescue file doesn't contain anything you need, you can delete it.", true);
+
+            dialog.showAll();
             response = dialog.run();
             dialog.hide();
 
-            if (response == ResponseType.CANCEL) {
-                throw new UnsupportedOperationException("\n" + "(do something constructive with Cancel!"); // FIXME
+            if (response != ResponseType.OK) {
+                /*
+                 * FUTURE This will need to change if we support editing
+                 * multiple documents in one Quill process.
+                 */
+                throw new SafelyTerminateException();
             }
         }
     }
