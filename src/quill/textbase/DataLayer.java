@@ -15,12 +15,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.NodeFactory;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import quill.client.RecoveryFileExistsException;
 import quill.quack.QuackConverter;
 import quill.quack.QuackLoader;
 import quill.quack.QuackNodeFactory;
@@ -57,6 +59,22 @@ public class DataLayer
         current = null;
     }
 
+    public File checkDocument(String filename) throws FileNotFoundException, RecoveryFileExistsException {
+        final File source, probe;
+
+        source = new File(filename).getAbsoluteFile();
+        if (!source.exists()) {
+            throw new FileNotFoundException("\n" + filename);
+        }
+
+        probe = new File(filename + ".RESCUED");
+        if (probe.exists()) {
+            throw new RecoveryFileExistsException(probe.toString());
+        }
+
+        return source;
+    }
+
     public void loadDocument(String filename) throws ValidityException, ParsingException, IOException {
         final File source;
         final NodeFactory factory;
@@ -67,9 +85,6 @@ public class DataLayer
         final Series[] collection;
 
         source = new File(filename).getAbsoluteFile();
-        if (!source.exists()) {
-            throw new FileNotFoundException("\n" + filename);
-        }
 
         factory = new QuackNodeFactory();
         parser = new Builder(factory);
@@ -239,6 +254,7 @@ public class DataLayer
         try {
             out = new FileOutputStream(tmp);
             saveDocument(out);
+            out.close();
         } catch (IOException ioe) {
             tmp.delete();
             throw ioe;
@@ -253,5 +269,52 @@ public class DataLayer
             tmp.delete();
             throw new IOException("Unbale to rename temporary file to target document!");
         }
+    }
+
+    /**
+     * Attempt to serialize out the current document. No guarantees. This
+     * method assumes it's being called immediately prior to program
+     * termination as a result of an Exception. It doesn't bother throwing
+     * anything of its own.
+     */
+    public void emergencySave() {
+        final String fullname, savename;
+        File target = null;
+        final OutputStream out;
+        final PrintStream err;
+
+        err = System.err;
+        err.flush();
+        err.print("Attempting emergency save... ");
+        err.flush();
+
+        if (name == null) {
+            fullname = "Untitled.xml"; // gotta call it something
+        } else {
+            fullname = name.getAbsolutePath();
+        }
+
+        try {
+            savename = fullname + ".RESCUED";
+            target = new File(savename);
+            out = new FileOutputStream(target);
+            saveDocument(out);
+            out.close();
+        } catch (Throwable t) {
+            // well, we tried
+            err.println("failed.");
+            err.flush();
+
+            if (target != null) {
+                target.delete();
+            }
+
+            t.printStackTrace(err);
+            return;
+        }
+
+        err.println("done. Wrote:");
+        err.println(savename);
+        err.flush();
     }
 }
