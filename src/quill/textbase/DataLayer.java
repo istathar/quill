@@ -239,6 +239,7 @@ public class DataLayer
         try {
             out = new FileOutputStream(tmp);
             saveDocument(out);
+            out.close();
         } catch (IOException ioe) {
             tmp.delete();
             throw ioe;
@@ -253,5 +254,42 @@ public class DataLayer
             tmp.delete();
             throw new IOException("Unbale to rename temporary file to target document!");
         }
+    }
+
+    /**
+     * Attempt to serialize out the current document. No guarantees. This
+     * method assumes it's being called immediately prior to program
+     * termination as a result of an Exception. It doesn't bother throwing
+     * anything of its own.
+     */
+    public void emergencySave() {
+        final String fullname, savename;
+        final File target;
+        final OutputStream out;
+
+        System.err.flush();
+        System.err.print("Attempting emergency save... ");
+        System.err.flush();
+
+        fullname = name.getAbsolutePath();
+        savename = fullname + ".RESCUED";
+        target = new File(savename);
+
+        try {
+            out = new FileOutputStream(target);
+            saveDocument(out);
+            out.close();
+        } catch (Throwable t) {
+            // well, we tried
+            target.delete();
+            System.err.println("failed.");
+            System.err.flush();
+            t.printStackTrace();
+            return;
+        }
+
+        System.err.println("done. Wrote:");
+        System.err.println(savename);
+        System.err.flush();
     }
 }

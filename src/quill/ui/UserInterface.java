@@ -231,6 +231,9 @@ public class UserInterface
         }
     }
 
+    /**
+     * Cause the document to be saved.
+     */
     void saveDocument() {
         MessageDialog dialog;
         File target;
@@ -260,7 +263,7 @@ public class UserInterface
     }
 
     /**
-     * Cause the document to be printed
+     * Cause the document to be printed.
      */
     /*
      * Passing a target filename in from here is either correct, or should be
