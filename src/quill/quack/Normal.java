@@ -25,10 +25,17 @@ import nu.xom.Text;
  */
 public class Normal implements Inline
 {
-    private final Text text;
+    private final String cached;
 
     public Normal(Node node) {
+        final Text text;
+
         text = (Text) node;
+        cached = text.getValue();
+    }
+
+    public Normal(String str) {
+        cached = str;
     }
 
     public void add(String str) {
@@ -36,6 +43,6 @@ public class Normal implements Inline
     }
 
     public String getText() {
-        return text.getValue();
+        return cached;
     }
 }

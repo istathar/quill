@@ -19,6 +19,7 @@ import nu.xom.Document;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.HeadingSegment;
+import quill.textbase.ImageSegment;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.PreformatSegment;
@@ -166,6 +167,11 @@ public class QuackLoader
             start = true;
             preserve = false;
             setSegment(new HeadingSegment());
+        } else if (block instanceof ImageElement) {
+            markup = null;
+            start = true;
+            preserve = false;
+            setSegment(new ImageSegment());
         } else if (block instanceof TitleElement) {
             markup = null;
             start = true;
