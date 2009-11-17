@@ -27,4 +27,8 @@ class HeadingEditorTextView extends EditorTextView
         super(segment);
         view.modifyFont(desc);
     }
+
+    protected boolean isEnterAllowed() {
+        return false;
+    }
 }

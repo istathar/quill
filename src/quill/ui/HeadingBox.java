@@ -14,7 +14,6 @@ import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
 
 import quill.textbase.Segment;
-import quill.textbase.TextChain;
 
 class HeadingBox extends HBox
 {
@@ -23,8 +22,6 @@ class HeadingBox extends HBox
     protected HeadingEditorTextView title;
 
     protected Label label;
-
-    private TextChain chain;
 
     public HeadingBox(Segment segment) {
         super(false, 0);
