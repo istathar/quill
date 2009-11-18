@@ -14,6 +14,7 @@ import java.io.FileNotFoundException;
 
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.FontOptions;
+import org.freedesktop.cairo.Matrix;
 import org.freedesktop.cairo.Surface;
 import org.freedesktop.cairo.XlibSurface;
 import org.gnome.gdk.Pixbuf;
@@ -202,8 +203,8 @@ public abstract class RenderEngine
                 drawExternalGraphic(cr, filename);
                 entire = text.extractAll();
                 drawBlankLine(cr);
-                if (entire.getWidth() == 0) {
-                    return;
+                if (entire == null) {
+                    continue;
                 }
                 drawCitationParagraph(cr, entire);
                 drawBlankLine(cr);
@@ -634,8 +635,14 @@ public abstract class RenderEngine
         rightMargin = savedRight;
     }
 
+    /**
+     * Render an image. Will scale down to fit within page margins if too
+     * wide.
+     */
     protected void drawAreaImage(final Context cr, final Pixbuf pixbuf) {
-        double width, height;
+        final double width, height;
+        final double available, scaleFactor;
+        final Matrix matrix;
 
         width = pixbuf.getWidth();
         height = pixbuf.getHeight();
@@ -645,14 +652,39 @@ public abstract class RenderEngine
             return;
         }
 
-        cr.setSource(pixbuf, pageWidth / 2 - width / 2, cursor);
-        cr.paint();
-
-        cursor += height;
+        available = pageWidth - rightMargin - leftMargin;
 
         /*
-         * And, of course, we need to reset to black text.
+         * This is a bit unusual; you'd think you would just moveTo(), or,
+         * just as conventionally, use the x,y co-ordinates of setSource().
+         * But it works out just as cleanly to do a translattion to (x,y) and
+         * then to just assume the source is (0,0).
          */
+
+        cr.save();
+        matrix = new Matrix();
+
+        if (width > available) {
+            scaleFactor = available / width;
+            matrix.translate(leftMargin, cursor);
+            matrix.scale(scaleFactor, scaleFactor);
+        } else {
+            scaleFactor = 1.0;
+            matrix.translate(pageWidth / 2 - width / 2, cursor);
+        }
+
+        cr.transform(matrix);
+        cr.setSource(pixbuf, 0, 0);
+        cr.paint();
+
+        cr.restore();
+
+        cursor += height * scaleFactor;
+
+        /*
+         * Reset the source [colour] to black text.
+         */
+
         cr.setSource(0.0, 0.0, 0.0);
     }
 }
