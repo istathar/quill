@@ -19,6 +19,9 @@ This is a simple
 <application>java-gnome</application> program
 with 𝑛-way permutations.
 </text>
+<image src="OldMap.jpg">
+An old map
+</image>
 <text>
 As you will see in the following definition
 of <type>GtkButton</type>'s

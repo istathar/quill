@@ -10,10 +10,13 @@
  */
 package parchment.render;
 
+import java.io.FileNotFoundException;
+
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.FontOptions;
 import org.freedesktop.cairo.Surface;
 import org.freedesktop.cairo.XlibSurface;
+import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.Unit;
 import org.gnome.pango.Attribute;
@@ -35,6 +38,7 @@ import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
+import quill.textbase.ImageSegment;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.Preformat;
@@ -47,6 +51,8 @@ import quill.textbase.Special;
 import quill.textbase.TextChain;
 
 import static org.freedesktop.cairo.HintMetrics.OFF;
+import static quill.textbase.Span.createSpan;
+import static quill.textbase.TextChain.extractFor;
 
 /**
  * Render a Series.
@@ -149,10 +155,12 @@ public abstract class RenderEngine
     }
 
     public void processSeries(final Context cr, final Series series) {
-        int i;
+        int i, j;
         Segment segment;
         TextChain text;
+        Extract entire;
         Extract[] paras;
+        String filename;
 
         cursor = topMargin;
         done = false;
@@ -165,26 +173,34 @@ public abstract class RenderEngine
             text = segment.getText();
 
             if (segment instanceof ComponentSegment) {
-                drawHeading(cr, text.extractAll(), 32.0);
+                entire = text.extractAll();
+                drawHeading(cr, entire, 32.0);
                 drawBlankLine(cr);
             } else if (segment instanceof HeadingSegment) {
-                drawHeading(cr, text.extractAll(), 16.0);
+                entire = text.extractAll();
+                drawHeading(cr, entire, 16.0);
                 drawBlankLine(cr);
             } else if (segment instanceof PreformatSegment) {
-                drawProgramCode(cr, text.extractAll());
+                entire = text.extractAll();
+                drawProgramCode(cr, entire);
                 drawBlankLine(cr);
             } else if (segment instanceof QuoteSegment) {
                 paras = text.extractParagraphs();
-                for (Extract extract : paras) {
-                    drawQuoteParagraph(cr, extract);
+                for (j = 0; j < paras.length; j++) {
+                    drawQuoteParagraph(cr, paras[j]);
                     drawBlankLine(cr);
                 }
             } else if (segment instanceof NormalSegment) {
                 paras = text.extractParagraphs();
-                for (Extract extract : paras) {
-                    drawNormalParagraph(cr, extract);
+                for (j = 0; j < paras.length; j++) {
+                    drawNormalParagraph(cr, paras[j]);
                     drawBlankLine(cr);
                 }
+            } else if (segment instanceof ImageSegment) {
+                filename = segment.getImage();
+                drawExternalGraphic(cr, filename);
+                entire = text.extractAll();
+                drawQuoteParagraph(cr, entire);
             }
         }
     }
@@ -408,8 +424,11 @@ public abstract class RenderEngine
     /**
      * Check and see if there is sufficient vertical space for the requested
      * height. If not, finish the page being drawn and star a fresh one if
-     * possible. Return false if the vertical cursor can't be restarted (which
-     * is the case when drawing to PreviewWidget).
+     * possible. Sets done if the vertical cursor can't be restarted (which is
+     * the case when drawing to PreviewWidget).
+     */
+    /*
+     * Throw an exception instead?
      */
     private void paginate(Context cr, double requestedHeight) {
         final Surface surface;
@@ -547,5 +566,37 @@ public abstract class RenderEngine
         cr.setSource(0.0, 0.0, 0.0);
         cr.moveTo(pageWidth - rightMargin - ink.getWidth(), pageHeight - bottomMargin - footerHeight);
         cr.showLayout(layout);
+    }
+
+    protected void drawExternalGraphic(final Context cr, final String filename) {
+        final Pixbuf pixbuf;
+        final Extract extract;
+
+        try {
+            pixbuf = new Pixbuf(filename);
+        } catch (FileNotFoundException e) {
+            extract = extractFor(createSpan("Missing image", Common.ITALICS));
+            drawAreaText(cr, extract, serifFace, false);
+            return;
+        }
+
+        drawAreaImage(cr, pixbuf);
+    }
+
+    protected void drawAreaImage(final Context cr, final Pixbuf pixbuf) {
+        double width, height;
+
+        width = pixbuf.getWidth();
+        height = pixbuf.getHeight();
+
+        paginate(cr, height);
+        if (done) {
+            return;
+        }
+
+        cr.setSource(pixbuf, pageWidth / 2 - width / 2, cursor);
+        cr.paint();
+
+        cursor += height;
     }
 }
