@@ -19,6 +19,7 @@ import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
+import quill.textbase.ImageSegment;
 import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
@@ -68,6 +69,7 @@ public class QuackConverter
      */
     public void append(final Segment segment) {
         final TextChain chain;
+        final String value;
 
         this.segment = segment;
 
@@ -82,6 +84,12 @@ public class QuackConverter
             block = new QuoteElement();
         } else if (segment instanceof NormalSegment) {
             block = new TextElement();
+        } else if (segment instanceof ImageSegment) {
+            block = new ImageElement();
+            value = segment.getImage();
+            block.add(new SourceAttribute(value));
+        } else {
+            throw new IllegalStateException("Unhandled segment type " + segment);
         }
         inline = null;
 

@@ -18,7 +18,7 @@ package quill.quack;
  */
 public class SourceAttribute extends QuackAttribute implements Meta
 {
-    SourceAttribute(String name, String value) {
-        super(name, value);
+    SourceAttribute(String value) {
+        super("src", value);
     }
 }

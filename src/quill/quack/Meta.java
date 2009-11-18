@@ -10,7 +10,7 @@
  */
 package quill.quack;
 
-public interface Meta extends Tag
+public interface Meta
 {
     public String getValue();
 }

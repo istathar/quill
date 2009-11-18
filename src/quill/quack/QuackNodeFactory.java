@@ -91,7 +91,7 @@ public class QuackNodeFactory extends NodeFactory
          * Eeek. This means any src attribute. No contextual awareness.
          */
         if (name.equals("src")) {
-            return new Nodes(new SourceAttribute("src", value));
+            return new Nodes(new SourceAttribute(value));
         } else {
             return super.makeAttribute(name, URI, value, type);
         }

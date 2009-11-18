@@ -37,6 +37,10 @@ abstract class QuackElement extends Element
         super.appendChild(str);
     }
 
+    void add(Meta data) {
+        super.addAttribute((QuackAttribute) data);
+    }
+
     void setValue(String name, String value) {
         super.addAttribute(new Attribute(name, value));
     }

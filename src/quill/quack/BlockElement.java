@@ -33,6 +33,10 @@ abstract class BlockElement extends QuackElement
         super.add(markup);
     }
 
+    public void add(Meta data) {
+        super.add(data);
+    }
+
     public Inline[] getBody() {
         final int num;
         final Inline[] result;
