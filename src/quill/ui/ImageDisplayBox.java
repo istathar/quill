@@ -14,7 +14,6 @@ import java.io.FileNotFoundException;
 
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.Gtk;
-import org.gnome.gtk.HBox;
 import org.gnome.gtk.IconSize;
 import org.gnome.gtk.Image;
 import org.gnome.gtk.Label;
@@ -29,7 +28,7 @@ public class ImageDisplayBox extends VBox
 
     private Image image;
 
-    private PropertyEditorTextView src;
+    private EditorTextView caption;
 
     public ImageDisplayBox(Segment segment) {
         super(false, 0);
@@ -38,29 +37,30 @@ public class ImageDisplayBox extends VBox
     }
 
     private void setupBox(Segment segment) {
-        final HBox center;
         final String filename;
+        String tooltip;
         Pixbuf pixbuf;
 
         box = this;
 
         filename = segment.getImage();
         try {
-            pixbuf = new Pixbuf(filename, 60, -1, true);
+            pixbuf = new Pixbuf(filename, 150, -1, true);
+            tooltip = " Image source: \n" + " <tt>" + filename + "</tt> ";
         } catch (FileNotFoundException e) {
             pixbuf = Gtk.renderIcon(new Label(), Stock.CANCEL, IconSize.DIALOG);
+            tooltip = " <b><big>Missing Image!</big></b> \n" + " Source file\n" + " <tt>" + filename
+                    + "</tt> \n" + " not found ";
         }
         image = new Image(pixbuf);
+        image.setTooltipMarkup(tooltip);
         box.packStart(image, true, true, 0);
 
-        src = new PropertyEditorTextView(segment);
-        center = new HBox(false, 0);
-        center.packStart(src, true, false, 50);
-        box.packEnd(center, false, false, 0);
-
+        caption = new CaptionEditorTextView(segment);
+        box.packStart(caption, true, true, 0);
     }
 
     EditorTextView getEditor() {
-        return src;
+        return caption;
     }
 }

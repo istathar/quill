@@ -201,6 +201,7 @@ public abstract class RenderEngine
                 drawExternalGraphic(cr, filename);
                 entire = text.extractAll();
                 drawQuoteParagraph(cr, entire);
+                drawBlankLine(cr);
             }
         }
     }
