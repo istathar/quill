@@ -10,6 +10,7 @@
  */
 package quill.ui;
 
+import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Image;
 import org.gnome.gtk.VBox;
@@ -32,10 +33,12 @@ public class ImageDisplayBox extends VBox
 
     private void setupBox(Segment segment) {
         final HBox center;
+        final Pixbuf pixbuf;
 
         box = this;
 
-        image = new Image("tests/OldMap.jpg");
+        pixbuf = segment.getImage();
+        image = new Image(pixbuf);
 
         box.packStart(image, true, true, 0);
 

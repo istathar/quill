@@ -24,4 +24,6 @@ public interface Block extends Tag
     public void add(Inline tag);
 
     public Inline[] getBody();
+
+    public Meta[] getData();
 }

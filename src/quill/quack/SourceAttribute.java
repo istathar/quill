@@ -1,5 +1,5 @@
 /*
- * MarkerElement.java
+ * SourceAttribute.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -11,21 +11,14 @@
 package quill.quack;
 
 /**
- * Common implementation for Marker classes
+ * Attributes which describe the location of external files, for instance
+ * <code>src="images/OldMap.jpg"</code>.
  * 
  * @author Andrew Cowie
  */
-abstract class MarkerElement extends QuackElement
+public class SourceAttribute extends QuackAttribute implements Meta
 {
-    MarkerElement(String name) {
-        super(name);
-    }
-
-    public void add(String text) {
-        super.setValue("ref", text);
-    }
-
-    public String getText() {
-        return super.getValue("ref");
+    SourceAttribute(String name, String value) {
+        super(name, value);
     }
 }

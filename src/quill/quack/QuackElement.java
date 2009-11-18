@@ -49,6 +49,13 @@ abstract class QuackElement extends Element
         return a.getValue();
     }
 
+    /*
+     * Unused by everything... except ImageElement
+     */
+    public Meta[] getMeta() {
+        return null;
+    }
+
     /**
      * Set the <code>xml:space="preserve"</code> Attribute on an Element.
      */

@@ -10,6 +10,7 @@
  */
 package quill.quack;
 
+import nu.xom.Attribute;
 import nu.xom.Node;
 import nu.xom.Text;
 
@@ -50,6 +51,28 @@ abstract class BlockElement extends QuackElement
                 result[i] = (Inline) child;
             } else {
                 throw new IllegalStateException("\n" + "What is " + child);
+            }
+        }
+
+        return result;
+    }
+
+    public Meta[] getData() {
+        final int len;
+        final Meta[] result;
+        int i;
+        Attribute a;
+
+        len = super.getAttributeCount();
+        result = new Meta[len];
+
+        for (i = 0; i < len; i++) {
+            a = super.getAttribute(i);
+
+            if (a instanceof Meta) {
+                result[i] = (Meta) a;
+            } else {
+                throw new IllegalStateException("\n" + "Can't handle non Meta attributes! " + a.toXML());
             }
         }
 

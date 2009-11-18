@@ -1,5 +1,5 @@
 /*
- * ImageElement.java
+ * Meta.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -10,9 +10,7 @@
  */
 package quill.quack;
 
-public class ImageElement extends BlockElement implements Block
+public interface Meta extends Tag
 {
-    public ImageElement() {
-        super("image");
-    }
+    public String getValue();
 }

@@ -10,6 +10,14 @@
  */
 package quill.textbase;
 
+import java.io.FileNotFoundException;
+
+import org.gnome.gdk.Pixbuf;
+import org.gnome.gtk.Gtk;
+import org.gnome.gtk.IconSize;
+import org.gnome.gtk.Label;
+import org.gnome.gtk.Stock;
+
 /**
  * Segments are the block level grouping mechanism in textbase. Concrete
  * instances of this represent the entities we model as UI blocks each with
@@ -55,4 +63,32 @@ public abstract class Segment
     }
 
     abstract Segment createSimilar();
+
+    /*
+     * FIXME Using Pixbuf here is wrong. We should be using something less
+     * instantiated GTK specific; perhaps a filename wrapper?
+     */
+    private Pixbuf image;
+
+    /*
+     * This is called by RenderEngine...
+     */
+    public Pixbuf getImage() {
+        return image;
+    }
+
+    public void setImage(Pixbuf pixbuf) {
+        this.image = pixbuf;
+    }
+
+    public void setImage(String filename) {
+        /*
+         * Totally wrong place for this
+         */
+        try {
+            this.image = new Pixbuf(filename);
+        } catch (FileNotFoundException e) {
+            this.image = Gtk.renderIcon(new Label(), Stock.CANCEL, IconSize.DIALOG);
+        }
+    }
 }
