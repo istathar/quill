@@ -10,7 +10,7 @@
  */
 package quill.ui;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.Gtk;
@@ -38,6 +38,7 @@ public class ImageDisplayBox extends VBox
 
     private void setupBox(Segment segment) {
         final String filename;
+        final int width;
         String tooltip;
         Pixbuf pixbuf;
 
@@ -45,16 +46,14 @@ public class ImageDisplayBox extends VBox
 
         filename = segment.getImage();
         try {
-            pixbuf = new Pixbuf(filename);
-            if (pixbuf.getWidth() > 150) {
-                /*
-                 * This is awful, but pixbuf.scale() doesn't take -1 on width
-                 * or height, so how else could we find out?
-                 */
+            width = Pixbuf.getFileInfoX(filename);
+            if (width > 150) {
                 pixbuf = new Pixbuf(filename, 150, -1, true);
+            } else {
+                pixbuf = new Pixbuf(filename);
             }
             tooltip = " Image source: \n" + " <tt>" + filename + "</tt> ";
-        } catch (FileNotFoundException e) {
+        } catch (IOException ioe) {
             pixbuf = Gtk.renderIcon(new Label(), Stock.MISSING_IMAGE, IconSize.DIALOG);
             tooltip = " <b><big>Missing Image!</big></b> \n" + " Source file\n" + " <tt>" + filename
                     + "</tt> \n" + " not found ";
