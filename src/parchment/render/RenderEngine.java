@@ -52,7 +52,6 @@ import quill.textbase.TextChain;
 
 import static org.freedesktop.cairo.HintMetrics.OFF;
 import static quill.textbase.Span.createSpan;
-import static quill.textbase.TextChain.extractFor;
 
 /**
  * Render a Series.
@@ -139,6 +138,8 @@ public abstract class RenderEngine
         sansFace = new Typeface(cr, new FontDescription("Liberation Sans, 7.3"), 0.0);
 
         headingFace = new Typeface(cr, new FontDescription("Linux Libertine O C"), 0.0);
+
+        cr.setSource(0.0, 0.0, 0.0);
     }
 
     /*
@@ -416,8 +417,6 @@ public abstract class RenderEngine
          * the lines.
          */
 
-        cr.setSource(0.0, 0.0, 0.0);
-
         for (LayoutLine line : layout.getLinesReadonly()) {
             paginate(cr, face.lineHeight);
             if (done) {
@@ -577,24 +576,37 @@ public abstract class RenderEngine
         layout.setText(Integer.toString(pageNumber));
         ink = layout.getExtentsInk();
 
-        cr.setSource(0.0, 0.0, 0.0);
         cr.moveTo(pageWidth - rightMargin - ink.getWidth(), pageHeight - bottomMargin - footerHeight);
         cr.showLayout(layout);
     }
 
     protected void drawExternalGraphic(final Context cr, final String filename) {
         final Pixbuf pixbuf;
+        final TextChain chain;
         final Extract extract;
 
         try {
             pixbuf = new Pixbuf(filename);
         } catch (FileNotFoundException e) {
-            extract = extractFor(createSpan("Missing image", Common.ITALICS));
-            drawAreaText(cr, extract, serifFace, false, true);
+            chain = new TextChain();
+            chain.append(createSpan("Image \"", null));
+            chain.append(createSpan(filename, Common.FILENAME));
+            chain.append(createSpan("\" missing", null));
+            extract = chain.extractAll();
+            drawErrorParagraph(cr, extract);
             return;
         }
 
         drawAreaImage(cr, pixbuf);
+    }
+
+    /**
+     * Show a message (in red) indicating a processing problem.
+     */
+    protected void drawErrorParagraph(Context cr, Extract extract) {
+        cr.setSource(1.0, 0.0, 0.0);
+        drawAreaText(cr, extract, sansFace, false, true);
+        cr.setSource(0.0, 0.0, 0.0);
     }
 
     /*
