@@ -48,7 +48,7 @@ public class ImageDisplayBox extends VBox
             pixbuf = new Pixbuf(filename, 150, -1, true);
             tooltip = " Image source: \n" + " <tt>" + filename + "</tt> ";
         } catch (FileNotFoundException e) {
-            pixbuf = Gtk.renderIcon(new Label(), Stock.CANCEL, IconSize.DIALOG);
+            pixbuf = Gtk.renderIcon(new Label(), Stock.MISSING_IMAGE, IconSize.DIALOG);
             tooltip = " <b><big>Missing Image!</big></b> \n" + " Source file\n" + " <tt>" + filename
                     + "</tt> \n" + " not found ";
         }

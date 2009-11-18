@@ -649,5 +649,10 @@ public abstract class RenderEngine
         cr.paint();
 
         cursor += height;
+
+        /*
+         * And, of course, we need to reset to black text.
+         */
+        cr.setSource(0.0, 0.0, 0.0);
     }
 }
