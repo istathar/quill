@@ -200,7 +200,11 @@ public abstract class RenderEngine
                 filename = segment.getImage();
                 drawExternalGraphic(cr, filename);
                 entire = text.extractAll();
-                drawQuoteParagraph(cr, entire);
+                drawBlankLine(cr);
+                if (entire.getWidth() == 0) {
+                    return;
+                }
+                drawCitationParagraph(cr, entire);
                 drawBlankLine(cr);
             }
         }
@@ -218,11 +222,11 @@ public abstract class RenderEngine
         desc.setSize(size);
         face = new Typeface(cr, desc, 0.0);
 
-        drawAreaText(cr, entire, face, false);
+        drawAreaText(cr, entire, face, false, false);
     }
 
     protected void drawNormalParagraph(Context cr, Extract extract) {
-        drawAreaText(cr, extract, serifFace, false);
+        drawAreaText(cr, extract, serifFace, false, false);
     }
 
     protected void drawQuoteParagraph(Context cr, Extract extract) {
@@ -234,14 +238,14 @@ public abstract class RenderEngine
         leftMargin += 45.0;
         rightMargin += 45.0;
 
-        drawAreaText(cr, extract, serifFace, false);
+        drawAreaText(cr, extract, serifFace, false, false);
 
         leftMargin = savedLeft;
         rightMargin = savedRight;
     }
 
     protected void drawProgramCode(Context cr, Extract entire) {
-        drawAreaText(cr, entire, monoFace, true);
+        drawAreaText(cr, entire, monoFace, true, false);
     }
 
     // character
@@ -327,7 +331,11 @@ public abstract class RenderEngine
      * Surface. Fancy typesetting character substitutions (smary quotes, etc)
      * will occur if not preformatted text.
      */
-    protected final void drawAreaText(Context cr, Extract extract, Typeface face, boolean preformatted) {
+    /*
+     * Change boolean centered for Alignment align?
+     */
+    protected final void drawAreaText(final Context cr, final Extract extract, final Typeface face,
+            final boolean preformatted, final boolean centered) {
         final Layout layout;
         final FontOptions options;
         final StringBuilder buf;
@@ -337,6 +345,7 @@ public abstract class RenderEngine
         Span span;
         Markup format;
         String str;
+        Rectangle rect;
 
         if (extract == null) {
             return;
@@ -415,9 +424,13 @@ public abstract class RenderEngine
                 return;
             }
 
-            cr.moveTo(leftMargin, cursor + face.lineAscent);
+            if (!centered) {
+                cr.moveTo(leftMargin, cursor + face.lineAscent);
+            } else {
+                rect = line.getExtentsLogical();
+                cr.moveTo(pageWidth / 2 - rect.getWidth() / 2, cursor + face.lineAscent);
+            }
             cr.showLayout(line);
-
             cursor += face.lineHeight;
         }
     }
@@ -577,11 +590,36 @@ public abstract class RenderEngine
             pixbuf = new Pixbuf(filename);
         } catch (FileNotFoundException e) {
             extract = extractFor(createSpan("Missing image", Common.ITALICS));
-            drawAreaText(cr, extract, serifFace, false);
+            drawAreaText(cr, extract, serifFace, false, true);
             return;
         }
 
         drawAreaImage(cr, pixbuf);
+    }
+
+    /*
+     * Indentation copied from drawQuoteParagraph(). And face setting copied
+     * from drawHeading(). Both of these should probably be abstracted.
+     */
+    protected void drawCitationParagraph(Context cr, Extract extract) {
+        final double savedLeft, savedRight;
+        final FontDescription desc;
+        final Typeface face;
+
+        savedLeft = leftMargin;
+        savedRight = rightMargin;
+
+        leftMargin += 45.0;
+        rightMargin += 45.0;
+
+        desc = serifFace.desc.copy();
+        desc.setStyle(Style.ITALIC);
+        face = new Typeface(cr, desc, 0.0);
+
+        drawAreaText(cr, extract, face, false, true);
+
+        leftMargin = savedLeft;
+        rightMargin = savedRight;
     }
 
     protected void drawAreaImage(final Context cr, final Pixbuf pixbuf) {
