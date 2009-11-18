@@ -45,7 +45,14 @@ public class ImageDisplayBox extends VBox
 
         filename = segment.getImage();
         try {
-            pixbuf = new Pixbuf(filename, 150, -1, true);
+            pixbuf = new Pixbuf(filename);
+            if (pixbuf.getWidth() > 150) {
+                /*
+                 * This is awful, but pixbuf.scale() doesn't take -1 on width
+                 * or height, so how else could we find out?
+                 */
+                pixbuf = new Pixbuf(filename, 150, -1, true);
+            }
             tooltip = " Image source: \n" + " <tt>" + filename + "</tt> ";
         } catch (FileNotFoundException e) {
             pixbuf = Gtk.renderIcon(new Label(), Stock.MISSING_IMAGE, IconSize.DIALOG);
@@ -54,7 +61,7 @@ public class ImageDisplayBox extends VBox
         }
         image = new Image(pixbuf);
         image.setTooltipMarkup(tooltip);
-        box.packStart(image, true, true, 0);
+        box.packStart(image, false, false, 0);
 
         caption = new CaptionEditorTextView(segment);
         box.packStart(caption, true, true, 0);
