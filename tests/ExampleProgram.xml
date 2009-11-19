@@ -19,9 +19,6 @@ This is a simple
 <application>java-gnome</application> program
 with 𝑛-way permutations.
 </text>
-<image src="OldMap.jpg">
-An old map
-</image>
 <text>
 As you will see in the following definition
 of <type>GtkButton</type>'s
@@ -160,6 +157,12 @@ et, ultricies lacinia, nibh, non tincidunt
 nibh purus sit amet dui. Congue dictum augue.
 Donec sit amet velit quis augue aliquam pulvinar.
 </text>
+<text>
+And in keeping with the feel of ancient civilization,
+</text>
+<image src="OldMap.jpg">
+An old map.
+</image>
 <text>
 Etiam rutrum velit in nunc porta auctor.
 Nullam fringilla velit volutpat felis. Etiam

@@ -20,7 +20,7 @@
 
 -->
 
-<!ELEMENT chapter (title?,(heading | text | code | quote)*,endnote*,reference*)>
+<!ELEMENT chapter (title?,(heading | text | code | quote | image)*,endnote*,reference*)>
 <!ATTLIST chapter schema CDATA #FIXED "0.1">
 <!ATTLIST chapter xmlns CDATA #FIXED "http://operationaldynamics.com/quack">
 
@@ -36,6 +36,9 @@
 <!ATTLIST code xml:space CDATA #REQUIRED>
 
 <!ELEMENT quote (#PCDATA | italics | bold | application | type | function | literal | filename | command | note)*>
+
+<!ELEMENT image (#PCDATA | italics | bold | application | type | function | literal | filename | command | note)*>
+<!ATTLIST image src CDATA #REQUIRED>
 
 <!ELEMENT endnote (#PCDATA | italics | bold | application | type | function | literal | filename | command | cite)*>
 <!ATTLIST endnote name CDATA #REQUIRED>
