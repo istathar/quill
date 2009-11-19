@@ -34,6 +34,7 @@ import org.gnome.pango.Style;
 import org.gnome.pango.StyleAttribute;
 import org.gnome.pango.Weight;
 import org.gnome.pango.WeightAttribute;
+import org.gnome.pango.WrapMode;
 
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
@@ -366,6 +367,7 @@ public abstract class RenderEngine
         layout.setFontDescription(face.desc);
 
         layout.setWidth(pageWidth - (leftMargin + rightMargin));
+        layout.setWrapMode(WrapMode.WORD_CHAR);
 
         buf = new StringBuilder();
 
@@ -590,9 +592,9 @@ public abstract class RenderEngine
             pixbuf = new Pixbuf(filename);
         } catch (FileNotFoundException e) {
             chain = new TextChain();
-            chain.append(createSpan("Image \"", null));
+            chain.append(createSpan("image" + "\n", null));
             chain.append(createSpan(filename, Common.FILENAME));
-            chain.append(createSpan("\" missing", null));
+            chain.append(createSpan("\n" + "not found", null));
             extract = chain.extractAll();
             drawErrorParagraph(cr, extract);
             return;
