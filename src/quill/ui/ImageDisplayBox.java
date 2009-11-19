@@ -46,9 +46,9 @@ public class ImageDisplayBox extends VBox
 
         filename = segment.getImage();
         try {
-            width = Pixbuf.getFileInfoX(filename);
+            width = Pixbuf.getFileInfoWidth(filename);
             if (width > 150) {
-                pixbuf = new Pixbuf(filename, 150, -1, true);
+                pixbuf = new Pixbuf(filename, -1, 100, true);
             } else {
                 pixbuf = new Pixbuf(filename);
             }
