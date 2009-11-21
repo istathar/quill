@@ -1,17 +1,29 @@
 INSTALL
 
 This project is still in the inception phases, so at the moment there is no
-build infrastructure.
+proper build infrastructure. There is a minimal configure script and Makefile;
+[temporarily] edit .config that configure produces for your local environment.
+That needs fixing; see BUGS
 
 You will need the following prerequisites:
 
- - java-gnome	>= 4.0.12 (and, probably, 'mainline')
- - xom		>= 1.2.1
+ - java-gnome	>= 4.0.14 (ie, 'mainline')
+ - xom		>= 1.2.1  (note Ubuntu and Gentoo 1.1 packages not sufficent)
 
-To build Quill, import this source tree as an Eclipse project called "quill".
-Follow the same pattern for setting up `~/workspace/quill` being a checkout of
-`~/src/quill/mainline` as you have done following java-gnome's `HACKING`
-instructions.
+To build Quill, run:
+
+	./configure
+	make
+	make test
+
+Then, to use it,
+
+	./quill
+
+or
+
+	./quill DocumentFileName.xml
+
 
 
 <!--
