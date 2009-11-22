@@ -55,4 +55,17 @@ public abstract class Segment
     }
 
     abstract Segment createSimilar();
+
+    private String image;
+
+    /*
+     * This is called by RenderEngine...
+     */
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String filename) {
+        this.image = filename;
+    }
 }

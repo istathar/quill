@@ -23,7 +23,9 @@ import org.gnome.gtk.Widget;
 
 import quill.textbase.Change;
 import quill.textbase.ComponentSegment;
+import quill.textbase.DataLayer;
 import quill.textbase.HeadingSegment;
+import quill.textbase.ImageSegment;
 import quill.textbase.NormalSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
@@ -108,11 +110,14 @@ class ComponentEditorWidget extends ScrolledWindow
 
     private Series series;
 
-    void initializeSeries(Series series) {
+    private DataLayer data;
+
+    void initializeSeries(DataLayer data, Series series) {
         Segment segment;
         int i;
         Widget widget;
 
+        this.data = data;
         this.series = series;
 
         for (i = 0; i < series.size(); i++) {
@@ -148,6 +153,7 @@ class ComponentEditorWidget extends ScrolledWindow
         Widget result;
         EditorTextView editor;
         HeadingBox heading;
+        ImageDisplayBox image;
         ScrolledWindow wide;
 
         if (segment instanceof NormalSegment) {
@@ -166,6 +172,11 @@ class ComponentEditorWidget extends ScrolledWindow
             wide.add(editor);
 
             result = wide;
+        } else if (segment instanceof ImageSegment) {
+            image = new ImageDisplayBox(data, segment);
+
+            editor = image.getEditor();
+            result = image;
         } else if (segment instanceof HeadingSegment) {
             heading = new SectionHeadingBox(segment);
 

@@ -1,5 +1,5 @@
 /*
- * ReportRenderEngine.java
+ * ImageElement.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,16 +8,11 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package parchment.render;
+package quill.quack;
 
-import org.gnome.gtk.PaperSize;
-
-import quill.textbase.DataLayer;
-import quill.textbase.Series;
-
-public class ReportRenderEngine extends RenderEngine
+public class ImageElement extends BlockElement implements Block
 {
-    public ReportRenderEngine(PaperSize paper, DataLayer data, Series series) {
-        super(paper, data, series);
+    public ImageElement() {
+        super("image");
     }
 }

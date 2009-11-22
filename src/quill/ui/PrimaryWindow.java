@@ -24,6 +24,7 @@ import org.gnome.gtk.Window;
 import org.gnome.pango.FontDescription;
 
 import quill.textbase.Change;
+import quill.textbase.DataLayer;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 
@@ -278,11 +279,11 @@ class PrimaryWindow extends Window
      * will need to be told what other Series are available. So be prepared to
      * change this to accepting a Folio.
      */
-    void displaySeries(Series series) {
+    void displaySeries(DataLayer data, Series series) {
         this.series = series;
 
-        editor.initializeSeries(series);
-        preview.renderSeries(series);
+        editor.initializeSeries(data, series);
+        preview.renderSeries(data, series);
         outline.renderSeries(series);
         this.updateTitle();
     }

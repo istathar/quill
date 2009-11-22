@@ -37,6 +37,10 @@ abstract class QuackElement extends Element
         super.appendChild(str);
     }
 
+    void add(Meta data) {
+        super.addAttribute((QuackAttribute) data);
+    }
+
     void setValue(String name, String value) {
         super.addAttribute(new Attribute(name, value));
     }
@@ -47,6 +51,13 @@ abstract class QuackElement extends Element
         a = super.getAttribute(name);
 
         return a.getValue();
+    }
+
+    /*
+     * Unused by everything... except ImageElement
+     */
+    public Meta[] getMeta() {
+        return null;
     }
 
     /**

@@ -10,10 +10,14 @@
  */
 package parchment.render;
 
+import java.io.FileNotFoundException;
+
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.FontOptions;
+import org.freedesktop.cairo.Matrix;
 import org.freedesktop.cairo.Surface;
 import org.freedesktop.cairo.XlibSurface;
+import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.Unit;
 import org.gnome.pango.Attribute;
@@ -30,11 +34,14 @@ import org.gnome.pango.Style;
 import org.gnome.pango.StyleAttribute;
 import org.gnome.pango.Weight;
 import org.gnome.pango.WeightAttribute;
+import org.gnome.pango.WrapMode;
 
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
+import quill.textbase.DataLayer;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
+import quill.textbase.ImageSegment;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.Preformat;
@@ -47,6 +54,7 @@ import quill.textbase.Special;
 import quill.textbase.TextChain;
 
 import static org.freedesktop.cairo.HintMetrics.OFF;
+import static quill.textbase.Span.createSpan;
 
 /**
  * Render a Series.
@@ -86,6 +94,8 @@ public abstract class RenderEngine
 
     private Series series;
 
+    private DataLayer data;
+
     Typeface sansFace;
 
     Typeface serifFace;
@@ -98,8 +108,9 @@ public abstract class RenderEngine
      * Construct a new RenderEngine. Call {@link #render(Context) render()} to
      * actually draw.
      */
-    protected RenderEngine(final PaperSize paper, final Series series) {
+    protected RenderEngine(final PaperSize paper, final DataLayer data, final Series series) {
         specifySize(paper);
+        this.data = data;
         this.series = series;
     }
 
@@ -133,6 +144,8 @@ public abstract class RenderEngine
         sansFace = new Typeface(cr, new FontDescription("Liberation Sans, 7.3"), 0.0);
 
         headingFace = new Typeface(cr, new FontDescription("Linux Libertine O C"), 0.0);
+
+        cr.setSource(0.0, 0.0, 0.0);
     }
 
     /*
@@ -149,10 +162,12 @@ public abstract class RenderEngine
     }
 
     public void processSeries(final Context cr, final Series series) {
-        int i;
+        int i, j;
         Segment segment;
         TextChain text;
+        Extract entire;
         Extract[] paras;
+        String filename;
 
         cursor = topMargin;
         done = false;
@@ -165,26 +180,39 @@ public abstract class RenderEngine
             text = segment.getText();
 
             if (segment instanceof ComponentSegment) {
-                drawHeading(cr, text.extractAll(), 32.0);
+                entire = text.extractAll();
+                drawHeading(cr, entire, 32.0);
                 drawBlankLine(cr);
             } else if (segment instanceof HeadingSegment) {
-                drawHeading(cr, text.extractAll(), 16.0);
+                entire = text.extractAll();
+                drawHeading(cr, entire, 16.0);
                 drawBlankLine(cr);
             } else if (segment instanceof PreformatSegment) {
-                drawProgramCode(cr, text.extractAll());
+                entire = text.extractAll();
+                drawProgramCode(cr, entire);
                 drawBlankLine(cr);
             } else if (segment instanceof QuoteSegment) {
                 paras = text.extractParagraphs();
-                for (Extract extract : paras) {
-                    drawQuoteParagraph(cr, extract);
+                for (j = 0; j < paras.length; j++) {
+                    drawQuoteParagraph(cr, paras[j]);
                     drawBlankLine(cr);
                 }
             } else if (segment instanceof NormalSegment) {
                 paras = text.extractParagraphs();
-                for (Extract extract : paras) {
-                    drawNormalParagraph(cr, extract);
+                for (j = 0; j < paras.length; j++) {
+                    drawNormalParagraph(cr, paras[j]);
                     drawBlankLine(cr);
                 }
+            } else if (segment instanceof ImageSegment) {
+                filename = segment.getImage();
+                drawExternalGraphic(cr, filename);
+                entire = text.extractAll();
+                drawBlankLine(cr);
+                if (entire == null) {
+                    continue;
+                }
+                drawCitationParagraph(cr, entire);
+                drawBlankLine(cr);
             }
         }
     }
@@ -201,11 +229,11 @@ public abstract class RenderEngine
         desc.setSize(size);
         face = new Typeface(cr, desc, 0.0);
 
-        drawAreaText(cr, entire, face, false);
+        drawAreaText(cr, entire, face, false, false);
     }
 
     protected void drawNormalParagraph(Context cr, Extract extract) {
-        drawAreaText(cr, extract, serifFace, false);
+        drawAreaText(cr, extract, serifFace, false, false);
     }
 
     protected void drawQuoteParagraph(Context cr, Extract extract) {
@@ -217,14 +245,14 @@ public abstract class RenderEngine
         leftMargin += 45.0;
         rightMargin += 45.0;
 
-        drawAreaText(cr, extract, serifFace, false);
+        drawAreaText(cr, extract, serifFace, false, false);
 
         leftMargin = savedLeft;
         rightMargin = savedRight;
     }
 
     protected void drawProgramCode(Context cr, Extract entire) {
-        drawAreaText(cr, entire, monoFace, true);
+        drawAreaText(cr, entire, monoFace, true, false);
     }
 
     // character
@@ -324,7 +352,11 @@ public abstract class RenderEngine
      * Surface. Fancy typesetting character substitutions (smary quotes, etc)
      * will occur if not preformatted text.
      */
-    protected final void drawAreaText(Context cr, Extract extract, Typeface face, boolean preformatted) {
+    /*
+     * Change boolean centered for Alignment align?
+     */
+    protected final void drawAreaText(final Context cr, final Extract extract, final Typeface face,
+            final boolean preformatted, final boolean centered) {
         final Layout layout;
         final FontOptions options;
         final StringBuilder buf;
@@ -334,6 +366,7 @@ public abstract class RenderEngine
         Span span;
         Markup format;
         String str;
+        Rectangle rect;
 
         if (extract == null) {
             return;
@@ -352,6 +385,7 @@ public abstract class RenderEngine
         layout.setFontDescription(face.desc);
 
         layout.setWidth(pageWidth - (leftMargin + rightMargin));
+        layout.setWrapMode(WrapMode.WORD_CHAR);
 
         buf = new StringBuilder();
 
@@ -404,17 +438,19 @@ public abstract class RenderEngine
          * the lines.
          */
 
-        cr.setSource(0.0, 0.0, 0.0);
-
         for (LayoutLine line : layout.getLinesReadonly()) {
             paginate(cr, face.lineHeight);
             if (done) {
                 return;
             }
 
-            cr.moveTo(leftMargin, cursor + face.lineAscent);
+            if (!centered) {
+                cr.moveTo(leftMargin, cursor + face.lineAscent);
+            } else {
+                rect = line.getExtentsLogical();
+                cr.moveTo(pageWidth / 2 - rect.getWidth() / 2, cursor + face.lineAscent);
+            }
             cr.showLayout(line);
-
             cursor += face.lineHeight;
         }
     }
@@ -422,8 +458,11 @@ public abstract class RenderEngine
     /**
      * Check and see if there is sufficient vertical space for the requested
      * height. If not, finish the page being drawn and star a fresh one if
-     * possible. Return false if the vertical cursor can't be restarted (which
-     * is the case when drawing to PreviewWidget).
+     * possible. Sets done if the vertical cursor can't be restarted (which is
+     * the case when drawing to PreviewWidget).
+     */
+    /*
+     * Throw an exception instead?
      */
     private void paginate(Context cr, double requestedHeight) {
         final Surface surface;
@@ -558,8 +597,118 @@ public abstract class RenderEngine
         layout.setText(Integer.toString(pageNumber));
         ink = layout.getExtentsInk();
 
-        cr.setSource(0.0, 0.0, 0.0);
         cr.moveTo(pageWidth - rightMargin - ink.getWidth(), pageHeight - bottomMargin - footerHeight);
         cr.showLayout(layout);
+    }
+
+    protected void drawExternalGraphic(final Context cr, final String source) {
+        final String parent, filename;
+        final Pixbuf pixbuf;
+        final TextChain chain;
+        final Extract extract;
+
+        parent = data.getDirectory();
+        filename = parent + "/" + source;
+
+        try {
+            pixbuf = new Pixbuf(filename);
+        } catch (FileNotFoundException e) {
+            chain = new TextChain();
+            chain.append(createSpan("image" + "\n", null));
+            chain.append(createSpan(filename, Common.FILENAME));
+            chain.append(createSpan("\n" + "not found", null));
+            extract = chain.extractAll();
+            drawErrorParagraph(cr, extract);
+            return;
+        }
+
+        drawAreaImage(cr, pixbuf);
+    }
+
+    /**
+     * Show a message (in red) indicating a processing problem.
+     */
+    protected void drawErrorParagraph(Context cr, Extract extract) {
+        cr.setSource(1.0, 0.0, 0.0);
+        drawAreaText(cr, extract, sansFace, false, true);
+        cr.setSource(0.0, 0.0, 0.0);
+    }
+
+    /*
+     * Indentation copied from drawQuoteParagraph(). And face setting copied
+     * from drawHeading(). Both of these should probably be abstracted.
+     */
+    protected void drawCitationParagraph(Context cr, Extract extract) {
+        final double savedLeft, savedRight;
+        final FontDescription desc;
+        final Typeface face;
+
+        savedLeft = leftMargin;
+        savedRight = rightMargin;
+
+        leftMargin += 45.0;
+        rightMargin += 45.0;
+
+        desc = serifFace.desc.copy();
+        desc.setStyle(Style.ITALIC);
+        face = new Typeface(cr, desc, 0.0);
+
+        drawAreaText(cr, extract, face, false, true);
+
+        leftMargin = savedLeft;
+        rightMargin = savedRight;
+    }
+
+    /**
+     * Render an image. Will scale down to fit within page margins if too
+     * wide.
+     */
+    protected void drawAreaImage(final Context cr, final Pixbuf pixbuf) {
+        final double width, height;
+        final double available, scaleFactor;
+        final Matrix matrix;
+
+        width = pixbuf.getWidth();
+        height = pixbuf.getHeight();
+
+        paginate(cr, height);
+        if (done) {
+            return;
+        }
+
+        available = pageWidth - rightMargin - leftMargin;
+
+        /*
+         * This is a bit unusual; you'd think you would just moveTo(), or,
+         * just as conventionally, use the x,y co-ordinates of setSource().
+         * But it works out just as cleanly to do a translattion to (x,y) and
+         * then to just assume the source is (0,0).
+         */
+
+        cr.save();
+        matrix = new Matrix();
+
+        if (width > available) {
+            scaleFactor = available / width;
+            matrix.translate(leftMargin, cursor);
+            matrix.scale(scaleFactor, scaleFactor);
+        } else {
+            scaleFactor = 1.0;
+            matrix.translate(pageWidth / 2 - width / 2, cursor);
+        }
+
+        cr.transform(matrix);
+        cr.setSource(pixbuf, 0, 0);
+        cr.paint();
+
+        cr.restore();
+
+        cursor += height * scaleFactor;
+
+        /*
+         * Reset the source [colour] to black text.
+         */
+
+        cr.setSource(0.0, 0.0, 0.0);
     }
 }

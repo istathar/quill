@@ -20,6 +20,7 @@ import org.gnome.gtk.Widget;
 
 import parchment.render.RenderEngine;
 import parchment.render.ReportRenderEngine;
+import quill.textbase.DataLayer;
 import quill.textbase.Series;
 
 /**
@@ -55,6 +56,8 @@ class PreviewWidget extends DrawingArea
 
     private int pixelHeight;
 
+    private DataLayer data;
+
     private Series series;
 
     PreviewWidget() {
@@ -71,7 +74,7 @@ class PreviewWidget extends DrawingArea
                 paper = PaperSize.A4;
 
                 // engine = new ReportRenderEngine(PaperSize.A4, series);
-                engine = new ReportRenderEngine(paper, series);
+                engine = new ReportRenderEngine(paper, data, series);
 
                 cr = new Context(source.getWindow());
 
@@ -179,7 +182,8 @@ class PreviewWidget extends DrawingArea
      * This will need refinement, obviously, once we start having live preview
      * and start dealing with multiple pages.
      */
-    void renderSeries(Series series) {
+    void renderSeries(DataLayer data, Series series) {
+        this.data = data;
         this.series = series;
         this.queueDraw();
     }

@@ -19,6 +19,7 @@ import nu.xom.Document;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.HeadingSegment;
+import quill.textbase.ImageSegment;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.PreformatSegment;
@@ -166,6 +167,13 @@ public class QuackLoader
             start = true;
             preserve = false;
             setSegment(new HeadingSegment());
+        } else if (block instanceof ImageElement) {
+            markup = null;
+            start = true;
+            preserve = false;
+            setSegment(new ImageSegment());
+
+            processData(block);
         } else if (block instanceof TitleElement) {
             markup = null;
             start = true;
@@ -181,6 +189,16 @@ public class QuackLoader
         processBody(block);
     }
 
+    private void processData(final Block block) {
+        final Meta[] data;
+        int i;
+
+        data = block.getData();
+        for (i = 0; i < data.length; i++) {
+            processMetadata(data[i]);
+        }
+    }
+
     private void processBody(Block block) {
         Inline[] elements;
         int i;
@@ -188,6 +206,17 @@ public class QuackLoader
         elements = block.getBody();
         for (i = 0; i < elements.length; i++) {
             processInline(elements[i]);
+        }
+    }
+
+    private void processMetadata(final Meta meta) {
+        final String str;
+
+        if (meta instanceof SourceAttribute) {
+            str = meta.getValue();
+            segment.setImage(str);
+        } else {
+            throw new IllegalStateException("Unknown Meta type");
         }
     }
 
@@ -217,7 +246,7 @@ public class QuackLoader
             } else if (span instanceof BoldElement) {
                 markup = Common.BOLD;
             } else {
-                throw new IllegalStateException("Unknown Element type");
+                throw new IllegalStateException("Unknown Inline type");
             }
 
             start = false;

@@ -115,7 +115,7 @@ abstract class EditorTextView extends TextView
     }
 
     /**
-     * Override this and return true if you want TAB characters to be inserted
+     * Override this and return true if you want Tab characters to be inserted
      * rather than swollowed.
      */
     protected boolean isTabAllowed() {
@@ -126,6 +126,14 @@ abstract class EditorTextView extends TextView
      * Override this and return false if you want spell checking off
      */
     protected boolean isSpellChecked() {
+        return true;
+    }
+
+    /**
+     * Override this and return false if you need to disallow Enter keys
+     * (headings, properties)
+     */
+    protected boolean isEnterAllowed() {
         return true;
     }
 
@@ -187,8 +195,10 @@ abstract class EditorTextView extends TextView
                  * formatting first.
                  */
                 if (key == Keyval.Return) {
-                    insertMarkup = null;
-                    insertText("\n");
+                    if (isEnterAllowed()) {
+                        insertMarkup = null;
+                        insertText("\n");
+                    }
                     return true;
                 } else if (key == Keyval.Delete) {
                     deleteAt();

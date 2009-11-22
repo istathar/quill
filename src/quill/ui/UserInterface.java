@@ -192,7 +192,7 @@ public class UserInterface
         }
 
         series = folio.get(0);
-        primary.displaySeries(series);
+        primary.displaySeries(data, series);
     }
 
     void saveAs() {
@@ -317,7 +317,7 @@ public class UserInterface
             folio = data.getActiveDocument();
 
             // HARDCODE
-            engine = new ReportRenderEngine(paper, folio.get(0));
+            engine = new ReportRenderEngine(paper, data, folio.get(0));
             engine.render(cr);
 
             surface.finish();

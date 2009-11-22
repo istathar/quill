@@ -51,6 +51,8 @@ public class QuackNodeFactory extends NodeFactory
             return new TitleElement();
         } else if (name.equals("heading")) {
             return new HeadingElement();
+        } else if (name.equals("image")) {
+            return new ImageElement();
         } else if (name.equals("function")) {
             return new FunctionElement();
         } else if (name.equals("filename")) {
@@ -86,14 +88,13 @@ public class QuackNodeFactory extends NodeFactory
 
     public Nodes makeAttribute(String name, String URI, String value, Attribute.Type type) {
         /*
-         * TODO validate schema inbound here?
+         * Eeek. This means any src attribute. No contextual awareness.
          */
-        /*
-         * The one attribute we work with is emphasis's bold. Do we need to do
-         * anything special there for that, or is that logic properly in
-         * QuackLoader?
-         */
-        return super.makeAttribute(name, URI, value, type);
+        if (name.equals("src")) {
+            return new Nodes(new SourceAttribute(value));
+        } else {
+            return super.makeAttribute(name, URI, value, type);
+        }
     }
 
     /*
