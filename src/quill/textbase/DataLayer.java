@@ -197,7 +197,8 @@ public class DataLayer
     }
 
     /**
-     * Set the filename that this document is being saved to.
+     * Set the filename that this document is being saved to. Things like
+     * overwriting confirmation should have been done by the UI already.
      */
     /*
      * configure the filename fields, and mark that Folio as the current
@@ -238,6 +239,14 @@ public class DataLayer
      */
     public String getDirectory() {
         return directory;
+    }
+
+    /**
+     * Get the base component (the file's main name without parent directory
+     * or extension suffix) of the target document.
+     */
+    public String getBasename() {
+        return basename;
     }
 
     public void saveDocument() throws IOException {

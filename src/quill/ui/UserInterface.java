@@ -279,8 +279,7 @@ public class UserInterface
      * RenderToPrintHarness.
      */
     public void printDocument() {
-        final String fullname, basename, targetname;
-        int i;
+        final String parentdir, fullname, basename, targetname;
         MessageDialog dialog;
         final Context cr;
         final Surface surface;
@@ -303,14 +302,13 @@ public class UserInterface
             }
 
             /*
-             * Work out the basename of the current [save] filename, then
+             * Get the basename of the current [save] filename, then
              * instantiate the Cairo Surface we're going to be drawing to with
              * that basename.pdf as the target.
              */
-
-            i = fullname.indexOf(".xml");
-            basename = fullname.substring(0, i);
-            targetname = basename + ".pdf";
+            parentdir = data.getDirectory();
+            basename = data.getBasename();
+            targetname = parentdir + "/" + basename + ".pdf";
 
             surface = new PdfSurface(targetname, paper.getWidth(Unit.POINTS),
                     paper.getHeight(Unit.POINTS));
