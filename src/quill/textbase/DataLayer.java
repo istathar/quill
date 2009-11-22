@@ -51,7 +51,11 @@ public class DataLayer
      */
     private Folio current;
 
-    private File name;
+    private String directory;
+
+    private String basename;
+
+    private String filename;
 
     public DataLayer() {
         stack = new ChangeStack();
@@ -75,7 +79,7 @@ public class DataLayer
         return source;
     }
 
-    public void loadDocument(String filename) throws ValidityException, ParsingException, IOException {
+    public void loadDocument(String pathname) throws ValidityException, ParsingException, IOException {
         final File source;
         final NodeFactory factory;
         final Builder parser;
@@ -84,7 +88,8 @@ public class DataLayer
         final Series series;
         final Series[] collection;
 
-        source = new File(filename).getAbsoluteFile();
+        setFilename(pathname);
+        source = new File(pathname);
 
         factory = new QuackNodeFactory();
         parser = new Builder(factory);
@@ -103,7 +108,7 @@ public class DataLayer
             series
         };
 
-        loadDocument(source, new Folio(collection));
+        current = new Folio(collection);
     }
 
     public Folio getActiveDocument() {
@@ -163,11 +168,6 @@ public class DataLayer
         return stack.redo();
     }
 
-    void loadDocument(File name, Folio folio) {
-        this.name = name;
-        this.current = folio;
-    }
-
     /**
      * Create a new blank document with a single Component.
      */
@@ -193,41 +193,74 @@ public class DataLayer
             chapter1
         });
 
-        loadDocument(null, folio);
+        current = folio;
     }
 
     /**
-     * Returns the File probed allowing you to figure out if this was
-     * successful.
+     * Set the filename that this document is being saved to. Things like
+     * overwriting confirmation should have been done by the UI already.
      */
-    public File setFilename(String filename) {
-        final File proposed;
+    /*
+     * configure the filename fields, and mark that Folio as the current
+     * document.
+     */
+    public void setFilename(String path) {
+        File proposed, absolute;
+        final String name;
+        final int i;
 
-        proposed = new File(filename).getAbsoluteFile();
-
-        if (proposed.exists()) {
-            throw new IllegalArgumentException(filename);
+        proposed = new File(path);
+        if (proposed.isAbsolute()) {
+            absolute = proposed;
+        } else {
+            absolute = proposed.getAbsoluteFile();
         }
 
-        name = proposed;
-        return proposed;
+        directory = absolute.getParent();
+        name = absolute.getName();
+
+        i = name.indexOf(".xml");
+        if (i == -1) {
+            throw new IllegalArgumentException("\n" + "Document files must have a .xml extension");
+        }
+        basename = name.substring(0, i);
+        filename = absolute.getPath();
     }
 
-    public File getFilename() {
-        return name;
+    /**
+     * Get the full (absolute) pathname of the target document.
+     */
+    public String getFilename() {
+        return filename;
+    }
+
+    /**
+     * Get the full path to the directory containing the target document.
+     */
+    public String getDirectory() {
+        return directory;
+    }
+
+    /**
+     * Get the base component (the file's main name without parent directory
+     * or extension suffix) of the target document.
+     */
+    public String getBasename() {
+        return basename;
     }
 
     public void saveDocument() throws IOException {
-        final File tmp;
+        final File target, tmp;
         final FileOutputStream out;
         boolean result;
         String dir, path;
 
-        if (name == null) {
+        if (filename == null) {
             throw new IllegalStateException("save filename not set");
         }
 
-        if (name.exists() && (!name.canWrite())) {
+        target = new File(filename);
+        if (target.exists() && (!target.canWrite())) {
             throw new IOException("Can't write to document file!\n\n" + "<i>Check permissions?</i>");
         }
 
@@ -237,7 +270,7 @@ public class DataLayer
          * wrong.
          */
 
-        tmp = new File(name.getAbsolutePath() + ".tmp");
+        tmp = new File(filename + ".tmp");
         if (tmp.exists()) {
             tmp.delete();
         }
@@ -264,7 +297,7 @@ public class DataLayer
          * And now replace the temp file over the actual document.
          */
 
-        result = tmp.renameTo(name);
+        result = tmp.renameTo(target);
         if (!result) {
             tmp.delete();
             throw new IOException("Unbale to rename temporary file to target document!");
@@ -278,7 +311,7 @@ public class DataLayer
      * anything of its own.
      */
     public void emergencySave() {
-        final String fullname, savename;
+        final String savename;
         File target = null;
         final OutputStream out;
         final PrintStream err;
@@ -288,14 +321,12 @@ public class DataLayer
         err.print("Attempting emergency save... ");
         err.flush();
 
-        if (name == null) {
-            fullname = "Untitled.xml"; // gotta call it something
-        } else {
-            fullname = name.getAbsolutePath();
+        if (filename == null) {
+            filename = "Untitled.xml"; // gotta call it something
         }
 
         try {
-            savename = fullname + ".RESCUED";
+            savename = filename + ".RESCUED";
             target = new File(savename);
             out = new FileOutputStream(target);
             saveDocument(out);

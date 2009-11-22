@@ -22,6 +22,7 @@ public class ValidateFileNaming extends IOTestCase
     public final void testInsertText() throws ValidityException, ParsingException, IOException {
         final DataLayer data;
         final File target;
+        final String parentdir, basename, filename;
 
         data = new DataLayer();
 
@@ -39,13 +40,16 @@ public class ValidateFileNaming extends IOTestCase
         assertFalse(target.exists());
         target.getParentFile().mkdirs();
 
-        data.setFilename(target.getAbsolutePath());
-        try {
-            data.setFilename(target.getAbsolutePath());
-        } catch (IllegalArgumentException iae) {
-            // good, except maybe we should change this to asking if we want
-            // to overwrite?
-        }
+        data.setFilename(target.getPath());
+
+        parentdir = data.getDirectory();
+        basename = data.getBasename();
+        filename = data.getFilename();
+
+        assertTrue(parentdir.endsWith("tmp/unittests/quill/ui"));
+        assertEquals("ValidateFileNaming", basename);
+        assertEquals(parentdir + "/" + basename + ".xml", filename);
+
         data.saveDocument();
 
         assertTrue(target.exists());
