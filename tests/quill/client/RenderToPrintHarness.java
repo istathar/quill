@@ -66,7 +66,7 @@ public class RenderToPrintHarness
 
         folio = data.getActiveDocument();
 
-        engine = new ReportRenderEngine(paper, folio.get(0));
+        engine = new ReportRenderEngine(paper, data, folio.get(0));
         // engine = new ScreenRenderEngine(paper, folio.get(0));
         engine.render(cr);
 

@@ -14,6 +14,7 @@ import org.freedesktop.cairo.Context;
 import org.gnome.gtk.PaperSize;
 import org.gnome.pango.FontDescription;
 
+import quill.textbase.DataLayer;
 import quill.textbase.Series;
 
 /**
@@ -29,8 +30,8 @@ import quill.textbase.Series;
  */
 public class ScreenRenderEngine extends RenderEngine
 {
-    public ScreenRenderEngine(PaperSize paper, Series series) {
-        super(paper, series);
+    public ScreenRenderEngine(PaperSize paper, DataLayer data, Series series) {
+        super(paper, data, series);
     }
 
     protected void specifyFonts(final Context cr) {

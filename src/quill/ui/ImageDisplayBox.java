@@ -20,6 +20,7 @@ import org.gnome.gtk.Label;
 import org.gnome.gtk.Stock;
 import org.gnome.gtk.VBox;
 
+import quill.textbase.DataLayer;
 import quill.textbase.Segment;
 
 public class ImageDisplayBox extends VBox
@@ -30,21 +31,26 @@ public class ImageDisplayBox extends VBox
 
     private EditorTextView caption;
 
-    public ImageDisplayBox(Segment segment) {
+    public ImageDisplayBox(DataLayer data, Segment segment) {
         super(false, 0);
-
-        setupBox(segment);
-    }
-
-    private void setupBox(Segment segment) {
-        final String filename;
+        final String source, parentdir, filename;
         final int width;
         String tooltip;
         Pixbuf pixbuf;
 
         box = this;
 
-        filename = segment.getImage();
+        /*
+         * Image paths specified in src= tags are assumed to be relatve to the
+         * base document. So using that relative path and our cached parent
+         * location, work out an actual pathname to the file.
+         */
+
+        source = segment.getImage();
+        parentdir = data.getDirectory();
+
+        filename = parentdir + "/" + source;
+
         try {
             width = Pixbuf.getFileInfoWidth(filename);
             if (width > 150) {

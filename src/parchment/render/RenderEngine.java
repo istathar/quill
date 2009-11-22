@@ -38,6 +38,7 @@ import org.gnome.pango.WrapMode;
 
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
+import quill.textbase.DataLayer;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
@@ -93,6 +94,8 @@ public abstract class RenderEngine
 
     private Series series;
 
+    private DataLayer data;
+
     Typeface sansFace;
 
     Typeface serifFace;
@@ -105,8 +108,9 @@ public abstract class RenderEngine
      * Construct a new RenderEngine. Call {@link #render(Context) render()} to
      * actually draw.
      */
-    protected RenderEngine(final PaperSize paper, final Series series) {
+    protected RenderEngine(final PaperSize paper, final DataLayer data, final Series series) {
         specifySize(paper);
+        this.data = data;
         this.series = series;
     }
 
@@ -597,10 +601,14 @@ public abstract class RenderEngine
         cr.showLayout(layout);
     }
 
-    protected void drawExternalGraphic(final Context cr, final String filename) {
+    protected void drawExternalGraphic(final Context cr, final String source) {
+        final String parent, filename;
         final Pixbuf pixbuf;
         final TextChain chain;
         final Extract extract;
+
+        parent = data.getDirectory();
+        filename = parent + "/" + source;
 
         try {
             pixbuf = new Pixbuf(filename);
