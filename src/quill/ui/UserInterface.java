@@ -12,7 +12,6 @@
  */
 package quill.ui;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -211,11 +210,10 @@ public class UserInterface
      * between who owns the filename, who is responsible for carrying out IO,
      * and who drives the process.
      */
-    File requestFilename() {
+    String requestFilename() {
         final FileChooserDialog dialog;
         String filename;
         ResponseType response;
-        File result;
 
         dialog = new FileChooserDialog("Save As...", primary, SAVE);
 
@@ -230,10 +228,7 @@ public class UserInterface
             filename = dialog.getFilename();
 
             try {
-                result = data.setFilename(filename);
-                if (result != null) {
-                    return result;
-                }
+                data.setFilename(filename);
             } finally {
                 // try again
             }
@@ -245,13 +240,13 @@ public class UserInterface
      */
     void saveDocument() {
         MessageDialog dialog;
-        File target;
+        String filename;
 
-        target = data.getFilename();
+        filename = data.getFilename();
 
-        if (target == null) {
-            target = requestFilename();
-            if (target == null) {
+        if (filename == null) {
+            filename = requestFilename();
+            if (filename == null) {
                 return; // cancelled by user
             }
         }
@@ -260,7 +255,7 @@ public class UserInterface
             data.saveDocument();
         } catch (IllegalStateException ise) {
             dialog = new ErrorMessageDialog(primary, "Save failed",
-                    "You have a problem in the structure or data of your document: " + ise.getMessage());
+                    "There is a problem in the structure or data of your document: " + ise.getMessage());
             dialog.run();
             dialog.hide();
         } catch (IOException ioe) {
@@ -284,9 +279,7 @@ public class UserInterface
      * RenderToPrintHarness.
      */
     public void printDocument() {
-        final File save;
-        final String fullname, basename, targetname;
-        int i;
+        final String parentdir, fullname, basename, targetname;
         MessageDialog dialog;
         final Context cr;
         final Surface surface;
@@ -297,8 +290,8 @@ public class UserInterface
         try {
             paper = PaperSize.A4;
 
-            save = data.getFilename();
-            if (save == null) {
+            fullname = data.getFilename();
+            if (fullname == null) {
                 dialog = new InfoMessageDialog(primary, "Set filename first",
                         "You can't print the document (to PDF) until you've set the filename of this document. "
                                 + "Choose <b>Save As...</b>, then come back and try again!");
@@ -308,17 +301,14 @@ public class UserInterface
                 return;
             }
 
-            fullname = save.getAbsolutePath();
-
             /*
-             * Work out the basename of the current [save] filename, then
+             * Get the basename of the current [save] filename, then
              * instantiate the Cairo Surface we're going to be drawing to with
              * that basename.pdf as the target.
              */
-
-            i = fullname.indexOf(".xml");
-            basename = fullname.substring(0, i);
-            targetname = basename + ".pdf";
+            parentdir = data.getDirectory();
+            basename = data.getBasename();
+            targetname = parentdir + "/" + basename + ".pdf";
 
             surface = new PdfSurface(targetname, paper.getWidth(Unit.POINTS),
                     paper.getHeight(Unit.POINTS));

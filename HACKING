@@ -1,0 +1,21 @@
+HACKING
+
+To work on Quill, import this source tree as an Eclipse project called
+"quill". Follow the same pattern for setting up `~/workspace/quill` being a
+checkout of `~/src/quill/mainline` as you have done following java-gnome's
+`HACKING` instructions.
+
+See TODO and BUGS.
+
+<!--
+
+  Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd 
+
+  As project documentation, this file forms an integral part of the source
+  code of the program it accompanies, and thus is made available to you by its
+  authors under the terms of the "GNU General Public Licence, version 2". See
+  the LICENCE file for the terms governing usage, copying and redistribution.
+
+  vim: set textwidth=78 nowrap:
+
+-->

@@ -303,6 +303,20 @@ public abstract class RenderEngine
                 buf.append('“');
                 num++;
             }
+        } else if (ch == '\'') {
+            /*
+             * Replace apostrophies. Unlike the double quote case above, we do
+             * not replace matched pairs since we are NOT using single quotes
+             * for quoted speech, and because there is no way to differentiate
+             * "I heard him say 'wow' out loud" and the aspirated contraction
+             * "There any 'round here?" We take the second case as more
+             * important to get right, which requires a close quote only. The
+             * relevant characters are U+2018 aka the LEFT SINGLE QUOTATION
+             * MARK and U+2019 aka the RIGHT SINGLE QUOTATION MARK. We only
+             * use the latter for typsetting contractions.
+             */
+            buf.append('’');
+            num++;
         } else if (ch == ' ') {
             /*
              * If the preceeding sequence is " - " then replace the hyphen
