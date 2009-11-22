@@ -10,12 +10,17 @@
  */
 package quill.ui;
 
+import java.io.FileNotFoundException;
+
 import org.freedesktop.cairo.Antialias;
 import org.freedesktop.cairo.Context;
 import org.gnome.gdk.EventExpose;
+import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.DrawingArea;
+import org.gnome.gtk.HBox;
+import org.gnome.gtk.Image;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.ReliefStyle;
 import org.gnome.gtk.VBox;
@@ -24,6 +29,7 @@ import org.gnome.gtk.Widget;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
+import quill.textbase.ImageSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
@@ -37,7 +43,8 @@ import quill.textbase.TextChain;
  */
 /*
  * TODO This is just a demonstration placeholder. It will need to be made live
- * and reactive to changes to the DataLayer.
+ * and reactive to changes to the DataLayer. The code to generate the
+ * "compressed lines" is horrendous.
  */
 class OutlineWidget extends VBox
 {
@@ -53,7 +60,7 @@ class OutlineWidget extends VBox
 
     private void buildOutline() {
         Segment segment;
-        int i, num;
+        int i;
         TextChain text;
         StringBuilder str;
         Button button;
@@ -80,6 +87,23 @@ class OutlineWidget extends VBox
                 str = new StringBuilder();
                 str.append("      ");
                 str.append(text.toString());
+            } else if (segment instanceof ImageSegment) {
+                Image image;
+                Pixbuf pixbuf;
+                HBox left;
+
+                try {
+                    pixbuf = new Pixbuf("share/pixmaps/graphic-16x16.png", -1, 10, true);
+                } catch (FileNotFoundException e) {
+                    throw new Error(e);
+                }
+                image = new Image(pixbuf);
+                image.setAlignment(Alignment.LEFT, Alignment.TOP);
+                image.setPadding(40, 3);
+                left = new HBox(false, 0);
+                left.packStart(image, false, false, 0);
+                top.packStart(left, false, false, 0);
+                continue;
             } else {
                 text = segment.getText();
                 text.extractParagraphs();
@@ -133,7 +157,7 @@ class CompressedLines extends DrawingArea
 
     private static final int WIDTH = 200;
 
-    private static final int SPACING = 3;
+    private static final int SPACING = 4;
 
     CompressedLines(TextChain text, boolean program) {
         super();
