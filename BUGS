@@ -9,6 +9,21 @@ Make does too much
 For some reason `make test` is actually rebuilding everything.
 
 
+Internal
+========
+
+Need an offset cache
+--------------------
+
+The data structure used to back a TextChain is a mutable linked list; that's
+fine for arbitrary insertions, but our real need is to find Spans at given
+offsets and to break Spans (creating boundaries) at given offsets.
+
+This was fine for preliminary implementation, but with the addition of spell
+checking we have probably hit O(n²) or worse when it comes to driving down
+splices as we iterate create Span boundaries at word beginnings and endings.
+
+
 <!--
 
   Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd 

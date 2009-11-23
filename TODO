@@ -25,16 +25,12 @@ We should refine the positioning algorithm. At present now you get drifted to
 the left rather than it remembering where (column? x?) you were recently and
 returning there when back on a longer line.
 
-Preview and Output
-==================
+Editor for notes and references
+-------------------------------
 
-Inheriting
-----------
-
-The whole PreviewWidget needs to be made a use case of our RenderEngine.
-Actual "page formats" will need to be concrete subclasses of RenderEngine, and
-code to draw various Segment types will need to be done in overrides of
-inherited methods.
+While loading, display, rendering, and saving of documents with <note> and
+<cite> tags is implemented, there's no user interface for adding or creating
+these markers yet, nor editing the reference bodies.
 
 
 Build
