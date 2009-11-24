@@ -15,7 +15,6 @@ import java.util.ArrayList;
 
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.FontOptions;
-import org.freedesktop.cairo.Matrix;
 import org.freedesktop.cairo.Surface;
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.PaperSize;
@@ -242,6 +241,7 @@ public abstract class RenderEngine
                 return;
             }
         }
+        paginate(cr, 2000.0);
     }
 
     protected void drawBlankLine(Context cr) {
@@ -469,11 +469,11 @@ public abstract class RenderEngine
             }
 
             if (!centered) {
-                area = new Area(leftMargin, cursor + face.lineAscent, line);
+                area = new TextArea(leftMargin, cursor + face.lineAscent, line);
                 areas.add(area);
             } else {
                 rect = line.getExtentsLogical();
-                area = new Area(pageWidth / 2 - rect.getWidth() / 2, cursor + face.lineAscent, line);
+                area = new TextArea(pageWidth / 2 - rect.getWidth() / 2, cursor + face.lineAscent, line);
                 areas.add(area);
             }
             cursor += face.lineHeight;
@@ -519,26 +519,6 @@ public abstract class RenderEngine
 
         cursor = topMargin;
         areas.clear();
-    }
-
-    private static class Area
-    {
-        private final double x;
-
-        private final double y;
-
-        private final LayoutLine line;
-
-        Area(double x, double y, LayoutLine line) {
-            this.x = x;
-            this.y = y;
-            this.line = line;
-        }
-
-        void render(Context cr) {
-            cr.moveTo(x, y);
-            cr.showLayout(line);
-        }
     }
 
     java.util.ArrayList<Area> areas;
@@ -725,50 +705,32 @@ public abstract class RenderEngine
      */
     protected void drawAreaImage(final Context cr, final Pixbuf pixbuf) {
         final double width, height;
-        final double available, scaleFactor;
-        final Matrix matrix;
+        final double available, scaleFactor, request;
+        final double leftCorner;
+        final Area area;
 
         width = pixbuf.getWidth();
         height = pixbuf.getHeight();
 
-        paginate(cr, height);
+        available = pageWidth - rightMargin - leftMargin;
+
+        if (width > available) {
+            scaleFactor = available / width;
+            leftCorner = leftMargin;
+        } else {
+            scaleFactor = 1.0;
+            leftCorner = pageWidth / 2 - width / 2;
+        }
+        request = height * scaleFactor;
+
+        paginate(cr, request);
         if (done) {
             return;
         }
 
-        available = pageWidth - rightMargin - leftMargin;
+        area = new ImageArea(leftCorner, cursor, pixbuf, scaleFactor);
+        areas.add(area);
 
-        /*
-         * This is a bit unusual; you'd think you would just moveTo(), or,
-         * just as conventionally, use the x,y co-ordinates of setSource().
-         * But it works out just as cleanly to do a translattion to (x,y) and
-         * then to just assume the source is (0,0).
-         */
-
-        cr.save();
-        matrix = new Matrix();
-
-        if (width > available) {
-            scaleFactor = available / width;
-            matrix.translate(leftMargin, cursor);
-            matrix.scale(scaleFactor, scaleFactor);
-        } else {
-            scaleFactor = 1.0;
-            matrix.translate(pageWidth / 2 - width / 2, cursor);
-        }
-
-        cr.transform(matrix);
-        cr.setSource(pixbuf, 0, 0);
-        cr.paint();
-
-        cr.restore();
-
-        cursor += height * scaleFactor;
-
-        /*
-         * Reset the source [colour] to black text.
-         */
-
-        cr.setSource(0.0, 0.0, 0.0);
+        cursor += request;
     }
 }
