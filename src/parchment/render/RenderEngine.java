@@ -11,12 +11,12 @@
 package parchment.render;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.FontOptions;
 import org.freedesktop.cairo.Matrix;
 import org.freedesktop.cairo.Surface;
-import org.freedesktop.cairo.XlibSurface;
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.Unit;
@@ -133,6 +133,25 @@ public abstract class RenderEngine
         }
     }
 
+    /**
+     * One page only?
+     */
+    private boolean preview;
+
+    private Segment target;
+
+    /**
+     * Have we found the target Segment & offset yet?
+     */
+    private boolean found;
+
+    public void renderPage(final Context cr, final Segment target) {
+        this.preview = true;
+        this.target = target;
+        this.found = false;
+        render(cr);
+    }
+
     /*
      * This will move to the actual RenderEngine subclass, I expect.
      */
@@ -169,15 +188,19 @@ public abstract class RenderEngine
         Extract[] paras;
         String filename;
 
+        areas = new ArrayList<Area>(60);
         cursor = topMargin;
         done = false;
         pageNumber = 0;
         footerHeight = serifFace.lineHeight;
 
-        drawFooter(cr);
         for (i = 0; i < series.size(); i++) {
             segment = series.get(i);
             text = segment.getText();
+
+            if (segment == target) {
+                found = true;
+            }
 
             if (segment instanceof ComponentSegment) {
                 entire = text.extractAll();
@@ -213,6 +236,10 @@ public abstract class RenderEngine
                 }
                 drawCitationParagraph(cr, entire);
                 drawBlankLine(cr);
+            }
+
+            if (done) {
+                return;
             }
         }
     }
@@ -367,12 +394,9 @@ public abstract class RenderEngine
         Markup format;
         String str;
         Rectangle rect;
+        Area area;
 
         if (extract == null) {
-            return;
-        }
-
-        if (done) {
             return;
         }
 
@@ -445,19 +469,20 @@ public abstract class RenderEngine
             }
 
             if (!centered) {
-                cr.moveTo(leftMargin, cursor + face.lineAscent);
+                area = new Area(leftMargin, cursor + face.lineAscent, line);
+                areas.add(area);
             } else {
                 rect = line.getExtentsLogical();
-                cr.moveTo(pageWidth / 2 - rect.getWidth() / 2, cursor + face.lineAscent);
+                area = new Area(pageWidth / 2 - rect.getWidth() / 2, cursor + face.lineAscent, line);
+                areas.add(area);
             }
-            cr.showLayout(line);
             cursor += face.lineHeight;
         }
     }
 
     /**
      * Check and see if there is sufficient vertical space for the requested
-     * height. If not, finish the page being drawn and star a fresh one if
+     * height. If not, finish the page being drawn and start a fresh one if
      * possible. Sets done if the vertical cursor can't be restarted (which is
      * the case when drawing to PreviewWidget).
      */
@@ -467,19 +492,56 @@ public abstract class RenderEngine
     private void paginate(Context cr, double requestedHeight) {
         final Surface surface;
 
-        if ((cursor + requestedHeight) > (pageHeight - bottomMargin - footerHeight)) {
-            surface = cr.getTarget();
-            if (surface instanceof XlibSurface) {
-                done = true;
-                return;
-            }
+        if ((cursor + requestedHeight) < (pageHeight - bottomMargin - footerHeight)) {
+            return;
+        }
 
-            surface.showPage();
+        pageNumber++;
+
+        if ((preview) && (!found)) {
             cursor = topMargin;
+            areas.clear();
+            return;
+        }
 
-            drawFooter(cr);
+        drawFooter(cr);
+
+        for (Area area : areas) {
+            area.render(cr);
+        }
+
+        if (preview) {
+            done = true;
+        } else {
+            surface = cr.getTarget();
+            surface.showPage();
+        }
+
+        cursor = topMargin;
+        areas.clear();
+    }
+
+    private static class Area
+    {
+        private final double x;
+
+        private final double y;
+
+        private final LayoutLine line;
+
+        Area(double x, double y, LayoutLine line) {
+            this.x = x;
+            this.y = y;
+            this.line = line;
+        }
+
+        void render(Context cr) {
+            cr.moveTo(x, y);
+            cr.showLayout(line);
         }
     }
+
+    java.util.ArrayList<Area> areas;
 
     private static final Attribute[] empty = new Attribute[] {};
 
@@ -589,8 +651,6 @@ public abstract class RenderEngine
     protected void drawFooter(Context cr) {
         final Layout layout;
         final Rectangle ink;
-
-        pageNumber++;
 
         layout = new Layout(cr);
         layout.setFontDescription(serifFace.desc);

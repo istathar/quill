@@ -82,7 +82,7 @@ class PreviewWidget extends DrawingArea
                 drawPageOutline(cr, engine);
                 drawCrosshairs(cr, engine);
 
-                engine.render(cr);
+                engine.renderPage(cr, series.get(11));
 
                 return true;
             }
