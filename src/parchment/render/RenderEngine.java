@@ -203,37 +203,37 @@ public abstract class RenderEngine
 
             if (segment instanceof ComponentSegment) {
                 entire = text.extractAll();
-                drawHeading(cr, entire, 32.0);
+                queueHeading(cr, entire, 32.0);
                 drawBlankLine(cr);
             } else if (segment instanceof HeadingSegment) {
                 entire = text.extractAll();
-                drawHeading(cr, entire, 16.0);
+                queueHeading(cr, entire, 16.0);
                 drawBlankLine(cr);
             } else if (segment instanceof PreformatSegment) {
                 entire = text.extractAll();
-                drawProgramCode(cr, entire);
+                queueProgramCode(cr, entire);
                 drawBlankLine(cr);
             } else if (segment instanceof QuoteSegment) {
                 paras = text.extractParagraphs();
                 for (j = 0; j < paras.length; j++) {
-                    drawQuoteParagraph(cr, paras[j]);
+                    queueQuoteParagraph(cr, paras[j]);
                     drawBlankLine(cr);
                 }
             } else if (segment instanceof NormalSegment) {
                 paras = text.extractParagraphs();
                 for (j = 0; j < paras.length; j++) {
-                    drawNormalParagraph(cr, paras[j]);
+                    queueNormalParagraph(cr, paras[j]);
                     drawBlankLine(cr);
                 }
             } else if (segment instanceof ImageSegment) {
                 filename = segment.getImage();
-                drawExternalGraphic(cr, filename);
+                queueExternalGraphic(cr, filename);
                 entire = text.extractAll();
                 drawBlankLine(cr);
                 if (entire == null) {
                     continue;
                 }
-                drawCitationParagraph(cr, entire);
+                queueCitationParagraph(cr, entire);
                 drawBlankLine(cr);
             }
 
@@ -248,7 +248,7 @@ public abstract class RenderEngine
         cursor += serifFace.lineHeight * 0.7;
     }
 
-    protected void drawHeading(Context cr, Extract entire, double size) {
+    protected void queueHeading(Context cr, Extract entire, double size) {
         FontDescription desc;
         Typeface face;
 
@@ -256,14 +256,14 @@ public abstract class RenderEngine
         desc.setSize(size);
         face = new Typeface(cr, desc, 0.0);
 
-        drawAreaText(cr, entire, face, false, false);
+        layoutAreaText(cr, entire, face, false, false);
     }
 
-    protected void drawNormalParagraph(Context cr, Extract extract) {
-        drawAreaText(cr, extract, serifFace, false, false);
+    protected void queueNormalParagraph(Context cr, Extract extract) {
+        layoutAreaText(cr, extract, serifFace, false, false);
     }
 
-    protected void drawQuoteParagraph(Context cr, Extract extract) {
+    protected void queueQuoteParagraph(Context cr, Extract extract) {
         final double savedLeft, savedRight;
 
         savedLeft = leftMargin;
@@ -272,14 +272,14 @@ public abstract class RenderEngine
         leftMargin += 45.0;
         rightMargin += 45.0;
 
-        drawAreaText(cr, extract, serifFace, false, false);
+        layoutAreaText(cr, extract, serifFace, false, false);
 
         leftMargin = savedLeft;
         rightMargin = savedRight;
     }
 
-    protected void drawProgramCode(Context cr, Extract entire) {
-        drawAreaText(cr, entire, monoFace, true, false);
+    protected void queueProgramCode(Context cr, Extract entire) {
+        layoutAreaText(cr, entire, monoFace, true, false);
     }
 
     // character
@@ -382,7 +382,7 @@ public abstract class RenderEngine
     /*
      * Change boolean centered for Alignment align?
      */
-    protected final void drawAreaText(final Context cr, final Extract extract, final Typeface face,
+    protected final void layoutAreaText(final Context cr, final Extract extract, final Typeface face,
             final boolean preformatted, final boolean centered) {
         final Layout layout;
         final FontOptions options;
@@ -507,7 +507,7 @@ public abstract class RenderEngine
         drawFooter(cr);
 
         for (Area area : areas) {
-            area.render(cr);
+            area.draw(cr);
         }
 
         if (preview) {
@@ -641,7 +641,7 @@ public abstract class RenderEngine
         cr.showLayout(layout);
     }
 
-    protected void drawExternalGraphic(final Context cr, final String source) {
+    protected void queueExternalGraphic(final Context cr, final String source) {
         final String parent, filename;
         final Pixbuf pixbuf;
         final TextChain chain;
@@ -658,19 +658,19 @@ public abstract class RenderEngine
             chain.append(createSpan(filename, Common.FILENAME));
             chain.append(createSpan("\n" + "not found", null));
             extract = chain.extractAll();
-            drawErrorParagraph(cr, extract);
+            queueErrorParagraph(cr, extract);
             return;
         }
 
-        drawAreaImage(cr, pixbuf);
+        layoutAreaImage(cr, pixbuf);
     }
 
     /**
      * Show a message (in red) indicating a processing problem.
      */
-    protected void drawErrorParagraph(Context cr, Extract extract) {
+    protected void queueErrorParagraph(Context cr, Extract extract) {
         cr.setSource(1.0, 0.0, 0.0);
-        drawAreaText(cr, extract, sansFace, false, true);
+        layoutAreaText(cr, extract, sansFace, false, true);
         cr.setSource(0.0, 0.0, 0.0);
     }
 
@@ -678,7 +678,7 @@ public abstract class RenderEngine
      * Indentation copied from drawQuoteParagraph(). And face setting copied
      * from drawHeading(). Both of these should probably be abstracted.
      */
-    protected void drawCitationParagraph(Context cr, Extract extract) {
+    protected void queueCitationParagraph(Context cr, Extract extract) {
         final double savedLeft, savedRight;
         final FontDescription desc;
         final Typeface face;
@@ -693,7 +693,7 @@ public abstract class RenderEngine
         desc.setStyle(Style.ITALIC);
         face = new Typeface(cr, desc, 0.0);
 
-        drawAreaText(cr, extract, face, false, true);
+        layoutAreaText(cr, extract, face, false, true);
 
         leftMargin = savedLeft;
         rightMargin = savedRight;
@@ -703,7 +703,7 @@ public abstract class RenderEngine
      * Render an image. Will scale down to fit within page margins if too
      * wide.
      */
-    protected void drawAreaImage(final Context cr, final Pixbuf pixbuf) {
+    protected final void layoutAreaImage(final Context cr, final Pixbuf pixbuf) {
         final double width, height;
         final double available, scaleFactor, request;
         final double leftCorner;

@@ -19,7 +19,7 @@ abstract class Area
 {
     Area() {}
 
-    abstract void render(Context cr);
+    abstract void draw(Context cr);
 }
 
 final class TextArea extends Area
@@ -36,7 +36,7 @@ final class TextArea extends Area
         this.line = line;
     }
 
-    void render(final Context cr) {
+    void draw(final Context cr) {
         cr.moveTo(x, y);
         cr.showLayout(line);
     }
@@ -59,7 +59,7 @@ final class ImageArea extends Area
         this.scale = scale;
     }
 
-    void render(final Context cr) {
+    void draw(final Context cr) {
         final Matrix matrix;
 
         /*
