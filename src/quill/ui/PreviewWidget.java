@@ -82,7 +82,8 @@ class PreviewWidget extends DrawingArea
                 drawPageOutline(cr, engine);
                 drawCrosshairs(cr, engine);
 
-                engine.renderPage(cr, series.get(11));
+                // FIXME HARDCODE
+                engine.render(cr, 2);
 
                 return true;
             }
