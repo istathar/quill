@@ -19,6 +19,7 @@ import quill.quack.ValidateTextChainToQuackConversion;
 import quill.quack.ValidateThereAndBackAgain;
 import quill.textbase.ValidateApplyUndoRedo;
 import quill.textbase.ValidateExtracts;
+import quill.textbase.ValidateOriginOrdering;
 import quill.textbase.ValidateSpanOperations;
 import quill.textbase.ValidateStructuralChange;
 import quill.textbase.ValidateText;
@@ -54,6 +55,7 @@ public class UnitTests
         suite.addTestSuite(ValidateText.class);
         suite.addTestSuite(ValidateUnicode.class);
         suite.addTestSuite(ValidateExtracts.class);
+        suite.addTestSuite(ValidateOriginOrdering.class);
         suite.addTestSuite(ValidateApplyUndoRedo.class);
         suite.addTestSuite(ValidateTextChainToQuackConversion.class);
         suite.addTestSuite(ValidateBlockquoteConversion.class);

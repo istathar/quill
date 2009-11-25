@@ -355,10 +355,6 @@ class ComponentEditorWidget extends ScrolledWindow
         cursorSegment = segment;
     }
 
-    private void setCursorSegment(EditorTextView editor) {
-        cursorSegment = lookup(editor);
-    }
-
     Origin getCursor() {
         final Widget widget;
         final EditorTextView editor;
@@ -396,7 +392,7 @@ class ComponentEditorWidget extends ScrolledWindow
         editor.placeCursorLastLine(position);
         editor.grabFocus();
 
-        setCursorSegment(editor);
+        cursorSegment = segment;
     }
 
     void moveCursorDown(final Widget from, final int position) {
@@ -420,7 +416,7 @@ class ComponentEditorWidget extends ScrolledWindow
         editor.placeCursorFirstLine(position);
         editor.grabFocus();
 
-        setCursorSegment(editor);
+        cursorSegment = segment;
     }
 
     // page down written first. See there.
@@ -456,7 +452,7 @@ class ComponentEditorWidget extends ScrolledWindow
         }
         editor.grabFocus();
 
-        setCursorSegment(editor);
+        cursorSegment = lookup(editor);
     }
 
     void movePageDown(final int x, final int y) {
@@ -512,7 +508,7 @@ class ComponentEditorWidget extends ScrolledWindow
         }
         editor.grabFocus();
 
-        setCursorSegment(editor);
+        cursorSegment = lookup(editor);
     }
 
     /**
@@ -601,7 +597,7 @@ class ComponentEditorWidget extends ScrolledWindow
         editor.placeCursorFirstLine(0);
         editor.grabFocus();
 
-        setCursorSegment(editor);
+        cursorSegment = series.get(0);
     }
 
     void moveCursorEnd() {
@@ -611,6 +607,6 @@ class ComponentEditorWidget extends ScrolledWindow
         editor.placeCursorLastLine(-1);
         editor.grabFocus();
 
-        setCursorSegment(editor);
+        cursorSegment = series.get(series.size() - 1);
     }
 }

@@ -114,12 +114,12 @@ public abstract class RenderEngine
     /**
      * The current Segment's index into the Series (for composing Origins).
      */
-    private int position;
+    private int currentPosition;
 
     /**
      * The current offset into the current Segment (for composing Origins).
      */
-    private int offset;
+    private int currentOffset;
 
     /**
      * Construct a new RenderEngine. Call {@link #render(Context) render()} to
@@ -232,6 +232,11 @@ public abstract class RenderEngine
         if (key != null) {
             page = lookup.get(key);
         } else {
+            /*
+             * Assuming there's a (0,0) Origin for the first page, we
+             * shouldn't ever get here. But guard against it as the Area ->
+             * Origin:Page logic is still a little raw.
+             */
             page = pages.get(0);
         }
 
@@ -280,7 +285,9 @@ public abstract class RenderEngine
         footerHeight = serifFace.lineHeight;
 
         for (i = 0; i < series.size(); i++) {
-            position = i;
+            currentPosition = i;
+            currentOffset = 0;
+
             segment = series.get(i);
             text = segment.getText();
 
@@ -329,7 +336,7 @@ public abstract class RenderEngine
 
         request = serifFace.lineHeight * 0.7;
 
-        origin = new Origin(position, offset);
+        origin = new Origin(currentPosition, currentOffset++);
         area = new BlankArea(origin, request);
         accumulate(area);
     }
@@ -586,10 +593,22 @@ public abstract class RenderEngine
                 x = pageWidth / 2 - rect.getWidth() / 2;
             }
 
-            // FIXME increment offset!
-            origin = new Origin(position, 0);
+            origin = new Origin(currentPosition, currentOffset);
             area = new TextArea(origin, x, face.lineHeight, face.lineAscent, line, error);
             result[k] = area;
+
+            /*
+             * Query the layoutline for it's width, thereby finding out where
+             * the next Origin should be marked. This isn't 100% correct,
+             * because the number of characters laid out is NOT the same as
+             * the number of characters in the editor [due to our typography
+             * changes]. But it's usually the same, and I'm not sure how we
+             * can go from LayoutLine (start, width) pairs to actual (Segment,
+             * offset) unless we track the mapping between Segments'
+             * TextChains and the typography() result.
+             */
+
+            currentOffset += line.getLength();
         }
 
         return result;
@@ -617,6 +636,7 @@ public abstract class RenderEngine
         available = pageHeight - bottomMargin - footerHeight;
 
         while (i < I) {
+            area = null; // hm
             page = new Page(num);
             cursor = topMargin;
 
@@ -633,6 +653,9 @@ public abstract class RenderEngine
                 break;
             }
 
+            origin = area.getOrigin();
+            lookup.put(origin, page);
+
             /*
              * Flow Areas onto the Page until we run out of room.
              */
@@ -646,9 +669,6 @@ public abstract class RenderEngine
                 }
 
                 page.append(cursor, area);
-
-                origin = area.getOrigin();
-                lookup.put(origin, page);
 
                 cursor += request;
                 i++;
@@ -879,7 +899,7 @@ public abstract class RenderEngine
         }
         request = height * scaleFactor;
 
-        origin = new Origin(position, 0);
+        origin = new Origin(currentPosition, 0);
         area = new ImageArea(origin, leftCorner, request, pixbuf, scaleFactor);
         return area;
     }
