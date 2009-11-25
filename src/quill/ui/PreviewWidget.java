@@ -21,7 +21,10 @@ import org.gnome.gtk.Widget;
 import parchment.render.RenderEngine;
 import parchment.render.ReportRenderEngine;
 import quill.textbase.DataLayer;
+import quill.textbase.Origin;
 import quill.textbase.Series;
+
+import static quill.client.Quill.ui;
 
 /**
  * Display a preview of what the final output document is going to be. This
@@ -68,6 +71,7 @@ class PreviewWidget extends DrawingArea
                 final PaperSize paper;
                 final RenderEngine engine;
                 final Context cr;
+                final Origin cursor;
 
                 // paper = new CustomPaperSize("Widescreen", 400, 300,
                 // Unit.MM);
@@ -82,8 +86,8 @@ class PreviewWidget extends DrawingArea
                 drawPageOutline(cr, engine);
                 drawCrosshairs(cr, engine);
 
-                // FIXME HARDCODE
-                engine.render(cr, 2);
+                cursor = ui.primary.getCursor();
+                engine.render(cr, cursor);
 
                 return true;
             }

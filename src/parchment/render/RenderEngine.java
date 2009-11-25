@@ -12,6 +12,7 @@ package parchment.render;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.FontOptions;
@@ -43,6 +44,7 @@ import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
+import quill.textbase.Origin;
 import quill.textbase.Preformat;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
@@ -105,6 +107,21 @@ public abstract class RenderEngine
     private ArrayList<Page> pages;
 
     /**
+     * Where is a given (Segment, offset) pair?
+     */
+    private TreeMap<Origin, Page> lookup;
+
+    /**
+     * The current Segment's index into the Series (for composing Origins).
+     */
+    private int position;
+
+    /**
+     * The current offset into the current Segment (for composing Origins).
+     */
+    private int offset;
+
+    /**
      * Construct a new RenderEngine. Call {@link #render(Context) render()} to
      * actually draw.
      */
@@ -149,6 +166,19 @@ public abstract class RenderEngine
         }
     }
 
+    public void render(Context cr, Origin cursor) {
+        if (series == null) {
+            return;
+        }
+
+        synchronized (this) {
+            specifyFonts(cr);
+            processSegmentsIntoAreas(cr);
+            flowAreasIntoPages(cr);
+            renderSinglePage(cr, cursor);
+        }
+    }
+
     private void renderAllPages(Context cr) {
         final Surface surface;
         final int I;
@@ -179,7 +209,7 @@ public abstract class RenderEngine
         surface.finish();
     }
 
-    public void renderSinglePage(Context cr, int pageNum) {
+    private void renderSinglePage(Context cr, int pageNum) {
         final Surface surface;
         final Page page;
 
@@ -191,8 +221,23 @@ public abstract class RenderEngine
         surface.finish();
     }
 
-    public void renderTarget(Context cr, Segment target, int offset) {
+    private void renderSinglePage(final Context cr, final Origin target) {
+        final Surface surface;
+        final Origin key;
+        final Page page;
 
+        surface = cr.getTarget();
+
+        key = lookup.floorKey(target);
+        if (key != null) {
+            page = lookup.get(key);
+        } else {
+            page = pages.get(0);
+        }
+
+        page.render(cr);
+
+        surface.finish();
     }
 
     /*
@@ -235,6 +280,7 @@ public abstract class RenderEngine
         footerHeight = serifFace.lineHeight;
 
         for (i = 0; i < series.size(); i++) {
+            position = i;
             segment = series.get(i);
             text = segment.getText();
 
@@ -259,7 +305,7 @@ public abstract class RenderEngine
             } else if (segment instanceof NormalSegment) {
                 paras = text.extractParagraphs();
                 for (j = 0; j < paras.length; j++) {
-                    appendNormalParagraph(cr, paras[j]);
+                    appendNormalParagraph(cr, segment, paras[j]);
                     appendBlankLine(cr);
                 }
             } else if (segment instanceof ImageSegment) {
@@ -277,11 +323,14 @@ public abstract class RenderEngine
     }
 
     protected void appendBlankLine(Context cr) {
+        final Origin origin;
         final Area area;
         final double request;
 
         request = serifFace.lineHeight * 0.7;
-        area = new BlankArea(request);
+
+        origin = new Origin(position, offset);
+        area = new BlankArea(origin, request);
         accumulate(area);
     }
 
@@ -310,7 +359,7 @@ public abstract class RenderEngine
         areas.add(area);
     }
 
-    protected void appendNormalParagraph(Context cr, Extract extract) {
+    protected void appendNormalParagraph(Context cr, Segment segment, Extract extract) {
         final Area[] list;
 
         list = layoutAreaText(cr, extract, serifFace, false, false, false);
@@ -455,6 +504,7 @@ public abstract class RenderEngine
         final Area[] result;
         Rectangle rect;
         double x;
+        Origin origin;
         Area area;
 
         if (extract == null) {
@@ -536,7 +586,9 @@ public abstract class RenderEngine
                 x = pageWidth / 2 - rect.getWidth() / 2;
             }
 
-            area = new TextArea(x, face.lineHeight, face.lineAscent, line, error);
+            // FIXME increment offset!
+            origin = new Origin(position, 0);
+            area = new TextArea(origin, x, face.lineHeight, face.lineAscent, line, error);
             result[k] = area;
         }
 
@@ -553,8 +605,10 @@ public abstract class RenderEngine
         double cursor, request;
         Page page;
         Area area, footer;
+        Origin origin;
 
         pages = new ArrayList<Page>(8);
+        lookup = new TreeMap<Origin, Page>();
 
         I = areas.size();
         i = 0;
@@ -592,6 +646,9 @@ public abstract class RenderEngine
                 }
 
                 page.append(cursor, area);
+
+                origin = area.getOrigin();
+                lookup.put(origin, page);
 
                 cursor += request;
                 i++;
@@ -730,8 +787,8 @@ public abstract class RenderEngine
 
         // switch to a layout, not just a line?
         line = layout.getLineReadonly(0);
-        return new TextArea(pageWidth - rightMargin - ink.getWidth(), footerHeight,
-                serifFace.lineAscent, line);
+        return new TextArea(null, pageWidth - rightMargin - ink.getWidth(), footerHeight,
+                serifFace.lineAscent, line, false);
 
     }
 
@@ -805,6 +862,7 @@ public abstract class RenderEngine
         final double width, height;
         final double available, scaleFactor, request;
         final double leftCorner;
+        final Origin origin;
         final Area area;
 
         width = pixbuf.getWidth();
@@ -821,7 +879,8 @@ public abstract class RenderEngine
         }
         request = height * scaleFactor;
 
-        area = new ImageArea(leftCorner, request, pixbuf, scaleFactor);
+        origin = new Origin(position, 0);
+        area = new ImageArea(origin, leftCorner, request, pixbuf, scaleFactor);
         return area;
     }
 }

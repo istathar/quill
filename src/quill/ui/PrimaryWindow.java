@@ -25,6 +25,7 @@ import org.gnome.pango.FontDescription;
 
 import quill.textbase.Change;
 import quill.textbase.DataLayer;
+import quill.textbase.Origin;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 
@@ -328,5 +329,9 @@ class PrimaryWindow extends Window
 
     public void grabFocus() {
         editor.grabFocus();
+    }
+
+    Origin getCursor() {
+        return editor.getCursor();
     }
 }

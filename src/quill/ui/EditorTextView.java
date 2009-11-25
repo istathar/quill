@@ -1515,4 +1515,8 @@ abstract class EditorTextView extends TextView
             alpha = omega;
         }
     }
+
+    int getInsertOffset() {
+        return insertOffset;
+    }
 }

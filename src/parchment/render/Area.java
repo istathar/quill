@@ -15,6 +15,8 @@ import org.freedesktop.cairo.Matrix;
 import org.gnome.gdk.Pixbuf;
 import org.gnome.pango.LayoutLine;
 
+import quill.textbase.Origin;
+
 /**
  * A rectangle of content which knows its height and which can be rendered to
  * a Page. These are lines of text, images, etc.
@@ -23,20 +25,30 @@ import org.gnome.pango.LayoutLine;
  */
 abstract class Area
 {
+    protected final Origin origin;
+
     protected final double x;
 
     protected final double height;
 
-    Area(final double x, final double height) {
+    Area(final Origin origin, final double x, final double height) {
+        this.origin = origin;
         this.x = x;
         this.height = height;
     }
 
     /**
-     * Get the height of this area, for flowing.
+     * Get the height of this Area, for flowing.
      */
     double getHeight() {
         return height;
+    }
+
+    /**
+     * Where did this Area come from?
+     */
+    Origin getOrigin() {
+        return origin;
     }
 
     /**
@@ -59,14 +71,11 @@ final class TextArea extends Area
 
     private final LayoutLine line;
 
-    TextArea(final double x, final double height, final double ascent, final LayoutLine line) {
-        this(x, height, ascent, line, false);
-    }
-
     private final boolean error;
 
-    public TextArea(double x, double height, double ascent, LayoutLine line, boolean error) {
-        super(x, height);
+    TextArea(final Origin origin, final double x, final double height, final double ascent,
+            final LayoutLine line, final boolean error) {
+        super(origin, x, height);
         this.a = ascent;
         this.line = line;
         this.error = error;
@@ -97,8 +106,9 @@ final class ImageArea extends Area
      * @param x
      *            offset from left margin.
      */
-    ImageArea(final double x, final double height, final Pixbuf pixbuf, final double scale) {
-        super(x, height);
+    ImageArea(final Origin origin, final double x, final double height, final Pixbuf pixbuf,
+            final double scale) {
+        super(origin, x, height);
         this.pixbuf = pixbuf;
         this.scale = scale;
     }
@@ -135,9 +145,11 @@ final class ImageArea extends Area
 
 final class BlankArea extends Area
 {
-    BlankArea(final double height) {
-        super(0, height);
+    BlankArea(final Origin origin, final double height) {
+        super(origin, 0, height);
     }
 
-    void draw(Context cr, double y) {}
+    void draw(Context cr, double y) {
+    // nothing :)
+    }
 }
