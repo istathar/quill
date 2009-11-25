@@ -566,6 +566,23 @@ public abstract class RenderEngine
             page = new Page(num);
             cursor = topMargin;
 
+            /*
+             * Absorb whitespace if it turns up at the top of a new Page
+             */
+
+            while (i < I) {
+                area = areas.get(i);
+                if (area instanceof BlankArea) {
+                    i++;
+                    continue;
+                }
+                break;
+            }
+
+            /*
+             * Flow Areas onto the Page until we run out of room.
+             */
+
             while (i < I) {
                 area = areas.get(i);
                 request = area.getHeight();
@@ -580,8 +597,16 @@ public abstract class RenderEngine
                 i++;
             }
 
+            /*
+             * Finally, create a footer and add it to the end of the Page.
+             */
+
             footer = layoutAreaFooter(cr, num);
             page.append(available, footer);
+
+            /*
+             * Accumulate the Page, then end the loop.
+             */
 
             pages.add(page);
 
