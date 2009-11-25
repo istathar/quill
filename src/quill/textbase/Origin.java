@@ -64,6 +64,6 @@ public final class Origin implements Comparable<Origin>
     }
 
     public String toString() {
-        return "Segment #" + position + ", offset=" + offset;
+        return "(Segment: #" + position + ", offset: " + offset + ")";
     }
 }

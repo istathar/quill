@@ -72,4 +72,8 @@ class Page
             f.render(cr);
         }
     }
+
+    public String toString() {
+        return "Page: # " + pageNumber;
+    }
 }
