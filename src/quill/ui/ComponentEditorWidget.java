@@ -66,11 +66,6 @@ class ComponentEditorWidget extends ScrolledWindow
      */
     private Segment cursorSegment;
 
-    /**
-     * What is the position in that Segment of the cursor?
-     */
-    private int cursorOffset;
-
     ComponentEditorWidget() {
         super();
         scroll = this;
@@ -369,6 +364,10 @@ class ComponentEditorWidget extends ScrolledWindow
 
         result = new Origin(position, offset);
         return result;
+    }
+
+    void setCursor(Segment segment) {
+        cursorSegment = segment;
     }
 
     void moveCursorUp(final Widget from, final int position) {
