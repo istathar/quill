@@ -27,6 +27,7 @@ import quill.textbase.DataLayer;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.NormalSegment;
+import quill.textbase.Origin;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
@@ -59,6 +60,11 @@ class ComponentEditorWidget extends ScrolledWindow
      * interface element; the opposite of deeper.
      */
     private Map<Segment, Widget> rising;
+
+    /**
+     * Which Segment currently has the cursor?
+     */
+    private Segment cursorSegment;
 
     ComponentEditorWidget() {
         super();
@@ -333,11 +339,35 @@ class ComponentEditorWidget extends ScrolledWindow
     }
 
     public void grabFocus() {
+        final Segment segment;
         final EditorTextView first;
 
-        first = (EditorTextView) lookup(series.get(0));
+        segment = series.get(0);
+        first = (EditorTextView) lookup(segment);
         first.placeCursorFirstLine(0);
         first.grabFocus();
+
+        cursorSegment = segment;
+    }
+
+    Origin getCursor() {
+        final Widget widget;
+        final EditorTextView editor;
+        final Origin result;
+        final int position, offset;
+
+        position = series.indexOf(cursorSegment);
+
+        widget = lookup(cursorSegment);
+        editor = (EditorTextView) widget;
+        offset = editor.getInsertOffset();
+
+        result = new Origin(position, offset);
+        return result;
+    }
+
+    void setCursor(Segment segment) {
+        cursorSegment = segment;
     }
 
     void moveCursorUp(final Widget from, final int position) {
@@ -360,6 +390,8 @@ class ComponentEditorWidget extends ScrolledWindow
         editor = (EditorTextView) above;
         editor.placeCursorLastLine(position);
         editor.grabFocus();
+
+        cursorSegment = segment;
     }
 
     void moveCursorDown(final Widget from, final int position) {
@@ -382,6 +414,8 @@ class ComponentEditorWidget extends ScrolledWindow
         editor = (EditorTextView) below;
         editor.placeCursorFirstLine(position);
         editor.grabFocus();
+
+        cursorSegment = segment;
     }
 
     // page down written first. See there.
@@ -416,6 +450,8 @@ class ComponentEditorWidget extends ScrolledWindow
             editor.placeCursorAtLocation(x, t);
         }
         editor.grabFocus();
+
+        cursorSegment = lookup(editor);
     }
 
     void movePageDown(final int x, final int y) {
@@ -470,6 +506,8 @@ class ComponentEditorWidget extends ScrolledWindow
             editor.placeCursorAtLocation(x, t);
         }
         editor.grabFocus();
+
+        cursorSegment = lookup(editor);
     }
 
     /**
@@ -557,6 +595,8 @@ class ComponentEditorWidget extends ScrolledWindow
         editor = findEditorFirst();
         editor.placeCursorFirstLine(0);
         editor.grabFocus();
+
+        cursorSegment = series.get(0);
     }
 
     void moveCursorEnd() {
@@ -565,5 +605,7 @@ class ComponentEditorWidget extends ScrolledWindow
         editor = findEditorLast();
         editor.placeCursorLastLine(-1);
         editor.grabFocus();
+
+        cursorSegment = series.get(series.size() - 1);
     }
 }

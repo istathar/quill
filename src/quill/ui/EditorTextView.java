@@ -845,6 +845,22 @@ abstract class EditorTextView extends TextView
                 ui.primary.scrollEditorToShow(alloc.getY() + rect.getY(), rect.getHeight() + 5);
             }
         });
+
+        /*
+         * When you click in an EditorTextView, you may have come from
+         * somewhere else, so update the enclosing ComponentEditorWidget's
+         * idea of what the current segment is, thereby allowing it to drive
+         * preview of the correct page.
+         */
+        view.connect(new Widget.ButtonPressEvent() {
+            public boolean onButtonPressEvent(Widget source, EventButton event) {
+                final ComponentEditorWidget parent;
+
+                parent = findComponentEditor(view);
+                parent.setCursor(segment);
+                return false;
+            }
+        });
     }
 
     private void clearFormat() {
@@ -1514,5 +1530,9 @@ abstract class EditorTextView extends TextView
             omega++;
             alpha = omega;
         }
+    }
+
+    int getInsertOffset() {
+        return insertOffset;
     }
 }
