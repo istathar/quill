@@ -420,15 +420,12 @@ class ComponentEditorWidget extends ScrolledWindow
 
     // page down written first. See there.
     void movePageUp(final int x, final int y) {
-        final int v, h, H, min, max, aim;
+        final int v, h, aim;
         int t;
         final EditorTextView editor;
 
         v = (int) adj.getValue();
         h = (int) adj.getPageSize();
-        H = (int) adj.getUpper();
-
-        min = 0;
 
         if (v == 0) {
             editor = findEditorFirst();
