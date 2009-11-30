@@ -279,7 +279,7 @@ public class UserInterface
      * code copied from what is presently our command line driven
      * RenderToPrintHarness.
      */
-    public void printDocument() {
+    void printDocument() {
         final String parentdir, fullname, basename, targetname;
         MessageDialog dialog;
         final Context cr;
@@ -441,7 +441,7 @@ public class UserInterface
     /**
      * Open a new chapter in the editor, replacing the current one.
      */
-    public void openDocument() {
+    void openDocument() {
         final FileChooserDialog dialog;
         final ErrorMessageDialog error;
         String filename;

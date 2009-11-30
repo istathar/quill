@@ -119,9 +119,26 @@ class ComponentEditorWidget extends ScrolledWindow
     private DataLayer data;
 
     void initializeSeries(DataLayer data, Series series) {
+        Widget[] children;
         Segment segment;
         int i;
         Widget widget;
+
+        /*
+         * If loading a new document, there may be a chapter already
+         * displayed; if so remove its children first.
+         */
+
+        children = box.getChildren();
+
+        for (i = 0; i < children.length; i++) {
+            widget = children[i];
+            box.remove(widget);
+        }
+
+        /*
+         * Now set up the new Series.
+         */
 
         this.data = data;
         this.series = series;
@@ -135,6 +152,12 @@ class ComponentEditorWidget extends ScrolledWindow
         }
 
         box.showAll();
+
+        /*
+         * And make sure the cursor is a Segment from this Series.
+         */
+
+        this.cursorSegment = series.get(0);
     }
 
     private void associate(Segment segment, Widget widget) {
