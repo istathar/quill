@@ -171,6 +171,10 @@ class PrimaryWindow extends Window
                         ui.printDocument();
                         return true;
                     }
+                    if (key == Keyval.o) {
+                        ui.openDocument();
+                        return true;
+                    }
                     if (key == Keyval.s) {
                         ui.saveDocument();
                         return true;

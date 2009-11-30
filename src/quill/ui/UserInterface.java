@@ -52,6 +52,7 @@ import quill.textbase.Folio;
 import quill.textbase.Series;
 import quill.textbase.Span;
 
+import static org.gnome.gtk.FileChooserAction.OPEN;
 import static org.gnome.gtk.FileChooserAction.SAVE;
 import static quill.textbase.Span.createSpan;
 import static quill.textbase.TextChain.extractFor;
@@ -278,7 +279,7 @@ public class UserInterface
      * code copied from what is presently our command line driven
      * RenderToPrintHarness.
      */
-    public void printDocument() {
+    void printDocument() {
         final String parentdir, fullname, basename, targetname;
         MessageDialog dialog;
         final Context cr;
@@ -435,6 +436,53 @@ public class UserInterface
                 throw new SafelyTerminateException();
             }
         }
+    }
+
+    /**
+     * Open a new chapter in the editor, replacing the current one.
+     */
+    void openDocument() {
+        final FileChooserDialog dialog;
+        final ErrorMessageDialog error;
+        String filename;
+        ResponseType response;
+        final Folio folio;
+
+        /*
+         * TODO: check for unsaved current document!
+         */
+
+        dialog = new FileChooserDialog("Open file...", primary, OPEN);
+
+        response = dialog.run();
+        dialog.hide();
+
+        if (response != ResponseType.OK) {
+            return;
+        }
+
+        filename = dialog.getFilename();
+
+        try {
+            data.loadDocument(filename);
+        } catch (Exception e) {
+            error = new ErrorMessageDialog(
+                    primary,
+                    "Failed to load document!",
+                    "Problem encountered when attempting to load:"
+                            + "\n<tt>"
+                            + filename
+                            + "</tt>\n\n"
+                            + "Worse, it wasn't something we were expecting. Here's the internal message, which might help a developer fix the problem:\n\n<tt>"
+                            + e.getClass().getSimpleName() + "</tt>:\n<tt>" + e.getMessage() + "</tt>");
+            error.setSecondaryUseMarkup(true);
+
+            error.run();
+            error.hide();
+            return;
+        }
+        folio = data.getActiveDocument();
+        this.displayDocument(folio);
     }
 }
 

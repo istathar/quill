@@ -333,6 +333,10 @@ public class QuackLoader
             str = trim.replace('\n', ' ');
         }
 
+        if (str.equals("")) {
+            throw new IllegalStateException("Can't have bare newlines in an otherwise empty element");
+        }
+
         chain.append(createSpan(str, markup));
 
         /*
