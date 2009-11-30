@@ -59,13 +59,18 @@ public class ValidateDocumentModified extends IOTestCase
     public final void testChangeCausesModified() throws IOException {
         final DataLayer data;
 
-        /*
-         * And empty document is not modified.
-         */
-
         data = new DataLayer();
         data.createDocument();
+
+        /*
+         * An empty document is not modified.
+         */
+
         assertFalse(data.isModified());
+
+        /*
+         * Modify, then undo back to empty.
+         */
 
         insertThreeSpansIntoFirstSegment(data);
 

@@ -237,9 +237,9 @@ public class UserInterface
     }
 
     /**
-     * Cause the document to be saved.
+     * Cause the document to be saved. Returns false on error or if cancelled.
      */
-    void saveDocument() {
+    boolean saveDocument() {
         MessageDialog dialog;
         String filename;
 
@@ -248,22 +248,25 @@ public class UserInterface
         if (filename == null) {
             filename = requestFilename();
             if (filename == null) {
-                return; // cancelled by user
+                return false; // cancelled by user
             }
         }
 
         try {
             data.saveDocument();
+            return true;
         } catch (IllegalStateException ise) {
             dialog = new ErrorMessageDialog(primary, "Save failed",
                     "There is a problem in the structure or data of your document: " + ise.getMessage());
             dialog.run();
             dialog.hide();
+            return false;
         } catch (IOException ioe) {
             dialog = new ErrorMessageDialog(primary, "Save failed", ioe.getMessage());
             dialog.setSecondaryUseMarkup(true);
             dialog.run();
             dialog.hide();
+            return false;
         }
     }
 
@@ -439,6 +442,66 @@ public class UserInterface
     }
 
     /**
+     * Ask the user if they want to save the document before closing the app
+     * or discarding it by opening a new one. Returns false if it is
+     * <b>not</b> ok to close the current document.
+     */
+    boolean askOkToClose() {
+        final MessageDialog dialog;
+        String filename;
+        final ResponseType response;
+        final Button discard, cancel, ok;
+
+        if (!data.isModified()) {
+            return true;
+        }
+
+        filename = data.getFilename();
+        if (filename == null) {
+            filename = "(untitled)";
+        }
+
+        dialog = new MessageDialog(primary, true, MessageType.WARNING, ButtonsType.NONE,
+                "Save Document?");
+        dialog.setSecondaryText("The current document" + "\n<tt>" + filename + "</tt>\n"
+                + "has been modified. Do you want to save it first?", true);
+
+        discard = new Button();
+        discard.setImage(new Image(Stock.DELETE, IconSize.BUTTON));
+        discard.setLabel("Discard changes");
+        dialog.addButton(discard, ResponseType.CLOSE);
+
+        cancel = new Button();
+        cancel.setImage(new Image(Stock.CANCEL, IconSize.BUTTON));
+        cancel.setLabel("Return to editor");
+        dialog.addButton(cancel, ResponseType.CANCEL);
+
+        ok = new Button();
+        ok.setImage(new Image(Stock.SAVE, IconSize.BUTTON));
+        ok.setLabel("Yes, save");
+        dialog.addButton(ok, ResponseType.OK);
+
+        dialog.showAll();
+        dialog.setTitle("Document modified!");
+        ok.grabFocus();
+
+        response = dialog.run();
+        dialog.hide();
+
+        if (response == ResponseType.CLOSE) {
+            return true;
+        } else if (response == ResponseType.OK) {
+            if (saveDocument()) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Open a new chapter in the editor, replacing the current one.
      */
     void openDocument() {
@@ -448,9 +511,9 @@ public class UserInterface
         ResponseType response;
         final Folio folio;
 
-        /*
-         * TODO: check for unsaved current document!
-         */
+        if (!askOkToClose()) {
+            return;
+        }
 
         dialog = new FileChooserDialog("Open file...", primary, OPEN);
 
