@@ -43,6 +43,13 @@ public class DataLayer
     private ChangeStack stack;
 
     /**
+     * The state of the document when last loaded or saved to disk, expressed
+     * as the Change object current at that point. The document is unmodified
+     * if the current item on the ChangeStack is this object.
+     */
+    private Change last;
+
+    /**
      * The document currently being worked on.
      */
     /*
@@ -143,6 +150,12 @@ public class DataLayer
          */
 
         converter.writeChapter(out);
+
+        /*
+         * Note the Change that was current when we saved
+         */
+
+        last = stack.getCurrent();
     }
 
     /**
@@ -166,6 +179,19 @@ public class DataLayer
      */
     public Change redo() {
         return stack.redo();
+    }
+
+    /**
+     * Has the document been modified since the last save? If undo/redo takes
+     * you back to the most recent save point, then indeed this will report
+     * false.
+     */
+    public boolean isModified() {
+        if (last == stack.getCurrent()) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**

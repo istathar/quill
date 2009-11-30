@@ -38,16 +38,19 @@ public class ValidateApplyUndoRedo extends TestCase
         change = new InsertTextualChange(chain, 0, new Extract(createSpan("Hello World", null)));
         stack.apply(change);
         assertEquals("Hello World", chain.toString());
+        assertSame(change, stack.getCurrent());
 
         extract = chain.extractRange(5, 6);
         change = new DeleteTextualChange(chain, 5, extract);
         stack.apply(change);
         assertEquals("Hello", chain.toString());
+        assertSame(change, stack.getCurrent());
 
         extract = chain.extractRange(1, 3);
         change = new DeleteTextualChange(chain, 1, extract);
         stack.apply(change);
         assertEquals("Ho", chain.toString());
+        assertSame(change, stack.getCurrent());
 
         /*
          * Now evaluate moving back and forth along the undo stack. redo at
@@ -56,6 +59,7 @@ public class ValidateApplyUndoRedo extends TestCase
 
         stack.redo();
         assertEquals("Ho", chain.toString());
+        assertSame(change, stack.getCurrent());
 
         stack.undo();
         assertEquals("Hello", chain.toString());
@@ -83,6 +87,7 @@ public class ValidateApplyUndoRedo extends TestCase
         }));
         stack.apply(change);
         assertEquals("Hello Santa Claus", chain.toString());
+        assertSame(change, stack.getCurrent());
 
         /*
          * This new Change is a divergence and so creates a new branch of the

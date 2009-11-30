@@ -91,4 +91,12 @@ class ChangeStack
 
         return change;
     }
+
+    Change getCurrent() {
+        if (pointer == 0) {
+            return null;
+        } else {
+            return stack.get(pointer - 1);
+        }
+    }
 }
