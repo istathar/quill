@@ -125,8 +125,13 @@ class PrimaryWindow extends Window
     private void hookupWindowManagement() {
         window.connect(new Window.DeleteEvent() {
             public boolean onDeleteEvent(Widget source, Event event) {
-                ui.shutdown();
-                return false;
+                try {
+                    ui.saveIfModified();
+                    ui.shutdown();
+                    return false;
+                } catch (SaveCancelledException sce) {
+                    return true;
+                }
             }
         });
     }
@@ -176,7 +181,11 @@ class PrimaryWindow extends Window
                         return true;
                     }
                     if (key == Keyval.s) {
-                        ui.saveDocument();
+                        try {
+                            ui.saveDocument();
+                        } catch (SaveCancelledException e) {
+                            // ignore
+                        }
                         return true;
                     } else if (key == Keyval.y) {
                         ui.redo();

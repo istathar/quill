@@ -196,22 +196,20 @@ public class UserInterface
         primary.displaySeries(data, series);
     }
 
-    void saveAs() {
+    void saveAs() throws SaveCancelledException {
         requestFilename();
-
         saveDocument();
     }
 
     /**
-     * This WILL set the filename in the DataLayer. However, you can check the
-     * return value to find out whether or not something useful happened.
+     * This WILL set the filename in the DataLayer, unless cancelled.
      */
     /*
      * This is a bit messy. There is confusion of responsibilities here
      * between who owns the filename, who is responsible for carrying out IO,
      * and who drives the process.
      */
-    String requestFilename() {
+    void requestFilename() throws SaveCancelledException {
         final FileChooserDialog dialog;
         String filename;
         ResponseType response;
@@ -223,13 +221,14 @@ public class UserInterface
             dialog.hide();
 
             if (response != ResponseType.OK) {
-                return null;
+                throw new SaveCancelledException();
             }
 
             filename = dialog.getFilename();
 
             try {
                 data.setFilename(filename);
+                return;
             } finally {
                 // try again
             }
@@ -239,34 +238,28 @@ public class UserInterface
     /**
      * Cause the document to be saved. Returns false on error or if cancelled.
      */
-    boolean saveDocument() {
+    void saveDocument() throws SaveCancelledException {
         MessageDialog dialog;
         String filename;
 
         filename = data.getFilename();
 
         if (filename == null) {
-            filename = requestFilename();
-            if (filename == null) {
-                return false; // cancelled by user
-            }
+            requestFilename(); // throws if user cancels
         }
 
         try {
             data.saveDocument();
-            return true;
         } catch (IllegalStateException ise) {
             dialog = new ErrorMessageDialog(primary, "Save failed",
                     "There is a problem in the structure or data of your document: " + ise.getMessage());
             dialog.run();
             dialog.hide();
-            return false;
         } catch (IOException ioe) {
             dialog = new ErrorMessageDialog(primary, "Save failed", ioe.getMessage());
             dialog.setSecondaryUseMarkup(true);
             dialog.run();
             dialog.hide();
-            return false;
         }
     }
 
@@ -443,19 +436,19 @@ public class UserInterface
 
     /**
      * Ask the user if they want to save the document before closing the app
-     * or discarding it by opening a new one. Returns false if it is
-     * <b>not</b> ok to close the current document.
+     * or discarding it by opening a new one.
      */
-    boolean askOkToClose() {
+    void saveIfModified() throws SaveCancelledException {
         final MessageDialog dialog;
         String filename;
         final ResponseType response;
         final Button discard, cancel, ok;
 
         if (!data.isModified()) {
-            return true;
+            return;
         }
 
+        // TODO change to document title?
         filename = data.getFilename();
         if (filename == null) {
             filename = "(untitled)";
@@ -488,16 +481,12 @@ public class UserInterface
         response = dialog.run();
         dialog.hide();
 
-        if (response == ResponseType.CLOSE) {
-            return true;
-        } else if (response == ResponseType.OK) {
-            if (saveDocument()) {
-                return true;
-            } else {
-                return false;
-            }
+        if (response == ResponseType.OK) {
+            saveDocument();
+        } else if (response == ResponseType.CLOSE) {
+            return;
         } else {
-            return false;
+            throw new SaveCancelledException();
         }
     }
 
@@ -511,7 +500,9 @@ public class UserInterface
         ResponseType response;
         final Folio folio;
 
-        if (!askOkToClose()) {
+        try {
+            saveIfModified();
+        } catch (SaveCancelledException sce) {
             return;
         }
 
