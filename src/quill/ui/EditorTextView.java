@@ -1266,8 +1266,20 @@ abstract class EditorTextView extends TextView
             X = position.getX();
             x = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X);
         }
+        /*
+         * Although forwardDisplayLine() does the right thing, the weird GTK
+         * behaviour is that it returns false if it becomes the end iterator,
+         * even if it changed the TextIter! That screws us up if you cursor
+         * down to a blank line as last line. So we do the dance of going to
+         * the end of the display line we're on; if we're not at the end of
+         * the buffer then we know we can go down at least one more display
+         * line.
+         */
 
-        if (pointer.forwardDisplayLine(view)) {
+        pointer.forwardDisplayLineEnd(view);
+        if (!pointer.isEnd()) {
+            pointer.forwardDisplayLine(view);
+
             X = view.convertWindowToBufferCoordsX(TEXT, x);
 
             position = view.getLocation(pointer);
