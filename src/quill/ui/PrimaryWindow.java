@@ -176,6 +176,16 @@ class PrimaryWindow extends Window
                         ui.printDocument();
                         return true;
                     }
+                    if (key == Keyval.n) {
+                        /*
+                         * I was about to hook up ui.newDocument() here, but I
+                         * think Ctrl+N needs to be saved for something more
+                         * common and important. New segment, perhaps (though
+                         * that's Ins in EditorTextView at the moment); new
+                         * series would be good too.
+                         */
+                        return true;
+                    }
                     if (key == Keyval.o) {
                         ui.openDocument();
                         return true;
