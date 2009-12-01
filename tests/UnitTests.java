@@ -11,6 +11,7 @@
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import quill.client.ValidateDocumentModified;
 import quill.client.ValidateFileNaming;
 import quill.quack.ValidateBlockquoteConversion;
 import quill.quack.ValidateCitationConversion;
@@ -58,6 +59,7 @@ public class UnitTests
         suite.addTestSuite(ValidateExtracts.class);
         suite.addTestSuite(ValidateOriginOrdering.class);
         suite.addTestSuite(ValidateApplyUndoRedo.class);
+        suite.addTestSuite(ValidateDocumentModified.class);
         suite.addTestSuite(ValidateTextChainToQuackConversion.class);
         suite.addTestSuite(ValidateBlockquoteConversion.class);
         suite.addTestSuite(ValidateEndnoteConversion.class);

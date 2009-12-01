@@ -125,8 +125,13 @@ class PrimaryWindow extends Window
     private void hookupWindowManagement() {
         window.connect(new Window.DeleteEvent() {
             public boolean onDeleteEvent(Widget source, Event event) {
-                ui.shutdown();
-                return false;
+                try {
+                    ui.saveIfModified();
+                    ui.shutdown();
+                    return false;
+                } catch (SaveCancelledException sce) {
+                    return true;
+                }
             }
         });
     }
@@ -171,12 +176,26 @@ class PrimaryWindow extends Window
                         ui.printDocument();
                         return true;
                     }
+                    if (key == Keyval.n) {
+                        /*
+                         * I was about to hook up ui.newDocument() here, but I
+                         * think Ctrl+N needs to be saved for something more
+                         * common and important. New segment, perhaps (though
+                         * that's Ins in EditorTextView at the moment); new
+                         * series would be good too.
+                         */
+                        return true;
+                    }
                     if (key == Keyval.o) {
                         ui.openDocument();
                         return true;
                     }
                     if (key == Keyval.s) {
-                        ui.saveDocument();
+                        try {
+                            ui.saveDocument();
+                        } catch (SaveCancelledException e) {
+                            // ignore
+                        }
                         return true;
                     } else if (key == Keyval.y) {
                         ui.redo();

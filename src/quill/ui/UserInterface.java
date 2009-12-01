@@ -196,22 +196,20 @@ public class UserInterface
         primary.displaySeries(data, series);
     }
 
-    void saveAs() {
+    void saveAs() throws SaveCancelledException {
         requestFilename();
-
         saveDocument();
     }
 
     /**
-     * This WILL set the filename in the DataLayer. However, you can check the
-     * return value to find out whether or not something useful happened.
+     * This WILL set the filename in the DataLayer, unless cancelled.
      */
     /*
      * This is a bit messy. There is confusion of responsibilities here
      * between who owns the filename, who is responsible for carrying out IO,
      * and who drives the process.
      */
-    String requestFilename() {
+    void requestFilename() throws SaveCancelledException {
         final FileChooserDialog dialog;
         String filename;
         ResponseType response;
@@ -223,13 +221,14 @@ public class UserInterface
             dialog.hide();
 
             if (response != ResponseType.OK) {
-                return null;
+                throw new SaveCancelledException();
             }
 
             filename = dialog.getFilename();
 
             try {
                 data.setFilename(filename);
+                return;
             } finally {
                 // try again
             }
@@ -237,19 +236,16 @@ public class UserInterface
     }
 
     /**
-     * Cause the document to be saved.
+     * Cause the document to be saved. Returns false on error or if cancelled.
      */
-    void saveDocument() {
+    void saveDocument() throws SaveCancelledException {
         MessageDialog dialog;
         String filename;
 
         filename = data.getFilename();
 
         if (filename == null) {
-            filename = requestFilename();
-            if (filename == null) {
-                return; // cancelled by user
-            }
+            requestFilename(); // throws if user cancels
         }
 
         try {
@@ -439,6 +435,62 @@ public class UserInterface
     }
 
     /**
+     * Ask the user if they want to save the document before closing the app
+     * or discarding it by opening a new one.
+     */
+    void saveIfModified() throws SaveCancelledException {
+        final MessageDialog dialog;
+        String filename;
+        final ResponseType response;
+        final Button discard, cancel, ok;
+
+        if (!data.isModified()) {
+            return;
+        }
+
+        // TODO change to document title?
+        filename = data.getFilename();
+        if (filename == null) {
+            filename = "(untitled)";
+        }
+
+        dialog = new MessageDialog(primary, true, MessageType.WARNING, ButtonsType.NONE,
+                "Save Document?");
+        dialog.setSecondaryText("The current document" + "\n<tt>" + filename + "</tt>\n"
+                + "has been modified. Do you want to save it first?", true);
+
+        discard = new Button();
+        discard.setImage(new Image(Stock.DELETE, IconSize.BUTTON));
+        discard.setLabel("Discard changes");
+        dialog.addButton(discard, ResponseType.CLOSE);
+
+        cancel = new Button();
+        cancel.setImage(new Image(Stock.CANCEL, IconSize.BUTTON));
+        cancel.setLabel("Return to editor");
+        dialog.addButton(cancel, ResponseType.CANCEL);
+
+        ok = new Button();
+        ok.setImage(new Image(Stock.SAVE, IconSize.BUTTON));
+        ok.setLabel("Yes, save");
+        dialog.addButton(ok, ResponseType.OK);
+
+        dialog.showAll();
+        dialog.setTitle("Document modified!");
+        ok.grabFocus();
+
+        response = dialog.run();
+        dialog.hide();
+
+        if (response == ResponseType.OK) {
+            saveDocument();
+        } else if (response == ResponseType.CLOSE) {
+            return;
+        } else {
+            throw new SaveCancelledException();
+        }
+    }
+
+    /**
      * Open a new chapter in the editor, replacing the current one.
      */
     void openDocument() {
@@ -448,9 +500,11 @@ public class UserInterface
         ResponseType response;
         final Folio folio;
 
-        /*
-         * TODO: check for unsaved current document!
-         */
+        try {
+            saveIfModified();
+        } catch (SaveCancelledException sce) {
+            return;
+        }
 
         dialog = new FileChooserDialog("Open file...", primary, OPEN);
 

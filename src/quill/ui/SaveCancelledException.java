@@ -1,5 +1,5 @@
 /*
- * ApplicationException.java
+ * SaveCancelledException.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,21 +8,19 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package quill.client;
+package quill.ui;
+
+import quill.client.ApplicationException;
 
 /**
- * Exceptions that represnt handlable problems in our application.
+ * Signal that an action, such as saving, was cancelled by the user.
  * 
  * @author Andrew Cowie
  */
 @SuppressWarnings("serial")
-public abstract class ApplicationException extends Exception
+class SaveCancelledException extends ApplicationException
 {
-    protected ApplicationException() {
+    public SaveCancelledException() {
         super();
-    }
-
-    protected ApplicationException(String payload) {
-        super(payload);
     }
 }
