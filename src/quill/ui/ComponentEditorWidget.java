@@ -379,6 +379,9 @@ class ComponentEditorWidget extends ScrolledWindow
         final Origin result;
         final int position, offset;
 
+        if (cursorSegment == null) {
+            return null;
+        }
         position = series.indexOf(cursorSegment);
 
         widget = lookup(cursorSegment);
