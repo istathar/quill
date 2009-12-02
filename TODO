@@ -18,13 +18,6 @@ replacements.
 User interface
 ==============
 
-Cursor movement
----------------
-
-We should refine the positioning algorithm. At present now you get drifted to
-the left rather than it remembering where (column? x?) you were recently and
-returning there when back on a longer line.
-
 Editor for notes and references
 -------------------------------
 
