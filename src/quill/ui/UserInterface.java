@@ -418,7 +418,9 @@ public class UserInterface
             dialog.setSecondaryText("A recovery file exists:" + "\n<tt>" + ae.getMessage() + "</tt>\n\n"
                     + "It <i>may</i> contain what you were working on before Quill crashed. "
                     + "You should quit and review it against your actual document. Once you're sure "
-                    + "the rescue file doesn't contain anything you need, you can delete it.", true);
+                    + "the rescue file doesn't contain anything you need, you can delete it." + "\n\n"
+                    + "Be warned that if the program crashes again, we will <i>not</i> overwrite "
+                    + "the existing recovery file.", true);
 
             dialog.showAll();
             response = dialog.run();

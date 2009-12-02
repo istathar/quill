@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter schema="0.1" xmlns="http://operationaldynamics.com/quack">
+<title>
+TODO
+</title>
+<heading>
+Saving
+</heading>
+<text>
+<bold>Line wrapping of XML output</bold>
+</text>
+<text>
+The line-breaking algorithm in
+<application>Xom</application> is rather
+poor: it takes the maximum line length specified,
+subtracts 10, and then looks for a possible
+line break after that point. This makes for
+erratic justification, trailing space characters,
+and other artifacts. This is due to
+<application>Xom</application>'s
+<type>Serializer</type> handles its output
+one character at a time and has no look ahead
+/ read back capability.
+</text>
+<text>
+It may be better for us to write the output
+file to a <type>StringWriter</type> or
+<type>ByteArrayOutputStream</type> and then
+do the breaks manually by doing <literal>'
+'</literal> to <literal>'\n' </literal>replacements.
+</text>
+<heading>
+User interface
+</heading>
+<text>
+<bold>Editor for notes and references</bold>
+</text>
+<text>
+While loading, display, rendering, and saving
+of documents with <literal>&lt;note&gt;</literal>
+and <literal>&lt;cite&gt;</literal> tags
+is implemented, there's no user interface
+for adding or creating these markers yet,
+nor editing the reference bodies.
+</text>
+<heading>
+Build
+</heading>
+<text>
+<bold>Needs a proper build system</bold>
+</text>
+<text>
+Top level configure is just a quick hack;
+probably need to copy in equivalence from
+<application>java-gnome</application> or
+<application>Slashtime</application>.
+</text>
+<heading>
+Copyright
+</heading>
+<quote>
+Copyright © 2008-2009 Operational Dynamics
+Consulting, Pty Ltd 
+</quote>
+<quote>
+As project documentation, this file forms
+an integral part of the source code of the
+program it accompanies, and thus is made
+available to you by its authors under the
+terms of the "GNU General Public Licence,
+version 2". See the <filename>LICENCE</filename>
+file for the terms governing usage, copying
+and redistribution.
+</quote>
+</chapter>
