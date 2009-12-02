@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter schema="0.1" xmlns="http://operationaldynamics.com/quack">
+<title>
+BUGS
+</title>
+<heading>
+User Interface
+</heading>
+<text>
+<bold>Splitting ComponentSegments forbidden</bold>
+</text>
+<text>
+If the cursor is in the chapter title, you
+shouldn't be able to do an <bold>Ins</bold>
+causing a split in that text (which ends
+up as <literal>&lt;title&gt;</literal>) with
+the result that a subsequent
+<type>ComponentSegment</type> is created;
+there's only supposed to be one. So it needs
+to be restricted to appending a new Segment
+only?
+</text>
+<text>
+<bold>StructuralChange at first character
+misplaces new Segment</bold>
+</text>
+<text>
+For some reason, if you're at offset
+<literal>0</literal> of a
+<type>NormalEditorTextView</type> and you
+<bold>Ins</bold> you end up with a new Segment
+not prepended in front of that Segment, but
+appended after the Segment.
+</text>
+<text>
+<bold>Scrolling on new Segment insert</bold>
+</text>
+<text>
+Inserting a Section heading from last line
+of last <type>NormalEditorTextView</type>,
+then cursor <bold>Down</bold> doesn't cause
+the new line to be scrolled into visible
+area of <type>ComponentEditorWidget</type>.
+</text>
+<text>
+<bold>Segment text needs escaping before
+passing to Label?</bold>
+</text>
+<text>
+If you put the text <literal>&lt;!--</literal>
+into a section heading, then <bold>F3</bold>
+Outline, the application crashes with an
+error from <type>Label</type>'s
+<literal>setUseMarkup()</literal>.
+</text>
+<text>
+<bold>Selection should be cleared when leaving
+EditorTextView</bold>
+</text>
+<text>
+If you select text in one editor, then you
+click in another, moving the focus, the TextView
+which looses focus sets the selected region
+the semi-tone "I'm inactive but still have
+a selection" color.
+</text>
+<text>
+It should probably be cleared so the behaviour
+is consistent with there only being one
+<type>TextView</type>.
+</text>
+<heading>
+Build
+</heading>
+<text>
+<bold>Make does too much</bold>
+</text>
+<text>
+For some reason <command>make test</command>
+is actually rebuilding everything, even if
+there's nothing that needs rebuilding. That's
+lame.
+</text>
+<heading>
+Internal
+</heading>
+<text>
+<bold>Need an offset cache</bold>
+</text>
+<text>
+The data structure used to back a
+<type>TextChain</type> is a mutable linked
+list; that's fine for arbitrary insertions,
+but our real need is to find <type>Span</type>s
+at given offsets and to break <type>Span</type>s
+(creating boundaries) at given offsets.
+</text>
+<text>
+This was fine for preliminary implementation,
+but with the addition of spell checking we
+have probably hit O(𝑛²) or worse when it
+comes to driving down splices as we iterate
+create <type>Span</type> boundaries at word
+beginnings and endings.
+</text>
+<text>
+<bold>Undo stack is unbounded</bold>
+</text>
+<text>
+The undo stack is a <type>LinkedList</type>
+right now; nothing is acting to constrain
+its size or clean off older entries. Unlimited
+undo steps is cool; unconstrained memory
+consumption until exhaustion is not.
+</text>
+<text>
+Making it <type>WeakReference</type> doesn't
+quite seem sufficient; we can't have items
+arbitrarily disappearing. Perhaps an
+<type>ArrayDequeue</type>?
+</text>
+<text>
+<bold>Caching result of render</bold>
+</text>
+<text>
+Right now the <type>PreviewWidget</type>'s
+<literal>ExposeEvent</literal> runs the entire
+<type>RenderEngine</type>; we need to cache
+the result and only update the result of
+processing Segments into <type>Area</type>s
+and <type>Page</type>s if the current
+<type>Change</type> object is no longer the
+same as that when the render happened.
+</text>
+<text/>
+<heading>
+Copyright
+</heading>
+<text>
+<bold>Need strong copyright handling</bold>
+</text>
+<text>
+The mere presence of this section as text
+in a <type>QuoteSegment</type>, and not metadata
+or otherwise with a purpose built UI, is
+a bug. <literal>:)</literal>
+</text>
+<quote>
+Copyright © 2008-2009 Operational Dynamics
+Consulting, Pty Ltd 
+</quote>
+<quote>
+As project documentation, this file forms
+an integral part of the source code of the
+program it accompanies, and thus is made
+available to you by its authors under the
+terms of the "GNU General Public Licence,
+version 2". See the <filename>LICENCE</filename>
+file for the terms governing usage, copying
+and redistribution.
+</quote>
+</chapter>
