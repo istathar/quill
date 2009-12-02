@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import nu.xom.Element;
 import nu.xom.Serializer;
 import nu.xom.Text;
-import quill.docbook.Structure;
 
 /**
  * Render a document as valid Quack XML.
@@ -123,12 +122,10 @@ class QuackSerializer extends Serializer
             swollowed = "";
         }
 
-        if ((e instanceof Block) && !(e instanceof Structure)) {
+        if (e instanceof Block) {
             /*
              * After writing a bunch of spans, take the cursor back to the
-             * beginning of the line before writing the end tag. The exception
-             * is tags like </blockquote>, because we're already at the line
-             * start due to the newline after the enclosed </para>.
+             * beginning of the line before writing the end tag.
              */
             breakLine();
         }
