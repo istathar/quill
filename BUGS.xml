@@ -7,7 +7,9 @@ BUGS
 User Interface
 </heading>
 <text>
-<bold>Splitting ComponentSegments forbidden</bold>
+<bold>Splitting</bold>
+<type>ComponentSegments</type>
+<bold>forbidden</bold>
 </text>
 <text>
 If the cursor is in the chapter title, you
@@ -21,8 +23,8 @@ to be restricted to appending a new Segment
 only?
 </text>
 <text>
-<bold>StructuralChange at first character
-misplaces new Segment</bold>
+<type>StructuralChange</type> at first character
+misplaces new Segment
 </text>
 <text>
 For some reason, if you're at offset
@@ -33,7 +35,8 @@ not prepended in front of that Segment, but
 appended after the Segment.
 </text>
 <text>
-<bold>Scrolling on new Segment insert</bold>
+<bold>Scrolling on new</bold> <type>Segment</type>
+<bold>insert</bold>
 </text>
 <text>
 Inserting a Section heading from last line
@@ -54,8 +57,8 @@ error from <type>Label</type>'s
 <literal>setUseMarkup()</literal>.
 </text>
 <text>
-<bold>Selection should be cleared when leaving
-EditorTextView</bold>
+<bold>Selection should be cleared when leaving</bold>
+<type>EditorTextView</type>
 </text>
 <text>
 If you select text in one editor, then you
@@ -80,6 +83,23 @@ For some reason <command>make test</command>
 is actually rebuilding everything, even if
 there's nothing that needs rebuilding. That's
 lame.
+</text>
+<heading>
+Data integrity
+</heading>
+<text>
+<bold>Markup loss?</bold>
+</text>
+<text>
+Text moving from bold to type seems to be
+loosing markup when saving!
+</text>
+<text>
+Related to having the two boundaries side
+by side? Manually setting the padding space
+to <literal>null</literal> instead of leaving
+it bold seems to workaround when saving, but those
+spaces are lost when reloading!
 </text>
 <heading>
 Internal
@@ -132,7 +152,22 @@ and <type>Page</type>s if the current
 <type>Change</type> object is no longer the
 same as that when the render happened.
 </text>
-<text/>
+<heading>
+Render Engine
+</heading>
+<text>
+<bold>Markup in headings is not scaled properly</bold>
+</text>
+<text>
+The current method of making the heading
+larger applies only on the actual
+<literal>headingFont</literal>. If you put
+markup (Type, for example) into a
+<type>HeadingSegment</type> then when it
+renders it will use <literal>sansFont</literal>
+at whatever that font is sized at, not at
+the larger size of the heading.
+</text>
 <heading>
 Copyright
 </heading>
