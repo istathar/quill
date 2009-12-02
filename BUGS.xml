@@ -7,9 +7,8 @@ BUGS
 User Interface
 </heading>
 <text>
-<bold>Splitting</bold>
-<type>ComponentSegments</type>
-<bold>forbidden</bold>
+<bold>Splitting </bold>
+<type>ComponentSegments</type><bold> forbidden</bold>
 </text>
 <text>
 If the cursor is in the chapter title, you
@@ -35,8 +34,8 @@ not prepended in front of that Segment, but
 appended after the Segment.
 </text>
 <text>
-<bold>Scrolling on new</bold> <type>Segment</type>
-<bold>insert</bold>
+<bold>Scrolling on new </bold><type>Segment</type>
+<bold> insert</bold>
 </text>
 <text>
 Inserting a Section heading from last line
@@ -46,8 +45,9 @@ the new line to be scrolled into visible
 area of <type>ComponentEditorWidget</type>.
 </text>
 <text>
-<bold>Segment text needs escaping before
-passing to Label?</bold>
+<type>Segment</type><bold> text needs escaping
+before passing to GTK </bold><type>Label</type>
+<bold>?</bold>
 </text>
 <text>
 If you put the text <literal>&lt;!--</literal>
@@ -87,20 +87,6 @@ lame.
 <heading>
 Data integrity
 </heading>
-<text>
-<bold>Markup loss?</bold>
-</text>
-<text>
-Text moving from bold to type seems to be
-loosing markup when saving!
-</text>
-<text>
-Related to having the two boundaries side
-by side? Manually setting the padding space
-to <literal>null</literal> instead of leaving
-it bold seems to workaround when saving, but those
-spaces are lost when reloading!
-</text>
 <heading>
 Internal
 </heading>
