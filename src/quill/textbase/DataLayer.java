@@ -354,6 +354,14 @@ public class DataLayer
         try {
             savename = filename + ".RESCUED";
             target = new File(savename);
+
+            if (target.exists()) {
+                err.println("inhibited.");
+                err.println("There's already a recovery file,\n" + savename + "\n"
+                        + "and we're not going to overwrite it.");
+                return;
+            }
+
             out = new FileOutputStream(target);
             saveDocument(out);
             out.close();
