@@ -97,7 +97,8 @@ public class ValidateDataIntegrity extends IOTestCase
 
     /*
      * This test echoes the proceeding one, but verifies that the same problem
-     * does not occur when loading.
+     * does not occur when loading; we're also loosing whitespace if the wrap
+     * boundary occurs at a continuous markup joint.
      */
     public final void testContinuousMarkupChangesLoad() throws IOException, ValidityException,
             ParsingException {
@@ -116,7 +117,7 @@ public class ValidateDataIntegrity extends IOTestCase
                 "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
                 "<text>",
                 "<bold>Hello </bold><type>GtkButton</type><bold>",
-                "world</bold>",
+                "world </bold><literal>printf()</literal>",
                 "</text>",
                 "</chapter>"
         });
