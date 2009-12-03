@@ -57,8 +57,8 @@ error from <type>Label</type>'s
 <literal>setUseMarkup()</literal>.
 </text>
 <text>
-<bold>Selection should be cleared when leaving</bold>
-<type>EditorTextView</type>
+<bold>Selection should be cleared when leaving
+</bold><type>EditorTextView</type>
 </text>
 <text>
 If you select text in one editor, then you
