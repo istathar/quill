@@ -1,5 +1,6 @@
+#!/bin/bash
 #
-# Makefile
+# tests.sh
 #
 # Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
 # 
@@ -9,23 +10,10 @@
 # redistribution.
 #
 
-ifdef V
-MAKEFLAGS=-R
-else
-MAKEFLAGS=-s -R
-REDIRECT=>/dev/null
-endif
+source .config
 
-.PHONY: all build clean test
-
-all: compile
-
-compile:
-	build/compile.sh
-
-clean:
-	rm -r tmp/
-
-test: compile
-	build/tests.sh
+echo -e "JAVA\tUnitTests"
+${JAVA} \
+	-classpath ${GNOME_JARS}:${XOM_JARS}:${JUNIT_JARS}:tmp/classes \
+	UnitTests
 

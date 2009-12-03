@@ -15,9 +15,9 @@ HERE
 
 print CONFIG <<HERE ;
 # libraries
-GNOME_JARS=/home/andrew/workspace/java-gnome/tmp/gtk-4.0.jar
-XOM_JARS=/usr/share/java/xom.jar:/usr/share/java/xercesImpl.jar:/usr/share/java/jaxen.jar
-JUNIT_JARS=/usr/share/java/junit.jar
+GNOME_JARS="/home/andrew/workspace/java-gnome/tmp/gtk-4.0.jar"
+XOM_JARS="/usr/share/java/xom.jar:/usr/share/java/xercesImpl.jar:/usr/share/java/jaxen.jar"
+JUNIT_JARS="/usr/share/java/junit.jar"
 
 HERE
 
@@ -29,8 +29,8 @@ HERE
 
 print CONFIG <<HERE ;
 # compiler and runtime
-JAVAC=/usr/lib/jvm/java-6-openjdk/bin/javac -g
-JAVA=/usr/lib/jvm/java-6-openjdk/bin/java -ea -client
+JAVAC="/usr/lib/jvm/java-6-openjdk/bin/javac -g"
+JAVA="/usr/lib/jvm/java-6-openjdk/bin/java -ea -client"
 
 HERE
 

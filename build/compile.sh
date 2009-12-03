@@ -1,6 +1,7 @@
 #!/bin/bash
 #
-# build.sh
+# compile.sh
+# Build the source code
 #
 # Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
 # 
@@ -10,15 +11,10 @@
 # redistribution.
 #
 
-set -x
-
-#
-# source all the Make variables as Shell variables
-# FIXME just write shell variables :)
-#
-eval `cat .config | sed -e '/^#/d' -e '/^$/d' -e 's/=/="/' -e 's/$/"/'`
+source .config
 
 if [ ! -d  tmp/classes ] ; then
+	echo -e "MKDIR\ttmp/"
 	mkdir -p tmp/classes
 fi
 
@@ -35,8 +31,10 @@ else
 fi
 
 if [ -s tmp/list-core ] ; then
-	$JAVAC \
-		-classpath $GNOME_JARS:$XOM_JARS \
+	echo -n "JAVAC"
+	sed -e 's/^/\t/' < tmp/list-core
+	${JAVAC} \
+		-classpath ${GNOME_JARS}:${XOM_JARS} \
 		-d tmp/classes \
 		-sourcepath src \
 		`cat tmp/list-core`
@@ -47,8 +45,10 @@ if [ -s tmp/list-core ] ; then
 fi
 
 if [ -s tmp/list-tests ] ; then
-	$JAVAC \
-		-classpath $GNOME_JARS:$XOM_JARS:$JUNIT_JARS \
+	echo -n "JAVAC"
+	sed -e 's/^/\t/' < tmp/list-tests	
+	${JAVAC} \
+		-classpath ${GNOME_JARS}:${XOM_JARS}:${JUNIT_JARS} \
 		-d tmp/classes \
 		-sourcepath src:tests \
 		`cat tmp/list-tests`
@@ -56,11 +56,5 @@ if [ -s tmp/list-tests ] ; then
 		exit $?
 	fi
 	touch tmp/build-tests
-fi
-
-if [ $* ] ; then
-	${JAVA} \
-	-classpath ${GNOME_JARS}:${XOM_JARS}:${JUNIT_JARS}:tmp/classes \
-	UnitTests
 fi
 
