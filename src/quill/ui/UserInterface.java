@@ -28,6 +28,7 @@ import org.gnome.gtk.Clipboard;
 import org.gnome.gtk.Dialog;
 import org.gnome.gtk.ErrorMessageDialog;
 import org.gnome.gtk.FileChooserDialog;
+import org.gnome.gtk.FileFilter;
 import org.gnome.gtk.Gtk;
 import org.gnome.gtk.IconSize;
 import org.gnome.gtk.Image;
@@ -497,6 +498,7 @@ public class UserInterface
      */
     void openDocument() {
         final FileChooserDialog dialog;
+        final FileFilter filter;
         final ErrorMessageDialog error;
         String filename;
         ResponseType response;
@@ -509,6 +511,11 @@ public class UserInterface
         }
 
         dialog = new FileChooserDialog("Open file...", primary, OPEN);
+
+        filter = new FileFilter();
+        filter.setName("Documents");
+        filter.addPattern("*.xml");
+        dialog.addFilter(filter);
 
         response = dialog.run();
         dialog.hide();

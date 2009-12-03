@@ -1,5 +1,5 @@
 /*
- * ValidateProperNewlineHandling.java
+ * ValidateDocumentModified.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 

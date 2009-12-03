@@ -15,6 +15,7 @@ import quill.client.ValidateDocumentModified;
 import quill.client.ValidateFileNaming;
 import quill.quack.ValidateBlockquoteConversion;
 import quill.quack.ValidateCitationConversion;
+import quill.quack.ValidateDataIntegrity;
 import quill.quack.ValidateEndnoteConversion;
 import quill.quack.ValidateProperNewlineHandling;
 import quill.quack.ValidateTextChainToQuackConversion;
@@ -61,6 +62,7 @@ public class UnitTests
         suite.addTestSuite(ValidateApplyUndoRedo.class);
         suite.addTestSuite(ValidateDocumentModified.class);
         suite.addTestSuite(ValidateTextChainToQuackConversion.class);
+        suite.addTestSuite(ValidateDataIntegrity.class);
         suite.addTestSuite(ValidateBlockquoteConversion.class);
         suite.addTestSuite(ValidateEndnoteConversion.class);
         suite.addTestSuite(ValidateCitationConversion.class);

@@ -157,17 +157,8 @@ public class QuackConverter
      */
     private void start(Markup format) {
         /*
-         * Are we returning from an inline to block level? If so, we're
-         * already nested and can just reset the state and escape.
-         */
-        if (inline != null) {
-            inline = null;
-            return;
-        }
-
-        /*
-         * Otherwise, we're either starting a new block or a new inline. Deal
-         * with the Block cases first:
+         * We're either starting a new block or a new inline. Deal with the
+         * Block cases first:
          */
 
         if (format == null) {
@@ -178,32 +169,30 @@ public class QuackConverter
          * Failing that, we cover off all the the Inline cases:
          */
 
-        if (inline == null) {
-            if (format == Common.FILENAME) {
-                inline = new FilenameElement();
-            } else if (format == Common.TYPE) {
-                inline = new TypeElement();
-            } else if (format == Common.FUNCTION) {
-                inline = new FunctionElement();
-            } else if (format == Common.ITALICS) {
-                inline = new ItalicsElement();
-            } else if (format == Common.BOLD) {
-                inline = new BoldElement();
-            } else if (format == Common.LITERAL) {
-                inline = new LiteralElement();
-            } else if (format == Common.APPLICATION) {
-                inline = new ApplicationElement();
-            } else if (format == Common.COMMAND) {
-                inline = new CommandElement();
-            } else if (format == Preformat.USERINPUT) {
-                // boom?
-            } else if (format == Special.NOTE) {
-                inline = new NoteElement();
-            } else if (format == Special.CITE) {
-                inline = new CiteElement();
-            } else {
-                throw new IllegalStateException();
-            }
+        if (format == Common.FILENAME) {
+            inline = new FilenameElement();
+        } else if (format == Common.TYPE) {
+            inline = new TypeElement();
+        } else if (format == Common.FUNCTION) {
+            inline = new FunctionElement();
+        } else if (format == Common.ITALICS) {
+            inline = new ItalicsElement();
+        } else if (format == Common.BOLD) {
+            inline = new BoldElement();
+        } else if (format == Common.LITERAL) {
+            inline = new LiteralElement();
+        } else if (format == Common.APPLICATION) {
+            inline = new ApplicationElement();
+        } else if (format == Common.COMMAND) {
+            inline = new CommandElement();
+        } else if (format == Preformat.USERINPUT) {
+            // boom?
+        } else if (format == Special.NOTE) {
+            inline = new NoteElement();
+        } else if (format == Special.CITE) {
+            inline = new CiteElement();
+        } else {
+            throw new IllegalStateException();
         }
     }
 
@@ -223,6 +212,7 @@ public class QuackConverter
         if (inline != null) {
             inline.add(buf.toString());
             block.add(inline);
+            inline = null;
         } else {
             block.add(buf.toString());
         }
