@@ -19,6 +19,7 @@ import quill.client.IOTestCase;
 import quill.textbase.Change;
 import quill.textbase.Common;
 import quill.textbase.DataLayer;
+import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.InsertTextualChange;
 import quill.textbase.NormalSegment;
@@ -103,26 +104,34 @@ public class ValidateDataIntegrity extends IOTestCase
     public final void testContinuousMarkupChangesLoad() throws IOException, ValidityException,
             ParsingException {
         final DataLayer data;
-        final ByteArrayOutputStream out;
-        final String expected;
+        final Span[] expected;
+        final Folio folio;
+        final Series series;
+        final Segment segment;
+        final TextChain chain;
+        final Extract entire;
+        int i;
 
         data = new DataLayer();
         data.loadDocument("tests/quill/quack/ContinuousMarkup.xml");
 
-        out = new ByteArrayOutputStream();
-        data.saveDocument(out);
+        expected = new Span[] {
+                createSpan("Hello ", Common.BOLD),
+                createSpan("GtkButton", Common.TYPE),
+                createSpan(" world", Common.BOLD),
+                createSpan(" ", Common.BOLD), // the \n
+                createSpan("printf()", Common.LITERAL)
+        };
 
-        expected = combine(new String[] {
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
-                "<text>",
-                "<bold>Hello </bold><type>GtkButton</type><bold>",
-                "world </bold><literal>printf()</literal>",
-                "</text>",
-                "</chapter>"
-        });
+        folio = data.getActiveDocument();
+        series = folio.get(0);
+        segment = series.get(1);
+        chain = segment.getText();
+        entire = chain.extractAll();
+        assertNotNull(entire);
 
-        assertEquals(expected, out.toString());
+        for (i = 0; i < expected.length; i++) {
+            assertEquals(expected[i], entire.get(i));
+        }
     }
-
 }
