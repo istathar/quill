@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #
 # Do at least a cursory investigation that things are in order.
@@ -9,9 +9,9 @@ if [ ! -f .config ] ; then
 fi
 
 #
-# source all the Make variables as Shell variables
+# source all the Shell variables.
 #
-eval `cat .config | sed -e '/^#/d' -e '/^$/d' -e 's/=/="/' -e 's/$/"/'`
+source .config
 
 #
 # and run Java appropriately.

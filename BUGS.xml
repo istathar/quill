@@ -73,21 +73,6 @@ is consistent with there only being one
 <type>TextView</type>.
 </text>
 <heading>
-Build
-</heading>
-<text>
-<bold>Make does too much</bold>
-</text>
-<text>
-For some reason <command>make test</command>
-is actually rebuilding everything, even if
-there's nothing that needs rebuilding. That's
-lame.
-</text>
-<heading>
-Data integrity
-</heading>
-<heading>
 Internal
 </heading>
 <text>
