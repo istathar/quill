@@ -74,6 +74,11 @@ public class QuackLoader
      */
     private boolean space;
 
+    /**
+     * If a whitespace was swollowed, then append this Span.
+     */
+    private Span pending;
+
     public QuackLoader() {
         list = new ArrayList<Segment>(5);
         chain = null;
@@ -127,7 +132,6 @@ public class QuackLoader
 
     private void processComponent(Component component) {
         if (component instanceof ChapterElement) {
-            markup = null;
             start = true;
             preserve = false;
             setSegment(new ComponentSegment());
@@ -137,9 +141,9 @@ public class QuackLoader
     }
 
     private void processBlock(Block block) {
+        start = true;
+
         if (block instanceof TextElement) {
-            markup = null;
-            start = true;
             preserve = false;
             if (segment instanceof NormalSegment) {
                 chain.append(Span.createSpan('\n', null));
@@ -147,15 +151,11 @@ public class QuackLoader
                 setSegment(new NormalSegment());
             }
         } else if (block instanceof CodeElement) {
-            markup = null;
-            start = true;
             preserve = true;
             if (!(segment instanceof PreformatSegment)) {
                 setSegment(new PreformatSegment());
             }
         } else if (block instanceof QuoteElement) {
-            markup = null;
-            start = true;
             preserve = false;
             if (segment instanceof QuoteSegment) {
                 chain.append(Span.createSpan('\n', null));
@@ -163,20 +163,14 @@ public class QuackLoader
                 setSegment(new QuoteSegment());
             }
         } else if (block instanceof HeadingElement) {
-            markup = null;
-            start = true;
             preserve = false;
             setSegment(new HeadingSegment());
         } else if (block instanceof ImageElement) {
-            markup = null;
-            start = true;
             preserve = false;
             setSegment(new ImageSegment());
 
             processData(block);
         } else if (block instanceof TitleElement) {
-            markup = null;
-            start = true;
             preserve = false;
             if (!(segment instanceof ComponentSegment)) {
                 throw new IllegalStateException("\n"
@@ -199,7 +193,7 @@ public class QuackLoader
         }
     }
 
-    private void processBody(Block block) {
+    private void processBody(final Block block) {
         Inline[] elements;
         int i;
 
@@ -302,7 +296,8 @@ public class QuackLoader
             text = text.substring(1);
             len--;
         } else if (space) {
-            chain.append(Span.createSpan(' ', null));
+            chain.append(pending);
+            pending = null;
         }
 
         /*
@@ -317,6 +312,7 @@ public class QuackLoader
             trim = text.substring(0, len - 1);
             len--;
             space = true;
+            pending = Span.createSpan(' ', markup);
         } else {
             trim = text;
             space = false;
@@ -333,13 +329,11 @@ public class QuackLoader
             str = trim.replace('\n', ' ');
         }
 
+        if (str.equals("")) {
+            throw new IllegalStateException("Can't have bare newlines in an otherwise empty element");
+        }
+
         chain.append(createSpan(str, markup));
-
-        /*
-         * And, having processed the inline, reset to normal.
-         */
-
-        markup = null;
     }
 
     private void processMarker(String str) {

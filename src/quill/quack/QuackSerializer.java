@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import nu.xom.Element;
 import nu.xom.Serializer;
 import nu.xom.Text;
-import quill.docbook.Structure;
 
 /**
  * Render a document as valid Quack XML.
@@ -42,7 +41,11 @@ class QuackSerializer extends Serializer
     }
 
     protected void writeStartTag(Element e) throws IOException {
-        String nested;
+        final String nested;
+        final int col;
+        final int first;
+        final int max;
+        final int len;
 
         /*
          * We don't want inline tags pushing us past our word wrap margin if
@@ -57,15 +60,21 @@ class QuackSerializer extends Serializer
         if (e instanceof Inline) {
             nested = e.toXML();
 
-            if (getColumnNumber() + firstBreakPoint(nested) + swollowed.length() > getMaxLength()) {
-                breakLine();
+            col = super.getColumnNumber();
+            first = firstBreakPoint(nested);
+            len = swollowed.length();
+            max = super.getMaxLength();
+
+            if (col + first + len > max) {
+                if (col > 0) {
+                    breakLine();
+                }
                 if (swollowed != "") {
-                    if (swollowed == " ") {
+                    if ((len == 1) && (swollowed.equals(" "))) {
                         swollowed = "";
                     } else {
-                        swollowed = swollowed.substring(1, swollowed.length());
+                        swollowed = swollowed.substring(1, len);
                     }
-
                 }
             }
         }
@@ -113,12 +122,10 @@ class QuackSerializer extends Serializer
             swollowed = "";
         }
 
-        if ((e instanceof Block) && !(e instanceof Structure)) {
+        if (e instanceof Block) {
             /*
              * After writing a bunch of spans, take the cursor back to the
-             * beginning of the line before writing the end tag. The exception
-             * is tags like </blockquote>, because we're already at the line
-             * start due to the newline after the enclosed </para>.
+             * beginning of the line before writing the end tag.
              */
             breakLine();
         }
@@ -143,18 +150,29 @@ class QuackSerializer extends Serializer
      * be extracted into a function.
      */
     protected void writeEmptyElementTag(Element e) throws IOException {
-        String nested;
+        final String nested;
+        final int col;
+        final int first;
+        final int max;
+        final int len;
 
         if (e instanceof Inline) {
             nested = e.toXML();
 
-            if (getColumnNumber() + firstBreakPoint(nested) + swollowed.length() > getMaxLength()) {
-                breakLine();
+            col = super.getColumnNumber();
+            first = firstBreakPoint(nested);
+            len = swollowed.length();
+            max = super.getMaxLength();
+
+            if (col + first + len > max) {
+                if (col > 0) {
+                    breakLine();
+                }
                 if (swollowed != "") {
                     if (swollowed == " ") {
                         swollowed = "";
                     } else {
-                        swollowed = swollowed.substring(1, swollowed.length());
+                        swollowed = swollowed.substring(1, len);
                     }
 
                 }

@@ -28,6 +28,7 @@ import org.gnome.gtk.Clipboard;
 import org.gnome.gtk.Dialog;
 import org.gnome.gtk.ErrorMessageDialog;
 import org.gnome.gtk.FileChooserDialog;
+import org.gnome.gtk.FileFilter;
 import org.gnome.gtk.Gtk;
 import org.gnome.gtk.IconSize;
 import org.gnome.gtk.Image;
@@ -52,6 +53,7 @@ import quill.textbase.Folio;
 import quill.textbase.Series;
 import quill.textbase.Span;
 
+import static org.gnome.gtk.FileChooserAction.OPEN;
 import static org.gnome.gtk.FileChooserAction.SAVE;
 import static quill.textbase.Span.createSpan;
 import static quill.textbase.TextChain.extractFor;
@@ -195,22 +197,20 @@ public class UserInterface
         primary.displaySeries(data, series);
     }
 
-    void saveAs() {
+    void saveAs() throws SaveCancelledException {
         requestFilename();
-
         saveDocument();
     }
 
     /**
-     * This WILL set the filename in the DataLayer. However, you can check the
-     * return value to find out whether or not something useful happened.
+     * This WILL set the filename in the DataLayer, unless cancelled.
      */
     /*
      * This is a bit messy. There is confusion of responsibilities here
      * between who owns the filename, who is responsible for carrying out IO,
      * and who drives the process.
      */
-    String requestFilename() {
+    void requestFilename() throws SaveCancelledException {
         final FileChooserDialog dialog;
         String filename;
         ResponseType response;
@@ -222,13 +222,14 @@ public class UserInterface
             dialog.hide();
 
             if (response != ResponseType.OK) {
-                return null;
+                throw new SaveCancelledException();
             }
 
             filename = dialog.getFilename();
 
             try {
                 data.setFilename(filename);
+                return;
             } finally {
                 // try again
             }
@@ -236,19 +237,16 @@ public class UserInterface
     }
 
     /**
-     * Cause the document to be saved.
+     * Cause the document to be saved. Returns false on error or if cancelled.
      */
-    void saveDocument() {
+    void saveDocument() throws SaveCancelledException {
         MessageDialog dialog;
         String filename;
 
         filename = data.getFilename();
 
         if (filename == null) {
-            filename = requestFilename();
-            if (filename == null) {
-                return; // cancelled by user
-            }
+            requestFilename(); // throws if user cancels
         }
 
         try {
@@ -278,7 +276,7 @@ public class UserInterface
      * code copied from what is presently our command line driven
      * RenderToPrintHarness.
      */
-    public void printDocument() {
+    void printDocument() {
         final String parentdir, fullname, basename, targetname;
         MessageDialog dialog;
         final Context cr;
@@ -421,7 +419,9 @@ public class UserInterface
             dialog.setSecondaryText("A recovery file exists:" + "\n<tt>" + ae.getMessage() + "</tt>\n\n"
                     + "It <i>may</i> contain what you were working on before Quill crashed. "
                     + "You should quit and review it against your actual document. Once you're sure "
-                    + "the rescue file doesn't contain anything you need, you can delete it.", true);
+                    + "the rescue file doesn't contain anything you need, you can delete it." + "\n\n"
+                    + "Be warned that if the program crashes again, we will <i>not</i> overwrite "
+                    + "the existing recovery file.", true);
 
             dialog.showAll();
             response = dialog.run();
@@ -435,6 +435,117 @@ public class UserInterface
                 throw new SafelyTerminateException();
             }
         }
+    }
+
+    /**
+     * Ask the user if they want to save the document before closing the app
+     * or discarding it by opening a new one.
+     */
+    void saveIfModified() throws SaveCancelledException {
+        final MessageDialog dialog;
+        String filename;
+        final ResponseType response;
+        final Button discard, cancel, ok;
+
+        if (!data.isModified()) {
+            return;
+        }
+
+        // TODO change to document title?
+        filename = data.getFilename();
+        if (filename == null) {
+            filename = "(untitled)";
+        }
+
+        dialog = new MessageDialog(primary, true, MessageType.WARNING, ButtonsType.NONE,
+                "Save Document?");
+        dialog.setSecondaryText("The current document" + "\n<tt>" + filename + "</tt>\n"
+                + "has been modified. Do you want to save it first?", true);
+
+        discard = new Button();
+        discard.setImage(new Image(Stock.DELETE, IconSize.BUTTON));
+        discard.setLabel("Discard changes");
+        dialog.addButton(discard, ResponseType.CLOSE);
+
+        cancel = new Button();
+        cancel.setImage(new Image(Stock.CANCEL, IconSize.BUTTON));
+        cancel.setLabel("Return to editor");
+        dialog.addButton(cancel, ResponseType.CANCEL);
+
+        ok = new Button();
+        ok.setImage(new Image(Stock.SAVE, IconSize.BUTTON));
+        ok.setLabel("Yes, save");
+        dialog.addButton(ok, ResponseType.OK);
+
+        dialog.showAll();
+        dialog.setTitle("Document modified!");
+        ok.grabFocus();
+
+        response = dialog.run();
+        dialog.hide();
+
+        if (response == ResponseType.OK) {
+            saveDocument();
+        } else if (response == ResponseType.CLOSE) {
+            return;
+        } else {
+            throw new SaveCancelledException();
+        }
+    }
+
+    /**
+     * Open a new chapter in the editor, replacing the current one.
+     */
+    void openDocument() {
+        final FileChooserDialog dialog;
+        final FileFilter filter;
+        final ErrorMessageDialog error;
+        String filename;
+        ResponseType response;
+        final Folio folio;
+
+        try {
+            saveIfModified();
+        } catch (SaveCancelledException sce) {
+            return;
+        }
+
+        dialog = new FileChooserDialog("Open file...", primary, OPEN);
+
+        filter = new FileFilter();
+        filter.setName("Documents");
+        filter.addPattern("*.xml");
+        dialog.addFilter(filter);
+
+        response = dialog.run();
+        dialog.hide();
+
+        if (response != ResponseType.OK) {
+            return;
+        }
+
+        filename = dialog.getFilename();
+
+        try {
+            data.loadDocument(filename);
+        } catch (Exception e) {
+            error = new ErrorMessageDialog(
+                    primary,
+                    "Failed to load document!",
+                    "Problem encountered when attempting to load:"
+                            + "\n<tt>"
+                            + filename
+                            + "</tt>\n\n"
+                            + "Worse, it wasn't something we were expecting. Here's the internal message, which might help a developer fix the problem:\n\n<tt>"
+                            + e.getClass().getSimpleName() + "</tt>:\n<tt>" + e.getMessage() + "</tt>");
+            error.setSecondaryUseMarkup(true);
+
+            error.run();
+            error.hide();
+            return;
+        }
+        folio = data.getActiveDocument();
+        this.displayDocument(folio);
     }
 }
 

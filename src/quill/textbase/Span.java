@@ -145,4 +145,32 @@ public abstract class Span
 
         return str.toString();
     }
+
+    public boolean equals(Object obj) {
+        final Span other;
+        final String mine, theirs;
+
+        if (this == obj) {
+            return true;
+        }
+
+        if (!(obj instanceof Span)) {
+            return false;
+        }
+
+        other = (Span) obj;
+
+        if (this.markup != other.markup) {
+            return false;
+        }
+
+        mine = this.getText();
+        theirs = other.getText();
+
+        if (!(mine.equals(theirs))) {
+            return false;
+        }
+
+        return true;
+    }
 }

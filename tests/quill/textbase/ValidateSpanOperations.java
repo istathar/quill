@@ -78,4 +78,26 @@ public class ValidateSpanOperations extends TestCase
         assertSame(d1.getText(), d2.getText());
         assertSame(e1.getText(), e2.getText());
     }
+
+    public final void testSpanEquality() {
+        final Span c1, c2, s1, s2;
+
+        c1 = createSpan('A', null);
+        c2 = createSpan('A', null);
+        s1 = createSpan("Hello World", null);
+        s2 = createSpan("Hello World", null);
+
+        assertFalse(c1.equals(this));
+
+        assertTrue(c1.equals(c1));
+        assertTrue(s1.equals(s1));
+
+        assertTrue(c1.equals(c2));
+        assertTrue(c2.equals(c1));
+        assertTrue(s1.equals(s2));
+        assertTrue(s2.equals(s1));
+
+        assertFalse(c1.equals(s1));
+        assertFalse(s1.equals(c1));
+    }
 }

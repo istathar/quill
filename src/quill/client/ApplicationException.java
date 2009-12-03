@@ -18,7 +18,11 @@ package quill.client;
 @SuppressWarnings("serial")
 public abstract class ApplicationException extends Exception
 {
-    public ApplicationException(String payload) {
+    protected ApplicationException() {
+        super();
+    }
+
+    protected ApplicationException(String payload) {
         super(payload);
     }
 }

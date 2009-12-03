@@ -11,12 +11,12 @@
 package parchment.render;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.TreeMap;
 
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.FontOptions;
-import org.freedesktop.cairo.Matrix;
 import org.freedesktop.cairo.Surface;
-import org.freedesktop.cairo.XlibSurface;
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.Unit;
@@ -44,6 +44,7 @@ import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
+import quill.textbase.Origin;
 import quill.textbase.Preformat;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
@@ -83,15 +84,6 @@ public abstract class RenderEngine
 
     private double footerHeight;
 
-    private double cursor;
-
-    /**
-     * Is there sufficient page area to keep drawing?
-     */
-    private boolean done;
-
-    private int pageNumber;
-
     private Series series;
 
     private DataLayer data;
@@ -103,6 +95,31 @@ public abstract class RenderEngine
     Typeface monoFace;
 
     Typeface headingFace;
+
+    /**
+     * This chapter's content, as prepared into Areas.
+     */
+    private ArrayList<Area> areas;
+
+    /**
+     * This chapter's content, as flowed into Pages.
+     */
+    private ArrayList<Page> pages;
+
+    /**
+     * Where is a given (Segment, offset) pair?
+     */
+    private TreeMap<Origin, Page> lookup;
+
+    /**
+     * The current Segment's index into the Series (for composing Origins).
+     */
+    private int currentPosition;
+
+    /**
+     * The current offset into the current Segment (for composing Origins).
+     */
+    private int currentOffset;
 
     /**
      * Construct a new RenderEngine. Call {@link #render(Context) render()} to
@@ -124,13 +141,108 @@ public abstract class RenderEngine
             return;
         }
 
-        /*
-         * An instance of this class can only do one render at a time.
-         */
         synchronized (this) {
             specifyFonts(cr);
-            processSeries(cr, series);
+            processSegmentsIntoAreas(cr);
+            flowAreasIntoPages(cr);
+            renderAllPages(cr);
         }
+    }
+
+    /*
+     * TODO needs to act to prepare and flow, caching the result so that
+     * subsequent calls here don't re-do everything.
+     */
+    public void render(Context cr, int pageNum) {
+        if (series == null) {
+            return;
+        }
+
+        synchronized (this) {
+            specifyFonts(cr);
+            processSegmentsIntoAreas(cr);
+            flowAreasIntoPages(cr);
+            renderSinglePage(cr, pageNum);
+        }
+    }
+
+    public void render(Context cr, Origin cursor) {
+        if (series == null) {
+            return;
+        }
+
+        synchronized (this) {
+            specifyFonts(cr);
+            processSegmentsIntoAreas(cr);
+            flowAreasIntoPages(cr);
+            renderSinglePage(cr, cursor);
+        }
+    }
+
+    private void renderAllPages(Context cr) {
+        final Surface surface;
+        final int I;
+        int i;
+        Page page;
+
+        I = pages.size();
+        surface = cr.getTarget();
+
+        for (i = 0; i < I; i++) {
+            page = pages.get(i);
+
+            /*
+             * Draw the page.
+             */
+
+            page.render(cr);
+
+            /*
+             * Flush the page out, and begin a new one.
+             */
+
+            if (i < I - 1) {
+                surface.showPage();
+            }
+        }
+
+        surface.finish();
+    }
+
+    private void renderSinglePage(Context cr, int pageNum) {
+        final Surface surface;
+        final Page page;
+
+        surface = cr.getTarget();
+
+        page = pages.get(pageNum - 1);
+        page.render(cr);
+
+        surface.finish();
+    }
+
+    private void renderSinglePage(final Context cr, final Origin target) {
+        final Surface surface;
+        final Origin key;
+        final Page page;
+
+        surface = cr.getTarget();
+
+        key = lookup.floorKey(target);
+        if (key != null) {
+            page = lookup.get(key);
+        } else {
+            /*
+             * Assuming there's a (0,0) Origin for the first page, we
+             * shouldn't ever get here. But guard against it as the Area ->
+             * Origin:Page logic is still a little raw.
+             */
+            page = pages.get(0);
+        }
+
+        page.render(cr);
+
+        surface.finish();
     }
 
     /*
@@ -161,7 +273,7 @@ public abstract class RenderEngine
         rightMargin = 45.0;
     }
 
-    public void processSeries(final Context cr, final Series series) {
+    public void processSegmentsIntoAreas(final Context cr) {
         int i, j;
         Segment segment;
         TextChain text;
@@ -169,75 +281,101 @@ public abstract class RenderEngine
         Extract[] paras;
         String filename;
 
-        cursor = topMargin;
-        done = false;
-        pageNumber = 0;
+        areas = new ArrayList<Area>(64);
         footerHeight = serifFace.lineHeight;
 
-        drawFooter(cr);
         for (i = 0; i < series.size(); i++) {
+            currentPosition = i;
+            currentOffset = 0;
+
             segment = series.get(i);
             text = segment.getText();
 
             if (segment instanceof ComponentSegment) {
                 entire = text.extractAll();
-                drawHeading(cr, entire, 32.0);
-                drawBlankLine(cr);
+                appendHeading(cr, entire, 32.0);
+                appendBlankLine(cr);
             } else if (segment instanceof HeadingSegment) {
                 entire = text.extractAll();
-                drawHeading(cr, entire, 16.0);
-                drawBlankLine(cr);
+                appendHeading(cr, entire, 16.0);
+                appendBlankLine(cr);
             } else if (segment instanceof PreformatSegment) {
                 entire = text.extractAll();
-                drawProgramCode(cr, entire);
-                drawBlankLine(cr);
+                appendProgramCode(cr, entire);
+                appendBlankLine(cr);
             } else if (segment instanceof QuoteSegment) {
                 paras = text.extractParagraphs();
                 for (j = 0; j < paras.length; j++) {
-                    drawQuoteParagraph(cr, paras[j]);
-                    drawBlankLine(cr);
+                    appendQuoteParagraph(cr, paras[j]);
+                    appendBlankLine(cr);
                 }
             } else if (segment instanceof NormalSegment) {
                 paras = text.extractParagraphs();
                 for (j = 0; j < paras.length; j++) {
-                    drawNormalParagraph(cr, paras[j]);
-                    drawBlankLine(cr);
+                    appendNormalParagraph(cr, segment, paras[j]);
+                    appendBlankLine(cr);
                 }
             } else if (segment instanceof ImageSegment) {
                 filename = segment.getImage();
-                drawExternalGraphic(cr, filename);
+                appendExternalGraphic(cr, filename);
                 entire = text.extractAll();
-                drawBlankLine(cr);
+                appendBlankLine(cr);
                 if (entire == null) {
                     continue;
                 }
-                drawCitationParagraph(cr, entire);
-                drawBlankLine(cr);
+                appendCitationParagraph(cr, entire);
+                appendBlankLine(cr);
             }
         }
     }
 
-    protected void drawBlankLine(Context cr) {
-        cursor += serifFace.lineHeight * 0.7;
+    protected void appendBlankLine(Context cr) {
+        final Origin origin;
+        final Area area;
+        final double request;
+
+        request = serifFace.lineHeight * 0.7;
+
+        origin = new Origin(currentPosition, currentOffset++);
+        area = new BlankArea(origin, request);
+        accumulate(area);
     }
 
-    protected void drawHeading(Context cr, Extract entire, double size) {
-        FontDescription desc;
-        Typeface face;
+    protected void appendHeading(Context cr, Extract entire, double size) {
+        final FontDescription desc;
+        final Typeface face;
+        final Area[] list;
 
         desc = headingFace.desc.copy();
         desc.setSize(size);
         face = new Typeface(cr, desc, 0.0);
 
-        drawAreaText(cr, entire, face, false, false);
+        list = layoutAreaText(cr, entire, face, false, false, false);
+        accumulate(list);
     }
 
-    protected void drawNormalParagraph(Context cr, Extract extract) {
-        drawAreaText(cr, extract, serifFace, false, false);
+    private void accumulate(Area[] list) {
+        int i;
+
+        for (i = 0; i < list.length; i++) {
+            areas.add(list[i]);
+        }
     }
 
-    protected void drawQuoteParagraph(Context cr, Extract extract) {
+    private void accumulate(Area area) {
+        areas.add(area);
+    }
+
+    protected void appendNormalParagraph(Context cr, Segment segment, Extract extract) {
+        final Area[] list;
+
+        list = layoutAreaText(cr, extract, serifFace, false, false, false);
+        accumulate(list);
+    }
+
+    protected void appendQuoteParagraph(Context cr, Extract extract) {
         final double savedLeft, savedRight;
+        final Area[] list;
 
         savedLeft = leftMargin;
         savedRight = rightMargin;
@@ -245,14 +383,18 @@ public abstract class RenderEngine
         leftMargin += 45.0;
         rightMargin += 45.0;
 
-        drawAreaText(cr, extract, serifFace, false, false);
+        list = layoutAreaText(cr, extract, serifFace, false, false, false);
+        accumulate(list);
 
         leftMargin = savedLeft;
         rightMargin = savedRight;
     }
 
-    protected void drawProgramCode(Context cr, Extract entire) {
-        drawAreaText(cr, entire, monoFace, true, false);
+    protected void appendProgramCode(Context cr, Extract entire) {
+        final Area[] list;
+
+        list = layoutAreaText(cr, entire, monoFace, true, false, false);
+        accumulate(list);
     }
 
     // character
@@ -348,32 +490,32 @@ public abstract class RenderEngine
     }
 
     /**
-     * Given an Extract of text and a FontDescription, render it to the target
-     * Surface. Fancy typesetting character substitutions (smary quotes, etc)
-     * will occur if not preformatted text.
+     * Render an Extract of text in the given Typeface into a TextArea object.
+     * 
+     * Fancy typesetting character substitutions (smary quotes, etc) will
+     * occur if not preformatted text.
      */
-    /*
-     * Change boolean centered for Alignment align?
-     */
-    protected final void drawAreaText(final Context cr, final Extract extract, final Typeface face,
-            final boolean preformatted, final boolean centered) {
+    protected final Area[] layoutAreaText(final Context cr, final Extract extract, final Typeface face,
+            final boolean preformatted, final boolean centered, boolean error) {
         final Layout layout;
         final FontOptions options;
         final StringBuilder buf;
         final AttributeList list;
-        int i, j, len, offset, width;
+        int i, j, k, len, offset, width;
+        final int K;
         boolean code;
         Span span;
         Markup format;
         String str;
+        LayoutLine line;
+        final Area[] result;
         Rectangle rect;
+        double x;
+        Origin origin;
+        Area area;
 
         if (extract == null) {
-            return;
-        }
-
-        if (done) {
-            return;
+            return new Area[] {};
         }
 
         layout = new Layout(cr);
@@ -438,46 +580,114 @@ public abstract class RenderEngine
          * the lines.
          */
 
-        for (LayoutLine line : layout.getLinesReadonly()) {
-            paginate(cr, face.lineHeight);
-            if (done) {
-                return;
-            }
+        K = layout.getLineCount();
+        result = new Area[K];
+
+        for (k = 0; k < K; k++) {
+            line = layout.getLineReadonly(k);
 
             if (!centered) {
-                cr.moveTo(leftMargin, cursor + face.lineAscent);
+                x = leftMargin;
             } else {
                 rect = line.getExtentsLogical();
-                cr.moveTo(pageWidth / 2 - rect.getWidth() / 2, cursor + face.lineAscent);
+                x = pageWidth / 2 - rect.getWidth() / 2;
             }
-            cr.showLayout(line);
-            cursor += face.lineHeight;
+
+            origin = new Origin(currentPosition, currentOffset);
+            area = new TextArea(origin, x, face.lineHeight, face.lineAscent, line, error);
+            result[k] = area;
+
+            /*
+             * Query the layoutline for it's width, thereby finding out where
+             * the next Origin should be marked. This isn't 100% correct,
+             * because the number of characters laid out is NOT the same as
+             * the number of characters in the editor [due to our typography
+             * changes]. But it's usually the same, and I'm not sure how we
+             * can go from LayoutLine (start, width) pairs to actual (Segment,
+             * offset) unless we track the mapping between Segments'
+             * TextChains and the typography() result.
+             */
+
+            currentOffset += line.getLength();
         }
+
+        return result;
     }
 
     /**
-     * Check and see if there is sufficient vertical space for the requested
-     * height. If not, finish the page being drawn and star a fresh one if
-     * possible. Sets done if the vertical cursor can't be restarted (which is
-     * the case when drawing to PreviewWidget).
+     * Take the Area[] and pour them into a Page[].
      */
-    /*
-     * Throw an exception instead?
-     */
-    private void paginate(Context cr, double requestedHeight) {
-        final Surface surface;
+    private void flowAreasIntoPages(Context cr) {
+        final int I;
+        int i, num;
+        final double available;
+        double cursor, request;
+        Page page;
+        Area area, footer;
+        Origin origin;
 
-        if ((cursor + requestedHeight) > (pageHeight - bottomMargin - footerHeight)) {
-            surface = cr.getTarget();
-            if (surface instanceof XlibSurface) {
-                done = true;
-                return;
-            }
+        pages = new ArrayList<Page>(8);
+        lookup = new TreeMap<Origin, Page>();
 
-            surface.showPage();
+        I = areas.size();
+        i = 0;
+        num = 1;
+
+        available = pageHeight - bottomMargin - footerHeight;
+
+        while (i < I) {
+            area = null; // hm
+            page = new Page(num);
             cursor = topMargin;
 
-            drawFooter(cr);
+            /*
+             * Absorb whitespace if it turns up at the top of a new Page
+             */
+
+            while (i < I) {
+                area = areas.get(i);
+                if (area instanceof BlankArea) {
+                    i++;
+                    continue;
+                }
+                break;
+            }
+
+            origin = area.getOrigin();
+            lookup.put(origin, page);
+
+            /*
+             * Flow Areas onto the Page until we run out of room.
+             */
+
+            while (i < I) {
+                area = areas.get(i);
+                request = area.getHeight();
+
+                if (cursor + request > available) {
+                    break;
+                }
+
+                page.append(cursor, area);
+
+                cursor += request;
+                i++;
+            }
+
+            /*
+             * Finally, create a footer and add it to the end of the Page.
+             */
+
+            footer = layoutAreaFooter(cr, num);
+            page.append(available, footer);
+
+            /*
+             * Accumulate the Page, then end the loop.
+             */
+
+            pages.add(page);
+
+            num++;
         }
     }
 
@@ -541,7 +751,6 @@ public abstract class RenderEngine
                 return empty;
             }
         }
-        // else TODO
 
         throw new IllegalArgumentException("\n" + "Translation of " + m + " not yet implemented");
     }
@@ -586,26 +795,29 @@ public abstract class RenderEngine
         return bottomMargin;
     }
 
-    protected void drawFooter(Context cr) {
+    protected Area layoutAreaFooter(Context cr, int pageNumber) {
         final Layout layout;
         final Rectangle ink;
-
-        pageNumber++;
+        final LayoutLine line;
 
         layout = new Layout(cr);
         layout.setFontDescription(serifFace.desc);
         layout.setText(Integer.toString(pageNumber));
         ink = layout.getExtentsInk();
 
-        cr.moveTo(pageWidth - rightMargin - ink.getWidth(), pageHeight - bottomMargin - footerHeight);
-        cr.showLayout(layout);
+        // switch to a layout, not just a line?
+        line = layout.getLineReadonly(0);
+        return new TextArea(null, pageWidth - rightMargin - ink.getWidth(), footerHeight,
+                serifFace.lineAscent, line, false);
+
     }
 
-    protected void drawExternalGraphic(final Context cr, final String source) {
+    protected void appendExternalGraphic(final Context cr, final String source) {
         final String parent, filename;
         final Pixbuf pixbuf;
         final TextChain chain;
         final Extract extract;
+        final Area image;
 
         parent = data.getDirectory();
         filename = parent + "/" + source;
@@ -618,30 +830,33 @@ public abstract class RenderEngine
             chain.append(createSpan(filename, Common.FILENAME));
             chain.append(createSpan("\n" + "not found", null));
             extract = chain.extractAll();
-            drawErrorParagraph(cr, extract);
+            appendErrorParagraph(cr, extract);
             return;
         }
 
-        drawAreaImage(cr, pixbuf);
+        image = layoutAreaImage(cr, pixbuf);
+        accumulate(image);
     }
 
     /**
      * Show a message (in red) indicating a processing problem.
      */
-    protected void drawErrorParagraph(Context cr, Extract extract) {
-        cr.setSource(1.0, 0.0, 0.0);
-        drawAreaText(cr, extract, sansFace, false, true);
-        cr.setSource(0.0, 0.0, 0.0);
+    protected void appendErrorParagraph(Context cr, Extract extract) {
+        final Area[] list;
+
+        list = layoutAreaText(cr, extract, sansFace, false, true, true);
+        accumulate(list);
     }
 
     /*
      * Indentation copied from drawQuoteParagraph(). And face setting copied
      * from drawHeading(). Both of these should probably be abstracted.
      */
-    protected void drawCitationParagraph(Context cr, Extract extract) {
+    protected void appendCitationParagraph(Context cr, Extract extract) {
         final double savedLeft, savedRight;
         final FontDescription desc;
         final Typeface face;
+        final Area[] list;
 
         savedLeft = leftMargin;
         savedRight = rightMargin;
@@ -653,62 +868,39 @@ public abstract class RenderEngine
         desc.setStyle(Style.ITALIC);
         face = new Typeface(cr, desc, 0.0);
 
-        drawAreaText(cr, extract, face, false, true);
+        list = layoutAreaText(cr, extract, face, false, true, false);
+        accumulate(list);
 
         leftMargin = savedLeft;
         rightMargin = savedRight;
     }
 
     /**
-     * Render an image. Will scale down to fit within page margins if too
-     * wide.
+     * If the image is wider than the margins it will be scaled down.
      */
-    protected void drawAreaImage(final Context cr, final Pixbuf pixbuf) {
+    protected final Area layoutAreaImage(final Context cr, final Pixbuf pixbuf) {
         final double width, height;
-        final double available, scaleFactor;
-        final Matrix matrix;
+        final double available, scaleFactor, request;
+        final double leftCorner;
+        final Origin origin;
+        final Area area;
 
         width = pixbuf.getWidth();
         height = pixbuf.getHeight();
 
-        paginate(cr, height);
-        if (done) {
-            return;
-        }
-
         available = pageWidth - rightMargin - leftMargin;
-
-        /*
-         * This is a bit unusual; you'd think you would just moveTo(), or,
-         * just as conventionally, use the x,y co-ordinates of setSource().
-         * But it works out just as cleanly to do a translattion to (x,y) and
-         * then to just assume the source is (0,0).
-         */
-
-        cr.save();
-        matrix = new Matrix();
 
         if (width > available) {
             scaleFactor = available / width;
-            matrix.translate(leftMargin, cursor);
-            matrix.scale(scaleFactor, scaleFactor);
+            leftCorner = leftMargin;
         } else {
             scaleFactor = 1.0;
-            matrix.translate(pageWidth / 2 - width / 2, cursor);
+            leftCorner = pageWidth / 2 - width / 2;
         }
+        request = height * scaleFactor;
 
-        cr.transform(matrix);
-        cr.setSource(pixbuf, 0, 0);
-        cr.paint();
-
-        cr.restore();
-
-        cursor += height * scaleFactor;
-
-        /*
-         * Reset the source [colour] to black text.
-         */
-
-        cr.setSource(0.0, 0.0, 0.0);
+        origin = new Origin(currentPosition, 0);
+        area = new ImageArea(origin, leftCorner, request, pixbuf, scaleFactor);
+        return area;
     }
 }

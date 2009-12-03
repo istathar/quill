@@ -845,6 +845,22 @@ abstract class EditorTextView extends TextView
                 ui.primary.scrollEditorToShow(alloc.getY() + rect.getY(), rect.getHeight() + 5);
             }
         });
+
+        /*
+         * When you click in an EditorTextView, you may have come from
+         * somewhere else, so update the enclosing ComponentEditorWidget's
+         * idea of what the current segment is, thereby allowing it to drive
+         * preview of the correct page.
+         */
+        view.connect(new Widget.ButtonPressEvent() {
+            public boolean onButtonPressEvent(Widget source, EventButton event) {
+                final ComponentEditorWidget parent;
+
+                parent = findComponentEditor(view);
+                parent.setCursor(segment);
+                return false;
+            }
+        });
     }
 
     private void clearFormat() {
@@ -1251,7 +1267,22 @@ abstract class EditorTextView extends TextView
             x = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X);
         }
 
-        if (pointer.forwardDisplayLine(view)) {
+        /*
+         * Although forwardDisplayLine() does the right thing, the weird GTK
+         * behaviour is that it returns false if it becomes the end iterator,
+         * even if it changed the TextIter! That screws us up if you cursor
+         * down to a blank line as last line. So we do the dance of going to
+         * the end of the display line we're on; if we're not at the end of
+         * the buffer then we know we can go down at least one more display
+         * line. forwardChar() is cheaper than forwardDisplayLine(); we're at
+         * the end now and all we want to do is get the cursor onto the next
+         * display line so we can measure it's Y location.
+         */
+
+        pointer.forwardDisplayLineEnd(view);
+        if (!pointer.isEnd()) {
+            pointer.forwardChar(); // move to next line
+
             X = view.convertWindowToBufferCoordsX(TEXT, x);
 
             position = view.getLocation(pointer);
@@ -1514,5 +1545,9 @@ abstract class EditorTextView extends TextView
             omega++;
             alpha = omega;
         }
+    }
+
+    int getInsertOffset() {
+        return insertOffset;
     }
 }

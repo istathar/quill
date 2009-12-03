@@ -45,4 +45,8 @@ public class Normal implements Inline
     public String getText() {
         return cached;
     }
+
+    public String toString() {
+        return "(text)";
+    }
 }

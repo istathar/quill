@@ -1,5 +1,5 @@
 /*
- * Application.java
+ * SaveCancelledException.java
  *
  * Copyright (c) 2009 Operational Dynamics Consulting Pty Ltd
  * 
@@ -8,16 +8,19 @@
  * version 2" See the LICENCE file for the terms governing usage and
  * redistribution.
  */
-package quill.docbook;
+package quill.ui;
+
+import quill.client.ApplicationException;
 
 /**
- * The name of a software project.
+ * Signal that an action, such as saving, was cancelled by the user.
  * 
  * @author Andrew Cowie
  */
-public class Application extends InlineElement implements Inline
+@SuppressWarnings("serial")
+class SaveCancelledException extends ApplicationException
 {
-    public Application() {
-        super("application");
+    public SaveCancelledException() {
+        super();
     }
 }

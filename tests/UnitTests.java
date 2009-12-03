@@ -11,14 +11,18 @@
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import quill.client.ValidateDocumentModified;
 import quill.client.ValidateFileNaming;
 import quill.quack.ValidateBlockquoteConversion;
 import quill.quack.ValidateCitationConversion;
+import quill.quack.ValidateDataIntegrity;
 import quill.quack.ValidateEndnoteConversion;
+import quill.quack.ValidateProperNewlineHandling;
 import quill.quack.ValidateTextChainToQuackConversion;
 import quill.quack.ValidateThereAndBackAgain;
 import quill.textbase.ValidateApplyUndoRedo;
 import quill.textbase.ValidateExtracts;
+import quill.textbase.ValidateOriginOrdering;
 import quill.textbase.ValidateSpanOperations;
 import quill.textbase.ValidateStructuralChange;
 import quill.textbase.ValidateText;
@@ -54,11 +58,15 @@ public class UnitTests
         suite.addTestSuite(ValidateText.class);
         suite.addTestSuite(ValidateUnicode.class);
         suite.addTestSuite(ValidateExtracts.class);
+        suite.addTestSuite(ValidateOriginOrdering.class);
         suite.addTestSuite(ValidateApplyUndoRedo.class);
+        suite.addTestSuite(ValidateDocumentModified.class);
         suite.addTestSuite(ValidateTextChainToQuackConversion.class);
+        suite.addTestSuite(ValidateDataIntegrity.class);
         suite.addTestSuite(ValidateBlockquoteConversion.class);
         suite.addTestSuite(ValidateEndnoteConversion.class);
         suite.addTestSuite(ValidateCitationConversion.class);
+        suite.addTestSuite(ValidateProperNewlineHandling.class);
         suite.addTestSuite(ValidateWrapperExpansions.class);
         suite.addTestSuite(ValidateStructuralChange.class);
         suite.addTestSuite(ValidateThereAndBackAgain.class);
