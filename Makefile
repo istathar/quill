@@ -9,40 +9,21 @@
 # redistribution.
 #
 
-#
-# FIXME This is just a placeholder. It's not a real build system. It's not even
-# a real Makefile; it's just here to show us what assumptions we're currently
-# making in our IDEs.
-#
+ifdef V
+else
+MAKEFLAGS=-s
+REDIRECT=>/dev/null
+endif
 
-include .config
+.PHONY: all build clean test
 
 all: build
 
-build: compile-core compile-tests
+build:
+	sh ./build.sh
 
-compile-core: dirs list
-	$(JAVAC) \
-	-classpath $(GNOME_JARS):$(XOM_JARS) \
-	-d tmp/classes \
-	-sourcepath src \
-	@tmp/list-core
-
-compile-tests: dirs list
-	$(JAVAC) \
-	-classpath $(GNOME_JARS):$(XOM_JARS):$(JUNIT_JARS) \
-	-d tmp/classes \
-	-sourcepath src \
-	@tmp/list-tests
-
-list: dirs
-	@find src -type f -name '*.java' > tmp/list-core
-	@find tests -type f -name '*.java' > tmp/list-tests
-
-dirs: tmp/classes
-
-tmp/classes:
-	mkdir -p tmp/classes
+clean:
+	rm -r tmp/
 
 test: build
 	$(JAVA) \
