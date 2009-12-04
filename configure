@@ -2,7 +2,7 @@
 
 open CONFIG, ">.config.tmp";
 print CONFIG <<HERE ;
-# This is an automatically generated Makefile fragment which is used
+# This is an automatically generated Shell fragment which is used
 # to configure quill for building. Do not edit (your changes will
 # be overwritten next time ./configure is run), do not commit to
 # repository.
