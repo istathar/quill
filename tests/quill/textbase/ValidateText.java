@@ -16,7 +16,6 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-
 package quill.textbase;
 
 import junit.framework.TestCase;
