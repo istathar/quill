@@ -25,8 +25,8 @@ Oh! You mean programs written in Swing. You're right — Sun's UI toolkit is
 hideous to develop with and even worse for the people using it. And it looks
 like shit on screen. But that's ok. We don't use Swing.
 
-Quill's user interface is in GTK and written using the excellent java-gnome UI
-library.
+Quill's user interface is in GTK and written using the excellent
+[java-gnome][] UI library.
 
 > I thought Quill was written with Qt since it begins with a 'Q'
 
@@ -41,6 +41,12 @@ Pango, so you'll need to use the latest releases there.
 > Uh, I meant Microsoft Vista and stuff...
 
 Oh. Really? Why would anyone use that? It's proprietary software.
+
+Links
+-----
+
+[java-gnome]: http://java-gnome.sourceforge.net/
+
 
 <!--
 

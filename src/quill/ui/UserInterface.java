@@ -99,7 +99,6 @@ public class UserInterface
     }
 
     private void setupApplication() {
-        Gtk.setProgramName("quill");
         Gtk.setDefaultIcon(images.quill);
     }
 

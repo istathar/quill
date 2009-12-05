@@ -12,6 +12,7 @@ package quill.client;
 
 import java.io.FileNotFoundException;
 
+import org.gnome.glib.Glib;
 import org.gnome.gtk.Gtk;
 
 import quill.textbase.DataLayer;
@@ -41,6 +42,7 @@ public class Quill
     }
 
     static void initializeUserInterface(String[] args) {
+        Glib.setProgramName("quill");
         Gtk.init(args);
 
         ui = new UserInterface(data);
