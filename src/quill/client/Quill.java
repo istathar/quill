@@ -1,5 +1,5 @@
 /*
- * Quill.java, from the Quill and Parchment WYSIWYN document editor.
+ * Quill.java, from the Quill and Parchment document editor.
  *
  * Copyright © 2008-2009 Operational Dynamics Consulting Pty Ltd
  *
