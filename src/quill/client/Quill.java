@@ -1,12 +1,20 @@
 /*
- * Quill.java
+ * Quill.java, from the Quill and Parchment WYSIWYN document editor.
  *
- * Copyright (c) 2008-2009 Operational Dynamics Consulting Pty Ltd
+ * Copyright © 2008-2009 Operational Dynamics Consulting Pty Ltd
+ *
+ * The code in this file, and the program it is a part of, is made available
+ * to you by its authors as open source software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License, version
+ * 2 ("GPL") as published by the Free Software Foundation.
  * 
- * The code in this file, and the program it is a part of, are made available
- * to you by its authors under the terms of the "GNU General Public Licence,
- * version 2" See the LICENCE file for the terms governing usage and
- * redistribution.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GPL for more details.
+ * 
+ * You should have received a copy of the GPL along with this program. If not,
+ * see http://www.gnu.org/licenses/. The authors of this program may be
+ * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
 package quill.client;
 
@@ -19,6 +27,13 @@ import quill.textbase.DataLayer;
 import quill.textbase.Folio;
 import quill.ui.UserInterface;
 
+/**
+ * Main execution entry point for the Quill what-you-see-is-what-you-need
+ * editor of Quack XML documents, using the Parchment rendering engine to
+ * produce printable output.
+ * 
+ * @author Andrew Cowie
+ */
 public class Quill
 {
     public static UserInterface ui;
