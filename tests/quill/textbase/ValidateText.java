@@ -228,7 +228,7 @@ public class ValidateText extends TestCase
 
         assertEquals("One Two Three Four", text.toString());
 
-        assertEquals(7, introspectNumberOfSpans(text));
+        assertEquals(7, countNumberOfSpans(text));
 
         /*
          * Now, try splicing something in
@@ -238,9 +238,41 @@ public class ValidateText extends TestCase
         text.insert(5, addition);
         assertEquals("One TwentyTwo Three Four", text.toString());
 
-        assertEquals(9, introspectNumberOfSpans(text));
+        assertEquals(9, countNumberOfSpans(text));
     }
 
+    private static int countNumberOfSpans(TextChain chain) {
+        final Node root;
+        final CountingVisitor tourist;
+        final int result;
+
+        root = chain.getTree();
+
+        if (root == null) {
+            return 0;
+        }
+
+        tourist = new CountingVisitor();
+        root.visitAll(tourist);
+        return tourist.count;
+    }
+
+    private static class CountingVisitor implements Visitor
+    {
+        private int count;
+
+        private CountingVisitor() {
+            count = 0;
+        }
+
+        public void visit(Span span) {
+            count++;
+        }
+    }
+
+    /**
+     * @deprecated
+     */
     private static int introspectNumberOfSpans(TextChain chain) {
         final Field field;
         Object spans;
