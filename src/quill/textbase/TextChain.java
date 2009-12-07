@@ -19,80 +19,48 @@
 package quill.textbase;
 
 /**
- * A mutable buffer of unicode text which manages a linked list of Spans in
- * order to maximize sharing of character array storage.
+ * A mutable buffer of unicode text which manages a binary tree of Spans in
+ * order to maximize sharing of character array storage while giving us
+ * efficient lookup by offset.
  * 
  * @author Andrew Cowie
  */
 public class TextChain
 {
-    Piece first;
-
-    /**
-     * cache of the length of this TextChain, in characters.
-     */
-    private int length = -1;
+    Node root;
 
     public TextChain() {
-        first = null;
+        root = null;
     }
 
-    TextChain(String str) {
-        first = new Piece();
-        first.span = Span.createSpan(str, null);
+    TextChain(final String str) {
+        final Span span;
+        span = Span.createSpan(str, null);
+        root = new Node(span);
     }
 
     TextChain(Span initial) {
-        first = new Piece();
-        first.span = initial;
-    }
-
-    private void invalidateCache() {
-        length = -1;
-    }
-
-    /**
-     * Update the offset cache [stored in the Pieces] in the process of
-     * calculating and storing the length of the TextChain.
-     */
-    private void calculateOffsets() {
-        Piece piece;
-        int result;
-
-        piece = first;
-        result = 0;
-
-        while (piece != null) {
-            piece.offset = result;
-            result += piece.span.getWidth();
-            piece = piece.next;
-        }
-
-        length = result;
+        root = new Node(initial);
     }
 
     /**
      * The length of this Text, in characters.
      */
     public int length() {
-        if (length == -1) {
-            calculateOffsets();
-        }
-        return length;
+        return root.getWidth();
     }
 
+    /**
+     * This is ineffecient! Use for debugging purposes only.
+     */
     public String toString() {
         final StringBuilder str;
-        Piece piece;
+        Node node;
+        Span span;
 
         str = new StringBuilder();
-        piece = first;
-
-        while (piece != null) {
-            str.append(piece.span.getText());
-            piece = piece.next;
-        }
-
+        span = root.getSpan();
+        str.append(span.getText());
         return str.toString();
     }
 

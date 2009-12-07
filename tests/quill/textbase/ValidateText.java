@@ -32,6 +32,7 @@ public class ValidateText extends TestCase
         final TextChain start;
 
         start = new TextChain("Hello world");
+        assertEquals(11, start.length());
 
         assertEquals("Hello world", start.toString());
     }
