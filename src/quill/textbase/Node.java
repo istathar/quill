@@ -154,6 +154,13 @@ class Node
     Span getSpanAt(final int offset) {
         final int widthLeft, widthCenter, widthRight;
 
+        if (offset == width) {
+            return null;
+        }
+        if (offset > width) {
+            throw new IndexOutOfBoundsException();
+        }
+
         if (left == null) {
             widthLeft = 0;
         } else {
