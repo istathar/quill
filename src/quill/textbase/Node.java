@@ -36,12 +36,24 @@ class Node
      */
     private final int offset;
 
+    /**
+     * Width of this tree, in characters.
+     */
     private final int width;
 
+    /**
+     * The binary tree below and preceeding this Node.
+     */
     private final Node left;
 
+    /**
+     * This Node's content.
+     */
     private final Span data;
 
+    /**
+     * The binary tree below and following this Node.
+     */
     private final Node right;
 
     /**
@@ -56,7 +68,11 @@ class Node
         right = null;
     }
 
-    public Node(Node alpha, Span span, Node omega) {
+    /**
+     * Create a new Node with the given Span as content and the given binary
+     * trees below before and after this Node.
+     */
+    Node(Node alpha, Span span, Node omega) {
         final int depthLeft, depthRight;
         final int widthLeft, widthRight;
 
@@ -127,7 +143,9 @@ class Node
         if (left != null) {
             left.visitAll(tourist);
         }
-        tourist.visit(data);
+        if (data != null) {
+            tourist.visit(data);
+        }
         if (right != null) {
             right.visitAll(tourist);
         }

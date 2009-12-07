@@ -35,6 +35,7 @@ public class TextChain
 
     TextChain(final String str) {
         final Span span;
+
         span = Span.createSpan(str, null);
         root = new Node(span);
     }
@@ -47,7 +48,11 @@ public class TextChain
      * The length of this Text, in characters.
      */
     public int length() {
-        return root.getWidth();
+        if (root == null) {
+            return 0;
+        } else {
+            return root.getWidth();
+        }
     }
 
     /**
@@ -55,6 +60,10 @@ public class TextChain
      */
     public String toString() {
         final StringBuilder str;
+
+        if (root == null) {
+            return "";
+        }
 
         str = new StringBuilder();
 
@@ -71,9 +80,6 @@ public class TextChain
      * This is an inefficient implementation!
      */
     public void append(Span addition) {
-        Piece piece;
-        final Piece last;
-
         if (addition == null) {
             throw new IllegalArgumentException();
         }
@@ -92,6 +98,14 @@ public class TextChain
          */
 
         root = root.append(addition);
+    }
+
+    /*
+     * TODO if we change to an EmptyNode singleton, then it should be returned
+     * if empty.
+     */
+    Node getTree() {
+        return root;
     }
 
     /**

@@ -72,12 +72,11 @@ public class ValidateText extends TestCase
 
     public final void testEmptyChain() {
         final TextChain chain;
-        Span span;
 
         chain = new TextChain();
 
-        span = chain.spanAt(0);
-        assertNull(span);
+        assertEquals(0, chain.length());
+        assertEquals("", chain.toString());
     }
 
     private static TextChain sampleData() {
