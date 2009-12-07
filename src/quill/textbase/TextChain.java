@@ -371,32 +371,19 @@ public class TextChain
      * between them. This is the workhorse of this class.
      */
     void insert(int offset, Span addition) {
-        Piece one, two, piece;
-
         if (offset < 0) {
-            throw new IllegalArgumentException();
+            throw new IndexOutOfBoundsException();
         }
-        invalidateCache();
 
-        piece = new Piece();
-        piece.span = addition;
-
-        if (offset == 0) {
-            piece.next = first;
-            first.prev = piece;
-            first = piece;
+        if (root == null) {
+            if (offset != 0) {
+                throw new IndexOutOfBoundsException();
+            }
+            root = new Node(addition);
             return;
         }
 
-        one = splitAt(offset);
-        two = one.next;
-
-        if (two != null) {
-            piece.next = two;
-            two.prev = piece;
-        }
-        one.next = piece;
-        piece.prev = one;
+        root = root.insertSpanAt(offset, addition);
     }
 
     /**

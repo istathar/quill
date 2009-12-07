@@ -178,6 +178,45 @@ class Node
             return right.getSpanAt(offset - widthCenter - widthLeft);
         }
     }
+
+    Node insertSpanAt(final int offset, final Span addition) {
+        final int widthLeft, widthCenter;
+        final Span before, after;
+        final int point;
+        final Node gauche, droit;
+
+        if (offset == width) {
+            return new Node(this, addition, null);
+        }
+        if (offset > width) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        if (left == null) {
+            widthLeft = 0;
+        } else {
+            widthLeft = left.getWidth();
+        }
+
+        if (offset < widthLeft) {
+            return left.insertSpanAt(offset, addition);
+        }
+
+        widthCenter = this.getWidth();
+        if (offset - widthLeft > widthCenter) {
+            return right.insertSpanAt(offset - widthCenter - widthLeft, addition);
+        }
+
+        point = offset - widthLeft;
+
+        before = data.split(0, point);
+        after = data.split(point);
+
+        gauche = new Node(left, before, null);
+        droit = new Node(null, after, right);
+
+        return new Node(gauche, addition, droit);
+    }
 }
 
 interface Visitor
