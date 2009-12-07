@@ -109,6 +109,20 @@ public class TextChain
     }
 
     /**
+     * Get the Span at a given offset, for testing purposes.
+     */
+    Span spanAt(int offset) {
+        if (root == null) {
+            if (offset == 0) {
+                return null;
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+        return root.getSpanAt(offset);
+    }
+
+    /**
      * Insert the given Java String at the specified offset.
      */
     protected void insert(int offset, String what) {

@@ -150,6 +150,27 @@ class Node
             right.visitAll(tourist);
         }
     }
+
+    Span getSpanAt(final int offset) {
+        final int widthLeft, widthCenter, widthRight;
+
+        if (left == null) {
+            widthLeft = 0;
+        } else {
+            widthLeft = left.getWidth();
+        }
+
+        if (offset < widthLeft) {
+            return left.getSpanAt(offset);
+        }
+
+        widthCenter = this.getWidth();
+        if (offset - widthLeft <= widthCenter) {
+            return data;
+        } else {
+            return right.getSpanAt(offset - widthCenter - widthLeft);
+        }
+    }
 }
 
 interface Visitor
