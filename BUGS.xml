@@ -73,21 +73,6 @@ is consistent with there only being one
 <type>TextView</type>.
 </text>
 <heading>
-Build
-</heading>
-<text>
-<bold>Make does too much</bold>
-</text>
-<text>
-For some reason <command>make test</command>
-is actually rebuilding everything, even if
-there's nothing that needs rebuilding. That's
-lame.
-</text>
-<heading>
-Data integrity
-</heading>
-<heading>
 Internal
 </heading>
 <text>
@@ -175,7 +160,7 @@ As project documentation, this file forms
 an integral part of the source code of the
 program it accompanies, and thus is made
 available to you by its authors under the
-terms of the "GNU General Public Licence,
+terms of the "GNU General Public Licence
 version 2". See the <filename>LICENCE</filename>
 file for the terms governing usage, copying
 and redistribution.
