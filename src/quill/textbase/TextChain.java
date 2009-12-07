@@ -55,15 +55,21 @@ public class TextChain
      */
     public String toString() {
         final StringBuilder str;
-        Node node;
-        Span span;
 
         str = new StringBuilder();
-        span = root.getSpan();
-        str.append(span.getText());
+
+        root.visitAll(new Visitor() {
+            public void visit(Span span) {
+                str.append(span.getText()); // TODO loop chars?
+            }
+        });
+
         return str.toString();
     }
 
+    /*
+     * This is an inefficient implementation!
+     */
     public void append(Span addition) {
         Piece piece;
         final Piece last;
@@ -71,15 +77,13 @@ public class TextChain
         if (addition == null) {
             throw new IllegalArgumentException();
         }
-        invalidateCache();
 
         /*
-         * Handle empty Text case
+         * Handle empty TextChain case
          */
 
-        if (first == null) {
-            first = new Piece();
-            first.span = addition;
+        if (root == null) {
+            root = new Node(addition);
             return;
         }
 
@@ -87,16 +91,7 @@ public class TextChain
          * Otherwise, we are appending. Hop to the end.
          */
 
-        piece = first;
-
-        while (piece.next != null) {
-            piece = piece.next;
-        }
-
-        last = new Piece();
-        last.prev = piece;
-        piece.next = last;
-        last.span = addition;
+        root = root.append(addition);
     }
 
     /**

@@ -56,6 +56,43 @@ class Node
         right = null;
     }
 
+    public Node(Node alpha, Span span, Node omega) {
+        final int depthLeft, depthRight;
+        final int widthLeft, widthRight;
+
+        if (alpha == null) {
+            depthLeft = 0;
+            widthLeft = 0;
+        } else {
+            depthLeft = alpha.getDepth();
+            widthLeft = alpha.getWidth();
+        }
+
+        if (omega == null) {
+            depthRight = 0;
+            widthRight = 0;
+        } else {
+            depthRight = omega.getDepth();
+            widthRight = omega.getWidth();
+        }
+
+        if (depthLeft == depthRight) {
+            depth = depthLeft + 1;
+        } else if (depthLeft > depthRight) {
+            depth = depthLeft;
+        } else {
+            depth = depthRight;
+        }
+
+        offset = 0;
+
+        left = alpha;
+        data = span;
+        right = omega;
+
+        width = widthLeft + span.getWidth() + widthRight;
+    }
+
     /**
      * Get the width of this node (and its descendents), in characters.
      */
@@ -73,4 +110,31 @@ class Node
     Span getSpan() {
         return data;
     }
+
+    Node append(Span addition) {
+        if (data == null) {
+            return new Node(addition);
+        } else {
+            return new Node(this, addition, null);
+        }
+    }
+
+    /**
+     * Invoke tourist's visit() method for each Span in the tree, in-order
+     * traversal.
+     */
+    public void visitAll(Visitor tourist) {
+        if (left != null) {
+            left.visitAll(tourist);
+        }
+        tourist.visit(data);
+        if (right != null) {
+            right.visitAll(tourist);
+        }
+    }
+}
+
+interface Visitor
+{
+    void visit(Span span);
 }

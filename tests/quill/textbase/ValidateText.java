@@ -46,6 +46,8 @@ public class ValidateText extends TestCase
         second = createSpan(" it is a sunny day", null);
         text.append(second);
 
+        assertEquals("Hello world it is a sunny day".length(), text.length());
+
         assertEquals("Hello world it is a sunny day", text.toString());
     }
 
