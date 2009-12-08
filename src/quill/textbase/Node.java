@@ -203,13 +203,23 @@ class Node
 
         point = offset - widthLeft;
 
-        before = data.split(0, point);
-        after = data.split(point);
+        if (point == 0) {
+            droit = new Node(null, data, right);
 
-        gauche = new Node(left, before, null);
-        droit = new Node(null, after, right);
+            return new Node(left, addition, droit);
+        } else if (point == width) {
+            gauche = new Node(left, data, null);
 
-        return new Node(gauche, addition, droit);
+            return new Node(gauche, addition, null);
+        } else {
+            before = data.split(0, point);
+            after = data.split(point);
+
+            gauche = new Node(left, before, null);
+            droit = new Node(null, after, right);
+
+            return new Node(gauche, addition, droit);
+        }
     }
 }
 
