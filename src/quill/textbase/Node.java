@@ -164,7 +164,7 @@ class Node
             return left.getSpanAt(offset);
         }
 
-        widthCenter = this.getWidth();
+        widthCenter = data.getWidth();
         if (offset - widthLeft <= widthCenter) {
             return data;
         } else {
@@ -173,7 +173,7 @@ class Node
     }
 
     Node insertSpanAt(final int offset, final Span addition) {
-        final int widthLeft;
+        final int widthLeft, widthCenter;
         final Span before, after;
         int point;
         final Node gauche, droit;
@@ -196,8 +196,9 @@ class Node
             return new Node(gauche, data, right);
         }
 
-        if (offset - widthLeft > width) {
-            droit = right.insertSpanAt(offset - width - widthLeft, addition);
+        widthCenter = data.getWidth();
+        if (offset - widthLeft > widthCenter) {
+            droit = right.insertSpanAt(offset - widthLeft - widthCenter, addition);
             return new Node(left, data, droit);
         }
 
@@ -207,10 +208,10 @@ class Node
             droit = new Node(null, data, right);
 
             return new Node(left, addition, droit);
-        } else if (point == width) {
+        } else if (point == data.getWidth()) {
             gauche = new Node(left, data, null);
 
-            return new Node(gauche, addition, null);
+            return new Node(gauche, addition, right);
         } else {
             before = data.split(0, point);
             after = data.split(point);
