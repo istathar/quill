@@ -20,6 +20,7 @@ package quill.textbase;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 import junit.framework.TestCase;
 
@@ -244,7 +245,6 @@ public class ValidateText extends TestCase
     private static int countNumberOfSpans(TextChain chain) {
         final Node root;
         final CountingVisitor tourist;
-        final int result;
 
         root = chain.getTree();
 
@@ -267,6 +267,49 @@ public class ValidateText extends TestCase
 
         public void visit(Span span) {
             count++;
+        }
+    }
+
+    /**
+     * Local utility to turn a tree into an array. This is obviously
+     * inefficient, but a large number of the original Extract tests here
+     * relied on this behaviour (since Extract wraps Span[]) so we wrap
+     * tree<Span> in Span[] to get on with it.
+     */
+    private static Span[] convertToSpanArray(TextChain chain) {
+        final Node root;
+        final AccumulatingVisitor tourist;
+
+        root = chain.getTree();
+
+        if (root == null) {
+            return new Span[] {};
+        }
+
+        tourist = new AccumulatingVisitor();
+        root.visitAll(tourist);
+        return tourist.getList();
+    }
+
+    private static class AccumulatingVisitor implements Visitor
+    {
+        private ArrayList<Span> list;
+
+        private AccumulatingVisitor() {
+            list = new ArrayList<Span>(8);
+        }
+
+        public void visit(Span span) {
+            list.add(span);
+        }
+
+        private Span[] getList() {
+            final Span[] result;
+
+            result = new Span[list.size()];
+            list.toArray(result);
+
+            return result;
         }
     }
 
@@ -482,13 +525,13 @@ public class ValidateText extends TestCase
 
         text.delete(2, 11);
         assertEquals("Zeee", text.toString());
-        assertEquals(2, introspectNumberOfSpans(text));
+        assertEquals(2, countNumberOfSpans(text));
         assertEquals("Ze", text.first.span.getText());
         assertEquals("ee", text.first.next.span.getText());
 
         text.delete(1, 2);
         assertEquals("Ze", text.toString());
-        assertEquals(2, introspectNumberOfSpans(text));
+        assertEquals(2, countNumberOfSpans(text));
     }
 
     public final void testDeleteBoundaries() {
@@ -527,7 +570,7 @@ public class ValidateText extends TestCase
         }
 
         assertEquals("Magic", text.toString());
-        assertEquals(1, introspectNumberOfSpans(text));
+        assertEquals(1, countNumberOfSpans(text));
 
         try {
             text.delete(7, 3);
@@ -537,7 +580,7 @@ public class ValidateText extends TestCase
         }
 
         assertEquals("Magic", text.toString());
-        assertEquals(1, introspectNumberOfSpans(text));
+        assertEquals(1, countNumberOfSpans(text));
 
         try {
             text.delete(2, 6);
@@ -547,7 +590,7 @@ public class ValidateText extends TestCase
         }
 
         assertEquals("Magic", text.toString());
-        assertEquals(2, introspectNumberOfSpans(text));
+        assertEquals(2, countNumberOfSpans(text));
         // is ok
     }
 

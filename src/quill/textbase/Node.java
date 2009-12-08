@@ -196,19 +196,18 @@ class Node
             return new Node(gauche, data, right);
         }
 
+        point = offset - widthLeft;
         widthCenter = data.getWidth();
-        if (offset - widthLeft > widthCenter) {
-            droit = right.insertSpanAt(offset - widthLeft - widthCenter, addition);
+        if (point > widthCenter) {
+            droit = right.insertSpanAt(point - widthCenter, addition);
             return new Node(left, data, droit);
         }
-
-        point = offset - widthLeft;
 
         if (point == 0) {
             droit = new Node(null, data, right);
 
             return new Node(left, addition, droit);
-        } else if (point == data.getWidth()) {
+        } else if (point == widthCenter) {
             gauche = new Node(left, data, null);
 
             return new Node(gauche, addition, right);
