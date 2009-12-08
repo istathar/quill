@@ -18,6 +18,8 @@
  */
 package quill.textbase;
 
+import java.util.ArrayList;
+
 /**
  * Read-only wrapper around an array of Spans.
  * 
@@ -25,14 +27,59 @@ package quill.textbase;
  */
 /*
  * The fields are package visible and that's ok because in here we know not to
- * change Span[], but if an Extract escapes outside this package then the
+ * change Span[], but for Extracts that escape outside this package then the
  * public methods are available and this class is immutable.
+ */
+/*
+ * TODO The existing API is a wrapper around an array of spans, so we (quite
+ * inefficiently, taken overall) covert the Node<Span> into such a Span[]. We
+ * want to do away with that, and just expose the tree as is.
  */
 public class Extract
 {
     final Span[] range;
 
     final int width;
+
+    Extract(final Node tree) {
+        range = convertToSpanArray(tree);
+        width = tree.getWidth();
+    }
+
+    private static Span[] convertToSpanArray(final Node root) {
+        final AccumulatingVisitor tourist;
+
+        if (root == null) {
+            return new Span[] {};
+        }
+
+        tourist = new AccumulatingVisitor();
+        root.visitAll(tourist);
+
+        return tourist.toArray();
+    }
+
+    private static class AccumulatingVisitor implements Visitor
+    {
+        private ArrayList<Span> list;
+
+        private AccumulatingVisitor() {
+            list = new ArrayList<Span>(8);
+        }
+
+        public void visit(Span span) {
+            list.add(span);
+        }
+
+        private Span[] toArray() {
+            final Span[] result;
+
+            result = new Span[list.size()];
+            list.toArray(result);
+
+            return result;
+        }
+    }
 
     Extract(Span[] range) {
         int w;
