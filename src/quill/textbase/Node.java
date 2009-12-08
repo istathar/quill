@@ -144,6 +144,28 @@ class Node
         }
     }
 
+    /**
+     * Call tourist's visit method for each Span in the tree <b>from start for
+     * width</b>, in-order traversal,
+     */
+    // FIXME HERE
+    public void visitRange(final Visitor tourist, final int start, final int wide) {
+        int point;
+
+        if (left != null) {
+            if (start < left.getWidth()) {
+                left.visitAll(tourist);
+            }
+            point = start - left.getWidth();
+        }
+        if (data != null) {
+            tourist.visit(data);
+        }
+        if (right != null) {
+            right.visitAll(tourist);
+        }
+    }
+
     Span getSpanAt(final int offset) {
         final int widthLeft, widthCenter;
 
