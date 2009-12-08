@@ -25,7 +25,10 @@ package quill.textbase;
  */
 class Node
 {
-    private final int depth;
+    /**
+     * Height of the tree.
+     */
+    private final int height;
 
     /**
      * The distance off the beginning of the backing Span tree this Node
@@ -34,7 +37,6 @@ class Node
     /*
      * TODO Do we need this?
      */
-    private final int offset;
 
     /**
      * Width of this tree, in characters.
@@ -60,8 +62,7 @@ class Node
      * Given a single Span, create a tree. Used in testing.
      */
     Node(Span span) {
-        depth = 1;
-        offset = 0;
+        height = 1;
         width = span.getWidth();
         data = span;
         left = null;
@@ -73,34 +74,26 @@ class Node
      * trees below before and after this Node.
      */
     Node(Node alpha, Span span, Node omega) {
-        final int depthLeft, depthRight;
+        final int heightLeft, heightRight;
         final int widthLeft, widthRight;
 
         if (alpha == null) {
-            depthLeft = 0;
+            heightLeft = 0;
             widthLeft = 0;
         } else {
-            depthLeft = alpha.getDepth();
+            heightLeft = alpha.getHeight();
             widthLeft = alpha.getWidth();
         }
 
         if (omega == null) {
-            depthRight = 0;
+            heightRight = 0;
             widthRight = 0;
         } else {
-            depthRight = omega.getDepth();
+            heightRight = omega.getHeight();
             widthRight = omega.getWidth();
         }
 
-        if (depthLeft == depthRight) {
-            depth = depthLeft + 1;
-        } else if (depthLeft > depthRight) {
-            depth = depthLeft;
-        } else {
-            depth = depthRight;
-        }
-
-        offset = 0;
+        height = Math.max(heightLeft, heightRight) + 1;
 
         left = alpha;
         data = span;
@@ -119,8 +112,8 @@ class Node
     /**
      * How many levels to the base of the tree? Leaves are 1, and emtpy is 0.
      */
-    int getDepth() {
-        return depth;
+    int getHeight() {
+        return height;
     }
 
     Span getSpan() {
@@ -152,7 +145,7 @@ class Node
     }
 
     Span getSpanAt(final int offset) {
-        final int widthLeft, widthCenter, widthRight;
+        final int widthLeft, widthCenter;
 
         if (offset == width) {
             return null;
@@ -180,9 +173,9 @@ class Node
     }
 
     Node insertSpanAt(final int offset, final Span addition) {
-        final int widthLeft, widthCenter;
+        final int widthLeft;
         final Span before, after;
-        final int point;
+        int point;
         final Node gauche, droit;
 
         if (offset == width) {
@@ -199,12 +192,13 @@ class Node
         }
 
         if (offset < widthLeft) {
-            return left.insertSpanAt(offset, addition);
+            gauche = left.insertSpanAt(offset, addition);
+            return new Node(gauche, data, right);
         }
 
-        widthCenter = this.getWidth();
-        if (offset - widthLeft > widthCenter) {
-            return right.insertSpanAt(offset - widthCenter - widthLeft, addition);
+        if (offset - widthLeft > width) {
+            droit = right.insertSpanAt(offset - width - widthLeft, addition);
+            return new Node(left, data, droit);
         }
 
         point = offset - widthLeft;
