@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import junit.framework.TestCase;
 
 import static quill.textbase.Span.createSpan;
-import static quill.textbase.TextChain.formArray;
 
 public class ValidateText extends TestCase
 {
@@ -154,15 +153,15 @@ public class ValidateText extends TestCase
 
         initial = createSpan("Concave", null);
         node = new Node(initial);
-        assertEquals("Concave", node.toString());
+        assertEquals("Concave", convertToString(node));
 
         one = node.subset(0, 3);
-        assertEquals("Concave", node.toString());
-        assertEquals("Con", one.toString());
+        assertEquals("Concave", convertToString(node));
+        assertEquals("Con", convertToString(one));
 
         two = node.subset(3, 4);
-        assertEquals("Concave", node.toString());
-        assertEquals("cave", two.toString());
+        assertEquals("Concave", convertToString(node));
+        assertEquals("cave", convertToString(two));
     }
 
     // FIXME
@@ -306,12 +305,43 @@ public class ValidateText extends TestCase
     }
 
     /**
+     * Test utility to turn a tree into a String.
+     */
+    private static String convertToString(final Node node) {
+        final StringVisitor tourist;
+
+        if (node == null) {
+            return "";
+        }
+
+        tourist = new StringVisitor();
+        node.visitAll(tourist);
+        return tourist.getString();
+    }
+
+    private static class StringVisitor implements Visitor
+    {
+        private StringBuilder str;
+
+        private StringVisitor() {
+            str = new StringBuilder();
+        }
+
+        public void visit(Span span) {
+            str.append(span.getText());
+        }
+
+        private String getString() {
+            return str.toString();
+        }
+    }
+
+    /**
      * @deprecated
      */
     private static int introspectNumberOfSpans(TextChain chain) {
         final Field field;
         Object spans;
-        Span s;
         final int result;
 
         try {
@@ -477,7 +507,7 @@ public class ValidateText extends TestCase
     public final void testExtractAll() {
         final TextChain text;
         final Span zero, one, two;
-        final Pair pair;
+        final Node node;
         final Span[] range;
 
         zero = createSpan("James", null);
@@ -490,11 +520,11 @@ public class ValidateText extends TestCase
 
         assertEquals("James T. Kirk", text.toString());
 
-        pair = text.extractFrom(0, 13);
+        node = text.extractFrom(0, 13);
 
         assertEquals("James T. Kirk", text.toString());
 
-        range = formArray(pair);
+        range = convertToSpanArray(node);
         assertEquals(13, lengthOf(range));
         assertEquals("James T. Kirk", textOf(range));
     }

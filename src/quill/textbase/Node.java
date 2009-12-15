@@ -349,12 +349,15 @@ class Node
             amount = wide;
         }
 
-        if (amount < data.getWidth()) {
+        if (amount == widthCenter) {
+            span = data;
+            droit = null;
+        } else if (amount < widthCenter) {
             span = data.split(0, amount);
             droit = null;
         } else {
             span = data;
-            droit = right.subset(0, amount - data.getWidth());
+            droit = right.subset(0, amount - widthCenter);
         }
 
         return new Node(gauche, span, droit);
