@@ -387,61 +387,15 @@ public class TextChain
     }
 
     /**
-     * Get an array of Pieces representing the concatonation of the marked up
-     * Spans in a given range.
-     * 
-     * Allocate a new Chunk by concatonating any and all Chunks starting at
-     * offset for width. While deleting, as such, does not require this,
-     * undo/redo does.
-     * 
-     * This will operate on the Text, doing a split at each end. That isn't
-     * strictly necessary, except that the reason you're usually calling this
-     * is to delete, so the boundaries are a good first step, and it makes the
-     * algorithm here far simpler.
-     * 
-     * Returns a Pair of the two Pieces enclosing the extracted range.
+     * Get a tree representing the concatonation of the marked up Spans in a
+     * given range.
      */
-    Pair extractFrom(int offset, int width) {
-        final Piece preceeding, alpha, omega;
-
-        if (offset < 0) {
-            throw new IllegalArgumentException();
-        }
-        if (width < 0) {
-            throw new IllegalArgumentException();
-        }
+    Node extractFrom(int offset, int width) {
         if (width == 0) {
             return null;
         }
 
-        /*
-         * TODO guard the other end, ie test for conditions
-         * IndexOutOfBoundsException("offset too high") and
-         * IndexOutOfBoundsException("width greater than available text")
-         */
-
-        /*
-         * Ensure splices at the start and end points of the deletion, and
-         * find out the pieces deliniating it. Then create a Span[] of the
-         * range that will be removed which we can return out for storage in
-         * the Change stack.
-         */
-
-        preceeding = splitAt(offset);
-        omega = splitAt(offset + width);
-        calculateOffsets();
-
-        if (preceeding == null) {
-            if (omega.prev == null) {
-                alpha = omega;
-            } else {
-                alpha = first;
-            }
-        } else {
-            alpha = preceeding.next;
-        }
-
-        return new Pair(alpha, omega);
+        return root.subset(offset, width);
     }
 
     static Span[] formArray(Pair pair) {

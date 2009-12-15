@@ -166,6 +166,23 @@ class Node
         }
     }
 
+    /**
+     * This is ineffecient! Use for debugging purposes only.
+     */
+    public String toString() {
+        final StringBuilder str;
+
+        str = new StringBuilder();
+
+        this.visitAll(new Visitor() {
+            public void visit(Span span) {
+                str.append(span.getText()); // TODO loop chars?
+            }
+        });
+
+        return str.toString();
+    }
+
     Span getSpanAt(final int offset) {
         final int widthLeft, widthCenter;
 
@@ -242,6 +259,88 @@ class Node
 
             return new Node(gauche, addition, droit);
         }
+    }
+
+    /**
+     * Get a subset of this tree from offset, wide characters in width.
+     */
+    Node subset(int offset, int wide) {
+        final int widthLeft, widthCenter;
+        int amount, begin, end;
+        Node gauche, droit;
+        Span span;
+
+        if (offset < 0) {
+            throw new IndexOutOfBoundsException("negative offset illegal");
+        }
+        if (width < 0) {
+            throw new IndexOutOfBoundsException("can't subset a negative number of characters");
+        }
+        if (offset >= width) {
+            throw new IndexOutOfBoundsException("offset too high");
+        }
+        if (offset + wide > width) {
+            throw new IndexOutOfBoundsException(
+                    "requested number of characters greater than available text");
+        }
+
+        /*
+         * Entirely left or entirely right?
+         */
+
+        if (left == null) {
+            widthLeft = 0;
+        } else {
+            widthLeft = left.getWidth();
+            if (offset + wide < widthLeft) {
+                return left.subset(offset, wide);
+            }
+        }
+
+        widthCenter = data.getWidth();
+
+        if (right != null) {
+            if (offset > widthLeft + widthCenter) {
+                return right.subset(offset, wide);
+            }
+        }
+
+        /*
+         * Entirely center?
+         */
+
+        if (wide <= widthCenter) {
+            begin = offset - widthLeft;
+            end = begin + wide;
+            span = data.split(begin, end);
+            return new Node(span);
+        }
+
+        /*
+         * So now we know it's at least partially overlapping either left or
+         * right.
+         */
+
+        if (offset < widthLeft) {
+            // how many characters?
+            amount = wide - (left.width - offset);
+            gauche = left.subset(offset, amount);
+            // how many characters remain?
+            amount = wide - amount;
+        } else {
+            gauche = null;
+            amount = wide;
+        }
+
+        if (amount < data.getWidth()) {
+            span = data.split(0, amount);
+            droit = null;
+        } else {
+            span = data;
+            droit = right.subset(0, amount - data.getWidth());
+        }
+
+        return new Node(gauche, span, droit);
     }
 }
 

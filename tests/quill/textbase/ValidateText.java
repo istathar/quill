@@ -148,26 +148,21 @@ public class ValidateText extends TestCase
         }
     }
 
-    // FIXME
-    public final void skipSplittingAtPoint() {
-        final TextChain text;
+    public final void testSplittingAtPoint() {
+        final Node node, one, two;
         final Span initial;
 
         initial = createSpan("Concave", null);
-        text = new TextChain(initial);
-        assertEquals("Concave", text.toString());
+        node = new Node(initial);
+        assertEquals("Concave", node.toString());
 
-        one = text.splitAt(text.first, 3);
-        assertEquals("Concave", text.toString());
+        one = node.subset(0, 3);
+        assertEquals("Concave", node.toString());
+        assertEquals("Con", one.toString());
 
-        assertNotNull(one.next);
-        assertEquals("Con", one.span.getText());
-
-        two = one.next;
-
-        assertEquals("cave", two.span.getText());
-        assertNull(two.next);
-        assertEquals(one, two.prev);
+        two = node.subset(3, 4);
+        assertEquals("Concave", node.toString());
+        assertEquals("cave", two.toString());
     }
 
     // FIXME
