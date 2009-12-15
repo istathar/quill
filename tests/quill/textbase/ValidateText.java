@@ -411,15 +411,17 @@ public class ValidateText extends TestCase
 
     public final void testExtractNothing() {
         final TextChain text;
+        final Node tree;
         Node node;
 
         text = new TextChain("All good people");
+        tree = text.getTree();
 
-        node = text.extractFrom(2, 0);
+        node = tree.subset(2, 0);
         assertNull(node);
-        node = text.extractFrom(0, 0);
+        node = tree.subset(0, 0);
         assertNull(node);
-        node = text.extractFrom(15, 0);
+        node = tree.subset(15, 0);
         assertNull(node);
     }
 
@@ -427,7 +429,7 @@ public class ValidateText extends TestCase
         final TextChain text;
         final Span zero, one, two, three;
         final Span[] range;
-        final Node node;
+        final Node tree, node;
 
         zero = createSpan("Zero", null);
         one = createSpan("One", null);
@@ -441,7 +443,8 @@ public class ValidateText extends TestCase
 
         assertEquals("ZeroOneTwoThree", text.toString());
 
-        node = text.extractFrom(2, 11);
+        tree = text.getTree();
+        node = tree.subset(2, 11);
         assertEquals("ZeroOneTwoThree", text.toString());
 
         range = convertToSpanArray(node);
@@ -452,7 +455,7 @@ public class ValidateText extends TestCase
     public final void testExtractAll() {
         final TextChain text;
         final Span zero, one, two;
-        final Node node;
+        final Node tree, node;
         final Span[] range;
 
         zero = createSpan("James", null);
@@ -465,7 +468,8 @@ public class ValidateText extends TestCase
 
         assertEquals("James T. Kirk", text.toString());
 
-        node = text.extractFrom(0, 13);
+        tree = text.getTree();
+        node = tree.subset(0, 13);
 
         assertEquals("James T. Kirk", text.toString());
 
