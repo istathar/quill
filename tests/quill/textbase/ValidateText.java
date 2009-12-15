@@ -164,36 +164,6 @@ public class ValidateText extends TestCase
         assertEquals("cave", convertToString(two));
     }
 
-    // FIXME
-    public final void skipSplittingAtPieceBoundary() {
-        final TextChain text;
-        final Span a, b;
-
-        a = createSpan("Alpha", null);
-        b = createSpan("Bravo", null);
-
-        text = new TextChain(a);
-        text.append(b);
-        assertEquals("AlphaBravo", text.toString());
-
-        assertNull(text.first.prev);
-        assertNull(text.first.next.next);
-
-        first = text.first;
-        one = text.splitAt(5);
-        assertEquals("AlphaBravo", text.toString());
-
-        assertSame(first, one);
-        assertNotNull(one.next);
-        assertNotSame(one, one.next);
-        assertEquals("Alpha", one.span.getText());
-
-        two = one.next;
-        assertEquals("Bravo", two.span.getText());
-        assertNull(two.next);
-        assertEquals(one, two.prev);
-    }
-
     public final void testSingleSplice() {
         final TextChain text;
 
@@ -566,11 +536,11 @@ public class ValidateText extends TestCase
 
         text.delete(0, 6);
         assertEquals("World", text.toString());
-        assertEquals(1, introspectNumberOfSpans(text));
+        assertEquals(1, countNumberOfSpans(text));
 
         text.delete(3, 2);
         assertEquals("Wor", text.toString());
-        assertEquals(1, introspectNumberOfSpans(text));
+        assertEquals(1, countNumberOfSpans(text));
     }
 
     public final void testDeleteAll() {
@@ -580,7 +550,7 @@ public class ValidateText extends TestCase
 
         text.delete(0, 5);
         assertEquals("", text.toString());
-        assertEquals(0, introspectNumberOfSpans(text));
+        assertEquals(0, countNumberOfSpans(text));
     }
 
     public final void testBoundsChecking() {
@@ -615,7 +585,7 @@ public class ValidateText extends TestCase
         }
 
         assertEquals("Magic", text.toString());
-        assertEquals(2, countNumberOfSpans(text));
+        assertEquals(1, countNumberOfSpans(text));
         // is ok
     }
 
