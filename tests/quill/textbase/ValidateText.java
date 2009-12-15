@@ -532,6 +532,7 @@ public class ValidateText extends TestCase
     public final void testDeleteRange() {
         final TextChain text;
         final Span zero, one, two, three;
+        Span[] outcome;
 
         zero = createSpan("Zero", null);
         one = createSpan("One", null);
@@ -547,8 +548,10 @@ public class ValidateText extends TestCase
         text.delete(2, 11);
         assertEquals("Zeee", text.toString());
         assertEquals(2, countNumberOfSpans(text));
-        assertEquals("Ze", text.first.span.getText());
-        assertEquals("ee", text.first.next.span.getText());
+
+        outcome = convertToSpanArray(node);
+        assertEquals("Ze", outcome[0].getText());
+        assertEquals("ee", outcome[1].getText());
 
         text.delete(1, 2);
         assertEquals("Ze", text.toString());

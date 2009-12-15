@@ -500,23 +500,11 @@ public class TextChain
          * (in which case we put in an "empty" Piece with a zero length Span).
          */
 
-        invalidateCache();
-
         preceeding = pair.one.prev;
         following = pair.two.next;
 
         if (offset == 0) {
-            if (following == null) {
-                first = null;
-            } else {
-                following.prev = null;
-                first = following;
-            }
         } else {
-            preceeding.next = following;
-            if (following != null) {
-                following.prev = preceeding;
-            }
         }
     }
 
@@ -610,17 +598,14 @@ public class TextChain
     }
 
     public Markup getMarkupAt(int offset) {
-        final Piece piece;
+        Span span;
 
-        if (length == -1) {
-            calculateOffsets();
-        }
+        span = root.getSpanAt(offset);
 
-        piece = pieceAt(offset);
-        if (piece == null) {
+        if (span == null) {
             return null;
         } else {
-            return piece.span.getMarkup();
+            return span.getMarkup();
         }
     }
 
@@ -647,8 +632,7 @@ public class TextChain
      * of work when actually calling delete() after this here.
      */
     public Extract extractRange(int start, int width) {
-        final Pair pair;
-        final Span[] spans;
+        final Node node;
 
         if (width < 0) {
             throw new IllegalArgumentException();
@@ -657,9 +641,8 @@ public class TextChain
             return new Extract();
         }
 
-        pair = extractFrom(start, width);
-        spans = formArray(pair);
-        return new Extract(spans);
+        node = extractFrom(start, width);
+        return new Extract(node);
     }
 
     /*
@@ -679,7 +662,7 @@ public class TextChain
         Span s;
         int num, len, i, delta;
 
-        if (first == null) {
+        if (root == null) {
             return new Extract[] {};
         }
 
