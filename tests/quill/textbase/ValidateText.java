@@ -94,7 +94,7 @@ public class ValidateText extends TestCase
         return result;
     }
 
-    public final void testCheckSamplePieces() {
+    public final void testCheckSampleData() {
         final String expected;
         final TextChain chain;
 
@@ -127,7 +127,7 @@ public class ValidateText extends TestCase
         assertEquals("Three", span.getText());
     }
 
-    public final void testPieceAtEnd() {
+    public final void testSpanAtEnd() {
         final TextChain chain;
         Span span;
 
@@ -168,7 +168,6 @@ public class ValidateText extends TestCase
     public final void skipSplittingAtPieceBoundary() {
         final TextChain text;
         final Span a, b;
-        final Piece first, one, two;
 
         a = createSpan("Alpha", null);
         b = createSpan("Bravo", null);
@@ -753,7 +752,6 @@ public class ValidateText extends TestCase
 
     public final void testRemovingFormatFromZero() {
         final TextChain text;
-        Piece p;
 
         text = new TextChain("Yo!");
         assertEquals("Yo!", text.toString());

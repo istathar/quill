@@ -285,11 +285,10 @@ public class TextChain
      * Add or remove a Markup format from a range of text.
      */
     protected void format(int offset, int width, Markup format) {
-        final Pair pair;
-        Piece p;
+        Node tree;
         Span s;
 
-        pair = extractFrom(offset, width);
+        tree = extractFrom(offset, width);
 
         /*
          * Unlike the insert() and delete() operations, we can leave the Piece
@@ -316,11 +315,10 @@ public class TextChain
      * Remove a Markup format from a range of text.
      */
     protected void clear(int offset, int width, Markup format) {
-        final Pair pair;
-        Piece p;
+        Node tree;
         Span s;
 
-        pair = extractFrom(offset, width);
+        tree = extractFrom(offset, width);
 
         /*
          * Unlike the insert() and delete() operations, we can leave the Piece
@@ -347,11 +345,10 @@ public class TextChain
      * Clear all markup from a range of text.
      */
     protected void clear(int offset, int width) {
-        final Pair pair;
-        Piece p;
+        Node tree;
         Span s;
 
-        pair = extractFrom(offset, width);
+        tree = extractFrom(offset, width);
 
         p = pair.one;
 
@@ -431,7 +428,6 @@ public class TextChain
      */
     public Extract[] extractParagraphs() {
         Extract[] result;
-        Piece p, alpha, omega;
         Span s;
         int num, len, i, delta;
 
@@ -687,8 +683,7 @@ public class TextChain
     /*
      * this could well become the basis of a public API
      */
-    static String makeWordFromSpans(Pair pair) {
-        final Piece alpha, omega;
+    static String makeWordFromSpans(Node tree) {
         final StringBuilder str;
         int j, J;
         Piece p;
@@ -733,17 +728,11 @@ public class TextChain
      * to this "pick word from offset" soon.
      */
     String getWordAt(final int offset) {
-        final Piece origin;
         int start, end;
         int i;
-        Pair pair;
         int ch;
 
-        if (length == -1) {
-            calculateOffsets();
-        }
-
-        if (offset == length) {
+        if (offset == root.getWidth()) {
             return null;
         }
 
