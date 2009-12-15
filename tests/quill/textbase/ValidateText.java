@@ -271,18 +271,15 @@ public class ValidateText extends TestCase
      * relied on this behaviour (since Extract wraps Span[]) so we wrap
      * tree<Span> in Span[] to get on with it.
      */
-    private static Span[] convertToSpanArray(TextChain chain) {
-        final Node root;
+    private static Span[] convertToSpanArray(final Node node) {
         final AccumulatingVisitor tourist;
 
-        root = chain.getTree();
-
-        if (root == null) {
+        if (node == null) {
             return new Span[] {};
         }
 
         tourist = new AccumulatingVisitor();
-        root.visitAll(tourist);
+        node.visitAll(tourist);
         return tourist.getList();
     }
 
@@ -439,23 +436,23 @@ public class ValidateText extends TestCase
 
     public final void testExtractNothing() {
         final TextChain text;
-        Pair pair;
+        Node node;
 
         text = new TextChain("All good people");
 
-        pair = text.extractFrom(2, 0);
-        assertNull(pair);
-        pair = text.extractFrom(0, 0);
-        assertNull(pair);
-        pair = text.extractFrom(15, 0);
-        assertNull(pair);
+        node = text.extractFrom(2, 0);
+        assertNull(node);
+        node = text.extractFrom(0, 0);
+        assertNull(node);
+        node = text.extractFrom(15, 0);
+        assertNull(node);
     }
 
     public final void testExtractRange() {
         final TextChain text;
         final Span zero, one, two, three;
         final Span[] range;
-        final Pair pair;
+        final Node node;
 
         zero = createSpan("Zero", null);
         one = createSpan("One", null);
@@ -469,11 +466,10 @@ public class ValidateText extends TestCase
 
         assertEquals("ZeroOneTwoThree", text.toString());
 
-        pair = text.extractFrom(2, 11);
-
+        node = text.extractFrom(2, 11);
         assertEquals("ZeroOneTwoThree", text.toString());
 
-        range = formArray(pair);
+        range = convertToSpanArray(node);
         assertEquals(11, lengthOf(range));
         assertEquals("roOneTwoThr", textOf(range));
     }

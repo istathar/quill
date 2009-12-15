@@ -171,14 +171,31 @@ class Node
      */
     public String toString() {
         final StringBuilder str;
+        final Visitor tourist;
 
         str = new StringBuilder();
 
-        this.visitAll(new Visitor() {
+        tourist = new Visitor() {
             public void visit(Span span) {
-                str.append(span.getText()); // TODO loop chars?
+                str.append(span.getText());
             }
-        });
+        };
+
+        str.append("«");
+        if (left != null) {
+            left.visitAll(tourist);
+        }
+        str.append("»\n");
+
+        str.append("«");
+        str.append(data.getText());
+        str.append("»\n");
+
+        str.append("«");
+        if (right != null) {
+            right.visitAll(tourist);
+        }
+        str.append("»\n");
 
         return str.toString();
     }
@@ -323,7 +340,7 @@ class Node
 
         if (offset < widthLeft) {
             // how many characters?
-            amount = wide - (left.width - offset);
+            amount = widthLeft - offset;
             gauche = left.subset(offset, amount);
             // how many characters remain?
             amount = wide - amount;
