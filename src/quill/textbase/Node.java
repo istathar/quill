@@ -188,6 +188,31 @@ class Node
     }
 
     /**
+     * Invoke tourist's visit() method for each character in the tree,
+     * in-order traversal.
+     */
+    public void visitAll(CharacterVisitor tourist) {
+        final int I;
+        int i, ch;
+        Markup m;
+
+        if (left != null) {
+            left.visitAll(tourist);
+        }
+        if (data != null) {
+            I = data.getWidth();
+            m = data.getMarkup();
+            for (i = 0; i < I; i++) {
+                ch = data.getChar(i);
+                tourist.visit(ch, m);
+            }
+        }
+        if (right != null) {
+            right.visitAll(tourist);
+        }
+    }
+
+    /**
      * Call tourist's visit method for each Span in the tree <b>from start for
      * width</b>, in-order traversal,
      */
@@ -214,13 +239,13 @@ class Node
      */
     public String toString() {
         final StringBuilder str;
-        final SpanVisitor tourist;
+        final CharacterVisitor tourist;
 
         str = new StringBuilder();
 
-        tourist = new SpanVisitor() {
-            public void visit(Span span) {
-                str.append(span.getText());
+        tourist = new CharacterVisitor() {
+            public void visit(int character, Markup markup) {
+                str.appendCodePoint(character);
             }
         };
 
@@ -436,7 +461,28 @@ class Node
     }
 }
 
+/**
+ * Visit the Spans in a range, in order.
+ * 
+ * @author Andrew Cowie
+ */
 interface SpanVisitor
 {
     void visit(Span span);
+}
+
+/**
+ * Visit the characters in a range, one by one, in order.
+ * 
+ * @author Andrew Cowie
+ */
+interface CharacterVisitor
+{
+    /**
+     * @param character
+     *            the Unicode codepoint at this offset
+     * @param markup
+     *            the Markup formatting applicable at this offset.
+     */
+    void visit(int character, Markup markup);
 }

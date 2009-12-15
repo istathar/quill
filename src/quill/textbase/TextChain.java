@@ -67,9 +67,9 @@ public class TextChain
 
         str = new StringBuilder();
 
-        root.visitAll(new SpanVisitor() {
-            public void visit(Span span) {
-                str.append(span.getText()); // TODO loop chars?
+        root.visitAll(new CharacterVisitor() {
+            public void visit(int character, Markup markup) {
+                str.appendCodePoint(character);
             }
         });
 
