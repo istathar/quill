@@ -175,7 +175,7 @@ class Node
      * Invoke tourist's visit() method for each Span in the tree, in-order
      * traversal.
      */
-    public void visitAll(Visitor tourist) {
+    public void visitAll(SpanVisitor tourist) {
         if (left != null) {
             left.visitAll(tourist);
         }
@@ -192,7 +192,7 @@ class Node
      * width</b>, in-order traversal,
      */
     // FIXME HERE
-    public void visitRange(final Visitor tourist, final int start, final int wide) {
+    public void visitRange(final SpanVisitor tourist, final int start, final int wide) {
         int point;
 
         if (left != null) {
@@ -214,11 +214,11 @@ class Node
      */
     public String toString() {
         final StringBuilder str;
-        final Visitor tourist;
+        final SpanVisitor tourist;
 
         str = new StringBuilder();
 
-        tourist = new Visitor() {
+        tourist = new SpanVisitor() {
             public void visit(Span span) {
                 str.append(span.getText());
             }
@@ -436,7 +436,7 @@ class Node
     }
 }
 
-interface Visitor
+interface SpanVisitor
 {
     void visit(Span span);
 }

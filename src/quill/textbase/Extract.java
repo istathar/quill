@@ -47,23 +47,23 @@ public class Extract
     }
 
     private static Span[] convertToSpanArray(final Node root) {
-        final AccumulatingVisitor tourist;
+        final AccumulatingSpanVisitor tourist;
 
         if (root == null) {
             return new Span[] {};
         }
 
-        tourist = new AccumulatingVisitor();
+        tourist = new AccumulatingSpanVisitor();
         root.visitAll(tourist);
 
         return tourist.toArray();
     }
 
-    private static class AccumulatingVisitor implements Visitor
+    private static class AccumulatingSpanVisitor implements SpanVisitor
     {
         private ArrayList<Span> list;
 
-        private AccumulatingVisitor() {
+        private AccumulatingSpanVisitor() {
             list = new ArrayList<Span>(8);
         }
 

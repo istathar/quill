@@ -205,7 +205,7 @@ public class ValidateText extends TestCase
 
     private static int countNumberOfSpans(TextChain chain) {
         final Node root;
-        final CountingVisitor tourist;
+        final CountingSpanVisitor tourist;
 
         root = chain.getTree();
 
@@ -213,16 +213,16 @@ public class ValidateText extends TestCase
             return 0;
         }
 
-        tourist = new CountingVisitor();
+        tourist = new CountingSpanVisitor();
         root.visitAll(tourist);
         return tourist.count;
     }
 
-    private static class CountingVisitor implements Visitor
+    private static class CountingSpanVisitor implements SpanVisitor
     {
         private int count;
 
-        private CountingVisitor() {
+        private CountingSpanVisitor() {
             count = 0;
         }
 
@@ -238,22 +238,22 @@ public class ValidateText extends TestCase
      * tree<Span> in Span[] to get on with it.
      */
     private static Span[] convertToSpanArray(final Node node) {
-        final AccumulatingVisitor tourist;
+        final AccumulatingSpanVisitor tourist;
 
         if (node == null) {
             return new Span[] {};
         }
 
-        tourist = new AccumulatingVisitor();
+        tourist = new AccumulatingSpanVisitor();
         node.visitAll(tourist);
         return tourist.getList();
     }
 
-    private static class AccumulatingVisitor implements Visitor
+    private static class AccumulatingSpanVisitor implements SpanVisitor
     {
         private ArrayList<Span> list;
 
-        private AccumulatingVisitor() {
+        private AccumulatingSpanVisitor() {
             list = new ArrayList<Span>(8);
         }
 
@@ -275,22 +275,22 @@ public class ValidateText extends TestCase
      * Test utility to turn a tree into a String.
      */
     private static String convertToString(final Node node) {
-        final StringVisitor tourist;
+        final StringSpanVisitor tourist;
 
         if (node == null) {
             return "";
         }
 
-        tourist = new StringVisitor();
+        tourist = new StringSpanVisitor();
         node.visitAll(tourist);
         return tourist.getString();
     }
 
-    private static class StringVisitor implements Visitor
+    private static class StringSpanVisitor implements SpanVisitor
     {
         private StringBuilder str;
 
-        private StringVisitor() {
+        private StringSpanVisitor() {
             str = new StringBuilder();
         }
 

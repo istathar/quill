@@ -67,7 +67,7 @@ public class TextChain
 
         str = new StringBuilder();
 
-        root.visitAll(new Visitor() {
+        root.visitAll(new SpanVisitor() {
             public void visit(Span span) {
                 str.append(span.getText()); // TODO loop chars?
             }
@@ -486,12 +486,6 @@ public class TextChain
     }
 
     public int wordBoundaryBefore(final int offset) {
-        final Piece origin;
-
-        if (length == -1) {
-            calculateOffsets();
-        }
-
         origin = pieceAt(offset);
         if (origin == null) {
             return length;
