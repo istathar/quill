@@ -132,59 +132,28 @@ public class TextChain
     /**
      * Insert the given range of Spans at the specified offset.
      */
+    /*
+     * FIXME replace this with (int, Node) since we're always just pulling the
+     * Span[] out of Extract to call this. TODO when we change Extract to
+     * <Node> rather than Span[]
+     */
     protected void insert(int offset, Span[] range) {
-        final Piece one, two;
-        Piece p, last;
-
         if (offset < 0) {
             throw new IllegalArgumentException();
         }
-        invalidateCache();
 
         /*
          * Create the insertion point
          */
 
-        one = splitAt(offset);
-        if (one == null) {
-            two = first;
-        } else {
-            two = one.next;
-        }
-
         /*
          * Create and insert Pieces wrapping the Spans.
          */
 
-        last = one;
-
-        for (Span s : range) {
-            p = new Piece();
-            p.span = s;
-            p.prev = last;
-            last = p;
-        }
-
         /*
          * And correct the linkages in the reverse direction
          */
-
-        last.next = two;
-        if (two != null) {
-            two.prev = last;
-        }
-
-        p = last;
-
-        do {
-            p = p.prev;
-            if (p == null) {
-                first = last;
-                break;
-            }
-            p.next = last;
-            last = p;
-        } while (p != one);
+        throw new Error("FIXME");
     }
 
     /**
@@ -221,31 +190,7 @@ public class TextChain
     }
 
     public Extract extractAll() {
-        Piece p, last;
-        Span[] range;
-
-        if (first == null) {
-            return null;
-        }
-
-        /*
-         * Maybe we should cache last?
-         */
-
-        p = first;
-
-        while (p.next != null) {
-            p = p.next;
-        }
-
-        last = p;
-
-        /*
-         * get an array
-         */
-
-        range = formArray(first, last);
-        return new Extract(range);
+        return new Extract(root);
     }
 
     /**
@@ -255,8 +200,15 @@ public class TextChain
      * passes in a tree of the known bit to be removed.
      */
     protected void delete(final int offset, final int wide) {
-        final Node preceeding;
-        final Node following;
+        final Node preceeding, following;
+        final int start, across;
+
+        if (root == null) {
+            throw new IllegalStateException("Can't delete when already emtpy");
+        }
+        if (wide == 0) {
+            throw new IllegalArgumentException("Can't delete nothing");
+        }
 
         /*
          * Handle the special case of deleting everything.
@@ -267,12 +219,15 @@ public class TextChain
             return;
         }
 
-        if (wide == 0) {
-            throw new IllegalArgumentException("Can't delete nothing");
-        }
+        /*
+         * Create subtrees for everything before and after the deletion range
+         */
 
         preceeding = extractFrom(0, offset);
-        following = extractFrom(offset + wide, root.getWidth());
+
+        start = offset + wide;
+        across = root.getWidth() - start;
+        following = extractFrom(start, across);
 
         /*
          * Now combine these subtrees to effect the deletion.

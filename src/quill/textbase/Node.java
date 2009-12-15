@@ -344,7 +344,7 @@ class Node
 
         if (right != null) {
             if (offset > widthLeft + widthCenter) {
-                return right.subset(offset, wide);
+                return right.subset(width - offset, wide);
             }
         }
 
