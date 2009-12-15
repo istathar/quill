@@ -37,11 +37,11 @@ public class TextChain
         final Span span;
 
         span = Span.createSpan(str, null);
-        root = new Node(span);
+        root = Node.create(span);
     }
 
     TextChain(Span initial) {
-        root = new Node(initial);
+        root = Node.create(initial);
     }
 
     /**
@@ -89,7 +89,7 @@ public class TextChain
          */
 
         if (root == null) {
-            root = new Node(addition);
+            root = Node.create(addition);
             return;
         }
 
@@ -170,7 +170,7 @@ public class TextChain
             if (offset != 0) {
                 throw new IndexOutOfBoundsException();
             }
-            root = new Node(addition);
+            root = Node.create(addition);
             return;
         }
 
@@ -235,7 +235,7 @@ public class TextChain
          * Now combine these subtrees to effect the deletion.
          */
 
-        root = new Node(preceeding, following);
+        root = Node.create(preceeding, following);
     }
 
     /**

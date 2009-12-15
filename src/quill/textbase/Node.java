@@ -58,10 +58,7 @@ class Node
      */
     private final Node right;
 
-    /**
-     * Given a single Span, create a tree. Used in testing.
-     */
-    Node(Span span) {
+    private Node(Span span) {
         height = 1;
         width = span.getWidth();
         data = span;
@@ -69,11 +66,7 @@ class Node
         right = null;
     }
 
-    /**
-     * Create a new Node with the given Span as content and the given binary
-     * trees below before and after this Node.
-     */
-    Node(Node alpha, Span span, Node omega) {
+    private Node(Node alpha, Span span, Node omega) {
         final int heightLeft, heightRight;
         final int widthLeft, widthRight, widthCenter;
 
@@ -110,12 +103,46 @@ class Node
     }
 
     /**
-     * Create a new Node with the given binary trees below before and after
+     * Given a single Span, create a tree. Used in testing.
+     */
+    static Node create(Span span) {
+        if (span == null) {
+            throw new IllegalArgumentException();
+        }
+        return new Node(span);
+    }
+
+    /**
+     * Create a new tree with the given binary trees below before and after
      * this Node, but with no content of its own. Used for adjoining two
      * trees.
      */
-    Node(Node alpha, Node omega) {
-        this(alpha, null, omega);
+    static Node create(Node right, Node left) {
+        if (right == null) {
+            return left;
+        } else if (left == null) {
+            return right;
+        }
+        return new Node(right, null, left);
+    }
+
+    /**
+     * Create a new Node with the given Span as content and the given binary
+     * trees below before and after this Node. Used when inserting.
+     */
+    static Node create(Node left, Span span, Node right) {
+        if ((left == null) && (right == null)) {
+            return new Node(span);
+        }
+        if (span == null) {
+            if (right == null) {
+                return left;
+            }
+            if (left == null) {
+                return right;
+            }
+        }
+        return new Node(left, span, right);
     }
 
     /**
