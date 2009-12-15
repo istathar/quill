@@ -309,13 +309,17 @@ class Node
         Node gauche, droit;
         Span span;
 
+        /*
+         * Boundary checks
+         */
+
         if (offset < 0) {
             throw new IndexOutOfBoundsException("negative offset illegal");
         }
         if (width < 0) {
             throw new IndexOutOfBoundsException("can't subset a negative number of characters");
         }
-        if (offset >= width) {
+        if (offset > width) {
             throw new IndexOutOfBoundsException("offset too high");
         }
         if (offset + wide > width) {
@@ -324,7 +328,22 @@ class Node
         }
 
         /*
-         * Entirely left or entirely right?
+         * Handle corner cases. If we ever adapt this into something that is
+         * subclassed rather than all-in-one, then some of this logic will
+         * move.
+         */
+
+        if ((offset == 0) && (wide == width)) {
+            return this;
+        }
+
+        if (wide == 0) {
+            return null;
+        }
+
+        /*
+         * Ok, we have a valid range. Is that range entirely left or entirely
+         * right?
          */
 
         if (left == null) {

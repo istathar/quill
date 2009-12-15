@@ -180,12 +180,10 @@ public class TextChain
     /**
      * Get a tree representing the concatonation of the marked up Spans in a
      * given range.
+     * 
+     * @deprecated use Node's subset() directly.
      */
     Node extractFrom(int offset, int wide) {
-        if (wide == 0) {
-            return null;
-        }
-
         return root.subset(offset, wide);
     }
 
@@ -223,11 +221,15 @@ public class TextChain
          * Create subtrees for everything before and after the deletion range
          */
 
-        preceeding = extractFrom(0, offset);
+        if (offset > 0) {
+            preceeding = root.subset(0, offset);
+        } else {
+            preceeding = null;
+        }
 
         start = offset + wide;
         across = root.getWidth() - start;
-        following = extractFrom(start, across);
+        following = root.subset(start, across);
 
         /*
          * Now combine these subtrees to effect the deletion.
@@ -356,17 +358,17 @@ public class TextChain
      * when constructing a DeleteChange, we probably end up duplicating a lot
      * of work when actually calling delete() after this here.
      */
-    public Extract extractRange(int start, int width) {
+    public Extract extractRange(int start, int wide) {
         final Node node;
 
-        if (width < 0) {
+        if (wide < 0) {
             throw new IllegalArgumentException();
         }
-        if (width == 0) {
+        if (wide == 0) {
             return new Extract();
         }
 
-        node = extractFrom(start, width);
+        node = root.subset(start, wide);
         return new Extract(node);
     }
 

@@ -18,8 +18,6 @@
  */
 package quill.textbase;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import junit.framework.TestCase;
@@ -305,28 +303,6 @@ public class ValidateText extends TestCase
         }
     }
 
-    /**
-     * @deprecated
-     */
-    private static int introspectNumberOfSpans(TextChain chain) {
-        final Field field;
-        Object spans;
-        final int result;
-
-        try {
-            field = TextChain.class.getDeclaredField("spans");
-            field.setAccessible(true);
-            spans = field.get(chain);
-            result = Array.getLength(spans);
-
-            return result;
-
-        } catch (Exception e) {
-            fail(e.toString());
-            return -1;
-        }
-    }
-
     public final void testTextLength() {
         final TextChain text;
         final Span zero, one, two;
@@ -591,7 +567,8 @@ public class ValidateText extends TestCase
 
     public final void testApplyFormatting() {
         final TextChain text;
-        Piece p;
+        Node tree;
+        Span[] results;
 
         text = new TextChain("Hello World");
 
@@ -602,11 +579,12 @@ public class ValidateText extends TestCase
 
         text.format(0, 5, Common.ITALICS);
 
-        assertEquals(2, introspectNumberOfSpans(text));
-        p = text.first;
-        assertSame(p.span.getMarkup(), Common.ITALICS);
-        p = p.next;
-        assertNull(p.span.getMarkup());
+        assertEquals(2, countNumberOfSpans(text));
+        tree = text.getTree();
+        results = convertToSpanArray(tree);
+        assertSame(results[0].getMarkup(), Common.ITALICS);
+        assertSame(results[1].getMarkup(), null);
+
         assertEquals("Hello World", text.toString());
 
         /*
@@ -615,16 +593,16 @@ public class ValidateText extends TestCase
 
         text.format(6, 5, Common.BOLD);
 
-        assertEquals(3, introspectNumberOfSpans(text));
-        p = text.first;
-        assertSame(p.span.getMarkup(), Common.ITALICS);
-        p = p.next;
-        assertEquals(null, p.span.getMarkup());
-        assertEquals(" ", p.span.getText());
-        p = p.next;
-        assertSame(p.span.getMarkup(), Common.BOLD);
-        assertEquals("World", p.span.getText());
-        assertNull(p.next);
+        assertEquals(3, countNumberOfSpans(text));
+        tree = text.getTree();
+        results = convertToSpanArray(tree);
+        assertSame(results[0].getMarkup(), Common.ITALICS);
+        assertSame(results[1].getMarkup(), null);
+        assertEquals(" ", results[1].getText());
+
+        assertSame(results[2].getMarkup(), Common.BOLD);
+        assertEquals("World", results[2].getText());
+
         assertEquals("Hello World", text.toString());
 
         /*
@@ -634,13 +612,12 @@ public class ValidateText extends TestCase
         text.format(0, 11, Common.FILENAME);
 
         // NEW: will replace all
-        assertEquals(3, introspectNumberOfSpans(text));
-        p = text.first;
-        assertSame(p.span.getMarkup(), Common.FILENAME);
-        p = p.next;
-        assertSame(p.span.getMarkup(), Common.FILENAME);
-        p = p.next;
-        assertSame(p.span.getMarkup(), Common.FILENAME);
+        assertEquals(3, countNumberOfSpans(text));
+
+        assertSame(results[0].getMarkup(), Common.FILENAME);
+        assertSame(results[1].getMarkup(), Common.FILENAME);
+        assertSame(results[2].getMarkup(), Common.FILENAME);
+
         assertEquals("Hello World", text.toString());
     }
 
@@ -673,7 +650,7 @@ public class ValidateText extends TestCase
 
         text.clear(0, 11, Common.ITALICS);
 
-        assertEquals(3, introspectNumberOfSpans(text));
+        assertEquals(3, countNumberOfSpans(text));
         p = text.first;
         assertEquals(null, p.span.getMarkup());
         p = p.next;
@@ -697,7 +674,7 @@ public class ValidateText extends TestCase
 
         text.clear(3, 5, Common.FILENAME);
 
-        assertEquals(5, introspectNumberOfSpans(text));
+        assertEquals(5, countNumberOfSpans(text));
 
         // Hel
         p = text.first;
