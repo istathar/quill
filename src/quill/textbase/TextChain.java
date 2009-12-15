@@ -188,184 +188,6 @@ public class TextChain
     }
 
     /**
-     * Cut a Piece in two at point. Amend the linkages so that overall Text is
-     * the same after the operation.
-     */
-    Piece splitAt(Piece from, int point) {
-        Piece preceeding, one, two, following;
-        Span before, after;
-
-        /*
-         * If it's already a width one span, then we're done. Note that this
-         * includes width one StringSpans.
-         */
-
-        if (from.span.getWidth() == 1) {
-            return from;
-        }
-
-        if (point == 0) {
-            return from;
-        }
-
-        /*
-         * Otherwise, split the StringSpan into two Spans - StringSpans
-         * ordinarily, but CharacterSpans if the widths are down to 1. When
-         * called on two succeeding offsets that happen to enclose a newline,
-         * this gives us newlines isolated in their own CharacterSpans.
-         */
-
-        before = from.span.split(0, point);
-        after = from.span.split(point);
-
-        /*
-         * and wrap Pieces around them.
-         */
-
-        one = new Piece();
-        two = new Piece();
-
-        preceeding = from.prev;
-
-        if (preceeding == null) {
-            first = one;
-        } else {
-            preceeding.next = one;
-            one.prev = preceeding;
-        }
-
-        one.span = before;
-        one.next = two;
-
-        two.prev = one;
-        two.span = after;
-
-        following = from.next;
-
-        if (following != null) {
-            two.next = following;
-            following.prev = two;
-        }
-
-        return one;
-    }
-
-    /**
-     * Find the Piece enclosing offset. This is used to then subdivide by
-     * splitAt().
-     * 
-     * Returns null if the offset is the end of the Chain. The end of the
-     * chain is null if the length of the Chain is zero, the null Piece is
-     * still the "end".
-     */
-    /*
-     * TODO implementation is an ugly linear search. Now that the offsets are
-     * cached in the Pieces, perhaps we can be smarter about hunting.
-     */
-    Piece pieceAt(final int offset) {
-        Piece piece, last;
-        int start;
-
-        if (offset == 0) {
-            return first;
-        }
-
-        if (length == -1) {
-            throw new IllegalStateException("\n"
-                    + "You must to ensure offsets are calculated before calling this");
-        }
-
-        if (offset == length) {
-            return null;
-        }
-
-        if (offset > length) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        piece = first;
-        last = first;
-        start = 0;
-
-        while (piece != null) {
-            start = piece.offset;
-
-            if (start > offset) {
-                return last;
-            }
-            if (start == offset) {
-                return piece;
-            }
-
-            last = piece;
-            piece = piece.next;
-        }
-
-        return last;
-    }
-
-    /**
-     * Find the Piece containing offset, and split it into two. Handle the
-     * boundary cases of an offset at a Piece boundary. Returns a Pair around
-     * the two Pieces. null will be set if there is no Piece before (or after)
-     * this point.
-     */
-    /*
-     * FIXME this code was copied to pieceAt(), and should call that method
-     * instead of doing the same work here.
-     */
-    Piece splitAt(int offset) {
-        Piece piece, last;
-        int start, following;
-
-        if (offset == 0) {
-            return null;
-        }
-
-        piece = first;
-        last = first;
-
-        start = 0;
-
-        while (piece != null) {
-            /*
-             * Are we already at a Piece boundary?
-             */
-
-            if (start == offset) {
-                return last;
-            }
-
-            /*
-             * Failing that, then let's see if this Piece contains the offset
-             * point. If it does, figure out the delta into this Piece's Chunk
-             * and split at that point.
-             */
-
-            following = start + piece.span.getWidth();
-
-            if (following > offset) {
-                return splitAt(piece, offset - start);
-            }
-            start = following;
-
-            last = piece;
-            piece = piece.next;
-        }
-
-        /*
-         * Reached the end; so long as there is nothing left we're in an
-         * append situation and no problem, otherwise out of bounds.
-         */
-
-        if (start == offset) {
-            return last;
-        }
-
-        throw new IndexOutOfBoundsException();
-    }
-
-    /**
      * Splice a Chunk into the Text. The result of doing this is three Pieces;
      * a new Piece before and after, and a Piece wrapping the Chunk and linked
      * between them. This is the workhorse of this class.
@@ -390,57 +212,12 @@ public class TextChain
      * Get a tree representing the concatonation of the marked up Spans in a
      * given range.
      */
-    Node extractFrom(int offset, int width) {
-        if (width == 0) {
+    Node extractFrom(int offset, int wide) {
+        if (wide == 0) {
             return null;
         }
 
-        return root.subset(offset, width);
-    }
-
-    static Span[] formArray(Pair pair) {
-        if (pair.one.offset < pair.two.offset) {
-            return formArray(pair.one, pair.two);
-        } else {
-            return formArray(pair.two, pair.one);
-        }
-    }
-
-    /**
-     * Form a Span[] from the Spans between Pieces start and end.
-     */
-    static Span[] formArray(Piece alpha, Piece omega) {
-        final Span[] result;
-        Piece p;
-        int i;
-
-        /*
-         * Need to know how many pieces are in between so we can size the
-         * return array.
-         */
-
-        p = alpha;
-        i = 1;
-
-        while (p != omega) {
-            i++;
-            p = p.next;
-        }
-
-        result = new Span[i];
-
-        /*
-         * And now populate the array representing the concatonation.
-         */
-
-        p = alpha;
-
-        for (i = 0; i < result.length; i++) {
-            result[i] = p.span;
-            p = p.next;
-        }
-
-        return result;
+        return root.subset(offset, wide);
     }
 
     public Extract extractAll() {
@@ -472,40 +249,36 @@ public class TextChain
     }
 
     /**
-     * Delete a width wide segment starting at offset.
+     * Delete a width wide segment starting at offset. Because people have to
+     * call extractRange() right before this in order to create a
+     * DeleteChange, this will duplicate effort. So, TODO create one which
+     * passes in a tree of the known bit to be removed.
      */
-    protected void delete(int offset, int width) {
-        final Piece preceeding, following;
-        final Pair pair;
+    protected void delete(final int offset, final int wide) {
+        final Node preceeding;
+        final Node following;
 
         /*
-         * Ensure splices at the start and end points of the deletion, and
-         * find out the Pieces deliniating it. Then create a Span[] of the
-         * range that will be removed which we can return out for storage in
-         * the Change stack.
-         * 
-         * TODO now that we have exposed extractRange() and people have to
-         * call it before creating a DeleteChange, this will likely be
-         * duplicate effort. Once we are caching offsets hopefully we can cut
-         * down the work.
+         * Handle the special case of deleting everything.
          */
 
-        pair = extractFrom(offset, width);
-
-        /*
-         * Now change the linkages so we affect the deletion. There are a
-         * number of corner cases here, the most notable being what happens if
-         * you delete from the beginning (in which case you need to change the
-         * first pointer), and the very special case of deleting everything
-         * (in which case we put in an "empty" Piece with a zero length Span).
-         */
-
-        preceeding = pair.one.prev;
-        following = pair.two.next;
-
-        if (offset == 0) {
-        } else {
+        if ((offset == 0) && (wide == root.getWidth())) {
+            root = null;
+            return;
         }
+
+        if (wide == 0) {
+            throw new IllegalArgumentException("Can't delete nothing");
+        }
+
+        preceeding = extractFrom(0, offset);
+        following = extractFrom(offset + wide, root.getWidth());
+
+        /*
+         * Now combine these subtrees to effect the deletion.
+         */
+
+        root = new Node(preceeding, following);
     }
 
     /**

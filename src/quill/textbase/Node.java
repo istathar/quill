@@ -75,7 +75,7 @@ class Node
      */
     Node(Node alpha, Span span, Node omega) {
         final int heightLeft, heightRight;
-        final int widthLeft, widthRight;
+        final int widthLeft, widthRight, widthCenter;
 
         if (alpha == null) {
             heightLeft = 0;
@@ -96,10 +96,26 @@ class Node
         height = Math.max(heightLeft, heightRight) + 1;
 
         left = alpha;
-        data = span;
         right = omega;
 
-        width = widthLeft + span.getWidth() + widthRight;
+        if (span == null) {
+            data = null;
+            widthCenter = 0;
+        } else {
+            data = span;
+            widthCenter = span.getWidth();
+        }
+
+        width = widthLeft + widthCenter + widthRight;
+    }
+
+    /**
+     * Create a new Node with the given binary trees below before and after
+     * this Node, but with no content of its own. Used for adjoining two
+     * trees.
+     */
+    Node(Node alpha, Node omega) {
+        this(alpha, null, omega);
     }
 
     /**
@@ -188,7 +204,9 @@ class Node
         str.append("»\n");
 
         str.append("«");
-        str.append(data.getText());
+        if (data != null) {
+            str.append(data.getText());
+        }
         str.append("»\n");
 
         str.append("«");
@@ -253,7 +271,11 @@ class Node
         }
 
         point = offset - widthLeft;
-        widthCenter = data.getWidth();
+        if (data == null) {
+            widthCenter = 0;
+        } else {
+            widthCenter = data.getWidth();
+        }
         if (point > widthCenter) {
             droit = right.insertSpanAt(point - widthCenter, addition);
             return new Node(left, data, droit);
@@ -314,7 +336,11 @@ class Node
             }
         }
 
-        widthCenter = data.getWidth();
+        if (data == null) {
+            widthCenter = 0;
+        } else {
+            widthCenter = data.getWidth();
+        }
 
         if (right != null) {
             if (offset > widthLeft + widthCenter) {
