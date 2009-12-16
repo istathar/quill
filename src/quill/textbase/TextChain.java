@@ -18,6 +18,8 @@
  */
 package quill.textbase;
 
+import java.util.ArrayList;
+
 /**
  * A mutable buffer of unicode text which manages a binary tree of Spans in
  * order to maximize sharing of character array storage while giving us
@@ -376,9 +378,10 @@ public class TextChain
      * Generate an array of Extracts, one for each \n separated paragraph.
      */
     public Extract[] extractParagraphs() {
-        Extract[] result;
-        Span s;
-        int num, len, i, delta;
+        final ArrayList<Integer> paragraphs;
+        final Node[] nodes;
+        int num, i, offset, wide;
+        final Extract[] result;
 
         if (root == null) {
             return new Extract[] {};
@@ -386,76 +389,55 @@ public class TextChain
 
         /*
          * First work out how many lines are in this Text as it stands right
-         * now.
+         * now. There is one paragraph if we're not empty.
          */
 
-        num = 1;
-        p = first;
+        paragraphs = new ArrayList<Integer>(8);
 
-        while (p != null) {
-            s = p.span;
-            len = s.getWidth();
+        root.visitAll(new CharacterVisitor() {
+            private int offset = 0;
 
-            delta = -1;
-            for (i = 0; i < len; i++) {
-                if (s.getChar(i) == '\n') {
-                    delta = i;
-                    break;
+            public void visit(int character, Markup markup) {
+                if (character == '\n') {
+                    paragraphs.add(offset);
                 }
+                offset++;
+            }
+        });
+
+        /*
+         * Now form the array of Nodes which represent the ranges of each
+         * paragraph. Note there is an assumption that there is not a newline
+         * character at the end of the TextChain.
+         */
+
+        num = paragraphs.size();
+        nodes = new Node[num];
+
+        if (num == 1) {
+            nodes[0] = root;
+        } else {
+            offset = 0;
+            wide = paragraphs.get(1);
+
+            for (i = 0; i < num - 1; i++) {
+                offset = paragraphs.get(i);
+                wide = paragraphs.get(i + 1) - paragraphs.get(i);
+
+                nodes[i] = root.subset(offset, wide);
             }
 
-            if (delta == 0) {
-                p = splitAt(p, 1);
-                num++;
-            } else if (delta > 0) {
-                p = splitAt(p, delta);
-                p = p.next;
-                p = splitAt(p, 1);
-                num++;
-            }
-            p = p.next;
+            nodes[i] = root.subset(offset, root.getWidth());
         }
+
+        /*
+         * Form the Extract array to return. TODO replace with pure tree use.
+         */
 
         result = new Extract[num];
 
-        /*
-         * This relies rather heavily on the assumption that there is not a
-         * newline character at the end of the TextChain.
-         */
-
-        i = 0;
-        p = first;
-        s = null;
-        alpha = p;
-        omega = p;
-
-        while (p != null) {
-            s = p.span;
-
-            if (s.getChar(0) == '\n') { // FIXME use of 0
-                if (alpha == p) {
-                    /*
-                     * blank paragraph
-                     */
-                    result[i] = new Extract();
-                } else {
-                    /*
-                     * normal paragraph
-                     */
-                    result[i] = new Extract(formArray(alpha, omega));
-                }
-                i++;
-                alpha = p.next;
-            } else {
-                omega = p;
-            }
-
-            p = p.next;
-        }
-        if (s.getChar(0) == '\n') {
-            result[i] = new Extract();
-        } else {
-            result[i] = new Extract(formArray(alpha, omega));
+        for (i = 0; i < num; i++) {
+            result[i] = new Extract(nodes[i]);
         }
 
         return result;
