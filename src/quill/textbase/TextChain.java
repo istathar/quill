@@ -316,62 +316,6 @@ public class TextChain
         }
     }
 
-    /**
-     * Remove a Markup format from a range of text.
-     */
-    protected void clear(int offset, int width, Markup format) {
-        Node tree;
-        Span s;
-
-        tree = extractFrom(offset, width);
-
-        /*
-         * Unlike the insert() and delete() operations, we can leave the Piece
-         * sequence alone. The difference is that we change the Spans that are
-         * pointed to in the range being changed.
-         */
-
-        p = pair.one;
-
-        while (true) {
-            s = p.span;
-
-            p.span = s.removeMarkup(format);
-
-            if (p == pair.two) {
-                break;
-            }
-
-            p = p.next;
-        }
-    }
-
-    /**
-     * Clear all markup from a range of text.
-     */
-    protected void clear(int offset, int width) {
-        Node tree;
-        Span s;
-
-        tree = extractFrom(offset, width);
-
-        p = pair.one;
-
-        while (true) {
-            s = p.span;
-
-            if (s.getMarkup() != null) {
-                p.span = s.copy(null);
-            }
-
-            if (p == pair.two) {
-                break;
-            }
-
-            p = p.next;
-        }
-    }
-
     public Markup getMarkupAt(int offset) {
         Span span;
 
