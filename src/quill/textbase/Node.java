@@ -336,7 +336,7 @@ class Node
         }
 
         widthCenter = data.getWidth();
-        if (offset - widthLeft <= widthCenter) {
+        if (offset - widthLeft < widthCenter) {
             return data;
         } else {
             return right.getSpanAt(offset - widthCenter - widthLeft);
