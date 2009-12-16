@@ -164,6 +164,9 @@ class Node
     }
 
     Node append(Span addition) {
+        if (addition == null) {
+            throw new IllegalArgumentException();
+        }
         if (data == null) {
             return new Node(addition);
         } else {

@@ -221,11 +221,7 @@ public class TextChain
          * Create subtrees for everything before and after the deletion range
          */
 
-        if (offset > 0) {
-            preceeding = root.subset(0, offset);
-        } else {
-            preceeding = null;
-        }
+        preceeding = root.subset(0, offset);
 
         start = offset + wide;
         across = root.getWidth() - start;
@@ -241,31 +237,35 @@ public class TextChain
     /**
      * Add or remove a Markup format from a range of text.
      */
-    protected void format(int offset, int width, Markup format) {
-        Node tree;
-        Span s;
-
-        tree = extractFrom(offset, width);
+    protected void format(int offset, int wide, Markup format) {
+        final Node preceeding, following;
+        final int start, across;
+        final int[] characters;
+        final Span span;
 
         /*
-         * Unlike the insert() and delete() operations, we can leave the Piece
-         * sequence alone. The difference is that we change the Spans that are
-         * pointed to in the range being changed.
+         * Create subtrees for everything before and after the changed range
          */
 
-        p = pair.one;
+        preceeding = root.subset(0, offset);
 
-        while (true) {
-            s = p.span;
+        start = offset + wide;
+        across = root.getWidth() - start;
+        following = root.subset(start, across);
 
-            p.span = s.applyMarkup(format);
+        /*
+         * Accumulate the text in the given range, and then create a new Span
+         * with the supplied new Markup.
+         */
+        
+        characters = new int[wide];
+        root.visitRange(tourist, start, wide)
 
-            if (p == pair.two) {
-                break;
-            }
+        /*
+         * Now combine these subtrees to effect the deletion.
+         */
 
-            p = p.next;
-        }
+        root = Node.create(preceeding, tree, following);
     }
 
     /**
