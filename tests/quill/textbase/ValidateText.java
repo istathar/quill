@@ -616,11 +616,10 @@ public class ValidateText extends TestCase
         text.format(0, 11, Common.FILENAME);
 
         // NEW: will replace all
-        assertEquals(3, countNumberOfSpans(text));
-
+        assertEquals(1, countNumberOfSpans(text));
+        tree = text.getTree();
+        results = convertToSpanArray(tree);
         assertSame(results[0].getMarkup(), Common.FILENAME);
-        assertSame(results[1].getMarkup(), Common.FILENAME);
-        assertSame(results[2].getMarkup(), Common.FILENAME);
 
         assertEquals("Hello World", text.toString());
     }

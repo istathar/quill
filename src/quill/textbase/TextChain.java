@@ -242,6 +242,7 @@ public class TextChain
         final int start, across;
         final int[] characters;
         final Span span;
+        AccumulatingCharacterVisitor tourist;
 
         /*
          * Create subtrees for everything before and after the changed range
@@ -257,15 +258,62 @@ public class TextChain
          * Accumulate the text in the given range, and then create a new Span
          * with the supplied new Markup.
          */
-        
-        characters = new int[wide];
-        root.visitRange(tourist, start, wide)
+
+        tourist = new AccumulatingCharacterVisitor(wide, format);
+
+        root.visitRange(tourist, offset, wide);
+
+        span = tourist.toSpan();
 
         /*
          * Now combine these subtrees to effect the deletion.
          */
 
-        root = Node.create(preceeding, tree, following);
+        root = Node.create(preceeding, span, following);
+    }
+
+    private static class AccumulatingCharacterVisitor implements CharacterVisitor
+    {
+        private final int[] characters;
+
+        private final Markup markup;
+
+        private int index;
+
+        /**
+         * Create an accumulator for a given number of characters, to
+         * subsequently have the supplied format.
+         */
+        private AccumulatingCharacterVisitor(final int num, Markup format) {
+            characters = new int[num];
+            markup = format;
+            index = 0;
+        }
+
+        public void visit(int character, Markup markup) {
+            characters[index] = character;
+            index++;
+        }
+
+        /**
+         * Convert the result of the accumulation into a single Span
+         */
+        /*
+         * FIXME This is awful; we need a Span constructor that works in
+         * character[]
+         */
+        private Span toSpan() {
+            StringBuilder str;
+            int i;
+
+            str = new StringBuilder(characters.length);
+
+            for (i = 0; i < characters.length; i++) {
+                str.appendCodePoint(characters[i]);
+            }
+
+            return Span.createSpan(str.toString(), markup);
+        }
     }
 
     /**
