@@ -156,11 +156,9 @@ public class ValidateExtracts extends TestCase
         assertEquals(2, lines.length);
 
         extract = lines[0];
-        assertNotNull(extract);
-        assertEquals(0, extract.getWidth());
+        assertNull(extract);
         extract = lines[1];
-        assertNotNull(extract);
-        assertEquals(0, extract.getWidth());
+        assertNull(extract);
     }
 
     public final void testExtractLinesEmbeddedNewline() {
@@ -216,8 +214,7 @@ public class ValidateExtracts extends TestCase
         assertEquals(2, lines.length);
 
         extract = lines[0];
-        assertNotNull(extract);
-        assertEquals(0, extract.getWidth());
+        assertNull(extract);
 
         extract = lines[1];
         assertNotNull(extract);
@@ -236,8 +233,7 @@ public class ValidateExtracts extends TestCase
         assertEquals("Hello World", extract.getText());
 
         extract = lines[1];
-        assertNotNull(extract);
-        assertEquals(0, extract.getWidth());
+        assertNull(extract);
     }
 
     public final void testExtractParagraphBoundaryAfterUnicode() {
