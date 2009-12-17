@@ -43,10 +43,8 @@ public class ValidateExtracts extends TestCase
         assertEquals("ell", extract.range[0].getText());
 
         extract = text.extractRange(0, 11);
-        assertEquals(3, extract.range.length);
-        assertEquals("H", extract.range[0].getText());
-        assertEquals("ell", extract.range[1].getText());
-        assertEquals("o World", extract.range[2].getText());
+        assertEquals(1, extract.range.length);
+        assertEquals("Hello World", extract.range[0].getText());
     }
 
     /*

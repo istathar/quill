@@ -393,6 +393,7 @@ public class TextChain
          */
 
         paragraphs = new ArrayList<Integer>(8);
+        paragraphs.add(0);
 
         root.visitAll(new CharacterVisitor() {
             private int offset = 0;
@@ -427,7 +428,9 @@ public class TextChain
                 nodes[i] = root.subset(offset, wide);
             }
 
-            nodes[i] = root.subset(offset, root.getWidth());
+            offset = 1 + offset + wide;
+            wide = root.getWidth() - offset;
+            nodes[i] = root.subset(offset, wide);
         }
 
         /*

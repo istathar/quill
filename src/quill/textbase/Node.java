@@ -491,7 +491,10 @@ class Node
             amount = wide;
         }
 
-        if (amount == widthCenter) {
+        if (amount == 0) {
+            span = null;
+            droit = null;
+        } else if (amount == widthCenter) {
             span = data;
             droit = null;
         } else if (amount < widthCenter) {
