@@ -42,16 +42,17 @@ public class Extract
     final int width;
 
     Extract(final Node tree) {
-        range = convertToSpanArray(tree);
-        width = tree.getWidth();
+        if (tree == null) {
+            range = new Span[] {};
+            width = 0;
+        } else {
+            range = convertToSpanArray(tree);
+            width = tree.getWidth();
+        }
     }
 
     private static Span[] convertToSpanArray(final Node root) {
         final AccumulatingSpanVisitor tourist;
-
-        if (root == null) {
-            return new Span[] {};
-        }
 
         tourist = new AccumulatingSpanVisitor();
         root.visitAll(tourist);
