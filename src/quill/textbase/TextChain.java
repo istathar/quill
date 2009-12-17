@@ -69,7 +69,7 @@ public class TextChain
 
         str = new StringBuilder();
 
-        root.visitAll(new CharacterVisitor() {
+        root.visit(new CharacterVisitor() {
             public void visit(int character, Markup markup) {
                 str.appendCodePoint(character);
             }
@@ -251,7 +251,7 @@ public class TextChain
 
         tourist = new AccumulatingCharacterVisitor(wide, format);
 
-        root.visitRange(tourist, offset, wide);
+        root.visit(tourist, offset, wide);
 
         span = tourist.toSpan();
 
@@ -371,7 +371,7 @@ public class TextChain
         paragraphs = new ArrayList<Integer>(8);
         paragraphs.add(0);
 
-        root.visitAll(new CharacterVisitor() {
+        root.visit(new CharacterVisitor() {
             private int offset = 0;
 
             public void visit(int character, Markup markup) {

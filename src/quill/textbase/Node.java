@@ -204,7 +204,7 @@ class Node extends Extract
         };
 
         if (left != null) {
-            left.visitAll(tourist);
+            left.visit(tourist);
         }
 
         if (data != null) {
@@ -212,7 +212,7 @@ class Node extends Extract
         }
 
         if (right != null) {
-            right.visitAll(tourist);
+            right.visit(tourist);
         }
 
         return str.toString();
@@ -234,15 +234,15 @@ class Node extends Extract
      * Invoke tourist's visit() method for each Span in the tree, in-order
      * traversal.
      */
-    public void visitAll(final SpanVisitor tourist) {
+    public void visit(final SpanVisitor tourist) {
         if (left != null) {
-            left.visitAll(tourist);
+            left.visit(tourist);
         }
         if (data != null) {
             tourist.visit(data);
         }
         if (right != null) {
-            right.visitAll(tourist);
+            right.visit(tourist);
         }
     }
 
@@ -250,13 +250,13 @@ class Node extends Extract
      * Invoke tourist's visit() method for each character in the tree,
      * in-order traversal.
      */
-    public void visitAll(final CharacterVisitor tourist) {
+    public void visit(final CharacterVisitor tourist) {
         final int I;
         int i, ch;
         Markup m;
 
         if (left != null) {
-            left.visitAll(tourist);
+            left.visit(tourist);
         }
         if (data != null) {
             I = data.getWidth();
@@ -267,15 +267,15 @@ class Node extends Extract
             }
         }
         if (right != null) {
-            right.visitAll(tourist);
+            right.visit(tourist);
         }
     }
 
     /**
-     * Call tourist's visit method for each character in the tree <b>from
-     * start for width</b>, in-order traversal,
+     * Call tourist's visit() method for each character in the tree from start
+     * for wide characters, traversing the tree in-order.
      */
-    public void visitRange(final CharacterVisitor tourist, final int offset, final int wide) {
+    public void visit(final CharacterVisitor tourist, final int offset, final int wide) {
         int i, start, across, consumed;
         final int widthLeft, widthCenter, widthRight;
         int ch;
@@ -286,12 +286,12 @@ class Node extends Extract
         if (left != null) {
             widthLeft = left.getWidth();
             if ((offset == 0) && (wide >= widthLeft)) {
-                left.visitAll(tourist);
+                left.visit(tourist);
                 consumed = widthLeft;
             } else if (offset < widthLeft) {
                 start = offset;
                 across = widthLeft - offset;
-                left.visitRange(tourist, start, across);
+                left.visit(tourist, start, across);
                 consumed = across;
             }
         } else {
@@ -326,11 +326,11 @@ class Node extends Extract
         if ((right != null) && (consumed != wide)) {
             widthRight = right.getWidth();
             if ((offset == widthLeft + widthCenter) && (wide == widthRight)) {
-                right.visitAll(tourist);
+                right.visit(tourist);
             } else {
                 start = offset - (widthLeft + widthCenter);
                 across = wide - consumed;
-                right.visitRange(tourist, start, across);
+                right.visit(tourist, start, across);
             }
         }
     }
@@ -356,7 +356,7 @@ class Node extends Extract
 
         str.append("«");
         if (left != null) {
-            left.visitAll(tourist);
+            left.visit(tourist);
         }
         str.append("»\n");
 
@@ -368,7 +368,7 @@ class Node extends Extract
 
         str.append("«");
         if (right != null) {
-            right.visitAll(tourist);
+            right.visit(tourist);
         }
         str.append("»\n");
 

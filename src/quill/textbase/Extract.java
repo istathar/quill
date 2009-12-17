@@ -51,4 +51,20 @@ public abstract class Extract
     public static Extract create(Span span) {
         return Node.createNode(span);
     }
+
+    /**
+     * Invoke tourist's visit() method for each Span in this extract.
+     */
+    public abstract void visit(SpanVisitor tourist);
+
+    /**
+     * Invoke tourist's visit() method for each character in this extract.
+     */
+    public abstract void visit(CharacterVisitor tourist);
+
+    /**
+     * Call tourist's visit() method for each character in this extract from
+     * starting offset <code>start</code> for <code>wide</code> characters.
+     */
+    public abstract void visit(CharacterVisitor tourist, int offset, int wide);
 }

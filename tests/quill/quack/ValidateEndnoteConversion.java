@@ -34,6 +34,7 @@ import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
+import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
 import quill.textbase.StringSpan;
 import quill.textbase.TextChain;
@@ -75,12 +76,24 @@ public class ValidateEndnoteConversion extends IOTestCase
 
         chain = segment.getText();
         entire = chain.extractAll();
-        assertEquals(2, entire.size());
-        span = entire.get(0);
-        assertTrue(span instanceof StringSpan);
-        span = entire.get(1);
-        assertTrue(span instanceof MarkerSpan);
-        assertEquals(Special.NOTE, span.getMarkup());
+        entire.visit(new SpanVisitor() {
+            private int i = 0;
+
+            public void visit(Span span) {
+                switch (i) {
+                case 0:
+                    assertTrue(span instanceof StringSpan);
+                    break;
+                case 1:
+                    assertTrue(span instanceof MarkerSpan);
+                    assertEquals(Special.NOTE, span.getMarkup());
+                    break;
+                default:
+                    fail();
+                }
+                i++;
+            }
+        });
 
         converter = new QuackConverter();
         converter.append(new ComponentSegment());
@@ -206,9 +219,11 @@ public class ValidateEndnoteConversion extends IOTestCase
         assertEquals(Special.NOTE, markup);
 
         extract = chain.extractRange(offset - 1, 1);
-        assertEquals(1, extract.getWidth());
-        span = extract.get(0);
-        assertTrue(span instanceof MarkerSpan);
+        extract.visit(new SpanVisitor() {
+            public void visit(Span span) {
+                assertTrue(span instanceof MarkerSpan);
+            }
+        });
 
         /*
          * Now, write out, and test. We shouldn't have lost any markup.

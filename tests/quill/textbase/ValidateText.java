@@ -214,7 +214,7 @@ public class ValidateText extends TestCase
         }
 
         tourist = new CountingSpanVisitor();
-        root.visitAll(tourist);
+        root.visit(tourist);
         return tourist.count;
     }
 
@@ -245,7 +245,7 @@ public class ValidateText extends TestCase
         }
 
         tourist = new AccumulatingSpanVisitor();
-        node.visitAll(tourist);
+        node.visit(tourist);
         return tourist.getList();
     }
 
@@ -282,7 +282,7 @@ public class ValidateText extends TestCase
         }
 
         tourist = new StringSpanVisitor();
-        node.visitAll(tourist);
+        node.visit(tourist);
         return tourist.getString();
     }
 

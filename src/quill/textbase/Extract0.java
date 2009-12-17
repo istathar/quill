@@ -57,7 +57,7 @@ public class Extract0
         final AccumulatingSpanVisitor tourist;
 
         tourist = new AccumulatingSpanVisitor();
-        root.visitAll(tourist);
+        root.visit(tourist);
 
         return tourist.toArray();
     }
