@@ -66,7 +66,6 @@ import quill.textbase.Span;
 import static org.gnome.gtk.FileChooserAction.OPEN;
 import static org.gnome.gtk.FileChooserAction.SAVE;
 import static quill.textbase.Span.createSpan;
-import static quill.textbase.TextChain.extractFor;
 
 public class UserInterface
 {
@@ -130,7 +129,7 @@ public class UserInterface
     /**
      * When text is cut or copied out, it will be cached here.
      */
-    private Extract stash;
+    private Node stash;
 
     private void hookupExternalClipboard() {
         stash = null;
@@ -179,7 +178,7 @@ public class UserInterface
     /**
      * Put the extracted text into the system clipboard.
      */
-    void setClipboard(Extract range) {
+    void setClipboard(Node tree) {
         owner = true;
         stash = range;
         clipboard.setText(range.getText());

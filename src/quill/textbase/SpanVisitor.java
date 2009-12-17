@@ -19,13 +19,11 @@
 package quill.textbase;
 
 /**
- * FIXME
+ * Visit the Spans in a range, in order.
  * 
  * @author Andrew Cowie
  */
-public interface Extract
+public interface SpanVisitor
 {
-    public int getWidth();
-
-    public String getText();
+    void visit(Span span);
 }

@@ -19,11 +19,26 @@
 package quill.textbase;
 
 /**
- * Base class of the binary tree we use for managing lists of Spans.
+ * A list of Spans.
+ * 
+ * <p>
+ * To access the Spans in this tree, use the visitor pattern via visitAll() or
+ * visitRange().
+ * 
+ * <p>
+ * This is implemented as a b-tree, with Node left, Span center, Node right.
+ * Most of the useful operations on trees are expressed on the
+ * {@link TextChain} class, which wraps one of these to back a Segment and its
+ * Editor.
+ * 
  * 
  * @author Andrew Cowie
  */
-class Node
+/*
+ * If this becomes an abstract base class, then create a new public class
+ * called Tree and replace public usage of Node with it.
+ */
+public class Node implements Extract
 {
     /**
      * Height of the tree.
@@ -507,30 +522,4 @@ class Node
 
         return new Node(gauche, span, droit);
     }
-}
-
-/**
- * Visit the Spans in a range, in order.
- * 
- * @author Andrew Cowie
- */
-interface SpanVisitor
-{
-    void visit(Span span);
-}
-
-/**
- * Visit the characters in a range, one by one, in order.
- * 
- * @author Andrew Cowie
- */
-interface CharacterVisitor
-{
-    /**
-     * @param character
-     *            the Unicode codepoint at this offset
-     * @param markup
-     *            the Markup formatting applicable at this offset.
-     */
-    void visit(int character, Markup markup);
 }

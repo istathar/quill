@@ -743,7 +743,7 @@ abstract class EditorTextView extends TextView
     private void extractText(boolean copy) {
         final TextIter start, end;
         int alpha, omega, offset, width;
-        final Extract extract;
+        final Node tree;
         final TextualChange change;
 
         /*
@@ -767,8 +767,8 @@ abstract class EditorTextView extends TextView
          * Copy the range to clipboard, being the "Copy" behviour.
          */
 
-        extract = chain.extractRange(offset, width);
-        ui.setClipboard(extract);
+        tree = chain.extractRange(offset, width);
+        ui.setClipboard(tree);
 
         if (copy) {
             return;

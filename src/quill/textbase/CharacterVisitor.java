@@ -19,13 +19,17 @@
 package quill.textbase;
 
 /**
- * FIXME
+ * Visit the characters in a range, one by one, in order.
  * 
  * @author Andrew Cowie
  */
-public interface Extract
+public interface CharacterVisitor
 {
-    public int getWidth();
-
-    public String getText();
+    /**
+     * @param character
+     *            the Unicode codepoint at this offset
+     * @param markup
+     *            the Markup formatting applicable at this offset.
+     */
+    void visit(int character, Markup markup);
 }
