@@ -403,6 +403,13 @@ class Node extends Extract
         }
     }
 
+    /*
+     * FUTURE It may be that nothing in the production code actually uses
+     * this! Given how single Span creation is the common case for the user
+     * typing, if we fix up InsertTextChange to persist just Spans (rather
+     * than automatically putting them into an Extract) or alternately stop
+     * using Changes then we can probably use this for real.
+     */
     Node insertSpanAt(final int offset, final Span addition) {
         final int widthLeft, widthCenter;
         final Span before, after;
@@ -454,6 +461,68 @@ class Node extends Extract
             droit = new Node(null, after, right);
 
             return new Node(gauche, addition, droit);
+        }
+    }
+
+    /*
+     * Logic cloned from insertSpanAt() above.
+     */
+    Node insertTreeAt(int offset, Node tree) {
+        final int widthLeft, widthCenter;
+        int point;
+        final Node gauche, droit;
+        final Span before, after;
+
+        if (offset == 0) {
+            return new Node(tree, null, this);
+        }
+        if (offset == width) {
+            return new Node(this, null, tree);
+        }
+        if (offset > width) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        if (left == null) {
+            widthLeft = 0;
+        } else {
+            widthLeft = left.getWidth();
+        }
+
+        if (offset < widthLeft) {
+            gauche = left.insertTreeAt(offset, tree);
+            return new Node(gauche, data, right);
+        }
+
+        point = offset - widthLeft;
+        if (data == null) {
+            widthCenter = 0;
+        } else {
+            widthCenter = data.getWidth();
+        }
+        if (point > widthCenter) {
+            droit = right.insertTreeAt(point - widthCenter, tree);
+            return new Node(left, data, droit);
+        }
+
+        if (point == 0) {
+            gauche = new Node(left, null, tree);
+            droit = new Node(null, data, right);
+
+            return new Node(gauche, null, droit);
+        } else if (point == widthCenter) {
+            gauche = new Node(left, data, null);
+            droit = new Node(tree, null, right);
+
+            return new Node(gauche, null, droit);
+        } else {
+            before = data.split(0, point);
+            after = data.split(point);
+
+            gauche = new Node(left, before, tree);
+            droit = new Node(null, after, right);
+
+            return new Node(gauche, null, droit);
         }
     }
 

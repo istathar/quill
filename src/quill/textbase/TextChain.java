@@ -134,23 +134,23 @@ public class TextChain
     /**
      * Insert the given tree of Spans at the specified offset.
      */
-    protected void insert(int offset, Extract tree) {
+    protected void insert(int offset, Extract extract) {
+        final Node tree;
+
         if (offset < 0) {
             throw new IllegalArgumentException();
         }
 
+        tree = (Node) extract;
+
         /*
          * Create the insertion point
          */
-
-        /*
-         * Create and insert Pieces wrapping the Spans.
-         */
-
-        /*
-         * And correct the linkages in the reverse direction
-         */
-        throw new Error("FIXME");
+        if (root == null) {
+            root = tree;
+        } else {
+            root = root.insertTreeAt(offset, tree);
+        }
     }
 
     /**
