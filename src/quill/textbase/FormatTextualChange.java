@@ -111,8 +111,8 @@ public class FormatTextualChange extends TextualChange
      * Doing clear() this way is cumbersome.
      */
     protected void apply() {
-        chain.delete(offset, removed.width);
-        chain.insert(offset, added.range);
+        chain.delete(offset, removed.getWidth());
+        chain.insert(offset, added);
     }
 
     /*
@@ -121,7 +121,7 @@ public class FormatTextualChange extends TextualChange
      * be able to just "replace" with it.
      */
     protected void undo() {
-        chain.delete(offset, added.width);
-        chain.insert(offset, removed.range);
+        chain.delete(offset, added.getWidth());
+        chain.insert(offset, removed);
     }
 }

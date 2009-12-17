@@ -31,7 +31,7 @@ public class DeleteTextualChange extends TextualChange
      * that are going to be removed so we can restore them later if an undo
      * happens.
      */
-    public DeleteTextualChange(TextChain chain, int offset, Node removed) {
+    public DeleteTextualChange(TextChain chain, int offset, Extract removed) {
         super(chain, offset, removed, null);
     }
 

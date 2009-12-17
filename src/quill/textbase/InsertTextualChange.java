@@ -43,7 +43,7 @@ public class InsertTextualChange extends TextualChange
      * Alternately, you've been given a range from somewhere and you want to
      * (re)insert it.
      */
-    public InsertTextualChange(TextChain chain, int offset, Node added) {
+    public InsertTextualChange(TextChain chain, int offset, Extract added) {
         super(chain, offset, null, added);
     }
 

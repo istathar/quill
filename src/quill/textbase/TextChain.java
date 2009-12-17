@@ -134,7 +134,7 @@ public class TextChain
     /**
      * Insert the given tree of Spans at the specified offset.
      */
-    protected void insert(int offset, Node tree) {
+    protected void insert(int offset, Extract tree) {
         if (offset < 0) {
             throw new IllegalArgumentException();
         }
@@ -358,7 +358,6 @@ public class TextChain
         final ArrayList<Integer> paragraphs;
         final Node[] nodes;
         int num, i, offset, wide;
-        final Extract[] result;
 
         if (root == null) {
             return new Extract[] {};
@@ -411,16 +410,10 @@ public class TextChain
         }
 
         /*
-         * Form the Extract array to return. TODO replace with pure tree use.
+         * Since Node is now Extract, we can just return our temporary array.
          */
 
-        result = new Extract[num];
-
-        for (i = 0; i < num; i++) {
-            result[i] = new Extract(nodes[i]);
-        }
-
-        return result;
+        return nodes;
     }
 
     private Segment belongs;

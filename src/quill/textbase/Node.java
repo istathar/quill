@@ -38,7 +38,7 @@ package quill.textbase;
  * If this becomes an abstract base class, then create a new public class
  * called Tree and replace public usage of Node with it.
  */
-public class Node implements Extract
+class Node implements Extract
 {
     /**
      * Height of the tree.
@@ -178,6 +178,43 @@ public class Node implements Extract
         return data;
     }
 
+    /**
+     * Get a String of the characters in this Node and its descendants. Only
+     * use this for minor cases (ie copy to clipboard). Regular usage should
+     * visit() across the characters or Spans.
+     */
+    /*
+     * Same inefficient implementation as toString(), without the extra
+     * debugging delimiters.
+     */
+    public String getText() {
+        final StringBuilder str;
+        final CharacterVisitor tourist;
+
+        str = new StringBuilder();
+
+        tourist = new CharacterVisitor() {
+            public void visit(int character, Markup markup) {
+                str.appendCodePoint(character);
+            }
+        };
+
+        if (left != null) {
+            left.visitAll(tourist);
+        }
+
+        if (data != null) {
+            str.append(data.getText());
+        }
+
+        if (right != null) {
+            right.visitAll(tourist);
+        }
+
+        return str.toString();
+
+    }
+
     Node append(final Span addition) {
         if (addition == null) {
             throw new IllegalArgumentException();
@@ -295,7 +332,11 @@ public class Node implements Extract
     }
 
     /**
-     * This is ineffecient! Use for debugging purposes only.
+     * Get a representation of this Node showing Node left, Span center and
+     * Node right each delimited by «». Use for debugging purposes only!
+     */
+    /*
+     * This is ineffecient!
      */
     public String toString() {
         final StringBuilder str;

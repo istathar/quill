@@ -129,7 +129,7 @@ public class UserInterface
     /**
      * When text is cut or copied out, it will be cached here.
      */
-    private Node stash;
+    private Extract stash;
 
     private void hookupExternalClipboard() {
         stash = null;
@@ -178,10 +178,10 @@ public class UserInterface
     /**
      * Put the extracted text into the system clipboard.
      */
-    void setClipboard(Node tree) {
+    void setClipboard(Extract extract) {
         owner = true;
-        stash = range;
-        clipboard.setText(range.getText());
+        stash = extract;
+        clipboard.setText(extract.getText());
     }
 
     /**

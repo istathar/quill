@@ -29,14 +29,14 @@ public class FullTextualChange extends TextualChange
     /**
      * Insert a Span[] at offset
      */
-    public FullTextualChange(TextChain chain, int offset, Node added) {
+    public FullTextualChange(TextChain chain, int offset, Extract added) {
         super(chain, offset, null, added);
     }
 
     /**
      * Replace the text between offset and width with a new Span[].
      */
-    public FullTextualChange(TextChain chain, int offset, Node replaced, Node added) {
+    public FullTextualChange(TextChain chain, int offset, Extract replaced, Extract added) {
         super(chain, offset, replaced, added);
     }
 
@@ -44,7 +44,7 @@ public class FullTextualChange extends TextualChange
      * Replace the text between offset and the width of replaced with the
      * given Span.
      */
-    public FullTextualChange(TextChain chain, int offset, Node replaced, Span span) {
+    public FullTextualChange(TextChain chain, int offset, Extract replaced, Span span) {
         super(chain, offset, replaced, Node.create(span));
     }
 

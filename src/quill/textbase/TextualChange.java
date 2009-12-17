@@ -29,11 +29,11 @@ public abstract class TextualChange extends Change
 
     final int offset;
 
-    final Node removed;
+    final Extract removed;
 
-    final Node added;
+    final Extract added;
 
-    TextualChange(TextChain chain, int offset, Node removed, Node added) {
+    TextualChange(TextChain chain, int offset, Extract removed, Extract added) {
         super(chain.getEnclosingSegment());
         this.chain = chain;
         this.offset = offset;
@@ -45,11 +45,11 @@ public abstract class TextualChange extends Change
         return offset;
     }
 
-    public Node getRemoved() {
+    public Extract getRemoved() {
         return removed;
     }
 
-    public Node getAdded() {
+    public Extract getAdded() {
         return added;
     }
 }
