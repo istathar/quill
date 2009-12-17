@@ -132,14 +132,9 @@ public class TextChain
     }
 
     /**
-     * Insert the given range of Spans at the specified offset.
+     * Insert the given tree of Spans at the specified offset.
      */
-    /*
-     * FIXME replace this with (int, Node) since we're always just pulling the
-     * Span[] out of Extract to call this. TODO when we change Extract to
-     * <Node> rather than Span[]
-     */
-    protected void insert(int offset, Span[] range) {
+    protected void insert(int offset, Node tree) {
         if (offset < 0) {
             throw new IllegalArgumentException();
         }
@@ -179,18 +174,11 @@ public class TextChain
         root = root.insertSpanAt(offset, addition);
     }
 
-    /**
-     * Get a tree representing the concatonation of the marked up Spans in a
-     * given range.
-     * 
-     * @deprecated use Node's subset() directly.
+    /*
+     * FUTURE replace with use of TextChain's getTree() instead?
      */
-    Node extractFrom(int offset, int wide) {
-        return root.subset(offset, wide);
-    }
-
-    public Extract extractAll() {
-        return new Extract(root);
+    public Node extractAll() {
+        return root;
     }
 
     /**
@@ -352,26 +340,15 @@ public class TextChain
      * when constructing a DeleteChange, we probably end up duplicating a lot
      * of work when actually calling delete() after this here.
      */
-    public Extract extractRange(int start, int wide) {
-        final Node node;
-
+    public Node extractRange(int start, int wide) {
         if (wide < 0) {
             throw new IllegalArgumentException();
         }
         if (wide == 0) {
-            return new Extract();
+            return null;
         }
 
-        node = root.subset(start, wide);
-        return new Extract(node);
-    }
-
-    /*
-     * Strictly there is no reason for this to be here, but it allows us to
-     * keep the constructors in Extract out of view.
-     */
-    public static Extract extractFor(Span span) {
-        return new Extract(span);
+        return root.subset(start, wide);
     }
 
     /**

@@ -24,6 +24,7 @@ import java.util.ArrayList;
  * Read-only wrapper around an array of Spans.
  * 
  * @author Andrew Cowie
+ * @deprecated
  */
 /*
  * The fields are package visible and that's ok because in here we know not to
@@ -35,6 +36,7 @@ import java.util.ArrayList;
  * inefficiently, taken overall) covert the Node<Span> into such a Span[]. We
  * want to do away with that, and just expose the tree as is.
  */
+@Deprecated
 public class Extract
 {
     final Span[] range;

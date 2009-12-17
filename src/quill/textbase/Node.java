@@ -221,7 +221,7 @@ class Node
      */
     public void visitRange(final CharacterVisitor tourist, final int offset, final int wide) {
         int i, start, across, consumed;
-        final int I, widthLeft, widthCenter, widthRight;
+        final int widthLeft, widthCenter, widthRight;
         int ch;
         Markup m;
 

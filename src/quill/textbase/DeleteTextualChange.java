@@ -18,23 +18,28 @@
  */
 package quill.textbase;
 
+/**
+ * Remove a range of text.
+ * 
+ * @author Andrew Cowie
+ */
 public class DeleteTextualChange extends TextualChange
 {
     /**
      * While it would be nice to be able to say
-     * "just remove between these two points", we need to have the Extract of
-     * Spans that are going to be removed so we can restore them later if an
-     * undo happens.
+     * "just remove between these two points", we need to have a list of Spans
+     * that are going to be removed so we can restore them later if an undo
+     * happens.
      */
-    public DeleteTextualChange(TextChain chain, int offset, Extract removed) {
+    public DeleteTextualChange(TextChain chain, int offset, Node removed) {
         super(chain, offset, removed, null);
     }
 
     protected void apply() {
-        chain.delete(offset, removed.width);
+        chain.delete(offset, removed.getWidth());
     }
 
     protected void undo() {
-        chain.insert(offset, removed.range);
+        chain.insert(offset, removed);
     }
 }
