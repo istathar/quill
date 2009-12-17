@@ -409,7 +409,7 @@ public class ValidateText extends TestCase
         return str.toString();
     }
 
-    public final void testExtractNothing() {
+    public final void testSubsetNothing() {
         final TextChain text;
         final Node tree;
         Node node;
@@ -425,7 +425,7 @@ public class ValidateText extends TestCase
         assertNull(node);
     }
 
-    public final void testExtractRange() {
+    public final void testSubsetRange() {
         final TextChain text;
         final Span zero, one, two, three;
         final Span[] range;
@@ -452,7 +452,7 @@ public class ValidateText extends TestCase
         assertEquals("roOneTwoThr", textOf(range));
     }
 
-    public final void testExtractAll() {
+    public final void testSubsetAll() {
         final TextChain text;
         final Span zero, one, two;
         final Node tree, node;

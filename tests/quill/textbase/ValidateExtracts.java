@@ -39,12 +39,10 @@ public class ValidateExtracts extends TestCase
 
         extract = text.extractRange(1, 3);
         assertEquals("Hello World", text.toString());
-        assertEquals(1, extract.range.length);
-        assertEquals("ell", extract.range[0].getText());
+        assertEquals("ell", extract.getText());
 
         extract = text.extractRange(0, 11);
-        assertEquals(1, extract.range.length);
-        assertEquals("Hello World", extract.range[0].getText());
+        assertEquals("Hello World", extract.getText());
     }
 
     /*
@@ -73,7 +71,6 @@ public class ValidateExtracts extends TestCase
         final TextChain text;
         Extract[] lines;
         Extract extract;
-        Span span;
 
         text = new TextChain();
         text.append(createSpan("Hello World", null));
@@ -86,15 +83,11 @@ public class ValidateExtracts extends TestCase
 
         extract = lines[0];
         assertNotNull(extract);
-        assertEquals(1, extract.size());
-        span = extract.get(0);
-        assertEquals("Hello World", span.getText());
+        assertEquals("Hello World", extract.getText());
 
         extract = lines[1];
         assertNotNull(extract);
-        assertEquals(1, extract.size());
-        span = extract.get(0);
-        assertEquals("Goodbye Eternity", span.getText());
+        assertEquals("Goodbye Eternity", extract.getText());
     }
 
     /*
@@ -104,7 +97,6 @@ public class ValidateExtracts extends TestCase
         final TextChain text;
         Extract[] lines;
         Extract extract;
-        Span span;
 
         text = new TextChain();
         text.append(createSpan("Hello World", null));
@@ -114,9 +106,7 @@ public class ValidateExtracts extends TestCase
 
         extract = lines[0];
         assertNotNull(extract);
-        assertEquals(1, extract.size());
-        span = extract.get(0);
-        assertEquals("Hello World", span.getText());
+        assertEquals("Hello World", extract.getText());
     }
 
     /*
@@ -139,7 +129,6 @@ public class ValidateExtracts extends TestCase
         final TextChain text;
         Extract[] lines;
         Extract extract;
-        Span span;
 
         text = new TextChain();
         text.append(createSpan('H', null));
@@ -149,9 +138,7 @@ public class ValidateExtracts extends TestCase
 
         extract = lines[0];
         assertNotNull(extract);
-        assertEquals(1, extract.size());
-        span = extract.get(0);
-        assertEquals("H", span.getText());
+        assertEquals("H", extract.getText());
     }
 
     /*
@@ -170,17 +157,16 @@ public class ValidateExtracts extends TestCase
 
         extract = lines[0];
         assertNotNull(extract);
-        assertEquals(0, extract.size());
+        assertEquals(0, extract.getWidth());
         extract = lines[1];
         assertNotNull(extract);
-        assertEquals(0, extract.size());
+        assertEquals(0, extract.getWidth());
     }
 
     public final void testExtractLinesEmbeddedNewline() {
         final TextChain text;
         Extract[] lines;
         Extract extract;
-        Span span;
 
         text = new TextChain();
         text.append(createSpan("Hello World\nGoodbye Eternity", null));
@@ -191,15 +177,11 @@ public class ValidateExtracts extends TestCase
 
         extract = lines[0];
         assertNotNull(extract);
-        assertEquals(1, extract.size());
-        span = extract.get(0);
-        assertEquals("Hello World", span.getText());
+        assertEquals("Hello World", extract.getText());
 
         extract = lines[1];
         assertNotNull(extract);
-        assertEquals(1, extract.size());
-        span = extract.get(0);
-        assertEquals("Goodbye Eternity", span.getText());
+        assertEquals("Goodbye Eternity", extract.getText());
     }
 
     /*
@@ -220,15 +202,11 @@ public class ValidateExtracts extends TestCase
 
         extract = lines[0];
         assertNotNull(extract);
-        assertEquals(1, extract.size());
-        span = extract.get(0);
-        assertEquals("H", span.getText());
+        assertEquals("H", extract.getText());
 
         extract = lines[1];
         assertNotNull(extract);
-        assertEquals(1, extract.size());
-        span = extract.get(0);
-        assertEquals("ello World", span.getText());
+        assertEquals("ello World", extract.getText());
 
         text = new TextChain();
         text.append(createSpan("\nHello World", null));
@@ -239,13 +217,11 @@ public class ValidateExtracts extends TestCase
 
         extract = lines[0];
         assertNotNull(extract);
-        assertEquals(0, extract.size());
+        assertEquals(0, extract.getWidth());
 
         extract = lines[1];
         assertNotNull(extract);
-        assertEquals(1, extract.size());
-        span = extract.get(0);
-        assertEquals("Hello World", span.getText());
+        assertEquals("Hello World", extract.getText());
 
         text = new TextChain();
         span = createSpan("Hello World\n", null);
@@ -257,13 +233,11 @@ public class ValidateExtracts extends TestCase
 
         extract = lines[0];
         assertNotNull(extract);
-        assertEquals(1, extract.size());
-        span = extract.get(0);
-        assertEquals("Hello World", span.getText());
+        assertEquals("Hello World", extract.getText());
 
         extract = lines[1];
         assertNotNull(extract);
-        assertEquals(0, extract.size());
+        assertEquals(0, extract.getWidth());
     }
 
     public final void testExtractParagraphBoundaryAfterUnicode() {
@@ -276,29 +250,22 @@ public class ValidateExtracts extends TestCase
         text.append(createSpan("Pro𝑛to\nSurprise", null));
         assertEquals("Pro𝑛to\nSurprise", text.toString());
         extract = text.extractAll();
-        assertEquals(1, extract.size());
+        assertNotNull(extract);
+        assertEquals(15, extract.getWidth());
 
         lines = text.extractParagraphs();
 
         extract = text.extractAll();
-        assertEquals(1, extract.size());
-        span = extract.get(0);
-        assertEquals("Pro𝑛to\nSurprise", span.getText());
+        assertEquals("Pro𝑛to\nSurprise", extract.getText());
 
         assertEquals(2, lines.length);
 
         extract = lines[0];
         assertNotNull(extract);
-        assertEquals(1, extract.size());
-        span = extract.get(0);
-        assertTrue(span instanceof UnicodeSpan);
-        assertEquals("Pro𝑛to", span.getText());
+        assertEquals("Pro𝑛to", extract.getText());
 
         extract = lines[1];
         assertNotNull(extract);
-        assertEquals(1, extract.size());
-        span = extract.get(0);
-        assertTrue(span instanceof StringSpan);
-        assertEquals("Surprise", span.getText());
+        assertEquals("Surprise", extract.getText());
     }
 }
