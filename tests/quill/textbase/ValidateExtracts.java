@@ -281,13 +281,9 @@ public class ValidateExtracts extends TestCase
         lines = text.extractParagraphs();
 
         extract = text.extractAll();
-        assertEquals(3, extract.size());
+        assertEquals(1, extract.size());
         span = extract.get(0);
-        assertEquals("Pro𝑛to", span.getText());
-        span = extract.get(1);
-        assertEquals("\n", span.getText());
-        span = extract.get(2);
-        assertEquals("Surprise", span.getText());
+        assertEquals("Pro𝑛to\nSurprise", span.getText());
 
         assertEquals(2, lines.length);
 
