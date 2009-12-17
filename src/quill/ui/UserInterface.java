@@ -160,7 +160,7 @@ public class UserInterface
                         return;
                     }
                     span = createSpan(str, null);
-                    stash = extractFor(span);
+                    stash = Extract.create(span);
                 }
             }
         });

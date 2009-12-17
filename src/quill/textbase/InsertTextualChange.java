@@ -36,7 +36,7 @@ public class InsertTextualChange extends TextualChange
      * it.
      */
     public InsertTextualChange(TextChain chain, int offset, Span span) {
-        super(chain, offset, null, Node.create(span));
+        super(chain, offset, null, Node.createNode(span));
     }
 
     /**

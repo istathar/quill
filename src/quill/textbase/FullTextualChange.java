@@ -45,7 +45,7 @@ public class FullTextualChange extends TextualChange
      * given Span.
      */
     public FullTextualChange(TextChain chain, int offset, Extract replaced, Span span) {
-        super(chain, offset, replaced, Node.create(span));
+        super(chain, offset, replaced, Node.createNode(span));
     }
 
     protected void apply() {

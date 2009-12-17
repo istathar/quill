@@ -150,7 +150,7 @@ public class ValidateText extends TestCase
         final Span initial;
 
         initial = createSpan("Concave", null);
-        node = Node.create(initial);
+        node = Node.createNode(initial);
         assertEquals("Concave", convertToString(node));
 
         one = node.subset(0, 3);

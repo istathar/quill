@@ -19,13 +19,36 @@
 package quill.textbase;
 
 /**
- * FIXME
+ * A range (or all) of the text within a TextChain.
  * 
  * @author Andrew Cowie
  */
-public interface Extract
+/*
+ * This base class would be an interface except it allows us to have a public
+ * API with a create() function in it, and to adjust implementations down the
+ * track. It's not a base class for a binary-tree; if you need one do that in
+ * the Node subclass.
+ */
+public abstract class Extract
 {
-    public int getWidth();
+    /**
+     * Get the width of this range, in characters.
+     */
+    public abstract int getWidth();
 
-    public String getText();
+    /**
+     * Get a String representing [just] the text in this range.
+     */
+    /*
+     * Only call this for cases where you only need a concatonated String; if
+     * you're doing anything more interesting then visit over the tree.
+     */
+    public abstract String getText();
+
+    /**
+     * Create an Extract wrapping the given Span.
+     */
+    public static Extract create(Span span) {
+        return Node.createNode(span);
+    }
 }

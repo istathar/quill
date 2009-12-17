@@ -38,7 +38,7 @@ package quill.textbase;
  * If this becomes an abstract base class, then create a new public class
  * called Tree and replace public usage of Node with it.
  */
-class Node implements Extract
+class Node extends Extract
 {
     /**
      * Height of the tree.
@@ -118,9 +118,13 @@ class Node implements Extract
     }
 
     /**
-     * Given a single Span, create a tree. Used in testing.
+     * Given a single Span, create a tree. Used in testing, and for the
+     * clipboard cases.
      */
-    static Node create(Span span) {
+    /*
+     * Called from Extract.create().
+     */
+    static Node createNode(Span span) {
         if (span == null) {
             throw new IllegalArgumentException();
         }
@@ -132,7 +136,7 @@ class Node implements Extract
      * this Node, but with no content of its own. Used for adjoining two
      * trees.
      */
-    static Node create(Node right, Node left) {
+    static Node createNode(Node right, Node left) {
         if (right == null) {
             return left;
         } else if (left == null) {
@@ -145,7 +149,7 @@ class Node implements Extract
      * Create a new Node with the given Span as content and the given binary
      * trees below before and after this Node. Used when inserting.
      */
-    static Node create(Node left, Span span, Node right) {
+    static Node createNode(Node left, Span span, Node right) {
         if ((left == null) && (right == null)) {
             return new Node(span);
         }

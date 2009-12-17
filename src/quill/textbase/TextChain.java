@@ -39,11 +39,11 @@ public class TextChain
         final Span span;
 
         span = Span.createSpan(str, null);
-        root = Node.create(span);
+        root = Node.createNode(span);
     }
 
     TextChain(Span initial) {
-        root = Node.create(initial);
+        root = Node.createNode(initial);
     }
 
     /**
@@ -91,7 +91,7 @@ public class TextChain
          */
 
         if (root == null) {
-            root = Node.create(addition);
+            root = Node.createNode(addition);
             return;
         }
 
@@ -167,7 +167,7 @@ public class TextChain
             if (offset != 0) {
                 throw new IndexOutOfBoundsException();
             }
-            root = Node.create(addition);
+            root = Node.createNode(addition);
             return;
         }
 
@@ -221,7 +221,7 @@ public class TextChain
          * Now combine these subtrees to effect the deletion.
          */
 
-        root = Node.create(preceeding, following);
+        root = Node.createNode(preceeding, following);
     }
 
     /**
@@ -259,7 +259,7 @@ public class TextChain
          * Now combine these subtrees to effect the deletion.
          */
 
-        root = Node.create(preceeding, span, following);
+        root = Node.createNode(preceeding, span, following);
     }
 
     private static class AccumulatingCharacterVisitor implements CharacterVisitor
