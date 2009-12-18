@@ -227,7 +227,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         ui.apply(change);
 
         span = createSpan("emergency", null);
-        extract = TextChain.extractFor(span);
+        extract = Extract.create(span);
         change = new FormatTextualChange(chain, 22, extract, Common.ITALICS);
         ui.apply(change);
 

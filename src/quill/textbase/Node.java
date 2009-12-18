@@ -235,14 +235,18 @@ class Node extends Extract
      * traversal.
      */
     public void visit(final SpanVisitor tourist) {
-        if (left != null) {
-            left.visit(tourist);
-        }
-        if (data != null) {
-            tourist.visit(data);
-        }
-        if (right != null) {
-            right.visit(tourist);
+        try {
+            if (left != null) {
+                left.visit(tourist);
+            }
+            if (data != null) {
+                tourist.visit(data);
+            }
+            if (right != null) {
+                right.visit(tourist);
+            }
+        } catch (StopVisitingException sve) {
+            // done
         }
     }
 
@@ -255,19 +259,23 @@ class Node extends Extract
         int i, ch;
         Markup m;
 
-        if (left != null) {
-            left.visit(tourist);
-        }
-        if (data != null) {
-            I = data.getWidth();
-            m = data.getMarkup();
-            for (i = 0; i < I; i++) {
-                ch = data.getChar(i);
-                tourist.visit(ch, m);
+        try {
+            if (left != null) {
+                left.visit(tourist);
             }
-        }
-        if (right != null) {
-            right.visit(tourist);
+            if (data != null) {
+                I = data.getWidth();
+                m = data.getMarkup();
+                for (i = 0; i < I; i++) {
+                    ch = data.getChar(i);
+                    tourist.visit(ch, m);
+                }
+            }
+            if (right != null) {
+                right.visit(tourist);
+            }
+        } catch (StopVisitingException sve) {
+            // done
         }
     }
 
@@ -281,57 +289,61 @@ class Node extends Extract
         int ch;
         Markup m;
 
-        consumed = 0;
+        try {
+            consumed = 0;
 
-        if (left != null) {
-            widthLeft = left.getWidth();
-            if ((offset == 0) && (wide >= widthLeft)) {
-                left.visit(tourist);
-                consumed = widthLeft;
-            } else if (offset < widthLeft) {
-                start = offset;
-                across = widthLeft - offset;
-                left.visit(tourist, start, across);
-                consumed = across;
-            }
-        } else {
-            widthLeft = 0;
-        }
-        if ((data != null) && (consumed != wide)) {
-            widthCenter = data.getWidth();
-            m = data.getMarkup();
-
-            if (offset < widthLeft + widthCenter) {
-                if (offset > widthLeft) {
-                    start = offset - widthLeft;
-                } else {
-                    start = 0;
+            if (left != null) {
+                widthLeft = left.getWidth();
+                if ((offset == 0) && (wide >= widthLeft)) {
+                    left.visit(tourist);
+                    consumed = widthLeft;
+                } else if (offset < widthLeft) {
+                    start = offset;
+                    across = widthLeft - offset;
+                    left.visit(tourist, start, across);
+                    consumed = across;
                 }
-                across = wide - consumed;
-
-                if (across > widthCenter) {
-                    across = widthCenter;
-                    consumed += widthCenter;
-                } else {
-                    consumed += across;
-                }
-                for (i = start; i < start + across; i++) {
-                    ch = data.getChar(i);
-                    tourist.visit(ch, m);
-                }
-            }
-        } else {
-            widthCenter = 0;
-        }
-        if ((right != null) && (consumed != wide)) {
-            widthRight = right.getWidth();
-            if ((offset == widthLeft + widthCenter) && (wide == widthRight)) {
-                right.visit(tourist);
             } else {
-                start = offset - (widthLeft + widthCenter);
-                across = wide - consumed;
-                right.visit(tourist, start, across);
+                widthLeft = 0;
             }
+            if ((data != null) && (consumed != wide)) {
+                widthCenter = data.getWidth();
+                m = data.getMarkup();
+
+                if (offset < widthLeft + widthCenter) {
+                    if (offset > widthLeft) {
+                        start = offset - widthLeft;
+                    } else {
+                        start = 0;
+                    }
+                    across = wide - consumed;
+
+                    if (across > widthCenter) {
+                        across = widthCenter;
+                        consumed += widthCenter;
+                    } else {
+                        consumed += across;
+                    }
+                    for (i = start; i < start + across; i++) {
+                        ch = data.getChar(i);
+                        tourist.visit(ch, m);
+                    }
+                }
+            } else {
+                widthCenter = 0;
+            }
+            if ((right != null) && (consumed != wide)) {
+                widthRight = right.getWidth();
+                if ((offset == widthLeft + widthCenter) && (wide == widthRight)) {
+                    right.visit(tourist);
+                } else {
+                    start = offset - (widthLeft + widthCenter);
+                    across = wide - consumed;
+                    right.visit(tourist, start, across);
+                }
+            }
+        } catch (StopVisitingException sve) {
+            // done
         }
     }
 

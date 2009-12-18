@@ -34,6 +34,7 @@ import quill.textbase.NormalSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
+import quill.textbase.SpanVisitor;
 import quill.textbase.TextChain;
 
 import static quill.textbase.Span.createSpan;
@@ -138,8 +139,13 @@ public class ValidateDataIntegrity extends IOTestCase
         entire = chain.extractAll();
         assertNotNull(entire);
 
-        for (i = 0; i < expected.length; i++) {
-            assertEquals(expected[i], entire.get(i));
-        }
+        entire.visit(new SpanVisitor() {
+            private int i = 0;
+
+            public void visit(Span span) {
+                assertEquals(expected[i], span);
+                i++;
+            }
+        });
     }
 }

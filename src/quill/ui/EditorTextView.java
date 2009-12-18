@@ -57,8 +57,10 @@ import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
+import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
 import quill.textbase.SplitStructuralChange;
+import quill.textbase.StopVisitingException;
 import quill.textbase.StructuralChange;
 import quill.textbase.TextChain;
 import quill.textbase.TextualChange;
@@ -601,13 +603,11 @@ abstract class EditorTextView extends TextView
     void affect(Change change) {
         final StructuralChange structural;
         final TextualChange textual;
-        TextIter start, finish;
-        int offset;
-        int alpha, omega;
+        final TextIter start, finish;
+        final int offset;
+        final int alpha, omega;
         Extract r;
         int i;
-        Span s;
-        TextTag tag;
 
         if (change instanceof StructuralChange) {
             structural = (StructuralChange) change;
@@ -628,28 +628,34 @@ abstract class EditorTextView extends TextView
             offset = textual.getOffset();
             alpha = offset;
 
-            for (i = 0; i < r.size(); i++) {
-                s = r.get(i);
+            r.visit(new SpanVisitor() {
+                private int offset = alpha;
 
-                start = buffer.getIter(offset);
-                offset += s.getWidth();
-                finish = buffer.getIter(offset);
+                public void visit(Span s) {
+                    final TextIter start, finish;
+                    final TextTag tag;
 
-                /*
-                 * FUTURE this is horribly inefficient compared to just adding
-                 * or removing the tag that has changed. But it is undeniably
-                 * easy to express. To do this properly we'll have to get the
-                 * individual Markup and whether it was added or removed from
-                 * the FormatChange.
-                 */
+                    start = buffer.getIter(offset);
+                    offset += s.getWidth();
+                    finish = buffer.getIter(offset);
 
-                buffer.removeAllTags(start, finish);
-                tag = tagForMarkup(s.getMarkup());
-                if (tag == null) {
-                    continue;
+                    /*
+                     * FUTURE this is horribly inefficient compared to just
+                     * adding or removing the tag that has changed. But it is
+                     * undeniably easy to express. To do this properly we'll
+                     * have to get the individual Markup and whether it was
+                     * added or removed from the FormatChange.
+                     */
+
+                    buffer.removeAllTags(start, finish);
+                    tag = tagForMarkup(s.getMarkup());
+                    if (tag == null) {
+                        return;
+                    }
+                    buffer.applyTag(tag, start, finish);
                 }
-                buffer.applyTag(tag, start, finish);
-            }
+            });
+
             omega = offset;
 
             checkSpellingRange(alpha, omega);
@@ -657,7 +663,7 @@ abstract class EditorTextView extends TextView
             textual = (TextualChange) change;
 
             alpha = textual.getOffset();
-            omega = alpha;
+            i = alpha;
 
             start = buffer.getIter(textual.getOffset());
 
@@ -665,18 +671,19 @@ abstract class EditorTextView extends TextView
             if (r != null) {
                 finish = buffer.getIter(textual.getOffset() + r.getWidth());
                 buffer.delete(start, finish);
-                start = finish;
+                // start = finish;
             }
 
             r = textual.getAdded();
             if (r != null) {
-                for (i = 0; i < r.size(); i++) {
-                    s = r.get(i);
-                    insertSpan(start, s);
-                }
-                omega += r.getWidth();
+                r.visit(new SpanVisitor() {
+                    public void visit(Span s) {
+                        insertSpan(start, s);
+                    }
+                });
+                i += r.getWidth();
             }
-
+            omega = i;
             checkSpellingRange(alpha, omega);
         } else {
             throw new IllegalStateException("Unknown Change type");
@@ -693,8 +700,6 @@ abstract class EditorTextView extends TextView
         final TextIter start, finish;
         int alpha, omega;
         Extract r;
-        int i;
-        Span s;
 
         if (obj instanceof StructuralChange) {
             structural = (StructuralChange) obj;
@@ -721,10 +726,11 @@ abstract class EditorTextView extends TextView
 
             r = textual.getRemoved();
             if (r != null) {
-                for (i = 0; i < r.size(); i++) {
-                    s = r.get(i);
-                    insertSpan(start, s);
-                }
+                r.visit(new SpanVisitor() {
+                    public void visit(Span s) {
+                        insertSpan(start, s);
+                    }
+                });
                 omega += r.getWidth();
             }
 
@@ -913,9 +919,7 @@ abstract class EditorTextView extends TextView
      */
     private void displaySegment() {
         final Extract entire;
-        TextIter pointer;
-        int i;
-        Span s;
+        final TextIter pointer;
 
         /*
          * Easy enough to just set the internal TextStack backing this editor
@@ -936,10 +940,11 @@ abstract class EditorTextView extends TextView
 
         pointer = buffer.getIterStart();
 
-        for (i = 0; i < entire.size(); i++) {
-            s = entire.get(i);
-            insertSpan(pointer, s);
-        }
+        entire.visit(new SpanVisitor() {
+            public void visit(Span span) {
+                insertSpan(pointer, span);
+            }
+        });
 
         checkSpellingRange(0, chain.length());
     }
@@ -1462,44 +1467,65 @@ abstract class EditorTextView extends TextView
         }
     }
 
+    private static class WordAccumulatorSpanVisitor implements SpanVisitor
+    {
+        private final StringBuilder str;
+
+        private Span first;
+
+        private int count;
+
+        private boolean skip;
+
+        private WordAccumulatorSpanVisitor() {
+            str = new StringBuilder();
+            skip = false;
+            count = 0;
+        }
+
+        public void visit(Span s) {
+            final int J;
+            int j;
+
+            if (skipSpellCheck(s.getMarkup())) {
+                skip = true;
+                throw new StopVisitingException();
+            }
+
+            if (first == null) {
+                first = s;
+            }
+
+            count++;
+
+            J = s.getWidth();
+
+            for (j = 0; j < J; j++) {
+                str.appendCodePoint(s.getChar(j));
+            }
+        }
+
+        private String getWord() {
+            if (skip) {
+                return "";
+            }
+            if (count == 1) {
+                return first.getText();
+            }
+            return str.toString();
+        }
+    }
+
     private static String makeWordFromSpans(Extract extract) {
-        final StringBuilder str;
-        int i, I, j, J;
-        Span s;
+        final WordAccumulatorSpanVisitor tourist;
 
-        I = extract.size();
-
-        if (I == 0) {
+        if (extract.getWidth() == 0) {
             return "";
         }
 
-        s = extract.get(0);
-
-        if (I == 1) {
-            if (skipSpellCheck(s.getMarkup())) {
-                return "";
-            } else {
-                return s.getText();
-            }
-        } else {
-            str = new StringBuilder();
-
-            for (i = 0; i < I; i++) {
-                s = extract.get(i);
-
-                if (skipSpellCheck(s.getMarkup())) {
-                    return "";
-                }
-
-                J = s.getWidth();
-
-                for (j = 0; j < J; j++) {
-                    str.appendCodePoint(s.getChar(j));
-                }
-            }
-
-            return str.toString();
-        }
+        tourist = new WordAccumulatorSpanVisitor();
+        extract.visit(tourist);
+        return tourist.getWord();
     }
 
     /**

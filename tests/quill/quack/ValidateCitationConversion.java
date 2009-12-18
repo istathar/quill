@@ -32,6 +32,7 @@ import quill.textbase.NormalSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
+import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
 import quill.textbase.StringSpan;
 import quill.textbase.TextChain;
@@ -77,12 +78,24 @@ public class ValidateCitationConversion extends IOTestCase
 
         chain = segment.getText();
         entire = chain.extractAll();
-        assertEquals(2, entire.size());
-        span = entire.get(0);
-        assertTrue(span instanceof StringSpan);
-        span = entire.get(1);
-        assertTrue(span instanceof MarkerSpan);
-        assertEquals(Special.CITE, span.getMarkup());
+        entire.visit(new SpanVisitor() {
+            private int i = 0;
+
+            public void visit(Span span) {
+                switch (i) {
+                case 0:
+                    assertTrue(span instanceof StringSpan);
+                    break;
+                case 1:
+                    assertTrue(span instanceof MarkerSpan);
+                    assertEquals(Special.CITE, span.getMarkup());
+                    break;
+                default:
+                    fail();
+                }
+                i++;
+            }
+        });
 
         converter = new QuackConverter();
 

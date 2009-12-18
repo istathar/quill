@@ -38,6 +38,7 @@ import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Span;
+import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
 import quill.textbase.TextChain;
 
@@ -114,10 +115,6 @@ public class QuackConverter
 
     private void append(final TextChain chain) {
         final Extract entire;
-        final int num;
-        int i, j, len;
-        Span span;
-        Markup previous, markup;
 
         if (chain == null) {
             return;
@@ -128,29 +125,33 @@ public class QuackConverter
             return;
         }
 
-        num = entire.size();
-        previous = entire.get(0).getMarkup();
-        start(previous);
+        // start(previous) // how?
 
-        for (i = 0; i < num; i++) {
-            span = entire.get(i);
+        entire.visit(new SpanVisitor() {
+            private Markup previous = null;
 
-            markup = span.getMarkup();
-            if (markup != previous) {
-                finish();
-                start(markup);
-                previous = markup;
-            }
+            public void visit(Span span) {
+                final Markup markup;
+                final int len;
+                int j;
 
-            if (span instanceof MarkerSpan) {
-                process(span.getText());
-            } else {
-                len = span.getWidth();
-                for (j = 0; j < len; j++) {
-                    process(span.getChar(j));
+                markup = span.getMarkup();
+                if (markup != previous) {
+                    finish();
+                    start(markup);
+                    previous = markup;
+                }
+
+                if (span instanceof MarkerSpan) {
+                    process(span.getText());
+                } else {
+                    len = span.getWidth();
+                    for (j = 0; j < len; j++) {
+                        process(span.getChar(j));
+                    }
                 }
             }
-        }
+        });
 
         /*
          * Finally, we need to deal with the fact that TextStacks (like the
