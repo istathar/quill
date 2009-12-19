@@ -27,7 +27,8 @@ nothing to it that you need to be worried
 about:
 </text>
 <code xml:space="preserve">
-public class Example {
+public class Example
+{
     public static void main(String[] args) {
         Gtk.init(args);
         Gtk.main();
@@ -139,9 +140,9 @@ And continuing
 <text>
 We mentioned <function>setLabel()</function>.
 In general you'll probably call it in code
-like this <literal>button.setLabel("Hello
-World");</literal> which isn't terribly original
-but is very important as a starting point.
+like <literal>button.setLabel("Hello World");</literal>
+which isn't terribly original but is very
+important as a starting point.
 </text>
 <text>
 In tincidunt nunc a leo. In id sem vitae
