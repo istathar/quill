@@ -648,4 +648,114 @@ class Node extends Extract
 
         return new Node(gauche, span, droit);
     }
+
+    private static class WordFinder
+    {
+        boolean foundBefore;
+
+        boolean foundPoint;
+
+        boolean foundAfter;
+
+        int offsetBefore;
+
+        int offsetAfter;
+
+        StringBuilder str;
+
+        private WordFinder() {
+            str = new StringBuilder();
+            foundPoint = false;
+            foundBefore = false;
+            foundAfter = false;
+        }
+
+        /*
+         * There are three steps to this: finding the Node containing our
+         * target offset, then finding a word boundary before, then finding a
+         * word boundary after. Doing this in one method makes for a rather
+         * complicated expression, but means we can use recursion.
+         */
+        // recursive descent over node
+        private void locate(Node node, int offset) {
+            final int widthLeft, widthCenter, widthRight;
+            int point;
+
+            if (node.left == null) {
+                widthLeft = 0;
+            } else {
+                widthLeft = node.left.getWidth();
+            }
+
+            if (node.data == null) {
+                widthCenter = 0;
+            } else {
+                widthCenter = node.data.getWidth();
+            }
+
+            if (node.right == null) {
+                widthRight = 0;
+            } else {
+                widthRight = node.right.getWidth();
+            }
+
+            if (!foundPoint) {
+                point = offset - widthLeft;
+
+                if (offset <= widthLeft) {
+                    locate(node.left, offset);
+                } else if (point > widthCenter) {
+                    locate(node.right, point - widthCenter);
+                }
+                foundPoint = true;
+            }
+
+            if (!foundBefore) {
+                // find before!
+            }
+
+            if (!foundAfter) {
+                // find after!
+            }
+        }
+
+        private Word getWord(Node start, int offset) {
+            /*
+             * Carry out the three-phase recursive descent.
+             */
+
+            locate(start, offset);
+
+            /*
+             * Put the result in our convenience touple, and return it.
+             */
+
+            return new Word(offsetBefore, offsetAfter, str.toString());
+        }
+    }
+
+    static class Word
+    {
+        final int before;
+
+        final int after;
+
+        final String str;
+
+        Word(int before, int after, String str) {
+            this.before = before;
+            this.after = after;
+            this.str = str;
+        }
+    }
+
+    Word getWordAt(final int offset) {
+        final WordFinder finder;
+        final Word word;
+
+        finder = new WordFinder();
+        word = finder.getWord(this, offset);
+
+        return word;
+    }
 }
