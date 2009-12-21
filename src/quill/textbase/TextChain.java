@@ -20,6 +20,8 @@ package quill.textbase;
 
 import java.util.ArrayList;
 
+import quill.textbase.Node.Word;
+
 /**
  * A mutable buffer of unicode text which manages a binary tree of Spans in
  * order to maximize sharing of character array storage while giving us
@@ -433,185 +435,23 @@ public class TextChain
     }
 
     public int wordBoundaryBefore(final int offset) {
-        origin = pieceAt(offset);
-        if (origin == null) {
-            return length;
-        }
+        final Word word;
 
-        return wordBoundaryBefore(origin, offset);
-    }
+        word = root.getWordAt(offset);
 
-    private int wordBoundaryBefore(final Piece origin, final int offset) {
-        int start;
-        Piece p;
-        int i;
-        boolean found;
-        int ch; // switch to char if you're debugging.
-
-        /*
-         * Calculate start by seeking backwards to find whitespace
-         */
-
-        p = origin;
-        start = offset;
-        i = -1;
-        found = false;
-
-        while (p != null) {
-            i = start - p.offset;
-
-            while (i > 0) {
-                i--;
-                ch = p.span.getChar(i);
-                if (!(Character.isLetter(ch) || (ch == '\''))) {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (found) {
-                break;
-            }
-
-            start = p.offset;
-            p = p.prev;
-        }
-
-        if (!found) {
-            start = 0;
-        } else {
-            start = p.offset + i + 1;
-        }
-
-        return start;
+        return word.before;
     }
 
     /*
-     * It would be nice to remove this
+     * TODO these are still useful while refactoring, but we should change to
+     * using returned Word struct.
      */
     public int wordBoundaryAfter(final int offset) {
-        final Piece origin;
+        final Word word;
 
-        if (length == -1) {
-            calculateOffsets();
-        }
+        word = root.getWordAt(offset);
 
-        origin = pieceAt(offset);
-        if (origin == null) {
-            return length;
-        }
-
-        return wordBoundaryAfter(origin, offset);
-    }
-
-    private int wordBoundaryAfter(final Piece origin, final int offset) {
-        int end;
-        Piece p;
-        int i, len;
-        boolean found;
-        int ch;
-
-        /*
-         * Calculate end by seeking forwards to find whitespace
-         */
-
-        p = origin;
-        end = offset;
-        i = end - p.offset;
-        found = false;
-
-        while (p != null) {
-            len = p.span.getWidth();
-
-            while (i < len) {
-                ch = p.span.getChar(i);
-                if (!(Character.isLetter(ch) || (ch == '\''))) {
-                    found = true;
-                    break;
-                }
-                i++;
-            }
-
-            if (found) {
-                break;
-            }
-
-            p = p.next;
-            i = 0;
-        }
-
-        if (p == null) {
-            end = length;
-        } else {
-            end = p.offset + i;
-        }
-
-        return end;
-    }
-
-    /*
-     * unused, but good code.
-     */
-    static String makeWordFromSpans(Extract extract) {
-        final StringBuilder str;
-        int i, I, j, J;
-        Span s;
-
-        I = extract.size();
-
-        if (I == 1) {
-            return extract.get(0).getText();
-        } else {
-            str = new StringBuilder();
-
-            for (i = 0; i < I; i++) {
-                s = extract.get(i);
-
-                J = s.getWidth();
-
-                for (j = 0; j < J; j++) {
-                    str.appendCodePoint(s.getChar(j));
-                }
-            }
-
-            return str.toString();
-        }
-    }
-
-    /*
-     * this could well become the basis of a public API
-     */
-    static String makeWordFromSpans(Node tree) {
-        final StringBuilder str;
-        int j, J;
-        Piece p;
-        Span s;
-
-        alpha = pair.one;
-        omega = pair.two;
-
-        if (alpha == omega) {
-            return alpha.span.getText();
-        } else {
-            str = new StringBuilder();
-
-            p = alpha;
-            while (p != null) {
-                s = p.span;
-                J = s.getWidth();
-
-                for (j = 0; j < J; j++) {
-                    str.appendCodePoint(s.getChar(j));
-                }
-
-                if (p == omega) {
-                    break;
-                }
-                p = p.next;
-            }
-
-            return str.toString();
-        }
+        return word.before;
     }
 
     /**
@@ -625,31 +465,33 @@ public class TextChain
      * Nevertheless this is heavily tested code, and we will probably return
      * to this "pick word from offset" soon.
      */
+    /*
+     * TODO wrapper to keep refactoring happy. No longer appropriate?
+     */
     String getWordAt(final int offset) {
-        int start, end;
-        int i;
-        int ch;
+        final Word word;
 
         if (offset == root.getWidth()) {
             return null;
         }
 
-        origin = pieceAt(offset);
+        /*
+         * Special case for what?
+         */
+        // origin = pieceAt(offset);
+        //
+        // i = offset - origin.offset;
+        // ch = origin.span.getChar(i);
+        // if (!Character.isLetter(ch)) {
+        // return null;
+        // }
 
-        i = offset - origin.offset;
-        ch = origin.span.getChar(i);
-        if (!Character.isLetter(ch)) {
-            return null;
-        }
-
-        start = wordBoundaryBefore(origin, offset);
-        end = wordBoundaryAfter(origin, offset);
+        word = root.getWordAt(offset);
 
         /*
-         * Now pull out the word
+         * Pull out the word
          */
 
-        pair = extractFrom(start, end - start);
-        return makeWordFromSpans(pair);
+        return word.str;
     }
 }

@@ -679,7 +679,8 @@ class Node extends Extract
         // recursive descent over node
         private void locate(Node node, int offset) {
             final int widthLeft, widthCenter, widthRight;
-            int point;
+            final int point;
+            int i, ch;
 
             if (node.left == null) {
                 widthLeft = 0;
@@ -699,9 +700,9 @@ class Node extends Extract
                 widthRight = node.right.getWidth();
             }
 
-            if (!foundPoint) {
-                point = offset - widthLeft;
+            point = offset - widthLeft;
 
+            if (!foundPoint) {
                 if (offset <= widthLeft) {
                     locate(node.left, offset);
                 } else if (point > widthCenter) {
@@ -711,7 +712,27 @@ class Node extends Extract
             }
 
             if (!foundBefore) {
-                // find before!
+                if (point > widthCenter) {
+                    locate(node.right, widthRight);
+                }
+
+                if (!foundBefore) {
+                    i = point;
+
+                    while (i >= 0) {
+                        ch = node.data.getChar(i);
+                        if (!(Character.isLetter(ch) || (ch == '\''))) {
+                            offsetBefore = i + 1;
+                            foundBefore = true;
+                            break;
+                        }
+                        i--;
+                    }
+                }
+
+                if (!foundBefore) {
+                    locate(node.left, widthLeft);
+                }
             }
 
             if (!foundAfter) {
