@@ -668,6 +668,63 @@ class Node extends Extract
             foundPoint = false;
             foundBefore = false;
             foundAfter = false;
+            offsetBefore = 0;
+        }
+
+        void locateBefore(Node node, int offset) {
+            final int widthLeft, widthCenter, widthRight, point;
+            int i, ch;
+
+            if (node == null) {
+                return;
+            }
+
+            if (node.left == null) {
+                widthLeft = 0;
+            } else {
+                widthLeft = node.left.getWidth();
+            }
+
+            if (node.data == null) {
+                widthCenter = 0;
+            } else {
+                widthCenter = node.data.getWidth();
+            }
+
+            if (node.right == null) {
+                widthRight = 0;
+            } else {
+                widthRight = node.right.getWidth();
+            }
+
+            if (offset > widthLeft + widthCenter) {
+                locateBefore(node.right, offset - (widthLeft + widthCenter));
+                if (foundBefore) {
+                    offsetBefore += (widthLeft + widthCenter);
+                    return;
+                }
+            }
+
+            // move
+            if (offset < widthLeft) {
+                locateBefore(node.left, offset);
+                if (foundBefore) {
+                    return;
+                }
+            }
+
+            point = offset - widthLeft;
+            i = point;
+
+            while (i >= 0) {
+                ch = node.data.getChar(i);
+                if (!(Character.isLetter(ch) || (ch == '\''))) {
+                    offsetBefore = i + 1;
+                    foundBefore = true;
+                    break;
+                }
+                i--;
+            }
         }
 
         /*
@@ -681,6 +738,10 @@ class Node extends Extract
             final int widthLeft, widthCenter, widthRight;
             final int point;
             int i, ch;
+
+            if (node == null) {
+                return;
+            }
 
             if (node.left == null) {
                 widthLeft = 0;
