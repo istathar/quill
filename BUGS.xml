@@ -95,6 +95,12 @@ create <type>Span</type> boundaries at word
 beginnings and endings.
 </text>
 <text>
+<italics>This is in progress; see branch
+</italics><literal>'b-tree-of-spans'</literal>
+<italics> and also work by Robert Collins
+and Peter Miller.</italics>
+</text>
+<text>
 <bold>Undo stack is unbounded</bold>
 </text>
 <text>

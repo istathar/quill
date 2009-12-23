@@ -29,6 +29,14 @@ file to a <type>StringWriter</type> or
 do the breaks manually by doing <literal>'
 '</literal> to <literal>'\n' </literal>replacements.
 </text>
+<text>
+For what it's worth, though, it's getting
+closer to the point where <italics>not</italics>
+using <application>Xom</application> and
+just doing the really minimal XML work ourselves
+would be feasible. Not really that interested
+going down the not-invented-here road, but...
+</text>
 <heading>
 User interface
 </heading>
@@ -43,6 +51,14 @@ is implemented, there's no user interface
 for adding or creating these markers yet,
 nor editing the reference bodies.
 </text>
+<text>
+<bold>Word count</bold>
+</text>
+<text>
+Needs a feature where we can do a word count
+for the {chapter, essay, document}. Question:
+how to treat program code?
+</text>
 <heading>
 Build
 </heading>
@@ -53,7 +69,9 @@ Build
 Top level configure is just a quick hack;
 probably need to copy in equivalence from
 <application>java-gnome</application> or
-<application>Slashtime</application>.
+<application>Slashtime</application>, though
+this application is potentially an opportunity
+to try something new.
 </text>
 <heading>
 Copyright
