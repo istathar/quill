@@ -347,6 +347,70 @@ class Node extends Extract
         }
     }
 
+    public void visit(WordVisitor tourist, final int offset) {
+        int i, start, across, consumed;
+        final int widthLeft, widthCenter, widthRight;
+        int ch;
+        Markup m;
+
+        try {
+            consumed = 0;
+
+            if (left != null) {
+                widthLeft = left.getWidth();
+                if ((offset == 0) && (wide >= widthLeft)) {
+                    left.visit(tourist);
+                    consumed = widthLeft;
+                } else if (offset < widthLeft) {
+                    start = offset;
+                    across = widthLeft - offset;
+                    left.visit(tourist, start, across);
+                    consumed = across;
+                }
+            } else {
+                widthLeft = 0;
+            }
+            if ((data != null) && (consumed != wide)) {
+                widthCenter = data.getWidth();
+                m = data.getMarkup();
+
+                if (offset < widthLeft + widthCenter) {
+                    if (offset > widthLeft) {
+                        start = offset - widthLeft;
+                    } else {
+                        start = 0;
+                    }
+                    across = wide - consumed;
+
+                    if (across > widthCenter) {
+                        across = widthCenter;
+                        consumed += widthCenter;
+                    } else {
+                        consumed += across;
+                    }
+                    for (i = start; i < start + across; i++) {
+                        ch = data.getChar(i);
+                        tourist.visit(ch, m);
+                    }
+                }
+            } else {
+                widthCenter = 0;
+            }
+            if ((right != null) && (consumed != wide)) {
+                widthRight = right.getWidth();
+                if ((offset == widthLeft + widthCenter) && (wide == widthRight)) {
+                    right.visit(tourist);
+                } else {
+                    start = offset - (widthLeft + widthCenter);
+                    across = wide - consumed;
+                    right.visit(tourist, start, across);
+                }
+            }
+        } catch (StopVisitingException sve) {
+            // done
+        }
+    }
+
     /**
      * Get a representation of this Node showing Node left, Span center and
      * Node right each delimited by «». Use for debugging purposes only!
@@ -649,195 +713,72 @@ class Node extends Extract
         return new Node(gauche, span, droit);
     }
 
-    private static class WordFinder
-    {
-        boolean foundBefore;
+    int getWordBoundaryBefore(final int offset) {
+        final int widthLeft, widthCenter;
+        final int result;
+        int i, ch;
+        char debug;
 
-        boolean foundPoint;
-
-        boolean foundAfter;
-
-        int offsetBefore;
-
-        int offsetAfter;
-
-        StringBuilder str;
-
-        private WordFinder() {
-            str = new StringBuilder();
-            foundPoint = false;
-            foundBefore = false;
-            foundAfter = false;
-            offsetBefore = 0;
+        if (offset == 0) {
+            return 0;
         }
 
-        void locateBefore(Node node, int offset) {
-            final int widthLeft, widthCenter, widthRight, point;
-            int i, ch;
+        if (offset > width) {
+            throw new IndexOutOfBoundsException();
+        }
 
-            if (node == null) {
-                return;
-            }
-
-            if (node.left == null) {
-                widthLeft = 0;
-            } else {
-                widthLeft = node.left.getWidth();
-            }
-
-            if (node.data == null) {
-                widthCenter = 0;
-            } else {
-                widthCenter = node.data.getWidth();
-            }
-
-            if (node.right == null) {
-                widthRight = 0;
-            } else {
-                widthRight = node.right.getWidth();
-            }
-
-            if (offset > widthLeft + widthCenter) {
-                locateBefore(node.right, offset - (widthLeft + widthCenter));
-                if (foundBefore) {
-                    offsetBefore += (widthLeft + widthCenter);
-                    return;
-                }
-            }
-
-            // move
-            if (offset < widthLeft) {
-                locateBefore(node.left, offset);
-                if (foundBefore) {
-                    return;
-                }
-            }
-
-            point = offset - widthLeft;
-            i = point;
-
-            while (i >= 0) {
-                ch = node.data.getChar(i);
-                if (!(Character.isLetter(ch) || (ch == '\''))) {
-                    offsetBefore = i + 1;
-                    foundBefore = true;
-                    break;
-                }
-                i--;
-            }
+        if (left == null) {
+            widthLeft = 0;
+        } else {
+            widthLeft = left.getWidth();
         }
 
         /*
-         * There are three steps to this: finding the Node containing our
-         * target offset, then finding a word boundary before, then finding a
-         * word boundary after. Doing this in one method makes for a rather
-         * complicated expression, but means we can use recursion.
+         * If it's on the left, then pass the search down, and we're done
+         * here.
          */
-        // recursive descent over node
-        private void locate(Node node, int offset) {
-            final int widthLeft, widthCenter, widthRight;
-            final int point;
-            int i, ch;
 
-            if (node == null) {
-                return;
+        if (offset < widthLeft) {
+            return left.getWordBoundaryBefore(offset);
+        }
+
+        /*
+         * If the offset is on the right, pass it down. But if we don't find
+         * it in the right sub node, we need to search here after all.
+         */
+
+        widthCenter = data.getWidth();
+
+        if (offset > widthLeft + widthCenter) {
+            result = right.getWordBoundaryBefore(offset - (widthCenter + widthLeft));
+            if (result > 0) {
+                return widthLeft + widthCenter + result;
             }
+            i = widthLeft + widthCenter;
+        } else {
+            i = offset;
+        }
 
-            if (node.left == null) {
-                widthLeft = 0;
-            } else {
-                widthLeft = node.left.getWidth();
-            }
+        /*
+         * Search here.
+         */
 
-            if (node.data == null) {
-                widthCenter = 0;
-            } else {
-                widthCenter = node.data.getWidth();
-            }
+        // FIXME null data check
 
-            if (node.right == null) {
-                widthRight = 0;
-            } else {
-                widthRight = node.right.getWidth();
-            }
+        while (i > 0) {
+            i--;
+            ch = data.getChar(i);
+            debug = (char) ch;
 
-            point = offset - widthLeft;
-
-            if (!foundPoint) {
-                if (offset <= widthLeft) {
-                    locate(node.left, offset);
-                } else if (point > widthCenter) {
-                    locate(node.right, point - widthCenter);
-                }
-                foundPoint = true;
-            }
-
-            if (!foundBefore) {
-                if (point > widthCenter) {
-                    locate(node.right, widthRight);
-                }
-
-                if (!foundBefore) {
-                    i = point;
-
-                    while (i >= 0) {
-                        ch = node.data.getChar(i);
-                        if (!(Character.isLetter(ch) || (ch == '\''))) {
-                            offsetBefore = i + 1;
-                            foundBefore = true;
-                            break;
-                        }
-                        i--;
-                    }
-                }
-
-                if (!foundBefore) {
-                    locate(node.left, widthLeft);
-                }
-            }
-
-            if (!foundAfter) {
-                // find after!
+            if (!(Character.isLetter(ch) || (ch == '\''))) {
+                return i + 1;
             }
         }
 
-        private Word getWord(Node start, int offset) {
-            /*
-             * Carry out the three-phase recursive descent.
-             */
-
-            locate(start, offset);
-
-            /*
-             * Put the result in our convenience touple, and return it.
-             */
-
-            return new Word(offsetBefore, offsetAfter, str.toString());
+        if (left != null) {
+            return left.getWordBoundaryBefore(widthLeft);
         }
-    }
 
-    static class Word
-    {
-        final int before;
-
-        final int after;
-
-        final String str;
-
-        Word(int before, int after, String str) {
-            this.before = before;
-            this.after = after;
-            this.str = str;
-        }
-    }
-
-    Word getWordAt(final int offset) {
-        final WordFinder finder;
-        final Word word;
-
-        finder = new WordFinder();
-        word = finder.getWord(this, offset);
-
-        return word;
+        return 0;
     }
 }

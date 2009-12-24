@@ -79,8 +79,8 @@ public class UnitTests
         suite.addTestSuite(ValidateStructuralChange.class);
         suite.addTestSuite(ValidateThereAndBackAgain.class);
         suite.addTestSuite(ValidateFileNaming.class);
-        suite.addTestSuite(ValidateChangePropagation.class);
         suite.addTestSuite(ValidateWordExtraction.class);
+        suite.addTestSuite(ValidateChangePropagation.class);
         suite.addTestSuite(ValidateSpellingOperations.class);
 
         return suite;

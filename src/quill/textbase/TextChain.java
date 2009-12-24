@@ -20,8 +20,6 @@ package quill.textbase;
 
 import java.util.ArrayList;
 
-import quill.textbase.Node.Word;
-
 /**
  * A mutable buffer of unicode text which manages a binary tree of Spans in
  * order to maximize sharing of character array storage while giving us
@@ -435,11 +433,7 @@ public class TextChain
     }
 
     public int wordBoundaryBefore(final int offset) {
-        final Word word;
-
-        word = root.getWordAt(offset);
-
-        return word.before;
+        return root.getWordBoundaryBefore(offset);
     }
 
     /*
@@ -447,11 +441,7 @@ public class TextChain
      * using returned Word struct.
      */
     public int wordBoundaryAfter(final int offset) {
-        final Word word;
-
-        word = root.getWordAt(offset);
-
-        return word.before;
+        return -1;
     }
 
     /**
@@ -469,7 +459,8 @@ public class TextChain
      * TODO wrapper to keep refactoring happy. No longer appropriate?
      */
     String getWordAt(final int offset) {
-        final Word word;
+        final WordBuildingCharacterVisitor tourist;
+        final int begin;
 
         if (offset == root.getWidth()) {
             return null;
@@ -486,12 +477,48 @@ public class TextChain
         // return null;
         // }
 
-        word = root.getWordAt(offset);
+        tourist = new WordBuildingCharacterVisitor();
+
+        /*
+         * Seek backwards from the current offset to find a word boundary.
+         */
+
+        begin = root.getWordBoundaryBefore(offset);
+
+        /*
+         * Iterate forward over the characters to get the word.
+         */
+
+        root.visit(tourist, begin, root.getWidth() - begin);
 
         /*
          * Pull out the word
          */
 
-        return word.str;
+        return tourist.getResult();
+    }
+
+    /*
+     * This is a local hack to enable getWordAt(). Real usage in the
+     * EditorTextView should use a WordVisitor, assuming we implement one.
+     */
+    private static class WordBuildingCharacterVisitor implements CharacterVisitor
+    {
+        private StringBuilder str;
+
+        private WordBuildingCharacterVisitor() {
+            str = new StringBuilder();
+        }
+
+        public void visit(int character, Markup markup) {
+            if (!(Character.isLetter(character) || (character == '\''))) {
+                throw new StopVisitingException();
+            }
+            str.appendCodePoint(character);
+        }
+
+        private String getResult() {
+            return str.toString();
+        }
     }
 }
