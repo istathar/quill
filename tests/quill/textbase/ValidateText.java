@@ -226,8 +226,9 @@ public class ValidateText extends TestCase
             count = 0;
         }
 
-        public void visit(Span span) {
+        public boolean visit(Span span) {
             count++;
+            return false;
         }
     }
 
@@ -257,8 +258,9 @@ public class ValidateText extends TestCase
             list = new ArrayList<Span>(8);
         }
 
-        public void visit(Span span) {
+        public boolean visit(Span span) {
             list.add(span);
+            return false;
         }
 
         private Span[] getList() {
@@ -294,8 +296,9 @@ public class ValidateText extends TestCase
             str = new StringBuilder();
         }
 
-        public void visit(Span span) {
+        public boolean visit(Span span) {
             str.append(span.getText());
+            return false;
         }
 
         private String getString() {

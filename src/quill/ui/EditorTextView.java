@@ -60,7 +60,6 @@ import quill.textbase.Span;
 import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
 import quill.textbase.SplitStructuralChange;
-import quill.textbase.StopVisitingException;
 import quill.textbase.StructuralChange;
 import quill.textbase.TextChain;
 import quill.textbase.TextualChange;
@@ -631,7 +630,7 @@ abstract class EditorTextView extends TextView
             r.visit(new SpanVisitor() {
                 private int offset = alpha;
 
-                public void visit(Span s) {
+                public boolean visit(Span s) {
                     final TextIter start, finish;
                     final TextTag tag;
 
@@ -649,10 +648,10 @@ abstract class EditorTextView extends TextView
 
                     buffer.removeAllTags(start, finish);
                     tag = tagForMarkup(s.getMarkup());
-                    if (tag == null) {
-                        return;
+                    if (tag != null) {
+                        buffer.applyTag(tag, start, finish);
                     }
-                    buffer.applyTag(tag, start, finish);
+                    return false;
                 }
             });
 
@@ -677,8 +676,9 @@ abstract class EditorTextView extends TextView
             r = textual.getAdded();
             if (r != null) {
                 r.visit(new SpanVisitor() {
-                    public void visit(Span s) {
+                    public boolean visit(Span s) {
                         insertSpan(start, s);
+                        return false;
                     }
                 });
                 i += r.getWidth();
@@ -727,8 +727,9 @@ abstract class EditorTextView extends TextView
             r = textual.getRemoved();
             if (r != null) {
                 r.visit(new SpanVisitor() {
-                    public void visit(Span s) {
+                    public boolean visit(Span s) {
                         insertSpan(start, s);
+                        return false;
                     }
                 });
                 omega += r.getWidth();
@@ -941,8 +942,9 @@ abstract class EditorTextView extends TextView
         pointer = buffer.getIterStart();
 
         entire.visit(new SpanVisitor() {
-            public void visit(Span span) {
+            public boolean visit(Span span) {
                 insertSpan(pointer, span);
+                return false;
             }
         });
 
@@ -1483,13 +1485,13 @@ abstract class EditorTextView extends TextView
             count = 0;
         }
 
-        public void visit(Span s) {
+        public boolean visit(Span s) {
             final int J;
             int j;
 
             if (skipSpellCheck(s.getMarkup())) {
                 skip = true;
-                throw new StopVisitingException();
+                return true;
             }
 
             if (first == null) {
@@ -1503,6 +1505,7 @@ abstract class EditorTextView extends TextView
             for (j = 0; j < J; j++) {
                 str.appendCodePoint(s.getChar(j));
             }
+            return false;
         }
 
         private String getWord() {

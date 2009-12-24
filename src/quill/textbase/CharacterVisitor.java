@@ -26,10 +26,13 @@ package quill.textbase;
 public interface CharacterVisitor
 {
     /**
+     * Callback for each character. Return <code>false</code> to keep going,
+     * or <code>true</code> to say you're done visiting.
+     * 
      * @param character
      *            the Unicode codepoint at this offset
      * @param markup
      *            the Markup formatting applicable at this offset.
      */
-    void visit(int character, Markup markup);
+    public boolean visit(int character, Markup markup);
 }

@@ -25,5 +25,5 @@ package quill.textbase;
  */
 public interface SpanVisitor
 {
-    void visit(Span span);
+    public boolean visit(Span span);
 }

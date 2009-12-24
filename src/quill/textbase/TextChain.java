@@ -70,8 +70,9 @@ public class TextChain
         str = new StringBuilder();
 
         root.visit(new CharacterVisitor() {
-            public void visit(int character, Markup markup) {
+            public boolean visit(int character, Markup markup) {
                 str.appendCodePoint(character);
+                return false;
             }
         });
 
@@ -280,9 +281,10 @@ public class TextChain
             index = 0;
         }
 
-        public void visit(int character, Markup markup) {
+        public boolean visit(int character, Markup markup) {
             characters[index] = character;
             index++;
+            return false;
         }
 
         /**
@@ -374,11 +376,12 @@ public class TextChain
         root.visit(new CharacterVisitor() {
             private int offset = 0;
 
-            public void visit(int character, Markup markup) {
+            public boolean visit(int character, Markup markup) {
                 if (character == '\n') {
                     paragraphs.add(offset);
                 }
                 offset++;
+                return false;
             }
         });
 
@@ -467,17 +470,6 @@ public class TextChain
             return null;
         }
 
-        /*
-         * Special case for what?
-         */
-        // origin = pieceAt(offset);
-        //
-        // i = offset - origin.offset;
-        // ch = origin.span.getChar(i);
-        // if (!Character.isLetter(ch)) {
-        // return null;
-        // }
-
         tourist = new WordBuildingCharacterVisitor();
 
         /*
@@ -516,11 +508,12 @@ public class TextChain
             str = new StringBuilder();
         }
 
-        public void visit(int character, Markup markup) {
+        public boolean visit(int character, Markup markup) {
             if (!(Character.isLetter(character) || (character == '\''))) {
-                throw new StopVisitingException();
+                return true;
             }
             str.appendCodePoint(character);
+            return false;
         }
 
         private String getResult() {

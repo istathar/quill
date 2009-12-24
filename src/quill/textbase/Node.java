@@ -198,8 +198,9 @@ class Node extends Extract
         str = new StringBuilder();
 
         tourist = new CharacterVisitor() {
-            public void visit(int character, Markup markup) {
+            public boolean visit(int character, Markup markup) {
                 str.appendCodePoint(character);
+                return false;
             }
         };
 
@@ -234,181 +235,145 @@ class Node extends Extract
      * Invoke tourist's visit() method for each Span in the tree, in-order
      * traversal.
      */
-    public void visit(final SpanVisitor tourist) {
-        try {
-            if (left != null) {
-                left.visit(tourist);
+    private boolean visitAll(final SpanVisitor tourist) {
+        if (left != null) {
+            if (left.visitAll(tourist)) {
+                return true;
             }
-            if (data != null) {
-                tourist.visit(data);
-            }
-            if (right != null) {
-                right.visit(tourist);
-            }
-        } catch (StopVisitingException sve) {
-            // done
         }
+        if (data != null) {
+            if (tourist.visit(data)) {
+                return true;
+            }
+        }
+        if (right != null) {
+            if (right.visitAll(tourist)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void visit(final SpanVisitor tourist) {
+        visitAll(tourist);
     }
 
     /**
      * Invoke tourist's visit() method for each character in the tree,
      * in-order traversal.
      */
-    public void visit(final CharacterVisitor tourist) {
+    private boolean visitAll(final CharacterVisitor tourist) {
         final int I;
         int i, ch;
         Markup m;
 
-        try {
-            if (left != null) {
-                left.visit(tourist);
+        if (left != null) {
+            if (left.visitAll(tourist)) {
+                return true;
             }
-            if (data != null) {
-                I = data.getWidth();
-                m = data.getMarkup();
-                for (i = 0; i < I; i++) {
-                    ch = data.getChar(i);
-                    tourist.visit(ch, m);
+        }
+        if (data != null) {
+            I = data.getWidth();
+            m = data.getMarkup();
+            for (i = 0; i < I; i++) {
+                ch = data.getChar(i);
+                if (tourist.visit(ch, m)) {
+                    return true;
                 }
             }
-            if (right != null) {
-                right.visit(tourist);
-            }
-        } catch (StopVisitingException sve) {
-            // done
         }
+        if (right != null) {
+            return right.visitAll(tourist);
+        }
+
+        return false;
+    }
+
+    public void visit(final CharacterVisitor tourist) {
+        visitAll(tourist);
     }
 
     /**
      * Call tourist's visit() method for each character in the tree from start
      * for wide characters, traversing the tree in-order.
      */
-    public void visit(final CharacterVisitor tourist, final int offset, final int wide) {
+    private boolean visitRange(final CharacterVisitor tourist, final int offset, final int wide) {
         int i, start, across, consumed;
         final int widthLeft, widthCenter, widthRight;
         int ch;
         Markup m;
 
-        try {
-            consumed = 0;
+        consumed = 0;
 
-            if (left != null) {
-                widthLeft = left.getWidth();
-                if ((offset == 0) && (wide >= widthLeft)) {
-                    left.visit(tourist);
-                    consumed = widthLeft;
-                } else if (offset < widthLeft) {
-                    start = offset;
-                    across = widthLeft - offset;
-                    left.visit(tourist, start, across);
-                    consumed = across;
+        if (left != null) {
+            widthLeft = left.getWidth();
+            if ((offset == 0) && (wide >= widthLeft)) {
+                if (left.visitAll(tourist)) {
+                    return true;
                 }
-            } else {
-                widthLeft = 0;
-            }
-            if ((data != null) && (consumed != wide)) {
-                widthCenter = data.getWidth();
-                m = data.getMarkup();
-
-                if (offset < widthLeft + widthCenter) {
-                    if (offset > widthLeft) {
-                        start = offset - widthLeft;
-                    } else {
-                        start = 0;
-                    }
-                    across = wide - consumed;
-
-                    if (across > widthCenter) {
-                        across = widthCenter;
-                        consumed += widthCenter;
-                    } else {
-                        consumed += across;
-                    }
-                    for (i = start; i < start + across; i++) {
-                        ch = data.getChar(i);
-                        tourist.visit(ch, m);
-                    }
+                consumed = widthLeft;
+            } else if (offset < widthLeft) {
+                start = offset;
+                across = widthLeft - offset;
+                if (left.visitRange(tourist, start, across)) {
+                    return true;
                 }
-            } else {
-                widthCenter = 0;
+                consumed = across;
             }
-            if ((right != null) && (consumed != wide)) {
-                widthRight = right.getWidth();
-                if ((offset == widthLeft + widthCenter) && (wide == widthRight)) {
-                    right.visit(tourist);
-                } else {
-                    start = offset - (widthLeft + widthCenter);
-                    across = wide - consumed;
-                    right.visit(tourist, start, across);
-                }
-            }
-        } catch (StopVisitingException sve) {
-            // done
+        } else {
+            widthLeft = 0;
         }
+        if ((data != null) && (consumed != wide)) {
+            widthCenter = data.getWidth();
+            m = data.getMarkup();
+
+            if (offset < widthLeft + widthCenter) {
+                if (offset > widthLeft) {
+                    start = offset - widthLeft;
+                } else {
+                    start = 0;
+                }
+                across = wide - consumed;
+
+                if (across > widthCenter) {
+                    across = widthCenter;
+                    consumed += widthCenter;
+                } else {
+                    consumed += across;
+                }
+                for (i = start; i < start + across; i++) {
+                    ch = data.getChar(i);
+                    if (tourist.visit(ch, m)) {
+                        return true;
+                    }
+                }
+            }
+        } else {
+            widthCenter = 0;
+        }
+        if ((right != null) && (consumed != wide)) {
+            widthRight = right.getWidth();
+            if ((offset == widthLeft + widthCenter) && (wide == widthRight)) {
+                if (right.visitAll(tourist)) {
+                    return true;
+                }
+            } else {
+                start = offset - (widthLeft + widthCenter);
+                across = wide - consumed;
+                if (right.visitRange(tourist, start, across)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void visit(final CharacterVisitor tourist, final int offset, final int wide) {
+        visitRange(tourist, offset, wide);
     }
 
     public void visit(WordVisitor tourist, final int offset) {
-        int i, start, across, consumed;
-        final int widthLeft, widthCenter, widthRight;
-        int ch;
-        Markup m;
-
-        try {
-            consumed = 0;
-
-            if (left != null) {
-                widthLeft = left.getWidth();
-                if ((offset == 0) && (wide >= widthLeft)) {
-                    left.visit(tourist);
-                    consumed = widthLeft;
-                } else if (offset < widthLeft) {
-                    start = offset;
-                    across = widthLeft - offset;
-                    left.visit(tourist, start, across);
-                    consumed = across;
-                }
-            } else {
-                widthLeft = 0;
-            }
-            if ((data != null) && (consumed != wide)) {
-                widthCenter = data.getWidth();
-                m = data.getMarkup();
-
-                if (offset < widthLeft + widthCenter) {
-                    if (offset > widthLeft) {
-                        start = offset - widthLeft;
-                    } else {
-                        start = 0;
-                    }
-                    across = wide - consumed;
-
-                    if (across > widthCenter) {
-                        across = widthCenter;
-                        consumed += widthCenter;
-                    } else {
-                        consumed += across;
-                    }
-                    for (i = start; i < start + across; i++) {
-                        ch = data.getChar(i);
-                        tourist.visit(ch, m);
-                    }
-                }
-            } else {
-                widthCenter = 0;
-            }
-            if ((right != null) && (consumed != wide)) {
-                widthRight = right.getWidth();
-                if ((offset == widthLeft + widthCenter) && (wide == widthRight)) {
-                    right.visit(tourist);
-                } else {
-                    start = offset - (widthLeft + widthCenter);
-                    across = wide - consumed;
-                    right.visit(tourist, start, across);
-                }
-            }
-        } catch (StopVisitingException sve) {
-            // done
-        }
+    // TODO
     }
 
     /**
@@ -425,8 +390,9 @@ class Node extends Extract
         str = new StringBuilder();
 
         tourist = new CharacterVisitor() {
-            public void visit(int character, Markup markup) {
+            public boolean visit(int character, Markup markup) {
                 str.appendCodePoint(character);
+                return false;
             }
         };
 
@@ -716,7 +682,7 @@ class Node extends Extract
     int getWordBoundaryBefore(final int offset) {
         final int widthLeft, widthCenter;
         final int result;
-        int i, ch;
+        int i, ch, previous;
 
         if (offset == 0) {
             return 0;
@@ -753,28 +719,32 @@ class Node extends Extract
             if (result > 0) {
                 return widthLeft + widthCenter + result;
             }
-            i = widthLeft + widthCenter;
+            i = widthCenter;
         } else {
-            i = offset;
+            i = offset - widthLeft;
         }
 
         /*
-         * Search here.
+         * Search here. We have to handle the corner cases of starting on a
+         * space and starting at the end. The previous variable handles the i
+         * + 1 case while allowing for the initial loop not needing this.
          */
 
         if (data != null) {
-            ch = data.getChar(i);
-            if (!(Character.isLetter(ch) || (ch == '\''))) {
-                return i;
+            previous = i;
+            if (i == widthCenter) {
+                i--;
             }
 
-            while (i > 0) {
-                i--;
+            while (i >= 0) {
                 ch = data.getChar(i);
 
-                if (!(Character.isLetter(ch) || (ch == '\''))) {
-                    return i + 1;
+                if (isWhitespace(ch)) {
+                    return widthLeft + previous;
                 }
+
+                previous = i;
+                i--;
             }
         }
 
@@ -783,5 +753,23 @@ class Node extends Extract
         }
 
         return 0;
+    }
+
+    /**
+     * Is the character a word character (from a spell-checking point of view)
+     * or whitespace?
+     */
+    /*
+     * Reasonably common expression. Maybe this should be part of the Extract
+     * base class?
+     */
+    private static final boolean isWhitespace(int ch) {
+        if (Character.isLetter(ch)) {
+            return false;
+        }
+        if (ch == '\'') {
+            return false;
+        }
+        return true;
     }
 }

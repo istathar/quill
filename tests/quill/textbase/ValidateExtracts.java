@@ -240,7 +240,6 @@ public class ValidateExtracts extends TestCase
         TextChain text;
         Extract[] lines;
         Extract extract;
-        Span span;
 
         text = new TextChain();
         text.append(createSpan("Pro𝑛to\nSurprise", null));

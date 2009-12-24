@@ -56,7 +56,6 @@ public class ValidateEndnoteConversion extends IOTestCase
         Segment segment;
         final TextChain chain;
         final Extract entire;
-        Span span;
         final QuackConverter converter;
         final ByteArrayOutputStream out;
         final String original, result;
@@ -79,7 +78,7 @@ public class ValidateEndnoteConversion extends IOTestCase
         entire.visit(new SpanVisitor() {
             private int i = 0;
 
-            public void visit(Span span) {
+            public boolean visit(Span span) {
                 switch (i) {
                 case 0:
                     assertTrue(span instanceof StringSpan);
@@ -92,6 +91,7 @@ public class ValidateEndnoteConversion extends IOTestCase
                     fail();
                 }
                 i++;
+                return false;
             }
         });
 
@@ -220,8 +220,9 @@ public class ValidateEndnoteConversion extends IOTestCase
 
         extract = chain.extractRange(offset - 1, 1);
         extract.visit(new SpanVisitor() {
-            public void visit(Span span) {
+            public boolean visit(Span span) {
                 assertTrue(span instanceof MarkerSpan);
+                return true;
             }
         });
 

@@ -130,7 +130,7 @@ public class QuackConverter
         entire.visit(new SpanVisitor() {
             private Markup previous = null;
 
-            public void visit(Span span) {
+            public boolean visit(Span span) {
                 final Markup markup;
                 final int len;
                 int j;
@@ -150,6 +150,8 @@ public class QuackConverter
                         process(span.getChar(j));
                     }
                 }
+
+                return false;
             }
         });
 

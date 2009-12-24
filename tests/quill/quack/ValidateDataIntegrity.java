@@ -119,7 +119,6 @@ public class ValidateDataIntegrity extends IOTestCase
         final Segment segment;
         final TextChain chain;
         final Extract entire;
-        int i;
 
         data = new DataLayer();
         data.loadDocument("tests/quill/quack/ContinuousMarkup.xml");
@@ -142,9 +141,10 @@ public class ValidateDataIntegrity extends IOTestCase
         entire.visit(new SpanVisitor() {
             private int i = 0;
 
-            public void visit(Span span) {
+            public boolean visit(Span span) {
                 assertEquals(expected[i], span);
                 i++;
+                return false;
             }
         });
     }
