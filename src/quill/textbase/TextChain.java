@@ -461,6 +461,7 @@ public class TextChain
     String getWordAt(final int offset) {
         final WordBuildingCharacterVisitor tourist;
         final int begin;
+        final String result;
 
         if (offset == root.getWidth()) {
             return null;
@@ -495,7 +496,12 @@ public class TextChain
          * Pull out the word
          */
 
-        return tourist.getResult();
+        result = tourist.getResult();
+        if (result.equals("")) {
+            return null;
+        } else {
+            return result;
+        }
     }
 
     /*

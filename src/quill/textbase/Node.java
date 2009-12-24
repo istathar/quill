@@ -717,7 +717,6 @@ class Node extends Extract
         final int widthLeft, widthCenter;
         final int result;
         int i, ch;
-        char debug;
 
         if (offset == 0) {
             return 0;
@@ -763,15 +762,19 @@ class Node extends Extract
          * Search here.
          */
 
-        // FIXME null data check
-
-        while (i > 0) {
-            i--;
+        if (data != null) {
             ch = data.getChar(i);
-            debug = (char) ch;
-
             if (!(Character.isLetter(ch) || (ch == '\''))) {
-                return i + 1;
+                return i;
+            }
+
+            while (i > 0) {
+                i--;
+                ch = data.getChar(i);
+
+                if (!(Character.isLetter(ch) || (ch == '\''))) {
+                    return i + 1;
+                }
             }
         }
 
