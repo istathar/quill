@@ -321,9 +321,9 @@ public class TextChain
     }
 
     /**
-     * Gets the array of Spans that represent the characters and formatting
-     * width wide from start. The result is returned wrapped in a read-only
-     * Extract object.
+     * Gets the Spans that represent the characters and formatting width wide
+     * from start. The result is returned wrapped in a read-only Extract
+     * object.
      * 
      * <p>
      * If width is negative, start will be decremented by that amount and the
@@ -342,7 +342,7 @@ public class TextChain
      * when constructing a DeleteChange, we probably end up duplicating a lot
      * of work when actually calling delete() after this here.
      */
-    public Node extractRange(int start, int wide) {
+    public Extract extractRange(int start, int wide) {
         if (wide < 0) {
             throw new IllegalArgumentException();
         }

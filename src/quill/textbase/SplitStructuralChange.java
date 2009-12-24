@@ -27,7 +27,7 @@ public class SplitStructuralChange extends StructuralChange
     protected void apply() {
         final Segment twin;
         final TextChain original, twain;
-        Node tree;
+        Extract tree;
         final int i, width;
         final Series series;
 
