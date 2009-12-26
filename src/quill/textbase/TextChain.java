@@ -440,11 +440,11 @@ public class TextChain
     }
 
     /*
-     * TODO these are still useful while refactoring, but we should change to
-     * using returned Word struct.
+     * TODO this is still useful while refactoring, but we should change this
+     * to a strong Visitor interface.
      */
     public int wordBoundaryAfter(final int offset) {
-        return -1;
+        return root.getWordBoundaryAfter(offset);
     }
 
     /**
@@ -454,41 +454,43 @@ public class TextChain
      */
     /*
      * After a huge amount of work, the current implementation in
-     * EditorTextView doesn't call this, but exercises a similar algorithm.
-     * Nevertheless this is heavily tested code, and we will probably return
-     * to this "pick word from offset" soon.
-     */
-    /*
-     * TODO wrapper to keep refactoring happy. No longer appropriate?
+     * EditorTextView doesn't call this, but needs the same boundary lookups,
+     * and meanwhile this is heavily tested.
      */
     String getWordAt(final int offset) {
-        final WordBuildingCharacterVisitor tourist;
-        final int begin;
+        final int begin, end;
+        final StringBuilder str;
         final String result;
 
         if (offset == root.getWidth()) {
             return null;
         }
 
-        tourist = new WordBuildingCharacterVisitor();
+        str = new StringBuilder();
 
         /*
          * Seek backwards from the current offset to find a word boundary.
          */
 
         begin = root.getWordBoundaryBefore(offset);
+        end = root.getWordBoundaryAfter(offset);
 
         /*
          * Iterate forward over the characters to get the word.
          */
 
-        root.visit(tourist, begin, root.getWidth() - begin);
+        root.visit(new CharacterVisitor() {
+            public boolean visit(int character, Markup markup) {
+                str.appendCodePoint(character);
+                return false;
+            }
+        }, begin, end - begin);
 
         /*
          * Pull out the word
          */
 
-        result = tourist.getResult();
+        result = str.toString();
         if (result.equals("")) {
             return null;
         } else {
@@ -496,28 +498,82 @@ public class TextChain
         }
     }
 
-    /*
-     * This is a local hack to enable getWordAt(). Real usage in the
-     * EditorTextView should use a WordVisitor, assuming we implement one.
+    /**
+     * Iterate over a given range and build encountered characters into words.
+     * 
+     * @author Andrew Cowie
      */
     private static class WordBuildingCharacterVisitor implements CharacterVisitor
     {
+        /*
+         * The WordVisitor passed in to TextChain's visit() that will be
+         * invoked here as words are accumulated.
+         */
+        private WordVisitor tourist;
+
         private StringBuilder str;
 
-        private WordBuildingCharacterVisitor() {
+        private int begin;
+
+        private int end;
+
+        private Markup previous;
+
+        private WordBuildingCharacterVisitor(WordVisitor visitor) {
+            tourist = visitor;
             str = new StringBuilder();
+            begin = 0;
+            end = 0;
         }
 
         public boolean visit(int character, Markup markup) {
-            if (!(Character.isLetter(character) || (character == '\''))) {
+            if (markup != previous) {
+                handleWord(previous);
+            }
+
+            if (!Extract.isWhitespace(character)) {
+                str.appendCodePoint(character);
+                end++;
+                return false;
+            }
+
+            if (handleWord(markup)) {
                 return true;
             }
-            str.appendCodePoint(character);
+
             return false;
         }
 
-        private String getResult() {
-            return str.toString();
+        private boolean handleWord(final Markup markup) {
+            final String word;
+
+            word = str.toString();
+            if (tourist.visit(word, markup, begin, end)) {
+                return true;
+            }
+
+            str.setLength(0);
+            end++;
+            begin = end;
+
+            return false;
         }
+
+        private void handleLastWord() {
+            handleWord(previous);
+        }
+    }
+
+    /**
+     * Visit through the given range and, as complete words are accumulated,
+     * invoke tourist's visit() method. Used in spell checking!
+     */
+    public void visit(final WordVisitor tourist, final int begin, final int end) {
+        final WordBuildingCharacterVisitor builder;
+
+        builder = new WordBuildingCharacterVisitor(tourist);
+
+        root.visit(builder, begin, end - begin);
+        builder.handleLastWord();
     }
 }

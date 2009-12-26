@@ -63,6 +63,7 @@ import quill.textbase.SplitStructuralChange;
 import quill.textbase.StructuralChange;
 import quill.textbase.TextChain;
 import quill.textbase.TextualChange;
+import quill.textbase.WordVisitor;
 
 import static org.gnome.gtk.TextWindowType.TEXT;
 import static quill.client.Quill.ui;
@@ -1539,7 +1540,7 @@ abstract class EditorTextView extends TextView
         int alpha, omega;
         Extract extract;
         String word;
-        TextIter start, finish;
+        final TextIter start, finish;
 
         /*
          * Some blocks (ie PreformatSegment as presented by
@@ -1551,9 +1552,13 @@ abstract class EditorTextView extends TextView
             return;
         }
 
+        /*
+         * Seek backwards and forwards to find the beginning and end of the
+         * word(s) in the given range.
+         */
+
         alpha = chain.wordBoundaryBefore(begin);
-        omega = begin;
-        done = chain.wordBoundaryAfter(end);
+        omega = chain.wordBoundaryAfter(end);
 
         /*
          * There's an annoying bug whereby if you type Space in the middle of
@@ -1563,25 +1568,28 @@ abstract class EditorTextView extends TextView
          * the range being checked, and then only [re]highlighting words that
          * need it.
          */
-        start = buffer.getIter(alpha);
-        finish = buffer.getIter(done);
+
+        start = buffer.getIter(begin);
+        finish = buffer.getIter(end);
         buffer.removeTag(spelling, start, finish);
 
-        while (omega < done) {
-            omega = chain.wordBoundaryAfter(alpha);
+        /*
+         * Then iterate forward across the range and mark mispelled words!
+         */
 
-            extract = chain.extractRange(alpha, omega - alpha);
-            word = makeWordFromSpans(extract);
+        chain.visit(new WordVisitor() {
+            public boolean visit(String word, Markup markup, int begin, int end) {
+                final TextIter start, finish;
 
-            if (!ui.dict.check(word)) {
-                start = buffer.getIter(alpha);
-                finish = buffer.getIter(omega);
-                buffer.applyTag(spelling, start, finish);
+                if (!ui.dict.check(word)) {
+                    start = buffer.getIter(begin);
+                    finish = buffer.getIter(end);
+                    buffer.applyTag(spelling, start, finish);
+                }
+
+                return false;
             }
-
-            omega++;
-            alpha = omega;
-        }
+        }, alpha, omega);
     }
 
     int getInsertOffset() {
