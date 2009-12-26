@@ -830,22 +830,4 @@ class Node extends Extract
 
         return width;
     }
-
-    /**
-     * Is the character a word character (from a spell-checking point of view)
-     * or whitespace?
-     */
-    /*
-     * Reasonably common expression. Maybe this should be part of the Extract
-     * base class?
-     */
-    private static final boolean isWhitespace(int ch) {
-        if (Character.isLetter(ch)) {
-            return false;
-        }
-        if (ch == '\'') {
-            return false;
-        }
-        return true;
-    }
 }

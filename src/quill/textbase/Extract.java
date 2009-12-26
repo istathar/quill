@@ -67,4 +67,18 @@ public abstract class Extract
      * starting offset <code>offset</code> for <code>wide</code> characters.
      */
     public abstract void visit(CharacterVisitor tourist, int offset, int wide);
+
+    /**
+     * Is the character a word character (from a spell-checking point of view)
+     * or whitespace?
+     */
+    protected static final boolean isWhitespace(int ch) {
+        if (Character.isLetter(ch)) {
+            return false;
+        }
+        if (ch == '\'') {
+            return false;
+        }
+        return true;
+    }
 }
