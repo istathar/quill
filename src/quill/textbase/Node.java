@@ -436,7 +436,12 @@ class Node extends Extract
             return left.getSpanAt(offset);
         }
 
-        widthCenter = data.getWidth();
+        if (data == null) {
+            widthCenter = 0;
+        } else {
+            widthCenter = data.getWidth();
+        }
+
         if (offset - widthLeft < widthCenter) {
             return data;
         } else {
