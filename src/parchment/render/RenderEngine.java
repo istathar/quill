@@ -59,6 +59,7 @@ import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
+import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
 import quill.textbase.TextChain;
 
@@ -509,11 +510,8 @@ public abstract class RenderEngine
         final FontOptions options;
         final StringBuilder buf;
         final AttributeList list;
-        int i, j, k, len, offset, width;
+        int k;
         final int K;
-        boolean code;
-        Span span;
-        Markup format;
         String str;
         LayoutLine line;
         final Area[] result;
@@ -540,7 +538,7 @@ public abstract class RenderEngine
         buf = new StringBuilder();
 
         list = new AttributeList();
-        offset = 0;
+
         previous = '\0';
 
         /*
@@ -548,33 +546,45 @@ public abstract class RenderEngine
          * creating Attributes along the way.
          */
 
-        for (i = 0; i < extract.size(); i++) {
-            span = extract.get(i);
-            format = span.getMarkup();
-            width = 0;
+        // TODO replace with CharacterVisitor?
+        extract.visit(new SpanVisitor() {
+            private int offset = 0;
 
-            if (preformatted) {
-                code = true;
-            } else if ((format == Common.LITERAL) || (format == Common.FILENAME)) {
-                code = true;
-            } else {
-                code = false;
+            public boolean visit(Span span) {
+                Markup format;
+                final int len;
+                int width, j;
+                boolean code;
+                String str;
+
+                format = span.getMarkup();
+                width = 0;
+
+                if (preformatted) {
+                    code = true;
+                } else if ((format == Common.LITERAL) || (format == Common.FILENAME)) {
+                    code = true;
+                } else {
+                    code = false;
+                }
+
+                str = span.getText();
+                len = str.length();
+
+                for (j = 0; j < len; j++) {
+                    width += translateAndAppend(buf, str.charAt(j), code);
+                }
+
+                for (Attribute attr : attributesForMarkup(span.getMarkup())) {
+                    attr.setIndices(offset, width);
+                    list.insert(attr);
+                }
+
+                offset += width;
+
+                return false;
             }
-
-            str = span.getText();
-            len = str.length();
-
-            for (j = 0; j < len; j++) {
-                width += translateAndAppend(buf, str.charAt(j), code);
-            }
-
-            for (Attribute attr : attributesForMarkup(span.getMarkup())) {
-                attr.setIndices(offset, width);
-                list.insert(attr);
-            }
-
-            offset += width;
-        }
+        });
 
         str = buf.toString();
         layout.setText(str);

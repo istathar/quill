@@ -311,6 +311,10 @@ public class TextChain
     public Markup getMarkupAt(int offset) {
         Span span;
 
+        if (root == null) {
+            return null;
+        }
+
         span = root.getSpanAt(offset);
 
         if (span == null) {
