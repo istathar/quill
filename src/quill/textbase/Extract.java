@@ -63,8 +63,8 @@ public abstract class Extract
     public abstract void visit(CharacterVisitor tourist);
 
     /**
-     * Call tourist's visit() method for each character in this extract from
-     * starting offset <code>start</code> for <code>wide</code> characters.
+     * Invoke tourist's visit() method for each character in this extract from
+     * starting offset <code>offset</code> for <code>wide</code> characters.
      */
     public abstract void visit(CharacterVisitor tourist, int offset, int wide);
 }

@@ -314,7 +314,12 @@ class Node extends Extract
                 consumed = widthLeft;
             } else if (offset < widthLeft) {
                 start = offset;
-                across = widthLeft - offset;
+                if (offset + wide > widthLeft) {
+                    across = widthLeft - offset;
+                } else {
+                    across = wide;
+                }
+
                 if (left.visitRange(tourist, start, across)) {
                     return true;
                 }
@@ -335,11 +340,8 @@ class Node extends Extract
                 }
                 across = wide - consumed;
 
-                if (across > widthCenter) {
-                    across = widthCenter;
-                    consumed += widthCenter;
-                } else {
-                    consumed += across;
+                if (start + across > widthCenter) {
+                    across = widthCenter - start;
                 }
                 for (i = start; i < start + across; i++) {
                     ch = data.getChar(i);
@@ -347,6 +349,7 @@ class Node extends Extract
                         return true;
                     }
                 }
+                consumed += across;
             }
         } else {
             widthCenter = 0;
@@ -370,10 +373,6 @@ class Node extends Extract
 
     public void visit(final CharacterVisitor tourist, final int offset, final int wide) {
         visitRange(tourist, offset, wide);
-    }
-
-    public void visit(WordVisitor tourist, final int offset) {
-    // TODO
     }
 
     /**
@@ -712,7 +711,11 @@ class Node extends Extract
          * it in the right sub node, we need to search here after all.
          */
 
-        widthCenter = data.getWidth();
+        if (data == null) {
+            widthCenter = 0;
+        } else {
+            widthCenter = data.getWidth();
+        }
 
         if (offset > widthLeft + widthCenter) {
             result = right.getWordBoundaryBefore(offset - (widthCenter + widthLeft));
@@ -753,6 +756,79 @@ class Node extends Extract
         }
 
         return 0;
+    }
+
+    int getWordBoundaryAfter(final int offset) {
+        final int widthLeft, widthCenter;
+        final int result;
+        int i, ch;
+
+        if (offset == width) {
+            return width;
+        }
+
+        if (offset > width) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        if (left == null) {
+            widthLeft = 0;
+        } else {
+            widthLeft = left.getWidth();
+        }
+
+        /*
+         * If it's on the left, then pass the search down.
+         */
+
+        if (offset < widthLeft) {
+            result = left.getWordBoundaryAfter(offset);
+            if (result != widthLeft) {
+                return result;
+            }
+        }
+
+        /*
+         * Otherwise run through this node
+         */
+
+        if (data == null) {
+            widthCenter = 0;
+        } else {
+            widthCenter = data.getWidth();
+        }
+
+        if (offset > widthLeft + widthCenter) {
+            return right.getWordBoundaryAfter(offset);
+        }
+
+        if (offset > widthLeft) {
+            i = offset - widthLeft;
+        } else {
+            i = 0;
+        }
+        while (i < widthCenter) {
+            ch = data.getChar(i);
+            if (isWhitespace(ch)) {
+                return widthLeft + i;
+            }
+            i++;
+        }
+
+        /*
+         * Still here? Ok, try going down the right side.
+         */
+
+        if (right != null) {
+            if (i == widthCenter) {
+                return widthLeft + widthCenter + right.getWordBoundaryAfter(0);
+            } else {
+                return widthLeft + widthCenter
+                        + right.getWordBoundaryAfter(offset - (widthLeft + widthCenter));
+            }
+        }
+
+        return width;
     }
 
     /**
