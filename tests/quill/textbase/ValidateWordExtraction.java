@@ -259,7 +259,7 @@ public class ValidateWordExtraction extends TestCase
         chain.visit(new WordVisitor() {
             private int iteration = 0;
 
-            public boolean visit(String word, Markup markup, int begin, int end) {
+            public boolean visit(String word, boolean skip, int begin, int end) {
                 switch (iteration) {
                 case 0:
                     assertEquals("Test", word);
@@ -296,7 +296,7 @@ public class ValidateWordExtraction extends TestCase
         chain.visit(new WordVisitor() {
             private int iteration = 0;
 
-            public boolean visit(String word, Markup markup, int begin, int end) {
+            public boolean visit(String word, boolean skip, int begin, int end) {
                 switch (iteration) {
                 case 0:
                     assertEquals("t", word);

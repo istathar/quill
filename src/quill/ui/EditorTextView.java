@@ -1455,83 +1455,6 @@ abstract class EditorTextView extends TextView
         return true;
     }
 
-    /*
-     * If a word has any range of non-spell checkable markup, then the whole
-     * word is not to be checkable.
-     */
-    private static boolean skipSpellCheck(Markup markup) {
-        if (markup == null) {
-            return false; // normal
-        }
-        if (markup.isSpellCheckable()) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    private static class WordAccumulatorSpanVisitor implements SpanVisitor
-    {
-        private final StringBuilder str;
-
-        private Span first;
-
-        private int count;
-
-        private boolean skip;
-
-        private WordAccumulatorSpanVisitor() {
-            str = new StringBuilder();
-            skip = false;
-            count = 0;
-        }
-
-        public boolean visit(Span s) {
-            final int J;
-            int j;
-
-            if (skipSpellCheck(s.getMarkup())) {
-                skip = true;
-                return true;
-            }
-
-            if (first == null) {
-                first = s;
-            }
-
-            count++;
-
-            J = s.getWidth();
-
-            for (j = 0; j < J; j++) {
-                str.appendCodePoint(s.getChar(j));
-            }
-            return false;
-        }
-
-        private String getWord() {
-            if (skip) {
-                return "";
-            }
-            if (count == 1) {
-                return first.getText();
-            }
-            return str.toString();
-        }
-    }
-
-    private static String makeWordFromSpans(Extract extract) {
-        final WordAccumulatorSpanVisitor tourist;
-
-        if (extract.getWidth() == 0) {
-            return "";
-        }
-
-        tourist = new WordAccumulatorSpanVisitor();
-        extract.visit(tourist);
-        return tourist.getWord();
-    }
-
     /**
      * Iterate over words from before(begin) to after(end)
      */
@@ -1575,8 +1498,12 @@ abstract class EditorTextView extends TextView
          */
 
         chain.visit(new WordVisitor() {
-            public boolean visit(String word, Markup markup, int begin, int end) {
+            public boolean visit(String word, boolean skip, int begin, int end) {
                 final TextIter start, finish;
+
+                if (skip) {
+                    return false;
+                }
 
                 if (!ui.dict.check(word)) {
                     start = buffer.getIter(begin);

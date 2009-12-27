@@ -233,7 +233,6 @@ public class TextChain
     protected void format(int offset, int wide, Markup format) {
         final Node preceeding, following;
         final int start, across;
-        final int[] characters;
         final Span span;
         AccumulatingCharacterVisitor tourist;
 
@@ -531,7 +530,28 @@ public class TextChain
 
         private int end;
 
-        private Markup previous;
+        private boolean skip;
+
+        /**
+         * Marker to allow us to avoid calling on the last word if the tourist
+         * returned true while visiting.
+         */
+        private boolean stop;
+
+        /*
+         * If a word has any range of non-spell checkable markup, then the
+         * whole word is not to be checkable.
+         */
+        private static boolean skipSpellCheck(Markup markup) {
+            if (markup == null) {
+                return false; // normal
+            }
+            if (markup.isSpellCheckable()) {
+                return false;
+            } else {
+                return true;
+            }
+        }
 
         /**
          * @param from
@@ -544,11 +564,15 @@ public class TextChain
             str = new StringBuilder();
             begin = from;
             end = from;
+            skip = false;
+            stop = false;
         }
 
         public boolean visit(final int character, final Markup markup) {
-            if (markup != previous) {
-                handleWord(previous);
+            if (!skip) {
+                if (skipSpellCheck(markup)) {
+                    skip = true;
+                }
             }
 
             if (!isWhitespace(character)) {
@@ -557,30 +581,41 @@ public class TextChain
                 return false;
             }
 
-            if (handleWord(markup)) {
-                return true;
-            }
-
-            return false;
-        }
-
-        private boolean handleWord(final Markup markup) {
-            final String word;
-
-            word = str.toString();
-            if (tourist.visit(word, markup, begin, end)) {
+            if (handleWord()) {
+                stop = true;
                 return true;
             }
 
             str.setLength(0);
             end++;
             begin = end;
+            skip = false;
 
             return false;
         }
 
-        private void handleLastWord() {
-            handleWord(previous);
+        /**
+         * Action the accumulated word.
+         */
+        /*
+         * Seperate code so that it can be invoked on the last word by the
+         * calling visit() method (the CharacterVisitor doesn't know when it's
+         * done, and so can't call this one last time).
+         */
+        private boolean handleWord() {
+            final String word;
+
+            if (stop) {
+                return true;
+            }
+
+            word = str.toString();
+            if (tourist.visit(word, skip, begin, end)) {
+                stop = true;
+                return true;
+            }
+
+            return false;
         }
     }
 
@@ -598,6 +633,6 @@ public class TextChain
         builder = new WordBuildingCharacterVisitor(tourist, begin);
 
         root.visit(builder, begin, end - begin);
-        builder.handleLastWord();
+        builder.handleWord();
     }
 }
