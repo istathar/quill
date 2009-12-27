@@ -612,7 +612,7 @@ class Node extends Extract
             widthLeft = 0;
         } else {
             widthLeft = left.getWidth();
-            if (offset + wide < widthLeft) {
+            if (offset + wide <= widthLeft) {
                 return left.subset(offset, wide);
             }
         }
@@ -624,8 +624,8 @@ class Node extends Extract
         }
 
         if (right != null) {
-            if (offset > widthLeft + widthCenter) {
-                return right.subset(width - offset, wide);
+            if (offset >= widthLeft + widthCenter) {
+                return right.subset(offset - widthLeft - widthCenter, wide);
             }
         }
 

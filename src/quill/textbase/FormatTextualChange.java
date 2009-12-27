@@ -18,6 +18,8 @@
  */
 package quill.textbase;
 
+import java.util.ArrayList;
+
 /**
  * Add format to a range of Text.
  * 
@@ -51,20 +53,36 @@ public class FormatTextualChange extends TextualChange
         }
     }
 
-    private static Extract applyMarkup(Extract original, Markup format) {
+    private static Extract applyMarkup(final Extract original, final Markup format) {
+        final ArrayList<Span> list;
+        Node node;
+        Span span;
         int i;
-        Span s;
-        Span[] range;
 
-        range = new Span[original.size()];
+        list = new ArrayList<Span>();
 
-        for (i = 0; i < original.size(); i++) {
-            s = original.get(i);
+        original.visit(new SpanVisitor() {
+            public boolean visit(Span span) {
+                final Span replacement;
+                replacement = span.applyMarkup(format);
+                list.add(replacement);
+                return false;
+            }
+        });
 
-            range[i] = s.applyMarkup(format);
+        /*
+         * TODO replace with an efficient list -> tree builder!
+         */
+
+        span = list.get(0);
+        node = Node.createNode(span);
+
+        for (i = 1; i < list.size(); i++) {
+            span = list.get(i);
+            node = node.append(span);
         }
 
-        return new Extract(range);
+        return node;
     }
 
     private static Extract removeMarkup(Extract original, Markup format) {
