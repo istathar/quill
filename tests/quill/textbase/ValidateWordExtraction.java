@@ -243,4 +243,42 @@ public class ValidateWordExtraction extends TestCase
             assertEquals("system", chain.getWordAt(i));
         }
     }
+
+    public final void testVisitingOverWords() {
+        final TextChain chain;
+
+        chain = new TextChain("Test emrgency bro𝑎dcast system");
+
+        chain.visit(new WordVisitor() {
+            private int iteration = 0;
+
+            public boolean visit(String word, Markup markup, int begin, int end) {
+                switch (iteration) {
+                case 0:
+                    assertEquals("Test", word);
+                    assertEquals(0, begin);
+                    assertEquals(4, end);
+                    break;
+                case 1:
+                    assertEquals("emrgency", word);
+                    assertEquals(5, begin);
+                    assertEquals(13, end);
+                    break;
+                case 2:
+                    assertEquals("bro𝑎dcast", word);
+                    assertEquals(14, begin);
+                    assertEquals(23, end);
+                    break;
+                case 3:
+                    assertEquals("system", word);
+                    assertEquals(24, begin);
+                    assertEquals(30, end);
+                    break;
+                }
+
+                iteration++;
+                return false;
+            }
+        }, 0, chain.length());
+    }
 }

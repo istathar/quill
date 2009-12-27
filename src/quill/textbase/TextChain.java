@@ -20,6 +20,8 @@ package quill.textbase;
 
 import java.util.ArrayList;
 
+import static quill.textbase.Extract.isWhitespace;
+
 /**
  * A mutable buffer of unicode text which manages a binary tree of Spans in
  * order to maximize sharing of character array storage while giving us
@@ -440,7 +442,11 @@ public class TextChain
     }
 
     public int wordBoundaryBefore(final int offset) {
-        return root.getWordBoundaryBefore(offset);
+        if (root == null) {
+            return 0;
+        } else {
+            return root.getWordBoundaryBefore(offset);
+        }
     }
 
     /*
@@ -448,7 +454,11 @@ public class TextChain
      * to a strong Visitor interface.
      */
     public int wordBoundaryAfter(final int offset) {
-        return root.getWordBoundaryAfter(offset);
+        if (root == null) {
+            return 0;
+        } else {
+            return root.getWordBoundaryAfter(offset);
+        }
     }
 
     /**
@@ -535,7 +545,7 @@ public class TextChain
                 handleWord(previous);
             }
 
-            if (!Extract.isWhitespace(character)) {
+            if (!isWhitespace(character)) {
                 str.appendCodePoint(character);
                 end++;
                 return false;
@@ -574,6 +584,10 @@ public class TextChain
      */
     public void visit(final WordVisitor tourist, final int begin, final int end) {
         final WordBuildingCharacterVisitor builder;
+
+        if (root == null) {
+            return;
+        }
 
         builder = new WordBuildingCharacterVisitor(tourist);
 
