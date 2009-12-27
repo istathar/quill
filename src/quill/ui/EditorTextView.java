@@ -1536,10 +1536,7 @@ abstract class EditorTextView extends TextView
      * Iterate over words from before(begin) to after(end)
      */
     private void checkSpellingRange(final int begin, final int end) {
-        final int done;
         int alpha, omega;
-        Extract extract;
-        String word;
         final TextIter start, finish;
 
         /*
@@ -1569,8 +1566,8 @@ abstract class EditorTextView extends TextView
          * need it.
          */
 
-        start = buffer.getIter(begin);
-        finish = buffer.getIter(end);
+        start = buffer.getIter(alpha);
+        finish = buffer.getIter(omega);
         buffer.removeTag(spelling, start, finish);
 
         /*
