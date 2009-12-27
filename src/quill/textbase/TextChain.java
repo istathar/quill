@@ -384,7 +384,7 @@ public class TextChain
 
             public boolean visit(int character, Markup markup) {
                 if (character == '\n') {
-                    paragraphs.add(offset);
+                    paragraphs.add(offset + 1);
                 }
                 offset++;
                 return false;
@@ -408,7 +408,7 @@ public class TextChain
 
             for (i = 0; i < num - 1; i++) {
                 offset = paragraphs.get(i);
-                wide = paragraphs.get(i + 1) - paragraphs.get(i);
+                wide = paragraphs.get(i + 1) - 1 - paragraphs.get(i);
 
                 nodes[i] = root.subset(offset, wide);
             }

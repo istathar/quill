@@ -167,11 +167,11 @@ public class ValidateExtracts extends TestCase
         Extract extract;
 
         text = new TextChain();
-        text.append(createSpan("Hello World\nGoodbye Eternity", null));
-        assertEquals("Hello World\nGoodbye Eternity", text.toString());
+        text.append(createSpan("Hello World\nGoodbye Eternity\nWakey wakey", null));
+        assertEquals("Hello World\nGoodbye Eternity\nWakey wakey", text.toString());
 
         lines = text.extractParagraphs();
-        assertEquals(2, lines.length);
+        assertEquals(3, lines.length);
 
         extract = lines[0];
         assertNotNull(extract);
@@ -180,6 +180,10 @@ public class ValidateExtracts extends TestCase
         extract = lines[1];
         assertNotNull(extract);
         assertEquals("Goodbye Eternity", extract.getText());
+
+        extract = lines[2];
+        assertNotNull(extract);
+        assertEquals("Wakey wakey", extract.getText());
     }
 
     /*
