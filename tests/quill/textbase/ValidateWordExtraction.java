@@ -247,7 +247,14 @@ public class ValidateWordExtraction extends TestCase
     public final void testVisitingOverWords() {
         final TextChain chain;
 
-        chain = new TextChain("Test emrgency bro𝑎dcast system");
+        chain = new TextChain("Test");
+        chain.append(Span.createSpan(' ', null));
+        chain.append(Span.createSpan("emrg", null));
+        chain.append(Span.createSpan("ency", null));
+        chain.append(Span.createSpan(" bro𝑎dcast sys", null));
+        chain.append(Span.createSpan('t', null));
+        chain.append(Span.createSpan('e', null));
+        chain.append(Span.createSpan('m', null));
 
         chain.visit(new WordVisitor() {
             private int iteration = 0;
@@ -280,5 +287,42 @@ public class ValidateWordExtraction extends TestCase
                 return false;
             }
         }, 0, chain.length());
+
+        /*
+         * That works, which is great! But it turns out the bug happened when
+         * the starting offset wasn't zero. Try again.
+         */
+
+        chain.visit(new WordVisitor() {
+            private int iteration = 0;
+
+            public boolean visit(String word, Markup markup, int begin, int end) {
+                switch (iteration) {
+                case 0:
+                    assertEquals("t", word);
+                    assertEquals(3, begin);
+                    assertEquals(4, end);
+                    break;
+                case 1:
+                    assertEquals("emrgency", word);
+                    assertEquals(5, begin);
+                    assertEquals(13, end);
+                    break;
+                case 2:
+                    assertEquals("bro𝑎dcast", word);
+                    assertEquals(14, begin);
+                    assertEquals(23, end);
+                    break;
+                case 3:
+                    assertEquals("sys", word);
+                    assertEquals(24, begin);
+                    assertEquals(27, end);
+                    break;
+                }
+
+                iteration++;
+                return false;
+            }
+        }, 3, 27);
     }
 }

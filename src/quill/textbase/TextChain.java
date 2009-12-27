@@ -533,14 +533,20 @@ public class TextChain
 
         private Markup previous;
 
-        private WordBuildingCharacterVisitor(WordVisitor visitor) {
+        /**
+         * @param from
+         *            Because we visit words over a range, we need to bump our
+         *            starting offset by whatever the start of the range was
+         *            given in the call to TextChain's visit().
+         */
+        private WordBuildingCharacterVisitor(final WordVisitor visitor, final int from) {
             tourist = visitor;
             str = new StringBuilder();
-            begin = 0;
-            end = 0;
+            begin = from;
+            end = from;
         }
 
-        public boolean visit(int character, Markup markup) {
+        public boolean visit(final int character, final Markup markup) {
             if (markup != previous) {
                 handleWord(previous);
             }
@@ -589,7 +595,7 @@ public class TextChain
             return;
         }
 
-        builder = new WordBuildingCharacterVisitor(tourist);
+        builder = new WordBuildingCharacterVisitor(tourist, begin);
 
         root.visit(builder, begin, end - begin);
         builder.handleLastWord();
