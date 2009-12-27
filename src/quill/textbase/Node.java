@@ -204,17 +204,7 @@ class Node extends Extract
             }
         };
 
-        if (left != null) {
-            left.visit(tourist);
-        }
-
-        if (data != null) {
-            str.append(data.getText());
-        }
-
-        if (right != null) {
-            right.visit(tourist);
-        }
+        this.visit(tourist);
 
         return str.toString();
 
