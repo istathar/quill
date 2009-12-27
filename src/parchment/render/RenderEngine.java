@@ -568,6 +568,12 @@ public abstract class RenderEngine
                     code = false;
                 }
 
+                /*
+                 * FIXME Use Span characters, not String!!!! Fixing this will
+                 * involve refactoring MarkerSpan to store reference data in
+                 * Markup instances, not Span text.
+                 */
+
                 str = span.getText();
                 len = str.length();
 
