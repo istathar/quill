@@ -825,4 +825,47 @@ class Node extends Extract
 
         return width;
     }
+
+    Node rebalance() {
+        int heightLeft, heightRight;
+
+        if (left == null) {
+            heightLeft = 0;
+        } else {
+            heightLeft = left.getHeight();
+        }
+
+        if (right == null) {
+            heightRight = 0;
+        } else {
+            heightRight = right.getHeight();
+        }
+
+        if (heightLeft > heightRight + 2) {
+            // rebalance left
+            return this;
+        } else if (heightRight > heightLeft + 2) {
+            // rebalance right
+            return this;
+        }
+
+        return this;
+    }
+
+    /**
+     * <pre>
+     *       D
+     *      / \
+     *     B   E          B'
+     *    / \           /   \
+     *   A   C   ->    A     D'
+     *  / \           / \   / \
+     * X   Y         X   Y C'  E'
+     * </pre>
+     * 
+     * Called on D, returns B'
+     */
+    private Node rebalanceLeft() {
+        return null;
+    }
 }
