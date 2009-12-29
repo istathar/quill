@@ -1458,7 +1458,7 @@ abstract class EditorTextView extends TextView
     /**
      * Iterate over words from before(begin) to after(end)
      */
-    private void checkSpellingRange(final int begin, final int end) {
+    private void checkSpellingRange(int begin, final int end) {
         int alpha, omega;
         final TextIter start, finish;
 
@@ -1470,6 +1470,19 @@ abstract class EditorTextView extends TextView
 
         if (!isSpellChecked()) {
             return;
+        }
+
+        /*
+         * There's a corner case where if you type space to complete or split
+         * a word, you've left the previous word behind without checking it.
+         * So push back one (so long as there is room).
+         * 
+         * This is somewhat ironic after all the work we put in to getting the
+         * definition of word boundaries right in Node.
+         */
+
+        if (begin > 0) {
+            begin--;
         }
 
         /*
