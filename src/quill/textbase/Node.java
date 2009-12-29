@@ -614,7 +614,7 @@ class Node extends Extract
      */
     Node subset(int offset, int wide) {
         final int widthLeft, widthCenter;
-        int amount, begin, end;
+        int consumed, across, begin, end;
         Node gauche, droit;
         Span span;
 
@@ -680,7 +680,7 @@ class Node extends Extract
          * Entirely center?
          */
 
-        if (wide <= widthCenter) {
+        if ((offset >= widthLeft) && (offset < widthLeft + widthCenter) && (wide <= widthCenter)) {
             begin = offset - widthLeft;
             end = begin + wide;
             span = data.split(begin, end);
@@ -688,33 +688,47 @@ class Node extends Extract
         }
 
         /*
-         * So now we know it's at least partially overlapping either left or
-         * right.
+         * So now we know it's at least partially overlapping either left
+         * and/or right. Do the left sub part first
          */
 
         if (offset < widthLeft) {
             // how many characters?
-            amount = widthLeft - offset;
-            gauche = left.subset(offset, amount);
-            // how many characters remain?
-            amount = wide - amount;
+            across = widthLeft - offset;
+            gauche = left.subset(offset, across);
+            consumed = across;
         } else {
             gauche = null;
-            amount = wide;
+            consumed = 0;
         }
 
-        if (amount == 0) {
-            span = null;
-            droit = null;
-        } else if (amount == widthCenter) {
-            span = data;
-            droit = null;
-        } else if (amount < widthCenter) {
-            span = data.split(0, amount);
-            droit = null;
-        } else {
-            span = data;
-            droit = right.subset(0, amount - widthCenter);
+        /*
+         * Now the right sub part. If we didn't get any left, then it's half
+         * center and half right.
+         */
+
+        if (consumed == 0) {
+            begin = offset - widthLeft;
+            span = data.split(begin, widthCenter);
+
+            consumed = widthCenter - begin;
+            droit = right.subset(0, wide - consumed);
+        }
+
+        /*
+         * Otherwise we did get some left.
+         */
+
+        else {
+            across = wide - consumed;
+            if (across <= widthCenter) {
+                span = data.split(0, across);
+                droit = null;
+            } else {
+                span = data;
+                across -= widthCenter;
+                droit = right.subset(0, across);
+            }
         }
 
         return new Node(gauche, span, droit);
