@@ -214,11 +214,58 @@ class Node extends Extract
         if (addition == null) {
             throw new IllegalArgumentException();
         }
-        if (data == null) {
-            return new Node(addition);
-        } else {
-            return new Node(this, addition, null);
+
+        /*
+         * Completely empty node, or single Span node. Grow height by one.
+         */
+
+        if ((left == null) && (right == null)) {
+            if (data == null) {
+                return new Node(addition);
+            } else {
+                return new Node(this, addition, null);
+            }
         }
+
+        /*
+         * This node full, so grow in height one.
+         */
+
+        if ((left != null) && (right != null)) {
+            if (left.getHeight() > right.getHeight()) {
+                return new Node(left, data, right.append(addition));
+            } else {
+                return new Node(this, addition, null);
+            }
+        }
+
+        /*
+         * This node left half full
+         */
+
+        if ((left != null) && (right == null)) {
+            if (data == null) {
+                return new Node(left, addition, null);
+            } else {
+                return new Node(left, data, new Node(addition));
+            }
+        }
+
+        /*
+         * This node right half full, so descend recursively and append.
+         */
+
+        if ((left == null) && (right != null)) {
+            if (data == null) {
+                // rare?
+                return right.append(addition);
+            } else {
+                return new Node(null, data, right.append(addition));
+            }
+
+        }
+
+        throw new IllegalStateException();
     }
 
     /**
@@ -678,10 +725,6 @@ class Node extends Extract
         final int result;
         int i, ch, previous;
 
-        if (offset == 0) {
-            return 0;
-        }
-
         if (offset > width) {
             throw new IndexOutOfBoundsException();
         }
@@ -712,14 +755,16 @@ class Node extends Extract
             widthCenter = data.getWidth();
         }
 
-        if (offset > widthLeft + widthCenter) {
-            result = right.getWordBoundaryBefore(offset - (widthCenter + widthLeft));
-            if (result > 0) {
-                return widthLeft + widthCenter + result;
+        i = offset - widthLeft;
+
+        if (right != null) {
+            if (offset >= widthLeft + widthCenter) {
+                result = right.getWordBoundaryBefore(offset - (widthCenter + widthLeft));
+                if (result > -1) {
+                    return widthLeft + widthCenter + result;
+                }
             }
             i = widthCenter;
-        } else {
-            i = offset - widthLeft;
         }
 
         /*
@@ -730,6 +775,7 @@ class Node extends Extract
 
         if (data != null) {
             previous = i;
+
             if (i == widthCenter) {
                 i--;
             }
@@ -750,17 +796,17 @@ class Node extends Extract
             return left.getWordBoundaryBefore(widthLeft);
         }
 
-        return 0;
+        return -1;
     }
 
     int getWordBoundaryAfter(final int offset) {
         final int widthLeft, widthCenter;
-        final int result;
+        int result;
         int i, ch;
 
-        if (offset == width) {
-            return width;
-        }
+        // if (offset == width) {
+        // return width;
+        // }
 
         if (offset > width) {
             throw new IndexOutOfBoundsException();
@@ -778,7 +824,7 @@ class Node extends Extract
 
         if (offset < widthLeft) {
             result = left.getWordBoundaryAfter(offset);
-            if (result != widthLeft) {
+            if (result > -1) {
                 return result;
             }
         }
@@ -793,8 +839,11 @@ class Node extends Extract
             widthCenter = data.getWidth();
         }
 
-        if (offset > widthLeft + widthCenter) {
-            return right.getWordBoundaryAfter(offset);
+        if (offset >= widthLeft + widthCenter) {
+            result = right.getWordBoundaryAfter(offset - widthLeft - widthCenter);
+            if (result > -1) {
+                return widthLeft + widthCenter + result;
+            }
         }
 
         if (offset > widthLeft) {
@@ -816,14 +865,20 @@ class Node extends Extract
 
         if (right != null) {
             if (i == widthCenter) {
-                return widthLeft + widthCenter + right.getWordBoundaryAfter(0);
+                result = right.getWordBoundaryAfter(0);
+                if (result > -1) {
+                    return widthLeft + widthCenter + result;
+                }
             } else {
-                return widthLeft + widthCenter
-                        + right.getWordBoundaryAfter(offset - (widthLeft + widthCenter));
+                result = right.getWordBoundaryAfter(offset - (widthLeft + widthCenter));
+                if (result > -1) {
+                    return widthLeft + widthCenter + result;
+                }
             }
         }
 
-        return width;
+        // not found
+        return -1;
     }
 
     Node rebalance() {
@@ -843,6 +898,7 @@ class Node extends Extract
 
         if (heightLeft > heightRight + 2) {
             // rebalance left
+            rebalanceLeft(); // FIXME
             return this;
         } else if (heightRight > heightLeft + 2) {
             // rebalance right

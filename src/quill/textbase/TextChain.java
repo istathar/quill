@@ -471,7 +471,7 @@ public class TextChain
      * and meanwhile this is heavily tested.
      */
     String getWordAt(final int offset) {
-        final int begin, end;
+        int begin, end;
         final StringBuilder str;
         final String result;
 
@@ -485,8 +485,17 @@ public class TextChain
          * Seek backwards from the current offset to find a word boundary.
          */
 
+        // FIXME move to Node
+
         begin = root.getWordBoundaryBefore(offset);
+        if (begin == -1) {
+            begin = 0;
+        }
+
         end = root.getWordBoundaryAfter(offset);
+        if (end == -1) {
+            end = root.getWidth();
+        }
 
         /*
          * Iterate forward over the characters to get the word.
