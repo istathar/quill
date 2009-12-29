@@ -157,6 +157,7 @@ public class ValidateWordExtraction extends TestCase
 
         assertEquals(26, chain.length());
         assertEquals('z', chain.toString().charAt(25));
+        assertEquals("abc efg ijk. nop rstuvwxyz", chain.toString());
 
         assertEquals("abc", chain.getWordAt(0));
         assertEquals("abc", chain.getWordAt(1));

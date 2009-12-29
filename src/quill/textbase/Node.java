@@ -393,12 +393,12 @@ class Node extends Extract
         }
         if ((right != null) && (consumed != wide)) {
             widthRight = right.getWidth();
-            if ((offset == widthLeft + widthCenter) && (wide == widthRight)) {
+            if ((offset + consumed == widthLeft + widthCenter) && (wide - consumed == widthRight)) {
                 if (right.visitAll(tourist)) {
                     return true;
                 }
             } else {
-                start = offset - (widthLeft + widthCenter);
+                start = (offset + consumed) - (widthLeft + widthCenter);
                 across = wide - consumed;
                 if (right.visitRange(tourist, start, across)) {
                     return true;
