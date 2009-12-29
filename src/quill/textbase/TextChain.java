@@ -18,100 +18,83 @@
  */
 package quill.textbase;
 
+import java.util.ArrayList;
+
+import static quill.textbase.Extract.isWhitespace;
+
 /**
- * A mutable buffer of unicode text which manages a linked list of Spans in
- * order to maximize sharing of character array storage.
+ * A mutable buffer of unicode text which manages a binary tree of Spans in
+ * order to maximize sharing of character array storage while giving us
+ * efficient lookup by offset.
  * 
  * @author Andrew Cowie
  */
 public class TextChain
 {
-    Piece first;
-
-    /**
-     * cache of the length of this TextChain, in characters.
-     */
-    private int length = -1;
+    Node root;
 
     public TextChain() {
-        first = null;
+        root = null;
     }
 
-    TextChain(String str) {
-        first = new Piece();
-        first.span = Span.createSpan(str, null);
+    TextChain(final String str) {
+        final Span span;
+
+        span = Span.createSpan(str, null);
+        root = Node.createNode(span);
     }
 
     TextChain(Span initial) {
-        first = new Piece();
-        first.span = initial;
-    }
-
-    private void invalidateCache() {
-        length = -1;
-    }
-
-    /**
-     * Update the offset cache [stored in the Pieces] in the process of
-     * calculating and storing the length of the TextChain.
-     */
-    private void calculateOffsets() {
-        Piece piece;
-        int result;
-
-        piece = first;
-        result = 0;
-
-        while (piece != null) {
-            piece.offset = result;
-            result += piece.span.getWidth();
-            piece = piece.next;
-        }
-
-        length = result;
+        root = Node.createNode(initial);
     }
 
     /**
      * The length of this Text, in characters.
      */
     public int length() {
-        if (length == -1) {
-            calculateOffsets();
+        if (root == null) {
+            return 0;
+        } else {
+            return root.getWidth();
         }
-        return length;
     }
 
+    /**
+     * This is ineffecient! Use for debugging purposes only.
+     */
     public String toString() {
         final StringBuilder str;
-        Piece piece;
+
+        if (root == null) {
+            return "";
+        }
 
         str = new StringBuilder();
-        piece = first;
 
-        while (piece != null) {
-            str.append(piece.span.getText());
-            piece = piece.next;
-        }
+        root.visit(new CharacterVisitor() {
+            public boolean visit(int character, Markup markup) {
+                str.appendCodePoint(character);
+                return false;
+            }
+        });
 
         return str.toString();
     }
 
+    /*
+     * This is an inefficient implementation!
+     */
     public void append(Span addition) {
-        Piece piece;
-        final Piece last;
-
         if (addition == null) {
             throw new IllegalArgumentException();
         }
-        invalidateCache();
 
         /*
-         * Handle empty Text case
+         * Handle empty TextChain case
          */
 
-        if (first == null) {
-            first = new Piece();
-            first.span = addition;
+        if (root == null) {
+            root = Node.createNode(addition);
             return;
         }
 
@@ -119,16 +102,29 @@ public class TextChain
          * Otherwise, we are appending. Hop to the end.
          */
 
-        piece = first;
+        root = root.append(addition);
+    }
 
-        while (piece.next != null) {
-            piece = piece.next;
+    /*
+     * TODO if we change to an EmptyNode singleton, then it should be returned
+     * if empty.
+     */
+    Node getTree() {
+        return root;
+    }
+
+    /**
+     * Get the Span at a given offset, for testing purposes.
+     */
+    Span spanAt(int offset) {
+        if (root == null) {
+            if (offset == 0) {
+                return null;
+            } else {
+                throw new IllegalStateException();
+            }
         }
-
-        last = new Piece();
-        last.prev = piece;
-        piece.next = last;
-        last.span = addition;
+        return root.getSpanAt(offset);
     }
 
     /**
@@ -139,239 +135,25 @@ public class TextChain
     }
 
     /**
-     * Insert the given range of Spans at the specified offset.
+     * Insert the given tree of Spans at the specified offset.
      */
-    protected void insert(int offset, Span[] range) {
-        final Piece one, two;
-        Piece p, last;
+    protected void insert(int offset, Extract extract) {
+        final Node tree;
 
         if (offset < 0) {
             throw new IllegalArgumentException();
         }
-        invalidateCache();
+
+        tree = (Node) extract;
 
         /*
          * Create the insertion point
          */
-
-        one = splitAt(offset);
-        if (one == null) {
-            two = first;
+        if (root == null) {
+            root = tree;
         } else {
-            two = one.next;
+            root = root.insertTreeAt(offset, tree);
         }
-
-        /*
-         * Create and insert Pieces wrapping the Spans.
-         */
-
-        last = one;
-
-        for (Span s : range) {
-            p = new Piece();
-            p.span = s;
-            p.prev = last;
-            last = p;
-        }
-
-        /*
-         * And correct the linkages in the reverse direction
-         */
-
-        last.next = two;
-        if (two != null) {
-            two.prev = last;
-        }
-
-        p = last;
-
-        do {
-            p = p.prev;
-            if (p == null) {
-                first = last;
-                break;
-            }
-            p.next = last;
-            last = p;
-        } while (p != one);
-    }
-
-    /**
-     * Cut a Piece in two at point. Amend the linkages so that overall Text is
-     * the same after the operation.
-     */
-    Piece splitAt(Piece from, int point) {
-        Piece preceeding, one, two, following;
-        Span before, after;
-
-        /*
-         * If it's already a width one span, then we're done. Note that this
-         * includes width one StringSpans.
-         */
-
-        if (from.span.getWidth() == 1) {
-            return from;
-        }
-
-        if (point == 0) {
-            return from;
-        }
-
-        /*
-         * Otherwise, split the StringSpan into two Spans - StringSpans
-         * ordinarily, but CharacterSpans if the widths are down to 1. When
-         * called on two succeeding offsets that happen to enclose a newline,
-         * this gives us newlines isolated in their own CharacterSpans.
-         */
-
-        before = from.span.split(0, point);
-        after = from.span.split(point);
-
-        /*
-         * and wrap Pieces around them.
-         */
-
-        one = new Piece();
-        two = new Piece();
-
-        preceeding = from.prev;
-
-        if (preceeding == null) {
-            first = one;
-        } else {
-            preceeding.next = one;
-            one.prev = preceeding;
-        }
-
-        one.span = before;
-        one.next = two;
-
-        two.prev = one;
-        two.span = after;
-
-        following = from.next;
-
-        if (following != null) {
-            two.next = following;
-            following.prev = two;
-        }
-
-        return one;
-    }
-
-    /**
-     * Find the Piece enclosing offset. This is used to then subdivide by
-     * splitAt().
-     * 
-     * Returns null if the offset is the end of the Chain. The end of the
-     * chain is null if the length of the Chain is zero, the null Piece is
-     * still the "end".
-     */
-    /*
-     * TODO implementation is an ugly linear search. Now that the offsets are
-     * cached in the Pieces, perhaps we can be smarter about hunting.
-     */
-    Piece pieceAt(final int offset) {
-        Piece piece, last;
-        int start;
-
-        if (offset == 0) {
-            return first;
-        }
-
-        if (length == -1) {
-            throw new IllegalStateException("\n"
-                    + "You must to ensure offsets are calculated before calling this");
-        }
-
-        if (offset == length) {
-            return null;
-        }
-
-        if (offset > length) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        piece = first;
-        last = first;
-        start = 0;
-
-        while (piece != null) {
-            start = piece.offset;
-
-            if (start > offset) {
-                return last;
-            }
-            if (start == offset) {
-                return piece;
-            }
-
-            last = piece;
-            piece = piece.next;
-        }
-
-        return last;
-    }
-
-    /**
-     * Find the Piece containing offset, and split it into two. Handle the
-     * boundary cases of an offset at a Piece boundary. Returns a Pair around
-     * the two Pieces. null will be set if there is no Piece before (or after)
-     * this point.
-     */
-    /*
-     * FIXME this code was copied to pieceAt(), and should call that method
-     * instead of doing the same work here.
-     */
-    Piece splitAt(int offset) {
-        Piece piece, last;
-        int start, following;
-
-        if (offset == 0) {
-            return null;
-        }
-
-        piece = first;
-        last = first;
-
-        start = 0;
-
-        while (piece != null) {
-            /*
-             * Are we already at a Piece boundary?
-             */
-
-            if (start == offset) {
-                return last;
-            }
-
-            /*
-             * Failing that, then let's see if this Piece contains the offset
-             * point. If it does, figure out the delta into this Piece's Chunk
-             * and split at that point.
-             */
-
-            following = start + piece.span.getWidth();
-
-            if (following > offset) {
-                return splitAt(piece, offset - start);
-            }
-            start = following;
-
-            last = piece;
-            piece = piece.next;
-        }
-
-        /*
-         * Reached the end; so long as there is nothing left we're in an
-         * append situation and no problem, otherwise out of bounds.
-         */
-
-        if (start == offset) {
-            return last;
-        }
-
-        throw new IndexOutOfBoundsException();
     }
 
     /**
@@ -380,322 +162,173 @@ public class TextChain
      * between them. This is the workhorse of this class.
      */
     void insert(int offset, Span addition) {
-        Piece one, two, piece;
-
         if (offset < 0) {
-            throw new IllegalArgumentException();
+            throw new IndexOutOfBoundsException();
         }
-        invalidateCache();
 
-        piece = new Piece();
-        piece.span = addition;
-
-        if (offset == 0) {
-            piece.next = first;
-            first.prev = piece;
-            first = piece;
+        if (root == null) {
+            if (offset != 0) {
+                throw new IndexOutOfBoundsException();
+            }
+            root = Node.createNode(addition);
             return;
         }
 
-        one = splitAt(offset);
-        two = one.next;
+        root = root.insertSpanAt(offset, addition);
+    }
 
-        if (two != null) {
-            piece.next = two;
-            two.prev = piece;
-        }
-        one.next = piece;
-        piece.prev = one;
+    /*
+     * FUTURE replace with use of TextChain's getTree() instead?
+     */
+    public Node extractAll() {
+        return root;
     }
 
     /**
-     * Get an array of Pieces representing the concatonation of the marked up
-     * Spans in a given range.
-     * 
-     * Allocate a new Chunk by concatonating any and all Chunks starting at
-     * offset for width. While deleting, as such, does not require this,
-     * undo/redo does.
-     * 
-     * This will operate on the Text, doing a split at each end. That isn't
-     * strictly necessary, except that the reason you're usually calling this
-     * is to delete, so the boundaries are a good first step, and it makes the
-     * algorithm here far simpler.
-     * 
-     * Returns a Pair of the two Pieces enclosing the extracted range.
+     * Delete a width wide segment starting at offset. Because people have to
+     * call extractRange() right before this in order to create a
+     * DeleteChange, this will duplicate effort. So, TODO create one which
+     * passes in a tree of the known bit to be removed.
      */
-    Pair extractFrom(int offset, int width) {
-        final Piece preceeding, alpha, omega;
+    protected void delete(final int offset, final int wide) {
+        final Node preceeding, following;
+        final int start, across;
 
-        if (offset < 0) {
-            throw new IllegalArgumentException();
+        if (root == null) {
+            throw new IllegalStateException("Can't delete when already emtpy");
         }
-        if (width < 0) {
-            throw new IllegalArgumentException();
-        }
-        if (width == 0) {
-            return null;
+        if (wide == 0) {
+            throw new IllegalArgumentException("Can't delete nothing");
         }
 
         /*
-         * TODO guard the other end, ie test for conditions
-         * IndexOutOfBoundsException("offset too high") and
-         * IndexOutOfBoundsException("width greater than available text")
+         * Handle the special case of deleting everything.
          */
 
-        /*
-         * Ensure splices at the start and end points of the deletion, and
-         * find out the pieces deliniating it. Then create a Span[] of the
-         * range that will be removed which we can return out for storage in
-         * the Change stack.
-         */
-
-        preceeding = splitAt(offset);
-        omega = splitAt(offset + width);
-        calculateOffsets();
-
-        if (preceeding == null) {
-            if (omega.prev == null) {
-                alpha = omega;
-            } else {
-                alpha = first;
-            }
-        } else {
-            alpha = preceeding.next;
-        }
-
-        return new Pair(alpha, omega);
-    }
-
-    static Span[] formArray(Pair pair) {
-        if (pair.one.offset < pair.two.offset) {
-            return formArray(pair.one, pair.two);
-        } else {
-            return formArray(pair.two, pair.one);
-        }
-    }
-
-    /**
-     * Form a Span[] from the Spans between Pieces start and end.
-     */
-    static Span[] formArray(Piece alpha, Piece omega) {
-        final Span[] result;
-        Piece p;
-        int i;
-
-        /*
-         * Need to know how many pieces are in between so we can size the
-         * return array.
-         */
-
-        p = alpha;
-        i = 1;
-
-        while (p != omega) {
-            i++;
-            p = p.next;
-        }
-
-        result = new Span[i];
-
-        /*
-         * And now populate the array representing the concatonation.
-         */
-
-        p = alpha;
-
-        for (i = 0; i < result.length; i++) {
-            result[i] = p.span;
-            p = p.next;
-        }
-
-        return result;
-    }
-
-    public Extract extractAll() {
-        Piece p, last;
-        Span[] range;
-
-        if (first == null) {
-            return null;
+        if ((offset == 0) && (wide == root.getWidth())) {
+            root = null;
+            return;
         }
 
         /*
-         * Maybe we should cache last?
+         * Create subtrees for everything before and after the deletion range
          */
 
-        p = first;
+        preceeding = root.subset(0, offset);
 
-        while (p.next != null) {
-            p = p.next;
-        }
-
-        last = p;
+        start = offset + wide;
+        across = root.getWidth() - start;
+        following = root.subset(start, across);
 
         /*
-         * get an array
+         * Now combine these subtrees to effect the deletion.
          */
 
-        range = formArray(first, last);
-        return new Extract(range);
-    }
-
-    /**
-     * Delete a width wide segment starting at offset.
-     */
-    protected void delete(int offset, int width) {
-        final Piece preceeding, following;
-        final Pair pair;
-
-        /*
-         * Ensure splices at the start and end points of the deletion, and
-         * find out the Pieces deliniating it. Then create a Span[] of the
-         * range that will be removed which we can return out for storage in
-         * the Change stack.
-         * 
-         * TODO now that we have exposed extractRange() and people have to
-         * call it before creating a DeleteChange, this will likely be
-         * duplicate effort. Once we are caching offsets hopefully we can cut
-         * down the work.
-         */
-
-        pair = extractFrom(offset, width);
-
-        /*
-         * Now change the linkages so we affect the deletion. There are a
-         * number of corner cases here, the most notable being what happens if
-         * you delete from the beginning (in which case you need to change the
-         * first pointer), and the very special case of deleting everything
-         * (in which case we put in an "empty" Piece with a zero length Span).
-         */
-
-        invalidateCache();
-
-        preceeding = pair.one.prev;
-        following = pair.two.next;
-
-        if (offset == 0) {
-            if (following == null) {
-                first = null;
-            } else {
-                following.prev = null;
-                first = following;
-            }
-        } else {
-            preceeding.next = following;
-            if (following != null) {
-                following.prev = preceeding;
-            }
-        }
+        root = Node.createNode(preceeding, following);
     }
 
     /**
      * Add or remove a Markup format from a range of text.
      */
-    protected void format(int offset, int width, Markup format) {
-        final Pair pair;
-        Piece p;
-        Span s;
-
-        pair = extractFrom(offset, width);
-
-        /*
-         * Unlike the insert() and delete() operations, we can leave the Piece
-         * sequence alone. The difference is that we change the Spans that are
-         * pointed to in the range being changed.
-         */
-
-        p = pair.one;
-
-        while (true) {
-            s = p.span;
-
-            p.span = s.applyMarkup(format);
-
-            if (p == pair.two) {
-                break;
-            }
-
-            p = p.next;
-        }
-    }
-
-    /**
-     * Remove a Markup format from a range of text.
-     */
-    protected void clear(int offset, int width, Markup format) {
-        final Pair pair;
-        Piece p;
-        Span s;
-
-        pair = extractFrom(offset, width);
+    protected void format(int offset, int wide, Markup format) {
+        final Node preceeding, following;
+        final int start, across;
+        final Span span;
+        AccumulatingCharacterVisitor tourist;
 
         /*
-         * Unlike the insert() and delete() operations, we can leave the Piece
-         * sequence alone. The difference is that we change the Spans that are
-         * pointed to in the range being changed.
+         * Create subtrees for everything before and after the changed range
          */
 
-        p = pair.one;
+        preceeding = root.subset(0, offset);
 
-        while (true) {
-            s = p.span;
+        start = offset + wide;
+        across = root.getWidth() - start;
+        following = root.subset(start, across);
 
-            p.span = s.removeMarkup(format);
+        /*
+         * Accumulate the text in the given range, and then create a new Span
+         * with the supplied new Markup.
+         */
 
-            if (p == pair.two) {
-                break;
-            }
+        tourist = new AccumulatingCharacterVisitor(wide, format);
 
-            p = p.next;
-        }
+        root.visit(tourist, offset, wide);
+
+        span = tourist.toSpan();
+
+        /*
+         * Now combine these subtrees to effect the deletion.
+         */
+
+        root = Node.createNode(preceeding, span, following);
     }
 
-    /**
-     * Clear all markup from a range of text.
-     */
-    protected void clear(int offset, int width) {
-        final Pair pair;
-        Piece p;
-        Span s;
+    private static class AccumulatingCharacterVisitor implements CharacterVisitor
+    {
+        private final int[] characters;
 
-        pair = extractFrom(offset, width);
+        private final Markup markup;
 
-        p = pair.one;
+        private int index;
 
-        while (true) {
-            s = p.span;
+        /**
+         * Create an accumulator for a given number of characters, to
+         * subsequently have the supplied format.
+         */
+        private AccumulatingCharacterVisitor(final int num, Markup format) {
+            characters = new int[num];
+            markup = format;
+            index = 0;
+        }
 
-            if (s.getMarkup() != null) {
-                p.span = s.copy(null);
+        public boolean visit(int character, Markup markup) {
+            characters[index] = character;
+            index++;
+            return false;
+        }
+
+        /**
+         * Convert the result of the accumulation into a single Span
+         */
+        /*
+         * FIXME This is awful; we need a Span constructor that works in
+         * character[]
+         */
+        private Span toSpan() {
+            StringBuilder str;
+            int i;
+
+            str = new StringBuilder(characters.length);
+
+            for (i = 0; i < characters.length; i++) {
+                str.appendCodePoint(characters[i]);
             }
 
-            if (p == pair.two) {
-                break;
-            }
-
-            p = p.next;
+            return Span.createSpan(str.toString(), markup);
         }
     }
 
     public Markup getMarkupAt(int offset) {
-        final Piece piece;
+        Span span;
 
-        if (length == -1) {
-            calculateOffsets();
+        if (root == null) {
+            return null;
         }
 
-        piece = pieceAt(offset);
-        if (piece == null) {
+        span = root.getSpanAt(offset);
+
+        if (span == null) {
             return null;
         } else {
-            return piece.span.getMarkup();
+            return span.getMarkup();
         }
     }
 
     /**
-     * Gets the array of Spans that represent the characters and formatting
-     * width wide from start. The result is returned wrapped in a read-only
-     * Extract object.
+     * Gets the Spans that represent the characters and formatting width wide
+     * from start. The result is returned wrapped in a read-only Extract
+     * object.
      * 
      * <p>
      * If width is negative, start will be decremented by that amount and the
@@ -714,118 +347,81 @@ public class TextChain
      * when constructing a DeleteChange, we probably end up duplicating a lot
      * of work when actually calling delete() after this here.
      */
-    public Extract extractRange(int start, int width) {
-        final Pair pair;
-        final Span[] spans;
-
-        if (width < 0) {
+    public Extract extractRange(int start, int wide) {
+        if (wide < 0) {
             throw new IllegalArgumentException();
         }
-        if (width == 0) {
-            return new Extract();
+        if (wide == 0) {
+            return null;
         }
 
-        pair = extractFrom(start, width);
-        spans = formArray(pair);
-        return new Extract(spans);
-    }
-
-    /*
-     * Strictly there is no reason for this to be here, but it allows us to
-     * keep the constructors in Extract out of view.
-     */
-    public static Extract extractFor(Span span) {
-        return new Extract(span);
+        return root.subset(start, wide);
     }
 
     /**
      * Generate an array of Extracts, one for each \n separated paragraph.
      */
     public Extract[] extractParagraphs() {
-        Extract[] result;
-        Piece p, alpha, omega;
-        Span s;
-        int num, len, i, delta;
+        final ArrayList<Integer> paragraphs;
+        final Node[] nodes;
+        int num, i, offset, wide;
 
-        if (first == null) {
+        if (root == null) {
             return new Extract[] {};
         }
 
         /*
          * First work out how many lines are in this Text as it stands right
-         * now.
+         * now. There is one paragraph if we're not empty.
          */
 
-        num = 1;
-        p = first;
+        paragraphs = new ArrayList<Integer>(8);
+        paragraphs.add(0);
 
-        while (p != null) {
-            s = p.span;
-            len = s.getWidth();
+        root.visit(new CharacterVisitor() {
+            private int offset = 0;
 
-            delta = -1;
-            for (i = 0; i < len; i++) {
-                if (s.getChar(i) == '\n') {
-                    delta = i;
-                    break;
+            public boolean visit(int character, Markup markup) {
+                if (character == '\n') {
+                    paragraphs.add(offset + 1);
                 }
+                offset++;
+                return false;
             }
-
-            if (delta == 0) {
-                p = splitAt(p, 1);
-                num++;
-            } else if (delta > 0) {
-                p = splitAt(p, delta);
-                p = p.next;
-                p = splitAt(p, 1);
-                num++;
-            }
-            p = p.next;
-        }
-
-        result = new Extract[num];
+        });
 
         /*
-         * This relies rather heavily on the assumption that there is not a
-         * newline character at the end of the TextChain.
+         * Now form the array of Nodes which represent the ranges of each
+         * paragraph. Note there is an assumption that there is not a newline
+         * character at the end of the TextChain.
          */
 
-        i = 0;
-        p = first;
-        s = null;
-        alpha = p;
-        omega = p;
+        num = paragraphs.size();
+        nodes = new Node[num];
 
-        while (p != null) {
-            s = p.span;
+        if (num == 1) {
+            nodes[0] = root;
+        } else {
+            offset = 0;
+            wide = paragraphs.get(1);
 
-            if (s.getChar(0) == '\n') { // FIXME use of 0
-                if (alpha == p) {
-                    /*
-                     * blank paragraph
-                     */
-                    result[i] = new Extract();
-                } else {
-                    /*
-                     * normal paragraph
-                     */
-                    result[i] = new Extract(formArray(alpha, omega));
-                }
-                i++;
-                alpha = p.next;
-            } else {
-                omega = p;
+            for (i = 0; i < num - 1; i++) {
+                offset = paragraphs.get(i);
+                wide = paragraphs.get(i + 1) - 1 - paragraphs.get(i);
+
+                nodes[i] = root.subset(offset, wide);
             }
 
-            p = p.next;
-        }
-        if (s.getChar(0) == '\n') {
-            result[i] = new Extract();
-        } else {
-            result[i] = new Extract(formArray(alpha, omega));
+            offset = 1 + offset + wide;
+            wide = root.getWidth() - offset;
+            nodes[i] = root.subset(offset, wide);
         }
 
-        return result;
+        /*
+         * Since Node is now Extract, we can just return our temporary array.
+         */
+
+        return nodes;
     }
 
     private Segment belongs;
@@ -844,192 +440,37 @@ public class TextChain
         return belongs;
     }
 
+    // FIXME doc
     public int wordBoundaryBefore(final int offset) {
-        final Piece origin;
+        final int result;
 
-        if (length == -1) {
-            calculateOffsets();
+        if (root == null) {
+            return 0;
         }
 
-        origin = pieceAt(offset);
-        if (origin == null) {
-            return length;
-        }
+        result = root.getWordBoundaryBefore(offset);
 
-        return wordBoundaryBefore(origin, offset);
-    }
-
-    private int wordBoundaryBefore(final Piece origin, final int offset) {
-        int start;
-        Piece p;
-        int i;
-        boolean found;
-        int ch; // switch to char if you're debugging.
-
-        /*
-         * Calculate start by seeking backwards to find whitespace
-         */
-
-        p = origin;
-        start = offset;
-        i = -1;
-        found = false;
-
-        while (p != null) {
-            i = start - p.offset;
-
-            while (i > 0) {
-                i--;
-                ch = p.span.getChar(i);
-                if (!(Character.isLetter(ch) || (ch == '\''))) {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (found) {
-                break;
-            }
-
-            start = p.offset;
-            p = p.prev;
-        }
-
-        if (!found) {
-            start = 0;
+        if (result == -1) {
+            return 0;
         } else {
-            start = p.offset + i + 1;
+            return result;
         }
-
-        return start;
     }
 
-    /*
-     * It would be nice to remove this
-     */
+    // FIXME doc
     public int wordBoundaryAfter(final int offset) {
-        final Piece origin;
+        final int result;
 
-        if (length == -1) {
-            calculateOffsets();
+        if (root == null) {
+            return 0;
         }
 
-        origin = pieceAt(offset);
-        if (origin == null) {
-            return length;
-        }
+        result = root.getWordBoundaryAfter(offset);
 
-        return wordBoundaryAfter(origin, offset);
-    }
-
-    private int wordBoundaryAfter(final Piece origin, final int offset) {
-        int end;
-        Piece p;
-        int i, len;
-        boolean found;
-        int ch;
-
-        /*
-         * Calculate end by seeking forwards to find whitespace
-         */
-
-        p = origin;
-        end = offset;
-        i = end - p.offset;
-        found = false;
-
-        while (p != null) {
-            len = p.span.getWidth();
-
-            while (i < len) {
-                ch = p.span.getChar(i);
-                if (!(Character.isLetter(ch) || (ch == '\''))) {
-                    found = true;
-                    break;
-                }
-                i++;
-            }
-
-            if (found) {
-                break;
-            }
-
-            p = p.next;
-            i = 0;
-        }
-
-        if (p == null) {
-            end = length;
+        if (result == -1) {
+            return root.getWidth();
         } else {
-            end = p.offset + i;
-        }
-
-        return end;
-    }
-
-    /*
-     * unused, but good code.
-     */
-    static String makeWordFromSpans(Extract extract) {
-        final StringBuilder str;
-        int i, I, j, J;
-        Span s;
-
-        I = extract.size();
-
-        if (I == 1) {
-            return extract.get(0).getText();
-        } else {
-            str = new StringBuilder();
-
-            for (i = 0; i < I; i++) {
-                s = extract.get(i);
-
-                J = s.getWidth();
-
-                for (j = 0; j < J; j++) {
-                    str.appendCodePoint(s.getChar(j));
-                }
-            }
-
-            return str.toString();
-        }
-    }
-
-    /*
-     * this could well become the basis of a public API
-     */
-    static String makeWordFromSpans(Pair pair) {
-        final Piece alpha, omega;
-        final StringBuilder str;
-        int j, J;
-        Piece p;
-        Span s;
-
-        alpha = pair.one;
-        omega = pair.two;
-
-        if (alpha == omega) {
-            return alpha.span.getText();
-        } else {
-            str = new StringBuilder();
-
-            p = alpha;
-            while (p != null) {
-                s = p.span;
-                J = s.getWidth();
-
-                for (j = 0; j < J; j++) {
-                    str.appendCodePoint(s.getChar(j));
-                }
-
-                if (p == omega) {
-                    break;
-                }
-                p = p.next;
-            }
-
-            return str.toString();
+            return result;
         }
     }
 
@@ -1040,41 +481,172 @@ public class TextChain
      */
     /*
      * After a huge amount of work, the current implementation in
-     * EditorTextView doesn't call this, but exercises a similar algorithm.
-     * Nevertheless this is heavily tested code, and we will probably return
-     * to this "pick word from offset" soon.
+     * EditorTextView doesn't call this, but needs the same boundary lookups,
+     * and meanwhile this is heavily tested.
      */
     String getWordAt(final int offset) {
-        final Piece origin;
-        int start, end;
-        int i;
-        Pair pair;
-        int ch;
+        int begin, end;
+        final StringBuilder str;
+        final String result;
 
-        if (length == -1) {
-            calculateOffsets();
-        }
-
-        if (offset == length) {
+        if (offset == root.getWidth()) {
             return null;
         }
 
-        origin = pieceAt(offset);
-
-        i = offset - origin.offset;
-        ch = origin.span.getChar(i);
-        if (!Character.isLetter(ch)) {
-            return null;
-        }
-
-        start = wordBoundaryBefore(origin, offset);
-        end = wordBoundaryAfter(origin, offset);
+        str = new StringBuilder();
 
         /*
-         * Now pull out the word
+         * Seek backwards from the current offset to find a word boundary.
          */
 
-        pair = extractFrom(start, end - start);
-        return makeWordFromSpans(pair);
+        begin = this.wordBoundaryBefore(offset);
+        end = this.wordBoundaryAfter(offset);
+
+        /*
+         * Iterate forward over the characters to get the word.
+         */
+
+        root.visit(new CharacterVisitor() {
+            public boolean visit(int character, Markup markup) {
+                str.appendCodePoint(character);
+                return false;
+            }
+        }, begin, end - begin);
+
+        /*
+         * Pull out the word
+         */
+
+        result = str.toString();
+        if (result.equals("")) {
+            return null;
+        } else {
+            return result;
+        }
+    }
+
+    /**
+     * Iterate over a given range and build encountered characters into words.
+     * 
+     * @author Andrew Cowie
+     */
+    private static class WordBuildingCharacterVisitor implements CharacterVisitor
+    {
+        /*
+         * The WordVisitor passed in to TextChain's visit() that will be
+         * invoked here as words are accumulated.
+         */
+        private WordVisitor tourist;
+
+        private StringBuilder str;
+
+        private int begin;
+
+        private int end;
+
+        private boolean skip;
+
+        /**
+         * Marker to allow us to avoid calling on the last word if the tourist
+         * returned true while visiting.
+         */
+        private boolean stop;
+
+        /*
+         * If a word has any range of non-spell checkable markup, then the
+         * whole word is not to be checkable.
+         */
+        private static boolean skipSpellCheck(Markup markup) {
+            if (markup == null) {
+                return false; // normal
+            }
+            if (markup.isSpellCheckable()) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        /**
+         * @param from
+         *            Because we visit words over a range, we need to bump our
+         *            starting offset by whatever the start of the range was
+         *            given in the call to TextChain's visit().
+         */
+        private WordBuildingCharacterVisitor(final WordVisitor visitor, final int from) {
+            tourist = visitor;
+            str = new StringBuilder();
+            begin = from;
+            end = from;
+            skip = false;
+            stop = false;
+        }
+
+        public boolean visit(final int character, final Markup markup) {
+            if (!skip) {
+                if (skipSpellCheck(markup)) {
+                    skip = true;
+                }
+            }
+
+            if (!isWhitespace(character)) {
+                str.appendCodePoint(character);
+                end++;
+                return false;
+            }
+
+            if (handleWord()) {
+                stop = true;
+                return true;
+            }
+
+            str.setLength(0);
+            end++;
+            begin = end;
+            skip = false;
+
+            return false;
+        }
+
+        /**
+         * Action the accumulated word.
+         */
+        /*
+         * Seperate code so that it can be invoked on the last word by the
+         * calling visit() method (the CharacterVisitor doesn't know when it's
+         * done, and so can't call this one last time).
+         */
+        private boolean handleWord() {
+            final String word;
+
+            if (stop) {
+                return true;
+            }
+
+            word = str.toString();
+            if (tourist.visit(word, skip, begin, end)) {
+                stop = true;
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    /**
+     * Visit through the given range and, as complete words are accumulated,
+     * invoke tourist's visit() method. Used in spell checking!
+     */
+    public void visit(final WordVisitor tourist, final int begin, final int end) {
+        final WordBuildingCharacterVisitor builder;
+
+        if (root == null) {
+            return;
+        }
+
+        builder = new WordBuildingCharacterVisitor(tourist, begin);
+
+        root.visit(builder, begin, end - begin);
+        builder.handleWord();
     }
 }

@@ -18,6 +18,17 @@
  */
 package quill.textbase;
 
+/**
+ * Insert some text into the TextChain.
+ * 
+ * @author Andrew Cowie
+ */
+/*
+ * FUTURE wouldn't we be better off having an InsertTextualChange that works
+ * for just a single Span? Admittedly that's only for keystrokes, but
+ * keystrokes are everything in a word processor! Maybe the whole question is
+ * moot if we get rid of Changes...
+ */
 public class InsertTextualChange extends TextualChange
 {
     /**
@@ -25,11 +36,11 @@ public class InsertTextualChange extends TextualChange
      * it.
      */
     public InsertTextualChange(TextChain chain, int offset, Span span) {
-        super(chain, offset, null, new Extract(span));
+        super(chain, offset, null, Node.createNode(span));
     }
 
     /**
-     * Alternately, you've been given a Range from somewhere and you want to
+     * Alternately, you've been given a range from somewhere and you want to
      * (re)insert it.
      */
     public InsertTextualChange(TextChain chain, int offset, Extract added) {
@@ -37,10 +48,10 @@ public class InsertTextualChange extends TextualChange
     }
 
     public void apply() {
-        chain.insert(offset, added.range);
+        chain.insert(offset, added);
     }
 
     public void undo() {
-        chain.delete(offset, added.width);
+        chain.delete(offset, added.getWidth());
     }
 }

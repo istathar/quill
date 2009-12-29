@@ -19,99 +19,66 @@
 package quill.textbase;
 
 /**
- * Read-only wrapper around an array of Spans.
+ * A range (or all) of the text within a TextChain.
  * 
  * @author Andrew Cowie
  */
 /*
- * The fields are package visible and that's ok because in here we know not to
- * change Span[], but if an Extract escapes outside this package then the
- * public methods are available and this class is immutable.
+ * This base class would be an interface except it allows us to have a public
+ * API with a create() function in it, and to adjust implementations down the
+ * track. It's not a base class for a binary-tree; if you need one do that in
+ * the Node subclass.
  */
-public class Extract
+public abstract class Extract
 {
-    final Span[] range;
+    /**
+     * Get the width of this range, in characters.
+     */
+    public abstract int getWidth();
 
-    final int width;
+    /**
+     * Get a String representing [just] the text in this range.
+     */
+    /*
+     * Only call this for cases where you only need a concatonated String; if
+     * you're doing anything more interesting then visit over the tree.
+     */
+    public abstract String getText();
 
-    Extract(Span[] range) {
-        int w;
+    /**
+     * Create an Extract wrapping the given Span.
+     */
+    public static Extract create(Span span) {
+        return Node.createNode(span);
+    }
 
-        w = 0;
+    /**
+     * Invoke tourist's visit() method for each Span in this extract.
+     */
+    public abstract void visit(SpanVisitor tourist);
 
-        for (Span s : range) {
-            w += s.getWidth();
+    /**
+     * Invoke tourist's visit() method for each character in this extract.
+     */
+    public abstract void visit(CharacterVisitor tourist);
+
+    /**
+     * Invoke tourist's visit() method for each character in this extract from
+     * starting offset <code>offset</code> for <code>wide</code> characters.
+     */
+    public abstract void visit(CharacterVisitor tourist, int offset, int wide);
+
+    /**
+     * Is the character a word character (from a spell-checking point of view)
+     * or whitespace?
+     */
+    protected static final boolean isWhitespace(int ch) {
+        if (Character.isLetter(ch)) {
+            return false;
         }
-
-        this.width = w;
-        this.range = range;
-    }
-
-    Extract(Span span) {
-        this.width = span.getWidth();
-        this.range = new Span[] {
-            span
-        };
-    }
-
-    Extract() {
-        this.width = 0;
-        this.range = new Span[] {};
-    }
-
-    /**
-     * Get the number of Spans in this Range.
-     */
-    public int size() {
-        return range.length;
-    }
-
-    /**
-     * Get the Span at index. Don't exceed {@link #size()} - 1.
-     */
-    public Span get(int index) {
-        return range[index];
-    }
-
-    /**
-     * Get the width, in characeters, that the Spans in this Range represent.
-     */
-    public int getWidth() {
-        return width;
-    }
-
-    /**
-     * Get a single continuous String with the textual contents of this
-     * Extract. The only time you should need this is for writing to
-     * clipboard.
-     */
-    public String getText() {
-        final StringBuilder str;
-        int i;
-
-        str = new StringBuilder();
-
-        for (i = 0; i < range.length; i++) {
-            str.append(range[i].getText());
+        if (ch == '\'') {
+            return false;
         }
-
-        return str.toString();
-    }
-
-    /**
-     * For debugging, only!
-     */
-    public String toString() {
-        final StringBuilder str;
-        int i;
-
-        str = new StringBuilder();
-
-        for (i = 0; i < range.length; i++) {
-            str.append(range[i].toString());
-            str.append('\n');
-        }
-
-        return str.toString();
+        return true;
     }
 }

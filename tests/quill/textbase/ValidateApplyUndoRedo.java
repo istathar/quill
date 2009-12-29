@@ -36,13 +36,17 @@ public class ValidateApplyUndoRedo extends TestCase
     public final void testInsertionAndDeletion() {
         final ChangeStack stack;
         final TextChain chain;
+        final Span span;
+        final Node tree;
         Extract extract;
         Change change;
 
         stack = new ChangeStack();
         chain = new TextChain();
+        span = createSpan("Hello World", null);
+        tree = Node.createNode(span);
 
-        change = new InsertTextualChange(chain, 0, new Extract(createSpan("Hello World", null)));
+        change = new InsertTextualChange(chain, 0, tree);
         stack.apply(change);
         assertEquals("Hello World", chain.toString());
         assertSame(change, stack.getCurrent());
@@ -89,9 +93,7 @@ public class ValidateApplyUndoRedo extends TestCase
         assertEquals("Hello World", chain.toString());
 
         stack.redo();
-        change = new InsertTextualChange(chain, 5, new Extract(new Span[] {
-            createSpan(" Santa Claus", null),
-        }));
+        change = new InsertTextualChange(chain, 5, Extract.create(createSpan(" Santa Claus", null)));
         stack.apply(change);
         assertEquals("Hello Santa Claus", chain.toString());
         assertSame(change, stack.getCurrent());

@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -19,27 +19,11 @@
 package quill.textbase;
 
 /**
- * Remove a range of text.
+ * Visit the Spans in a range, in order.
  * 
  * @author Andrew Cowie
  */
-public class DeleteTextualChange extends TextualChange
+public interface SpanVisitor
 {
-    /**
-     * While it would be nice to be able to say
-     * "just remove between these two points", we need to have a list of Spans
-     * that are going to be removed so we can restore them later if an undo
-     * happens.
-     */
-    public DeleteTextualChange(TextChain chain, int offset, Extract removed) {
-        super(chain, offset, removed, null);
-    }
-
-    protected void apply() {
-        chain.delete(offset, removed.getWidth());
-    }
-
-    protected void undo() {
-        chain.insert(offset, removed);
-    }
+    public boolean visit(Span span);
 }

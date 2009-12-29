@@ -27,7 +27,7 @@ public class SplitStructuralChange extends StructuralChange
     protected void apply() {
         final Segment twin;
         final TextChain original, twain;
-        Extract extract;
+        Extract tree;
         final int i, width;
         final Series series;
 
@@ -40,13 +40,13 @@ public class SplitStructuralChange extends StructuralChange
         width = original.length() - offset;
 
         if (offset == 0) {
-            extract = null;
+            tree = null;
             i = index;
         } else if (width == 0) {
-            extract = null;
+            tree = null;
             i = index + 1;
         } else {
-            extract = original.extractRange(offset, width);
+            tree = original.extractRange(offset, width);
             original.delete(offset, width);
             i = index + 1;
         }
@@ -58,10 +58,10 @@ public class SplitStructuralChange extends StructuralChange
 
         series = into.getParent();
 
-        if (extract != null) {
+        if (tree != null) {
             twin = into.createSimilar();
             twain = new TextChain();
-            twain.insert(0, extract.range);
+            twain.insert(0, tree);
             twin.setText(twain);
 
             series.insert(i, twin);
@@ -81,7 +81,7 @@ public class SplitStructuralChange extends StructuralChange
         int i;
         final Segment following;
         final TextChain first, second, third;
-        final Extract extract;
+        final Node tree;
 
         series = into.getParent();
 
@@ -100,12 +100,12 @@ public class SplitStructuralChange extends StructuralChange
 
             following = series.get(i);
             third = following.getText();
-            extract = third.extractAll();
+            tree = third.extractAll();
 
-            third.delete(0, extract.width);
+            third.delete(0, tree.getWidth());
 
             first = into.getText();
-            first.insert(offset, extract.range);
+            first.insert(offset, tree);
 
             series.delete(i);
             i--;

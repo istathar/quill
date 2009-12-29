@@ -76,31 +76,6 @@ is consistent with there only being one
 Internal
 </heading>
 <text>
-<bold>Need an offset cache</bold>
-</text>
-<text>
-The data structure used to back a
-<type>TextChain</type> is a mutable linked
-list; that's fine for arbitrary insertions,
-but our real need is to find <type>Span</type>s
-at given offsets and to break <type>Span</type>s
-(creating boundaries) at given offsets.
-</text>
-<text>
-This was fine for preliminary implementation,
-but with the addition of spell checking we
-have probably hit O(𝑛²) or worse when it
-comes to driving down splices as we iterate
-create <type>Span</type> boundaries at word
-beginnings and endings.
-</text>
-<text>
-<italics>This is in progress; see branch
-</italics><literal>'b-tree-of-spans'</literal>
-<italics> and also work by Robert Collins
-and Peter Miller.</italics>
-</text>
-<text>
 <bold>Undo stack is unbounded</bold>
 </text>
 <text>

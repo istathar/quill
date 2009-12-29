@@ -19,22 +19,20 @@
 package quill.textbase;
 
 /**
- * Wrapper touple representing the Pieces begining and ending a splice.
+ * Visit the characters in a range, one by one, in order.
  * 
  * @author Andrew Cowie
  */
-final class Pair
+public interface CharacterVisitor
 {
-    final Piece one;
-
-    final Piece two;
-
-    Pair(Piece first, Piece second) {
-        this.one = first;
-        this.two = second;
-    }
-
-    public String toString() {
-        return one + "\n" + two;
-    }
+    /**
+     * Callback for each character. Return <code>false</code> to keep going,
+     * or <code>true</code> to say you're done visiting.
+     * 
+     * @param character
+     *            the Unicode codepoint at this offset
+     * @param markup
+     *            the Markup formatting applicable at this offset.
+     */
+    public boolean visit(int character, Markup markup);
 }

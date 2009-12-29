@@ -66,7 +66,6 @@ import quill.textbase.Span;
 import static org.gnome.gtk.FileChooserAction.OPEN;
 import static org.gnome.gtk.FileChooserAction.SAVE;
 import static quill.textbase.Span.createSpan;
-import static quill.textbase.TextChain.extractFor;
 
 public class UserInterface
 {
@@ -161,7 +160,7 @@ public class UserInterface
                         return;
                     }
                     span = createSpan(str, null);
-                    stash = extractFor(span);
+                    stash = Extract.create(span);
                 }
             }
         });
@@ -179,10 +178,10 @@ public class UserInterface
     /**
      * Put the extracted text into the system clipboard.
      */
-    void setClipboard(Extract range) {
+    void setClipboard(Extract extract) {
         owner = true;
-        stash = range;
-        clipboard.setText(range.getText());
+        stash = extract;
+        clipboard.setText(extract.getText());
     }
 
     /**

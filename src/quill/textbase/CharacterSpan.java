@@ -109,7 +109,8 @@ public class CharacterSpan extends Span
 
     public int getChar(int position) {
         if (position != 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("\n"
+                    + "Can only address position 0 of a CharacterSpan, not " + position);
         }
         return ch;
     }

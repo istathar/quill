@@ -57,11 +57,13 @@ import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
+import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
 import quill.textbase.SplitStructuralChange;
 import quill.textbase.StructuralChange;
 import quill.textbase.TextChain;
 import quill.textbase.TextualChange;
+import quill.textbase.WordVisitor;
 
 import static org.gnome.gtk.TextWindowType.TEXT;
 import static quill.client.Quill.ui;
@@ -601,13 +603,11 @@ abstract class EditorTextView extends TextView
     void affect(Change change) {
         final StructuralChange structural;
         final TextualChange textual;
-        TextIter start, finish;
-        int offset;
-        int alpha, omega;
+        final TextIter start, finish;
+        final int offset;
+        final int alpha, omega;
         Extract r;
         int i;
-        Span s;
-        TextTag tag;
 
         if (change instanceof StructuralChange) {
             structural = (StructuralChange) change;
@@ -628,28 +628,34 @@ abstract class EditorTextView extends TextView
             offset = textual.getOffset();
             alpha = offset;
 
-            for (i = 0; i < r.size(); i++) {
-                s = r.get(i);
+            r.visit(new SpanVisitor() {
+                private int offset = alpha;
 
-                start = buffer.getIter(offset);
-                offset += s.getWidth();
-                finish = buffer.getIter(offset);
+                public boolean visit(Span s) {
+                    final TextIter start, finish;
+                    final TextTag tag;
 
-                /*
-                 * FUTURE this is horribly inefficient compared to just adding
-                 * or removing the tag that has changed. But it is undeniably
-                 * easy to express. To do this properly we'll have to get the
-                 * individual Markup and whether it was added or removed from
-                 * the FormatChange.
-                 */
+                    start = buffer.getIter(offset);
+                    offset += s.getWidth();
+                    finish = buffer.getIter(offset);
 
-                buffer.removeAllTags(start, finish);
-                tag = tagForMarkup(s.getMarkup());
-                if (tag == null) {
-                    continue;
+                    /*
+                     * FUTURE this is horribly inefficient compared to just
+                     * adding or removing the tag that has changed. But it is
+                     * undeniably easy to express. To do this properly we'll
+                     * have to get the individual Markup and whether it was
+                     * added or removed from the FormatChange.
+                     */
+
+                    buffer.removeAllTags(start, finish);
+                    tag = tagForMarkup(s.getMarkup());
+                    if (tag != null) {
+                        buffer.applyTag(tag, start, finish);
+                    }
+                    return false;
                 }
-                buffer.applyTag(tag, start, finish);
-            }
+            });
+
             omega = offset;
 
             checkSpellingRange(alpha, omega);
@@ -657,7 +663,7 @@ abstract class EditorTextView extends TextView
             textual = (TextualChange) change;
 
             alpha = textual.getOffset();
-            omega = alpha;
+            i = alpha;
 
             start = buffer.getIter(textual.getOffset());
 
@@ -665,18 +671,20 @@ abstract class EditorTextView extends TextView
             if (r != null) {
                 finish = buffer.getIter(textual.getOffset() + r.getWidth());
                 buffer.delete(start, finish);
-                start = finish;
+                // start = finish;
             }
 
             r = textual.getAdded();
             if (r != null) {
-                for (i = 0; i < r.size(); i++) {
-                    s = r.get(i);
-                    insertSpan(start, s);
-                }
-                omega += r.getWidth();
+                r.visit(new SpanVisitor() {
+                    public boolean visit(Span s) {
+                        insertSpan(start, s);
+                        return false;
+                    }
+                });
+                i += r.getWidth();
             }
-
+            omega = i;
             checkSpellingRange(alpha, omega);
         } else {
             throw new IllegalStateException("Unknown Change type");
@@ -693,8 +701,6 @@ abstract class EditorTextView extends TextView
         final TextIter start, finish;
         int alpha, omega;
         Extract r;
-        int i;
-        Span s;
 
         if (obj instanceof StructuralChange) {
             structural = (StructuralChange) obj;
@@ -721,10 +727,12 @@ abstract class EditorTextView extends TextView
 
             r = textual.getRemoved();
             if (r != null) {
-                for (i = 0; i < r.size(); i++) {
-                    s = r.get(i);
-                    insertSpan(start, s);
-                }
+                r.visit(new SpanVisitor() {
+                    public boolean visit(Span s) {
+                        insertSpan(start, s);
+                        return false;
+                    }
+                });
                 omega += r.getWidth();
             }
 
@@ -913,9 +921,7 @@ abstract class EditorTextView extends TextView
      */
     private void displaySegment() {
         final Extract entire;
-        TextIter pointer;
-        int i;
-        Span s;
+        final TextIter pointer;
 
         /*
          * Easy enough to just set the internal TextStack backing this editor
@@ -936,10 +942,12 @@ abstract class EditorTextView extends TextView
 
         pointer = buffer.getIterStart();
 
-        for (i = 0; i < entire.size(); i++) {
-            s = entire.get(i);
-            insertSpan(pointer, s);
-        }
+        entire.visit(new SpanVisitor() {
+            public boolean visit(Span span) {
+                insertSpan(pointer, span);
+                return false;
+            }
+        });
 
         checkSpellingRange(0, chain.length());
     }
@@ -1447,70 +1455,12 @@ abstract class EditorTextView extends TextView
         return true;
     }
 
-    /*
-     * If a word has any range of non-spell checkable markup, then the whole
-     * word is not to be checkable.
-     */
-    private static boolean skipSpellCheck(Markup markup) {
-        if (markup == null) {
-            return false; // normal
-        }
-        if (markup.isSpellCheckable()) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    private static String makeWordFromSpans(Extract extract) {
-        final StringBuilder str;
-        int i, I, j, J;
-        Span s;
-
-        I = extract.size();
-
-        if (I == 0) {
-            return "";
-        }
-
-        s = extract.get(0);
-
-        if (I == 1) {
-            if (skipSpellCheck(s.getMarkup())) {
-                return "";
-            } else {
-                return s.getText();
-            }
-        } else {
-            str = new StringBuilder();
-
-            for (i = 0; i < I; i++) {
-                s = extract.get(i);
-
-                if (skipSpellCheck(s.getMarkup())) {
-                    return "";
-                }
-
-                J = s.getWidth();
-
-                for (j = 0; j < J; j++) {
-                    str.appendCodePoint(s.getChar(j));
-                }
-            }
-
-            return str.toString();
-        }
-    }
-
     /**
      * Iterate over words from before(begin) to after(end)
      */
-    private void checkSpellingRange(final int begin, final int end) {
-        final int done;
+    private void checkSpellingRange(int begin, final int end) {
         int alpha, omega;
-        Extract extract;
-        String word;
-        TextIter start, finish;
+        final TextIter start, finish;
 
         /*
          * Some blocks (ie PreformatSegment as presented by
@@ -1522,9 +1472,26 @@ abstract class EditorTextView extends TextView
             return;
         }
 
+        /*
+         * There's a corner case where if you type space to complete or split
+         * a word, you've left the previous word behind without checking it.
+         * So push back one (so long as there is room).
+         * 
+         * This is somewhat ironic after all the work we put in to getting the
+         * definition of word boundaries right in Node.
+         */
+
+        if (begin > 0) {
+            begin--;
+        }
+
+        /*
+         * Seek backwards and forwards to find the beginning and end of the
+         * word(s) in the given range.
+         */
+
         alpha = chain.wordBoundaryBefore(begin);
-        omega = begin;
-        done = chain.wordBoundaryAfter(end);
+        omega = chain.wordBoundaryAfter(end);
 
         /*
          * There's an annoying bug whereby if you type Space in the middle of
@@ -1534,25 +1501,32 @@ abstract class EditorTextView extends TextView
          * the range being checked, and then only [re]highlighting words that
          * need it.
          */
+
         start = buffer.getIter(alpha);
-        finish = buffer.getIter(done);
+        finish = buffer.getIter(omega);
         buffer.removeTag(spelling, start, finish);
 
-        while (omega < done) {
-            omega = chain.wordBoundaryAfter(alpha);
+        /*
+         * Then iterate forward across the range and mark mispelled words!
+         */
 
-            extract = chain.extractRange(alpha, omega - alpha);
-            word = makeWordFromSpans(extract);
+        chain.visit(new WordVisitor() {
+            public boolean visit(String word, boolean skip, int begin, int end) {
+                final TextIter start, finish;
 
-            if (!ui.dict.check(word)) {
-                start = buffer.getIter(alpha);
-                finish = buffer.getIter(omega);
-                buffer.applyTag(spelling, start, finish);
+                if (skip) {
+                    return false;
+                }
+
+                if (!ui.dict.check(word)) {
+                    start = buffer.getIter(begin);
+                    finish = buffer.getIter(end);
+                    buffer.applyTag(spelling, start, finish);
+                }
+
+                return false;
             }
-
-            omega++;
-            alpha = omega;
-        }
+        }, alpha, omega);
     }
 
     int getInsertOffset() {

@@ -157,6 +157,7 @@ public class ValidateWordExtraction extends TestCase
 
         assertEquals(26, chain.length());
         assertEquals('z', chain.toString().charAt(25));
+        assertEquals("abc efg ijk. nop rstuvwxyz", chain.toString());
 
         assertEquals("abc", chain.getWordAt(0));
         assertEquals("abc", chain.getWordAt(1));
@@ -242,5 +243,87 @@ public class ValidateWordExtraction extends TestCase
         for (i = 24; i < 30; i++) {
             assertEquals("system", chain.getWordAt(i));
         }
+    }
+
+    public final void testVisitingOverWords() {
+        final TextChain chain;
+
+        chain = new TextChain("Test");
+        chain.append(Span.createSpan(' ', null));
+        chain.append(Span.createSpan("emrg", null));
+        chain.append(Span.createSpan("ency", null));
+        chain.append(Span.createSpan(" bro𝑎dcast sys", null));
+        chain.append(Span.createSpan('t', null));
+        chain.append(Span.createSpan('e', null));
+        chain.append(Span.createSpan('m', null));
+
+        chain.visit(new WordVisitor() {
+            private int iteration = 0;
+
+            public boolean visit(String word, boolean skip, int begin, int end) {
+                switch (iteration) {
+                case 0:
+                    assertEquals("Test", word);
+                    assertEquals(0, begin);
+                    assertEquals(4, end);
+                    break;
+                case 1:
+                    assertEquals("emrgency", word);
+                    assertEquals(5, begin);
+                    assertEquals(13, end);
+                    break;
+                case 2:
+                    assertEquals("bro𝑎dcast", word);
+                    assertEquals(14, begin);
+                    assertEquals(23, end);
+                    break;
+                case 3:
+                    assertEquals("system", word);
+                    assertEquals(24, begin);
+                    assertEquals(30, end);
+                    break;
+                }
+
+                iteration++;
+                return false;
+            }
+        }, 0, chain.length());
+
+        /*
+         * That works, which is great! But it turns out the bug happened when
+         * the starting offset wasn't zero. Try again.
+         */
+
+        chain.visit(new WordVisitor() {
+            private int iteration = 0;
+
+            public boolean visit(String word, boolean skip, int begin, int end) {
+                switch (iteration) {
+                case 0:
+                    assertEquals("t", word);
+                    assertEquals(3, begin);
+                    assertEquals(4, end);
+                    break;
+                case 1:
+                    assertEquals("emrgency", word);
+                    assertEquals(5, begin);
+                    assertEquals(13, end);
+                    break;
+                case 2:
+                    assertEquals("bro𝑎dcast", word);
+                    assertEquals(14, begin);
+                    assertEquals(23, end);
+                    break;
+                case 3:
+                    assertEquals("sys", word);
+                    assertEquals(24, begin);
+                    assertEquals(27, end);
+                    break;
+                }
+
+                iteration++;
+                return false;
+            }
+        }, 3, 27);
     }
 }

@@ -138,6 +138,7 @@ public abstract class Span
 
         str = new StringBuilder();
 
+        str.append('(');
         str.append('"');
         str.append(getText());
         str.append('"');
@@ -148,6 +149,7 @@ public abstract class Span
             str.append(", ");
             str.append(this.markup.toString());
         }
+        str.append(')');
 
         return str.toString();
     }

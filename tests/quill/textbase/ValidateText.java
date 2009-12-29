@@ -18,10 +18,11 @@
  */
 package quill.textbase;
 
+import java.util.ArrayList;
+
 import junit.framework.TestCase;
 
 import static quill.textbase.Span.createSpan;
-import static quill.textbase.TextChain.formArray;
 
 public class ValidateText extends TestCase
 {
@@ -29,6 +30,7 @@ public class ValidateText extends TestCase
         final TextChain start;
 
         start = new TextChain("Hello world");
+        assertEquals(11, start.length());
 
         assertEquals("Hello world", start.toString());
     }
@@ -41,6 +43,8 @@ public class ValidateText extends TestCase
 
         second = createSpan(" it is a sunny day", null);
         text.append(second);
+
+        assertEquals("Hello world it is a sunny day".length(), text.length());
 
         assertEquals("Hello world it is a sunny day", text.toString());
     }
@@ -66,12 +70,11 @@ public class ValidateText extends TestCase
 
     public final void testEmptyChain() {
         final TextChain chain;
-        Piece piece;
 
         chain = new TextChain();
 
-        piece = chain.pieceAt(0);
-        assertNull(piece);
+        assertEquals(0, chain.length());
+        assertEquals("", chain.toString());
     }
 
     private static TextChain sampleData() {
@@ -89,7 +92,7 @@ public class ValidateText extends TestCase
         return result;
     }
 
-    public final void testCheckSamplePieces() {
+    public final void testCheckSampleData() {
         final String expected;
         final TextChain chain;
 
@@ -101,44 +104,41 @@ public class ValidateText extends TestCase
         assertEquals(expected, chain.toString());
     }
 
-    public final void testPieceAt() {
+    public final void testSpanAt() {
         final TextChain chain;
-        Piece piece;
+        Span span;
 
         chain = sampleData();
-        // force cache
-        chain.length();
 
-        piece = chain.pieceAt(0);
-        assertEquals("One", piece.span.getText());
-        piece = chain.pieceAt(1);
-        assertEquals("One", piece.span.getText());
-        piece = chain.pieceAt(2);
-        assertEquals("One", piece.span.getText());
-        piece = chain.pieceAt(3);
-        assertEquals(" ", piece.span.getText());
-        piece = chain.pieceAt(4);
-        assertEquals("Two", piece.span.getText());
+        span = chain.spanAt(0);
+        assertEquals("One", span.getText());
+        span = chain.spanAt(1);
+        assertEquals("One", span.getText());
+        span = chain.spanAt(2);
+        assertEquals("One", span.getText());
+        span = chain.spanAt(3);
+        assertEquals(" ", span.getText());
+        span = chain.spanAt(4);
+        assertEquals("Two", span.getText());
 
-        piece = chain.pieceAt(12);
-        assertEquals("Three", piece.span.getText());
+        span = chain.spanAt(12);
+        assertEquals("Three", span.getText());
     }
 
-    public final void testPieceAtEnd() {
+    public final void testSpanAtEnd() {
         final TextChain chain;
-        Piece piece;
+        Span span;
 
         chain = sampleData();
-        chain.length();
 
-        piece = chain.pieceAt(17);
-        assertEquals("Four", piece.span.getText());
+        span = chain.spanAt(17);
+        assertEquals("Four", span.getText());
 
-        piece = chain.pieceAt(18);
-        assertNull(piece);
+        span = chain.spanAt(18);
+        assertNull(span);
 
         try {
-            piece = chain.pieceAt(19);
+            span = chain.spanAt(19);
             fail();
         } catch (IndexOutOfBoundsException ioobe) {
             // good
@@ -146,57 +146,20 @@ public class ValidateText extends TestCase
     }
 
     public final void testSplittingAtPoint() {
-        final TextChain text;
+        final Node node, one, two;
         final Span initial;
-        final Piece one, two;
 
         initial = createSpan("Concave", null);
-        text = new TextChain(initial);
-        assertEquals("Concave", text.toString());
-        assertNull(text.first.next);
-        assertNull(text.first.prev);
+        node = Node.createNode(initial);
+        assertEquals("Concave", convertToString(node));
 
-        one = text.splitAt(text.first, 3);
-        assertEquals("Concave", text.toString());
+        one = node.subset(0, 3);
+        assertEquals("Concave", convertToString(node));
+        assertEquals("Con", convertToString(one));
 
-        assertNotNull(one.next);
-        assertEquals("Con", one.span.getText());
-
-        two = one.next;
-
-        assertEquals("cave", two.span.getText());
-        assertNull(two.next);
-        assertEquals(one, two.prev);
-    }
-
-    public final void testSplittingAtPieceBoundary() {
-        final TextChain text;
-        final Span a, b;
-        final Piece first, one, two;
-
-        a = createSpan("Alpha", null);
-        b = createSpan("Bravo", null);
-
-        text = new TextChain(a);
-        text.append(b);
-        assertEquals("AlphaBravo", text.toString());
-
-        assertNull(text.first.prev);
-        assertNull(text.first.next.next);
-
-        first = text.first;
-        one = text.splitAt(5);
-        assertEquals("AlphaBravo", text.toString());
-
-        assertSame(first, one);
-        assertNotNull(one.next);
-        assertNotSame(one, one.next);
-        assertEquals("Alpha", one.span.getText());
-
-        two = one.next;
-        assertEquals("Bravo", two.span.getText());
-        assertNull(two.next);
-        assertEquals(one, two.prev);
+        two = node.subset(3, 4);
+        assertEquals("Concave", convertToString(node));
+        assertEquals("cave", convertToString(two));
     }
 
     public final void testSingleSplice() {
@@ -227,7 +190,7 @@ public class ValidateText extends TestCase
 
         assertEquals("One Two Three Four", text.toString());
 
-        assertEquals(7, calculateNumberPieces(text));
+        assertEquals(7, countNumberOfSpans(text));
 
         /*
          * Now, try splicing something in
@@ -237,20 +200,110 @@ public class ValidateText extends TestCase
         text.insert(5, addition);
         assertEquals("One TwentyTwo Three Four", text.toString());
 
-        assertEquals(9, calculateNumberPieces(text));
+        assertEquals(9, countNumberOfSpans(text));
     }
 
-    private static int calculateNumberPieces(TextChain text) {
-        Piece p;
-        int i;
+    private static int countNumberOfSpans(TextChain chain) {
+        final Node root;
+        final CountingSpanVisitor tourist;
 
-        i = 0;
-        p = text.first;
-        while (p != null) {
-            p = p.next;
-            i++;
+        root = chain.getTree();
+
+        if (root == null) {
+            return 0;
         }
-        return i;
+
+        tourist = new CountingSpanVisitor();
+        root.visit(tourist);
+        return tourist.count;
+    }
+
+    private static class CountingSpanVisitor implements SpanVisitor
+    {
+        private int count;
+
+        private CountingSpanVisitor() {
+            count = 0;
+        }
+
+        public boolean visit(Span span) {
+            count++;
+            return false;
+        }
+    }
+
+    /**
+     * Local utility to turn a tree into an array. This is obviously
+     * inefficient, but a large number of the original Extract tests here
+     * relied on this behaviour (since Extract wraps Span[]) so we wrap
+     * tree<Span> in Span[] to get on with it.
+     */
+    private static Span[] convertToSpanArray(final Node node) {
+        final AccumulatingSpanVisitor tourist;
+
+        if (node == null) {
+            return new Span[] {};
+        }
+
+        tourist = new AccumulatingSpanVisitor();
+        node.visit(tourist);
+        return tourist.getList();
+    }
+
+    private static class AccumulatingSpanVisitor implements SpanVisitor
+    {
+        private ArrayList<Span> list;
+
+        private AccumulatingSpanVisitor() {
+            list = new ArrayList<Span>(8);
+        }
+
+        public boolean visit(Span span) {
+            list.add(span);
+            return false;
+        }
+
+        private Span[] getList() {
+            final Span[] result;
+
+            result = new Span[list.size()];
+            list.toArray(result);
+
+            return result;
+        }
+    }
+
+    /**
+     * Test utility to turn a tree into a String.
+     */
+    private static String convertToString(final Node node) {
+        final StringSpanVisitor tourist;
+
+        if (node == null) {
+            return "";
+        }
+
+        tourist = new StringSpanVisitor();
+        node.visit(tourist);
+        return tourist.getString();
+    }
+
+    private static class StringSpanVisitor implements SpanVisitor
+    {
+        private StringBuilder str;
+
+        private StringSpanVisitor() {
+            str = new StringBuilder();
+        }
+
+        public boolean visit(Span span) {
+            str.append(span.getText());
+            return false;
+        }
+
+        private String getString() {
+            return str.toString();
+        }
     }
 
     public final void testTextLength() {
@@ -271,7 +324,7 @@ public class ValidateText extends TestCase
         assertEquals(14, text.length());
     }
 
-    public final void testInsertBetweenExistingChunks() {
+    public final void testInsertBeginning() {
         final TextChain text;
         final Span zero, one, two, three;
 
@@ -280,14 +333,38 @@ public class ValidateText extends TestCase
         two = createSpan("Two", null);
         three = createSpan("Three", null);
 
-        text = new TextChain(one);
+        text = new TextChain();
+        text.append(one);
         text.append(two);
         text.append(three);
 
         assertEquals("OneTwoThree", text.toString());
+        assertEquals(11, text.length());
 
         text.insert(0, zero);
         assertEquals("ZeroOneTwoThree", text.toString());
+        assertEquals(15, text.length());
+    }
+
+    public final void testInsertBetweenExistingSpans() {
+        final TextChain text;
+        final Span zero, one, two, three;
+
+        zero = createSpan("Zero", null);
+        one = createSpan("One", null);
+        two = createSpan("Two", null);
+        three = createSpan("Three", null);
+
+        text = new TextChain(zero);
+        text.append(two);
+        text.append(three);
+
+        assertEquals("ZeroTwoThree", text.toString());
+        assertEquals(12, text.length());
+
+        text.insert(4, one);
+        assertEquals("ZeroOneTwoThree", text.toString());
+        assertEquals(15, text.length());
 
         text.insert(15, zero);
         assertEquals("ZeroOneTwoThreeZero", text.toString());
@@ -335,25 +412,27 @@ public class ValidateText extends TestCase
         return str.toString();
     }
 
-    public final void testExtractNothing() {
+    public final void testSubsetNothing() {
         final TextChain text;
-        Pair pair;
+        final Node tree;
+        Node node;
 
         text = new TextChain("All good people");
+        tree = text.getTree();
 
-        pair = text.extractFrom(2, 0);
-        assertNull(pair);
-        pair = text.extractFrom(0, 0);
-        assertNull(pair);
-        pair = text.extractFrom(15, 0);
-        assertNull(pair);
+        node = tree.subset(2, 0);
+        assertNull(node);
+        node = tree.subset(0, 0);
+        assertNull(node);
+        node = tree.subset(15, 0);
+        assertNull(node);
     }
 
-    public final void testExtractRange() {
+    public final void testSubsetRange() {
         final TextChain text;
         final Span zero, one, two, three;
         final Span[] range;
-        final Pair pair;
+        final Node tree, node;
 
         zero = createSpan("Zero", null);
         one = createSpan("One", null);
@@ -367,19 +446,19 @@ public class ValidateText extends TestCase
 
         assertEquals("ZeroOneTwoThree", text.toString());
 
-        pair = text.extractFrom(2, 11);
-
+        tree = text.getTree();
+        node = tree.subset(2, 11);
         assertEquals("ZeroOneTwoThree", text.toString());
 
-        range = formArray(pair);
+        range = convertToSpanArray(node);
         assertEquals(11, lengthOf(range));
         assertEquals("roOneTwoThr", textOf(range));
     }
 
-    public final void testExtractAll() {
+    public final void testSubsetAll() {
         final TextChain text;
         final Span zero, one, two;
-        final Pair pair;
+        final Node tree, node;
         final Span[] range;
 
         zero = createSpan("James", null);
@@ -392,11 +471,12 @@ public class ValidateText extends TestCase
 
         assertEquals("James T. Kirk", text.toString());
 
-        pair = text.extractFrom(0, 13);
+        tree = text.getTree();
+        node = tree.subset(0, 13);
 
         assertEquals("James T. Kirk", text.toString());
 
-        range = formArray(pair);
+        range = convertToSpanArray(node);
         assertEquals(13, lengthOf(range));
         assertEquals("James T. Kirk", textOf(range));
     }
@@ -404,6 +484,8 @@ public class ValidateText extends TestCase
     public final void testDeleteRange() {
         final TextChain text;
         final Span zero, one, two, three;
+        Node node;
+        Span[] outcome;
 
         zero = createSpan("Zero", null);
         one = createSpan("One", null);
@@ -418,13 +500,16 @@ public class ValidateText extends TestCase
 
         text.delete(2, 11);
         assertEquals("Zeee", text.toString());
-        assertEquals(2, calculateNumberPieces(text));
-        assertEquals("Ze", text.first.span.getText());
-        assertEquals("ee", text.first.next.span.getText());
+        assertEquals(2, countNumberOfSpans(text));
+
+        node = text.getTree();
+        outcome = convertToSpanArray(node);
+        assertEquals("Ze", outcome[0].getText());
+        assertEquals("ee", outcome[1].getText());
 
         text.delete(1, 2);
         assertEquals("Ze", text.toString());
-        assertEquals(2, calculateNumberPieces(text));
+        assertEquals(2, countNumberOfSpans(text));
     }
 
     public final void testDeleteBoundaries() {
@@ -434,11 +519,11 @@ public class ValidateText extends TestCase
 
         text.delete(0, 6);
         assertEquals("World", text.toString());
-        assertEquals(1, calculateNumberPieces(text));
+        assertEquals(1, countNumberOfSpans(text));
 
         text.delete(3, 2);
         assertEquals("Wor", text.toString());
-        assertEquals(1, calculateNumberPieces(text));
+        assertEquals(1, countNumberOfSpans(text));
     }
 
     public final void testDeleteAll() {
@@ -448,7 +533,7 @@ public class ValidateText extends TestCase
 
         text.delete(0, 5);
         assertEquals("", text.toString());
-        assertEquals(0, calculateNumberPieces(text));
+        assertEquals(0, countNumberOfSpans(text));
     }
 
     public final void testBoundsChecking() {
@@ -463,7 +548,7 @@ public class ValidateText extends TestCase
         }
 
         assertEquals("Magic", text.toString());
-        assertEquals(1, calculateNumberPieces(text));
+        assertEquals(1, countNumberOfSpans(text));
 
         try {
             text.delete(7, 3);
@@ -473,7 +558,7 @@ public class ValidateText extends TestCase
         }
 
         assertEquals("Magic", text.toString());
-        assertEquals(1, calculateNumberPieces(text));
+        assertEquals(1, countNumberOfSpans(text));
 
         try {
             text.delete(2, 6);
@@ -483,13 +568,14 @@ public class ValidateText extends TestCase
         }
 
         assertEquals("Magic", text.toString());
-        assertEquals(2, calculateNumberPieces(text));
+        assertEquals(1, countNumberOfSpans(text));
         // is ok
     }
 
     public final void testApplyFormatting() {
         final TextChain text;
-        Piece p;
+        Node tree;
+        Span[] results;
 
         text = new TextChain("Hello World");
 
@@ -500,11 +586,12 @@ public class ValidateText extends TestCase
 
         text.format(0, 5, Common.ITALICS);
 
-        assertEquals(2, calculateNumberPieces(text));
-        p = text.first;
-        assertSame(p.span.getMarkup(), Common.ITALICS);
-        p = p.next;
-        assertNull(p.span.getMarkup());
+        assertEquals(2, countNumberOfSpans(text));
+        tree = text.getTree();
+        results = convertToSpanArray(tree);
+        assertSame(results[0].getMarkup(), Common.ITALICS);
+        assertSame(results[1].getMarkup(), null);
+
         assertEquals("Hello World", text.toString());
 
         /*
@@ -513,16 +600,16 @@ public class ValidateText extends TestCase
 
         text.format(6, 5, Common.BOLD);
 
-        assertEquals(3, calculateNumberPieces(text));
-        p = text.first;
-        assertSame(p.span.getMarkup(), Common.ITALICS);
-        p = p.next;
-        assertEquals(null, p.span.getMarkup());
-        assertEquals(" ", p.span.getText());
-        p = p.next;
-        assertSame(p.span.getMarkup(), Common.BOLD);
-        assertEquals("World", p.span.getText());
-        assertNull(p.next);
+        assertEquals(3, countNumberOfSpans(text));
+        tree = text.getTree();
+        results = convertToSpanArray(tree);
+        assertSame(results[0].getMarkup(), Common.ITALICS);
+        assertSame(results[1].getMarkup(), null);
+        assertEquals(" ", results[1].getText());
+
+        assertSame(results[2].getMarkup(), Common.BOLD);
+        assertEquals("World", results[2].getText());
+
         assertEquals("Hello World", text.toString());
 
         /*
@@ -532,13 +619,11 @@ public class ValidateText extends TestCase
         text.format(0, 11, Common.FILENAME);
 
         // NEW: will replace all
-        assertEquals(3, calculateNumberPieces(text));
-        p = text.first;
-        assertSame(p.span.getMarkup(), Common.FILENAME);
-        p = p.next;
-        assertSame(p.span.getMarkup(), Common.FILENAME);
-        p = p.next;
-        assertSame(p.span.getMarkup(), Common.FILENAME);
+        assertEquals(1, countNumberOfSpans(text));
+        tree = text.getTree();
+        results = convertToSpanArray(tree);
+        assertSame(results[0].getMarkup(), Common.FILENAME);
+
         assertEquals("Hello World", text.toString());
     }
 
@@ -548,112 +633,6 @@ public class ValidateText extends TestCase
         assertEquals(0xf0f0, (0xfff0 & 0xf0f0));
         assertEquals(0xf0f0, (0xfff0 & (0xfff0 ^ 0x0f00)));
         assertEquals(0xfff0, (0xfff0 & (0xfff0 ^ 0x0000)));
-    }
-
-    public final void testRemovingFormatting() {
-        final TextChain text;
-        Piece p;
-
-        text = new TextChain("Hello World");
-        assertEquals("Hello World", text.toString());
-
-        /*
-         * Setup as demonstrated above
-         */
-
-        text.format(0, 11, Common.FILENAME);
-        text.format(0, 5, Common.ITALICS);
-        text.format(6, 5, Common.BOLD);
-
-        /*
-         * Now remove one, and test
-         */
-
-        text.clear(0, 11, Common.ITALICS);
-
-        assertEquals(3, calculateNumberPieces(text));
-        p = text.first;
-        assertEquals(null, p.span.getMarkup());
-        p = p.next;
-        assertSame(p.span.getMarkup(), Common.FILENAME);
-        p = p.next;
-        assertSame(p.span.getMarkup(), Common.BOLD);
-
-        /*
-         * Does doing it twice hurt?
-         */
-
-        text.clear(0, 11, Common.ITALICS);
-
-        assertEquals(3, calculateNumberPieces(text));
-        p = text.first;
-        assertEquals(null, p.span.getMarkup());
-        p = p.next;
-        assertSame(p.span.getMarkup(), Common.FILENAME);
-        p = p.next;
-        assertSame(p.span.getMarkup(), Common.BOLD);
-
-        text.clear(3, 5, Common.FILENAME);
-
-        assertEquals(5, calculateNumberPieces(text));
-
-        // Hel
-        p = text.first;
-        assertEquals(null, p.span.getMarkup());
-
-        // "lo"
-        p = p.next;
-        assertEquals(null, p.span.getMarkup());
-
-        // " "
-        p = p.next;
-        assertEquals(null, p.span.getMarkup());
-
-        // "Wo"
-        p = p.next;
-        assertSame(p.span.getMarkup(), Common.BOLD);
-
-        // "rld"
-        p = p.next;
-        assertSame(p.span.getMarkup(), Common.BOLD);
-    }
-
-    public final void testRemovingFormatFromZero() {
-        final TextChain text;
-        Piece p;
-
-        text = new TextChain("Yo!");
-        assertEquals("Yo!", text.toString());
-
-        p = text.first;
-        while (p != null) {
-            assertNull(p.span.getMarkup());
-            p = p.next;
-        }
-
-        /*
-         * Should have no effect
-         */
-
-        text.clear(0, 3, Common.FILENAME);
-
-        p = text.first;
-        while (p != null) {
-            assertNull(p.span.getMarkup());
-            p = p.next;
-        }
-
-        /*
-         * Should again have no effect
-         */
-
-        text.clear(0, 3, Common.FILENAME);
-
-        p = text.first;
-        while (p != null) {
-            assertNull(p.span.getMarkup());
-            p = p.next;
-        }
     }
 
     public final void testGetMarkupFromChain() {
