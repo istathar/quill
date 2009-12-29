@@ -440,23 +440,37 @@ public class TextChain
         return belongs;
     }
 
+    // FIXME doc
     public int wordBoundaryBefore(final int offset) {
+        final int result;
+
         if (root == null) {
             return 0;
+        }
+
+        result = root.getWordBoundaryBefore(offset);
+
+        if (result == -1) {
+            return 0;
         } else {
-            return root.getWordBoundaryBefore(offset);
+            return result;
         }
     }
 
-    /*
-     * TODO this is still useful while refactoring, but we should change this
-     * to a strong Visitor interface.
-     */
+    // FIXME doc
     public int wordBoundaryAfter(final int offset) {
+        final int result;
+
         if (root == null) {
             return 0;
+        }
+
+        result = root.getWordBoundaryAfter(offset);
+
+        if (result == -1) {
+            return root.getWidth();
         } else {
-            return root.getWordBoundaryAfter(offset);
+            return result;
         }
     }
 
@@ -485,17 +499,8 @@ public class TextChain
          * Seek backwards from the current offset to find a word boundary.
          */
 
-        // FIXME move to Node
-
-        begin = root.getWordBoundaryBefore(offset);
-        if (begin == -1) {
-            begin = 0;
-        }
-
-        end = root.getWordBoundaryAfter(offset);
-        if (end == -1) {
-            end = root.getWidth();
-        }
+        begin = this.wordBoundaryBefore(offset);
+        end = this.wordBoundaryAfter(offset);
 
         /*
          * Iterate forward over the characters to get the word.

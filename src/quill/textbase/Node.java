@@ -725,6 +725,10 @@ class Node extends Extract
         final int result;
         int i, ch, previous;
 
+        /*
+         * Unlike the after case below, we _do_ have to check position zero.
+         */
+
         if (offset > width) {
             throw new IndexOutOfBoundsException();
         }
@@ -804,9 +808,13 @@ class Node extends Extract
         int result;
         int i, ch;
 
-        // if (offset == width) {
-        // return width;
-        // }
+        /*
+         * If the requested offset is already the end, then we can return
+         * "not found"
+         */
+        if (offset == width) {
+            return -1;
+        }
 
         if (offset > width) {
             throw new IndexOutOfBoundsException();
