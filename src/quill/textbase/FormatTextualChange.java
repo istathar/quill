@@ -38,10 +38,33 @@ public class FormatTextualChange extends TextualChange
         this.format = format;
     }
 
+    private static class FirstSpanFinder implements SpanVisitor
+    {
+        private Markup markup;
+
+        private FirstSpanFinder() {}
+
+        public boolean visit(Span span) {
+            markup = span.getMarkup();
+            return true;
+        }
+
+        private Markup getFirst() {
+            return markup;
+        }
+    }
+
     private static Extract toggleMarkup(Extract original, Markup format) {
+        final FirstSpanFinder finder;
         final Markup markup;
 
-        markup = original.range[0].getMarkup();
+        /*
+         * Get the first Span's Markup
+         */
+
+        finder = new FirstSpanFinder();
+        original.visit(finder);
+        markup = finder.getFirst();
 
         // TODO change to handle instances rather than singletons
         if (markup == null) {
@@ -85,20 +108,36 @@ public class FormatTextualChange extends TextualChange
         return node;
     }
 
-    private static Extract removeMarkup(Extract original, Markup format) {
+    private static Extract removeMarkup(final Extract original, final Markup format) {
+        final ArrayList<Span> list;
+        Node node;
+        Span span;
         int i;
-        Span s;
-        Span[] range;
 
-        range = new Span[original.size()];
+        list = new ArrayList<Span>();
 
-        for (i = 0; i < original.size(); i++) {
-            s = original.get(i);
+        original.visit(new SpanVisitor() {
+            public boolean visit(Span span) {
+                final Span replacement;
+                replacement = span.removeMarkup(format);
+                list.add(replacement);
+                return false;
+            }
+        });
 
-            range[i] = s.removeMarkup(format);
+        /*
+         * TODO replace with an efficient list -> tree builder!
+         */
+
+        span = list.get(0);
+        node = Node.createNode(span);
+
+        for (i = 1; i < list.size(); i++) {
+            span = list.get(i);
+            node = node.append(span);
         }
 
-        return new Extract(range);
+        return node;
     }
 
     /**
@@ -110,19 +149,35 @@ public class FormatTextualChange extends TextualChange
     }
 
     private static Extract clearMarkup(Extract original) {
+        final ArrayList<Span> list;
+        Node node;
+        Span span;
         int i;
-        Span s;
-        Span[] range;
 
-        range = new Span[original.size()];
+        list = new ArrayList<Span>();
 
-        for (i = 0; i < original.size(); i++) {
-            s = original.get(i);
+        original.visit(new SpanVisitor() {
+            public boolean visit(Span span) {
+                final Span replacement;
+                replacement = span.copy(null);
+                list.add(replacement);
+                return false;
+            }
+        });
 
-            range[i] = s.copy(null);
+        /*
+         * TODO replace with an efficient list -> tree builder!
+         */
+
+        span = list.get(0);
+        node = Node.createNode(span);
+
+        for (i = 1; i < list.size(); i++) {
+            span = list.get(i);
+            node = node.append(span);
         }
 
-        return new Extract(range);
+        return node;
     }
 
     /*
