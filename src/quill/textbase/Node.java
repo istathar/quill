@@ -18,6 +18,8 @@
  */
 package quill.textbase;
 
+import java.util.ArrayList;
+
 /**
  * A list of Spans.
  * 
@@ -44,14 +46,6 @@ class Node extends Extract
      * Height of the tree.
      */
     private final int height;
-
-    /**
-     * The distance off the beginning of the backing Span tree this Node
-     * begins, in characters.
-     */
-    /*
-     * TODO Do we need this?
-     */
 
     /**
      * Width of this tree, in characters.
@@ -180,6 +174,14 @@ class Node extends Extract
 
     Span getSpan() {
         return data;
+    }
+
+    Node getLeft() {
+        return left;
+    }
+
+    Node getRight() {
+        return right;
     }
 
     /**
@@ -945,5 +947,41 @@ class Node extends Extract
      */
     private Node rebalanceLeft() {
         return null;
+    }
+
+    /*
+     * Not a rebalance so much as repopulating
+     */
+    Node rebuild() {
+        final ArrayList<Span> list;
+        final int len;
+        Span span;
+        Node node;
+        int i;
+
+        list = new ArrayList<Span>();
+
+        this.visit(new SpanVisitor() {
+            public boolean visit(Span span) {
+                list.add(span);
+                return false;
+            }
+        });
+
+        len = list.size();
+
+        if (len == 1) {
+            return this;
+        }
+
+        span = list.get(0);
+        node = new Node(span);
+
+        for (i = 1; i < len; i++) {
+            span = list.get(i);
+            node = node.append(span);
+        }
+
+        return node;
     }
 }

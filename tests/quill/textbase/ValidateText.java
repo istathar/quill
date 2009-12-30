@@ -145,6 +145,26 @@ public class ValidateText extends TestCase
         }
     }
 
+    /*
+     * Added fairly late in the game: test rebalancing.
+     */
+
+    public final void testNodeRebalancing() {
+        final TextChain chain;
+        final Node root, left, right;
+
+        chain = sampleData();
+        root = chain.getTree();
+
+        left = root.getLeft();
+        right = root.getRight();
+
+        assertEquals(4, root.getHeight());
+        /*
+         * TODO test something else!
+         */
+    }
+
     public final void testSplittingAtPoint() {
         final Node node, one, two;
         final Span initial;
