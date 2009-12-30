@@ -67,6 +67,29 @@ class Node extends Extract
      */
     private final Node right;
 
+    /*
+     * At the moment we don't use a reference to this constant to indicate
+     * no-node in left or right; we just use null. This is for cases where an
+     * empty Extract has to be returned, specifically TextChain's
+     * extractParagraphs().
+     */
+    private static final Node EMPTY;
+
+    static {
+        EMPTY = new Node();
+    }
+
+    /*
+     * Empty
+     */
+    private Node() {
+        height = 0;
+        width = 0;
+        data = null;
+        left = null;
+        right = null;
+    }
+
     private Node(Span span) {
         height = 1;
         width = span.getWidth();
@@ -109,6 +132,13 @@ class Node extends Extract
         }
 
         width = widthLeft + widthCenter + widthRight;
+    }
+
+    /**
+     * An empty tree.
+     */
+    static Node createNode() {
+        return EMPTY;
     }
 
     /**

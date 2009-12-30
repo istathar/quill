@@ -418,8 +418,16 @@ public class TextChain
         }
 
         /*
-         * Since Node is now Extract, we can just return our temporary array.
+         * Since Node is now Extract, we can just return our temporary array -
+         * except that we don't want to have null entries, so we supplant
+         * those if any exist (representing blank lines) with empty trees.
          */
+
+        for (i = 0; i < num; i++) {
+            if (nodes[i] == null) {
+                nodes[i] = Node.createNode();
+            }
+        }
 
         return nodes;
     }
