@@ -40,63 +40,19 @@ import java.util.ArrayList;
  * If this becomes an abstract base class, then create a new public class
  * called Tree and replace public usage of Node with it.
  */
-class Node extends Extract
+abstract class Node extends Extract
 {
-    /**
-     * Height of the tree.
-     */
-    private final int height;
-
-    /**
-     * Width of this tree, in characters.
-     */
-    private final int width;
-
-    /**
-     * The binary tree below and preceeding this Node.
-     */
-    private final Node left;
-
-    /**
-     * This Node's content.
-     */
-    private final Span data;
-
-    /**
-     * The binary tree below and following this Node.
-     */
-    private final Node right;
-
     /*
-     * At the moment we don't use a reference to this constant to indicate
-     * no-node in left or right; we just use null. This is for cases where an
-     * empty Extract has to be returned, specifically TextChain's
-     * extractParagraphs().
+     * For cases where an empty Extract has to be returned, specifically
+     * TextChain's extractParagraphs().
      */
-    private static final Node EMPTY;
+    protected static final Node EMPTY;
 
     static {
-        EMPTY = new Node();
+        EMPTY = new EmptyNode();
     }
 
-    /*
-     * Empty
-     */
-    private Node() {
-        height = 0;
-        width = 0;
-        data = null;
-        left = null;
-        right = null;
-    }
-
-    private Node(Span span) {
-        height = 1;
-        width = span.getWidth();
-        data = span;
-        left = null;
-        right = null;
-    }
+    protected Node() {}
 
     private Node(Node alpha, Span span, Node omega) {
         final int heightLeft, heightRight;
@@ -152,7 +108,7 @@ class Node extends Extract
         if (span == null) {
             throw new IllegalArgumentException();
         }
-        return new Node(span);
+        return new LeafNode(span);
     }
 
     /**
@@ -166,7 +122,7 @@ class Node extends Extract
         } else if (left == null) {
             return right;
         }
-        return new Node(right, null, left);
+        return new BranchNode(right, left);
     }
 
     /**
@@ -175,7 +131,7 @@ class Node extends Extract
      */
     static Node createNode(Node left, Span span, Node right) {
         if ((left == null) && (right == null)) {
-            return new Node(span);
+            return new LeafNode(span);
         }
         if (span == null) {
             if (right == null) {
@@ -191,28 +147,12 @@ class Node extends Extract
     /**
      * Get the width of this node (and its descendents), in characters.
      */
-    public int getWidth() {
-        return width;
-    }
+    public abstract int getWidth();
 
     /**
      * How many levels to the base of the tree? Leaves are 1, and emtpy is 0.
      */
-    int getHeight() {
-        return height;
-    }
-
-    Span getSpan() {
-        return data;
-    }
-
-    Node getLeft() {
-        return left;
-    }
-
-    Node getRight() {
-        return right;
-    }
+    abstract int getHeight();
 
     /**
      * Get a String of the characters in this Node and its descendants. Only
@@ -304,24 +244,7 @@ class Node extends Extract
      * Invoke tourist's visit() method for each Span in the tree, in-order
      * traversal.
      */
-    private boolean visitAll(final SpanVisitor tourist) {
-        if (left != null) {
-            if (left.visitAll(tourist)) {
-                return true;
-            }
-        }
-        if (data != null) {
-            if (tourist.visit(data)) {
-                return true;
-            }
-        }
-        if (right != null) {
-            if (right.visitAll(tourist)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    abstract boolean visitAll(final SpanVisitor tourist);
 
     public void visit(final SpanVisitor tourist) {
         visitAll(tourist);
@@ -331,32 +254,7 @@ class Node extends Extract
      * Invoke tourist's visit() method for each character in the tree,
      * in-order traversal.
      */
-    private boolean visitAll(final CharacterVisitor tourist) {
-        final int I;
-        int i, ch;
-        Markup m;
-
-        if (left != null) {
-            if (left.visitAll(tourist)) {
-                return true;
-            }
-        }
-        if (data != null) {
-            I = data.getWidth();
-            m = data.getMarkup();
-            for (i = 0; i < I; i++) {
-                ch = data.getChar(i);
-                if (tourist.visit(ch, m)) {
-                    return true;
-                }
-            }
-        }
-        if (right != null) {
-            return right.visitAll(tourist);
-        }
-
-        return false;
-    }
+    abstract boolean visitAll(final CharacterVisitor tourist);
 
     public void visit(final CharacterVisitor tourist) {
         visitAll(tourist);
@@ -686,6 +584,8 @@ class Node extends Extract
          * Ok, we have a valid range. Is that range entirely left or entirely
          * right?
          */
+
+        widthLeft = getLeft().getWidth();
 
         if (left == null) {
             widthLeft = 0;
