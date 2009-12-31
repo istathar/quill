@@ -43,4 +43,19 @@ final class EmptyNode extends Node
     boolean visitAll(CharacterVisitor tourist) {
         return false;
     }
+
+    /**
+     * Get a representation of this Node showing «» delimiters. Use for
+     * debugging purposes only!
+     */
+    public String toString() {
+        return "«»";
+    }
+
+    Span getSpanAt(int offset) {
+        if (offset != 0) {
+            throw new IndexOutOfBoundsException();
+        }
+        return null;
+    }
 }

@@ -20,7 +20,6 @@ package quill.textbase;
 
 final class LeafNode extends Node
 {
-
     /**
      * This Node's content: a Span (character+,Markup) which may be shared
      * around [notably due to cut and paste], and which in turn resuses its
@@ -81,5 +80,32 @@ final class LeafNode extends Node
         }
 
         return false;
+    }
+
+    /**
+     * Get a representation of this Node showing Span content delimited by «».
+     * Use for debugging purposes only!
+     */
+    public String toString() {
+        final StringBuilder str;
+
+        str = new StringBuilder();
+
+        str.append("«");
+        str.append(data.getText());
+        str.append("»");
+
+        return str.toString();
+    }
+
+    Span getSpanAt(int offset) {
+        if (offset == width) {
+            return null;
+        }
+        if (offset > width) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        return data;
     }
 }

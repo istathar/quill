@@ -136,4 +136,53 @@ final class BranchNode extends Node
         return false;
     }
 
+    /**
+     * Get a representation of this Node showing Node left, and Node right
+     * each delimited by «». Use for debugging purposes only!
+     */
+    /*
+     * This is ineffecient!
+     */
+    public String toString() {
+        final StringBuilder str;
+        final CharacterVisitor tourist;
+
+        str = new StringBuilder();
+
+        tourist = new CharacterVisitor() {
+            public boolean visit(int character, Markup markup) {
+                str.appendCodePoint(character);
+                return false;
+            }
+        };
+
+        str.append("«");
+        left.visitAll(tourist);
+        str.append("»\n");
+
+        str.append("«");
+        right.visitAll(tourist);
+        str.append("»");
+
+        return str.toString();
+    }
+
+    Span getSpanAt(final int offset) {
+        final int widthLeft;
+
+        if (offset == width) {
+            return null;
+        }
+        if (offset > width) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        widthLeft = left.getWidth();
+
+        if (offset < widthLeft) {
+            return left.getSpanAt(offset);
+        } else {
+            return right.getSpanAt(offset - widthLeft);
+        }
+    }
 }
