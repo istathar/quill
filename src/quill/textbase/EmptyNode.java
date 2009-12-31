@@ -32,6 +32,10 @@ final class EmptyNode extends Node
         return 0;
     }
 
+    Node append(final Span addition) {
+        return new LeafNode(addition);
+    }
+
     boolean visitAll(SpanVisitor tourist) {
         return false;
     }

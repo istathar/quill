@@ -36,6 +36,10 @@ final class LeafNode extends Node
     LeafNode(Span span) {
         super();
 
+        if (span == null) {
+            throw new IllegalArgumentException();
+        }
+
         width = span.getWidth();
         data = span;
     }
@@ -46,6 +50,13 @@ final class LeafNode extends Node
 
     int getHeight() {
         return 1;
+    }
+
+    Node append(final Span addition) {
+        final Node omega;
+
+        omega = new LeafNode(addition);
+        return new BranchNode(this, omega);
     }
 
     boolean visitAll(final SpanVisitor tourist) {

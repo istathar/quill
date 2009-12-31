@@ -54,42 +54,6 @@ abstract class Node extends Extract
 
     protected Node() {}
 
-    private Node(Node alpha, Span span, Node omega) {
-        final int heightLeft, heightRight;
-        final int widthLeft, widthRight, widthCenter;
-
-        if (alpha == null) {
-            heightLeft = 0;
-            widthLeft = 0;
-        } else {
-            heightLeft = alpha.getHeight();
-            widthLeft = alpha.getWidth();
-        }
-
-        if (omega == null) {
-            heightRight = 0;
-            widthRight = 0;
-        } else {
-            heightRight = omega.getHeight();
-            widthRight = omega.getWidth();
-        }
-
-        height = Math.max(heightLeft, heightRight) + 1;
-
-        left = alpha;
-        right = omega;
-
-        if (span == null) {
-            data = null;
-            widthCenter = 0;
-        } else {
-            data = span;
-            widthCenter = span.getWidth();
-        }
-
-        width = widthLeft + widthCenter + widthRight;
-    }
-
     /**
      * An empty tree.
      */
@@ -129,7 +93,13 @@ abstract class Node extends Extract
      * Create a new Node with the given Span as content and the given binary
      * trees below before and after this Node. Used when inserting.
      */
+    /*
+     * TODO this is now ugly. The insert() case can do this itself, and
+     * probably better, with knowledge of the tree shape?
+     */
     static Node createNode(Node left, Span span, Node right) {
+        Node node;
+
         if ((left == null) && (right == null)) {
             return new LeafNode(span);
         }
@@ -140,8 +110,11 @@ abstract class Node extends Extract
             if (left == null) {
                 return right;
             }
+            return new BranchNode(left, right);
         }
-        return new Node(left, span, right);
+
+        node = new BranchNode(left, new LeafNode(span));
+        return new BranchNode(node, right);
     }
 
     /**
@@ -182,63 +155,7 @@ abstract class Node extends Extract
 
     }
 
-    Node append(final Span addition) {
-        if (addition == null) {
-            throw new IllegalArgumentException();
-        }
-
-        /*
-         * Completely empty node, or single Span node. Grow height by one.
-         */
-
-        if ((left == null) && (right == null)) {
-            if (data == null) {
-                return new Node(addition);
-            } else {
-                return new Node(this, addition, null);
-            }
-        }
-
-        /*
-         * This node full, so grow in height one.
-         */
-
-        if ((left != null) && (right != null)) {
-            if (left.getHeight() > right.getHeight()) {
-                return new Node(left, data, right.append(addition));
-            } else {
-                return new Node(this, addition, null);
-            }
-        }
-
-        /*
-         * This node left half full
-         */
-
-        if ((left != null) && (right == null)) {
-            if (data == null) {
-                return new Node(left, addition, null);
-            } else {
-                return new Node(left, data, new Node(addition));
-            }
-        }
-
-        /*
-         * This node right half full, so descend recursively and append.
-         */
-
-        if ((left == null) && (right != null)) {
-            if (data == null) {
-                // rare?
-                return right.append(addition);
-            } else {
-                return new Node(null, data, right.append(addition));
-            }
-
-        }
-
-        throw new IllegalStateException();
-    }
+    abstract Node append(final Span addition);
 
     /**
      * Invoke tourist's visit() method for each Span in the tree, in-order

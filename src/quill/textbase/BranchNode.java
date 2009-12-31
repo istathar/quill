@@ -75,6 +75,43 @@ final class BranchNode extends Node
         return right;
     }
 
+    Node append(Span addition) {
+        /*
+         * Strange situation, but if we have empty nodes we can shortcut.
+         */
+
+        if ((left == EMPTY) && (right == EMPTY)) {
+            return new LeafNode(addition);
+        }
+
+        /*
+         * This node left half full, but right is available. So just plug it
+         * in.
+         */
+
+        if ((left != EMPTY) && (right == EMPTY)) {
+            return new BranchNode(left, new LeafNode(addition));
+        }
+
+        /*
+         * This node right half full, so descend recursively and append.
+         */
+
+        if ((left == EMPTY) && (right != EMPTY)) {
+            return right.append(addition);
+        }
+
+        /*
+         * This node full, so grow in height one.
+         */
+
+        if (left.getHeight() > right.getHeight()) {
+            return new BranchNode(left, right.append(addition));
+        } else {
+            return new BranchNode(this, new LeafNode(addition));
+        }
+    }
+
     boolean visitAll(SpanVisitor tourist) {
         if (left.visitAll(tourist)) {
             return true;
