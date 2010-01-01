@@ -82,6 +82,22 @@ final class LeafNode extends Node
         return false;
     }
 
+    boolean visitRange(final CharacterVisitor tourist, final int offset, final int wide) {
+        int i;
+        int ch;
+        Markup m;
+
+        m = data.getMarkup();
+
+        for (i = offset; i < offset + wide; i++) {
+            ch = data.getChar(i);
+            if (tourist.visit(ch, m)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Get a representation of this Node showing Span content delimited by «».
      * Use for debugging purposes only!

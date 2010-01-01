@@ -75,4 +75,9 @@ final class EmptyNode extends Node
         }
         return this;
     }
+
+    boolean visitRange(final CharacterVisitor tourist, final int offset, final int wide) {
+        return false;
+    }
+
 }

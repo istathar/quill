@@ -294,4 +294,51 @@ final class BranchNode extends Node
 
         return new BranchNode(gauche, droit);
     }
+
+    boolean visitRange(final CharacterVisitor tourist, final int offset, final int wide) {
+        int start, across, consumed;
+        final int widthLeft, widthRight;
+
+        consumed = 0;
+
+        widthLeft = left.getWidth();
+
+        if ((offset == 0) && (wide >= widthLeft)) {
+            if (left.visitAll(tourist)) {
+                return true;
+            }
+            consumed = widthLeft;
+        } else if (offset < widthLeft) {
+            start = offset;
+            if (offset + wide > widthLeft) {
+                across = widthLeft - offset;
+            } else {
+                across = wide;
+            }
+
+            if (left.visitRange(tourist, start, across)) {
+                return true;
+            }
+            consumed = across;
+        }
+
+        if (consumed == wide) {
+            return false;
+        }
+
+        widthRight = right.getWidth();
+
+        if (wide - consumed == widthRight) {
+            if (right.visitAll(tourist)) {
+                return true;
+            }
+        } else {
+            start = offset + consumed - widthLeft;
+            across = wide - consumed;
+            if (right.visitRange(tourist, start, across)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
