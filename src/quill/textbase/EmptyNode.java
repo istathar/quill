@@ -96,4 +96,7 @@ final class EmptyNode extends Node
         return -1;
     }
 
+    Node rebalance() {
+        return this;
+    }
 }

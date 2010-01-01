@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -218,49 +218,7 @@ abstract class Node extends Extract
 
     abstract int getWordBoundaryAfter(final int offset);
 
-    Node rebalance() {
-        int heightLeft, heightRight;
-
-        if (left == null) {
-            heightLeft = 0;
-        } else {
-            heightLeft = left.getHeight();
-        }
-
-        if (right == null) {
-            heightRight = 0;
-        } else {
-            heightRight = right.getHeight();
-        }
-
-        if (heightLeft > heightRight + 2) {
-            // rebalance left
-            rebalanceLeft(); // FIXME
-            return this;
-        } else if (heightRight > heightLeft + 2) {
-            // rebalance right
-            return this;
-        }
-
-        return this;
-    }
-
-    /**
-     * <pre>
-     *       D
-     *      / \
-     *     B   E          B'
-     *    / \           /   \
-     *   A   C   ->    A     D'
-     *  / \           / \   / \
-     * X   Y         X   Y C'  E'
-     * </pre>
-     * 
-     * Called on D, returns B'
-     */
-    private Node rebalanceLeft() {
-        return null;
-    }
+    abstract Node rebalance();
 
     /*
      * Not a rebalance so much as repopulating
@@ -288,7 +246,7 @@ abstract class Node extends Extract
         }
 
         span = list.get(0);
-        node = new Node(span);
+        node = new LeafNode(span);
 
         for (i = 1; i < len; i++) {
             span = list.get(i);

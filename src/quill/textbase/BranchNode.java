@@ -420,4 +420,54 @@ final class BranchNode extends Node
         // not found
         return -1;
     }
+
+    Node rebalance() {
+        int heightLeft, heightRight;
+
+        if (left == null) {
+            heightLeft = 0;
+        } else {
+            heightLeft = left.getHeight();
+        }
+
+        if (right == null) {
+            heightRight = 0;
+        } else {
+            heightRight = right.getHeight();
+        }
+
+        if (heightLeft > heightRight + 2) {
+            // rebalance left
+            rebalanceLeft(); // FIXME
+            return this;
+        } else if (heightRight > heightLeft + 2) {
+            // rebalance right
+            rebalanceRight(); // FIXME
+            return this;
+        }
+
+        return this;
+    }
+
+    /**
+     * <pre>
+     *       D
+     *      / \
+     *     B   E          B'
+     *    / \           /   \
+     *   A   C   ->    A     D'
+     *  / \           / \   / \
+     * X   Y         X   Y C   E'
+     * </pre>
+     * 
+     * Called on D, returns B'
+     */
+    private Node rebalanceLeft() {
+        return null;
+    }
+
+    private Node rebalanceRight() {
+        return null;
+    }
+
 }

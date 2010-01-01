@@ -256,4 +256,8 @@ final class LeafNode extends Node
         // not found
         return -1;
     }
+
+    Node rebalance() {
+        return this;
+    }
 }
