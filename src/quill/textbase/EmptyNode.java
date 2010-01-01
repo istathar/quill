@@ -65,4 +65,14 @@ final class EmptyNode extends Node
         }
         return tree;
     }
+
+    Node subset(int offset, int wide) {
+        if (offset != 0) {
+            throw new IndexOutOfBoundsException("can't subset an empty node");
+        }
+        if (wide != 0) {
+            throw new IndexOutOfBoundsException("can't subset an empty node");
+        }
+        return this;
+    }
 }

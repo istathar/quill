@@ -439,11 +439,11 @@ public class ValidateText extends TestCase
         tree = text.getTree();
 
         node = tree.subset(2, 0);
-        assertNull(node);
+        assertSame(node, Node.EMPTY);
         node = tree.subset(0, 0);
-        assertNull(node);
+        assertSame(node, Node.EMPTY);
         node = tree.subset(15, 0);
-        assertNull(node);
+        assertSame(node, Node.EMPTY);
     }
 
     public final void testSubsetRange() {

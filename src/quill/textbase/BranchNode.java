@@ -233,4 +233,65 @@ final class BranchNode extends Node
 
         throw new IllegalStateException();
     }
+
+    Node subset(int offset, int wide) {
+        final int widthLeft;
+        int across;
+        Node gauche, droit;
+
+        if (offset < 0) {
+            throw new IndexOutOfBoundsException("negative offset illegal");
+        }
+        if (width < 0) {
+            throw new IndexOutOfBoundsException("can't subset a negative number of characters");
+        }
+        if (offset > width) {
+            throw new IndexOutOfBoundsException("offset too high");
+        }
+        if (offset + wide > width) {
+            throw new IndexOutOfBoundsException(
+                    "requested number of characters greater than available text");
+        }
+
+        if ((offset == 0) && (wide == width)) {
+            return this;
+        }
+
+        if (wide == 0) {
+            return EMPTY;
+        }
+
+        /*
+         * Ok, we have a valid range. Is that range entirely left or entirely
+         * right?
+         */
+
+        widthLeft = left.getWidth();
+
+        if (offset + wide <= widthLeft) {
+            return left.subset(offset, wide);
+        }
+
+        if (offset > widthLeft) {
+            return right.subset(offset - widthLeft, wide);
+        }
+
+        /*
+         * So now we know it's at least partially overlapping left and right.
+         * Do the left sub part first
+         */
+
+        // how many characters?
+        across = widthLeft - offset;
+        gauche = left.subset(offset, across);
+
+        /*
+         * Now the right sub part.
+         */
+
+        across = wide - across;
+        droit = right.subset(0, across);
+
+        return new BranchNode(gauche, droit);
+    }
 }

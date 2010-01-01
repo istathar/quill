@@ -136,4 +136,33 @@ final class LeafNode extends Node
         node = new BranchNode(gauche, tree);
         return new BranchNode(node, droit);
     }
+
+    Node subset(int offset, int wide) {
+        final Span span;
+
+        if (offset < 0) {
+            throw new IndexOutOfBoundsException("negative offset illegal");
+        }
+        if (width < 0) {
+            throw new IndexOutOfBoundsException("can't subset a negative number of characters");
+        }
+        if (offset > width) {
+            throw new IndexOutOfBoundsException("offset too high");
+        }
+        if (offset + wide > width) {
+            throw new IndexOutOfBoundsException(
+                    "requested number of characters greater than available text");
+        }
+
+        if ((offset == 0) && (wide == width)) {
+            return this;
+        }
+
+        if (wide == 0) {
+            return EMPTY;
+        }
+
+        span = data.split(offset, offset + wide);
+        return new LeafNode(span);
+    }
 }
