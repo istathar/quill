@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -151,17 +151,15 @@ public class ValidateText extends TestCase
 
     public final void testNodeRebalancing() {
         final TextChain chain;
-        final Node root, left, right;
+        final Node root;
 
         chain = sampleData();
         root = chain.getTree();
 
-        left = root.getLeft();
-        right = root.getRight();
-
         assertEquals(4, root.getHeight());
+
         /*
-         * TODO test something else!
+         * TODO test something!
          */
     }
 

@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -184,5 +184,53 @@ final class BranchNode extends Node
         } else {
             return right.getSpanAt(offset - widthLeft);
         }
+    }
+
+    Node insertTreeAt(int offset, Node tree) {
+        final int widthLeft;
+        int point;
+        final Node gauche, droit;
+
+        if (offset < 0) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (offset > width) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        /*
+         * Insert at beginning, and append to end. What about balancing?
+         */
+
+        if (offset == 0) {
+            return new BranchNode(tree, this);
+        }
+        if (offset == width) {
+            return new BranchNode(this, tree);
+        }
+
+        widthLeft = left.getWidth();
+
+        if (offset < widthLeft) {
+            gauche = left.insertTreeAt(offset, tree);
+            return new BranchNode(gauche, right);
+        }
+
+        point = offset - widthLeft;
+
+        if (point > 0) {
+            droit = right.insertTreeAt(point, tree);
+            return new BranchNode(left, droit);
+        } else if (point == 0) {
+            if (left.getHeight() > right.getHeight()) {
+                droit = new BranchNode(tree, right);
+                return new BranchNode(left, droit);
+            } else {
+                gauche = new BranchNode(left, tree);
+                return new BranchNode(gauche, right);
+            }
+        }
+
+        throw new IllegalStateException();
     }
 }
