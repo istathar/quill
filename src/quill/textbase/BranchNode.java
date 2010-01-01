@@ -397,7 +397,8 @@ final class BranchNode extends Node
         widthLeft = left.getWidth();
 
         /*
-         * If it's on the left, then pass the search down.
+         * If it's on the left, then pass the search down, otherwise run
+         * through the right.
          */
 
         if (offset < widthLeft) {
@@ -405,19 +406,15 @@ final class BranchNode extends Node
             if (result > -1) {
                 return result;
             }
-        }
-
-        /*
-         * Otherwise run through the right
-         */
-
-        if (offset > widthLeft) {
-            result = right.getWordBoundaryAfter(offset - widthLeft);
-        } else {
             result = right.getWordBoundaryAfter(0);
-        }
-        if (result > -1) {
-            return widthLeft + result;
+            if (result > -1) {
+                return widthLeft + result;
+            }
+        } else {
+            result = right.getWordBoundaryAfter(offset - widthLeft);
+            if (result > -1) {
+                return widthLeft + result;
+            }
         }
 
         // not found
