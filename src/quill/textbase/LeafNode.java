@@ -181,4 +181,79 @@ final class LeafNode extends Node
         span = data.split(offset, offset + wide);
         return new LeafNode(span);
     }
+
+    int getWordBoundaryBefore(final int offset) {
+        int i, ch, previous;
+
+        /*
+         * Unlike the after case below, we _do_ have to check position zero.
+         */
+
+        if (offset > width) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        /*
+         * Search here. We have to handle the corner cases of starting on a
+         * space and starting at the end. The previous variable handles the i
+         * + 1 case while allowing for the initial loop not needing this.
+         */
+
+        i = offset;
+        previous = i;
+
+        if (i == width) {
+            i--;
+        }
+
+        while (i >= 0) {
+            ch = data.getChar(i);
+
+            if (isWhitespace(ch)) {
+                return previous;
+            }
+
+            previous = i;
+            i--;
+        }
+
+        return -1;
+    }
+
+    int getWordBoundaryAfter(final int offset) {
+        int i, ch;
+
+        /*
+         * If the requested offset is already the end, then we can return
+         * "not found"
+         */
+        if (offset == width) {
+            return -1;
+        }
+
+        if (offset > width) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        /*
+         * Otherwise run through this node
+         */
+
+        i = offset;
+
+        while (i < width) {
+            ch = data.getChar(i);
+            if (isWhitespace(ch)) {
+                return i;
+            }
+            i++;
+        }
+
+        /*
+         * Still here? Ok, not found!
+         */
+
+        // not found
+        return -1;
+    }
 }

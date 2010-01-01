@@ -80,4 +80,20 @@ final class EmptyNode extends Node
         return false;
     }
 
+    int getWordBoundaryBefore(final int offset) {
+        if (offset != 0) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        return -1;
+    }
+
+    int getWordBoundaryAfter(final int offset) {
+        if (offset != 0) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        return -1;
+    }
+
 }

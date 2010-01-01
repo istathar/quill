@@ -341,4 +341,86 @@ final class BranchNode extends Node
         }
         return false;
     }
+
+    int getWordBoundaryBefore(final int offset) {
+        final int widthLeft;
+        final int result;
+
+        /*
+         * Unlike the after case below, we _do_ have to check position zero.
+         */
+
+        if (offset > width) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        widthLeft = left.getWidth();
+
+        /*
+         * If it's on the left, then pass the search down, and we're done
+         * here.
+         */
+
+        if (offset < widthLeft) {
+            return left.getWordBoundaryBefore(offset);
+        }
+
+        /*
+         * If the offset is on the right, pass it down, then continue down
+         * left if we come back.
+         */
+
+        result = right.getWordBoundaryBefore(offset - widthLeft);
+        if (result > -1) {
+            return widthLeft + result;
+        }
+
+        return left.getWordBoundaryBefore(widthLeft);
+    }
+
+    int getWordBoundaryAfter(final int offset) {
+        final int widthLeft;
+        int result;
+
+        /*
+         * If the requested offset is already the end, then we can return
+         * "not found"
+         */
+        if (offset == width) {
+            return -1;
+        }
+
+        if (offset > width) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        widthLeft = left.getWidth();
+
+        /*
+         * If it's on the left, then pass the search down.
+         */
+
+        if (offset < widthLeft) {
+            result = left.getWordBoundaryAfter(offset);
+            if (result > -1) {
+                return result;
+            }
+        }
+
+        /*
+         * Otherwise run through the right
+         */
+
+        if (offset > widthLeft) {
+            result = right.getWordBoundaryAfter(offset - widthLeft);
+        } else {
+            result = right.getWordBoundaryAfter(0);
+        }
+        if (result > -1) {
+            return widthLeft + result;
+        }
+
+        // not found
+        return -1;
+    }
 }
