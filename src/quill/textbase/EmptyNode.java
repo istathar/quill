@@ -99,4 +99,12 @@ final class EmptyNode extends Node
     Node rebalance() {
         return this;
     }
+
+    Node rotateLeft(Node right) {
+        return right;
+    }
+
+    Node rotateRight(Node left) {
+        return left;
+    }
 }

@@ -253,11 +253,18 @@ final class LeafNode extends Node
          * Still here? Ok, not found!
          */
 
-        // not found
         return -1;
     }
 
     Node rebalance() {
         return this;
+    }
+
+    Node rotateLeft(Node right) {
+        return new BranchNode(this, right);
+    }
+
+    Node rotateRight(Node left) {
+        return new BranchNode(left, this);
     }
 }

@@ -218,7 +218,21 @@ abstract class Node extends Extract
 
     abstract int getWordBoundaryAfter(final int offset);
 
+    /**
+     * Rebalance the tree through a series of rotations.
+     */
+    /*
+     * The only one that actually does anything is BranchNode, which is where
+     * the height comparison logic is located.
+     */
     abstract Node rebalance();
+
+    /*
+     * Again, only actually implemented in BranchNode
+     */
+    abstract Node rotateLeft(Node right);
+
+    abstract Node rotateRight(Node left);
 
     /*
      * Not a rebalance so much as repopulating

@@ -424,50 +424,72 @@ final class BranchNode extends Node
     Node rebalance() {
         int heightLeft, heightRight;
 
-        if (left == null) {
-            heightLeft = 0;
-        } else {
-            heightLeft = left.getHeight();
-        }
+        heightLeft = left.getHeight();
+        heightRight = right.getHeight();
 
-        if (right == null) {
-            heightRight = 0;
+        if (heightLeft >= heightRight + 2) {
+            return left.rotateLeft(right);
+        } else if (heightRight >= heightLeft + 2) {
+            return right.rotateRight(left);
         } else {
-            heightRight = right.getHeight();
-        }
-
-        if (heightLeft > heightRight + 2) {
-            // rebalance left
-            rebalanceLeft(); // FIXME
-            return this;
-        } else if (heightRight > heightLeft + 2) {
-            // rebalance right
-            rebalanceRight(); // FIXME
             return this;
         }
-
-        return this;
     }
 
     /**
      * <pre>
-     *       D
+     *       C
      *      / \
-     *     B   E          B'
+     *     B  N4          B'
      *    / \           /   \
-     *   A   C   ->    A     D'
+     *   A  N3   ->    A     C'
      *  / \           / \   / \
-     * X   Y         X   Y C   E'
+     * N1 N2         N1 N2 N3 N4
      * </pre>
      * 
-     * Called on D, returns B'
+     * C calls this on B (with N4), returns B'
      */
-    private Node rebalanceLeft() {
-        return null;
+    Node rotateLeft(Node N4) {
+        Node A, Bp, Cp;
+
+        A = left;
+        Cp = new BranchNode(right, N4);
+        Bp = new BranchNode(A, Cp);
+
+        return Bp;
     }
 
-    private Node rebalanceRight() {
-        return null;
-    }
+    /**
+     * <pre>
+     *       C
+     *      / \
+     *     B  N4          B'
+     *    / \           /   \
+     *   A  N3   ->    A     C'
+     *  / \           / \   / \
+     * N1 N2         N1 N2 N3 N4
+     * </pre>
+     * 
+     * <pre>
+     *   A
+     *  / \
+     * N1  B              B'
+     *    / \           /   \
+     *   N2  C   ->    A'    C
+     *      / \       / \   / \
+     *     N3 N4     N1 N2 N3 N4
+     * </pre>
+     * 
+     * 
+     * A calls this on B (with N1), returns B'
+     */
+    Node rotateRight(Node N1) {
+        Node Ap, Bp, C;
 
+        C = right;
+        Ap = new BranchNode(N1, left);
+        Bp = new BranchNode(Ap, C);
+
+        return Bp;
+    }
 }
