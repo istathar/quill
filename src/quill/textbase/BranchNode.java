@@ -423,15 +423,18 @@ final class BranchNode extends Node
 
     Node rebalance() {
         final int heightLeft, heightRight, delta;
+        final Node node;
 
         heightLeft = left.getHeight();
         heightRight = right.getHeight();
         delta = heightLeft - heightRight;
 
         if (delta >= 2) {
-            return left.rotateRight(right);
+            node = left.rebalance();
+            return node.rotateRight(right);
         } else if (delta <= -2) {
-            return right.rotateLeft(left);
+            node = right.rebalance();
+            return node.rotateLeft(left);
         } else {
             return this;
         }
@@ -460,25 +463,6 @@ final class BranchNode extends Node
      * 
      * C calls this on B (with N4), returns B'
      */
-    private Node rebalanceLeft(Node N4) {
-        Node rotated;
-        final Node N1, N2, N3, A, Ap, B, Bp, Cp;
-
-        if (left.getHeight() > right.getHeight()) {
-            A = left;
-            B = this;
-            N3 = right;
-
-            // return left.rotateLeft(right);
-            return A.rotateLeft(N3);
-        } else {
-            // Left1
-            rotated = right.rotateRight(left);
-        }
-
-        throw new Error();
-        // return new BranchNode(Ap, Cp);
-    }
 
     /**
      * <pre>
