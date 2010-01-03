@@ -422,74 +422,108 @@ final class BranchNode extends Node
     }
 
     Node rebalance() {
-        int heightLeft, heightRight;
+        final int heightLeft, heightRight, delta;
 
         heightLeft = left.getHeight();
         heightRight = right.getHeight();
+        delta = heightLeft - heightRight;
 
-        if (heightLeft >= heightRight + 2) {
-            return left.rotateLeft(right);
-        } else if (heightRight >= heightLeft + 2) {
-            return right.rotateRight(left);
+        if (delta >= 2) {
+            return left.rotateRight(right);
+        } else if (delta <= -2) {
+            return right.rotateLeft(left);
         } else {
             return this;
         }
     }
 
     /**
+     * Case Left1 or Left2
+     * 
      * <pre>
      *       C
      *      / \
      *     B  N4          B'
      *    / \           /   \
-     *   A  N3   ->    A     C'
+     *   A  N3   ->    A'    C'
      *  / \           / \   / \
      * N1 N2         N1 N2 N3 N4
+     * 
+     *       C
+     *      / \
+     *     B  N4          B'
+     *    / \           /   \
+     *   N1  A   ->    A'    C'
+     *      / \       / \   / \
+     *     N2 N3     N1 N2 N3 N4
      * </pre>
      * 
      * C calls this on B (with N4), returns B'
      */
-    Node rotateLeft(Node N4) {
-        Node A, Bp, Cp;
+    private Node rebalanceLeft(Node N4) {
+        Node rotated;
+        final Node N1, N2, N3, A, Ap, B, Bp, Cp;
 
-        A = left;
-        Cp = new BranchNode(right, N4);
-        Bp = new BranchNode(A, Cp);
+        if (left.getHeight() > right.getHeight()) {
+            A = left;
+            B = this;
+            N3 = right;
 
-        return Bp;
+            // return left.rotateLeft(right);
+            return A.rotateLeft(N3);
+        } else {
+            // Left1
+            rotated = right.rotateRight(left);
+        }
+
+        throw new Error();
+        // return new BranchNode(Ap, Cp);
     }
 
     /**
      * <pre>
-     *       C
-     *      / \
-     *     B  N4          B'
-     *    / \           /   \
-     *   A  N3   ->    A     C'
-     *  / \           / \   / \
-     * N1 N2         N1 N2 N3 N4
+     * 
+     *     B             A'
+     *    / \           / \
+     *   A  N3   ->    N1  B'
+     *  / \               / \
+     * N1 N2             N2 N3
      * </pre>
      * 
-     * <pre>
-     *   A
-     *  / \
-     * N1  B              B'
-     *    / \           /   \
-     *   N2  C   ->    A'    C
-     *      / \       / \   / \
-     *     N3 N4     N1 N2 N3 N4
-     * </pre>
-     * 
-     * 
-     * A calls this on B (with N1), returns B'
+     * B calls this on A with N3, gets A' back
      */
-    Node rotateRight(Node N1) {
-        Node Ap, Bp, C;
+    Node rotateRight(Node N3) {
+        final Node N1, N2, Ap, Bp;
 
-        C = right;
-        Ap = new BranchNode(N1, left);
-        Bp = new BranchNode(Ap, C);
+        N1 = left;
+        N2 = right;
 
-        return Bp;
+        Bp = new BranchNode(N2, N3);
+        Ap = new BranchNode(N1, Bp);
+
+        return Ap;
+    }
+
+    /**
+     * <pre>
+     *     B             A'
+     *    / \           / \
+     *   N1  A   ->    B' N3
+     *      / \       / \  
+     *     N2 N3     N1 N2
+     * </pre>
+     * 
+     * B calls this on A with N1, gets A' back
+     */
+    Node rotateLeft(Node N1) {
+        final Node N2, N3, Ap, Bp;
+
+        N2 = left;
+        N3 = right;
+
+        Bp = new BranchNode(N1, N2);
+        Ap = new BranchNode(Bp, N3);
+
+        return Ap;
     }
 }

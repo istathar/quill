@@ -106,4 +106,52 @@ public class ValidateNodeBalancing extends TestCase
         checkSampleData(result);
     }
 
+    /**
+     * Case Left1:
+     * 
+     * <pre>
+     *       C
+     *      / \
+     *     B  N4          B'
+     *    / \           /   \
+     *   N1  A   ->    A'    C'
+     *      / \       / \   / \
+     *     N2 N3     N1 N2 N3 N4
+     * </pre>
+     */
+    private static Node sampleTreeLeft1() {
+        Span span;
+        final Node N1, N2, N3, N4, A, B, C;
+
+        span = Span.createSpan("1", null);
+        N1 = new LeafNode(span);
+
+        span = Span.createSpan("2", null);
+        N2 = new LeafNode(span);
+
+        span = Span.createSpan("3", null);
+        N3 = new LeafNode(span);
+
+        span = Span.createSpan("4", null);
+        N4 = new LeafNode(span);
+
+        A = new BranchNode(N2, N3);
+        B = new BranchNode(N1, A);
+        C = new BranchNode(B, N4);
+
+        return C;
+    }
+
+    public final void testNodeRebalancingLeft1() {
+        final Node tree, result;
+
+        tree = sampleTreeLeft1();
+        assertEquals(4, tree.getHeight());
+        checkSampleData(tree);
+
+        result = tree.rebalance();
+
+        assertEquals(3, result.getHeight());
+        checkSampleData(result);
+    }
 }
