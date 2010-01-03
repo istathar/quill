@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -34,7 +34,7 @@ public class TextChain
     Node root;
 
     public TextChain() {
-        root = null;
+        root = Node.createNode();
     }
 
     TextChain(final String str) {
@@ -52,11 +52,7 @@ public class TextChain
      * The length of this Text, in characters.
      */
     public int length() {
-        if (root == null) {
-            return 0;
-        } else {
-            return root.getWidth();
-        }
+        return root.getWidth();
     }
 
     /**
@@ -64,10 +60,6 @@ public class TextChain
      */
     public String toString() {
         final StringBuilder str;
-
-        if (root == null) {
-            return "";
-        }
 
         str = new StringBuilder();
 
@@ -85,23 +77,6 @@ public class TextChain
      * This is an inefficient implementation!
      */
     public void append(Span addition) {
-        if (addition == null) {
-            throw new IllegalArgumentException();
-        }
-
-        /*
-         * Handle empty TextChain case
-         */
-
-        if (root == null) {
-            root = Node.createNode(addition);
-            return;
-        }
-
-        /*
-         * Otherwise, we are appending. Hop to the end.
-         */
-
         root = root.append(addition);
     }
 
@@ -117,13 +92,6 @@ public class TextChain
      * Get the Span at a given offset, for testing purposes.
      */
     Span spanAt(int offset) {
-        if (root == null) {
-            if (offset == 0) {
-                return null;
-            } else {
-                throw new IllegalStateException();
-            }
-        }
         return root.getSpanAt(offset);
     }
 
@@ -149,29 +117,15 @@ public class TextChain
         /*
          * Create the insertion point
          */
-        if (root == null) {
-            root = tree;
-        } else {
-            root = root.insertTreeAt(offset, tree);
-        }
+        root = root.insertTreeAt(offset, tree);
     }
 
     /**
-     * Splice a Chunk into the Text. The result of doing this is three Pieces;
-     * a new Piece before and after, and a Piece wrapping the Chunk and linked
-     * between them. This is the workhorse of this class.
+     * Splice a Span into the TextChain.
      */
     void insert(int offset, Span addition) {
         if (offset < 0) {
             throw new IndexOutOfBoundsException();
-        }
-
-        if (root == null) {
-            if (offset != 0) {
-                throw new IndexOutOfBoundsException();
-            }
-            root = Node.createNode(addition);
-            return;
         }
 
         root = root.insertSpanAt(offset, addition);
@@ -194,7 +148,7 @@ public class TextChain
         final Node preceeding, following;
         final int start, across;
 
-        if (root == null) {
+        if (root == Node.EMPTY) {
             throw new IllegalStateException("Can't delete when already emtpy");
         }
         if (wide == 0) {
@@ -206,7 +160,7 @@ public class TextChain
          */
 
         if ((offset == 0) && (wide == root.getWidth())) {
-            root = null;
+            root = Node.EMPTY;
             return;
         }
 
@@ -312,7 +266,7 @@ public class TextChain
     public Markup getMarkupAt(int offset) {
         Span span;
 
-        if (root == null) {
+        if (root == Node.EMPTY) {
             return null;
         }
 
@@ -366,7 +320,7 @@ public class TextChain
         final Node[] nodes;
         int num, i, offset, wide;
 
-        if (root == null) {
+        if (root == Node.EMPTY) {
             return new Extract[] {};
         }
 
@@ -418,8 +372,16 @@ public class TextChain
         }
 
         /*
-         * Since Node is now Extract, we can just return our temporary array.
+         * Since Node is now Extract, we can just return our temporary array -
+         * except that we don't want to have null entries, so we supplant
+         * those if any exist (representing blank lines) with empty trees.
          */
+
+        for (i = 0; i < num; i++) {
+            if (nodes[i] == null) {
+                nodes[i] = Node.createNode();
+            }
+        }
 
         return nodes;
     }
@@ -444,7 +406,7 @@ public class TextChain
     public int wordBoundaryBefore(final int offset) {
         final int result;
 
-        if (root == null) {
+        if (root == Node.EMPTY) {
             return 0;
         }
 
@@ -461,7 +423,7 @@ public class TextChain
     public int wordBoundaryAfter(final int offset) {
         final int result;
 
-        if (root == null) {
+        if (root == Node.EMPTY) {
             return 0;
         }
 
@@ -640,7 +602,7 @@ public class TextChain
     public void visit(final WordVisitor tourist, final int begin, final int end) {
         final WordBuildingCharacterVisitor builder;
 
-        if (root == null) {
+        if (root == Node.EMPTY) {
             return;
         }
 

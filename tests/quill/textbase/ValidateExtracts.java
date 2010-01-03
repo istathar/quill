@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -156,9 +156,9 @@ public class ValidateExtracts extends TestCase
         assertEquals(2, lines.length);
 
         extract = lines[0];
-        assertNull(extract);
+        assertSame(Node.EMPTY, extract);
         extract = lines[1];
-        assertNull(extract);
+        assertSame(Node.EMPTY, extract);
     }
 
     public final void testExtractLinesEmbeddedNewline() {
@@ -218,7 +218,7 @@ public class ValidateExtracts extends TestCase
         assertEquals(2, lines.length);
 
         extract = lines[0];
-        assertNull(extract);
+        assertSame(Node.EMPTY, extract);
 
         extract = lines[1];
         assertNotNull(extract);
@@ -237,7 +237,7 @@ public class ValidateExtracts extends TestCase
         assertEquals("Hello World", extract.getText());
 
         extract = lines[1];
-        assertNull(extract);
+        assertSame(Node.EMPTY, extract);
     }
 
     public final void testExtractParagraphBoundaryAfterUnicode() {
