@@ -23,6 +23,7 @@ import org.gnome.gdk.EventFocus;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.WindowTypeHint;
+import org.gnome.gtk.Allocation;
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnString;
@@ -177,12 +178,42 @@ class SuggestionsPopupWindow extends Window
         });
     }
 
-    void presentAt(int x, int y) {
+    /**
+     * The maximum height we want our popup to be.
+     */
+    private static final int HEIGHT = 200;
+
+    void presentAt(final int x, final int y, final int h) {
+        final Allocation alloc;
+        final int H;
+
+        window.setSizeRequest(150, HEIGHT);
         window.showAll();
 
         window.present();
-        window.move(x, y);
+
         window.grabFocus();
+
+        /*
+         * Get the height of the parent window. Right now this is available on
+         * the UserInterface global.
+         */
+
+        alloc = ui.primary.getAllocation();
+
+        H = alloc.getHeight();
+
+        /*
+         * Figure out if there is sufficient room for the popup below, as we
+         * would prefer. The plus 3 is sufficient to continue to show the red
+         * squiggle.
+         */
+
+        if (y + HEIGHT < H) {
+            window.move(x - 2, y + h + 3);
+        } else {
+            window.move(x - 2, y - HEIGHT);
+        }
     }
 
     private SuggestionsPopupWindow.WordSelected handler;

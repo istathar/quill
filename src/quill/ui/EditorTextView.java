@@ -1584,8 +1584,7 @@ abstract class EditorTextView extends TextView
         xP = underlying.getOriginX();
         yP = underlying.getOriginY();
 
-        // plus sufficient to continue to show the red squiggle
-        popup.presentAt(x + xP, y + yP + h + 3);
+        popup.presentAt(x + xP, y + yP, h);
 
         // similar to insertText()
         popup.connect(new SuggestionsPopupWindow.WordSelected() {
