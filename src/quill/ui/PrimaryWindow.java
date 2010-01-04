@@ -219,6 +219,21 @@ class PrimaryWindow extends Window
                             // ignore
                         }
                         return true;
+                    } else if (key == Keyval.w) {
+                        /*
+                         * FUTURE if we evolve to holding multiple documents
+                         * open at once in a single instance of Quill, then
+                         * this will need to change to closing the window
+                         * (document?) that is currently active instead of
+                         * terminating the application.
+                         */
+                        try {
+                            ui.saveIfModified();
+                            ui.shutdown();
+                            return true;
+                        } catch (SaveCancelledException sce) {
+                            return true;
+                        }
                     } else if (key == Keyval.y) {
                         ui.redo();
                         return true;
