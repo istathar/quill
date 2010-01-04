@@ -19,26 +19,35 @@
 package quill.client;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
+import org.freedesktop.cairo.Context;
+import org.freedesktop.cairo.PdfSurface;
+import org.freedesktop.cairo.Surface;
 import org.gnome.glib.Glib;
 import org.gnome.gtk.Gtk;
+import org.gnome.gtk.PaperSize;
+import org.gnome.gtk.Unit;
 
+import parchment.render.RenderEngine;
+import parchment.render.ReportRenderEngine;
 import quill.textbase.DataLayer;
 import quill.textbase.Folio;
 import quill.ui.UserInterface;
 
 /**
- * Main execution entry point for the Quill what-you-see-is-what-you-need
- * editor of Quack XML documents, using the Parchment rendering engine to
- * produce printable output.
+ * Front end allowing you to render the Quack XML document named on the
+ * command line using the Parchment rendering engine to produce printable
+ * output as a PDF.
  * 
  * @author Andrew Cowie
  */
 /*
- * TODO the ui singleton really needs to move somewhere else, or better yet be
- * passed along when instantiating things.
+ * Forked from quill.client.Quill; seeing as how much is common between these
+ * two pieces of code, it may be that more code can push out of here and go
+ * elsewhere in quill.client
  */
-public class Quill
+public class Render
 {
     public static UserInterface ui;
 
@@ -49,7 +58,7 @@ public class Quill
             initializeDataLayer();
             initializeUserInterface(args);
             parseCommandLine(args);
-            runUserInterface();
+            runRenderPipeline();
         } catch (SafelyTerminateException ste) {
             // quietly supress
             return;
@@ -60,66 +69,70 @@ public class Quill
         data = new DataLayer();
     }
 
+    /*
+     * We do need to initialize java-gnome. We don't need to initialize the
+     * Quill UI.
+     */
     static void initializeUserInterface(String[] args) {
         Glib.setProgramName("quill");
         Gtk.init(args);
-
-        ui = new UserInterface(data);
     }
 
+    /**
+     * Parse arguments from command line. See
+     * {@link Quill#parseCommandLine(String[])} for a discussion of how hard
+     * this is.
+     */
     /*
-     * TODO parsing problems are going to be insanely difficult to present to
-     * the user. And this is before the main loop is running.
-     * 
      * TODO parse arguments properly here.
      */
     static void parseCommandLine(String[] args) throws Exception {
-        if (args.length > 0) {
+        if (args.length == 1) {
             loadDocumentFile(args[0]);
         } else {
-            loadDocumentBlank();
+            System.err.println("ERROR: Please supply one filename to render.");
+            throw new SafelyTerminateException();
         }
     }
 
     static void loadDocumentFile(String filename) throws Exception {
-        final Folio folio;
-
         try {
             data.checkDocument(filename);
             data.loadDocument(filename);
         } catch (FileNotFoundException fnfe) {
-            data.createDocument();
-            data.setFilename(filename);
-        } catch (RecoveryFileExistsException rfee) {
-            ui.warning(rfee);
-            data.loadDocument(filename);
+            System.err.println("ERROR: File not found?" + "\n" + fnfe.getMessage());
+            throw new SafelyTerminateException();
         }
-
-        folio = data.getActiveDocument();
-        ui.displayDocument(folio);
-    }
-
-    static void loadDocumentBlank() {
-        final Folio folio;
-
-        // sets active
-        data.createDocument();
-
-        // there a cleaner way to do this?
-        folio = data.getActiveDocument();
-        ui.displayDocument(folio);
     }
 
     /**
-     * Run the GTK main loop. This call blocks.
+     * Run a Parchment RenderEngine. The filename logic is copied from
+     * {@link quill.ui.UserInterface}'s printDocument(), and probably
+     * shouldn't be duplicated, BUT see the discussion there about forthcoming
+     * document level output targets.
      */
-    static void runUserInterface() {
-        try {
-            ui.focusEditor();
-            Gtk.main();
-        } catch (Throwable t) {
-            t.printStackTrace();
-            data.emergencySave();
-        }
+    static void runRenderPipeline() throws IOException {
+        final String parentdir, basename, targetname;
+        final Context cr;
+        final Surface surface;
+        final Folio folio;
+        final PaperSize paper;
+        final RenderEngine engine;
+
+        paper = PaperSize.A4;
+
+        parentdir = data.getDirectory();
+        basename = data.getBasename();
+        targetname = parentdir + "/" + basename + ".pdf";
+
+        surface = new PdfSurface(targetname, paper.getWidth(Unit.POINTS), paper.getHeight(Unit.POINTS));
+        cr = new Context(surface);
+
+        folio = data.getActiveDocument();
+
+        engine = new ReportRenderEngine(paper, data, folio.get(0));
+        engine.render(cr);
+
+        surface.finish();
     }
 }
