@@ -1562,9 +1562,13 @@ abstract class EditorTextView extends TextView
 
         // -1
 
-        pointer = buffer.getIter(insertOffset);
+        pointer = buffer.getIter(alpha);
 
         word = chain.getWordAt(insertOffset);
+
+        if (word == null) {
+            return;
+        }
 
         popup = new SuggestionsPopupWindow();
         popup.populateSuggestions(word);
@@ -1580,7 +1584,8 @@ abstract class EditorTextView extends TextView
         xP = underlying.getOriginX();
         yP = underlying.getOriginY();
 
-        popup.presentAt(x + xP, y + yP + h);
+        // plus sufficient to continue to show the red squiggle
+        popup.presentAt(x + xP, y + yP + h + 3);
     }
 
     int getInsertOffset() {

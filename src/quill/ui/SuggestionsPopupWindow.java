@@ -19,6 +19,7 @@
 package quill.ui;
 
 import org.gnome.gdk.Event;
+import org.gnome.gdk.EventFocus;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.WindowTypeHint;
@@ -54,10 +55,10 @@ class SuggestionsPopupWindow extends Window
         setupWindow();
         setupListView();
 
-        hookupKeybindings();
+        hookupBehaviourHandlers();
     }
 
-    private void hookupKeybindings() {
+    private void hookupBehaviourHandlers() {
         window.connect(new DeleteEvent() {
             public boolean onDeleteEvent(Widget source, Event event) {
                 window.hide();
@@ -78,6 +79,36 @@ class SuggestionsPopupWindow extends Window
                 return false;
             }
         });
+
+        /*
+         * Lost focus? Then close!
+         */
+
+        window.connect(new Widget.FocusOutEvent() {
+            public boolean onFocusOutEvent(Widget source, EventFocus event) {
+                window.hide();
+                return false;
+            }
+        });
+
+        /*
+         * Horizontal cursor movement? Then close!
+         */
+
+        window.connect(new Widget.KeyPressEvent() {
+            public boolean onKeyPressEvent(Widget source, EventKey event) {
+                final Keyval key;
+
+                key = event.getKeyval();
+
+                if ((key == Keyval.Left) || (key == Keyval.Right)) {
+                    window.hide();
+                    return true;
+                }
+                return false;
+            }
+        });
+
     }
 
     void populateSuggestions(String word) {
@@ -86,7 +117,7 @@ class SuggestionsPopupWindow extends Window
 
         if (word == null) {
             row = model.appendRow();
-            model.setValue(row, columnWords, "<no suggestions>");
+            model.setValue(row, columnWords, "<i>no suggestions</i>");
             return;
         }
 
@@ -127,14 +158,9 @@ class SuggestionsPopupWindow extends Window
         vertical = view.appendColumn();
 
         renderer = new CellRendererText(vertical);
-        renderer.setText(columnWords);
+        renderer.setMarkup(columnWords);
 
         window.add(view);
-    }
-
-    private void initialPresentation() {
-        window.showAll();
-        window.present();
     }
 
     void presentAt(int x, int y) {
