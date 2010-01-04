@@ -29,6 +29,7 @@ import org.gnome.gtk.DataColumnString;
 import org.gnome.gtk.ListStore;
 import org.gnome.gtk.SelectionMode;
 import org.gnome.gtk.TreeIter;
+import org.gnome.gtk.TreePath;
 import org.gnome.gtk.TreeSelection;
 import org.gnome.gtk.TreeView;
 import org.gnome.gtk.TreeViewColumn;
@@ -161,6 +162,19 @@ class SuggestionsPopupWindow extends Window
         renderer.setMarkup(columnWords);
 
         window.add(view);
+
+        view.connect(new TreeView.RowActivated() {
+            public void onRowActivated(TreeView source, TreePath path, TreeViewColumn vertical) {
+                TreeIter row;
+                String word;
+
+                row = model.getIter(path);
+                word = model.getValue(row, columnWords);
+
+                window.hide();
+                handler.onRowActivated(word);
+            }
+        });
     }
 
     void presentAt(int x, int y) {
@@ -169,5 +183,19 @@ class SuggestionsPopupWindow extends Window
         window.present();
         window.move(x, y);
         window.grabFocus();
+    }
+
+    private SuggestionsPopupWindow.RowActivated handler;
+
+    /**
+     * Allow the parent EditorTextView to react to a selection being chosen
+     */
+    void connect(SuggestionsPopupWindow.RowActivated handler) {
+        this.handler = handler;
+    }
+
+    static interface RowActivated
+    {
+        void onRowActivated(String word);
     }
 }

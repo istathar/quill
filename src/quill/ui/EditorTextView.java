@@ -1586,6 +1586,21 @@ abstract class EditorTextView extends TextView
 
         // plus sufficient to continue to show the red squiggle
         popup.presentAt(x + xP, y + yP + h + 3);
+
+        // similar to insertText()
+        popup.connect(new SuggestionsPopupWindow.RowActivated() {
+            public void onRowActivated(String word) {
+                final Extract removed;
+                final Span span;
+                final Change change;
+
+                removed = chain.extractRange(alpha, omega - alpha);
+                span = Span.createSpan(word, insertMarkup);
+                change = new FullTextualChange(chain, alpha, removed, span);
+
+                ui.apply(change);
+            }
+        });
     }
 
     int getInsertOffset() {
