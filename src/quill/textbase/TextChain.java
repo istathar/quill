@@ -446,7 +446,7 @@ public class TextChain
      * EditorTextView doesn't call this, but needs the same boundary lookups,
      * and meanwhile this is heavily tested.
      */
-    String getWordAt(final int offset) {
+    public String getWordAt(final int offset) {
         int begin, end;
         final StringBuilder str;
         final String result;

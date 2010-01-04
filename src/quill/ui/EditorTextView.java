@@ -217,7 +217,7 @@ abstract class EditorTextView extends TextView
                  */
 
                 if (key == Keyval.Menu) {
-                    // TODO our spelling menu?
+                    offerSpellingSuggestions();
 
                     /*
                      * Inhibit TextView's default menu.
@@ -1534,6 +1534,47 @@ abstract class EditorTextView extends TextView
                 return false;
             }
         }, alpha, omega);
+    }
+
+    /**
+     * Find the word under the cursor, feed it to Enchant, and then popup a
+     * window with suggestions.
+     */
+    /*
+     * This seems to overlap somewhat with checkSpellingRange() above. Hm.
+     */
+    private void offerSpellingSuggestions() {
+        final int alpha, omega;
+        final TextIter pointer;
+        final String word;
+        final SuggestionsPopupWindow popup;
+        final Rectangle rect;
+        final int x, y, X, Y;
+
+        /*
+         * Seek backwards and forwards to find the beginning and end of the
+         * word(s) in the given range.
+         */
+
+        alpha = chain.wordBoundaryBefore(insertOffset);
+        omega = chain.wordBoundaryAfter(insertOffset);
+
+        // -1
+
+        pointer = buffer.getIter(insertOffset);
+
+        word = chain.getWordAt(insertOffset);
+
+        popup = new SuggestionsPopupWindow();
+        popup.populateSuggestions(word);
+
+        rect = view.getLocation(pointer);
+        X = rect.getX();
+        Y = rect.getY();
+        x = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X);
+        y = view.convertBufferToWindowCoordsY(TextWindowType.TEXT, Y);
+
+        popup.presentAt(x, y);
     }
 
     int getInsertOffset() {
