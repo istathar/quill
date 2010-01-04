@@ -47,6 +47,7 @@ import org.gnome.gtk.MessageDialog;
 import org.gnome.gtk.MessageType;
 import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.ResponseType;
+import org.gnome.gtk.Settings;
 import org.gnome.gtk.Stock;
 import org.gnome.gtk.Unit;
 import org.gnome.pango.FontDescription;
@@ -108,7 +109,13 @@ public class UserInterface
     }
 
     private void setupApplication() {
+        final Settings settings;
+
         Gtk.setDefaultIcon(images.quill);
+
+        settings = Gtk.getSettings();
+        settings.setShowInputMethodMenu(false);
+        settings.setShowUnicodeMenu(false);
     }
 
     /**

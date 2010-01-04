@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -24,6 +24,7 @@ import org.gnome.gdk.EventCrossing;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
+import org.gnome.gdk.MouseButton;
 import org.gnome.gdk.Rectangle;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.EventBox;
@@ -156,13 +157,6 @@ abstract class EditorTextView extends TextView
             }
         });
 
-        view.connect(new Widget.ButtonPressEvent() {
-            public boolean onButtonPressEvent(Widget source, EventButton event) {
-                x = -1;
-                return false;
-            }
-        });
-
         view.connect(new Widget.KeyPressEvent() {
             public boolean onKeyPressEvent(Widget source, EventKey event) {
                 final Keyval key;
@@ -223,8 +217,13 @@ abstract class EditorTextView extends TextView
                  */
 
                 if (key == Keyval.Menu) {
-                    // TODO
-                    return false;
+                    // TODO our spelling menu?
+
+                    /*
+                     * Inhibit TextView's default menu.
+                     */
+
+                    return true;
                 }
 
                 /*
@@ -1103,26 +1102,34 @@ abstract class EditorTextView extends TextView
          * The default context menu created by TextView on a right click popup
          * is annoying in that it contains stuff about input methods and
          * unicode, all entirely unnecessary. The TextView API doesn't give us
-         * anything to inhibit this nonsense, but we can dig into the packing
-         * hierarchy and, as Widgets, remove them.
+         * anything to inhibit this nonsense [GtkSettings does] but in any
+         * case we need to stop GTK from mutating our buffer without our
+         * action. So we simply inhibit their context menu entirely.
          */
 
-        view.connect(new TextView.PopulatePopup() {
-            public void onPopulatePopup(TextView source, Menu menu) {
-                Widget[] items;
-                int i;
+        view.connect(new Widget.ButtonPressEvent() {
+            public boolean onButtonPressEvent(Widget source, EventButton event) {
+                final MouseButton button;
 
-                items = menu.getChildren();
-                i = items.length - 3;
+                /*
+                 * When the user clicks somewhere else, forget the cached
+                 * up/down movement point.
+                 */
 
-                // "[separator]"
-                menu.remove(items[i++]);
+                x = -1;
 
-                // "Input Methods"
-                menu.remove(items[i++]);
+                /*
+                 * Inhibit TextView's default menu.
+                 */
 
-                // "Insert Unicode Control Character"
-                menu.remove(items[i++]);
+                button = event.getButton();
+
+                if (button == MouseButton.RIGHT) {
+                    // FUTURE and popup our own instead?
+                    return true;
+                }
+
+                return false;
             }
         });
     }
