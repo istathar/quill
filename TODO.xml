@@ -59,6 +59,13 @@ Needs a feature where we can do a word count
 for the {chapter, essay, document}. Question:
 how to treat program code?
 </text>
+<text>
+<bold>Add a Quit button</bold>
+</text>
+<text>
+Need to hook up <bold>Ctrl+Q</bold> to terminate
+the application.
+</text>
 <heading>
 Build
 </heading>
@@ -77,7 +84,7 @@ to try something new.
 Copyright
 </heading>
 <quote>
-Copyright © 2008-2009 Operational Dynamics
+Copyright © 2008-2010 Operational Dynamics
 Consulting, Pty Ltd 
 </quote>
 <quote>
