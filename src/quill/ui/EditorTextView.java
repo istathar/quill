@@ -1588,8 +1588,8 @@ abstract class EditorTextView extends TextView
         popup.presentAt(x + xP, y + yP + h + 3);
 
         // similar to insertText()
-        popup.connect(new SuggestionsPopupWindow.RowActivated() {
-            public void onRowActivated(String word) {
+        popup.connect(new SuggestionsPopupWindow.WordSelected() {
+            public void onWordSelected(String word) {
                 final Extract removed;
                 final Span span;
                 final Change change;

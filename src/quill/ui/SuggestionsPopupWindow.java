@@ -172,7 +172,7 @@ class SuggestionsPopupWindow extends Window
                 word = model.getValue(row, columnWords);
 
                 window.hide();
-                handler.onRowActivated(word);
+                handler.onWordSelected(word);
             }
         });
     }
@@ -185,17 +185,17 @@ class SuggestionsPopupWindow extends Window
         window.grabFocus();
     }
 
-    private SuggestionsPopupWindow.RowActivated handler;
+    private SuggestionsPopupWindow.WordSelected handler;
 
     /**
      * Allow the parent EditorTextView to react to a selection being chosen
      */
-    void connect(SuggestionsPopupWindow.RowActivated handler) {
+    void connect(SuggestionsPopupWindow.WordSelected handler) {
         this.handler = handler;
     }
 
-    static interface RowActivated
+    static interface WordSelected
     {
-        void onRowActivated(String word);
+        void onWordSelected(String word);
     }
 }
