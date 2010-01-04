@@ -2,4 +2,4 @@
 source .config
 exec ${JAVA} \
 	-classpath ${GNOME_JARS}:${XOM_JARS}:tmp/classes/ \
-	quill.client.RenderToPrintHarness $*
+	quill.client.Render $*
