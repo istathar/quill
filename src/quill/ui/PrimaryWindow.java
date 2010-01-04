@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -195,8 +195,22 @@ class PrimaryWindow extends Window
                         return true;
                     }
                     if (key == Keyval.o) {
-                        ui.openDocument();
-                        return true;
+                        try {
+                            ui.saveIfModified();
+                            ui.openDocument();
+                            return true;
+                        } catch (SaveCancelledException sce) {
+                            return true;
+                        }
+                    }
+                    if (key == Keyval.q) {
+                        try {
+                            ui.saveIfModified();
+                            ui.shutdown();
+                            return true;
+                        } catch (SaveCancelledException sce) {
+                            return true;
+                        }
                     }
                     if (key == Keyval.s) {
                         try {
