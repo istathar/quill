@@ -21,6 +21,7 @@ package quill.ui;
 import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
+import org.gnome.gdk.WindowTypeHint;
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnString;
@@ -83,20 +84,26 @@ class SuggestionsPopupWindow extends Window
         final String[] suggestions;
         TreeIter row;
 
+        if (word == null) {
+            row = model.appendRow();
+            model.setValue(row, columnWords, "<no suggestions>");
+            return;
+        }
+
         suggestions = ui.dict.suggest(word);
 
         for (String suggestion : suggestions) {
             row = model.appendRow();
             model.setValue(row, columnWords, suggestion);
-            System.out.println(suggestion);
         }
     }
 
     private void setupWindow() {
-        window.setDefaultSize(150, 150);
         window.setDecorated(false);
         window.setBorderWidth(1);
         window.setTransientFor(ui.primary); // ?
+        window.setResizable(false);
+        window.setTypeHint(WindowTypeHint.UTILITY);
     }
 
     private void setupListView() {
@@ -131,17 +138,10 @@ class SuggestionsPopupWindow extends Window
     }
 
     void presentAt(int x, int y) {
-        final org.gnome.gdk.Window underlying;
-        final int xP, yP;
-
         window.showAll();
 
-        underlying = window.getWindow();
-        xP = underlying.getOriginX();
-        yP = underlying.getOriginY();
-
+        window.present();
         window.move(x, y);
         window.grabFocus();
-        window.present();
     }
 }

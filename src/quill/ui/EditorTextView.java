@@ -1549,7 +1549,8 @@ abstract class EditorTextView extends TextView
         final String word;
         final SuggestionsPopupWindow popup;
         final Rectangle rect;
-        final int x, y, X, Y;
+        final int x, y, h, X, Y, xP, yP;
+        final org.gnome.gdk.Window underlying;
 
         /*
          * Seek backwards and forwards to find the beginning and end of the
@@ -1571,10 +1572,15 @@ abstract class EditorTextView extends TextView
         rect = view.getLocation(pointer);
         X = rect.getX();
         Y = rect.getY();
+        h = rect.getHeight();
         x = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X);
         y = view.convertBufferToWindowCoordsY(TextWindowType.TEXT, Y);
 
-        popup.presentAt(x, y);
+        underlying = view.getWindow();
+        xP = underlying.getOriginX();
+        yP = underlying.getOriginY();
+
+        popup.presentAt(x + xP, y + yP + h);
     }
 
     int getInsertOffset() {

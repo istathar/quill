@@ -22,7 +22,7 @@ import quill.textbase.Segment;
 
 class QuoteEditorTextView extends EditorTextView
 {
-    public QuoteEditorTextView(Segment segment) {
+    QuoteEditorTextView(Segment segment) {
         super(segment);
 
         view.modifyFont(fonts.serif);
