@@ -28,12 +28,15 @@ import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnString;
 import org.gnome.gtk.ListStore;
+import org.gnome.gtk.PolicyType;
+import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.SelectionMode;
 import org.gnome.gtk.TreeIter;
 import org.gnome.gtk.TreePath;
 import org.gnome.gtk.TreeSelection;
 import org.gnome.gtk.TreeView;
 import org.gnome.gtk.TreeViewColumn;
+import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.WindowType;
@@ -48,7 +51,9 @@ class SuggestionsPopupWindow extends Window
 
     private ListStore model;
 
-    private DataColumnString columnWords;
+    private DataColumnString columnMarkup;
+
+    private DataColumnString columnWord;
 
     SuggestionsPopupWindow() {
         super(WindowType.TOPLEVEL);
@@ -119,7 +124,7 @@ class SuggestionsPopupWindow extends Window
 
         if (word == null) {
             row = model.appendRow();
-            model.setValue(row, columnWords, "<i>no suggestions</i>");
+            model.setValue(row, columnMarkup, "<i>no suggestions</i>");
             return;
         }
 
@@ -127,25 +132,32 @@ class SuggestionsPopupWindow extends Window
 
         for (String suggestion : suggestions) {
             row = model.appendRow();
-            model.setValue(row, columnWords, suggestion);
+            model.setValue(row, columnMarkup, "<b>" + suggestion + "</b>");
+            model.setValue(row, columnWord, suggestion);
         }
     }
 
     private void setupWindow() {
+        final VBox top;
+
         window.setDecorated(false);
         window.setBorderWidth(1);
         window.setTransientFor(ui.primary); // ?
         window.setResizable(false);
         window.setTypeHint(WindowTypeHint.UTILITY);
+
+        top = new VBox(false, 0);
+
     }
 
     private void setupListView() {
         final TreeSelection selection;
         final TreeViewColumn vertical;
         final CellRendererText renderer;
+        final ScrolledWindow scroll;
 
         model = new ListStore(new DataColumn[] {
-            columnWords = new DataColumnString(),
+                columnWord = new DataColumnString(), columnMarkup = new DataColumnString(),
         });
 
         view = new TreeView(model);
@@ -160,9 +172,16 @@ class SuggestionsPopupWindow extends Window
         vertical = view.appendColumn();
 
         renderer = new CellRendererText(vertical);
-        renderer.setMarkup(columnWords);
+        renderer.setMarkup(columnMarkup);
 
-        window.add(view);
+        /*
+         * Add scrollbars for when there are more words than available space.
+         */
+
+        scroll = new ScrolledWindow();
+        scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
+        scroll.add(view);
+        window.add(scroll);
 
         view.connect(new TreeView.RowActivated() {
             public void onRowActivated(TreeView source, TreePath path, TreeViewColumn vertical) {
@@ -170,7 +189,7 @@ class SuggestionsPopupWindow extends Window
                 String word;
 
                 row = model.getIter(path);
-                word = model.getValue(row, columnWords);
+                word = model.getValue(row, columnWord);
 
                 window.hide();
                 handler.onWordSelected(word);
