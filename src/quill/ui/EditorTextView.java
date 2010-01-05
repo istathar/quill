@@ -1110,6 +1110,8 @@ abstract class EditorTextView extends TextView
         view.connect(new Widget.ButtonPressEvent() {
             public boolean onButtonPressEvent(Widget source, EventButton event) {
                 final MouseButton button;
+                final int xe, ye, X, Y;
+                final TextIter pointer;
 
                 /*
                  * When the user clicks somewhere else, forget the cached
@@ -1118,14 +1120,36 @@ abstract class EditorTextView extends TextView
 
                 x = -1;
 
-                /*
-                 * Inhibit TextView's default menu.
-                 */
-
                 button = event.getButton();
 
                 if (button == MouseButton.RIGHT) {
-                    // FUTURE and popup our own instead?
+                    /*
+                     * We want to send the cursor to wherever the click was.
+                     * FUTURE this isn't as bullet proof as we'd like, since
+                     * if there is already a context menu up then the click
+                     * will be lost dismissing the menu. What can we do about
+                     * that?
+                     */
+
+                    xe = (int) event.getX();
+                    ye = (int) event.getY();
+
+                    X = view.convertWindowToBufferCoordsX(TEXT, xe);
+                    Y = view.convertBufferToWindowCoordsY(TEXT, ye);
+
+                    pointer = view.getIterAtLocation(X, Y);
+                    buffer.placeCursor(pointer);
+
+                    /*
+                     * Now see if there is any spelling to be done: present
+                     * context menu with suggestions.
+                     */
+
+                    offerSpellingSuggestions();
+
+                    /*
+                     * Inhibit TextView's default menu.
+                     */
                     return true;
                 }
 
