@@ -1547,7 +1547,7 @@ abstract class EditorTextView extends TextView
         final int alpha, omega;
         final TextIter pointer;
         final String word;
-        final SuggestionsPopupWindow popup;
+        final SuggestionsPopupMenu popup;
         final Rectangle rect;
         final int x, y, h, X, Y, xP, yP;
         final org.gnome.gdk.Window underlying;
@@ -1570,7 +1570,7 @@ abstract class EditorTextView extends TextView
             return;
         }
 
-        popup = new SuggestionsPopupWindow();
+        popup = new SuggestionsPopupMenu();
         popup.populateSuggestions(word);
 
         rect = view.getLocation(pointer);
@@ -1587,7 +1587,7 @@ abstract class EditorTextView extends TextView
         popup.presentAt(x + xP, y + yP, h);
 
         // similar to insertText()
-        popup.connect(new SuggestionsPopupWindow.WordSelected() {
+        popup.connect(new SuggestionsPopupMenu.WordSelected() {
             public void onWordSelected(String word) {
                 final Extract removed;
                 final Span span;
