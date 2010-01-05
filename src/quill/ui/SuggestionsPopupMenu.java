@@ -20,7 +20,6 @@ package quill.ui;
 
 import org.gnome.gdk.Screen;
 import org.gnome.gtk.Alignment;
-import org.gnome.gtk.Button;
 import org.gnome.gtk.ImageMenuItem;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.Menu;
@@ -31,6 +30,13 @@ import org.gnome.gtk.Stock;
 
 import static quill.client.Quill.ui;
 
+/**
+ * Since Enchant can get a bit out of control with the suggestions it offers,
+ * limit the displayed menu to 10 suggestions, thereby preventing the Menu
+ * from wrapping top/bottom.
+ * 
+ * @author Andrew Cowie
+ */
 class SuggestionsPopupMenu extends Menu
 {
     private Menu menu;
@@ -48,7 +54,7 @@ class SuggestionsPopupMenu extends Menu
         final String[] suggestions;
         MenuItem item;
         Label label;
-        final Button button;
+        int i;
 
         if (word == null) {
             item = new MenuItem();
@@ -63,8 +69,12 @@ class SuggestionsPopupMenu extends Menu
 
         suggestions = ui.dict.suggest(word);
 
-        for (String suggestion : suggestions) {
-            label = new Label("<b>" + suggestion + "</b>");
+        for (i = 0; i < suggestions.length; i++) {
+            if (i > 10) {
+                break;
+            }
+
+            label = new Label("<b>" + suggestions[i] + "</b>");
             label.setUseMarkup(true);
             label.setAlignment(Alignment.LEFT, Alignment.CENTER);
 
@@ -89,11 +99,6 @@ class SuggestionsPopupMenu extends Menu
         });
         menu.showAll();
     }
-
-    /**
-     * The maximum height we want our popup to be.
-     */
-    private static final int HEIGHT = 200;
 
     /**
      * Present the suggestions menu at x, y (and supplying current line's
