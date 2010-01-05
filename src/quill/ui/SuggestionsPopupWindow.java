@@ -23,7 +23,9 @@ import org.gnome.gdk.EventFocus;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.WindowTypeHint;
+import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
+import org.gnome.gtk.Button;
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnString;
@@ -46,6 +48,8 @@ import static quill.client.Quill.ui;
 class SuggestionsPopupWindow extends Window
 {
     private Window window;
+
+    private VBox top;
 
     private TreeView view;
 
@@ -121,6 +125,7 @@ class SuggestionsPopupWindow extends Window
     void populateSuggestions(String word) {
         final String[] suggestions;
         TreeIter row;
+        final Button button;
 
         if (word == null) {
             row = model.appendRow();
@@ -135,11 +140,13 @@ class SuggestionsPopupWindow extends Window
             model.setValue(row, columnMarkup, "<b>" + suggestion + "</b>");
             model.setValue(row, columnWord, suggestion);
         }
+
+        button = new Button("Add");
+        button.setAlignment(Alignment.LEFT, Alignment.CENTER);
+        top.packEnd(button, false, false, 0);
     }
 
     private void setupWindow() {
-        final VBox top;
-
         window.setDecorated(false);
         window.setBorderWidth(1);
         window.setTransientFor(ui.primary); // ?
@@ -148,6 +155,7 @@ class SuggestionsPopupWindow extends Window
 
         top = new VBox(false, 0);
 
+        window.add(top);
     }
 
     private void setupListView() {
@@ -179,9 +187,9 @@ class SuggestionsPopupWindow extends Window
          */
 
         scroll = new ScrolledWindow();
-        scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
+        scroll.setPolicy(PolicyType.NEVER, PolicyType.AUTOMATIC);
         scroll.add(view);
-        window.add(scroll);
+        top.packStart(scroll, true, true, 0);
 
         view.connect(new TreeView.RowActivated() {
             public void onRowActivated(TreeView source, TreePath path, TreeViewColumn vertical) {
