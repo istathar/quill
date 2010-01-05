@@ -72,10 +72,6 @@ class SuggestionsPopupMenu extends Menu
         Label label;
         int i;
 
-        if (word == null) {
-            return;
-        }
-
         /*
          * Add a MenuItem for each suggestion provided by Enchant. Reuse the
          * same signal handler for each one; calls the WordSelected handler

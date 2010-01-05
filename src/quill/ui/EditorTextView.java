@@ -1585,8 +1585,8 @@ abstract class EditorTextView extends TextView
             final int x, y, h, X, Y, xP, yP;
             final org.gnome.gdk.Window underlying;
 
-            if (word == null) {
-                return true;
+            if ((word == null) || (word.equals(""))) {
+                return false;
             }
 
             popup = new SuggestionsPopupMenu();
