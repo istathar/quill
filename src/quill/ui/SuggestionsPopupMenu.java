@@ -145,7 +145,7 @@ class SuggestionsPopupMenu extends Menu
     void presentAt(final int x, final int y, final int R) {
         final Screen screen;
         final int h, H;
-
+        int target;
         final Requisition req;
 
         /*
@@ -164,15 +164,18 @@ class SuggestionsPopupMenu extends Menu
         /*
          * Figure out if there is sufficient room for the popup below, as we
          * would prefer. The plus 3 is sufficient to continue to show the red
-         * squiggle. The minus 24 moves the popup back so that the suggestions
-         * are aligned with the word start.
+         * squiggle.
          */
 
-        if (y + R + h < H) {
-            menu.popup(x, y + R + 3);
-        } else {
-            menu.popup(x, y - h);
+        target = y + R + 3;
+
+        if (target + h > H) {
+            target = y - h;
+            if (target < 0) {
+                target = y;
+            }
         }
+        menu.popup(x, target);
     }
 
     /**
