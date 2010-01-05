@@ -22,8 +22,8 @@ to be restricted to appending a new Segment
 only?
 </text>
 <text>
-<type>StructuralChange</type> at first character
-misplaces new Segment
+<type>StructuralChange</type><bold> at first
+character misplaces new Segment</bold>
 </text>
 <text>
 For some reason, if you're at offset

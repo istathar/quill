@@ -59,6 +59,21 @@ Needs a feature where we can do a word count
 for the {chapter, essay, document}. Question:
 how to treat program code?
 </text>
+<text>
+<bold>Document word lists</bold>
+</text>
+<text>
+While we have enabled adding words to the
+user's custom dictionary via "Add" in the
+suggestions menu, it may make sense to add
+words to the document. Perhaps this is just
+"Ignore"?
+</text>
+<text>
+This will likely make more sense when we
+have a proper notion of document and can
+store a word list there.
+</text>
 <heading>
 Build
 </heading>

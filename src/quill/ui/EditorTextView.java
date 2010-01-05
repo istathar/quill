@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -24,6 +24,7 @@ import org.gnome.gdk.EventCrossing;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
+import org.gnome.gdk.MouseButton;
 import org.gnome.gdk.Rectangle;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.EventBox;
@@ -156,13 +157,6 @@ abstract class EditorTextView extends TextView
             }
         });
 
-        view.connect(new Widget.ButtonPressEvent() {
-            public boolean onButtonPressEvent(Widget source, EventButton event) {
-                x = -1;
-                return false;
-            }
-        });
-
         view.connect(new Widget.KeyPressEvent() {
             public boolean onKeyPressEvent(Widget source, EventKey event) {
                 final Keyval key;
@@ -223,8 +217,13 @@ abstract class EditorTextView extends TextView
                  */
 
                 if (key == Keyval.Menu) {
-                    // TODO
-                    return false;
+                    offerSpellingSuggestions();
+
+                    /*
+                     * Inhibit TextView's default menu.
+                     */
+
+                    return true;
                 }
 
                 /*
@@ -1103,26 +1102,58 @@ abstract class EditorTextView extends TextView
          * The default context menu created by TextView on a right click popup
          * is annoying in that it contains stuff about input methods and
          * unicode, all entirely unnecessary. The TextView API doesn't give us
-         * anything to inhibit this nonsense, but we can dig into the packing
-         * hierarchy and, as Widgets, remove them.
+         * anything to inhibit this nonsense [GtkSettings does] but in any
+         * case we need to stop GTK from mutating our buffer without our
+         * action. So we simply inhibit their context menu entirely.
          */
 
-        view.connect(new TextView.PopulatePopup() {
-            public void onPopulatePopup(TextView source, Menu menu) {
-                Widget[] items;
-                int i;
+        view.connect(new Widget.ButtonPressEvent() {
+            public boolean onButtonPressEvent(Widget source, EventButton event) {
+                final MouseButton button;
+                final int xe, ye, X, Y;
+                final TextIter pointer;
 
-                items = menu.getChildren();
-                i = items.length - 3;
+                /*
+                 * When the user clicks somewhere else, forget the cached
+                 * up/down movement point.
+                 */
 
-                // "[separator]"
-                menu.remove(items[i++]);
+                x = -1;
 
-                // "Input Methods"
-                menu.remove(items[i++]);
+                button = event.getButton();
 
-                // "Insert Unicode Control Character"
-                menu.remove(items[i++]);
+                if (button == MouseButton.RIGHT) {
+                    /*
+                     * We want to send the cursor to wherever the click was.
+                     * FUTURE this isn't as bullet proof as we'd like, since
+                     * if there is already a context menu up then the click
+                     * will be lost dismissing the menu. What can we do about
+                     * that?
+                     */
+
+                    xe = (int) event.getX();
+                    ye = (int) event.getY();
+
+                    X = view.convertWindowToBufferCoordsX(TEXT, xe);
+                    Y = view.convertBufferToWindowCoordsY(TEXT, ye);
+
+                    pointer = view.getIterAtLocation(X, Y);
+                    buffer.placeCursor(pointer);
+
+                    /*
+                     * Now see if there is any spelling to be done: present
+                     * context menu with suggestions.
+                     */
+
+                    offerSpellingSuggestions();
+
+                    /*
+                     * Inhibit TextView's default menu.
+                     */
+                    return true;
+                }
+
+                return false;
             }
         });
     }
@@ -1527,6 +1558,120 @@ abstract class EditorTextView extends TextView
                 return false;
             }
         }, alpha, omega);
+    }
+
+    /**
+     * Find the word under the cursor, feed it to Enchant, and then popup an
+     * window with suggestions.
+     * 
+     * I experimented with selecting the word being considered [which is what
+     * Writer does] but after some consideration I decided it's more
+     * distracting than not. If you're asking for suggestions, you already
+     * have a good idea what word it is you were working on.
+     */
+    /*
+     * Implemented using a WordVisitor (even though we only need the first
+     * word and only expect [and accept] one) since it allows us to access the
+     * logic around whether or not a word should be spell checked based on its
+     * Markup. We were using TextChain's getWordAt() but we need to make the
+     * boundary calls anyway in order to be able to replace the word with a
+     * suggestion.
+     */
+    private void offerSpellingSuggestions() {
+        final int alpha, omega;
+
+        /*
+         * Seek backwards and forwards to find the beginning and end of the
+         * word(s) in the given range.
+         */
+
+        alpha = chain.wordBoundaryBefore(insertOffset - 1);
+        omega = chain.wordBoundaryAfter(insertOffset);
+
+        chain.visit(new SuggestionsWordVisitor(), alpha, omega);
+    }
+
+    /*
+     * Convenience for grouping the calls by offerSpellingSuggestions().
+     */
+    private class SuggestionsWordVisitor implements WordVisitor, SuggestionsPopupMenu.WordSelected
+    {
+        private int offset;
+
+        private int wide;
+
+        private SuggestionsWordVisitor() {}
+
+        public boolean visit(final String word, final boolean skip, final int begin, final int end) {
+            final TextIter pointer;
+            final SuggestionsPopupMenu popup;
+            final Rectangle rect;
+            final int x, y, h, X, Y, xP, yP;
+            final org.gnome.gdk.Window underlying;
+
+            if ((word == null) || (word.equals(""))) {
+                return false;
+            }
+
+            popup = new SuggestionsPopupMenu();
+            popup.populateSuggestions(word);
+
+            /*
+             * This controls the positioning of the popup context menu. It was
+             * tempting to use the word beginning, but it seems conventional
+             * across the desktop that the popup is placed at mouse [normal]
+             * or cursor position [enlightened editors].
+             * 
+             * It is necessary to go to all the effort to work out the
+             * position of the cursor because if we use the default popup()
+             * handler and press Menu but with the mouse elsewhere, then the
+             * context menu will be at mouse pointer, not at the word where
+             * the cursor is.
+             */
+
+            pointer = buffer.getIter(insertOffset);
+
+            rect = view.getLocation(pointer);
+            X = rect.getX();
+            Y = rect.getY();
+            h = rect.getHeight();
+            x = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X);
+            y = view.convertBufferToWindowCoordsY(TextWindowType.TEXT, Y);
+
+            underlying = view.getWindow();
+            xP = underlying.getOriginX();
+            yP = underlying.getOriginY();
+
+            popup.presentAt(x + xP, y + yP, h);
+
+            offset = begin;
+            wide = end - begin;
+            popup.connect(this);
+
+            return true;
+        }
+
+        // similar to insertText()
+        public void onWordSelected(String word, boolean replacement) {
+            final Extract removed;
+            final Span span;
+            final Change change;
+            final TextIter start, finish;
+
+            if (replacement) {
+                // new text, so mutate, which will result in a recheck
+                removed = chain.extractRange(offset, wide);
+                span = Span.createSpan(word, insertMarkup);
+                change = new FullTextualChange(chain, offset, removed, span);
+
+                ui.apply(change);
+            } else {
+                // the word has been added, so we need to unmark it.
+                start = buffer.getIter(offset);
+                finish = buffer.getIter(offset + wide);
+                buffer.removeTag(spelling, start, finish);
+            }
+        }
     }
 
     int getInsertOffset() {
