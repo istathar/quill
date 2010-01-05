@@ -1537,69 +1537,108 @@ abstract class EditorTextView extends TextView
     }
 
     /**
-     * Find the word under the cursor, feed it to Enchant, and then popup a
+     * Find the word under the cursor, feed it to Enchant, and then popup an
      * window with suggestions.
+     * 
+     * I experimented with selecting the word being considered [which is what
+     * Writer does] but after some consideration I decided it's more
+     * distracting than not. If you're asking for suggestions, you already
+     * have a good idea what word it is you were working on.
      */
     /*
-     * This seems to overlap somewhat with checkSpellingRange() above. Hm.
+     * Implemented using a WordVisitor (even though we only need the first
+     * word and only expect [and accept] one) since it allows us to access the
+     * logic around whether or not a word should be spell checked based on its
+     * Markup. We were using TextChain's getWordAt() but we need to make the
+     * boundary calls anyway in order to be able to replace the word with a
+     * suggestion.
      */
     private void offerSpellingSuggestions() {
         final int alpha, omega;
-        final TextIter pointer;
-        final String word;
-        final SuggestionsPopupMenu popup;
-        final Rectangle rect;
-        final int x, y, h, X, Y, xP, yP;
-        final org.gnome.gdk.Window underlying;
 
         /*
          * Seek backwards and forwards to find the beginning and end of the
          * word(s) in the given range.
          */
 
-        alpha = chain.wordBoundaryBefore(insertOffset);
+        alpha = chain.wordBoundaryBefore(insertOffset - 1);
         omega = chain.wordBoundaryAfter(insertOffset);
 
-        // -1
+        chain.visit(new SuggestionsWordVisitor(), alpha, omega);
+    }
 
-        pointer = buffer.getIter(alpha);
+    /*
+     * Convenience for grouping the calls by offerSpellingSuggestions().
+     */
+    private class SuggestionsWordVisitor implements WordVisitor, SuggestionsPopupMenu.WordSelected
+    {
+        private int start;
 
-        word = chain.getWordAt(insertOffset);
+        private int wide;
 
-        if (word == null) {
-            return;
+        private SuggestionsWordVisitor() {}
+
+        public boolean visit(final String word, final boolean skip, final int begin, final int end) {
+            final TextIter pointer;
+            final SuggestionsPopupMenu popup;
+            final Rectangle rect;
+            final int x, y, h, X, Y, xP, yP;
+            final org.gnome.gdk.Window underlying;
+
+            if (word == null) {
+                return true;
+            }
+
+            popup = new SuggestionsPopupMenu();
+            popup.populateSuggestions(word);
+
+            /*
+             * This controls the positioning of the popup context menu. It was
+             * tempting to use the word beginning, but it seems conventional
+             * across the desktop that the popup is placed at mouse [normal]
+             * or cursor position [enlightened editors].
+             * 
+             * It is necessary to go to all the effort to work out the
+             * position of the cursor because if we use the default popup()
+             * handler and press Menu but with the mouse elsewhere, then the
+             * context menu will be at mouse pointer, not at the word where
+             * the cursor is.
+             */
+
+            pointer = buffer.getIter(insertOffset);
+
+            rect = view.getLocation(pointer);
+            X = rect.getX();
+            Y = rect.getY();
+            h = rect.getHeight();
+            x = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X);
+            y = view.convertBufferToWindowCoordsY(TextWindowType.TEXT, Y);
+
+            underlying = view.getWindow();
+            xP = underlying.getOriginX();
+            yP = underlying.getOriginY();
+
+            popup.presentAt(x + xP, y + yP, h);
+
+            start = begin;
+            wide = end - begin;
+            popup.connect(this);
+
+            return true;
         }
 
-        popup = new SuggestionsPopupMenu();
-        popup.populateSuggestions(word);
-
-        rect = view.getLocation(pointer);
-        X = rect.getX();
-        Y = rect.getY();
-        h = rect.getHeight();
-        x = view.convertBufferToWindowCoordsX(TextWindowType.TEXT, X);
-        y = view.convertBufferToWindowCoordsY(TextWindowType.TEXT, Y);
-
-        underlying = view.getWindow();
-        xP = underlying.getOriginX();
-        yP = underlying.getOriginY();
-
-        popup.presentAt(x + xP, y + yP, h);
-
         // similar to insertText()
-        popup.connect(new SuggestionsPopupMenu.WordSelected() {
-            public void onWordSelected(String word) {
-                final Extract removed;
-                final Span span;
-                final Change change;
+        public void onWordSelected(String word) {
+            final Extract removed;
+            final Span span;
+            final Change change;
 
-                removed = chain.extractRange(alpha, omega - alpha);
-                span = Span.createSpan(word, insertMarkup);
-                change = new FullTextualChange(chain, alpha, removed, span);
+            removed = chain.extractRange(start, wide);
+            span = Span.createSpan(word, insertMarkup);
+            change = new FullTextualChange(chain, start, removed, span);
 
-                ui.apply(change);
-            }
-        });
+            ui.apply(change);
+        }
     }
 
     int getInsertOffset() {

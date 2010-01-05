@@ -41,40 +41,51 @@ class SuggestionsPopupMenu extends Menu
 {
     private Menu menu;
 
+    private MenuItem.Activate picked;
+
+    private SuggestionsPopupMenu.WordSelected handler;
+
     SuggestionsPopupMenu() {
         super();
         menu = this;
+
+        picked = new MenuItem.Activate() {
+            public void onActivate(MenuItem source) {
+                final WordMenuItem local;
+                final String suggestion;
+
+                local = (WordMenuItem) source;
+                suggestion = local.getWord();
+
+                handler.onWordSelected(suggestion);
+            }
+        };
 
         hookupBehaviourHandlers();
     }
 
     private void hookupBehaviourHandlers() {}
 
-    void populateSuggestions(String word) {
+    void populateSuggestions(final String word) {
         final String[] suggestions;
         MenuItem item;
         Label label;
         int i;
 
         if (word == null) {
-            item = new MenuItem();
-
-            label = new Label("<i>no suggestions</i>");
-            label.setUseMarkup(true);
-
-            item.add(label);
-            menu.append(item);
             return;
         }
 
+        /*
+         * Add a MenuItem for each suggestion provided by Enchant. Reuse the
+         * same signal handler for each one; calls the WordSelected handler
+         * passed in by the EditorTextView if it is Activated.
+         */
+
         suggestions = ui.dict.suggest(word);
 
-        for (i = 0; i < suggestions.length; i++) {
-            if (i > 10) {
-                break;
-            }
-
-            label = new Label("<b>" + suggestions[i] + "</b>");
+        if (suggestions == null) {
+            label = new Label("<i>no suggestions</i>");
             label.setUseMarkup(true);
             label.setAlignment(Alignment.LEFT, Alignment.CENTER);
 
@@ -82,21 +93,46 @@ class SuggestionsPopupMenu extends Menu
             item.add(label);
 
             menu.append(item);
+
+        } else {
+            for (i = 0; i < suggestions.length; i++) {
+                if (i > 10) {
+                    break;
+                }
+
+                label = new Label("<b>" + suggestions[i] + "</b>");
+                label.setUseMarkup(true);
+                label.setAlignment(Alignment.LEFT, Alignment.CENTER);
+
+                item = new WordMenuItem(suggestions[i]);
+                item.add(label);
+
+                item.connect(picked);
+
+                menu.append(item);
+            }
         }
 
-        item = new SeparatorMenuItem();
-        menu.append(item);
-        item = new ImageMenuItem(Stock.ADD);
-        menu.append(item);
+        /*
+         * Now, since we allow asking for suggestions even on correctly
+         * spelled words [which is a prelude to completion operations], we
+         * need to NOT offer to add the word to a custom dictionary if the
+         * word is not already unknown.
+         */
+        if (!ui.dict.check(word)) {
+            item = new SeparatorMenuItem();
+            menu.append(item);
+            item = new ImageMenuItem(Stock.ADD);
+            menu.append(item);
 
-        item.connect(new MenuItem.Activate() {
+            item.connect(new MenuItem.Activate() {
+                public void onActivate(MenuItem source) {
+                    menu.hide();
+                    ui.dict.add(word);
+                }
+            });
+        }
 
-            public void onActivate(MenuItem source) {
-                // menu.hide();
-
-                handler.onWordSelected("");
-            }
-        });
         menu.showAll();
     }
 
@@ -131,13 +167,11 @@ class SuggestionsPopupMenu extends Menu
          */
 
         if (y + R + h < H) {
-            menu.popup(x - 24, y + R + 3);
+            menu.popup(x, y + R + 3);
         } else {
-            menu.popup(x - 24, y - h);
+            menu.popup(x, y - h);
         }
     }
-
-    private SuggestionsPopupMenu.WordSelected handler;
 
     /**
      * Allow the parent EditorTextView to react to a selection being chosen
@@ -149,5 +183,24 @@ class SuggestionsPopupMenu extends Menu
     static interface WordSelected
     {
         void onWordSelected(String word);
+    }
+
+    /**
+     * Wrapper class to let us get at the word that was passed in as a
+     * suggestion.
+     * 
+     * @author Andrew Cowie
+     */
+    private static class WordMenuItem extends MenuItem
+    {
+        private String word;
+
+        private WordMenuItem(final String suggestion) {
+            this.word = suggestion;
+        }
+
+        private String getWord() {
+            return word;
+        }
     }
 }
