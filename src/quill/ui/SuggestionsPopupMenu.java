@@ -18,8 +18,8 @@
  */
 package quill.ui;
 
+import org.gnome.gdk.Screen;
 import org.gnome.gtk.Alignment;
-import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.ImageMenuItem;
 import org.gnome.gtk.Label;
@@ -100,18 +100,20 @@ class SuggestionsPopupMenu extends Menu
      * y-range [height] as R).
      */
     void presentAt(final int x, final int y, final int R) {
-        final Allocation alloc;
+        final Screen screen;
         final int h, H;
 
         final Requisition req;
 
         /*
-         * Get the height of the parent window. Right now this is available on
-         * the UserInterface global.
+         * Get the available height. We use the user's screen rather than the
+         * parent window because there's nothing wrong with a popup menu
+         * overlapping (say) the gnome-panel. Just use the the UserInterface
+         * global as an easily available toplevel Window.
          */
 
-        alloc = ui.primary.getAllocation();
-        H = alloc.getHeight();
+        screen = ui.primary.getScreen();
+        H = screen.getHeight();
 
         req = menu.getRequisition();
         h = req.getHeight();
