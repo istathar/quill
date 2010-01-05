@@ -1572,7 +1572,7 @@ abstract class EditorTextView extends TextView
      */
     private class SuggestionsWordVisitor implements WordVisitor, SuggestionsPopupMenu.WordSelected
     {
-        private int start;
+        private int offset;
 
         private int wide;
 
@@ -1620,7 +1620,7 @@ abstract class EditorTextView extends TextView
 
             popup.presentAt(x + xP, y + yP, h);
 
-            start = begin;
+            offset = begin;
             wide = end - begin;
             popup.connect(this);
 
@@ -1628,16 +1628,25 @@ abstract class EditorTextView extends TextView
         }
 
         // similar to insertText()
-        public void onWordSelected(String word) {
+        public void onWordSelected(String word, boolean replacement) {
             final Extract removed;
             final Span span;
             final Change change;
+            final TextIter start, finish;
 
-            removed = chain.extractRange(start, wide);
-            span = Span.createSpan(word, insertMarkup);
-            change = new FullTextualChange(chain, start, removed, span);
+            if (replacement) {
+                // new text, so mutate, which will result in a recheck
+                removed = chain.extractRange(offset, wide);
+                span = Span.createSpan(word, insertMarkup);
+                change = new FullTextualChange(chain, offset, removed, span);
 
-            ui.apply(change);
+                ui.apply(change);
+            } else {
+                // the word has been added, so we need to unmark it.
+                start = buffer.getIter(offset);
+                finish = buffer.getIter(offset + wide);
+                buffer.removeTag(spelling, start, finish);
+            }
         }
     }
 

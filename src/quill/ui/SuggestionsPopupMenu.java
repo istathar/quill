@@ -57,7 +57,7 @@ class SuggestionsPopupMenu extends Menu
                 local = (WordMenuItem) source;
                 suggestion = local.getWord();
 
-                handler.onWordSelected(suggestion);
+                handler.onWordSelected(suggestion, true);
             }
         };
 
@@ -129,6 +129,8 @@ class SuggestionsPopupMenu extends Menu
                 public void onActivate(MenuItem source) {
                     menu.hide();
                     ui.dict.add(word);
+
+                    handler.onWordSelected(word, false);
                 }
             });
         }
@@ -180,9 +182,18 @@ class SuggestionsPopupMenu extends Menu
         this.handler = handler;
     }
 
+    /**
+     * Return the word chosen by the user (if any) to the EditorTextView
+     * asking for suggestions.
+     */
     static interface WordSelected
     {
-        void onWordSelected(String word);
+        /**
+         * @param replacement
+         *            Indicates whether the word being returned is different
+         *            from the word that was queried.
+         */
+        void onWordSelected(String word, boolean replacement);
     }
 
     /**
