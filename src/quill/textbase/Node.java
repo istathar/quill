@@ -28,23 +28,22 @@ import java.util.ArrayList;
  * visitRange().
  * 
  * <p>
- * This is implemented as a b-tree, with Node left, Span center, Node right.
- * Most of the useful operations on trees are expressed on the
- * {@link TextChain} class, which wraps one of these to back a Segment and its
- * Editor.
+ * This is implemented as a binary-tree, with this class abstract and concrete
+ * subclasses BranchNode (with left and right Node children), LeafNode, and
+ * EmptyNode.
  * 
+ * <p>
+ * Most of the useful operations on trees are actually expressed on the
+ * {@link TextChain} class, which wraps a Node tree to back a Segment and its
+ * EditorTextView.
  * 
  * @author Andrew Cowie
- */
-/*
- * If this becomes an abstract base class, then create a new public class
- * called Tree and replace public usage of Node with it.
  */
 abstract class Node extends Extract
 {
     /*
      * For cases where an empty Extract has to be returned, specifically
-     * TextChain's extractParagraphs().
+     * TextChain's extractParagraphs(). Is this the best place to put this?
      */
     protected static final Node EMPTY;
 
