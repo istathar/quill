@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -21,10 +21,12 @@ package quill.ui;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Container;
 import org.gnome.gtk.PolicyType;
+import org.gnome.gtk.Scrollbar;
 import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
@@ -187,11 +189,12 @@ class ComponentEditorWidget extends ScrolledWindow
     }
 
     private Widget createEditorForSegment(Segment segment) {
-        Widget result;
-        EditorTextView editor;
-        HeadingBox heading;
-        ImageDisplayBox image;
-        ScrolledWindow wide;
+        final Widget result;
+        final EditorTextView editor;
+        final HeadingBox heading;
+        final ImageDisplayBox image;
+        final Scrollbar bar;
+        final ScrolledWindow wide;
 
         if (segment instanceof NormalSegment) {
             editor = new NormalEditorTextView(segment);
@@ -207,6 +210,29 @@ class ComponentEditorWidget extends ScrolledWindow
             wide = new ScrolledWindow();
             wide.setPolicy(PolicyType.AUTOMATIC, PolicyType.NEVER);
             wide.add(editor);
+
+            /*
+             * Having set up horizontal scrollbars for code blocks, we want to
+             * make them a bit less obtrusive in normal use. If we can come up
+             * with a way to limit the size without involving any horizontal
+             * scrollbar at all.
+             */
+
+            bar = wide.getHScrollbar();
+            editor.connect(new Widget.FocusInEvent() {
+                public boolean onFocusInEvent(Widget source, EventFocus event) {
+                    bar.setSensitive(true);
+                    return false;
+                }
+            });
+            editor.connect(new Widget.FocusOutEvent() {
+                public boolean onFocusOutEvent(Widget source, EventFocus event) {
+                    bar.setValue(0);
+                    bar.setSensitive(false);
+                    return false;
+                }
+            });
+            bar.setSensitive(false);
 
             result = wide;
         } else if (segment instanceof ImageSegment) {
