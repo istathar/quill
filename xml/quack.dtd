@@ -2,7 +2,7 @@
 
   quack.dtd
 
-  Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+  Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
 
   This is the public schema for "Quack", the file format used for storing text
   documents created by the Quill and Parchment suite of programs.
@@ -63,6 +63,8 @@
 <!ELEMENT filename (#PCDATA)>
 
 <!ELEMENT command (#PCDATA)>
+
+<!ELEMENT highlight (#PCDATA)>
 
 <!ELEMENT note EMPTY>
 <!ATTLIST note ref CDATA #REQUIRED>

@@ -78,6 +78,10 @@ or if you'd rather just "run away screaming"
 now...
 </text>
 <text>
+<highlight>TODO</highlight> Get a better
+example document!
+</text>
+<text>
 <italics>Lor</italics>em
 ip<italics>sum</italics><note ref="2"/> sit amet,
 consectetuer adipiscing elit. Proin adipiscing
@@ -206,7 +210,7 @@ BBC Books, 1989). ISBN 0563207736.
 
   Example.xml
 
-  Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+  Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
 
   This is an example instance of a document following the Quack schema. As
   such, this file forms an integral part of the source code of the program it

@@ -331,6 +331,9 @@ abstract class EditorTextView extends TextView
                     } else if (key == Keyval.g) {
                         insertImage();
                         return true;
+                    } else if (key == Keyval.h) {
+                        toggleMarkup(Common.HIGHLIGHT);
+                        return true;
                     } else if (key == Keyval.i) {
                         toggleMarkup(Common.ITALICS);
                         return true;
