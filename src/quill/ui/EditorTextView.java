@@ -331,9 +331,6 @@ abstract class EditorTextView extends TextView
                     } else if (key == Keyval.g) {
                         insertImage();
                         return true;
-                    } else if (key == Keyval.h) {
-                        toggleMarkup(Common.HIGHLIGHT);
-                        return true;
                     } else if (key == Keyval.i) {
                         toggleMarkup(Common.ITALICS);
                         return true;
@@ -373,6 +370,9 @@ abstract class EditorTextView extends TextView
                         return true;
                     } else if (key == Keyval.F) {
                         toggleMarkup(Common.FILENAME);
+                        return true;
+                    } else if (key == Keyval.H) {
+                        toggleMarkup(Common.HIGHLIGHT);
                         return true;
                     } else if (key == Keyval.M) {
                         // function or _m_ethod
@@ -586,6 +586,14 @@ abstract class EditorTextView extends TextView
             ui.apply(change);
             this.affect(change);
 
+            /*
+             * Force deselect the range - you want to SEE the markup you just
+             * applied! Also ensure the cursor is at the end (double click
+             * select seems to put insertBound at the beginning).
+             */
+
+            end = buffer.getIter(offset + width);
+            buffer.placeCursor(end);
         } else {
             if (insertMarkup == format) {
                 insertMarkup = null; // OR, something more block oriented?
