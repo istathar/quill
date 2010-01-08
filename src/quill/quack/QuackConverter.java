@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -198,6 +198,8 @@ public class QuackConverter
             inline = new ApplicationElement();
         } else if (format == Common.COMMAND) {
             inline = new CommandElement();
+        } else if (format == Common.HIGHLIGHT) {
+            inline = new HighlightElement();
         } else if (format == Preformat.USERINPUT) {
             // boom?
         } else if (format == Special.NOTE) {

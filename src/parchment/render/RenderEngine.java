@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -30,6 +30,7 @@ import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.Unit;
 import org.gnome.pango.Attribute;
 import org.gnome.pango.AttributeList;
+import org.gnome.pango.BackgroundColorAttribute;
 import org.gnome.pango.FontDescription;
 import org.gnome.pango.FontDescriptionAttribute;
 import org.gnome.pango.ForegroundColorAttribute;
@@ -759,6 +760,10 @@ public abstract class RenderEngine
                         new FontDescriptionAttribute(monoFace.desc),
                         new WeightAttribute(Weight.SEMIBOLD),
                         new ForegroundColorAttribute(0.1, 0.1, 0.1),
+                };
+            } else if (m == Common.HIGHLIGHT) {
+                return new Attribute[] {
+                    new BackgroundColorAttribute(1.0, 1.0, 0.0),
                 };
             }
 

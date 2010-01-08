@@ -371,6 +371,9 @@ abstract class EditorTextView extends TextView
                     } else if (key == Keyval.F) {
                         toggleMarkup(Common.FILENAME);
                         return true;
+                    } else if (key == Keyval.H) {
+                        toggleMarkup(Common.HIGHLIGHT);
+                        return true;
                     } else if (key == Keyval.M) {
                         // function or _m_ethod
                         toggleMarkup(Common.FUNCTION);
@@ -583,6 +586,14 @@ abstract class EditorTextView extends TextView
             ui.apply(change);
             this.affect(change);
 
+            /*
+             * Force deselect the range - you want to SEE the markup you just
+             * applied! Also ensure the cursor is at the end (double click
+             * select seems to put insertBound at the beginning).
+             */
+
+            end = buffer.getIter(offset + width);
+            buffer.placeCursor(end);
         } else {
             if (insertMarkup == format) {
                 insertMarkup = null; // OR, something more block oriented?
@@ -602,7 +613,7 @@ abstract class EditorTextView extends TextView
     void affect(Change change) {
         final StructuralChange structural;
         final TextualChange textual;
-        final TextIter start, finish;
+        final TextIter start, finish, pointer;
         final int offset;
         final int alpha, omega;
         Extract r;
@@ -655,9 +666,14 @@ abstract class EditorTextView extends TextView
                 }
             });
 
+            // BUG?
             omega = offset;
 
             checkSpellingRange(alpha, omega);
+
+            /*
+             * Toggling placed the cursor. Hm.
+             */
         } else if (change instanceof TextualChange) {
             textual = (TextualChange) change;
 
@@ -685,9 +701,14 @@ abstract class EditorTextView extends TextView
             }
             omega = i;
             checkSpellingRange(alpha, omega);
+
+            pointer = buffer.getIter(omega);
+            buffer.placeCursor(pointer);
+
         } else {
             throw new IllegalStateException("Unknown Change type");
         }
+        view.grabFocus();
     }
 
     /**
@@ -697,7 +718,7 @@ abstract class EditorTextView extends TextView
     void reverse(Change obj) {
         final StructuralChange structural;
         final TextualChange textual;
-        final TextIter start, finish;
+        final TextIter start, finish, pointer;
         int alpha, omega;
         Extract r;
 
@@ -736,6 +757,10 @@ abstract class EditorTextView extends TextView
             }
 
             checkSpellingRange(alpha, omega);
+
+            pointer = buffer.getIter(omega);
+            buffer.placeCursor(pointer);
+            view.grabFocus();
         }
     }
 

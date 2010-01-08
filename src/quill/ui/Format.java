@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -54,6 +54,8 @@ class Format
 
     static final TextTag command;
 
+    static final TextTag highlight;
+
     static final TextTag hidden;
 
     static final TextTag userinput;
@@ -86,6 +88,9 @@ class Format
         command.setFamily("DejaVu Sans Mono");
         command.setWeight(Weight.BOLD);
         command.setForeground("#444444");
+
+        highlight = new TextTag();
+        highlight.setBackground("yellow");
 
         italics = new TextTag();
         italics.setStyle(Style.ITALIC);
@@ -144,6 +149,8 @@ class Format
                 return application;
             } else if (m == Common.COMMAND) {
                 return command;
+            } else if (m == Common.HIGHLIGHT) {
+                return highlight;
             } else if (m == Common.LITERAL) {
                 return code;
             }
