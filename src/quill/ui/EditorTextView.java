@@ -613,7 +613,7 @@ abstract class EditorTextView extends TextView
     void affect(Change change) {
         final StructuralChange structural;
         final TextualChange textual;
-        final TextIter start, finish;
+        final TextIter start, finish, pointer;
         final int offset;
         final int alpha, omega;
         Extract r;
@@ -666,9 +666,14 @@ abstract class EditorTextView extends TextView
                 }
             });
 
+            // BUG?
             omega = offset;
 
             checkSpellingRange(alpha, omega);
+
+            /*
+             * Toggling placed the cursor. Hm.
+             */
         } else if (change instanceof TextualChange) {
             textual = (TextualChange) change;
 
@@ -696,9 +701,14 @@ abstract class EditorTextView extends TextView
             }
             omega = i;
             checkSpellingRange(alpha, omega);
+
+            pointer = buffer.getIter(omega);
+            buffer.placeCursor(pointer);
+
         } else {
             throw new IllegalStateException("Unknown Change type");
         }
+        view.grabFocus();
     }
 
     /**
@@ -708,7 +718,7 @@ abstract class EditorTextView extends TextView
     void reverse(Change obj) {
         final StructuralChange structural;
         final TextualChange textual;
-        final TextIter start, finish;
+        final TextIter start, finish, pointer;
         int alpha, omega;
         Extract r;
 
@@ -747,6 +757,10 @@ abstract class EditorTextView extends TextView
             }
 
             checkSpellingRange(alpha, omega);
+
+            pointer = buffer.getIter(omega);
+            buffer.placeCursor(pointer);
+            view.grabFocus();
         }
     }
 
