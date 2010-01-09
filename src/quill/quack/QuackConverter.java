@@ -71,6 +71,8 @@ public class QuackConverter
 
     private Inline inline;
 
+    private Markup previous = null;
+
     public QuackConverter() {
         buf = new StringBuilder();
     }
@@ -128,8 +130,6 @@ public class QuackConverter
         // start(previous) // how?
 
         entire.visit(new SpanVisitor() {
-            private Markup previous = null;
-
             public boolean visit(Span span) {
                 final Markup markup;
                 final int len;
@@ -242,9 +242,7 @@ public class QuackConverter
     private void process(int ch) {
         if (ch == '\n') {
             finish();
-            if (inline != null) {
-                inline = null;
-            }
+            start(previous);
             if (segment instanceof NormalSegment) {
                 block = new TextElement();
             } else if (segment instanceof PreformatSegment) {

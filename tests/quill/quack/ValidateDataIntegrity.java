@@ -148,4 +148,62 @@ public class ValidateDataIntegrity extends IOTestCase
             }
         });
     }
+
+    public void testMarkupContinuingBetweenTextBlocks() throws ValidityException, ParsingException,
+            IOException {
+        final DataLayer data;
+        final Span[] inbound;
+        final Folio folio;
+        final Series series;
+        final Segment segment;
+        final TextChain chain;
+        final Extract entire;
+        final ByteArrayOutputStream out;
+        final String outbound;
+
+        data = new DataLayer();
+        data.loadDocument("tests/quill/quack/TwoBlocksMarkup.xml");
+
+        inbound = new Span[] {
+                createSpan("Hello world. ", null),
+                createSpan("It is a lovely day.", Common.ITALICS),
+                createSpan("\n", null),
+                createSpan("And so is this day.", Common.ITALICS),
+                createSpan(" Goodbye.", null),
+        };
+
+        folio = data.getActiveDocument();
+        series = folio.get(0);
+        segment = series.get(1);
+        chain = segment.getText();
+        entire = chain.extractAll();
+        assertNotNull(entire);
+
+        entire.visit(new SpanVisitor() {
+            private int i = 0;
+
+            public boolean visit(Span span) {
+                assertEquals(inbound[i], span);
+                i++;
+                return false;
+            }
+        });
+
+        out = new ByteArrayOutputStream();
+        data.saveDocument(out);
+
+        outbound = combine(new String[] {
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<text>",
+                "Hello world. <italics>It is a lovely day.</italics>",
+                "</text>",
+                "<text>",
+                "<italics>And so is this day.</italics> Goodbye.",
+                "</text>",
+                "</chapter>"
+        });
+
+        assertEquals(outbound, out.toString());
+    }
 }
