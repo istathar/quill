@@ -76,34 +76,79 @@ public class FormatTextualChange extends TextualChange
         }
     }
 
-    private static Extract applyMarkup(final Extract original, final Markup format) {
+    /**
+     * Apply a given Markup to the specified tree. Does NOT apply that Markup
+     * to any \n characters.
+     */
+    /*
+     * This may not be ideal; if we already had only one StringSpan then we
+     * won't reuse its backing String.
+     */
+    private static class NewlineSkipper implements CharacterVisitor
+    {
+        final StringBuilder str;
+
         final ArrayList<Span> list;
-        Node node;
-        Span span;
-        int i;
 
-        list = new ArrayList<Span>();
+        final Markup replacement;
 
-        original.visit(new SpanVisitor() {
-            public boolean visit(Span span) {
-                final Span replacement;
-                replacement = span.applyMarkup(format);
-                list.add(replacement);
-                return false;
-            }
-        });
-
-        /*
-         * TODO replace with an efficient list -> tree builder!
-         */
-
-        span = list.get(0);
-        node = Node.createNode(span);
-
-        for (i = 1; i < list.size(); i++) {
-            span = list.get(i);
-            node = node.append(span);
+        private NewlineSkipper(int guess, Markup markup) {
+            str = new StringBuilder(guess);
+            list = new ArrayList<Span>();
+            replacement = markup;
         }
+
+        public boolean visit(int character, Markup markup) {
+            Span span;
+
+            if (character == '\n') {
+                span = Span.createSpan(str.toString(), replacement);
+                list.add(span);
+                span = Span.createSpan('\n', null);
+                list.add(span);
+                str.setLength(0);
+            } else {
+                str.appendCodePoint(character);
+            }
+
+            return false;
+        }
+
+        private Node getTree() {
+            Span span;
+            Node node;
+            int i;
+
+            /*
+             * Handle remaining characters
+             */
+
+            span = Span.createSpan(str.toString(), replacement);
+            list.add(span);
+
+            /*
+             * TODO replace with an efficient list -> tree builder?
+             */
+
+            span = list.get(0);
+            node = Node.createNode(span);
+
+            for (i = 1; i < list.size(); i++) {
+                span = list.get(i);
+                node = node.append(span);
+            }
+
+            return node;
+        }
+    }
+
+    private static Extract applyMarkup(final Extract original, final Markup format) {
+        NewlineSkipper tourist;
+        Node node;
+
+        tourist = new NewlineSkipper(original.getWidth(), format);
+        original.visit(tourist);
+        node = tourist.getTree();
 
         return node;
     }
