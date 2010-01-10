@@ -78,13 +78,16 @@ public class FormatTextualChange extends TextualChange
 
     /**
      * Apply a given Markup to the specified tree. Does NOT apply that Markup
-     * to any \n characters.
+     * to any \n characters, but otherwise converts the range into a single
+     * Span.
      */
     /*
      * This may not be ideal; if we already had only one StringSpan then we
-     * won't reuse its backing String.
+     * won't reuse its backing String. We could actually fix this to be a
+     * SpanVisitor if we could ENSURE that all '\n' were in CharacterSpans of
+     * their own (or perhaps even a special NewlineSpan).
      */
-    private static class NewlineSkipper implements CharacterVisitor
+    private static class Applicator implements CharacterVisitor
     {
         final StringBuilder str;
 
@@ -92,7 +95,7 @@ public class FormatTextualChange extends TextualChange
 
         final Markup replacement;
 
-        private NewlineSkipper(int guess, Markup markup) {
+        private Applicator(int guess, Markup markup) {
             str = new StringBuilder(guess);
             list = new ArrayList<Span>();
             replacement = markup;
@@ -143,16 +146,26 @@ public class FormatTextualChange extends TextualChange
     }
 
     private static Extract applyMarkup(final Extract original, final Markup format) {
-        NewlineSkipper tourist;
+        Applicator tourist;
         Node node;
 
-        tourist = new NewlineSkipper(original.getWidth(), format);
+        tourist = new Applicator(original.getWidth(), format);
         original.visit(tourist);
         node = tourist.getTree();
 
         return node;
     }
 
+    /**
+     * Remove a Markup from a range of text. While this normally is just
+     * reverting to clear, it is implemented somewhat different that the
+     * applyMarkup() case above: this one removes the specified format ONLY,
+     * leaving any other Markups in place.
+     * 
+     * This is useful when (for example) you've got a range of italic text,
+     * and a word within it marked as <type>. You want to remove the italics,
+     * but the marked up word will remain marked up.
+     */
     private static Extract removeMarkup(final Extract original, final Markup format) {
         final ArrayList<Span> list;
         Node node;
@@ -164,7 +177,13 @@ public class FormatTextualChange extends TextualChange
         original.visit(new SpanVisitor() {
             public boolean visit(Span span) {
                 final Span replacement;
-                replacement = span.removeMarkup(format);
+
+                if (span.getMarkup() == format) {
+                    replacement = span.copy(null);
+                } else {
+                    replacement = span;
+                }
+
                 list.add(replacement);
                 return false;
             }
