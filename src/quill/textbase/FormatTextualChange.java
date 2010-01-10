@@ -87,7 +87,7 @@ public class FormatTextualChange extends TextualChange
      * SpanVisitor if we could ENSURE that all '\n' were in CharacterSpans of
      * their own (or perhaps even a special NewlineSpan).
      */
-    private static class Applicator implements CharacterVisitor
+    private static class Accumulator implements CharacterVisitor
     {
         final StringBuilder str;
 
@@ -95,7 +95,7 @@ public class FormatTextualChange extends TextualChange
 
         final Markup replacement;
 
-        private Applicator(int guess, Markup markup) {
+        private Accumulator(int guess, Markup markup) {
             str = new StringBuilder(guess);
             list = new ArrayList<Span>();
             replacement = markup;
@@ -105,6 +105,9 @@ public class FormatTextualChange extends TextualChange
             Span span;
 
             if (character == '\n') {
+                if (str.length() == 0) {
+                    return false;
+                }
                 span = Span.createSpan(str.toString(), replacement);
                 list.add(span);
                 span = Span.createSpan('\n', null);
@@ -146,10 +149,10 @@ public class FormatTextualChange extends TextualChange
     }
 
     private static Extract applyMarkup(final Extract original, final Markup format) {
-        Applicator tourist;
+        Accumulator tourist;
         Node node;
 
-        tourist = new Applicator(original.getWidth(), format);
+        tourist = new Accumulator(original.getWidth(), format);
         original.visit(tourist);
         node = tourist.getTree();
 
@@ -213,33 +216,12 @@ public class FormatTextualChange extends TextualChange
     }
 
     private static Extract clearMarkup(Extract original) {
-        final ArrayList<Span> list;
+        Accumulator tourist;
         Node node;
-        Span span;
-        int i;
 
-        list = new ArrayList<Span>();
-
-        original.visit(new SpanVisitor() {
-            public boolean visit(Span span) {
-                final Span replacement;
-                replacement = span.copy(null);
-                list.add(replacement);
-                return false;
-            }
-        });
-
-        /*
-         * TODO replace with an efficient list -> tree builder!
-         */
-
-        span = list.get(0);
-        node = Node.createNode(span);
-
-        for (i = 1; i < list.size(); i++) {
-            span = list.get(i);
-            node = node.append(span);
-        }
+        tourist = new Accumulator(original.getWidth(), null);
+        original.visit(tourist);
+        node = tourist.getTree();
 
         return node;
     }

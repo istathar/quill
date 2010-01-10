@@ -613,7 +613,7 @@ abstract class EditorTextView extends TextView
     void affect(Change change) {
         final StructuralChange structural;
         final TextualChange textual;
-        final TextIter start, finish, pointer;
+        final TextIter start, finish;
         final int offset;
         final int alpha, omega;
         Extract r;
