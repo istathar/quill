@@ -265,7 +265,7 @@ public class UserInterface
         }
 
         try {
-            data.saveDocument();
+            data.saveManuscript();
         } catch (IllegalStateException ise) {
             dialog = new ErrorMessageDialog(primary, "Save failed",
                     "There is a problem in the structure or data of your document: " + ise.getMessage());
@@ -536,7 +536,7 @@ public class UserInterface
         filename = dialog.getFilename();
 
         try {
-            data.loadDocument(filename);
+            data.loadManuscript(filename);
         } catch (Exception e) {
             error = new ErrorMessageDialog(
                     primary,

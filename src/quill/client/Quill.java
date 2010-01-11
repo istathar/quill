@@ -85,14 +85,14 @@ public class Quill
         final Folio folio;
 
         try {
-            data.checkDocument(filename);
-            data.loadDocument(filename);
+            data.checkFilename(filename);
+            data.loadManuscript(filename);
         } catch (FileNotFoundException fnfe) {
-            data.createDocument();
+            data.createManuscript();
             data.setFilename(filename);
         } catch (RecoveryFileExistsException rfee) {
             ui.warning(rfee);
-            data.loadDocument(filename);
+            data.loadManuscript(filename);
         }
 
         folio = data.getActiveDocument();
@@ -103,7 +103,7 @@ public class Quill
         final Folio folio;
 
         // sets active
-        data.createDocument();
+        data.createManuscript();
 
         // there a cleaner way to do this?
         folio = data.getActiveDocument();

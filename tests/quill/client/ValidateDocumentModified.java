@@ -68,7 +68,7 @@ public class ValidateDocumentModified extends IOTestCase
         final DataLayer data;
 
         data = new DataLayer();
-        data.createDocument();
+        data.createManuscript();
 
         /*
          * An empty document is not modified.
@@ -96,14 +96,14 @@ public class ValidateDocumentModified extends IOTestCase
         final ByteArrayOutputStream out;
 
         data = new DataLayer();
-        data.createDocument();
+        data.createManuscript();
 
         insertThreeSpansIntoFirstSegment(data);
 
         assertTrue(data.isModified());
 
         out = new ByteArrayOutputStream();
-        data.saveDocument(out);
+        data.saveChapter(out);
         assertFalse(data.isModified());
 
         /*

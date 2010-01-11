@@ -97,8 +97,8 @@ public class Render
 
     static void loadDocumentFile(String filename) throws Exception {
         try {
-            data.checkDocument(filename);
-            data.loadDocument(filename);
+            data.checkFilename(filename);
+            data.loadManuscript(filename);
         } catch (FileNotFoundException fnfe) {
             System.err.println("ERROR: File not found?" + "\n" + fnfe.getMessage());
             throw new SafelyTerminateException();

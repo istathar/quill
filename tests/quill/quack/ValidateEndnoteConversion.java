@@ -63,7 +63,7 @@ public class ValidateEndnoteConversion extends IOTestCase
         original = loadFileIntoString("tests/quill/quack/Endnote.xml");
 
         data = new DataLayer();
-        data.loadDocument("tests/quill/quack/Endnote.xml");
+        data.loadChapter("tests/quill/quack/Endnote.xml");
 
         series = data.getActiveDocument().get(0);
         assertEquals(2, series.size());
@@ -121,7 +121,7 @@ public class ValidateEndnoteConversion extends IOTestCase
         original = loadFileIntoString(FILE);
 
         data = new DataLayer();
-        data.loadDocument(FILE);
+        data.loadChapter(FILE);
 
         /*
          * Check the state is what we think it is
@@ -182,7 +182,7 @@ public class ValidateEndnoteConversion extends IOTestCase
         expected = loadFileIntoString(FILE2);
 
         data = new DataLayer();
-        data.loadDocument(FILE1);
+        data.loadChapter(FILE1);
 
         /*
          * Check the state is what we think it is

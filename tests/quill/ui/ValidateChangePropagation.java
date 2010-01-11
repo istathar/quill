@@ -53,11 +53,11 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         data = new DataLayer();
 
-        data.createDocument();
+        data.createManuscript();
         folio1 = data.getActiveDocument();
         assertNotNull(folio1);
 
-        data.createDocument();
+        data.createManuscript();
         folio2 = data.getActiveDocument();
         assertNotNull(folio2);
 
@@ -77,7 +77,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         data = new DataLayer();
         ui = new UserInterface(data);
 
-        data.createDocument();
+        data.createManuscript();
         folio = data.getActiveDocument();
         ui.displayDocument(folio);
 
@@ -89,7 +89,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         ui.apply(change);
 
         out = new ByteArrayOutputStream();
-        data.saveDocument(out);
+        data.saveChapter(out);
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -118,7 +118,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         data = new DataLayer();
         ui = new UserInterface(data);
 
-        data.createDocument();
+        data.createManuscript();
         folio = data.getActiveDocument();
         ui.displayDocument(folio);
 
@@ -134,7 +134,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         ui.apply(change);
 
         out = new ByteArrayOutputStream();
-        data.saveDocument(out);
+        data.saveChapter(out);
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -181,7 +181,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
          */
 
         out = new ByteArrayOutputStream();
-        data.saveDocument(out);
+        data.saveChapter(out);
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -211,7 +211,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         data = new DataLayer();
         ui = new UserInterface(data);
 
-        data.createDocument();
+        data.createManuscript();
         folio = data.getActiveDocument();
         ui.displayDocument(folio);
 
@@ -232,7 +232,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         ui.apply(change);
 
         out = new ByteArrayOutputStream();
-        data.saveDocument(out);
+        data.saveChapter(out);
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -266,7 +266,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         buffer.endUserAction();
 
         out = new ByteArrayOutputStream();
-        data.saveDocument(out);
+        data.saveChapter(out);
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -296,7 +296,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         buffer.endUserAction();
 
         out = new ByteArrayOutputStream();
-        data.saveDocument(out);
+        data.saveChapter(out);
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",

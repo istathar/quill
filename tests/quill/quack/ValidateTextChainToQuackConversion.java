@@ -50,7 +50,7 @@ public class ValidateTextChainToQuackConversion extends IOTestCase
         final TextChain text;
 
         data = new DataLayer();
-        data.loadDocument("tests/quill/quack/HelloWorld.xml");
+        data.loadChapter("tests/quill/quack/HelloWorld.xml");
 
         series = data.getActiveDocument().get(0);
         assertEquals(2, series.size());
@@ -194,7 +194,7 @@ public class ValidateTextChainToQuackConversion extends IOTestCase
         final TextChain chain;
 
         data = new DataLayer();
-        data.loadDocument("tests/quill/quack/TemporaryFiles.xml");
+        data.loadChapter("tests/quill/quack/TemporaryFiles.xml");
 
         series = data.getActiveDocument().get(0);
         assertEquals(2, series.size());

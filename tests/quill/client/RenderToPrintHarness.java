@@ -51,7 +51,7 @@ public class RenderToPrintHarness
 
     private static void loadExampleDocument() throws ValidityException, ParsingException, IOException {
         Gtk.init(null);
-        data.loadDocument("tests/ExampleProgram.xml");
+        data.loadChapter("tests/ExampleProgram.xml");
     }
 
     private static void runRenderPipeline() throws IOException {

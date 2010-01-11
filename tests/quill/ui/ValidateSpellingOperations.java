@@ -59,7 +59,7 @@ public class ValidateSpellingOperations extends GraphicalTestCase
         data = new DataLayer();
         ui = new UserInterface(data);
 
-        data.createDocument();
+        data.createManuscript();
         folio = data.getActiveDocument();
         ui.displayDocument(folio);
 
@@ -172,7 +172,7 @@ public class ValidateSpellingOperations extends GraphicalTestCase
         data = new DataLayer();
         ui = new UserInterface(data);
 
-        data.createDocument();
+        data.createManuscript();
         folio = data.getActiveDocument();
         ui.displayDocument(folio);
 

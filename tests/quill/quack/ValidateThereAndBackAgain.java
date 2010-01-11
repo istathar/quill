@@ -47,12 +47,12 @@ public class ValidateThereAndBackAgain extends IOTestCase
         assertTrue(source.exists());
 
         data = new DataLayer();
-        data.loadDocument(source.getPath());
+        data.loadChapter(source.getPath());
 
         target = new File("tmp/unittests/quill/quack/ValidateThereAndBackAgain.xml");
         target.getParentFile().mkdirs();
         out = new FileOutputStream(target);
-        data.saveDocument(out);
+        data.saveChapter(out);
 
         /*
          * Now run an hashing algorithm over both files to figure out if
@@ -73,7 +73,7 @@ public class ValidateThereAndBackAgain extends IOTestCase
         int i;
 
         data = new DataLayer();
-        data.loadDocument("tests/ExampleProgram.xml");
+        data.loadChapter("tests/ExampleProgram.xml");
 
         for (i = 1; i <= 70; i++) {
             System.err.print(i / 10);
@@ -85,6 +85,6 @@ public class ValidateThereAndBackAgain extends IOTestCase
         System.err.println("\n");
         System.err.flush();
 
-        data.saveDocument(System.out);
+        data.saveChapter(System.out);
     }
 }

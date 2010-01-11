@@ -85,12 +85,12 @@ public class ValidateDataIntegrity extends IOTestCase
         final String expected;
 
         data = new DataLayer();
-        data.createDocument();
+        data.createManuscript();
 
         insertThreeSpansIntoFirstSegment(data);
 
         out = new ByteArrayOutputStream();
-        data.saveDocument(out);
+        data.saveChapter(out);
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -121,7 +121,7 @@ public class ValidateDataIntegrity extends IOTestCase
         final Extract entire;
 
         data = new DataLayer();
-        data.loadDocument("tests/quill/quack/ContinuousMarkup.xml");
+        data.loadChapter("tests/quill/quack/ContinuousMarkup.xml");
 
         expected = new Span[] {
                 createSpan("Hello ", Common.BOLD),
@@ -162,7 +162,7 @@ public class ValidateDataIntegrity extends IOTestCase
         final String outbound;
 
         data = new DataLayer();
-        data.loadDocument("tests/quill/quack/TwoBlocksMarkup.xml");
+        data.loadChapter("tests/quill/quack/TwoBlocksMarkup.xml");
 
         inbound = new Span[] {
                 createSpan("Hello world. ", null),
@@ -190,7 +190,7 @@ public class ValidateDataIntegrity extends IOTestCase
         });
 
         out = new ByteArrayOutputStream();
-        data.saveDocument(out);
+        data.saveChapter(out);
 
         outbound = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",

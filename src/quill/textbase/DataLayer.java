@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -78,7 +78,12 @@ public class DataLayer
         current = null;
     }
 
-    public File checkDocument(String filename) throws FileNotFoundException, RecoveryFileExistsException {
+    /**
+     * Find out if the given filename exists, is a loadable document, and
+     * check to make sure there isn't a RESCUED file lurking. Throws
+     * RecoveryFileExistsException if one does.
+     */
+    public File checkFilename(String filename) throws FileNotFoundException, RecoveryFileExistsException {
         final File source, probe;
 
         source = new File(filename).getAbsoluteFile();
@@ -94,14 +99,40 @@ public class DataLayer
         return source;
     }
 
-    public void loadDocument(String pathname) throws ValidityException, ParsingException, IOException {
+    public void loadManuscript(String pathname) throws ValidityException, ParsingException, IOException {
+        final File source;
+        String filename;
+        final int size;
+        int i;
+        Series series;
+        final Series[] collection;
+
+        // FIXME calculate size
+        size = 1;
+
+        collection = new Series[size];
+
+        for (i = 0; i < size; i++) {
+            // FIXME get individual filenames out of document file
+            filename = "";
+            series = loadChapter(filename);
+            collection[i] = series;
+        }
+
+        current = new Folio(collection);
+    }
+
+    /**
+     * Given a chapter pathname, load and parse the document into a Segment[],
+     * wrapped as a Series.
+     */
+    public Series loadChapter(String pathname) throws ValidityException, ParsingException, IOException {
         final File source;
         final NodeFactory factory;
         final Builder parser;
         final Document doc;
         final QuackLoader loader; // change to interface or baseclass
         final Series series;
-        final Series[] collection;
 
         setFilename(pathname);
         source = new File(pathname);
@@ -113,24 +144,14 @@ public class DataLayer
         loader = new QuackLoader();
         series = loader.process(doc);
 
-        /*
-         * TODO this only handles a work with a single component (chapter) per
-         * file. That's probably right, but overall this logic is insufficient
-         * to load a work with components spread across multiple files.
-         */
-
-        collection = new Series[] {
-            series
-        };
-
-        current = new Folio(collection);
+        return series;
     }
 
     public Folio getActiveDocument() {
         return current;
     }
 
-    public void saveDocument(OutputStream out) throws IOException {
+    public void saveChapter(OutputStream out) throws IOException {
         final Series series;
         final QuackConverter converter;
         int i;
@@ -158,12 +179,6 @@ public class DataLayer
          */
 
         converter.writeChapter(out);
-
-        /*
-         * Note the Change that was current when we saved
-         */
-
-        last = stack.getCurrent();
     }
 
     /**
@@ -205,7 +220,7 @@ public class DataLayer
     /**
      * Create a new blank document with a single Component.
      */
-    public void createDocument() {
+    public void createManuscript() {
         final Segment heading, para;
         TextChain chain;
         final Series chapter1;
@@ -235,10 +250,35 @@ public class DataLayer
      * overwriting confirmation should have been done by the UI already.
      */
     /*
-     * configure the filename fields, and mark that Folio as the current
-     * document.
+     * configure the filename fields
      */
+    // TODO rename to setManuscriptFilename()?
     public void setFilename(String path) {
+        File proposed, absolute;
+        final String name;
+        final int i;
+
+        proposed = new File(path);
+        if (proposed.isAbsolute()) {
+            absolute = proposed;
+        } else {
+            absolute = proposed.getAbsoluteFile();
+        }
+
+        directory = absolute.getParent();
+        name = absolute.getName();
+
+        i = name.indexOf(".parchment");
+        if (i == -1) {
+            throw new IllegalArgumentException("\n"
+                    + "Manuscript files must have a .parchment extension");
+        }
+        basename = name.substring(0, i);
+        filename = absolute.getPath();
+    }
+
+    // FIXME this is the original .xml implementation
+    void setChapterFilename(String path) {
         File proposed, absolute;
         final String name;
         final int i;
@@ -283,7 +323,17 @@ public class DataLayer
         return basename;
     }
 
-    public void saveDocument() throws IOException {
+    public void saveManuscript() throws IOException {
+        saveChapter();
+
+        /*
+         * Note the Change that was current when we saved
+         */
+
+        last = stack.getCurrent();
+    }
+
+    public void saveChapter() throws IOException {
         final File target, tmp;
         final FileOutputStream out;
         boolean result;
@@ -320,7 +370,7 @@ public class DataLayer
 
         try {
             out = new FileOutputStream(tmp);
-            saveDocument(out);
+            saveChapter(out);
             out.close();
         } catch (IOException ioe) {
             tmp.delete();
@@ -371,7 +421,7 @@ public class DataLayer
             }
 
             out = new FileOutputStream(target);
-            saveDocument(out);
+            saveChapter(out);
             out.close();
         } catch (Throwable t) {
             // well, we tried

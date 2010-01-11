@@ -34,10 +34,10 @@ public class ValidateFileNaming extends IOTestCase
 
         data = new DataLayer();
 
-        data.createDocument();
+        data.createManuscript();
 
         try {
-            data.saveDocument();
+            data.saveChapter();
             fail("Lack of name not trapped");
         } catch (IllegalStateException ise) {
             // good
@@ -48,7 +48,7 @@ public class ValidateFileNaming extends IOTestCase
         assertFalse(target.exists());
         target.getParentFile().mkdirs();
 
-        data.setFilename(target.getPath());
+        data.setChapterFilename(target.getPath());
 
         parentdir = data.getDirectory();
         basename = data.getBasename();
@@ -58,7 +58,7 @@ public class ValidateFileNaming extends IOTestCase
         assertEquals("ValidateFileNaming", basename);
         assertEquals(parentdir + "/" + basename + ".xml", filename);
 
-        data.saveDocument();
+        data.saveChapter();
 
         assertTrue(target.exists());
     }

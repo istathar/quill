@@ -77,7 +77,7 @@ public class ValidatePreformattedConversion extends IOTestCase
         final String blob;
 
         data = new DataLayer();
-        data.createDocument();
+        data.createManuscript();
         folio = data.getActiveDocument();
         series = folio.get(0);
 

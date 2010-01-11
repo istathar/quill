@@ -38,7 +38,7 @@ public class ValidateBlockquoteConversion extends TestCase
         Segment segment;
 
         data = new DataLayer();
-        data.loadDocument("tests/quill/quack/Blockquote.xml");
+        data.loadChapter("tests/quill/quack/Blockquote.xml");
 
         series = data.getActiveDocument().get(0);
         assertEquals(4, series.size());

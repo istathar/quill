@@ -57,7 +57,7 @@ public class ValidateProperNewlineHandling extends IOTestCase
          */
 
         data = new DataLayer();
-        data.createDocument();
+        data.createManuscript();
 
         folio = data.getActiveDocument();
         series = folio.get(0);
@@ -85,7 +85,7 @@ public class ValidateProperNewlineHandling extends IOTestCase
          */
 
         out = new ByteArrayOutputStream();
-        data.saveDocument(out);
+        data.saveChapter(out);
 
         blob = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -110,7 +110,7 @@ public class ValidateProperNewlineHandling extends IOTestCase
 
         data = new DataLayer();
         try {
-            data.loadDocument("tests/quill/quack/IllegalNewlines.xml");
+            data.loadChapter("tests/quill/quack/IllegalNewlines.xml");
             fail();
             return;
         } catch (IllegalStateException ise) {
@@ -130,10 +130,10 @@ public class ValidateProperNewlineHandling extends IOTestCase
         final String expected;
 
         data = new DataLayer();
-        data.loadDocument("tests/quill/quack/ReallyLongInlineLeadingBlock.xml");
+        data.loadChapter("tests/quill/quack/ReallyLongInlineLeadingBlock.xml");
 
         out = new ByteArrayOutputStream();
-        data.saveDocument(out);
+        data.saveChapter(out);
 
         expected = loadFileIntoString("tests/quill/quack/ReallyLongInlineLeadingBlock.xml");
         assertEquals(expected, out.toString());
