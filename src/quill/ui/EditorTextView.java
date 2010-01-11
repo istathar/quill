@@ -613,7 +613,7 @@ abstract class EditorTextView extends TextView
     void affect(Change change) {
         final StructuralChange structural;
         final TextualChange textual;
-        final TextIter start, finish, pointer;
+        final TextIter start, finish;
         final int offset;
         final int alpha, omega;
         Extract r;
@@ -702,8 +702,8 @@ abstract class EditorTextView extends TextView
             omega = i;
             checkSpellingRange(alpha, omega);
 
-            pointer = buffer.getIter(omega);
-            buffer.placeCursor(pointer);
+            // start is at the end now, thaks to TextBuffer's insert()
+            buffer.placeCursor(start);
 
         } else {
             throw new IllegalStateException("Unknown Change type");
@@ -758,8 +758,20 @@ abstract class EditorTextView extends TextView
 
             checkSpellingRange(alpha, omega);
 
-            pointer = buffer.getIter(omega);
-            buffer.placeCursor(pointer);
+            /*
+             * There is an usual experience we'd like to create: when applying
+             * a formatting, and then undoing it, you tend to want to apply a
+             * DIFFERENT formatting, and so [re]selecting the range that was
+             * picked makes that much easier. Otherwise we do what we do
+             * elsewhere: de-select and put the cursor at the end of the
+             * current operation range.
+             */
+            if (obj instanceof FormatTextualChange) {
+                pointer = buffer.getIter(alpha);
+                buffer.selectRange(pointer, start);
+            } else {
+                buffer.placeCursor(start);
+            }
             view.grabFocus();
         }
     }
