@@ -30,20 +30,20 @@
 
 <!ELEMENT heading (#PCDATA)>
 
-<!ELEMENT text (#PCDATA | italics | bold | application | type | function | literal | filename | command | note)*>
+<!ELEMENT text (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
 
-<!ELEMENT code (#PCDATA | bold | note)*>
+<!ELEMENT code (#PCDATA | bold | highlight | note)*>
 <!ATTLIST code xml:space CDATA #REQUIRED>
 
-<!ELEMENT quote (#PCDATA | italics | bold | application | type | function | literal | filename | command | note)*>
+<!ELEMENT quote (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
 
-<!ELEMENT image (#PCDATA | italics | bold | application | type | function | literal | filename | command | note)*>
+<!ELEMENT image (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
 <!ATTLIST image src CDATA #REQUIRED>
 
-<!ELEMENT endnote (#PCDATA | italics | bold | application | type | function | literal | filename | command | cite)*>
+<!ELEMENT endnote (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | cite)*>
 <!ATTLIST endnote name CDATA #REQUIRED>
 
-<!ELEMENT reference (#PCDATA | italics | bold | application | type | function | literal | filename | command)*>
+<!ELEMENT reference (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight)*>
 <!ATTLIST reference name CDATA #REQUIRED>
 
 <!-- inline spans -->

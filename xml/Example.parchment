@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manuscript xmlns="http://namespace.operationaldynamics.com/parchment/0.2">
+
+<content>
+<chapter src="Introduction.xml"/>
+<chapter src="Final Everywhere.xml"/>
+</content>
+
+<presentation>
+<renderer class="com.operationaldynamics.parchment.Report"/>
+<paper size="A4"/>
+<margins top="10.00" left="57.75" right="25.00" bottom="10.00"/>
+<fonts sans="Liberation Sans, 8.0" serif="Linux Libertine, 9.0"
+mono="Inconsolata, 8.1"  heading="Linux Libertine O C"/>
+</presentation>
+
+</manuscript>
+

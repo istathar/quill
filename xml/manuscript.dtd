@@ -1,0 +1,58 @@
+<!--
+
+  manuscript.dtd
+
+  Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
+
+  This is the public schema for "Quack", the file format used for storing text
+  documents created by the Quill and Parchment suite of programs.
+
+  As such, this file forms an integral part of the source code of the program
+  it accompanies, and is made available to you by its authors under the terms
+  of the "GNU General Public Licence version 2". See the LICENCE file for the
+  terms governing usage, copying and redistribution.
+
+  Although you have the freedom to use this file in accordance with this
+  licence, the schema it describes is controlled by the XML Standards Team at
+  Operational Dynamics. Changes will only be made after public consultation
+  and in correlation with support in the "Quill and Parchment" application for
+  such new schema versions to ensure forward and backwards compatibility.
+
+-->
+
+<!ELEMENT manuscript (content, presentation)>
+<!ATTLIST manuscript xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/0.2">
+
+<!-- document source -->
+
+<!ELEMENT content (chapter)+>
+
+<!ELEMENT chapter EMPTY>
+<!ATTLIST chapter src CDATA #REQUIRED>
+
+<!-- render engine -->
+
+<!ELEMENT presentation (renderer,paper,margins?,fonts?)>
+
+<!ELEMENT renderer EMPTY>
+<!ATTLIST renderer class CDATA #REQUIRED>
+
+<!ELEMENT paper EMPTY>
+<!ATTLIST paper size CDATA #REQUIRED>
+
+<!ELEMENT margins EMPTY>
+<!ATTLIST margins top CDATA #REQUIRED>
+<!ATTLIST margins bottom CDATA #REQUIRED>
+<!ATTLIST margins left CDATA #REQUIRED>
+<!ATTLIST margins right CDATA #REQUIRED>
+
+<!ELEMENT fonts EMPTY>
+<!ATTLIST fonts sans CDATA #REQUIRED>
+<!ATTLIST fonts serif CDATA #REQUIRED>
+<!ATTLIST fonts mono CDATA #REQUIRED>
+<!ATTLIST fonts heading CDATA #REQUIRED>
+
+
+<!--
+  vim: set textwidth=78 nowrap:
+-->
