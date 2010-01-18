@@ -1,6 +1,6 @@
 <!--
 
-  quack.dtd
+  chapter.dtd
 
   Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
 
@@ -21,8 +21,7 @@
 -->
 
 <!ELEMENT chapter (title?,(heading | text | code | quote | image)*,endnote*,reference*)>
-<!ATTLIST chapter schema CDATA #FIXED "0.1">
-<!ATTLIST chapter xmlns CDATA #FIXED "http://operationaldynamics.com/quack">
+<!ATTLIST chapter xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/0.2">
 
 <!-- block level  -->
 
@@ -33,7 +32,7 @@
 <!ELEMENT text (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
 
 <!ELEMENT code (#PCDATA | bold | highlight | note)*>
-<!ATTLIST code xml:space CDATA #REQUIRED>
+<!ATTLIST code xml:space CDATA #FIXED "preserve">
 
 <!ELEMENT quote (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
 

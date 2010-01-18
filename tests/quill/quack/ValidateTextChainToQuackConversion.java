@@ -50,9 +50,7 @@ public class ValidateTextChainToQuackConversion extends IOTestCase
         final TextChain text;
 
         data = new DataLayer();
-        data.loadChapter("tests/quill/quack/HelloWorld.xml");
-
-        series = data.getActiveDocument().get(0);
+        series = data.loadChapter("tests/quill/quack/HelloWorld.xml");
         assertEquals(2, series.size());
 
         text = series.get(1).getText();
@@ -97,7 +95,7 @@ public class ValidateTextChainToQuackConversion extends IOTestCase
 
         blob = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
                 "<text>",
                 "Hello",
                 "</text>",
@@ -170,7 +168,7 @@ public class ValidateTextChainToQuackConversion extends IOTestCase
 
         blob = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
                 "<text>",
                 "Accessing the " + "<filename>/tmp</filename>" + " directory",
                 "directly is fine, but you are often better",
@@ -194,9 +192,7 @@ public class ValidateTextChainToQuackConversion extends IOTestCase
         final TextChain chain;
 
         data = new DataLayer();
-        data.loadChapter("tests/quill/quack/TemporaryFiles.xml");
-
-        series = data.getActiveDocument().get(0);
+        series = data.loadChapter("tests/quill/quack/TemporaryFiles.xml");
         assertEquals(2, series.size());
 
         chain = series.get(1).getText();
@@ -243,7 +239,7 @@ public class ValidateTextChainToQuackConversion extends IOTestCase
 
         blob = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
                 "<text>",
                 ":𝑛:",
                 "</text>",

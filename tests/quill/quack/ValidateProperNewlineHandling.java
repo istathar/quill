@@ -89,7 +89,7 @@ public class ValidateProperNewlineHandling extends IOTestCase
 
         blob = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
                 "<text>",
                 "Hello",
                 "</text>",

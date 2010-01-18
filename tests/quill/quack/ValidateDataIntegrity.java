@@ -94,7 +94,7 @@ public class ValidateDataIntegrity extends IOTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
                 "<text>",
                 "<bold>Hello </bold><type>GtkButton</type><bold>",
                 "world</bold>",
@@ -114,14 +114,10 @@ public class ValidateDataIntegrity extends IOTestCase
             ParsingException {
         final DataLayer data;
         final Span[] expected;
-        final Folio folio;
         final Series series;
         final Segment segment;
         final TextChain chain;
         final Extract entire;
-
-        data = new DataLayer();
-        data.loadChapter("tests/quill/quack/ContinuousMarkup.xml");
 
         expected = new Span[] {
                 createSpan("Hello ", Common.BOLD),
@@ -131,8 +127,8 @@ public class ValidateDataIntegrity extends IOTestCase
                 createSpan("printf()", Common.LITERAL)
         };
 
-        folio = data.getActiveDocument();
-        series = folio.get(0);
+        data = new DataLayer();
+        series = data.loadChapter("tests/quill/quack/ContinuousMarkup.xml");
         segment = series.get(1);
         chain = segment.getText();
         entire = chain.extractAll();
@@ -153,16 +149,12 @@ public class ValidateDataIntegrity extends IOTestCase
             IOException {
         final DataLayer data;
         final Span[] inbound;
-        final Folio folio;
         final Series series;
         final Segment segment;
         final TextChain chain;
         final Extract entire;
         final ByteArrayOutputStream out;
         final String outbound;
-
-        data = new DataLayer();
-        data.loadChapter("tests/quill/quack/TwoBlocksMarkup.xml");
 
         inbound = new Span[] {
                 createSpan("Hello world. ", null),
@@ -172,8 +164,8 @@ public class ValidateDataIntegrity extends IOTestCase
                 createSpan(" Goodbye.", null),
         };
 
-        folio = data.getActiveDocument();
-        series = folio.get(0);
+        data = new DataLayer();
+        series = data.loadChapter("tests/quill/quack/TwoBlocksMarkup.xml");
         segment = series.get(1);
         chain = segment.getText();
         entire = chain.extractAll();
@@ -194,7 +186,7 @@ public class ValidateDataIntegrity extends IOTestCase
 
         outbound = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
                 "<text>",
                 "Hello world. <italics>It is a lovely day.</italics>",
                 "</text>",

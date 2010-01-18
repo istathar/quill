@@ -93,7 +93,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
                 "<text>",
                 "h",
                 "</text>",
@@ -138,7 +138,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
                 "<text>",
                 "This is a test of the emergency broadcast",
                 "system",
@@ -185,7 +185,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
                 "<text>",
                 "This is an emergency broadcast system",
                 "</text>",
@@ -236,7 +236,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
                 "<text>",
                 "This is a test of the <italics>emergency</italics>",
                 "broadcast system",
@@ -270,7 +270,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter schema=\"0.1\" xmlns=\"http://operationaldynamics.com/quack\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
                 "<text>",
                 "This is a test of the",
                 "a<italics>emergency</italics> broadcast",
