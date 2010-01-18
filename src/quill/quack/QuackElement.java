@@ -34,7 +34,7 @@ import nu.xom.Serializer;
 abstract class QuackElement extends Element
 {
     QuackElement(String name) {
-        super(name, "http://operationaldynamics.com/quack");
+        super(name, "http://namespace.operationaldynamics.com/parchment/0.2");
     }
 
     void add(Tag tag) {
@@ -87,12 +87,6 @@ abstract class QuackElement extends Element
         final Serializer s;
 
         doc = new Document(this);
-
-        /*
-         * The top level element in a DocBook XML document has to have a
-         * version attribute.
-         */
-        this.setValue("schema", "0.1");
 
         s = new QuackSerializer(out, this);
         s.write(doc);
