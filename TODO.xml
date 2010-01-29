@@ -4,6 +4,62 @@
 TODO
 </title>
 <heading>
+File format
+</heading>
+<text>
+Quill and Parchment's primary use scenario
+is working on books, that is, documents that
+have multiple chapters. An article is simply
+a document with only one chapter.
+</text>
+<text>
+Right now the chapters are in files with
+<filename>.xml</filename> as their extension
+and &lt;chapter&gt; as their root element.
+This is fine.
+</text>
+<text>
+We need to finalize the schema for the overall
+document container, and work out the cases
+for individual chapter files. The extension
+for these files will be
+<filename>.parchment</filename> and will
+contain &lt;manuscript&gt; root elements.
+</text>
+<text>
+The on-disk format needs to be completed,
+and finalized as <literal>1.0</literal>.
+</text>
+<text>
+<italics>This is being worked on in the </italics>
+<literal>'manuscripts-and-chapters'</literal>
+<italics> branch.</italics>
+</text>
+<text>
+<bold>Launching documents from Nautilus</bold>
+</text>
+<text>
+Once the format is finalized, we need to
+register a MIME type with GNOME via a
+<literal>.desktop</literal> file so that
+documents are launched when opened by the
+<application>Nautilus</application> file
+browser or with <command>gnome-open</command>
+from the command line.
+</text>
+<text>
+This will probably also require single instance
+code via [org.gnome.notify] <type>Notify</type>.
+We'll need to have a mechanism to differentiate
+between development and normal use (start
+new instance &amp; terminate existing vs
+just load into existing instance?).
+</text>
+<text>
+Should individual chapters be launchable,
+or just the document?
+</text>
+<heading>
 Saving
 </heading>
 <text>
