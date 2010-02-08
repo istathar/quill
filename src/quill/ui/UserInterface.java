@@ -103,9 +103,9 @@ public class UserInterface
     }
 
     private void loadFonts() {
-        fonts.serif = new FontDescription("Deja Vu Serif, 11");
-        fonts.sans = new FontDescription("Deja Vu Sans, 11");
-        fonts.mono = new FontDescription("Deja Vu Sans Mono, 11");
+        fonts.serif = new FontDescription("Deja Vu Serif, 12");
+        fonts.sans = new FontDescription("Deja Vu Sans, 12");
+        fonts.mono = new FontDescription("Deja Vu Sans Mono, 12");
     }
 
     private void setupApplication() {
