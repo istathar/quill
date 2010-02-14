@@ -41,6 +41,7 @@ import org.gnome.gtk.TextView;
 import org.gnome.gtk.TextWindowType;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.WrapMode;
+import org.gnome.pango.FontDescription;
 
 import quill.textbase.Change;
 import quill.textbase.Common;
@@ -1003,11 +1004,14 @@ abstract class EditorTextView extends TextView
 
     private static Widget createEndnote(Span span) {
         final String ref;
+        final FontDescription desc;
         final Label label;
         final EventBox box;
 
         ref = span.getText();
+        desc = new FontDescription("Deja Vu Sans, 8.0");
         label = new Label(ref);
+        label.modifyFont(desc);
 
         box = new EventBox();
         box.setVisibleWindow(false);

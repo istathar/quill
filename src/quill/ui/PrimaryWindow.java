@@ -24,12 +24,11 @@ import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gdk.WindowState;
 import org.gnome.gtk.Allocation;
-import org.gnome.gtk.HBox;
+import org.gnome.gtk.HPaned;
 import org.gnome.gtk.Notebook;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
-import org.gnome.pango.FontDescription;
 
 import quill.textbase.Change;
 import quill.textbase.DataLayer;
@@ -50,7 +49,7 @@ class PrimaryWindow extends Window
 
     private VBox top;
 
-    private HBox two;
+    private HPaned pane;
 
     private Notebook left;
 
@@ -80,32 +79,28 @@ class PrimaryWindow extends Window
     }
 
     private void setupWindow() {
-        final FontDescription desc;
-
         window = this;
         window.setMaximize(true);
         window.setTitle("Quill");
 
-        desc = new FontDescription("Deja Vu Serif, 11");
-        window.modifyFont(desc);
-
         top = new VBox(false, 0);
         window.add(top);
 
-        two = new HBox(true, 0);
-        top.packStart(two, true, true, 0);
+        pane = new HPaned();
+        pane.setPosition(680);
+        top.packStart(pane, true, true, 0);
     }
 
     private void setupEditorSide() {
         left = new Notebook();
         left.setShowTabs(false);
         left.setShowBorder(false);
-        left.setSizeRequest(640, -1);
+        left.setSizeRequest(400, -1);
 
         editor = new ComponentEditorWidget();
         left.insertPage(editor, null, 0);
 
-        two.packStart(left, true, true, 0);
+        pane.add1(left);
     }
 
     private void setupPreviewSide() {
@@ -122,7 +117,7 @@ class PrimaryWindow extends Window
         outline = new OutlineWidget();
         right.add(outline);
 
-        two.packStart(right, false, false, 0);
+        pane.add2(right);
     }
 
     private void initialPresentation() {
