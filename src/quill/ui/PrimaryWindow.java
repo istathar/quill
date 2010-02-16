@@ -18,30 +18,55 @@
  */
 package quill.ui;
 
+import java.io.IOException;
+
+import org.freedesktop.cairo.Context;
+import org.freedesktop.cairo.PdfSurface;
+import org.freedesktop.cairo.Surface;
 import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gdk.WindowState;
 import org.gnome.gtk.Allocation;
+import org.gnome.gtk.Button;
+import org.gnome.gtk.ButtonsType;
+import org.gnome.gtk.ErrorMessageDialog;
+import org.gnome.gtk.FileChooserDialog;
+import org.gnome.gtk.FileFilter;
 import org.gnome.gtk.HBox;
+import org.gnome.gtk.IconSize;
+import org.gnome.gtk.Image;
+import org.gnome.gtk.InfoMessageDialog;
+import org.gnome.gtk.MessageDialog;
+import org.gnome.gtk.MessageType;
 import org.gnome.gtk.Notebook;
+import org.gnome.gtk.PaperSize;
+import org.gnome.gtk.ResponseType;
+import org.gnome.gtk.Stock;
+import org.gnome.gtk.Unit;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.pango.FontDescription;
 
+import parchment.render.RenderEngine;
+import parchment.render.ReportRenderEngine;
 import quill.textbase.Change;
 import quill.textbase.ChangeStack;
 import quill.textbase.DataLayer;
+import quill.textbase.Folio;
 import quill.textbase.Origin;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 
+import static org.gnome.gtk.FileChooserAction.OPEN;
+import static org.gnome.gtk.FileChooserAction.SAVE;
 import static quill.client.Quill.ui;
 
 /**
- * The main application window. Single instance, probably.
+ * The main application window, representing a single loaded (or brand new)
+ * document.
  * 
  * @author Andrew Cowie
  */
@@ -83,8 +108,52 @@ class PrimaryWindow extends Window
         initialPresentation();
     }
 
+    /*
+     * This code sure has migrated around the application quite a bit. Seems
+     * to make sense here now, though; after all, undo and redo are user
+     * interface artifacts.
+     */
     private void setupUndoCapability() {
         stack = new ChangeStack();
+    }
+
+    /**
+     * Apply a Change to the data layer and then to this user interface.
+     */
+    public void apply(Change change) {
+        stack.apply(change);
+        editor.affect(change);
+    }
+
+    /**
+     * Pick the latest Change off the ChangeStack, and then do something with
+     * it
+     */
+    void undo() {
+        final Change change;
+
+        change = stack.undo();
+
+        if (change == null) {
+            return;
+        }
+
+        editor.reverse(change);
+    }
+
+    /**
+     * Grab the Change that was most recently undone, and redo it.
+     */
+    void redo() {
+        final Change change;
+
+        change = stack.redo();
+
+        if (change == null) {
+            return;
+        }
+
+        editor.affect(change);
     }
 
     private void setupWindow() {
@@ -110,7 +179,7 @@ class PrimaryWindow extends Window
         left.setShowBorder(false);
         left.setSizeRequest(640, -1);
 
-        editor = new ComponentEditorWidget();
+        editor = new ComponentEditorWidget(this);
         left.insertPage(editor, null, 0);
 
         two.packStart(left, true, true, 0);
@@ -142,7 +211,7 @@ class PrimaryWindow extends Window
         window.connect(new Window.DeleteEvent() {
             public boolean onDeleteEvent(Widget source, Event event) {
                 try {
-                    ui.saveIfModified();
+                    saveIfModified();
                     ui.shutdown();
                     return false;
                 } catch (SaveCancelledException sce) {
@@ -189,7 +258,7 @@ class PrimaryWindow extends Window
                     }
                 } else if (mod == ModifierType.CONTROL_MASK) {
                     if (key == Keyval.p) {
-                        ui.printDocument();
+                        printDocument();
                         return true;
                     }
                     if (key == Keyval.n) {
@@ -204,8 +273,8 @@ class PrimaryWindow extends Window
                     }
                     if (key == Keyval.o) {
                         try {
-                            ui.saveIfModified();
-                            ui.openDocument();
+                            saveIfModified();
+                            openDocument();
                             return true;
                         } catch (SaveCancelledException sce) {
                             return true;
@@ -213,7 +282,7 @@ class PrimaryWindow extends Window
                     }
                     if (key == Keyval.q) {
                         try {
-                            ui.saveIfModified();
+                            saveIfModified();
                             ui.shutdown();
                             return true;
                         } catch (SaveCancelledException sce) {
@@ -222,31 +291,31 @@ class PrimaryWindow extends Window
                     }
                     if (key == Keyval.s) {
                         try {
-                            ui.saveDocument();
+                            saveDocument();
                         } catch (SaveCancelledException e) {
                             // ignore
                         }
                         return true;
                     } else if (key == Keyval.w) {
                         /*
-                         * FUTURE if we evolve to holding multiple documents
+                         * FIXME if we evolve to holding multiple documents
                          * open at once in a single instance of Quill, then
                          * this will need to change to closing the window
                          * (document?) that is currently active instead of
                          * terminating the application.
                          */
                         try {
-                            ui.saveIfModified();
+                            saveIfModified();
                             ui.shutdown();
                             return true;
                         } catch (SaveCancelledException sce) {
                             return true;
                         }
                     } else if (key == Keyval.y) {
-                        ui.redo();
+                        redo();
                         return true;
                     } else if (key == Keyval.z) {
-                        ui.undo();
+                        undo();
                         return true;
                     }
                 }
@@ -387,19 +456,244 @@ class PrimaryWindow extends Window
         super.setTitle(str);
     }
 
-    void affect(Change change) {
-        editor.affect(change);
-    }
-
-    void reverse(Change change) {
-        editor.reverse(change);
-    }
-
     public void grabFocus() {
         editor.grabFocus();
     }
 
     Origin getCursor() {
         return editor.getCursor();
+    }
+
+    /**
+     * This WILL set the filename in the DataLayer, unless cancelled.
+     */
+    /*
+     * This is a bit messy. There is confusion of responsibilities here
+     * between who owns the filename, who is responsible for carrying out IO,
+     * and who drives the process.
+     */
+    void requestFilename() throws SaveCancelledException {
+        final FileChooserDialog dialog;
+        String filename;
+        ResponseType response;
+
+        dialog = new FileChooserDialog("Save As...", window, SAVE);
+
+        while (true) {
+            response = dialog.run();
+            dialog.hide();
+
+            if (response != ResponseType.OK) {
+                throw new SaveCancelledException();
+            }
+
+            filename = dialog.getFilename();
+
+            try {
+                manuscript.setFilename(filename);
+                return;
+            } finally {
+                // try again
+            }
+        }
+    }
+
+    /**
+     * Cause the document to be saved. Returns false on error or if cancelled.
+     */
+    void saveDocument() throws SaveCancelledException {
+        MessageDialog dialog;
+        String filename;
+
+        filename = manuscript.getFilename();
+
+        if (filename == null) {
+            requestFilename(); // throws if user cancels
+        }
+
+        try {
+            manuscript.saveManuscript();
+        } catch (IllegalStateException ise) {
+            dialog = new ErrorMessageDialog(window, "Save failed",
+                    "There is a problem in the structure or data of your document: " + ise.getMessage());
+            dialog.run();
+            dialog.hide();
+        } catch (IOException ioe) {
+            dialog = new ErrorMessageDialog(window, "Save failed", ioe.getMessage());
+            dialog.setSecondaryUseMarkup(true);
+            dialog.run();
+            dialog.hide();
+        }
+    }
+
+    /**
+     * Ask the user if they want to save the document before closing the app
+     * or discarding it by opening a new one.
+     */
+    void saveIfModified() throws SaveCancelledException {
+        final MessageDialog dialog;
+        String filename;
+        final ResponseType response;
+        final Button discard, cancel, ok;
+
+        if (!data.isModified()) {
+            return;
+        }
+
+        // TODO change to document title?
+        filename = data.getFilename();
+        if (filename == null) {
+            filename = "(untitled)";
+        }
+
+        dialog = new MessageDialog(window, true, MessageType.WARNING, ButtonsType.NONE, "Save Document?");
+        dialog.setSecondaryText("The current document" + "\n<tt>" + filename + "</tt>\n"
+                + "has been modified. Do you want to save it first?", true);
+
+        discard = new Button();
+        discard.setImage(new Image(Stock.DELETE, IconSize.BUTTON));
+        discard.setLabel("Discard changes");
+        dialog.addButton(discard, ResponseType.CLOSE);
+
+        cancel = new Button();
+        cancel.setImage(new Image(Stock.CANCEL, IconSize.BUTTON));
+        cancel.setLabel("Return to editor");
+        dialog.addButton(cancel, ResponseType.CANCEL);
+
+        ok = new Button();
+        ok.setImage(new Image(Stock.SAVE, IconSize.BUTTON));
+        ok.setLabel("Yes, save");
+        dialog.addButton(ok, ResponseType.OK);
+
+        dialog.showAll();
+        dialog.setTitle("Document modified!");
+        ok.grabFocus();
+
+        response = dialog.run();
+        dialog.hide();
+
+        if (response == ResponseType.OK) {
+            saveDocument();
+        } else if (response == ResponseType.CLOSE) {
+            return;
+        } else {
+            throw new SaveCancelledException();
+        }
+    }
+
+    /**
+     * Open a new chapter in the editor, replacing the current one.
+     */
+    void openDocument() {
+        final FileChooserDialog dialog;
+        final FileFilter filter;
+        final ErrorMessageDialog error;
+        String filename;
+        ResponseType response;
+        final Folio folio;
+
+        dialog = new FileChooserDialog("Open file...", window, OPEN);
+
+        filter = new FileFilter();
+        filter.setName("Documents");
+        filter.addPattern("*.xml");
+        dialog.addFilter(filter);
+
+        response = dialog.run();
+        dialog.hide();
+
+        if (response != ResponseType.OK) {
+            return;
+        }
+
+        filename = dialog.getFilename();
+
+        try {
+            folio = data.loadManuscript(filename);
+        } catch (Exception e) {
+            error = new ErrorMessageDialog(
+                    window,
+                    "Failed to load document!",
+                    "Problem encountered when attempting to load:"
+                            + "\n<tt>"
+                            + filename
+                            + "</tt>\n\n"
+                            + "Worse, it wasn't something we were expecting. Here's the internal message, which might help a developer fix the problem:\n\n<tt>"
+                            + e.getClass().getSimpleName() + "</tt>:\n<tt>" + e.getMessage() + "</tt>");
+            error.setSecondaryUseMarkup(true);
+
+            error.run();
+            error.hide();
+            return;
+        }
+        this.displayDocument(folio);
+    }
+
+    void saveAs() throws SaveCancelledException {
+        requestFilename();
+        saveDocument();
+    }
+
+    /**
+     * Cause the document to be printed.
+     */
+    /*
+     * Passing a target filename in from here is either correct, or should be
+     * sourced from the DataLayer. The code driving the renderer probably
+     * shouldn't be here. Should it be in RenderEngine instead? Improving this
+     * will also have to wait on our establishing a proper abstraction for
+     * documents as a whole, containing settings relating to publishing. This
+     * code copied from what is presently our command line driven
+     * RenderToPrintHarness.
+     */
+    void printDocument() {
+        final String parentdir, fullname, basename, targetname;
+        MessageDialog dialog;
+        final Context cr;
+        final Surface surface;
+        final Folio folio;
+        final PaperSize paper;
+        final RenderEngine engine;
+
+        try {
+            paper = PaperSize.A4;
+
+            fullname = data.getFilename();
+            if (fullname == null) {
+                dialog = new InfoMessageDialog(window, "Set filename first",
+                        "You can't print the document (to PDF) until you've set the filename of this document. "
+                                + "Choose <b>Save As...</b>, then come back and try again!");
+                dialog.setSecondaryUseMarkup(true);
+                dialog.run();
+                dialog.hide();
+                return;
+            }
+
+            /*
+             * Get the basename of the current [save] filename, then
+             * instantiate the Cairo Surface we're going to be drawing to with
+             * that basename.pdf as the target.
+             */
+            parentdir = manuscript.getDirectory();
+            basename = manuscript.getBasename();
+            targetname = parentdir + "/" + basename + ".pdf";
+
+            surface = new PdfSurface(targetname, paper.getWidth(Unit.POINTS),
+                    paper.getHeight(Unit.POINTS));
+            cr = new Context(surface);
+
+            folio = data.getActiveDocument();
+
+            // HARDCODE
+            engine = new ReportRenderEngine(paper, manuscript, folio.get(0));
+            engine.render(cr);
+
+            surface.finish();
+        } catch (IOException ioe) {
+            dialog = new ErrorMessageDialog(window, "Print failed", "There's some kind of I/O problem: "
+                    + ioe.getMessage());
+            dialog.run();
+            dialog.hide();
+        }
     }
 }
