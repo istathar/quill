@@ -32,6 +32,7 @@ import org.gnome.gtk.Window;
 import org.gnome.pango.FontDescription;
 
 import quill.textbase.Change;
+import quill.textbase.ChangeStack;
 import quill.textbase.DataLayer;
 import quill.textbase.Origin;
 import quill.textbase.Segment;
@@ -64,6 +65,8 @@ class PrimaryWindow extends Window
 
     private OutlineWidget outline;
 
+    private ChangeStack stack;
+
     /**
      * The Components currently being represented by this PrimaryWindow
      */
@@ -72,11 +75,16 @@ class PrimaryWindow extends Window
     PrimaryWindow() {
         super();
         setupWindow();
+        setupUndoCapability();
         setupEditorSide();
         setupPreviewSide();
         hookupDefaultKeyhandlers();
         hookupWindowManagement();
         initialPresentation();
+    }
+
+    private void setupUndoCapability() {
+        stack = new ChangeStack();
     }
 
     private void setupWindow() {

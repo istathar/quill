@@ -58,7 +58,6 @@ import quill.client.ApplicationException;
 import quill.client.RecoveryFileExistsException;
 import quill.client.SafelyTerminateException;
 import quill.textbase.Change;
-import quill.textbase.DataLayer;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.Series;
@@ -70,24 +69,17 @@ import static quill.textbase.Span.createSpan;
 
 public class UserInterface
 {
-    private DataLayer data;
-
     PrimaryWindow primary;
 
     Dictionary dict;
 
-    public UserInterface(DataLayer data) {
+    public UserInterface() {
         loadImages();
         loadFonts();
-        setupUndoCapability(data);
         setupApplication();
         setupWindows();
         hookupExternalClipboard();
         loadDictionary();
-    }
-
-    private void setupUndoCapability(final DataLayer layer) {
-        data = layer;
     }
 
     private void setupWindows() {
