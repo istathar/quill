@@ -5,7 +5,7 @@
     <chapter src="Final Everywhere.xml"/>
   </content>
   <presentation>
-    <renderer class="com.operationaldynamics.parchment.Report"/>
+    <renderer class="com.operationaldynamics.parchment.ReportRenderEngine"/>
     <paper size="A4"/>
     <margins top="10.00" left="57.75" right="25.00" bottom="10.00"/>
     <font sans="Liberation Sans, 8.0"/>
@@ -14,4 +14,3 @@
     <font heading="Linux Libertine O C"/>
   </presentation>
 </manuscript>
-

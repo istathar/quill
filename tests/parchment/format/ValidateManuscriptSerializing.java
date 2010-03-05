@@ -18,12 +18,16 @@
  */
 package parchment.format;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import nu.xom.Attribute;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Serializer;
+import quill.client.IOTestCase;
 
 /**
  * Evaluate XOM's Serializer to output our <code>&lt;manuscript&gt;</code>
@@ -31,9 +35,38 @@ import nu.xom.Serializer;
  * 
  * @author Andrew Cowie
  */
-public class PrototypeManuscriptSerializer
+public class ValidateManuscriptSerializing extends IOTestCase
 {
-    public static void main(String[] args) throws IOException {
+    /*
+     * Just test the manual code we wrote in the prototype against the
+     * reference example in xml/.
+     */
+    public final void testManualSerializeOut() throws IOException {
+        String filename, reference, exercise;
+        FileOutputStream out;
+        File dir;
+
+        dir = new File("tmp/unittests/parchment/format/");
+
+        if (!dir.exists() && (!dir.isDirectory())) {
+            dir.mkdirs();
+        }
+        filename = "tmp/unittests/parchment/format/ValidateManuscriptSerializing.xml";
+
+        out = new FileOutputStream(filename);
+        serialize(out);
+        out.close();
+
+        exercise = loadFileIntoString(filename);
+        reference = loadFileIntoString("xml/Example.parchment");
+
+        assertEquals(reference, exercise);
+    }
+
+    /*
+     * This will be moved into a real tree builder, obviously.
+     */
+    private static void serialize(OutputStream out) throws IOException {
         final Document document;
         final Element manuscript, content, presentation;
         final Element renderer, paper, margins;
@@ -85,7 +118,7 @@ public class PrototypeManuscriptSerializer
         presentation.appendChild(font);
 
         font = new ParchmentElement("font");
-        attribute = new Attribute("sans", "Liberation Sans, 8.0");
+        attribute = new Attribute("serif", "Linux Libertine, 9.0");
         font.addAttribute(attribute);
         presentation.appendChild(font);
 
@@ -103,8 +136,9 @@ public class PrototypeManuscriptSerializer
 
         document = new Document(manuscript);
 
-        serializer = new Serializer(System.out);
+        serializer = new Serializer(out);
         serializer.setIndent(2);
+        serializer.setLineSeparator("\n");
         serializer.setMaxLength(0);
         serializer.write(document);
     }
