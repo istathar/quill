@@ -2,9 +2,9 @@
 
   manuscript.dtd
 
-  Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
+  Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
 
-  This is the public schema for "Quack", the file format used for storing text
+  This is the public schema for "Manuscript", the container used to describe
   documents created by the Quill and Parchment suite of programs.
 
   As such, this file forms an integral part of the source code of the program
@@ -32,7 +32,7 @@
 
 <!-- render engine -->
 
-<!ELEMENT presentation (renderer,paper,margins?,fonts?)>
+<!ELEMENT presentation (renderer,paper,margins,font+)>
 
 <!ELEMENT renderer EMPTY>
 <!ATTLIST renderer class CDATA #REQUIRED>
@@ -46,11 +46,19 @@
 <!ATTLIST margins left CDATA #REQUIRED>
 <!ATTLIST margins right CDATA #REQUIRED>
 
-<!ELEMENT fonts EMPTY>
-<!ATTLIST fonts sans CDATA #REQUIRED>
-<!ATTLIST fonts serif CDATA #REQUIRED>
-<!ATTLIST fonts mono CDATA #REQUIRED>
-<!ATTLIST fonts heading CDATA #REQUIRED>
+<!--
+  Given how long FontDescription strings are, these knobs are given one per
+  element, so that each one will fit on a single 78 character wide line.
+  This isn't perfect from a validation perspective (the reality is that four
+  font elements need to be declared, one per), but it is the best we can do
+  given the aesthetic we're trying for.
+-->
+
+<!ELEMENT font EMPTY>
+<!ATTLIST font sans CDATA #IMPLIED>
+<!ATTLIST font serif CDATA #IMPLIED>
+<!ATTLIST font mono CDATA #IMPLIED>
+<!ATTLIST font heading CDATA #IMPLIED>
 
 
 <!--

@@ -36,8 +36,8 @@ public class PrototypeManuscriptSerializer
     public static void main(String[] args) throws IOException {
         final Document document;
         final Element manuscript, content, presentation;
-        final Element renderer, paper, margins, fonts;
-        Element chapter;
+        final Element renderer, paper, margins;
+        Element chapter, font;
         Attribute attribute;
         final Serializer serializer;
 
@@ -55,6 +55,7 @@ public class PrototypeManuscriptSerializer
         attribute = new Attribute("src", "Final Everywhere.xml");
         chapter.addAttribute(attribute);
         content.appendChild(chapter);
+
         manuscript.appendChild(content);
 
         renderer = new ParchmentElement("renderer");
@@ -78,21 +79,30 @@ public class PrototypeManuscriptSerializer
         margins.addAttribute(attribute);
         presentation.appendChild(margins);
 
-        fonts = new ParchmentElement("fonts");
+        font = new ParchmentElement("font");
         attribute = new Attribute("sans", "Liberation Sans, 8.0");
-        fonts.addAttribute(attribute);
-        attribute = new Attribute("serif", "Linux Libertine, 9.0");
-        fonts.addAttribute(attribute);
-        attribute = new Attribute("mono", "Inconsolata, 8.1");
-        fonts.addAttribute(attribute);
-        attribute = new Attribute("sans", "Linux Libertine O C");
-        fonts.addAttribute(attribute);
+        font.addAttribute(attribute);
+        presentation.appendChild(font);
 
-        presentation.appendChild(fonts);
+        font = new ParchmentElement("font");
+        attribute = new Attribute("sans", "Liberation Sans, 8.0");
+        font.addAttribute(attribute);
+        presentation.appendChild(font);
+
+        font = new ParchmentElement("font");
+        attribute = new Attribute("mono", "Inconsolata, 8.1");
+        font.addAttribute(attribute);
+        presentation.appendChild(font);
+
+        font = new ParchmentElement("font");
+        attribute = new Attribute("heading", "Linux Libertine O C");
+        font.addAttribute(attribute);
+        presentation.appendChild(font);
 
         manuscript.appendChild(presentation);
 
         document = new Document(manuscript);
+
         serializer = new Serializer(System.out);
         serializer.setIndent(2);
         serializer.setMaxLength(0);
