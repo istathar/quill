@@ -29,9 +29,9 @@ import org.gnome.gtk.Gtk;
 import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.Unit;
 
+import parchment.format.Manuscript;
 import parchment.render.RenderEngine;
 import parchment.render.ReportRenderEngine;
-import quill.textbase.DataLayer;
 import quill.textbase.Folio;
 import quill.ui.UserInterface;
 
@@ -51,11 +51,12 @@ public class Render
 {
     public static UserInterface ui;
 
-    private static DataLayer data;
+    private static Manuscript manuscript;
+
+    private static Folio folio;
 
     public static void main(String[] args) throws Exception {
         try {
-            initializeDataLayer();
             initializeUserInterface(args);
             parseCommandLine(args);
             runRenderPipeline();
@@ -63,10 +64,6 @@ public class Render
             // quietly supress
             return;
         }
-    }
-
-    static void initializeDataLayer() {
-        data = new DataLayer();
     }
 
     /*
@@ -96,9 +93,13 @@ public class Render
     }
 
     static void loadDocumentFile(String filename) throws Exception {
+        final Manuscript attempt;
+
         try {
-            data.checkFilename(filename);
-            data.loadManuscript(filename);
+            attempt = new Manuscript(filename);
+            attempt.checkFilename(filename);
+            manuscript = attempt;
+            folio = manuscript.loadManuscript();
         } catch (FileNotFoundException fnfe) {
             System.err.println("ERROR: File not found?" + "\n" + fnfe.getMessage());
             throw new SafelyTerminateException();
@@ -115,22 +116,19 @@ public class Render
         final String parentdir, basename, targetname;
         final Context cr;
         final Surface surface;
-        final Folio folio;
         final PaperSize paper;
         final RenderEngine engine;
 
         paper = PaperSize.A4;
 
-        parentdir = data.getDirectory();
-        basename = data.getBasename();
+        parentdir = manuscript.getDirectory();
+        basename = manuscript.getBasename();
         targetname = parentdir + "/" + basename + ".pdf";
 
         surface = new PdfSurface(targetname, paper.getWidth(Unit.POINTS), paper.getHeight(Unit.POINTS));
         cr = new Context(surface);
 
-        folio = data.getActiveDocument();
-
-        engine = new ReportRenderEngine(paper, data, folio.get(0));
+        engine = new ReportRenderEngine(paper, manuscript, folio.get(0));
         engine.render(cr);
 
         surface.finish();
