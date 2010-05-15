@@ -100,6 +100,13 @@ class PrimaryWindow extends Window
     private ChangeStack stack;
 
     /**
+     * The state of the document when last loaded or saved to disk, expressed
+     * as the Change object current at that point. The document is unmodified
+     * if the current item on the ChangeStack is this object.
+     */
+    private Change last;
+
+    /**
      * The root of the document currently being presented by this
      * PrimaryWindow.
      */
@@ -542,6 +549,7 @@ class PrimaryWindow extends Window
 
         try {
             manuscript.saveDocument(folio);
+            last = stack.getCurrent();
         } catch (IllegalStateException ise) {
             dialog = new ErrorMessageDialog(window, "Save failed",
                     "There is a problem in the structure or data of your document: " + ise.getMessage());
@@ -578,7 +586,7 @@ class PrimaryWindow extends Window
         final ResponseType response;
         final Button discard, cancel, ok;
 
-        if (!manuscript.isModified()) { // ?
+        if (!isModified()) {
             return;
         }
 

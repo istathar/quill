@@ -43,12 +43,12 @@ import org.gnome.gtk.Settings;
 import org.gnome.gtk.Stock;
 import org.gnome.pango.FontDescription;
 
+import parchment.format.Manuscript;
 import quill.client.ApplicationException;
 import quill.client.RecoveryFileExistsException;
 import quill.client.SafelyTerminateException;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
-import quill.textbase.Series;
 import quill.textbase.Span;
 
 import static quill.textbase.Span.createSpan;
@@ -179,15 +179,8 @@ public class UserInterface
      * navigation options it can offer. Which means maybe we should pass it
      * the Folio?
      */
-    public void displayDocument(Folio folio) {
-        final Series series;
-
-        if (folio.size() == 0) {
-            throw new IllegalStateException();
-        }
-
-        series = folio.get(0);
-        primary.displaySeries(data, series);
+    public void displayDocument(Manuscript manuscript, Folio folio) {
+        primary.displayDocument(manuscript, folio);
     }
 
     /**
@@ -259,6 +252,10 @@ public class UserInterface
                 throw new SafelyTerminateException();
             }
         }
+    }
+
+    public void emergencySave() {
+        primary.emergencySave();
     }
 
 }
