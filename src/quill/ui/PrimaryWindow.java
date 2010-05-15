@@ -31,6 +31,7 @@ import org.gnome.gdk.WindowState;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.ButtonsType;
+import org.gnome.gtk.Dialog;
 import org.gnome.gtk.ErrorMessageDialog;
 import org.gnome.gtk.FileChooserDialog;
 import org.gnome.gtk.FileFilter;
@@ -50,11 +51,12 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.pango.FontDescription;
 
+import parchment.format.Manuscript;
 import parchment.render.RenderEngine;
 import parchment.render.ReportRenderEngine;
+import quill.client.ImproperFilenameException;
 import quill.textbase.Change;
 import quill.textbase.ChangeStack;
-import quill.textbase.DataLayer;
 import quill.textbase.Folio;
 import quill.textbase.Origin;
 import quill.textbase.Segment;
@@ -90,12 +92,24 @@ class PrimaryWindow extends Window
 
     private OutlineWidget outline;
 
+    /**
+     * The document this PrimaryWindow is displaying.
+     */
+    private Manuscript manuscript;
+
     private ChangeStack stack;
 
     /**
-     * The Components currently being represented by this PrimaryWindow
+     * The root of the document currently being presented by this
+     * PrimaryWindow.
      */
-    Series series;
+    private Folio folio;
+
+    /**
+     * The series of Components (the current chapter) currently being
+     * represented by this PrimaryWindow.
+     */
+    private Series series;
 
     PrimaryWindow() {
         super();
@@ -411,17 +425,18 @@ class PrimaryWindow extends Window
     /**
      * Show the nominated Series in this PrimaryWindow
      */
-    /*
-     * FUTURE considerations: when we start dealing in multiple chapters,
-     * we'll want to be able to navigate between them, which means this UI
-     * will need to be told what other Series are available. So be prepared to
-     * change this to accepting a Folio.
-     */
-    void displaySeries(DataLayer data, Series series) {
-        this.series = series;
+    // FIXME rename?
+    void displayDocument(Manuscript manuscript, Folio folio) {
+        this.manuscript = manuscript;
 
-        editor.initializeSeries(data, series);
-        preview.renderSeries(data, series);
+        if (folio.size() == 0) {
+            throw new IllegalStateException();
+        }
+
+        this.series = folio.get(0);
+
+        editor.initializeSeries(series);
+        preview.renderSeries(manuscript, series);
         outline.renderSeries(series);
         this.updateTitle();
     }
@@ -465,7 +480,7 @@ class PrimaryWindow extends Window
     }
 
     /**
-     * This WILL set the filename in the DataLayer, unless cancelled.
+     * This WILL set the filename in the Manuscript, unless cancelled.
      */
     /*
      * This is a bit messy. There is confusion of responsibilities here
@@ -492,10 +507,24 @@ class PrimaryWindow extends Window
             try {
                 manuscript.setFilename(filename);
                 return;
-            } finally {
+            } catch (ImproperFilenameException ife) {
+                warnUserAboutFilename();
                 // try again
+                continue;
             }
         }
+    }
+
+    private void warnUserAboutFilename() {
+        final Dialog dialog;
+
+        dialog = new ErrorMessageDialog(window, "Improper filename",
+                "Parchment filenames must have a <tt>.parchment</tt> extension");
+        dialog.showAll();
+        dialog.setTitle("Improper filename!");
+
+        dialog.run();
+        dialog.hide();
     }
 
     /**
@@ -512,7 +541,7 @@ class PrimaryWindow extends Window
         }
 
         try {
-            manuscript.saveManuscript();
+            manuscript.saveDocument(folio);
         } catch (IllegalStateException ise) {
             dialog = new ErrorMessageDialog(window, "Save failed",
                     "There is a problem in the structure or data of your document: " + ise.getMessage());
@@ -527,6 +556,19 @@ class PrimaryWindow extends Window
     }
 
     /**
+     * Has the document been modified since the last save? If undo/redo takes
+     * you back to the most recent save point, then indeed this will report
+     * false.
+     */
+    public boolean isModified() {
+        if (last == stack.getCurrent()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
      * Ask the user if they want to save the document before closing the app
      * or discarding it by opening a new one.
      */
@@ -536,12 +578,12 @@ class PrimaryWindow extends Window
         final ResponseType response;
         final Button discard, cancel, ok;
 
-        if (!data.isModified()) {
+        if (!manuscript.isModified()) { // ?
             return;
         }
 
         // TODO change to document title?
-        filename = data.getFilename();
+        filename = manuscript.getFilename();
         if (filename == null) {
             filename = "(untitled)";
         }
@@ -585,6 +627,7 @@ class PrimaryWindow extends Window
      * Open a new chapter in the editor, replacing the current one.
      */
     void openDocument() {
+        final Manuscript attempt;
         final FileChooserDialog dialog;
         final FileFilter filter;
         final ErrorMessageDialog error;
@@ -595,8 +638,8 @@ class PrimaryWindow extends Window
         dialog = new FileChooserDialog("Open file...", window, OPEN);
 
         filter = new FileFilter();
-        filter.setName("Documents");
-        filter.addPattern("*.xml");
+        filter.setName("Quill and Parchment documents");
+        filter.addPattern("*.parchment");
         dialog.addFilter(filter);
 
         response = dialog.run();
@@ -609,7 +652,9 @@ class PrimaryWindow extends Window
         filename = dialog.getFilename();
 
         try {
-            folio = data.loadManuscript(filename);
+            attempt = new Manuscript(filename);
+            folio = attempt.loadDocument();
+            manuscript = attempt;
         } catch (Exception e) {
             error = new ErrorMessageDialog(
                     window,
@@ -626,7 +671,7 @@ class PrimaryWindow extends Window
             error.hide();
             return;
         }
-        this.displayDocument(folio);
+        this.displayDocument(manuscript, folio);
     }
 
     void saveAs() throws SaveCancelledException {
@@ -658,7 +703,7 @@ class PrimaryWindow extends Window
         try {
             paper = PaperSize.A4;
 
-            fullname = data.getFilename();
+            fullname = manuscript.getFilename();
             if (fullname == null) {
                 dialog = new InfoMessageDialog(window, "Set filename first",
                         "You can't print the document (to PDF) until you've set the filename of this document. "
@@ -682,7 +727,7 @@ class PrimaryWindow extends Window
                     paper.getHeight(Unit.POINTS));
             cr = new Context(surface);
 
-            folio = data.getActiveDocument();
+            folio = manuscript.getActiveDocument();
 
             // HARDCODE
             engine = new ReportRenderEngine(paper, manuscript, folio.get(0));
@@ -695,5 +740,9 @@ class PrimaryWindow extends Window
             dialog.run();
             dialog.hide();
         }
+    }
+
+    void emergencySave() {
+        manuscript.emergencySave(folio);
     }
 }
