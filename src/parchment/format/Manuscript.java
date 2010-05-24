@@ -30,7 +30,6 @@ import nu.xom.ValidityException;
 import parchment.render.RenderEngine;
 import quill.client.ImproperFilenameException;
 import quill.client.RecoveryFileExistsException;
-import quill.textbase.Change;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Folio;
 import quill.textbase.NormalSegment;
@@ -62,13 +61,6 @@ public class Manuscript
     private Class<RenderEngine> engine;
 
     private Chapter[] chapters;
-
-    /**
-     * The state of the document when last loaded or saved to disk, expressed
-     * as the Change object current at that point. The document is unmodified
-     * if the current item on the ChangeStack is this object.
-     */
-    private Change last;
 
     /**
      * The document currently being worked on, in its in-memory form as loaded

@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -22,7 +22,12 @@ import java.util.LinkedList;
 
 /**
  * An ordered list of Change instances which are the basis of our undo/redo
- * stack. This is delegated to by DataLayer.
+ * stack. There is one of these for each PrimaryWindow to track modifications
+ * to its document.
+ * 
+ * Although public, it is only so in order that PrimaryWindow can see it; it
+ * is in the textbase package in order that the restricted action methods on
+ * Change objects can be accessed.
  * 
  * @author Andrew Cowie
  */
@@ -32,13 +37,13 @@ import java.util.LinkedList;
  * something will need to act to limit its size. A Queue, perhaps? Or maybe
  * discarding older operations at certain defined lifecycle points?
  */
-class ChangeStack
+public class ChangeStack
 {
     private LinkedList<Change> stack;
 
     private int pointer;
 
-    ChangeStack() {
+    public ChangeStack() {
         stack = new LinkedList<Change>();
         pointer = 0;
     }
@@ -46,7 +51,7 @@ class ChangeStack
     /**
      * Apply a Change to the data layer.
      */
-    void apply(Change change) {
+    public void apply(Change change) {
         while (pointer < stack.size()) {
             stack.removeLast();
         }
@@ -61,7 +66,7 @@ class ChangeStack
      * Undo. Return the Change which represents the delta from current to one
      * before.
      */
-    Change undo() {
+    public Change undo() {
         final Change change;
 
         if (stack.size() == 0) {
@@ -82,7 +87,7 @@ class ChangeStack
      * Redo a previous undo. Returns the Change which is the delta you will
      * need to [re]apply.
      */
-    Change redo() {
+    public Change redo() {
         final Change change;
 
         if (stack.size() == 0) {
@@ -100,7 +105,7 @@ class ChangeStack
         return change;
     }
 
-    Change getCurrent() {
+    public Change getCurrent() {
         if (pointer == 0) {
             return null;
         } else {
