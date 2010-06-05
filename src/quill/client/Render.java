@@ -97,9 +97,9 @@ public class Render
 
         try {
             attempt = new Manuscript(filename);
-            attempt.checkFilename(filename);
+            attempt.checkFilename();
             manuscript = attempt;
-            folio = manuscript.loadManuscript();
+            folio = manuscript.loadDocument();
         } catch (FileNotFoundException fnfe) {
             System.err.println("ERROR: File not found?" + "\n" + fnfe.getMessage());
             throw new SafelyTerminateException();

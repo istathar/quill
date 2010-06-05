@@ -23,7 +23,7 @@ import java.io.FileNotFoundException;
 import org.gnome.glib.Glib;
 import org.gnome.gtk.Gtk;
 
-import quill.textbase.DataLayer;
+import parchment.format.Manuscript;
 import quill.textbase.Folio;
 import quill.ui.UserInterface;
 
@@ -42,11 +42,8 @@ public class Quill
 {
     public static UserInterface ui;
 
-    private static DataLayer data;
-
     public static void main(String[] args) throws Exception {
         try {
-            initializeDataLayer();
             initializeUserInterface(args);
             parseCommandLine(args);
             runUserInterface();
@@ -56,15 +53,11 @@ public class Quill
         }
     }
 
-    static void initializeDataLayer() {
-        data = new DataLayer();
-    }
-
     static void initializeUserInterface(String[] args) {
         Glib.setProgramName("quill");
         Gtk.init(args);
 
-        ui = new UserInterface(data);
+        ui = new UserInterface();
     }
 
     /*
@@ -82,32 +75,40 @@ public class Quill
     }
 
     static void loadDocumentFile(String filename) throws Exception {
-        final Folio folio;
+        Manuscript manuscript;
+        Folio folio;
 
         try {
-            data.checkFilename(filename);
-            data.loadManuscript(filename);
-        } catch (FileNotFoundException fnfe) {
-            data.createManuscript();
-            data.setFilename(filename);
-        } catch (RecoveryFileExistsException rfee) {
-            ui.warning(rfee);
-            data.loadManuscript(filename);
+            manuscript = new Manuscript(filename);
+        } catch (ImproperFilenameException ife) {
+            ui.error(ife); // change to info + exit
+            throw new SafelyTerminateException();
         }
 
-        folio = data.getActiveDocument();
-        ui.displayDocument(folio);
+        try {
+            manuscript.checkFilename();
+            folio = manuscript.loadDocument();
+        } catch (FileNotFoundException fnfe) {
+            manuscript = new Manuscript(filename);
+            folio = manuscript.createDocument();
+        } catch (RecoveryFileExistsException rfee) {
+            ui.warning(rfee);
+            folio = manuscript.loadDocument();
+        }
+
+        ui.displayDocument(manuscript, folio);
     }
 
     static void loadDocumentBlank() {
+        final Manuscript manuscript;
         final Folio folio;
 
         // sets active
-        data.createManuscript();
+        manuscript = new Manuscript();
+        folio = manuscript.createDocument();
 
         // there a cleaner way to do this?
-        folio = data.getActiveDocument();
-        ui.displayDocument(folio);
+        ui.displayDocument(manuscript, folio);
     }
 
     /**
@@ -119,7 +120,7 @@ public class Quill
             Gtk.main();
         } catch (Throwable t) {
             t.printStackTrace();
-            data.emergencySave();
+            ui.emergencySave();
         }
     }
 }
