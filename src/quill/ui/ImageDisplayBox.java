@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -28,7 +28,7 @@ import org.gnome.gtk.Label;
 import org.gnome.gtk.Stock;
 import org.gnome.gtk.VBox;
 
-import quill.textbase.DataLayer;
+import parchment.format.Manuscript;
 import quill.textbase.Segment;
 
 public class ImageDisplayBox extends VBox
@@ -39,8 +39,9 @@ public class ImageDisplayBox extends VBox
 
     private EditorTextView caption;
 
-    public ImageDisplayBox(DataLayer data, Segment segment) {
+    public ImageDisplayBox(PrimaryWindow primary, Segment segment) {
         super(false, 0);
+        final Manuscript manuscript;
         final String source, parentdir, filename;
         final int width;
         String tooltip;
@@ -55,7 +56,8 @@ public class ImageDisplayBox extends VBox
          */
 
         source = segment.getImage();
-        parentdir = data.getDirectory();
+        manuscript = primary.getDocument();
+        parentdir = manuscript.getDirectory();
 
         filename = parentdir + "/" + source;
 
@@ -76,7 +78,7 @@ public class ImageDisplayBox extends VBox
         image.setTooltipMarkup(tooltip);
         box.packStart(image, false, false, 0);
 
-        caption = new CaptionEditorTextView(segment);
+        caption = new CaptionEditorTextView(primary, segment);
         box.packStart(caption, true, true, 0);
     }
 

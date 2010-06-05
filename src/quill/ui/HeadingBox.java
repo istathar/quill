@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -31,16 +31,16 @@ class HeadingBox extends HBox
 
     protected Label label;
 
-    public HeadingBox(Segment segment) {
+    public HeadingBox(PrimaryWindow primary, Segment segment) {
         super(false, 0);
 
-        setupBox(segment);
+        setupBox(primary, segment);
     }
 
-    private void setupBox(Segment segment) {
+    private void setupBox(PrimaryWindow primary, Segment segment) {
         box = this;
 
-        title = new HeadingEditorTextView(segment);
+        title = new HeadingEditorTextView(primary, segment);
         box.packStart(title, true, true, 0);
 
         label = new Label();

@@ -753,4 +753,11 @@ class PrimaryWindow extends Window
     void emergencySave() {
         manuscript.emergencySave(folio);
     }
+
+    /**
+     * Get the document being edited.
+     */
+    Manuscript getDocument() {
+        return manuscript;
+    }
 }

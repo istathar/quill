@@ -33,7 +33,6 @@ import org.gnome.gtk.Widget;
 
 import quill.textbase.Change;
 import quill.textbase.ComponentSegment;
-import quill.textbase.DataLayer;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.NormalSegment;
@@ -76,9 +75,15 @@ class ComponentEditorWidget extends ScrolledWindow
      */
     private Segment cursorSegment;
 
-    ComponentEditorWidget() {
+    /**
+     * What is the top level UI holding this document?
+     */
+    private PrimaryWindow parent;
+
+    ComponentEditorWidget(PrimaryWindow primary) {
         super();
         scroll = this;
+        parent = primary;
         setupMaps();
 
         setupScrolling();
@@ -126,9 +131,11 @@ class ComponentEditorWidget extends ScrolledWindow
 
     private Series series;
 
-    private DataLayer data;
+    PrimaryWindow getPrimary() {
+        return parent;
+    }
 
-    void initializeSeries(DataLayer data, Series series) {
+    void initializeSeries(Series series) {
         Widget[] children;
         Segment segment;
         int i;
@@ -150,7 +157,6 @@ class ComponentEditorWidget extends ScrolledWindow
          * Now set up the new Series.
          */
 
-        this.data = data;
         this.series = series;
 
         for (i = 0; i < series.size(); i++) {
@@ -197,15 +203,15 @@ class ComponentEditorWidget extends ScrolledWindow
         final ScrolledWindow wide;
 
         if (segment instanceof NormalSegment) {
-            editor = new NormalEditorTextView(segment);
+            editor = new NormalEditorTextView(parent, segment);
 
             result = editor;
         } else if (segment instanceof QuoteSegment) {
-            editor = new QuoteEditorTextView(segment);
+            editor = new QuoteEditorTextView(parent, segment);
 
             result = editor;
         } else if (segment instanceof PreformatSegment) {
-            editor = new PreformatEditorTextView(segment);
+            editor = new PreformatEditorTextView(parent, segment);
 
             wide = new ScrolledWindow();
             wide.setPolicy(PolicyType.AUTOMATIC, PolicyType.NEVER);
@@ -236,17 +242,17 @@ class ComponentEditorWidget extends ScrolledWindow
 
             result = wide;
         } else if (segment instanceof ImageSegment) {
-            image = new ImageDisplayBox(data, segment);
+            image = new ImageDisplayBox(parent, segment);
 
             editor = image.getEditor();
             result = image;
         } else if (segment instanceof HeadingSegment) {
-            heading = new SectionHeadingBox(segment);
+            heading = new SectionHeadingBox(parent, segment);
 
             editor = heading.getEditor();
             result = heading;
         } else if (segment instanceof ComponentSegment) {
-            heading = new ChapterHeadingBox(segment);
+            heading = new ChapterHeadingBox(parent, segment);
 
             editor = heading.getEditor();
             result = heading;

@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -26,9 +26,9 @@ import org.gnome.gtk.DrawingArea;
 import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.Widget;
 
+import parchment.format.Manuscript;
 import parchment.render.RenderEngine;
 import parchment.render.ReportRenderEngine;
-import quill.textbase.DataLayer;
 import quill.textbase.Origin;
 import quill.textbase.Series;
 
@@ -67,8 +67,6 @@ class PreviewWidget extends DrawingArea
 
     private int pixelHeight;
 
-    private DataLayer data;
-
     private Series series;
 
     PreviewWidget() {
@@ -86,7 +84,7 @@ class PreviewWidget extends DrawingArea
                 paper = PaperSize.A4;
 
                 // engine = new ReportRenderEngine(PaperSize.A4, series);
-                engine = new ReportRenderEngine(paper, data, series);
+                engine = new ReportRenderEngine(paper, manuscript, series);
 
                 cr = new Context(source.getWindow());
 
@@ -187,16 +185,14 @@ class PreviewWidget extends DrawingArea
         cr.transform(matrix);
     }
 
+    private Manuscript manuscript;
+
     /**
-     * Given a Series representing the Segments in a chapter or article,
-     * instruct this Widget to render a preview of them.
+     * Given a Series in a Manuscript representing the Segments in a chapter
+     * or article, instruct this Widget to render a preview of them.
      */
-    /*
-     * This will need refinement, obviously, once we start having live preview
-     * and start dealing with multiple pages.
-     */
-    void renderSeries(DataLayer data, Series series) {
-        this.data = data;
+    void renderSeries(Manuscript manuscript, Series series) {
+        this.manuscript = manuscript;
         this.series = series;
         this.queueDraw();
     }

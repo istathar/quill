@@ -97,9 +97,10 @@ abstract class EditorTextView extends TextView
 
     private PrimaryWindow primary;
 
-    EditorTextView(Segment segment) {
+    EditorTextView(PrimaryWindow primary, Segment segment) {
         super();
         this.view = this;
+        this.primary = primary;
         this.segment = segment;
 
         setupTextView();
