@@ -18,6 +18,8 @@
  */
 package quill.textbase;
 
+import java.util.List;
+
 /**
  * A sequence of Series making up a document.
  * 
@@ -33,6 +35,25 @@ public class Folio
 
     Folio(Series[] components) {
         this.collection = components;
+    }
+
+    /**
+     * Create a Folio with a single [presumably nigh-on-empty] chapter as its
+     * body.
+     */
+    public static Folio create(Series component) {
+        return new Folio(new Series[] {
+            component
+        });
+    }
+
+    public static Folio create(List<Series> components) {
+        Series[] array;
+
+        array = new Series[components.size()];
+        components.toArray(array);
+
+        return new Folio(array);
     }
 
     public int size() {
