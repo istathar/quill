@@ -45,9 +45,9 @@ import org.gnome.pango.Weight;
 import org.gnome.pango.WeightAttribute;
 import org.gnome.pango.WrapMode;
 
+import parchment.format.Manuscript;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
-import quill.textbase.DataLayer;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
@@ -96,7 +96,7 @@ public abstract class RenderEngine
 
     private Series series;
 
-    private DataLayer data;
+    private Manuscript manuscript;
 
     Typeface sansFace;
 
@@ -135,9 +135,9 @@ public abstract class RenderEngine
      * Construct a new RenderEngine. Call {@link #render(Context) render()} to
      * actually draw.
      */
-    protected RenderEngine(final PaperSize paper, final DataLayer data, final Series series) {
+    protected RenderEngine(final PaperSize paper, final Manuscript manuscript, final Series series) {
         specifySize(paper);
-        this.data = data;
+        this.manuscript = manuscript;
         this.series = series;
     }
 
@@ -848,7 +848,7 @@ public abstract class RenderEngine
         final Extract extract;
         final Area image;
 
-        parent = data.getDirectory();
+        parent = manuscript.getDirectory();
         filename = parent + "/" + source;
 
         try {
