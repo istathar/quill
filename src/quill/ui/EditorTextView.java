@@ -95,6 +95,8 @@ abstract class EditorTextView extends TextView
      */
     private Segment segment;
 
+    private PrimaryWindow primary;
+
     EditorTextView(Segment segment) {
         super();
         this.view = this;
@@ -468,7 +470,7 @@ abstract class EditorTextView extends TextView
             change = new InsertTextualChange(chain, insertOffset, span);
         }
 
-        ui.apply(change);
+        primary.apply(change);
     }
 
     private void pasteText() {
@@ -500,7 +502,7 @@ abstract class EditorTextView extends TextView
          * it will result in ComponentEditorWindow calling this.affect().
          */
 
-        ui.apply(change);
+        primary.apply(change);
     }
 
     private void deleteBack() {
@@ -556,7 +558,7 @@ abstract class EditorTextView extends TextView
         range = chain.extractRange(offset, width);
         change = new DeleteTextualChange(chain, offset, range);
 
-        ui.apply(change);
+        primary.apply(change);
     }
 
     private void toggleMarkup(Markup format) {
@@ -583,7 +585,7 @@ abstract class EditorTextView extends TextView
             original = chain.extractRange(offset, width);
 
             change = new FormatTextualChange(chain, offset, original, format);
-            ui.apply(change);
+            primary.apply(change);
             this.affect(change);
 
             /*
@@ -824,7 +826,7 @@ abstract class EditorTextView extends TextView
          */
 
         change = new DeleteTextualChange(chain, offset, ui.getClipboard());
-        ui.apply(change);
+        primary.apply(change);
     }
 
     private static int normalizeOffset(int alpha, int omega) {
@@ -894,7 +896,7 @@ abstract class EditorTextView extends TextView
                 rect = view.getLocation(pointer);
                 alloc = view.getAllocation();
 
-                ui.primary.scrollEditorToShow(alloc.getY() + rect.getY(), rect.getHeight() + 5);
+                primary.scrollEditorToShow(alloc.getY() + rect.getY(), rect.getHeight() + 5);
             }
         });
 
@@ -940,7 +942,7 @@ abstract class EditorTextView extends TextView
             original = chain.extractRange(offset, width);
             change = new FormatTextualChange(chain, offset, original);
 
-            ui.apply(change);
+            primary.apply(change);
             this.affect(change);
         }
 
@@ -1198,7 +1200,7 @@ abstract class EditorTextView extends TextView
     /**
      * Take the necessary actions to create a new Segment, which you pass in.
      * If we're at the end of the view we're appending. Jump the logic to the
-     * UserInterface facade.
+     * user interface facades on PrimaryWindow.
      */
     private void handleInsertSegment(Segment addition) {
         final Change change;
@@ -1207,7 +1209,7 @@ abstract class EditorTextView extends TextView
 
         change = new SplitStructuralChange(segment, insertOffset, addition);
 
-        ui.apply(change);
+        primary.apply(change);
     }
 
     /*
@@ -1701,7 +1703,7 @@ abstract class EditorTextView extends TextView
                 span = Span.createSpan(word, insertMarkup);
                 change = new FullTextualChange(chain, offset, removed, span);
 
-                ui.apply(change);
+                primary.apply(change);
             } else {
                 // the word has been added, so we need to unmark it.
                 start = buffer.getIter(offset);
