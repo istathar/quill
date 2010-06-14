@@ -16,19 +16,15 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.quack;
+package parchment.format;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import quill.client.IOTestCase;
-import quill.textbase.Change;
 import quill.textbase.Common;
-import quill.textbase.DataLayer;
 import quill.textbase.Folio;
-import quill.textbase.InsertTextualChange;
 import quill.textbase.NormalSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
@@ -37,15 +33,15 @@ import quill.textbase.TextChain;
 
 import static quill.textbase.Span.createSpan;
 
-public class ValidateProperNewlineHandling extends IOTestCase
+public class ValidateProperNewlineHandling extends ParchmentTestCase
 {
     public final void testWriteChainWithTrainingBlankLine() throws IOException {
         final TextChain chain;
-        final DataLayer data;
+        final Manuscript manuscript;
+        final Chapter chapter;
         Span[] spans;
         int i, j;
         Span span;
-        Change change;
         final Folio folio;
         final Series series;
         final Segment segment;
@@ -56,10 +52,9 @@ public class ValidateProperNewlineHandling extends IOTestCase
          * Build up a trivial example
          */
 
-        data = new DataLayer();
-        data.createManuscript();
+        manuscript = new Manuscript();
+        folio = manuscript.createDocument();
 
-        folio = data.getActiveDocument();
         series = folio.get(0);
         segment = series.get(1);
         assertTrue(segment instanceof NormalSegment);
@@ -75,17 +70,16 @@ public class ValidateProperNewlineHandling extends IOTestCase
         j = 0;
         for (i = 0; i < spans.length; i++) {
             span = spans[i];
-            change = new InsertTextualChange(chain, j, span);
-            data.apply(change);
-            j += span.getWidth();
+            chain.append(span);
         }
 
         /*
          * Now run conversion process.
          */
+        chapter = new Chapter();
 
         out = new ByteArrayOutputStream();
-        data.saveChapter(out);
+        chapter.saveDocument(series, out);
 
         blob = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -106,11 +100,12 @@ public class ValidateProperNewlineHandling extends IOTestCase
 
     public final void testCatchDocumentKnownBroken() throws IOException, ValidityException,
             ParsingException {
-        final DataLayer data;
+        final Chapter chapter;
 
-        data = new DataLayer();
+        chapter = new Chapter();
+        chapter.setFilename("tests/quill/quack/IllegalNewlines.xml");
         try {
-            data.loadChapter("tests/quill/quack/IllegalNewlines.xml");
+            chapter.loadDocument();
             fail();
             return;
         } catch (IllegalStateException ise) {
@@ -125,15 +120,17 @@ public class ValidateProperNewlineHandling extends IOTestCase
      * non-preformatted elements
      */
     public final void testBugOverlyLongInline() throws IOException, ValidityException, ParsingException {
-        final DataLayer data;
+        final Chapter chapter;
+        final Series series;
         final ByteArrayOutputStream out;
         final String expected;
 
-        data = new DataLayer();
-        data.loadChapter("tests/quill/quack/ReallyLongInlineLeadingBlock.xml");
+        chapter = new Chapter();
+        chapter.setFilename("tests/quill/quack/ReallyLongInlineLeadingBlock.xml");
+        series = chapter.loadDocument();
 
         out = new ByteArrayOutputStream();
-        data.saveChapter(out);
+        chapter.saveDocument(series, out);
 
         expected = loadFileIntoString("tests/quill/quack/ReallyLongInlineLeadingBlock.xml");
         assertEquals(expected, out.toString());

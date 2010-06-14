@@ -28,6 +28,7 @@ import nu.xom.Document;
 import nu.xom.NodeFactory;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import quill.client.ImproperFilenameException;
 import quill.quack.QuackConverter;
 import quill.quack.QuackLoader;
 import quill.quack.QuackNodeFactory;
@@ -47,6 +48,13 @@ public class Chapter
 
     public Chapter() {
 
+    }
+
+    /*
+     * I'm not really convinced this should be public.
+     */
+    public Chapter(String pathname) throws ImproperFilenameException {
+        setFilename(pathname);
     }
 
     /**
@@ -75,9 +83,9 @@ public class Chapter
 
     /**
      * Specify the filename that this chapter will be serialized to. Path will
-     * be stored as absolute if it isn't already.
+     * be converted to absolute form if it isn't there already.
      */
-    void setFilename(String path) {
+    public void setFilename(String path) {
         File proposed, absolute;
         final String name;
         final int i;
