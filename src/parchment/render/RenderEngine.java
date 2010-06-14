@@ -49,6 +49,7 @@ import parchment.format.Manuscript;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
+import quill.textbase.Folio;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.Markup;
@@ -133,12 +134,13 @@ public abstract class RenderEngine
 
     /**
      * Construct a new RenderEngine. Call {@link #render(Context) render()} to
-     * actually draw.
+     * actually draw. Pass in the document being rendered (the target file
+     * will be derived from this) and the current document state root.
      */
-    protected RenderEngine(final PaperSize paper, final Manuscript manuscript, final Series series) {
+    protected RenderEngine(final PaperSize paper, final Manuscript manuscript, final Folio folio) {
         specifySize(paper);
         this.manuscript = manuscript;
-        this.series = series;
+        this.series = folio.get(0); // HARDCODE
     }
 
     /**

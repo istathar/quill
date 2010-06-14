@@ -23,7 +23,7 @@ import org.gnome.gtk.PaperSize;
 import org.gnome.pango.FontDescription;
 
 import parchment.format.Manuscript;
-import quill.textbase.Series;
+import quill.textbase.Folio;
 
 /**
  * A render engine outputting to a page size with an aspect ratio actually
@@ -38,8 +38,8 @@ import quill.textbase.Series;
  */
 public class ScreenRenderEngine extends RenderEngine
 {
-    public ScreenRenderEngine(PaperSize paper, Manuscript manuscript, Series series) {
-        super(paper, manuscript, series);
+    public ScreenRenderEngine(PaperSize paper, Manuscript manuscript, Folio folio) {
+        super(paper, manuscript, folio);
     }
 
     protected void specifyFonts(final Context cr) {

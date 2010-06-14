@@ -21,11 +21,11 @@ package parchment.render;
 import org.gnome.gtk.PaperSize;
 
 import parchment.format.Manuscript;
-import quill.textbase.Series;
+import quill.textbase.Folio;
 
 public class ReportRenderEngine extends RenderEngine
 {
-    public ReportRenderEngine(PaperSize paper, Manuscript manuscript, Series series) {
-        super(paper, manuscript, series);
+    public ReportRenderEngine(PaperSize paper, Manuscript manuscript, Folio folio) {
+        super(paper, manuscript, folio);
     }
 }

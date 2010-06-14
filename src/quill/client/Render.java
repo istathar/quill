@@ -128,7 +128,7 @@ public class Render
         surface = new PdfSurface(targetname, paper.getWidth(Unit.POINTS), paper.getHeight(Unit.POINTS));
         cr = new Context(surface);
 
-        engine = new ReportRenderEngine(paper, manuscript, folio.get(0));
+        engine = new ReportRenderEngine(paper, manuscript, folio);
         engine.render(cr);
 
         surface.finish();

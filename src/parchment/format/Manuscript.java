@@ -63,25 +63,21 @@ public class Manuscript
     private Chapter[] chapters;
 
     /**
-     * The document currently being worked on, in its in-memory form as loaded
-     * by this class and subsequently manipulated by Quill.
-     */
-    private Folio current;
-
-    /**
      * Create a new Manuscript intermediary.
      */
     public Manuscript() {
-        current = null;
+        chapters = null; // FIXME
     }
 
     public Manuscript(String pathname) throws ImproperFilenameException {
         setFilename(pathname);
+        chapters = null; // FIXME
     }
 
     /**
      * Load the document: open the .parchment file this Manuscript represents,
-     * and then load its chapters.
+     * and then load its chapters. Returns an internal root object
+     * representing the complete state of the document as loaded.
      */
     public Folio loadDocument() throws ValidityException, ParsingException, IOException {
         String filename;
@@ -122,10 +118,6 @@ public class Manuscript
 
         folio = Folio.create(components);
         return folio;
-    }
-
-    public Folio getActiveDocument() {
-        return current;
     }
 
     /**

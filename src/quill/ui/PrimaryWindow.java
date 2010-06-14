@@ -704,7 +704,6 @@ class PrimaryWindow extends Window
         MessageDialog dialog;
         final Context cr;
         final Surface surface;
-        final Folio folio;
         final PaperSize paper;
         final RenderEngine engine;
 
@@ -735,10 +734,8 @@ class PrimaryWindow extends Window
                     paper.getHeight(Unit.POINTS));
             cr = new Context(surface);
 
-            folio = manuscript.getActiveDocument();
-
             // HARDCODE
-            engine = new ReportRenderEngine(paper, manuscript, folio.get(0));
+            engine = new ReportRenderEngine(paper, manuscript, folio);
             engine.render(cr);
 
             surface.finish();
