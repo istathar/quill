@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -40,7 +40,7 @@ public class ValidateProperNewlineHandling extends ParchmentTestCase
         final Manuscript manuscript;
         final Chapter chapter;
         Span[] spans;
-        int i, j;
+        int i;
         Span span;
         final Folio folio;
         final Series series;
@@ -67,7 +67,7 @@ public class ValidateProperNewlineHandling extends ParchmentTestCase
                 createSpan("\n", null),
                 createSpan("\n", null)
         };
-        j = 0;
+
         for (i = 0; i < spans.length; i++) {
             span = spans[i];
             chain.append(span);

@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -19,15 +19,17 @@
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import parchment.format.ValidateDataIntegrity;
+import parchment.format.ValidateManuscriptLoading;
+import parchment.format.ValidateManuscriptSerializing;
+import parchment.format.ValidateProperNewlineHandling;
+import parchment.format.ValidateThereAndBackAgain;
 import quill.client.ValidateDocumentModified;
 import quill.client.ValidateFileNaming;
 import quill.quack.ValidateBlockquoteConversion;
 import quill.quack.ValidateCitationConversion;
-import quill.quack.ValidateDataIntegrity;
 import quill.quack.ValidateEndnoteConversion;
-import quill.quack.ValidateProperNewlineHandling;
 import quill.quack.ValidateTextChainToQuackConversion;
-import quill.quack.ValidateThereAndBackAgain;
 import quill.textbase.ValidateApplyUndoRedo;
 import quill.textbase.ValidateExtracts;
 import quill.textbase.ValidateOriginOrdering;
@@ -69,6 +71,8 @@ public class UnitTests
         suite.addTestSuite(ValidateOriginOrdering.class);
         suite.addTestSuite(ValidateApplyUndoRedo.class);
         suite.addTestSuite(ValidateDocumentModified.class);
+        suite.addTestSuite(ValidateManuscriptSerializing.class);
+        suite.addTestSuite(ValidateManuscriptLoading.class);
         suite.addTestSuite(ValidateTextChainToQuackConversion.class);
         suite.addTestSuite(ValidateDataIntegrity.class);
         suite.addTestSuite(ValidateBlockquoteConversion.class);

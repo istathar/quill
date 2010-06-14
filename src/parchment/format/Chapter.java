@@ -32,7 +32,11 @@ import quill.client.ImproperFilenameException;
 import quill.quack.QuackConverter;
 import quill.quack.QuackLoader;
 import quill.quack.QuackNodeFactory;
+import quill.textbase.ComponentSegment;
+import quill.textbase.NormalSegment;
+import quill.textbase.Segment;
 import quill.textbase.Series;
+import quill.textbase.TextChain;
 
 /**
  * A chapter on disk in an .xml file containing a <chapter> root element.
@@ -55,6 +59,26 @@ public class Chapter
      */
     public Chapter(String pathname) throws ImproperFilenameException {
         setFilename(pathname);
+    }
+
+    public Series createDocument() {
+        final Segment heading, para;
+        TextChain chain;
+        final Series result;
+
+        heading = new ComponentSegment();
+        chain = new TextChain();
+        heading.setText(chain);
+
+        para = new NormalSegment();
+        chain = new TextChain();
+        para.setText(chain);
+
+        result = new Series(new Segment[] {
+                heading, para
+        });
+
+        return result;
     }
 
     /**
@@ -165,7 +189,7 @@ public class Chapter
         }
     }
 
-    void saveDocument(final Series series, final OutputStream out) throws IOException {
+    public void saveDocument(final Series series, final OutputStream out) throws IOException {
         final QuackConverter converter;
         int i;
 

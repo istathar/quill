@@ -30,12 +30,8 @@ import nu.xom.ValidityException;
 import parchment.render.RenderEngine;
 import quill.client.ImproperFilenameException;
 import quill.client.RecoveryFileExistsException;
-import quill.textbase.ComponentSegment;
 import quill.textbase.Folio;
-import quill.textbase.NormalSegment;
-import quill.textbase.Segment;
 import quill.textbase.Series;
-import quill.textbase.TextChain;
 
 /**
  * A document on disk in a .parchment file contining a <manuscript> root
@@ -146,24 +142,15 @@ public class Manuscript
      * Create a new blank document with a single Component.
      */
     public Folio createDocument() {
-        final Segment heading, para;
-        TextChain chain;
-        final Series chapter1;
+        final Series series1;
         final Folio folio;
 
-        heading = new ComponentSegment();
-        chain = new TextChain();
-        heading.setText(chain);
+        final Chapter chapter1;
 
-        para = new NormalSegment();
-        chain = new TextChain();
-        para.setText(chain);
+        chapter1 = new Chapter();
+        series1 = chapter1.createDocument();
 
-        chapter1 = new Series(new Segment[] {
-                heading, para
-        });
-
-        folio = Folio.create(chapter1);
+        folio = Folio.create(series1);
 
         return folio;
     }
