@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -27,13 +27,12 @@ import java.io.IOException;
 
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import parchment.format.Chapter;
 import quill.client.IOTestCase;
 import quill.textbase.Change;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
-import quill.textbase.DataLayer;
 import quill.textbase.HeadingSegment;
-import quill.textbase.InsertTextualChange;
 import quill.textbase.NormalSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
@@ -42,15 +41,16 @@ import quill.textbase.TextChain;
 
 import static quill.textbase.Span.createSpan;
 
-public class ValidateTextChainToQuackConversion extends IOTestCase
+public class ValidateTextChainToChapterConversion extends IOTestCase
 {
     public final void testLoadQuack() throws IOException, ValidityException, ParsingException {
-        final DataLayer data;
+        final Chapter chapter;
         final Series series;
         final TextChain text;
 
-        data = new DataLayer();
-        series = data.loadChapter("tests/quill/quack/HelloWorld.xml");
+        chapter = new Chapter();
+        chapter.setFilename("tests/quill/quack/HelloWorld.xml");
+        series = chapter.loadDocument();
         assertEquals(2, series.size());
 
         text = series.get(1).getText();
@@ -60,9 +60,7 @@ public class ValidateTextChainToQuackConversion extends IOTestCase
 
     public final void testWritePlainParas() throws IOException {
         final TextChain chain;
-        final DataLayer data;
         final Span span;
-        final Change change;
         final Segment segment;
         final QuackConverter converter;
         final ByteArrayOutputStream out;
@@ -72,12 +70,10 @@ public class ValidateTextChainToQuackConversion extends IOTestCase
          * Build up a trivial example
          */
 
-        data = new DataLayer();
         chain = new TextChain();
 
         span = createSpan("Hello\nWorld", null);
-        change = new InsertTextualChange(chain, 0, span);
-        data.apply(change);
+        chain.append(span);
 
         /*
          * Now run conversion process.
@@ -108,11 +104,9 @@ public class ValidateTextChainToQuackConversion extends IOTestCase
     }
 
     public final void testWriteComplexPara() throws IOException {
-        final DataLayer data;
         final TextChain chain;
         final Span[] spans;
         int offset;
-        Change change;
         Segment segment;
         final QuackConverter converter;
         final ByteArrayOutputStream out;
@@ -139,14 +133,11 @@ public class ValidateTextChainToQuackConversion extends IOTestCase
                 createSpan(" function.", null),
         };
 
-        data = new DataLayer();
         chain = new TextChain();
         offset = 0;
 
         for (Span span : spans) {
-            change = new InsertTextualChange(chain, offset, span);
-            data.apply(change);
-            offset += span.getWidth();
+            chain.append(span);
         }
 
         /*
@@ -187,12 +178,13 @@ public class ValidateTextChainToQuackConversion extends IOTestCase
     }
 
     public final void testLoadComplexDocument() throws IOException, ValidityException, ParsingException {
-        final DataLayer data;
+        final Chapter chapter;
         final Series series;
         final TextChain chain;
 
-        data = new DataLayer();
-        series = data.loadChapter("tests/quill/quack/TemporaryFiles.xml");
+        chapter = new Chapter();
+        chapter.setFilename("tests/quill/quack/TemporaryFiles.xml");
+        series = chapter.loadDocument();
         assertEquals(2, series.size());
 
         chain = series.get(1).getText();
@@ -205,7 +197,6 @@ public class ValidateTextChainToQuackConversion extends IOTestCase
 
     public final void testWriteUnicode() throws IOException {
         final TextChain chain;
-        final DataLayer data;
         final Span span;
         final Change change;
         Segment segment;
@@ -218,12 +209,10 @@ public class ValidateTextChainToQuackConversion extends IOTestCase
          * least when they are expressed as Java escapes.
          */
 
-        data = new DataLayer();
         chain = new TextChain();
 
         span = createSpan(":\ud835\udc5b:", null);
-        change = new InsertTextualChange(chain, 0, span);
-        data.apply(change);
+        chain.append(span);
 
         converter = new QuackConverter();
 

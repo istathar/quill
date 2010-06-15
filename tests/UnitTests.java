@@ -29,7 +29,7 @@ import quill.client.ValidateFileNaming;
 import quill.quack.ValidateBlockquoteConversion;
 import quill.quack.ValidateCitationConversion;
 import quill.quack.ValidateEndnoteConversion;
-import quill.quack.ValidateTextChainToQuackConversion;
+import quill.quack.ValidateTextChainToChapterConversion;
 import quill.textbase.ValidateApplyUndoRedo;
 import quill.textbase.ValidateExtracts;
 import quill.textbase.ValidateOriginOrdering;
@@ -73,7 +73,7 @@ public class UnitTests
         suite.addTestSuite(ValidateDocumentModified.class);
         suite.addTestSuite(ValidateManuscriptSerializing.class);
         suite.addTestSuite(ValidateManuscriptLoading.class);
-        suite.addTestSuite(ValidateTextChainToQuackConversion.class);
+        suite.addTestSuite(ValidateTextChainToChapterConversion.class);
         suite.addTestSuite(ValidateDataIntegrity.class);
         suite.addTestSuite(ValidateBlockquoteConversion.class);
         suite.addTestSuite(ValidateEndnoteConversion.class);
