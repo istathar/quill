@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -16,49 +16,55 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.client;
+package parchment.format;
 
 import java.io.File;
 import java.io.IOException;
 
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import quill.textbase.DataLayer;
+import quill.client.IOTestCase;
+import quill.client.ImproperFilenameException;
+import quill.textbase.Folio;
 
 public class ValidateFileNaming extends IOTestCase
 {
     public final void testInsertText() throws ValidityException, ParsingException, IOException {
-        final DataLayer data;
+        final Manuscript manuscript;
+        final Folio folio;
         final File target;
         final String parentdir, basename, filename;
 
-        data = new DataLayer();
-
-        data.createManuscript();
+        manuscript = new Manuscript();
+        folio = manuscript.createDocument();
 
         try {
-            data.saveChapter();
+            manuscript.saveDocument(folio);
             fail("Lack of name not trapped");
         } catch (IllegalStateException ise) {
             // good
         }
 
-        target = new File("tmp/unittests/quill/ui/ValidateFileNaming.xml");
+        target = new File("tmp/unittests/parchment/format/ValidateFileNaming.parchment");
         target.delete();
         assertFalse(target.exists());
         target.getParentFile().mkdirs();
 
-        data.setChapterFilename(target.getPath());
+        try {
+            manuscript.setFilename(target.getPath());
+        } catch (ImproperFilenameException e) {
+            fail("Shouldn't have thrown");
+        }
 
-        parentdir = data.getDirectory();
-        basename = data.getBasename();
-        filename = data.getFilename();
+        parentdir = manuscript.getDirectory();
+        basename = manuscript.getBasename();
+        filename = manuscript.getFilename();
 
-        assertTrue(parentdir.endsWith("tmp/unittests/quill/ui"));
+        assertTrue(parentdir.endsWith("tmp/unittests/parchment/format"));
         assertEquals("ValidateFileNaming", basename);
-        assertEquals(parentdir + "/" + basename + ".xml", filename);
+        assertEquals(parentdir + "/" + basename + ".parchment", filename);
 
-        data.saveChapter();
+        manuscript.saveDocument(folio);
 
         assertTrue(target.exists());
     }
