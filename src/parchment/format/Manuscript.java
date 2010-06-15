@@ -208,10 +208,29 @@ public class Manuscript
     }
 
     public void saveDocument(Folio folio) throws IOException {
+        final File target;
         int i;
+        Series series;
+        Chapter chapter;
 
-        for (i = 0; i < folio.size(); i++) {
+        if (filename == null) {
+            throw new IllegalStateException("save filename not set");
+        }
 
+        target = new File(filename);
+        if (target.exists() && (!target.canWrite())) {
+            throw new IOException("Can't write to document file!\n\n" + "<i>Check permissions?</i>");
+        }
+
+        /*
+         * FIXME! Process names appropriate to actual inbound Folio, not
+         * existing Chapters
+         */
+
+        for (i = 0; i < chapters.length; i++) {
+            series = folio.get(i);
+            chapter = chapters[i];
+            chapter.saveDocument(series);
         }
     }
 

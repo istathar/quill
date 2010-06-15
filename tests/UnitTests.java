@@ -20,12 +20,12 @@
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import parchment.format.ValidateDataIntegrity;
+import parchment.format.ValidateFileNaming;
 import parchment.format.ValidateManuscriptLoading;
 import parchment.format.ValidateManuscriptSerializing;
 import parchment.format.ValidateProperNewlineHandling;
 import parchment.format.ValidateThereAndBackAgain;
 import quill.client.ValidateDocumentModified;
-import quill.client.ValidateFileNaming;
 import quill.quack.ValidateBlockquoteConversion;
 import quill.quack.ValidateCitationConversion;
 import quill.quack.ValidateEndnoteConversion;

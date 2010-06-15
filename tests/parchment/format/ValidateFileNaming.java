@@ -66,6 +66,6 @@ public class ValidateFileNaming extends IOTestCase
 
         manuscript.saveDocument(folio);
 
-        assertTrue(target.exists());
+        assertTrue("Save didn't write anything!", target.exists());
     }
 }
