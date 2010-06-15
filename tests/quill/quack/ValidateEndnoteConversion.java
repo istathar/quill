@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -23,9 +23,9 @@ import java.io.IOException;
 
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import parchment.format.Chapter;
 import quill.client.IOTestCase;
 import quill.textbase.ComponentSegment;
-import quill.textbase.DataLayer;
 import quill.textbase.Extract;
 import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
@@ -51,7 +51,7 @@ public class ValidateEndnoteConversion extends IOTestCase
     }
 
     public final void testInlineNote() throws IOException, ValidityException, ParsingException {
-        final DataLayer data;
+        final Chapter chapter;
         final Series series;
         Segment segment;
         final TextChain chain;
@@ -62,10 +62,10 @@ public class ValidateEndnoteConversion extends IOTestCase
 
         original = loadFileIntoString("tests/quill/quack/Endnote.xml");
 
-        data = new DataLayer();
-        data.loadChapter("tests/quill/quack/Endnote.xml");
+        chapter = new Chapter();
+        chapter.setFilename("tests/quill/quack/Endnote.xml");
+        series = chapter.loadDocument();
 
-        series = data.getActiveDocument().get(0);
         assertEquals(2, series.size());
 
         segment = series.get(0);
@@ -108,7 +108,7 @@ public class ValidateEndnoteConversion extends IOTestCase
 
     public final void testManyNotes() throws IOException, ValidityException, ParsingException {
         final String FILE;
-        final DataLayer data;
+        final Chapter chapter;
         final Series series;
         Segment segment;
         final QuackConverter converter;
@@ -120,14 +120,14 @@ public class ValidateEndnoteConversion extends IOTestCase
 
         original = loadFileIntoString(FILE);
 
-        data = new DataLayer();
-        data.loadChapter(FILE);
+        chapter = new Chapter();
+        chapter.setFilename(FILE);
 
         /*
          * Check the state is what we think it is
          */
 
-        series = data.getActiveDocument().get(0);
+        series = chapter.loadDocument();
         assertEquals(4, series.size());
 
         segment = series.get(0);
@@ -163,7 +163,7 @@ public class ValidateEndnoteConversion extends IOTestCase
      */
     public final void testTwoBlockWithNote() throws IOException, ValidityException, ParsingException {
         final String FILE1, FILE2;
-        final DataLayer data;
+        final Chapter chapter;
         final Series series;
         Segment segment;
         final TextChain chain;
@@ -181,14 +181,14 @@ public class ValidateEndnoteConversion extends IOTestCase
 
         expected = loadFileIntoString(FILE2);
 
-        data = new DataLayer();
-        data.loadChapter(FILE1);
+        chapter = new Chapter();
+        chapter.setFilename(FILE1);
 
         /*
          * Check the state is what we think it is
          */
 
-        series = data.getActiveDocument().get(0);
+        series = chapter.loadDocument();
         assertEquals(4, series.size());
 
         segment = series.get(0);
