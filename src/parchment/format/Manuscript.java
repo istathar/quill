@@ -144,13 +144,21 @@ public class Manuscript
     public Folio createDocument() {
         final Series series1;
         final Folio folio;
-
         final Chapter chapter1;
 
         chapter1 = new Chapter();
         series1 = chapter1.createDocument();
 
         folio = Folio.create(series1);
+
+        try {
+            chapter1.setFilename("Chapter1.xml");
+        } catch (ImproperFilenameException ife) {
+            throw new IllegalStateException();
+        }
+
+        chapters = new Chapter[1];
+        chapters[0] = chapter1;
 
         return folio;
     }
@@ -207,6 +215,13 @@ public class Manuscript
         filename = absolute.getPath();
     }
 
+    /*
+     * FIXME! Process names appropriate to actual inbound Folio, not existing
+     * Chapters
+     */
+    /*
+     * FIXME actually save something!
+     */
     public void saveDocument(Folio folio) throws IOException {
         final File target;
         int i;
@@ -221,11 +236,6 @@ public class Manuscript
         if (target.exists() && (!target.canWrite())) {
             throw new IOException("Can't write to document file!\n\n" + "<i>Check permissions?</i>");
         }
-
-        /*
-         * FIXME! Process names appropriate to actual inbound Folio, not
-         * existing Chapters
-         */
 
         for (i = 0; i < chapters.length; i++) {
             series = folio.get(i);

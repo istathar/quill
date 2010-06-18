@@ -26,10 +26,11 @@ import nu.xom.ValidityException;
 import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
 import quill.textbase.Folio;
+import quill.textbase.Series;
 
 public class ValidateFileNaming extends IOTestCase
 {
-    public final void testInsertText() throws ValidityException, ParsingException, IOException {
+    public final void testManuscriptName() throws ValidityException, ParsingException, IOException {
         final Manuscript manuscript;
         final Folio folio;
         final File target;
@@ -63,9 +64,63 @@ public class ValidateFileNaming extends IOTestCase
         assertTrue(parentdir.endsWith("tmp/unittests/parchment/format"));
         assertEquals("ValidateFileNaming", basename);
         assertEquals(parentdir + "/" + basename + ".parchment", filename);
+    }
 
+    public final void testChapterName() throws IOException {
+        final Chapter chapter;
+        final Series series;
+        final File target;
+
+        chapter = new Chapter();
+        series = chapter.createDocument();
+
+        try {
+            chapter.saveDocument(series);
+            fail("Lack of name not trapped");
+        } catch (IllegalStateException ise) {
+            // good
+        }
+
+        try {
+            chapter.setFilename("something.other");
+            fail("Should have rejected improper filename");
+        } catch (ImproperFilenameException e) {
+            // good
+        }
+
+        target = new File("tmp/unittests/parchment/format/chapter01.xml");
+        target.delete();
+        assertFalse(target.exists());
+        target.getParentFile().mkdirs();
+
+        try {
+            chapter.setFilename(target.getPath());
+        } catch (ImproperFilenameException e) {
+            fail("Shouldn't have thrown");
+        }
+
+    }
+
+    // TODO
+    public final void testThroughChapter() throws ValidityException, ParsingException, IOException,
+            ImproperFilenameException {
+        final Manuscript manuscript;
+        final Folio folio;
+        final File target;
+
+        manuscript = new Manuscript();
+        folio = manuscript.createDocument();
+
+        target = new File("tmp/unittests/parchment/format/ValidateFileNaming.parchment");
+        target.delete();
+        assertFalse(target.exists());
+
+        manuscript.setFilename(target.getPath());
         manuscript.saveDocument(folio);
 
         assertTrue("Save didn't write anything!", target.exists());
+
+        // TODO
     }
+
 }

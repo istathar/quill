@@ -109,7 +109,7 @@ public class Chapter
      * Specify the filename that this chapter will be serialized to. Path will
      * be converted to absolute form if it isn't there already.
      */
-    public void setFilename(String path) {
+    public void setFilename(String path) throws ImproperFilenameException {
         File proposed, absolute;
         final String name;
         final int i;
@@ -125,7 +125,7 @@ public class Chapter
 
         i = name.indexOf(".xml");
         if (i == -1) {
-            throw new IllegalArgumentException("\n" + "Chapter files must have a .xml extension");
+            throw new ImproperFilenameException("\n" + "Chapter files must have a .xml extension");
         }
 
         filename = absolute.getPath();
@@ -209,5 +209,32 @@ public class Chapter
          */
 
         converter.writeChapter(out);
+    }
+
+    /**
+     * Get the (relative) filename of this Chapter on disk.
+     */
+    /*
+     * Maybe some of this logic moves to setFilename()?
+     */
+    public String getFilenameRelative(Manuscript manuscript) {
+        final String directory, relative;
+        int prefix;
+        
+        directory = manuscript.getDirectory();
+        
+        if (!filename.startsWith(directory)) {
+            throw new ImproperFilenameException("Why isn't this Chapter's filename within the Manuscript's directory?");
+        }
+        
+        prefix = directory.length();
+        if (filename.length() <= prefix) {
+            throw new IllegalStateException("Why is the (absolute) filename not longer than the directory it is in?");
+        }
+        
+        
+        relative = filename.substring(prefix) {
+            
+        }
     }
 }
