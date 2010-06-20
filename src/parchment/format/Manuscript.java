@@ -153,12 +153,13 @@ public class Manuscript
         final Folio folio;
         final Chapter chapter1;
 
-        chapter1 = new Chapter();
+        chapter1 = new Chapter(this);
         series1 = chapter1.createDocument();
 
         folio = new Folio(this, chapter1, series1);
 
         try {
+            this.setFilename("Untitled.parchment");
             chapter1.setFilename("Chapter1.xml");
         } catch (ImproperFilenameException ife) {
             throw new IllegalStateException();

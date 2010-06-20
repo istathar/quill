@@ -39,12 +39,7 @@ public class ValidateFileNaming extends IOTestCase
         manuscript = new Manuscript();
         folio = manuscript.createDocument();
 
-        try {
-            manuscript.saveDocument(folio);
-            fail("Lack of name not trapped");
-        } catch (IllegalStateException ise) {
-            // good
-        }
+        assertEquals("Untitled", manuscript.getBasename());
 
         target = new File("tmp/unittests/parchment/format/ValidateFileNaming.parchment");
         target.delete();
@@ -104,43 +99,51 @@ public class ValidateFileNaming extends IOTestCase
     public final void testChapterRelative() throws IOException {
         final Manuscript manuscript;
         final Folio folio;
-        final Chapter chapter;
+        final Chapter chapter, another;
         final Series series;
-        final String relative;
-
-        manuscript = new Manuscript();
-        try {
-            manuscript.setFilename("tmp/unittests/parchment/format/ValidateFileNaming-testChapterRelative.parchment");
-        } catch (ImproperFilenameException ife) {
-            fail(ife.getMessage());
-        }
-        folio = manuscript.createDocument();
+        final String relative, second;
 
         chapter = new Chapter();
         series = chapter.createDocument();
         try {
             chapter.setFilename("relative.xml");
-        } catch (ImproperFilenameException ife) {
-            fail(ife.getMessage());
-        }
 
-        // but
-
-        try {
-            relative = chapter.getFilenameRelative(manuscript);
-            assertEquals("relative.xml", relative);
         } catch (ImproperFilenameException ife) {
             fail(ife.getMessage());
         }
 
         try {
-            chapter.setFilename("tmp/unittests/parchment/format/relative.xml");
+            chapter.getRelative();
+            fail("No parent Manuscript, so getRelative() should have been guarded");
+        } catch (IllegalStateException ise) {
+            // good
+        }
+
+        /*
+         * Ok, so how about
+         */
+
+        manuscript = new Manuscript();
+        try {
+            manuscript.setFilename("tmp/unittests/parchment/format/ValidateFileNaming.parchment");
+        } catch (ImproperFilenameException ife) {
+            fail(ife.getMessage());
+        }
+
+        folio = manuscript.createDocument();
+        another = folio.getChapter(0);
+        relative = another.getRelative();
+        assertEquals("Chapter1.xml", relative);
+
+        try {
+            another.setFilename("tmp/unittests/parchment/format/relative.xml");
         } catch (ImproperFilenameException ife) {
             fail("Should have been ok");
         }
+        second = another.getRelative();
+        assertEquals("tmp/unittests/parchment/format/relative.xml", second);
 
         chapter.saveDocument(series);
-
     }
 
     // TODO

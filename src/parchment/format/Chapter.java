@@ -50,9 +50,22 @@ import quill.textbase.TextChain;
  */
 public class Chapter
 {
+    /**
+     * The Manuscript this Chapter belongs to. We allow this to be null for
+     * tests?
+     */
     private Manuscript parent;
 
+    /**
+     * Full pathname to .xml file
+     */
     private String filename;
+
+    /**
+     * Relative path to .xml, relative to the directory of the "parent"
+     * Manuscript.
+     */
+    private String relative;
 
     /**
      * This is only for testing save operations around a single Chapter and
@@ -119,8 +132,9 @@ public class Chapter
      */
     public void setFilename(String path) throws ImproperFilenameException {
         File proposed, absolute;
-        final String name;
+        final String name, directory;
         final int i;
+        int prefix;
 
         proposed = new File(path);
         if (proposed.isAbsolute()) {
@@ -137,6 +151,33 @@ public class Chapter
         }
 
         filename = absolute.getPath();
+
+        if (parent == null) {
+            /*
+             * For historical reasons, we parent can be null to allow isolated
+             * testing of Chapters. But we'd better not hit this path in
+             * normal usage. This is guarded in getRelative().
+             */
+            return;
+        }
+
+        directory = parent.getDirectory();
+
+        if (!filename.startsWith(directory)) {
+            throw new ImproperFilenameException(
+                    "Why isn't this Chapter's filename within the Manuscript's directory?");
+        }
+
+        prefix = directory.length();
+        if (filename.length() <= prefix) {
+            throw new IllegalStateException(
+                    "Why is the (absolute) filename not longer than the directory it is in?");
+        }
+
+        /*
+         * Need to add the trailing '/' character
+         */
+        relative = filename.substring(prefix + 1);
     }
 
     /**
@@ -227,25 +268,10 @@ public class Chapter
      * It works out that way in practise, of course, but making that manditory
      * would complciate test isolation.
      */
-    String getFilenameRelative(Manuscript manuscript) throws ImproperFilenameException {
-        final String directory, relative;
-        int prefix;
-
-        directory = manuscript.getDirectory();
-
-        if (!filename.startsWith(directory)) {
-            throw new ImproperFilenameException(
-                    "Why isn't this Chapter's filename within the Manuscript's directory?");
+    String getRelative() {
+        if (parent == null) {
+            throw new IllegalStateException("Chapter needs to be part of a Manuscript");
         }
-
-        prefix = directory.length();
-        if (filename.length() <= prefix) {
-            throw new IllegalStateException(
-                    "Why is the (absolute) filename not longer than the directory it is in?");
-        }
-
-        relative = filename.substring(prefix);
-
         return relative;
     }
 }
