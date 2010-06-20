@@ -18,24 +18,49 @@
  */
 package quill.textbase;
 
+import java.util.List;
+
+import parchment.format.Chapter;
+
 /**
  * A collection of Segments, comprising a visible section of a document. Like
  * other areas in textbase, is is a wrapper around an array.
  * 
  * @author Andrew Cowie
  */
+// immutable
 public class Series
 {
-    private Segment[] segments;
+    private final Chapter chapter;
 
-    public Series(Segment[] segments) {
+    private final Segment[] segments;
+
+    public Series(Chapter chapter, List<Segment> segments) {
+        Segment[] result;
         int i;
 
-        this.segments = segments;
+        this.chapter = chapter;
+
+        result = new Segment[segments.size()];
+        segments.toArray(result);
+
+        for (i = 0; i < result.length; i++) {
+            result[i].setParent(this);
+        }
+
+        this.segments = result;
+    }
+
+    Series(Chapter chapter, Segment[] segments) {
+        int i;
+
+        this.chapter = chapter;
 
         for (i = 0; i < segments.length; i++) {
             segments[i].setParent(this);
         }
+
+        this.segments = segments;
     }
 
     public int size() {
@@ -47,32 +72,43 @@ public class Series
     }
 
     /**
+     * Get the [reference to] the Chapter on disk.
+     */
+    public Chapter getChapter() {
+        return chapter;
+    }
+
+    /**
      * Update the Series with the given Segment inserted at position.
      */
-    void insert(int position, Segment segment) {
-        final Segment[] result;
+    static Series insert(Series series, int position, Segment segment) {
+        final Segment[] original, replacement;
 
-        result = new Segment[segments.length + 1];
+        original = series.segments;
 
-        System.arraycopy(segments, 0, result, 0, position);
-        result[position] = segment;
-        System.arraycopy(segments, position, result, position + 1, segments.length - position);
+        replacement = new Segment[original.length + 1];
 
-        segments = result;
+        System.arraycopy(original, 0, replacement, 0, position);
+        replacement[position] = segment;
+        System.arraycopy(original, position, replacement, position + 1, original.length - position);
+
+        return new Series(series.chapter, replacement);
     }
 
     /**
      * Remove the Segment at the given position.
      */
-    void delete(int position) {
-        final Segment[] result;
+    static Series delete(Series series, int position) {
+        final Segment[] original, replacement;
 
-        result = new Segment[segments.length - 1];
+        original = series.segments;
 
-        System.arraycopy(segments, 0, result, 0, position);
-        System.arraycopy(segments, position + 1, result, position, segments.length - position - 1);
+        replacement = new Segment[original.length - 1];
 
-        segments = result;
+        System.arraycopy(original, 0, replacement, 0, position);
+        System.arraycopy(original, position + 1, replacement, position, original.length - position - 1);
+
+        return new Series(series.chapter, replacement);
     }
 
     public int indexOf(Segment segment) {

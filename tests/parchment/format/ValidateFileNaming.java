@@ -101,6 +101,48 @@ public class ValidateFileNaming extends IOTestCase
 
     }
 
+    public final void testChapterRelative() throws IOException {
+        final Manuscript manuscript;
+        final Folio folio;
+        final Chapter chapter;
+        final Series series;
+        final String relative;
+
+        manuscript = new Manuscript();
+        try {
+            manuscript.setFilename("tmp/unittests/parchment/format/ValidateFileNaming-testChapterRelative.parchment");
+        } catch (ImproperFilenameException ife) {
+            fail(ife.getMessage());
+        }
+        folio = manuscript.createDocument();
+
+        chapter = new Chapter();
+        series = chapter.createDocument();
+        try {
+            chapter.setFilename("relative.xml");
+        } catch (ImproperFilenameException ife) {
+            fail(ife.getMessage());
+        }
+
+        // but
+
+        try {
+            relative = chapter.getFilenameRelative(manuscript);
+            assertEquals("relative.xml", relative);
+        } catch (ImproperFilenameException ife) {
+            fail(ife.getMessage());
+        }
+
+        try {
+            chapter.setFilename("tmp/unittests/parchment/format/relative.xml");
+        } catch (ImproperFilenameException ife) {
+            fail("Should have been ok");
+        }
+
+        chapter.saveDocument(series);
+
+    }
+
     // TODO
     public final void testThroughChapter() throws ValidityException, ParsingException, IOException,
             ImproperFilenameException {

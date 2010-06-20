@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -20,6 +20,8 @@ package quill.textbase;
 
 import java.util.List;
 
+import parchment.format.Manuscript;
+
 /**
  * A sequence of Series making up a document.
  * 
@@ -29,31 +31,41 @@ import java.util.List;
  * 
  * @author Andrew Cowie
  */
+// immutable
 public class Folio
 {
     private final Series[] collection;
 
-    Folio(Series[] components) {
-        this.collection = components;
+    /**
+     * The file [reference] that this document was (orignally) loaded from.
+     * While Folio states evolve, importantly the Manuscript will stay the
+     * same unless and until the underlying filename etc is changed.
+     */
+    private final Manuscript manuscript;
+
+    /**
+     * Create a Folio with a single [presumably nigh-on-empty] component as
+     * its body.
+     */
+    public Folio(Manuscript manuscript, Series component) {
+        this.manuscript = manuscript;
+        this.collection = new Series[] {
+            component
+        };
     }
 
     /**
-     * Create a Folio with a single [presumably nigh-on-empty] chapter as its
-     * body.
+     * Create a Folio with a list of components to be used as the body.
      */
-    public static Folio create(Series component) {
-        return new Folio(new Series[] {
-            component
-        });
-    }
-
-    public static Folio create(List<Series> components) {
+    public Folio(Manuscript manuscript, List<Series> components) {
         Series[] array;
 
-        array = new Series[components.size()];
-        components.toArray(array);
+        this.manuscript = manuscript;
 
-        return new Folio(array);
+        array = new Series[components.size()];
+        array = components.toArray(array);
+
+        this.collection = array;
     }
 
     public int size() {

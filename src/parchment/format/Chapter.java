@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -48,22 +50,26 @@ import quill.textbase.TextChain;
  */
 public class Chapter
 {
+    private Manuscript parent;
+
     private String filename;
 
-    public Chapter() {
-
+    /**
+     * This is only for testing save operations around a single Chapter and
+     * it's .xml file.
+     */
+    Chapter() {
+        parent = null;
     }
 
-    /*
-     * I'm not really convinced this should be public.
-     */
-    public Chapter(String pathname) throws ImproperFilenameException {
-        setFilename(pathname);
+    public Chapter(Manuscript manuscript) {
+        parent = manuscript;
     }
 
     public Series createDocument() {
         final Segment heading, para;
         TextChain chain;
+        final List<Segment> list;
         final Series result;
 
         heading = new ComponentSegment();
@@ -74,9 +80,11 @@ public class Chapter
         chain = new TextChain();
         para.setText(chain);
 
-        result = new Series(new Segment[] {
-                heading, para
-        });
+        list = new ArrayList<Segment>(2);
+        list.add(heading);
+        list.add(para);
+
+        result = new Series(this, list);
 
         return result;
     }
@@ -215,26 +223,29 @@ public class Chapter
      * Get the (relative) filename of this Chapter on disk.
      */
     /*
-     * Maybe some of this logic moves to setFilename()?
+     * Should a Manuscript be an obligitory parent of each and every Chapter?
+     * It works out that way in practise, of course, but making that manditory
+     * would complciate test isolation.
      */
-    public String getFilenameRelative(Manuscript manuscript) {
+    String getFilenameRelative(Manuscript manuscript) throws ImproperFilenameException {
         final String directory, relative;
         int prefix;
-        
+
         directory = manuscript.getDirectory();
-        
+
         if (!filename.startsWith(directory)) {
-            throw new ImproperFilenameException("Why isn't this Chapter's filename within the Manuscript's directory?");
+            throw new ImproperFilenameException(
+                    "Why isn't this Chapter's filename within the Manuscript's directory?");
         }
-        
+
         prefix = directory.length();
         if (filename.length() <= prefix) {
-            throw new IllegalStateException("Why is the (absolute) filename not longer than the directory it is in?");
+            throw new IllegalStateException(
+                    "Why is the (absolute) filename not longer than the directory it is in?");
         }
-        
-        
-        relative = filename.substring(prefix) {
-            
-        }
+
+        relative = filename.substring(prefix);
+
+        return relative;
     }
 }

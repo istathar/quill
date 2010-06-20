@@ -109,7 +109,6 @@ public class QuackLoader
         final Component chapter;
         int j;
         Block[] blocks;
-        final Segment[] result;
 
         chapter = (Component) doc.getRootElement();
         processComponent(chapter);
@@ -129,10 +128,7 @@ public class QuackLoader
          * Series, and return it.
          */
 
-        result = new Segment[list.size()];
-        list.toArray(result);
-
-        return new Series(result);
+        return new Series(list);
     }
 
     private void processComponent(Component component) {

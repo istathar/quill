@@ -56,18 +56,13 @@ public class Manuscript
 
     private Class<RenderEngine> engine;
 
-    private Chapter[] chapters;
-
     /**
      * Create a new Manuscript intermediary.
      */
-    public Manuscript() {
-        chapters = null; // FIXME
-    }
+    public Manuscript() {}
 
     public Manuscript(String pathname) throws ImproperFilenameException {
         setFilename(pathname);
-        chapters = null; // FIXME
     }
 
     /**
@@ -75,7 +70,8 @@ public class Manuscript
      * and then load its chapters. Returns an internal root object
      * representing the complete state of the document as loaded.
      */
-    public Folio loadDocument() throws ValidityException, ParsingException, IOException {
+    public Folio loadDocument() throws ValidityException, ParsingException, IOException,
+            ImproperFilenameException {
         String filename;
         final int size;
         int i;
@@ -102,6 +98,17 @@ public class Manuscript
             // FIXME get individual filenames out of .parchments file
             filename = "tests/SomeOfEverything.xml";
 
+            /*
+             * Setting the chapter filename results in the normal checked
+             * exception ImproperFilenameException. When loading it would be
+             * reasonable to make the assumption that the given pathname is
+             * valid, which it should be when sourcing from a .parchment file
+             * that we wrote. However, someone could have manually screwed
+             * with the contents of the .parchment file resulting in an
+             * illegal chapter filename but if that's happened then we have
+             * bigger problems.
+             */
+
             chapter = new Chapter();
             chapter.setFilename(filename);
 
@@ -112,7 +119,7 @@ public class Manuscript
             components.add(series);
         }
 
-        folio = Folio.create(components);
+        folio = new Folio(this, components);
         return folio;
     }
 

@@ -23,8 +23,8 @@ import java.io.IOException;
 
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import parchment.format.Chapter;
 import quill.client.IOTestCase;
+import quill.client.ImproperFilenameException;
 import quill.textbase.Common;
 import quill.textbase.Extract;
 import quill.textbase.NormalSegment;
@@ -102,7 +102,7 @@ public class ValidateDataIntegrity extends IOTestCase
      * boundary occurs at a continuous markup joint.
      */
     public final void testContinuousMarkupChangesLoad() throws IOException, ValidityException,
-            ParsingException {
+            ParsingException, ImproperFilenameException {
         final Chapter chapter;
         final Span[] expected;
         final Series series;
@@ -138,7 +138,7 @@ public class ValidateDataIntegrity extends IOTestCase
     }
 
     public void testMarkupContinuingBetweenTextBlocks() throws ValidityException, ParsingException,
-            IOException {
+            IOException, ImproperFilenameException {
         final Chapter chapter;
         final Span[] inbound;
         final Series series;

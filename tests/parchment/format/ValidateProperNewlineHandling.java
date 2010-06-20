@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import quill.client.ImproperFilenameException;
 import quill.textbase.Common;
 import quill.textbase.Folio;
 import quill.textbase.NormalSegment;
@@ -99,7 +100,7 @@ public class ValidateProperNewlineHandling extends ParchmentTestCase
     }
 
     public final void testCatchDocumentKnownBroken() throws IOException, ValidityException,
-            ParsingException {
+            ParsingException, ImproperFilenameException {
         final Chapter chapter;
 
         chapter = new Chapter();
@@ -119,7 +120,8 @@ public class ValidateProperNewlineHandling extends ParchmentTestCase
      * appearing, breaking the contract that we don't have bare newlines in
      * non-preformatted elements
      */
-    public final void testBugOverlyLongInline() throws IOException, ValidityException, ParsingException {
+    public final void testBugOverlyLongInline() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
         final Chapter chapter;
         final Series series;
         final ByteArrayOutputStream out;
