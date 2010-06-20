@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -16,15 +16,15 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.quack;
+package parchment.format;
 
 import java.io.IOException;
 
 import junit.framework.TestCase;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import quill.client.ImproperFilenameException;
 import quill.textbase.ComponentSegment;
-import quill.textbase.DataLayer;
 import quill.textbase.NormalSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
@@ -32,15 +32,16 @@ import quill.textbase.Series;
 
 public class ValidateBlockquoteConversion extends TestCase
 {
-    public final void testLoadDocbook() throws IOException, ValidityException, ParsingException {
-        final DataLayer data;
+    public final void testLoadDocbook() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
+        final Chapter chapter;
         final Series series;
         Segment segment;
 
-        data = new DataLayer();
-        data.loadChapter("tests/quill/quack/Blockquote.xml");
+        chapter = new Chapter();
+        chapter.setFilename("tests/quill/quack/Blockquote.xml");
+        series = chapter.loadDocument();
 
-        series = data.getActiveDocument().get(0);
         assertEquals(4, series.size());
 
         segment = series.get(0);
