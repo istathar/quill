@@ -84,7 +84,7 @@ public class Chapter
         list.add(heading);
         list.add(para);
 
-        result = new Series(this, list);
+        result = new Series(list);
 
         return result;
     }

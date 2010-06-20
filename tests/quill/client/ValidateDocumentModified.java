@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -18,12 +18,11 @@
  */
 package quill.client;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import parchment.format.Manuscript;
 import quill.textbase.Change;
 import quill.textbase.Common;
-import quill.textbase.DataLayer;
 import quill.textbase.Folio;
 import quill.textbase.InsertTextualChange;
 import quill.textbase.NormalSegment;
@@ -36,18 +35,16 @@ import static quill.textbase.Span.createSpan;
 
 public class ValidateDocumentModified extends IOTestCase
 {
-    private static final void insertThreeSpansIntoFirstSegment(final DataLayer data) {
+    private static final void insertThreeSpansIntoFirstSegment(final Folio folio) {
         final TextChain chain;
         Span[] spans;
         int i, j;
         Span span;
         Change change;
-        final Folio folio;
         final Series series;
         final Segment segment;
 
-        folio = data.getActiveDocument();
-        series = folio.get(0);
+        series = folio.getSeries(0);
         segment = series.get(1);
         assertTrue(segment instanceof NormalSegment);
         chain = segment.getText();
@@ -65,10 +62,10 @@ public class ValidateDocumentModified extends IOTestCase
     }
 
     public final void testChangeCausesModified() throws IOException {
-        final DataLayer data;
+        final Manuscript manuscript;
 
-        data = new DataLayer();
-        data.createManuscript();
+        manuscript = new Manuscript();
+        manuscript.createDocument();
 
         /*
          * An empty document is not modified.
@@ -92,23 +89,23 @@ public class ValidateDocumentModified extends IOTestCase
     }
 
     public final void testSaveClearsModified() throws IOException {
-        final DataLayer data;
-        final ByteArrayOutputStream out;
+        final Manuscript manuscript;
+        final Folio folio;
 
-        data = new DataLayer();
-        data.createManuscript();
+        manuscript = new Manuscript();
+        manuscript.setFilename("UncertaintyPrinciple.parchment");
+        folio = manuscript.createDocument();
 
-        insertThreeSpansIntoFirstSegment(data);
+        insertThreeSpansIntoFirstSegment(folio);
 
         assertTrue(data.isModified());
 
-        out = new ByteArrayOutputStream();
-        data.saveChapter(out);
+        manuscript.saveDocument(folio);
         assertFalse(data.isModified());
 
         /*
          * Now walk the undo/redo stack backwards and forwards past the new
-         * (non-zero) save point to see if the modified behaviour holds
+         * (non-zero) save point to see if the modified behaviour holds.
          */
 
         data.undo();

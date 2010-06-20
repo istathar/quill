@@ -140,7 +140,7 @@ public abstract class RenderEngine
     protected RenderEngine(final PaperSize paper, final Manuscript manuscript, final Folio folio) {
         specifySize(paper);
         this.manuscript = manuscript;
-        this.series = folio.get(0); // HARDCODE
+        this.series = folio.getSeries(0); // HARDCODE
     }
 
     /**

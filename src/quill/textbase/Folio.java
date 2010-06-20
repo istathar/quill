@@ -20,6 +20,7 @@ package quill.textbase;
 
 import java.util.List;
 
+import parchment.format.Chapter;
 import parchment.format.Manuscript;
 
 /**
@@ -34,7 +35,9 @@ import parchment.format.Manuscript;
 // immutable
 public class Folio
 {
-    private final Series[] collection;
+    private final Series[] components;
+
+    private final Chapter[] chapters;
 
     /**
      * The file [reference] that this document was (orignally) loaded from.
@@ -47,9 +50,12 @@ public class Folio
      * Create a Folio with a single [presumably nigh-on-empty] component as
      * its body.
      */
-    public Folio(Manuscript manuscript, Series component) {
+    public Folio(Manuscript manuscript, Chapter chapter, Series component) {
         this.manuscript = manuscript;
-        this.collection = new Series[] {
+        this.chapters = new Chapter[] {
+            chapter
+        };
+        this.components = new Series[] {
             component
         };
     }
@@ -57,22 +63,38 @@ public class Folio
     /**
      * Create a Folio with a list of components to be used as the body.
      */
-    public Folio(Manuscript manuscript, List<Series> components) {
-        Series[] array;
+    public Folio(Manuscript manuscript, List<Chapter> chapters, List<Series> components) {
+        final int num;
+        final Chapter[] c;
+        final Series[] s;
+
+        num = chapters.size();
+        if (num != components.size()) {
+            throw new AssertionError();
+        }
 
         this.manuscript = manuscript;
 
-        array = new Series[components.size()];
-        array = components.toArray(array);
+        c = new Chapter[num];
+        this.chapters = chapters.toArray(c);
 
-        this.collection = array;
+        s = new Series[num];
+        this.components = components.toArray(s);
     }
 
     public int size() {
-        return collection.length;
+        return components.length;
     }
 
-    public Series get(int index) {
-        return collection[index];
+    public Series getSeries(int index) {
+        return components[index];
     }
+
+    /**
+     * Get the [reference to] the Chapter on disk at position <code>i</code>.
+     */
+    public Chapter getChapter(int index) {
+        return chapters[index];
+    }
+
 }

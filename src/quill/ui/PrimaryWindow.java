@@ -440,7 +440,7 @@ class PrimaryWindow extends Window
             throw new IllegalStateException();
         }
 
-        this.series = folio.get(0);
+        this.series = folio.getSeries(0);
 
         editor.initializeSeries(series);
         preview.renderSeries(manuscript, series);

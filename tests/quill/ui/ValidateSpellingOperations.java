@@ -67,7 +67,7 @@ public class ValidateSpellingOperations extends GraphicalTestCase
          * Establish some starting text.
          */
 
-        segment = folio.get(0).get(1);
+        segment = folio.getSeries(0).get(1);
         chain = segment.getText();
         span = createSpan("Test emrgency bro𝑎dcast system", null);
 
@@ -186,7 +186,7 @@ public class ValidateSpellingOperations extends GraphicalTestCase
                 createSpan(" speek.", null),
         };
 
-        segment = folio.get(0).get(1);
+        segment = folio.getSeries(0).get(1);
         chain = segment.getText();
 
         for (i = 0, j = 0; i < spans.length; i++) {

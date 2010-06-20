@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -31,9 +31,9 @@ import org.gnome.gtk.Test;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 
+import parchment.format.Manuscript;
 import quill.textbase.Change;
 import quill.textbase.Common;
-import quill.textbase.DataLayer;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.FormatTextualChange;
@@ -48,24 +48,22 @@ import static quill.textbase.Span.createSpan;
 public class ValidateChangePropagation extends GraphicalTestCase
 {
     public final void testSetupBlank() throws ValidityException, ParsingException, IOException {
-        final DataLayer data;
+        final Manuscript manuscript;
         final Folio folio1, folio2;
 
-        data = new DataLayer();
+        manuscript = new Manuscript();
 
-        data.createManuscript();
-        folio1 = data.getActiveDocument();
+        folio1 = manuscript.createDocument();
         assertNotNull(folio1);
 
-        data.createManuscript();
-        folio2 = data.getActiveDocument();
+        folio2 = manuscript.createDocument();
         assertNotNull(folio2);
 
         assertNotSame(folio1, folio2);
     }
 
     public final void testInsertText() throws ValidityException, ParsingException, IOException {
-        final DataLayer data;
+        final Manuscript manuscript;
         final Folio folio;
         final Segment segment;
         final TextChain chain;
@@ -74,14 +72,13 @@ public class ValidateChangePropagation extends GraphicalTestCase
         final OutputStream out;
         final String expected;
 
-        data = new DataLayer();
-        ui = new UserInterface(data);
+        manuscript = new Manuscript();
+        ui = new UserInterface();
 
-        data.createManuscript();
-        folio = data.getActiveDocument();
-        ui.displayDocument(folio);
+        folio = manuscript.createDocument();
+        ui.displayDocument(manuscript, folio);
 
-        segment = folio.get(0).get(1);
+        segment = folio.getSeries(0).get(1);
         chain = segment.getText();
         span = createSpan('h', null);
 
@@ -103,7 +100,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
     }
 
     public final void skipReplaceText() throws ValidityException, ParsingException, IOException {
-        final DataLayer data;
+        final Manuscript manuscript;
         final Folio folio;
         final Segment segment;
         final TextChain chain;
@@ -115,8 +112,8 @@ public class ValidateChangePropagation extends GraphicalTestCase
         final TextBuffer buffer;
         TextIter start, end;
 
-        data = new DataLayer();
-        ui = new UserInterface(data);
+        manuscript = new Manuscript();
+        ui = new UserInterface(manuscript);
 
         data.createManuscript();
         folio = data.getActiveDocument();
@@ -126,7 +123,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
          * Establish some starting text.
          */
 
-        segment = folio.get(0).get(1);
+        segment = folio.getSeries(0).get(1);
         chain = segment.getText();
         span = createSpan("This is a test of the emergency broadcast system", null);
 
@@ -219,7 +216,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
          * Establish some starting text.
          */
 
-        segment = folio.get(0).get(1);
+        segment = folio.getSeries(0).get(1);
         chain = segment.getText();
 
         span = createSpan("This is a test of the emergency broadcast system", null);

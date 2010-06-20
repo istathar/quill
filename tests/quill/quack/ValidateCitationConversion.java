@@ -67,7 +67,7 @@ public class ValidateCitationConversion extends IOTestCase
         data = new DataLayer();
         data.loadChapter(FILE);
 
-        series = data.getActiveDocument().get(0);
+        series = data.getActiveDocument().getSeries(0);
         assertEquals(2, series.size());
 
         segment = series.get(0);

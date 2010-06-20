@@ -79,7 +79,7 @@ public class ValidatePreformattedConversion extends IOTestCase
         data = new DataLayer();
         data.createManuscript();
         folio = data.getActiveDocument();
-        series = folio.get(0);
+        series = folio.getSeries(0);
 
         /*
          * Construct some data

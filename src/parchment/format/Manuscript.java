@@ -78,11 +78,11 @@ public class Manuscript
         Series series;
         Chapter chapter;
         final List<Series> components;
-        final List<Chapter> files;
+        final List<Chapter> chapters;
         final Folio folio;
 
         components = new ArrayList<Series>();
-        files = new ArrayList<Chapter>();
+        chapters = new ArrayList<Chapter>();
 
         /*
          * TODO load .parchment file
@@ -115,11 +115,11 @@ public class Manuscript
             series = chapter.loadDocument();
 
             // Hm?
-            files.add(chapter);
+            chapters.add(chapter);
             components.add(series);
         }
 
-        folio = new Folio(this, components);
+        folio = new Folio(this, chapters, components);
         return folio;
     }
 
@@ -156,16 +156,13 @@ public class Manuscript
         chapter1 = new Chapter();
         series1 = chapter1.createDocument();
 
-        folio = Folio.create(series1);
+        folio = new Folio(this, chapter1, series1);
 
         try {
             chapter1.setFilename("Chapter1.xml");
         } catch (ImproperFilenameException ife) {
             throw new IllegalStateException();
         }
-
-        chapters = new Chapter[1];
-        chapters[0] = chapter1;
 
         return folio;
     }
@@ -244,9 +241,9 @@ public class Manuscript
             throw new IOException("Can't write to document file!\n\n" + "<i>Check permissions?</i>");
         }
 
-        for (i = 0; i < chapters.length; i++) {
-            series = folio.get(i);
-            chapter = chapters[i];
+        for (i = 0; i < folio.size(); i++) {
+            series = folio.getSeries(i);
+            chapter = folio.getChapter(i);
             chapter.saveDocument(series);
         }
     }
@@ -260,6 +257,8 @@ public class Manuscript
     public void emergencySave(final Folio folio) {
         final String savename;
         File target = null;
+        Chapter chapter;
+        Series series;
         final PrintStream err;
         int i;
 
@@ -283,8 +282,11 @@ public class Manuscript
                 return;
             }
 
-            for (i = 0; i < chapters.length; i++) {
-                chapters[i].saveDocument(folio.get(i));
+            for (i = 0; i < folio.size(); i++) {
+                chapter = folio.getChapter(i);
+                series = folio.getSeries(i);
+
+                chapter.saveDocument(series);
             }
         } catch (Throwable t) {
             // well, we tried
