@@ -86,6 +86,14 @@ public class Folio
         return components.length;
     }
 
+    /**
+     * Get the Manuscript object representing the file this Folio was loaded
+     * from, or will be saved to.
+     */
+    public Manuscript getManuscript() {
+        return manuscript;
+    }
+
     public Series getSeries(int index) {
         return components[index];
     }

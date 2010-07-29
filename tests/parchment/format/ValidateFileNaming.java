@@ -39,6 +39,7 @@ public class ValidateFileNaming extends IOTestCase
         manuscript = new Manuscript();
         folio = manuscript.createDocument();
 
+        assertNotNull(folio);
         assertEquals("Untitled", manuscript.getBasename());
 
         target = new File("tmp/unittests/parchment/format/ValidateFileNaming.parchment");
@@ -100,11 +101,10 @@ public class ValidateFileNaming extends IOTestCase
         final Manuscript manuscript;
         final Folio folio;
         final Chapter chapter, another;
-        final Series series;
         final String relative, second;
 
         chapter = new Chapter();
-        series = chapter.createDocument();
+
         try {
             chapter.setFilename("relative.xml");
 
@@ -142,8 +142,6 @@ public class ValidateFileNaming extends IOTestCase
         }
         second = another.getRelative();
         assertEquals("tmp/unittests/parchment/format/relative.xml", second);
-
-        chapter.saveDocument(series);
     }
 
     // TODO

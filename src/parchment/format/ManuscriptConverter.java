@@ -18,6 +18,8 @@
  */
 package parchment.format;
 
+import java.io.OutputStream;
+
 import nu.xom.Attribute;
 import quill.textbase.Folio;
 import quill.textbase.Series;
@@ -120,4 +122,6 @@ class ManuscriptConverter
         font.addAttribute(attribute);
         presentation.appendChild(font);
     }
+
+    public void writeManuscript(OutputStream out) {}
 }

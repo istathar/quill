@@ -20,6 +20,7 @@ package parchment.format;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -229,9 +230,30 @@ public class Manuscript
      */
     public void saveDocument(Folio folio) throws IOException {
         final File target;
+        final ManuscriptConverter converter;
         int i;
         Series series;
         Chapter chapter;
+
+        this.saveDocument0(folio);
+
+        /*
+         * Now save chapters
+         */
+
+        for (i = 0; i < folio.size(); i++) {
+            series = folio.getSeries(i);
+            chapter = folio.getChapter(i);
+            chapter.saveDocument(series);
+        }
+    }
+
+    private void saveDocument0(Folio folio) throws IOException {
+        final File target, tmp;
+        final FileOutputStream out;
+        boolean result;
+        String dir, path;
+        final ManuscriptConverter converter;
 
         if (filename == null) {
             throw new IllegalStateException("save filename not set");
@@ -242,11 +264,48 @@ public class Manuscript
             throw new IOException("Can't write to document file!\n\n" + "<i>Check permissions?</i>");
         }
 
-        for (i = 0; i < folio.size(); i++) {
-            series = folio.getSeries(i);
-            chapter = folio.getChapter(i);
-            chapter.saveDocument(series);
+        /*
+         * We need a temporary file to write to, since writing is descructive
+         * and we don't want to blow away the existing file if something goes
+         * wrong.
+         */
+
+        tmp = new File(filename + ".tmp");
+        if (tmp.exists()) {
+            tmp.delete();
         }
+        result = tmp.createNewFile();
+        if (!result) {
+            dir = new File(".").getAbsolutePath();
+            dir = dir.substring(0, dir.length() - 1);
+            path = tmp.toString().substring(dir.length());
+            throw new IOException("Can't create temporary file for saving.\n\n"
+                    + "<i>Assuming all is well otherwise, remove</i>\n" + "<tt>" + path
+                    + "</tt>\n<i>and try again?</i>");
+        }
+
+        try {
+            out = new FileOutputStream(tmp);
+
+            converter = new ManuscriptConverter(folio);
+            converter.writeManuscript(out);
+
+            out.close();
+        } catch (IOException ioe) {
+            tmp.delete();
+            throw ioe;
+        }
+
+        /*
+         * And now replace the temp file over the actual document.
+         */
+
+        result = tmp.renameTo(target);
+        if (!result) {
+            tmp.delete();
+            throw new IOException("Unable to rename temporary file to target document!");
+        }
+
     }
 
     /**
