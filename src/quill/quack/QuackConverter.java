@@ -278,6 +278,13 @@ public class QuackConverter
         chapter.toXML(out);
     }
 
+    /**
+     * This is legacy, but it shows the heritage of when we had more than one
+     * kind of "component", namely <code>&lt;chapter&gt;</code>s and
+     * <code>&lt;article&gt;</code>s.
+     * 
+     * @deprecated
+     */
     public void writeArticle(OutputStream out) throws IOException {
         throw new UnsupportedOperationException("Not yet implemented");
     }

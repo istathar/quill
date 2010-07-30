@@ -149,21 +149,25 @@ public class ValidateFileNaming extends IOTestCase
             ImproperFilenameException {
         final Manuscript manuscript;
         final Folio folio;
-        final File target;
+        final File dotParchment, dotXml;
 
         manuscript = new Manuscript();
         folio = manuscript.createDocument();
 
-        target = new File("tmp/unittests/parchment/format/ValidateFileNaming.parchment");
-        target.delete();
-        assertFalse(target.exists());
+        dotParchment = new File("tmp/unittests/parchment/format/ValidateFileNaming.parchment");
+        dotParchment.delete();
+        assertFalse(dotParchment.exists());
 
-        manuscript.setFilename(target.getPath());
+        dotXml = new File("tmp/unittests/parchment/format/Chapter1.xml");
+        dotXml.delete();
+        assertFalse(dotXml.exists());
+
+        manuscript.setFilename(dotParchment.getPath());
         manuscript.saveDocument(folio);
 
-        assertTrue("Save didn't write anything!", target.exists());
-
-        // TODO
+        assertTrue("Save didn't write the expected .parchment file!", dotParchment.exists());
+        assertTrue("Save didn't write anything to the .parchment file!", dotParchment.length() > 0);
+        assertTrue("Save didn't write the expected .xml file!", dotXml.exists());
+        assertTrue("Save didn't write anything to the .xml file!", dotXml.length() > 0);
     }
-
 }

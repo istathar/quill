@@ -18,6 +18,7 @@
  */
 package parchment.format;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 import nu.xom.Attribute;
@@ -73,6 +74,7 @@ class ManuscriptConverter
             element = new ManuscriptElement("chapter");
             attribute = new Attribute("src", filename);
             element.addAttribute(attribute);
+            content.appendChild(element);
         }
     }
 
@@ -123,5 +125,11 @@ class ManuscriptConverter
         presentation.appendChild(font);
     }
 
-    public void writeManuscript(OutputStream out) {}
+    /**
+     * Create a <code>&lt;manuscript&gt;</code> object based on what has been
+     * fed to the converter, and write it to the given stream.
+     */
+    public void writeManuscript(OutputStream out) throws IOException {
+        root.toXML(out);
+    }
 }
