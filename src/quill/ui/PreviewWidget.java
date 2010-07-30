@@ -29,10 +29,8 @@ import org.gnome.gtk.Widget;
 import parchment.format.Manuscript;
 import parchment.render.RenderEngine;
 import parchment.render.ReportRenderEngine;
+import quill.textbase.Folio;
 import quill.textbase.Origin;
-import quill.textbase.Series;
-
-import static quill.client.Quill.ui;
 
 /**
  * Display a preview of what the final output document is going to be. This
@@ -67,10 +65,18 @@ class PreviewWidget extends DrawingArea
 
     private int pixelHeight;
 
-    private Series series;
+    private Manuscript manuscript;
 
-    PreviewWidget() {
+    private Folio folio;
+
+    /**
+     * What is the top level UI holding this document?
+     */
+    private PrimaryWindow parent;
+
+    PreviewWidget(PrimaryWindow primary) {
         super();
+        parent = primary;
 
         this.connect(new Widget.ExposeEvent() {
             public boolean onExposeEvent(Widget source, EventExpose event) {
@@ -83,8 +89,7 @@ class PreviewWidget extends DrawingArea
                 // Unit.MM);
                 paper = PaperSize.A4;
 
-                // engine = new ReportRenderEngine(PaperSize.A4, series);
-                engine = new ReportRenderEngine(paper, manuscript, series);
+                engine = new ReportRenderEngine(paper, manuscript, folio);
 
                 cr = new Context(source.getWindow());
 
@@ -92,7 +97,7 @@ class PreviewWidget extends DrawingArea
                 drawPageOutline(cr, engine);
                 drawCrosshairs(cr, engine);
 
-                cursor = ui.primary.getCursor();
+                cursor = parent.getCursor();
                 engine.render(cr, cursor);
 
                 return true;
@@ -185,15 +190,13 @@ class PreviewWidget extends DrawingArea
         cr.transform(matrix);
     }
 
-    private Manuscript manuscript;
-
     /**
      * Given a Series in a Manuscript representing the Segments in a chapter
      * or article, instruct this Widget to render a preview of them.
      */
-    void renderSeries(Manuscript manuscript, Series series) {
+    void renderSeries(Manuscript manuscript, Folio folio) {
         this.manuscript = manuscript;
-        this.series = series;
+        this.folio = folio;
         this.queueDraw();
     }
 }

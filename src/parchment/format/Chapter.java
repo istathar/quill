@@ -273,10 +273,19 @@ public class Chapter
         if (parent == null) {
             throw new IllegalStateException("Chapter needs to be part of a Manuscript");
         }
+
         return relative;
     }
 
     String getFilename() {
-        return parent.getDirectory() + "/" + this.getRelative();
+        final String directory;
+
+        if (parent == null) {
+            throw new IllegalStateException("Chapter needs to be part of a Manuscript");
+        }
+
+        directory = parent.getDirectory();
+
+        return directory + "/" + relative;
     }
 }

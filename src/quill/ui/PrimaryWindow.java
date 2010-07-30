@@ -211,7 +211,7 @@ class PrimaryWindow extends Window
         right.setShowTabs(false);
         right.setShowBorder(false);
 
-        preview = new PreviewWidget();
+        preview = new PreviewWidget(this);
         right.add(preview);
 
         help = new HelpWidget();
@@ -443,7 +443,7 @@ class PrimaryWindow extends Window
         this.series = folio.getSeries(0);
 
         editor.initializeSeries(series);
-        preview.renderSeries(manuscript, series);
+        preview.renderSeries(manuscript, folio);
         outline.renderSeries(series);
         this.updateTitle();
     }

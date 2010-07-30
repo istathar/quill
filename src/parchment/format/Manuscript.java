@@ -110,7 +110,7 @@ public class Manuscript
              * bigger problems.
              */
 
-            chapter = new Chapter();
+            chapter = new Chapter(this);
             chapter.setFilename(filename);
 
             series = chapter.loadDocument();
