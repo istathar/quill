@@ -18,7 +18,10 @@
  */
 package parchment.format;
 
+import nu.xom.Attribute;
 import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.Elements;
 
 /**
  * Simplistic methods to reach into a <code>&lt;manuscript&gt;</code> XOM tree
@@ -27,45 +30,44 @@ import nu.xom.Document;
  * @author Andrew Cowie
  */
 /*
- * FUTURE do the exception messages in this class need escaping? Perhaps
- * that's up to the UI.
+ * Just use the XOM API directly.
  */
 class ManuscriptLoader
 {
     private String[] chapterSources;
 
     ManuscriptLoader(Document document) throws InvalidDocumentException {
-        final ManuscriptElement root;
+        final Element root;
 
-        root = (ManuscriptElement) document.getRootElement();
+        root = document.getRootElement();
 
         processManuscript(root);
     }
 
-    private void processManuscript(ManuscriptElement root) throws InvalidDocumentException {
-        final ManuscriptElement[] children;
+    private void processManuscript(Element root) throws InvalidDocumentException {
+        final Elements children;
         final int num;
         String name;
-        final ManuscriptElement content;
-        final ManuscriptElement presentation;
+        final Element content;
+        final Element presentation;
 
-        children = root.getChildren();
-        num = children.length;
+        children = root.getChildElements();
+        num = children.size();
 
         if (num != 2) {
             throw new InvalidDocumentException("Should be exactly 2 elements in <manuscript>, not "
                     + num);
         }
 
-        content = children[0];
+        content = children.get(0);
         name = content.getLocalName();
         if (!name.equals("content")) {
             throw new InvalidDocumentException(
                     "The first element of <manuscript> should be <content>, not <" + name + ">");
         }
 
-        presentation = children[1];
-        name = content.getLocalName();
+        presentation = children.get(1);
+        name = presentation.getLocalName();
         if (!name.equals("presentation")) {
             throw new InvalidDocumentException(
                     "The second element of <manuscript> should be <presentation>, not <" + name + ">");
@@ -73,22 +75,21 @@ class ManuscriptLoader
 
         processContent(content);
         processPresentation(presentation);
-
     }
 
-    private void processContent(ManuscriptElement content) throws InvalidDocumentException {
-        final ManuscriptElement[] children;
+    private void processContent(Element content) throws InvalidDocumentException {
+        final Elements children;
         final int num;
         int i;
-        ManuscriptElement chapter;
+        Element chapter;
         String src, name;
 
-        children = content.getChildren();
-        num = children.length;
+        children = content.getChildElements();
+        num = children.size();
         chapterSources = new String[num];
 
         for (i = 0; i < num; i++) {
-            chapter = children[i];
+            chapter = children.get(i);
 
             name = content.getLocalName();
             if (!name.equals("content")) {
@@ -97,14 +98,31 @@ class ManuscriptLoader
                                 + "> which is invalid");
             }
 
-            src = chapter.getValue("src");
+            src = getValue(chapter, "src");
             chapterSources[i] = src;
         }
     }
 
-    private void processPresentation(ManuscriptElement presentation) {
+    private static String getValue(Element element, String name) throws InvalidDocumentException {
+        final Attribute a;
+
+        a = element.getAttribute(name);
+
+        if (a == null) {
+            throw new InvalidDocumentException("Looked for attribute \"" + name + "\" in <"
+                    + element.getLocalName() + "> but not found");
+        }
+
+        return a.getValue();
+    }
+
+    private void processPresentation(Element presentation) {
     // TODO Auto-generated method stub
 
+    }
+
+    String[] getChapterSources() {
+        return chapterSources;
     }
 
 }

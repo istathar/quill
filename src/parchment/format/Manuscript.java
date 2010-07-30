@@ -26,6 +26,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import nu.xom.Builder;
+import nu.xom.Document;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import parchment.render.RenderEngine;
@@ -72,9 +74,13 @@ public class Manuscript
      * representing the complete state of the document as loaded.
      */
     public Folio loadDocument() throws ValidityException, ParsingException, IOException,
-            ImproperFilenameException {
-        String filename;
+            ImproperFilenameException, InvalidDocumentException {
+        final File source;
+        final Builder parser;
+        final Document doc;
+        final ManuscriptLoader loader;
         final int size;
+        String[] sources;
         int i;
         Series series;
         Chapter chapter;
@@ -85,20 +91,20 @@ public class Manuscript
         components = new ArrayList<Series>();
         chapters = new ArrayList<Chapter>();
 
-        /*
-         * TODO load .parchment file
-         */
+        source = new File(filename);
+        parser = new Builder();
+        doc = parser.build(source);
+
+        loader = new ManuscriptLoader(doc);
+        sources = loader.getChapterSources();
 
         /*
          * FIXME load this; if we know size we can use arrays already.
          * Otherwise, we use List.
          */
-        size = 1;
+        size = sources.length;
 
         for (i = 0; i < size; i++) {
-            // FIXME get individual filenames out of .parchments file
-            filename = "tests/SomeOfEverything.xml";
-
             /*
              * Setting the chapter filename results in the normal checked
              * exception ImproperFilenameException. When loading it would be
@@ -111,7 +117,7 @@ public class Manuscript
              */
 
             chapter = new Chapter(this);
-            chapter.setFilename(filename);
+            chapter.setFilename(sources[i]);
 
             series = chapter.loadDocument();
 
