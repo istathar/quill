@@ -221,16 +221,15 @@ public class Manuscript
         filename = absolute.getPath();
     }
 
+    /**
+     * Save the state described by the given Folio into the set of files
+     * described by this Manuscript.
+     */
     /*
      * FIXME! Process names appropriate to actual inbound Folio, not existing
      * Chapters
      */
-    /*
-     * FIXME actually save something!
-     */
     public void saveDocument(Folio folio) throws IOException {
-        final File target;
-        final ManuscriptConverter converter;
         int i;
         Series series;
         Chapter chapter;

@@ -57,11 +57,6 @@ public class Chapter
     private Manuscript parent;
 
     /**
-     * Full pathname to .xml file
-     */
-    private String filename;
-
-    /**
      * Relative path to .xml, relative to the directory of the "parent"
      * Manuscript.
      */
@@ -107,6 +102,7 @@ public class Chapter
      * a Segment[], wrapped as a Series.
      */
     public Series loadDocument() throws ValidityException, ParsingException, IOException {
+        final String filename;
         final File source;
         final NodeFactory factory;
         final Builder parser;
@@ -114,6 +110,7 @@ public class Chapter
         final QuackLoader loader; // change to interface or baseclass
         final Series series;
 
+        filename = this.getFilename();
         source = new File(filename);
 
         factory = new QuackNodeFactory();
@@ -128,11 +125,12 @@ public class Chapter
 
     /**
      * Specify the filename that this chapter will be serialized to. Path will
-     * be converted to absolute form if it isn't there already.
+     * be compared against the parent Manuscript's filepath, and if it's not
+     * relative it had better be within that path.
      */
     public void setFilename(String path) throws ImproperFilenameException {
         File proposed, absolute;
-        final String name, directory;
+        final String name, directory, filename;
         final int i;
         int prefix;
 
@@ -184,14 +182,17 @@ public class Chapter
      * You need to have set the filename first, of course.
      */
     public void saveDocument(final Series series) throws IOException {
+        final String filename;
         final File target, tmp;
         final FileOutputStream out;
         boolean result;
         String dir, path;
 
-        if (filename == null) {
+        if (relative == null) {
             throw new IllegalStateException("save filename not set");
         }
+
+        filename = this.getFilename();
 
         target = new File(filename);
         if (target.exists() && (!target.canWrite())) {
@@ -273,5 +274,9 @@ public class Chapter
             throw new IllegalStateException("Chapter needs to be part of a Manuscript");
         }
         return relative;
+    }
+
+    String getFilename() {
+        return parent.getDirectory() + "/" + this.getRelative();
     }
 }
