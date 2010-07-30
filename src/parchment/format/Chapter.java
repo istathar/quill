@@ -128,27 +128,11 @@ public class Chapter
      * be compared against the parent Manuscript's filepath, and if it's not
      * relative it had better be within that path.
      */
-    public void setFilename(String path) throws ImproperFilenameException {
+    public void setFilename(final String path) throws ImproperFilenameException {
         File proposed, absolute;
         final String name, directory, filename;
         final int i;
         int prefix;
-
-        proposed = new File(path);
-        if (proposed.isAbsolute()) {
-            absolute = proposed;
-        } else {
-            absolute = proposed.getAbsoluteFile();
-        }
-
-        name = absolute.getName();
-
-        i = name.indexOf(".xml");
-        if (i == -1) {
-            throw new ImproperFilenameException("\n" + "Chapter files must have a .xml extension");
-        }
-
-        filename = absolute.getPath();
 
         if (parent == null) {
             /*
@@ -160,6 +144,23 @@ public class Chapter
         }
 
         directory = parent.getDirectory();
+
+        proposed = new File(path);
+        if (proposed.isAbsolute()) {
+            absolute = proposed;
+        } else {
+            proposed = new File(directory + "/" + path);
+            absolute = proposed.getAbsoluteFile();
+        }
+
+        name = absolute.getName();
+
+        i = name.indexOf(".xml");
+        if (i == -1) {
+            throw new ImproperFilenameException("\n" + "Chapter files must have a .xml extension");
+        }
+
+        filename = absolute.getPath();
 
         if (!filename.startsWith(directory)) {
             throw new ImproperFilenameException(

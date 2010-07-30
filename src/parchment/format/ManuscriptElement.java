@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import nu.xom.Attribute;
 import nu.xom.Document;
 import nu.xom.Element;
+import nu.xom.Elements;
 import nu.xom.Serializer;
 
 /**
@@ -41,6 +42,9 @@ class ManuscriptElement extends Element
         super.addAttribute(new Attribute(name, value));
     }
 
+    /**
+     * @deprecated
+     */
     String getValue(String name) {
         final Attribute a;
 
@@ -76,5 +80,26 @@ class ManuscriptElement extends Element
 
     public String toString() {
         return "<" + getQualifiedName() + ">";
+    }
+
+    /**
+     * @deprecated
+     */
+    ManuscriptElement[] getChildren() {
+        final ManuscriptElement[] result;
+        final int num;
+        final Elements children;
+        int i;
+
+        num = super.getChildCount();
+        result = new ManuscriptElement[num];
+
+        children = getChildElements();
+
+        for (i = 0; i < num; i++) {
+            result[i] = (ManuscriptElement) children.get(i);
+        }
+
+        return result;
     }
 }
