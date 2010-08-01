@@ -16,11 +16,12 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.client;
+package quill.ui;
 
 import java.io.IOException;
 
 import parchment.format.Manuscript;
+import quill.client.ImproperFilenameException;
 import quill.textbase.Change;
 import quill.textbase.Common;
 import quill.textbase.Folio;
@@ -33,9 +34,10 @@ import quill.textbase.TextChain;
 
 import static quill.textbase.Span.createSpan;
 
-public class ValidateDocumentModified extends IOTestCase
+public class ValidateDocumentModified extends GraphicalTestCase
 {
-    private static final void insertThreeSpansIntoFirstSegment(final Folio folio) {
+    private static final void insertThreeSpansIntoFirstSegment(final PrimaryWindow primary) {
+        final Folio folio;
         final TextChain chain;
         Span[] spans;
         int i, j;
@@ -44,6 +46,7 @@ public class ValidateDocumentModified extends IOTestCase
         final Series series;
         final Segment segment;
 
+        folio = primary.getDocument();
         series = folio.getSeries(0);
         segment = series.get(1);
         assertTrue(segment instanceof NormalSegment);
@@ -52,73 +55,82 @@ public class ValidateDocumentModified extends IOTestCase
         spans = new Span[] {
                 createSpan("Hello", null), createSpan(" ", null), createSpan("World", Common.BOLD)
         };
+
         j = 0;
         for (i = 0; i < spans.length; i++) {
             span = spans[i];
             change = new InsertTextualChange(chain, j, span);
-            data.apply(change);
+            primary.apply(change);
             j += span.getWidth();
         }
     }
 
     public final void testChangeCausesModified() throws IOException {
         final Manuscript manuscript;
+        final Folio folio;
+        final PrimaryWindow primary;
 
         manuscript = new Manuscript();
-        manuscript.createDocument();
+        folio = manuscript.createDocument();
+
+        primary = new PrimaryWindow();
+        primary.displayDocument(manuscript, folio);
 
         /*
          * An empty document is not modified.
          */
 
-        assertFalse(data.isModified());
+        assertFalse(primary.isModified());
 
         /*
          * Modify, then undo back to empty.
          */
 
-        insertThreeSpansIntoFirstSegment(data);
+        insertThreeSpansIntoFirstSegment(primary);
 
-        assertTrue(data.isModified());
-        data.undo();
-        assertTrue(data.isModified());
-        data.undo();
-        assertTrue(data.isModified());
-        data.undo();
-        assertFalse(data.isModified());
+        assertTrue(primary.isModified());
+        primary.undo();
+        assertTrue(primary.isModified());
+        primary.undo();
+        assertTrue(primary.isModified());
+        primary.undo();
+        assertFalse(primary.isModified());
     }
 
-    public final void testSaveClearsModified() throws IOException {
+    public final void testSaveClearsModified() throws IOException, ImproperFilenameException {
         final Manuscript manuscript;
         final Folio folio;
+        final PrimaryWindow primary;
 
         manuscript = new Manuscript();
         manuscript.setFilename("UncertaintyPrinciple.parchment");
         folio = manuscript.createDocument();
 
-        insertThreeSpansIntoFirstSegment(folio);
+        primary = new PrimaryWindow();
 
-        assertTrue(data.isModified());
+        insertThreeSpansIntoFirstSegment(primary);
+
+        assertTrue(primary.isModified());
 
         manuscript.saveDocument(folio);
-        assertFalse(data.isModified());
+        assertFalse(primary.isModified());
 
         /*
          * Now walk the undo/redo stack backwards and forwards past the new
          * (non-zero) save point to see if the modified behaviour holds.
          */
 
-        data.undo();
-        assertTrue(data.isModified());
+        primary.undo();
+        assertTrue(primary.isModified());
 
-        data.redo();
-        assertFalse(data.isModified());
+        primary.redo();
+        assertFalse(primary.isModified());
 
-        insertThreeSpansIntoFirstSegment(data);
-        assertTrue(data.isModified());
-        data.undo();
-        data.undo();
-        data.undo();
-        assertFalse(data.isModified());
+        insertThreeSpansIntoFirstSegment(primary);
+        assertTrue(primary.isModified());
+        primary.undo();
+        primary.undo();
+        primary.undo();
+        assertFalse(primary.isModified());
     }
 }

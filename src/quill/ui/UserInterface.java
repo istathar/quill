@@ -176,8 +176,7 @@ public class UserInterface
      * For now this starts at the first component, but presumably we want to
      * record somewhere what the last edited point was and start there
      * instead. We also need to instruct the PrimaryWindow about what
-     * navigation options it can offer. Which means maybe we should pass it
-     * the Folio?
+     * navigation options it can offer.
      */
     public void displayDocument(Manuscript manuscript, Folio folio) {
         primary.displayDocument(manuscript, folio);

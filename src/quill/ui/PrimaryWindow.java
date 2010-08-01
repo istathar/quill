@@ -754,7 +754,7 @@ class PrimaryWindow extends Window
     /**
      * Get the document being edited.
      */
-    Manuscript getDocument() {
-        return manuscript;
+    Folio getDocument() {
+        return folio;
     }
 }

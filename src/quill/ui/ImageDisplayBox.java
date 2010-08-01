@@ -29,6 +29,7 @@ import org.gnome.gtk.Stock;
 import org.gnome.gtk.VBox;
 
 import parchment.format.Manuscript;
+import quill.textbase.Folio;
 import quill.textbase.Segment;
 
 public class ImageDisplayBox extends VBox
@@ -41,6 +42,7 @@ public class ImageDisplayBox extends VBox
 
     public ImageDisplayBox(PrimaryWindow primary, Segment segment) {
         super(false, 0);
+        final Folio folio;
         final Manuscript manuscript;
         final String source, parentdir, filename;
         final int width;
@@ -56,7 +58,8 @@ public class ImageDisplayBox extends VBox
          */
 
         source = segment.getImage();
-        manuscript = primary.getDocument();
+        folio = primary.getDocument();
+        manuscript = folio.getManuscript();
         parentdir = manuscript.getDirectory();
 
         filename = parentdir + "/" + source;

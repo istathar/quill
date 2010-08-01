@@ -26,7 +26,6 @@ import parchment.format.ValidateManuscriptLoading;
 import parchment.format.ValidateManuscriptSerializing;
 import parchment.format.ValidateProperNewlineHandling;
 import parchment.format.ValidateThereAndBackAgain;
-import quill.client.ValidateDocumentModified;
 import quill.quack.ValidateCitationConversion;
 import quill.quack.ValidateEndnoteConversion;
 import quill.quack.ValidateTextChainToChapterConversion;
@@ -40,6 +39,7 @@ import quill.textbase.ValidateUnicode;
 import quill.textbase.ValidateWordExtraction;
 import quill.textbase.ValidateWrapperExpansions;
 import quill.ui.ValidateChangePropagation;
+import quill.ui.ValidateDocumentModified;
 import quill.ui.ValidateSpellingOperations;
 
 public class UnitTests
