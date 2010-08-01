@@ -63,11 +63,13 @@ public class ValidateFileNaming extends IOTestCase
     }
 
     public final void testChapterName() throws IOException {
+        final Manuscript manuscript;
         final Chapter chapter;
         final Series series;
         final File target;
 
-        chapter = new Chapter();
+        manuscript = new Manuscript();
+        chapter = new Chapter(manuscript);
         series = chapter.createDocument();
 
         try {
@@ -84,6 +86,12 @@ public class ValidateFileNaming extends IOTestCase
             // good
         }
 
+        try {
+            manuscript.setFilename("fake.parchment");
+        } catch (ImproperFilenameException e) {
+            fail("Fake; should have been ok");
+        }
+
         target = new File("tmp/unittests/parchment/format/chapter01.xml");
         target.delete();
         assertFalse(target.exists());
@@ -92,9 +100,8 @@ public class ValidateFileNaming extends IOTestCase
         try {
             chapter.setFilename(target.getPath());
         } catch (ImproperFilenameException e) {
-            fail("Shouldn't have thrown");
+            fail("Shouldn't have thrown\n" + e);
         }
-
     }
 
     public final void testChapterRelative() throws IOException {
@@ -103,29 +110,17 @@ public class ValidateFileNaming extends IOTestCase
         final Chapter chapter, another;
         final String relative, second;
 
-        chapter = new Chapter();
+        manuscript = new Manuscript();
+        chapter = new Chapter(manuscript);
 
         try {
-            chapter.setFilename("relative.xml");
-
+            manuscript.setFilename("tmp/unittests/parchment/format/ValidateFileNaming.parchment");
         } catch (ImproperFilenameException ife) {
             fail(ife.getMessage());
         }
 
         try {
-            chapter.getRelative();
-            fail("No parent Manuscript, so getRelative() should have been guarded");
-        } catch (IllegalStateException ise) {
-            // good
-        }
-
-        /*
-         * Ok, so how about
-         */
-
-        manuscript = new Manuscript();
-        try {
-            manuscript.setFilename("tmp/unittests/parchment/format/ValidateFileNaming.parchment");
+            chapter.setFilename("relative.xml");
         } catch (ImproperFilenameException ife) {
             fail(ife.getMessage());
         }

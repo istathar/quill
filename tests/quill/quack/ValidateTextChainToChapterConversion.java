@@ -28,8 +28,9 @@ import java.io.IOException;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import parchment.format.Chapter;
+import parchment.format.Manuscript;
 import quill.client.IOTestCase;
-import quill.textbase.Change;
+import quill.client.ImproperFilenameException;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.HeadingSegment;
@@ -43,13 +44,17 @@ import static quill.textbase.Span.createSpan;
 
 public class ValidateTextChainToChapterConversion extends IOTestCase
 {
-    public final void testLoadQuack() throws IOException, ValidityException, ParsingException {
+    public final void testLoadQuack() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
+        final Manuscript manuscript;
         final Chapter chapter;
         final Series series;
         final TextChain text;
 
-        chapter = new Chapter();
-        chapter.setFilename("tests/quill/quack/HelloWorld.xml");
+        manuscript = new Manuscript();
+        manuscript.setFilename("tests/quill/quack/HelloWorld.parchment"); // ignored
+        chapter = new Chapter(manuscript);
+        chapter.setFilename("HelloWorld.xml");
         series = chapter.loadDocument();
         assertEquals(2, series.size());
 
@@ -106,7 +111,6 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
     public final void testWriteComplexPara() throws IOException {
         final TextChain chain;
         final Span[] spans;
-        int offset;
         Segment segment;
         final QuackConverter converter;
         final ByteArrayOutputStream out;
@@ -134,7 +138,6 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         };
 
         chain = new TextChain();
-        offset = 0;
 
         for (Span span : spans) {
             chain.append(span);
@@ -177,13 +180,17 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         assertEquals(blob, out.toString());
     }
 
-    public final void testLoadComplexDocument() throws IOException, ValidityException, ParsingException {
+    public final void testLoadComplexDocument() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
+        final Manuscript manuscript;
         final Chapter chapter;
         final Series series;
         final TextChain chain;
 
-        chapter = new Chapter();
-        chapter.setFilename("tests/quill/quack/TemporaryFiles.xml");
+        manuscript = new Manuscript();
+        manuscript.setFilename("tests/quill/quack/HelloWorld.parchment"); // ignored
+        chapter = new Chapter(manuscript);
+        chapter.setFilename("TemporaryFiles.xml");
         series = chapter.loadDocument();
         assertEquals(2, series.size());
 
@@ -198,7 +205,6 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
     public final void testWriteUnicode() throws IOException {
         final TextChain chain;
         final Span span;
-        final Change change;
         Segment segment;
         final QuackConverter converter;
         final ByteArrayOutputStream out;

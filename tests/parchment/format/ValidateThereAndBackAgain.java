@@ -25,6 +25,7 @@ import java.io.IOException;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.client.IOTestCase;
+import quill.client.ImproperFilenameException;
 import quill.textbase.Series;
 
 /**
@@ -36,7 +37,8 @@ import quill.textbase.Series;
  */
 public class ValidateThereAndBackAgain extends IOTestCase
 {
-    public void testRoundTrip() throws IOException, ValidityException, ParsingException {
+    public void testRoundTrip() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
         final File source, target;
         final Chapter chapter;
         final Series series;
@@ -70,7 +72,8 @@ public class ValidateThereAndBackAgain extends IOTestCase
         assertTrue(msg, sum1.equals(sum2));
     }
 
-    public static void main(String[] args) throws IOException, ValidityException, ParsingException {
+    public static void main(String[] args) throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
         final Chapter chapter;
         final Series series;
         int i;

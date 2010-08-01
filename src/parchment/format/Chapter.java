@@ -62,15 +62,10 @@ public class Chapter
      */
     private String relative;
 
-    /**
-     * This is only for testing save operations around a single Chapter and
-     * it's .xml file.
-     */
-    Chapter() {
-        parent = null;
-    }
-
     public Chapter(Manuscript manuscript) {
+        if (manuscript == null) {
+            throw new IllegalArgumentException("Can't use a null Manuscript");
+        }
         parent = manuscript;
     }
 
@@ -134,14 +129,12 @@ public class Chapter
         final int i;
         int prefix;
 
-        if (parent == null) {
-            /*
-             * For historical reasons, we parent can be null to allow isolated
-             * testing of Chapters. But we'd better not hit this path in
-             * normal usage. This is guarded in getRelative().
-             */
-            return;
-        }
+        /*
+         * Ideally we'd only get relative paths passed in, and we do when
+         * loading a .parchment, but of who knows what a FileChooser will end
+         * up giving us. So we check that and use the Manuscript's directory
+         * if we were given something relative.
+         */
 
         directory = parent.getDirectory();
 
@@ -265,25 +258,12 @@ public class Chapter
     /**
      * Get the (relative) filename of this Chapter on disk.
      */
-    /*
-     * Should a Manuscript be an obligitory parent of each and every Chapter?
-     * It works out that way in practise, of course, but making that manditory
-     * would complciate test isolation.
-     */
     String getRelative() {
-        if (parent == null) {
-            throw new IllegalStateException("Chapter needs to be part of a Manuscript");
-        }
-
         return relative;
     }
 
     String getFilename() {
         final String directory;
-
-        if (parent == null) {
-            throw new IllegalStateException("Chapter needs to be part of a Manuscript");
-        }
 
         directory = parent.getDirectory();
 

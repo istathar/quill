@@ -24,7 +24,9 @@ import java.io.IOException;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import parchment.format.Chapter;
+import parchment.format.Manuscript;
 import quill.client.IOTestCase;
+import quill.client.ImproperFilenameException;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
 import quill.textbase.MarkerSpan;
@@ -50,7 +52,9 @@ public class ValidateEndnoteConversion extends IOTestCase
         assertEquals(Special.NOTE, span.getMarkup());
     }
 
-    public final void testInlineNote() throws IOException, ValidityException, ParsingException {
+    public final void testInlineNote() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
+        final Manuscript manuscript;
         final Chapter chapter;
         final Series series;
         Segment segment;
@@ -62,8 +66,10 @@ public class ValidateEndnoteConversion extends IOTestCase
 
         original = loadFileIntoString("tests/quill/quack/Endnote.xml");
 
-        chapter = new Chapter();
-        chapter.setFilename("tests/quill/quack/Endnote.xml");
+        manuscript = new Manuscript();
+        manuscript.setFilename("tests/quill/quack/ValidateEndnoteConversion.parchment");
+        chapter = new Chapter(manuscript);
+        chapter.setFilename("Endnote.xml");
         series = chapter.loadDocument();
 
         assertEquals(2, series.size());
@@ -106,8 +112,9 @@ public class ValidateEndnoteConversion extends IOTestCase
         assertEquals(original, result);
     }
 
-    public final void testManyNotes() throws IOException, ValidityException, ParsingException {
-        final String FILE;
+    public final void testManyNotes() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
+        final Manuscript manuscript;
         final Chapter chapter;
         final Series series;
         Segment segment;
@@ -116,12 +123,12 @@ public class ValidateEndnoteConversion extends IOTestCase
         final String original, result;
         int i;
 
-        FILE = "tests/quill/quack/Manynotes.xml";
+        original = loadFileIntoString("tests/quill/quack/Manynotes.xml");
 
-        original = loadFileIntoString(FILE);
-
-        chapter = new Chapter();
-        chapter.setFilename(FILE);
+        manuscript = new Manuscript();
+        manuscript.setFilename("tests/quill/quack/ValidateEndnoteConversion.parchment");
+        chapter = new Chapter(manuscript);
+        chapter.setFilename("Manynotes.xml");
 
         /*
          * Check the state is what we think it is
@@ -161,8 +168,9 @@ public class ValidateEndnoteConversion extends IOTestCase
      * Bug: for some reason, markup at the beginning of a following block is
      * being lost. This test demonstrates the problem.
      */
-    public final void testTwoBlockWithNote() throws IOException, ValidityException, ParsingException {
-        final String FILE1, FILE2;
+    public final void testTwoBlockWithNote() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
+        final Manuscript manuscript;
         final Chapter chapter;
         final Series series;
         Segment segment;
@@ -176,13 +184,12 @@ public class ValidateEndnoteConversion extends IOTestCase
         final String expected, result;
         int i;
 
-        FILE1 = "tests/quill/quack/Manynotes.xml";
-        FILE2 = "tests/quill/quack/Manynotes2.xml";
+        expected = loadFileIntoString("tests/quill/quack/Manynotes2.xml");
 
-        expected = loadFileIntoString(FILE2);
-
-        chapter = new Chapter();
-        chapter.setFilename(FILE1);
+        manuscript = new Manuscript();
+        manuscript.setFilename("tests/quill/quack/ValidateEndnoteConversion.parchment");
+        chapter = new Chapter(manuscript);
+        chapter.setFilename("Manynotes.xml");
 
         /*
          * Check the state is what we think it is

@@ -62,7 +62,14 @@ public class Manuscript
     /**
      * Create a new Manuscript intermediary.
      */
-    public Manuscript() {}
+    /*
+     * Initialize to empty to support Chapter only testing.
+     */
+    public Manuscript() {
+        directory = "";
+        basename = "";
+        filename = "";
+    }
 
     public Manuscript(String pathname) throws ImproperFilenameException {
         setFilename(pathname);
@@ -310,7 +317,6 @@ public class Manuscript
             tmp.delete();
             throw new IOException("Unable to rename temporary file to target document!");
         }
-
     }
 
     /**
