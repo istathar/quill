@@ -22,7 +22,6 @@ import java.io.IOException;
 
 import parchment.format.Manuscript;
 import quill.client.ImproperFilenameException;
-import quill.client.Quill;
 import quill.textbase.Change;
 import quill.textbase.Common;
 import quill.textbase.Folio;
@@ -98,24 +97,24 @@ public class ValidateDocumentModified extends GraphicalTestCase
         assertFalse(primary.isModified());
     }
 
-    public final void testSaveClearsModified() throws IOException, ImproperFilenameException {
+    public final void testSaveClearsModified() throws IOException, ImproperFilenameException,
+            SaveCancelledException {
         final Manuscript manuscript;
         final Folio folio;
-        final UserInterface ui;
         final PrimaryWindow primary;
 
         manuscript = new Manuscript();
         manuscript.setFilename("UncertaintyPrinciple.parchment");
         folio = manuscript.createDocument();
 
-        ui = Quill.getUserInterface();
         primary = new PrimaryWindow();
+        primary.displayDocument(folio);
 
         insertThreeSpansIntoFirstSegment(primary);
 
         assertTrue(primary.isModified());
 
-        manuscript.saveDocument(folio);
+        primary.saveDocument();
         assertFalse(primary.isModified());
 
         /*

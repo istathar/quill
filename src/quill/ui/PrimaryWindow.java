@@ -445,6 +445,7 @@ class PrimaryWindow extends Window
             throw new IllegalStateException();
         }
 
+        this.folio = folio;
         this.series = folio.getSeries(0);
 
         editor.initializeSeries(series);
