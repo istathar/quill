@@ -77,7 +77,6 @@ public class Quill
     static void loadDocumentFile(String filename) throws Exception {
         Manuscript manuscript;
         Folio folio;
-        PrimaryWindow primary;
 
         try {
             manuscript = new Manuscript(filename);
@@ -97,8 +96,7 @@ public class Quill
             folio = manuscript.loadDocument();
         }
 
-        primary = ui.createPrimaryWindow();
-        primary.displayDocument(folio);
+        ui.displayDocument(folio);
     }
 
     static void loadDocumentBlank() {
@@ -109,8 +107,7 @@ public class Quill
         manuscript = new Manuscript();
         folio = manuscript.createDocument();
 
-        // there a cleaner way to do this?
-        ui.displayDocument(manuscript, folio);
+        ui.displayDocument(folio);
     }
 
     /**

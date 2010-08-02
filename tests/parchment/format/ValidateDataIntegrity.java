@@ -27,6 +27,7 @@ import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
 import quill.textbase.Common;
 import quill.textbase.Extract;
+import quill.textbase.Folio;
 import quill.textbase.NormalSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
@@ -70,13 +71,17 @@ public class ValidateDataIntegrity extends IOTestCase
      * Bug where markup1markup2markup3 is loosing markup2!
      */
     public final void testContinuousMarkupChangesSave() throws IOException {
+        final Manuscript manuscript;
         final Chapter chapter;
+        final Folio folio;
         final Series series;
         final ByteArrayOutputStream out;
         final String expected;
 
-        chapter = new Chapter();
-        series = chapter.createDocument();
+        manuscript = new Manuscript();
+        folio = manuscript.createDocument();
+        series = folio.getSeries(0);
+        chapter = folio.getChapter(0);
 
         insertThreeSpansIntoFirstSegment(series);
 
@@ -103,6 +108,7 @@ public class ValidateDataIntegrity extends IOTestCase
      */
     public final void testContinuousMarkupChangesLoad() throws IOException, ValidityException,
             ParsingException, ImproperFilenameException {
+        final Manuscript manuscript;
         final Chapter chapter;
         final Span[] expected;
         final Series series;
@@ -118,8 +124,12 @@ public class ValidateDataIntegrity extends IOTestCase
                 createSpan("printf()", Common.LITERAL)
         };
 
-        chapter = new Chapter();
-        chapter.setFilename("tests/quill/quack/ContinuousMarkup.xml");
+        manuscript = new Manuscript();
+        manuscript.setFilename("tests/quill/quack/ValidateDataIntegrity.parchment"); // junk
+
+        chapter = new Chapter(manuscript);
+        chapter.setFilename("ContinuousMarkup.xml");
+
         series = chapter.loadDocument();
         segment = series.get(1);
         chain = segment.getText();
@@ -139,6 +149,7 @@ public class ValidateDataIntegrity extends IOTestCase
 
     public void testMarkupContinuingBetweenTextBlocks() throws ValidityException, ParsingException,
             IOException, ImproperFilenameException {
+        final Manuscript manuscript;
         final Chapter chapter;
         final Span[] inbound;
         final Series series;
@@ -156,8 +167,11 @@ public class ValidateDataIntegrity extends IOTestCase
                 createSpan(" Goodbye.", null),
         };
 
-        chapter = new Chapter();
-        chapter.setFilename("tests/quill/quack/TwoBlocksMarkup.xml");
+        manuscript = new Manuscript();
+        manuscript.setFilename("tests/quill/quack/ValidateDataIntegrity.parchment"); // junk
+
+        chapter = new Chapter(manuscript);
+        chapter.setFilename("TwoBlocksMarkup.xml");
         series = chapter.loadDocument();
         segment = series.get(1);
         chain = segment.getText();

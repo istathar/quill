@@ -31,8 +31,8 @@ import org.gnome.gtk.Test;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 
+import parchment.format.Chapter;
 import parchment.format.Manuscript;
-import quill.client.Quill;
 import quill.textbase.Change;
 import quill.textbase.Common;
 import quill.textbase.Extract;
@@ -40,6 +40,7 @@ import quill.textbase.Folio;
 import quill.textbase.FormatTextualChange;
 import quill.textbase.InsertTextualChange;
 import quill.textbase.Segment;
+import quill.textbase.Series;
 import quill.textbase.Span;
 import quill.textbase.TextChain;
 
@@ -47,12 +48,6 @@ import static quill.textbase.Span.createSpan;
 
 public class ValidateChangePropagation extends GraphicalTestCase
 {
-    private final UserInterface ui;
-
-    public ValidateChangePropagation() {
-        ui = Quill.getUserInterface();
-    }
-
     public final void testSetupBlank() throws ValidityException, ParsingException, IOException {
         final Manuscript manuscript;
         final Folio folio1, folio2;
@@ -70,7 +65,10 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
     public final void testInsertText() throws ValidityException, ParsingException, IOException {
         final Manuscript manuscript;
+        final Chapter chapter;
         final Folio folio;
+        final Series series;
+        final PrimaryWindow primary;
         final Segment segment;
         final TextChain chain;
         final Change change;
@@ -79,20 +77,22 @@ public class ValidateChangePropagation extends GraphicalTestCase
         final String expected;
 
         manuscript = new Manuscript();
-        ui = new UserInterface();
+        chapter = new Chapter(manuscript);
 
         folio = manuscript.createDocument();
-        ui.displayDocument(manuscript, folio);
+        primary = new PrimaryWindow();
+        primary.displayDocument(folio);
 
-        segment = folio.getSeries(0).get(1);
+        series = folio.getSeries(0);
+        segment = series.get(1);
         chain = segment.getText();
         span = createSpan('h', null);
 
         change = new InsertTextualChange(chain, 0, span);
-        ui.apply(change);
+        primary.apply(change);
 
         out = new ByteArrayOutputStream();
-        data.saveChapter(out);
+        chapter.saveDocument(series, out);
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -107,7 +107,10 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
     public final void skipReplaceText() throws ValidityException, ParsingException, IOException {
         final Manuscript manuscript;
+        final Chapter chapter;
         final Folio folio;
+        final Series series;
+        final PrimaryWindow primary;
         final Segment segment;
         final TextChain chain;
         Change change;
@@ -120,23 +123,26 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         manuscript = new Manuscript();
 
-        data.createManuscript();
-        folio = data.getActiveDocument();
-        ui.displayDocument(folio);
+        folio = manuscript.createDocument();
+        chapter = folio.getChapter(0);
+
+        primary = new PrimaryWindow();
+        primary.displayDocument(folio);
 
         /*
          * Establish some starting text.
          */
 
-        segment = folio.getSeries(0).get(1);
+        series = folio.getSeries(0);
+        segment = series.get(1);
         chain = segment.getText();
         span = createSpan("This is a test of the emergency broadcast system", null);
 
         change = new InsertTextualChange(chain, 0, span);
-        ui.apply(change);
+        primary.apply(change);
 
         out = new ByteArrayOutputStream();
-        data.saveChapter(out);
+        chapter.saveDocument(series, out);
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",

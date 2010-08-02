@@ -34,12 +34,15 @@ public class ValidateBlockquoteConversion extends TestCase
 {
     public final void testLoadDocbook() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
+        final Manuscript manuscript;
         final Chapter chapter;
         final Series series;
         Segment segment;
 
-        chapter = new Chapter();
-        chapter.setFilename("tests/quill/quack/Blockquote.xml");
+        manuscript = new Manuscript();
+        manuscript.setFilename("tests/quill/quack/ValidateBlockquoteConversion.parchment"); // junk
+        chapter = new Chapter(manuscript);
+        chapter.setFilename("Blockquote.xml");
         series = chapter.loadDocument();
 
         assertEquals(4, series.size());

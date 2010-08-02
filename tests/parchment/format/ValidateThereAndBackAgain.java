@@ -19,7 +19,6 @@
 package parchment.format;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import nu.xom.ParsingException;
@@ -39,24 +38,28 @@ public class ValidateThereAndBackAgain extends IOTestCase
 {
     public void testRoundTrip() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
+        final Manuscript manuscript;
         final File source, target;
         final Chapter chapter;
         final Series series;
-        final FileOutputStream out;
         final String msg;
         final String sum1, sum2;
 
         source = new File("tests/SomeOfEverything.xml");
         assertTrue(source.exists());
 
-        chapter = new Chapter();
-        chapter.setFilename(source.getPath());
+        manuscript = new Manuscript();
+        manuscript.setFilename("tests/NonExistent.parchment"); // junk
+        chapter = new Chapter(manuscript);
+        chapter.setFilename(source.getName());
         series = chapter.loadDocument();
 
-        target = new File("tmp/unittests/quill/quack/ValidateThereAndBackAgain.xml");
+        manuscript.setFilename("tmp/quill/quack/ValidateThereAndBackAgain.parchment"); // junk
+        chapter.setFilename("ValidateThereAndBackAgain.testRoundTrip.xml");
+        target = new File(chapter.getFilename());
         target.getParentFile().mkdirs();
-        out = new FileOutputStream(target);
-        chapter.saveDocument(series, out);
+
+        chapter.saveDocument(series);
 
         /*
          * Now run an hashing algorithm over both files to figure out if
@@ -74,11 +77,14 @@ public class ValidateThereAndBackAgain extends IOTestCase
 
     public static void main(String[] args) throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
+        final Manuscript manuscript;
         final Chapter chapter;
         final Series series;
         int i;
 
-        chapter = new Chapter();
+        manuscript = new Manuscript();
+        manuscript.setFilename("tests/ExampleProgram.parchment");
+        chapter = new Chapter(manuscript);
         chapter.setFilename("tests/SomeOfEverything.xml");
         series = chapter.loadDocument();
 

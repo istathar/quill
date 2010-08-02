@@ -109,7 +109,7 @@ public class ValidateDocumentModified extends GraphicalTestCase
         folio = manuscript.createDocument();
 
         ui = Quill.getUserInterface();
-        primary = ui.createPrimaryWindow(manuscript, folio);
+        primary = new PrimaryWindow();
 
         insertThreeSpansIntoFirstSegment(primary);
 

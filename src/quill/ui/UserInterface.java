@@ -49,6 +49,7 @@ import quill.client.ApplicationException;
 import quill.client.RecoveryFileExistsException;
 import quill.client.SafelyTerminateException;
 import quill.textbase.Extract;
+import quill.textbase.Folio;
 import quill.textbase.Span;
 
 import static quill.textbase.Span.createSpan;
@@ -178,10 +179,11 @@ public class UserInterface
      * instead. We also need to instruct the PrimaryWindow about what
      * navigation options it can offer.
      */
-    public void createPrimaryWindow() {
+    public void displayDocument(Folio folio) {
         final PrimaryWindow primary;
 
         primary = new PrimaryWindow();
+        primary.displayDocument(folio);
 
         primaries.add(primary);
     }
@@ -270,7 +272,6 @@ public class UserInterface
             primary.emergencySave();
         }
     }
-
 }
 
 class images

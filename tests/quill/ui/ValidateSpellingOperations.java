@@ -27,23 +27,24 @@ import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextTag;
 
+import parchment.format.Manuscript;
+import quill.client.Quill;
 import quill.textbase.Change;
 import quill.textbase.Common;
-import quill.textbase.DataLayer;
 import quill.textbase.Folio;
 import quill.textbase.InsertTextualChange;
 import quill.textbase.Segment;
 import quill.textbase.Span;
 import quill.textbase.TextChain;
 
-import static quill.client.Quill.ui;
 import static quill.textbase.Span.createSpan;
 
 public class ValidateSpellingOperations extends GraphicalTestCase
 {
     public final void testSpellingMarks() throws ValidityException, ParsingException, IOException {
-        final DataLayer data;
+        final Manuscript manuscript;
         final Folio folio;
+        final PrimaryWindow primary;
         final Segment segment;
         final TextChain chain;
         Change change;
@@ -56,12 +57,11 @@ public class ValidateSpellingOperations extends GraphicalTestCase
         TextTag[] tags;
         TextTag tag;
 
-        data = new DataLayer();
-        ui = new UserInterface(data);
+        manuscript = new Manuscript();
+        folio = manuscript.createDocument();
 
-        data.createManuscript();
-        folio = data.getActiveDocument();
-        ui.displayDocument(folio);
+        primary = new PrimaryWindow();
+        primary.displayDocument(folio);
 
         /*
          * Establish some starting text.
@@ -72,7 +72,7 @@ public class ValidateSpellingOperations extends GraphicalTestCase
         span = createSpan("Test emrgency bro𝑎dcast system", null);
 
         change = new InsertTextualChange(chain, 0, span);
-        ui.apply(change);
+        primary.apply(change);
 
         assertEquals("Test emrgency bro𝑎dcast system", chain.toString());
         assertEquals(30, chain.length());
@@ -84,7 +84,7 @@ public class ValidateSpellingOperations extends GraphicalTestCase
          * insert.
          */
 
-        editor = (EditorTextView) findEditor(ui.primary.getChild());
+        editor = (EditorTextView) findEditor(primary.getChild());
         buffer = editor.getBuffer();
         pointer = buffer.getIterStart();
 
@@ -154,8 +154,10 @@ public class ValidateSpellingOperations extends GraphicalTestCase
 
     public final void testNotSpellingBasedOnMarkup() throws ValidityException, ParsingException,
             IOException {
-        final DataLayer data;
+        final Manuscript manuscript;
         final Folio folio;
+        final UserInterface ui;
+        final PrimaryWindow primary;
         final Span[] spans;
         final Segment segment;
         final TextChain chain;
@@ -169,12 +171,11 @@ public class ValidateSpellingOperations extends GraphicalTestCase
         TextTag[] tags;
         TextTag tag;
 
-        data = new DataLayer();
-        ui = new UserInterface(data);
+        manuscript = new Manuscript();
+        primary = new PrimaryWindow();
 
-        data.createManuscript();
-        folio = data.getActiveDocument();
-        ui.displayDocument(folio);
+        folio = manuscript.createDocument();
+        primary.displayDocument(folio);
 
         /*
          * Establish some starting text.
@@ -192,7 +193,7 @@ public class ValidateSpellingOperations extends GraphicalTestCase
         for (i = 0, j = 0; i < spans.length; i++) {
             span = spans[i];
             change = new InsertTextualChange(chain, j, span);
-            ui.apply(change);
+            primary.apply(change);
             j += span.getWidth();
         }
 
@@ -203,6 +204,8 @@ public class ValidateSpellingOperations extends GraphicalTestCase
          * Verify that the thing we think is a spelling mistake actually is.
          */
 
+        ui = Quill.getUserInterface();
+
         assertFalse(ui.dict.check("dsmthng"));
 
         /*
@@ -210,7 +213,7 @@ public class ValidateSpellingOperations extends GraphicalTestCase
          * see what it has done.
          */
 
-        editor = (EditorTextView) findEditor(ui.primary.getChild());
+        editor = (EditorTextView) findEditor(primary.getChild());
         buffer = editor.getBuffer();
         pointer = buffer.getIterStart();
 
