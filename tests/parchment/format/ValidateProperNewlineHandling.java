@@ -77,7 +77,7 @@ public class ValidateProperNewlineHandling extends ParchmentTestCase
         /*
          * Now run conversion process.
          */
-        chapter = new Chapter();
+        chapter = new Chapter(manuscript);
 
         out = new ByteArrayOutputStream();
         chapter.saveDocument(series, out);
@@ -101,10 +101,13 @@ public class ValidateProperNewlineHandling extends ParchmentTestCase
 
     public final void testCatchDocumentKnownBroken() throws IOException, ValidityException,
             ParsingException, ImproperFilenameException {
+        final Manuscript manuscript;
         final Chapter chapter;
 
-        chapter = new Chapter();
-        chapter.setFilename("tests/quill/quack/IllegalNewlines.xml");
+        manuscript = new Manuscript();
+        manuscript.setFilename("tests/quill/quack/ValudateProperNewlineHandling.parchment"); // junk
+        chapter = new Chapter(manuscript);
+        chapter.setFilename("IllegalNewlines.xml");
         try {
             chapter.loadDocument();
             fail();
@@ -122,13 +125,16 @@ public class ValidateProperNewlineHandling extends ParchmentTestCase
      */
     public final void testBugOverlyLongInline() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
+        final Manuscript manuscript;
         final Chapter chapter;
         final Series series;
         final ByteArrayOutputStream out;
         final String expected;
 
-        chapter = new Chapter();
-        chapter.setFilename("tests/quill/quack/ReallyLongInlineLeadingBlock.xml");
+        manuscript = new Manuscript();
+        manuscript.setFilename("tests/quill/quack/ValudateProperNewlineHandling.parchment"); // junk
+        chapter = new Chapter(manuscript);
+        chapter.setFilename("ReallyLongInlineLeadingBlock.xml");
         series = chapter.loadDocument();
 
         out = new ByteArrayOutputStream();

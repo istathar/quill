@@ -23,9 +23,12 @@ import java.io.IOException;
 
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import parchment.format.Chapter;
+import parchment.format.InvalidDocumentException;
+import parchment.format.Manuscript;
 import quill.client.IOTestCase;
+import quill.client.ImproperFilenameException;
 import quill.textbase.ComponentSegment;
-import quill.textbase.DataLayer;
 import quill.textbase.Extract;
 import quill.textbase.MarkerSpan;
 import quill.textbase.NormalSegment;
@@ -48,9 +51,11 @@ public class ValidateCitationConversion extends IOTestCase
         assertEquals(Special.CITE, span.getMarkup());
     }
 
-    public final void testInlineCite() throws IOException, ValidityException, ParsingException {
+    public final void testInlineCite() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException, InvalidDocumentException {
         final String FILE;
-        final DataLayer data;
+        final Manuscript manuscript;
+        final Chapter chapter;
         final Series series;
         Segment segment;
         final TextChain chain;
@@ -64,10 +69,12 @@ public class ValidateCitationConversion extends IOTestCase
 
         original = loadFileIntoString(FILE);
 
-        data = new DataLayer();
-        data.loadChapter(FILE);
+        manuscript = new Manuscript();
+        manuscript.setFilename("tests/quill/quack/ValidateCitationConversion.parchment"); // junk
+        chapter = new Chapter(manuscript);
+        chapter.setFilename("Citation.xml");
+        series = chapter.loadDocument();
 
-        series = data.getActiveDocument().getSeries(0);
         assertEquals(2, series.size());
 
         segment = series.get(0);
