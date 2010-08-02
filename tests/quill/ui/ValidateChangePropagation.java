@@ -32,6 +32,7 @@ import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 
 import parchment.format.Manuscript;
+import quill.client.Quill;
 import quill.textbase.Change;
 import quill.textbase.Common;
 import quill.textbase.Extract;
@@ -42,11 +43,16 @@ import quill.textbase.Segment;
 import quill.textbase.Span;
 import quill.textbase.TextChain;
 
-import static quill.client.Quill.ui;
 import static quill.textbase.Span.createSpan;
 
 public class ValidateChangePropagation extends GraphicalTestCase
 {
+    private final UserInterface ui;
+
+    public ValidateChangePropagation() {
+        ui = Quill.getUserInterface();
+    }
+
     public final void testSetupBlank() throws ValidityException, ParsingException, IOException {
         final Manuscript manuscript;
         final Folio folio1, folio2;
@@ -113,7 +119,6 @@ public class ValidateChangePropagation extends GraphicalTestCase
         TextIter start, end;
 
         manuscript = new Manuscript();
-        ui = new UserInterface(manuscript);
 
         data.createManuscript();
         folio = data.getActiveDocument();

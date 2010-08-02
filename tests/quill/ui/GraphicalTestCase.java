@@ -27,6 +27,8 @@ import org.gnome.gtk.Container;
 import org.gnome.gtk.Gtk;
 import org.gnome.gtk.Widget;
 
+import quill.client.Quill;
+
 import static java.lang.Thread.sleep;
 
 /**
@@ -51,6 +53,7 @@ public abstract class GraphicalTestCase extends TestCase
         File target;
         final String DISPLAY;
         final Runtime runtime;
+        final UserInterface ui;
 
         if (initialized) {
             checkVirtualServerRunning();
@@ -130,6 +133,13 @@ public abstract class GraphicalTestCase extends TestCase
         });
 
         initialized = true;
+
+        /*
+         * Now setup the UserInterface singleton
+         */
+
+        ui = new UserInterface();
+        Quill.setUserInterface(ui);
     }
 
     private void checkVirtualServerRunning() {

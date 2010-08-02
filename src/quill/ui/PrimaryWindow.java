@@ -55,6 +55,7 @@ import parchment.format.Manuscript;
 import parchment.render.RenderEngine;
 import parchment.render.ReportRenderEngine;
 import quill.client.ImproperFilenameException;
+import quill.client.Quill;
 import quill.textbase.Change;
 import quill.textbase.ChangeStack;
 import quill.textbase.Folio;
@@ -64,7 +65,6 @@ import quill.textbase.Series;
 
 import static org.gnome.gtk.FileChooserAction.OPEN;
 import static org.gnome.gtk.FileChooserAction.SAVE;
-import static quill.client.Quill.ui;
 
 /**
  * The main application window, representing a single loaded (or brand new)
@@ -75,6 +75,9 @@ import static quill.client.Quill.ui;
 class PrimaryWindow extends Window
 {
     private Window window;
+
+    // convenience referece
+    private UserInterface ui;
 
     private VBox top;
 
@@ -179,6 +182,8 @@ class PrimaryWindow extends Window
 
     private void setupWindow() {
         final FontDescription desc;
+
+        ui = Quill.getUserInterface();
 
         window = this;
         window.setMaximize(true);
@@ -433,8 +438,8 @@ class PrimaryWindow extends Window
      * Show the nominated Series in this PrimaryWindow
      */
     // FIXME rename?
-    void displayDocument(Manuscript manuscript, Folio folio) {
-        this.manuscript = manuscript;
+    void displayDocument(Folio folio) {
+        this.manuscript = folio.getManuscript();
 
         if (folio.size() == 0) {
             throw new IllegalStateException();
@@ -679,7 +684,7 @@ class PrimaryWindow extends Window
             error.hide();
             return;
         }
-        this.displayDocument(manuscript, folio);
+        this.displayDocument(folio);
     }
 
     void saveAs() throws SaveCancelledException {

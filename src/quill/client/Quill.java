@@ -40,7 +40,7 @@ import quill.ui.UserInterface;
  */
 public class Quill
 {
-    public static UserInterface ui;
+    private static UserInterface ui;
 
     public static void main(String[] args) throws Exception {
         try {
@@ -77,6 +77,7 @@ public class Quill
     static void loadDocumentFile(String filename) throws Exception {
         Manuscript manuscript;
         Folio folio;
+        PrimaryWindow primary;
 
         try {
             manuscript = new Manuscript(filename);
@@ -96,7 +97,8 @@ public class Quill
             folio = manuscript.loadDocument();
         }
 
-        ui.displayDocument(manuscript, folio);
+        primary = ui.createPrimaryWindow();
+        primary.displayDocument(folio);
     }
 
     static void loadDocumentBlank() {
@@ -122,5 +124,19 @@ public class Quill
             t.printStackTrace();
             ui.emergencySave();
         }
+    }
+
+    public static UserInterface getUserInterface() {
+        if (ui == null) {
+            throw new Error("Not yet initialized");
+        }
+        return ui;
+    }
+
+    public static void setUserInterface(UserInterface instance) {
+        if (ui != null) {
+            throw new Error("UserInterface already initialized");
+        }
+        ui = instance;
     }
 }

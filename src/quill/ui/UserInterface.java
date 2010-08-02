@@ -23,6 +23,8 @@ package quill.ui;
  */
 
 import java.io.FileNotFoundException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.freedesktop.enchant.Dictionary;
 import org.freedesktop.enchant.Enchant;
@@ -43,19 +45,17 @@ import org.gnome.gtk.Settings;
 import org.gnome.gtk.Stock;
 import org.gnome.pango.FontDescription;
 
-import parchment.format.Manuscript;
 import quill.client.ApplicationException;
 import quill.client.RecoveryFileExistsException;
 import quill.client.SafelyTerminateException;
 import quill.textbase.Extract;
-import quill.textbase.Folio;
 import quill.textbase.Span;
 
 import static quill.textbase.Span.createSpan;
 
 public class UserInterface
 {
-    PrimaryWindow primary;
+    private Set<PrimaryWindow> primaries;
 
     Dictionary dict;
 
@@ -69,7 +69,7 @@ public class UserInterface
     }
 
     private void setupWindows() {
-        primary = new PrimaryWindow();
+        primaries = new HashSet<PrimaryWindow>(3);
     }
 
     private void loadImages() {
@@ -178,8 +178,12 @@ public class UserInterface
      * instead. We also need to instruct the PrimaryWindow about what
      * navigation options it can offer.
      */
-    public void displayDocument(Manuscript manuscript, Folio folio) {
-        primary.displayDocument(manuscript, folio);
+    public void createPrimaryWindow() {
+        final PrimaryWindow primary;
+
+        primary = new PrimaryWindow();
+
+        primaries.add(primary);
     }
 
     /**
@@ -193,9 +197,10 @@ public class UserInterface
     public void error(Exception e) {
         Dialog d;
 
-        if (primary != null) {
+        for (PrimaryWindow primary : primaries) {
             primary.hide();
         }
+
         e.printStackTrace();
 
         d = new ErrorMessageDialog(null, "Problem", e.getMessage());
@@ -206,7 +211,14 @@ public class UserInterface
     }
 
     public void focusEditor() {
-        primary.grabFocus();
+        /*
+         * Grabbing focus was the previous behaviour, and what we want. Is
+         * focus a window by window property, or is it app wide. If the
+         * former, then this is correct.
+         */
+        for (PrimaryWindow primary : primaries) {
+            primary.grabFocus();
+        }
     }
 
     private void loadDictionary() {
@@ -220,7 +232,7 @@ public class UserInterface
         final ResponseType response;
 
         if (ae instanceof RecoveryFileExistsException) {
-            dialog = new MessageDialog(primary, true, MessageType.WARNING, ButtonsType.NONE,
+            dialog = new MessageDialog(null, true, MessageType.WARNING, ButtonsType.NONE,
                     "Crash recovery file exists");
             cancel = new Button();
             cancel.setImage(new Image(Stock.CANCEL, IconSize.BUTTON));
@@ -254,7 +266,9 @@ public class UserInterface
     }
 
     public void emergencySave() {
-        primary.emergencySave();
+        for (PrimaryWindow primary : primaries) {
+            primary.emergencySave();
+        }
     }
 
 }

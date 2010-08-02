@@ -42,6 +42,7 @@ import org.gnome.gtk.TextWindowType;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.WrapMode;
 
+import quill.client.Quill;
 import quill.textbase.Change;
 import quill.textbase.Common;
 import quill.textbase.DeleteTextualChange;
@@ -67,7 +68,6 @@ import quill.textbase.TextualChange;
 import quill.textbase.WordVisitor;
 
 import static org.gnome.gtk.TextWindowType.TEXT;
-import static quill.client.Quill.ui;
 import static quill.ui.Format.spelling;
 import static quill.ui.Format.tagForMarkup;
 
@@ -95,11 +95,14 @@ abstract class EditorTextView extends TextView
      */
     private Segment segment;
 
-    private PrimaryWindow primary;
+    private final UserInterface ui;
+
+    private final PrimaryWindow primary;
 
     EditorTextView(PrimaryWindow primary, Segment segment) {
         super();
         this.view = this;
+        this.ui = Quill.getUserInterface();
         this.primary = primary;
         this.segment = segment;
 
