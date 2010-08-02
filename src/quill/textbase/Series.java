@@ -66,10 +66,10 @@ public class Series
     /**
      * Update the Series with the given Segment inserted at position.
      */
-    static Series insert(Series series, int position, Segment segment) {
+    Series insert(int position, Segment segment) {
         final Segment[] original, replacement;
 
-        original = series.segments;
+        original = this.segments;
 
         replacement = new Segment[original.length + 1];
 
@@ -83,10 +83,10 @@ public class Series
     /**
      * Remove the Segment at the given position.
      */
-    static Series delete(Series series, int position) {
+    Series delete(int position) {
         final Segment[] original, replacement;
 
-        original = series.segments;
+        original = this.segments;
 
         replacement = new Segment[original.length - 1];
 

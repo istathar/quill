@@ -29,7 +29,7 @@ public class SplitStructuralChange extends StructuralChange
         final TextChain original, twain;
         Extract tree;
         final int i, width;
-        final Series series;
+        Series series;
 
         /*
          * Grab the underlying TextChain, figure out an Extract with the
@@ -64,7 +64,7 @@ public class SplitStructuralChange extends StructuralChange
             twain.insert(0, tree);
             twin.setText(twain);
 
-            series.insert(i, twin);
+            series = series.insert(i, twin);
         }
 
         /*
@@ -72,11 +72,13 @@ public class SplitStructuralChange extends StructuralChange
          * insertion point.
          */
 
-        series.insert(i, added);
+        series = series.insert(i, added);
+
+        added.setParent(series);
     }
 
     protected void undo() {
-        final Series series;
+        Series series;
         TextChain original;
         int i;
         final Segment following;
@@ -107,10 +109,11 @@ public class SplitStructuralChange extends StructuralChange
             first = into.getText();
             first.insert(offset, tree);
 
-            series.delete(i);
+            series = series.delete(i);
             i--;
         }
 
-        series.delete(i);
+        series = series.delete(i);
+        into.setParent(series);
     }
 }
