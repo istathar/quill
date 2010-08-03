@@ -51,13 +51,13 @@ public class ValidateThereAndBackAgain extends IOTestCase
         manuscript = new Manuscript();
         manuscript.setFilename("tests/NonExistent.parchment"); // junk
         chapter = new Chapter(manuscript);
-        chapter.setFilename(source.getName());
+        chapter.setFilename("SomeOfEverything.xml");
         series = chapter.loadDocument();
 
-        manuscript.setFilename("tmp/quill/quack/ValidateThereAndBackAgain.parchment"); // junk
-        chapter.setFilename("ValidateThereAndBackAgain.testRoundTrip.xml");
+        ensureDirectory("tmp/unittests/parchment/format/");
+        manuscript.setFilename("tmp/unittests/parchment/format/ValidateThereAndBackAgain.parchment"); // junk
+        chapter.setFilename("testRoundTrip.xml");
         target = new File(chapter.getFilename());
-        target.getParentFile().mkdirs();
 
         chapter.saveDocument(series);
 

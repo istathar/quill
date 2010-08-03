@@ -32,6 +32,7 @@ import quill.textbase.Series;
 import quill.textbase.Span;
 import quill.textbase.TextChain;
 
+import static quill.client.IOTestCase.ensureDirectory;
 import static quill.textbase.Span.createSpan;
 
 public class ValidateDocumentModified extends GraphicalTestCase
@@ -104,7 +105,6 @@ public class ValidateDocumentModified extends GraphicalTestCase
         final PrimaryWindow primary;
 
         manuscript = new Manuscript();
-        manuscript.setFilename("UncertaintyPrinciple.parchment");
         folio = manuscript.createDocument();
 
         primary = new PrimaryWindow();
@@ -114,6 +114,8 @@ public class ValidateDocumentModified extends GraphicalTestCase
 
         assertTrue(primary.isModified());
 
+        ensureDirectory("tmp/unittests/quill/ui/");
+        manuscript.setFilename("tmp/unittests/quill/ui/ValidateDocumentModified.parchment");
         primary.saveDocument();
         assertFalse(primary.isModified());
 

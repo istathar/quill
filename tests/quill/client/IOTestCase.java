@@ -101,4 +101,13 @@ public abstract class IOTestCase extends TestCase
 
         return str.toString();
     }
+
+    public static void ensureDirectory(String path) {
+        File dir;
+
+        dir = new File(path);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+    }
 }
