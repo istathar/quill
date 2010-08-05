@@ -31,8 +31,8 @@ class HeadingEditorTextView extends EditorTextView
         desc.setSize(14.0);
     }
 
-    HeadingEditorTextView(PrimaryWindow primary, Segment segment) {
-        super(primary, segment);
+    HeadingEditorTextView(ComponentEditorWidget parent, Segment segment) {
+        super(parent, segment);
         view.modifyFont(desc);
     }
 

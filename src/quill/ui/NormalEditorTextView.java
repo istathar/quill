@@ -22,8 +22,8 @@ import quill.textbase.Segment;
 
 class NormalEditorTextView extends EditorTextView
 {
-    NormalEditorTextView(PrimaryWindow primary, Segment segment) {
-        super(primary, segment);
+    NormalEditorTextView(ComponentEditorWidget parent, Segment segment) {
+        super(parent, segment);
 
         view.modifyFont(fonts.serif);
 

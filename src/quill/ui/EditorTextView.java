@@ -99,11 +99,14 @@ abstract class EditorTextView extends TextView
 
     private final PrimaryWindow primary;
 
-    EditorTextView(PrimaryWindow primary, Segment segment) {
+    private final ComponentEditorWidget parent;
+
+    EditorTextView(ComponentEditorWidget parent, Segment segment) {
         super();
         this.view = this;
         this.ui = Quill.getUserInterface();
-        this.primary = primary;
+        this.primary = parent.getPrimary();
+        this.parent = parent;
         this.segment = segment;
 
         setupTextView();
@@ -438,18 +441,6 @@ abstract class EditorTextView extends TextView
                 return false;
             }
         });
-    }
-
-    // recursive
-    private static ComponentEditorWidget findComponentEditor(Widget widget) {
-        final Widget parent;
-
-        parent = widget.getParent();
-        if (parent instanceof ComponentEditorWidget) {
-            return (ComponentEditorWidget) parent;
-        } else {
-            return findComponentEditor(parent);
-        }
     }
 
     private void insertText(String text) {
@@ -912,9 +903,6 @@ abstract class EditorTextView extends TextView
          */
         view.connect(new Widget.ButtonPressEvent() {
             public boolean onButtonPressEvent(Widget source, EventButton event) {
-                final ComponentEditorWidget parent;
-
-                parent = findComponentEditor(view);
                 parent.setCursor(segment);
                 return false;
             }
@@ -1096,9 +1084,9 @@ abstract class EditorTextView extends TextView
     private void popupInsertMenu() {
         final Widget[] children;
         int i;
-        final Series series;
         final int len;
         final Segment next;
+        final Series series;
 
         /*
          * Turn off the type that the current Segment is
@@ -1120,7 +1108,7 @@ abstract class EditorTextView extends TextView
          */
 
         if (insertOffset == chain.length()) {
-            series = segment.getParent();
+            series = parent.getSeries();
             i = series.indexOf(segment);
             len = series.size();
 
@@ -1300,7 +1288,6 @@ abstract class EditorTextView extends TextView
 
     private boolean handleCursorUp() {
         TextIter pointer;
-        final ComponentEditorWidget parent;
         Rectangle position;
         int X, Y;
 
@@ -1323,19 +1310,16 @@ abstract class EditorTextView extends TextView
             buffer.placeCursor(pointer);
             return true;
         } else {
-            parent = findComponentEditor(view);
             parent.moveCursorUp(view, x);
             return true;
         }
     }
 
     private boolean handleCursorLeft() {
-        final ComponentEditorWidget parent;
 
         x = -1;
 
         if (insertOffset == 0) {
-            parent = findComponentEditor(view);
             parent.moveCursorUp(view, -1);
             return true;
         } else {
@@ -1345,7 +1329,6 @@ abstract class EditorTextView extends TextView
 
     private boolean handleCursorDown() {
         TextIter pointer;
-        final ComponentEditorWidget parent;
         Rectangle position;
         int X, Y;
 
@@ -1383,14 +1366,12 @@ abstract class EditorTextView extends TextView
             buffer.placeCursor(pointer);
             return true;
         } else {
-            parent = findComponentEditor(view);
             parent.moveCursorDown(view, x);
             return true;
         }
     }
 
     private boolean handleCursorRight() {
-        final ComponentEditorWidget parent;
         final int len;
 
         x = -1;
@@ -1398,7 +1379,6 @@ abstract class EditorTextView extends TextView
         len = chain.length();
 
         if (insertOffset == len) {
-            parent = findComponentEditor(view);
             parent.moveCursorDown(view, 0);
             return true;
         } else {
@@ -1411,7 +1391,6 @@ abstract class EditorTextView extends TextView
         final TextIter pointer;
         final Rectangle rect;
         final Allocation alloc;
-        final ComponentEditorWidget parent;
         final int y, Y, X;
 
         pointer = buffer.getIter(insertOffset);
@@ -1426,7 +1405,6 @@ abstract class EditorTextView extends TextView
         Y = alloc.getY() + rect.getY();
         y = view.convertBufferToWindowCoordsY(TEXT, Y);
 
-        parent = findComponentEditor(view);
         parent.movePageUp(x, y);
 
         return true;
@@ -1436,7 +1414,6 @@ abstract class EditorTextView extends TextView
         final TextIter pointer;
         final Rectangle rect;
         final Allocation alloc;
-        final ComponentEditorWidget parent;
         final int y, Y, X;
 
         pointer = buffer.getIter(insertOffset);
@@ -1451,25 +1428,18 @@ abstract class EditorTextView extends TextView
         Y = alloc.getY() + rect.getY();
         y = view.convertBufferToWindowCoordsY(TEXT, Y);
 
-        parent = findComponentEditor(view);
         parent.movePageDown(x, y);
 
         return true;
     }
 
     private boolean handleJumpHome() {
-        final ComponentEditorWidget parent;
-
-        parent = findComponentEditor(view);
         parent.moveCursorStart();
 
         return true;
     }
 
     private boolean handleJumpEnd() {
-        final ComponentEditorWidget parent;
-
-        parent = findComponentEditor(view);
         parent.moveCursorEnd();
 
         return true;
@@ -1477,14 +1447,12 @@ abstract class EditorTextView extends TextView
 
     private boolean handleJumpUp() {
         final TextIter pointer;
-        final ComponentEditorWidget parent;
 
         if (insertOffset == 0) {
             /*
              * TODO. It would be cool to place the cursor at the start of the
              * preceeding editor's last paragraph.
              */
-            parent = findComponentEditor(view);
             parent.moveCursorUp(view, -1);
         } else {
             pointer = buffer.getIter(insertOffset);
@@ -1504,14 +1472,12 @@ abstract class EditorTextView extends TextView
 
     private boolean handleJumpDown() {
         final TextIter pointer;
-        final ComponentEditorWidget parent;
 
         if (insertOffset == chain.length()) {
             /*
              * TODO. It would be cool to place the cursor at the end of the
              * following editor's first paragraph.
              */
-            parent = findComponentEditor(view);
             parent.moveCursorDown(view, 0);
         } else {
             pointer = buffer.getIter(insertOffset);

@@ -24,8 +24,8 @@ import quill.textbase.Segment;
 
 class PreformatEditorTextView extends EditorTextView
 {
-    PreformatEditorTextView(PrimaryWindow primary, Segment segment) {
-        super(primary, segment);
+    PreformatEditorTextView(ComponentEditorWidget parent, Segment segment) {
+        super(parent, segment);
 
         view.modifyFont(fonts.mono);
 

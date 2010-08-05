@@ -22,8 +22,8 @@ import quill.textbase.Segment;
 
 class QuoteEditorTextView extends EditorTextView
 {
-    QuoteEditorTextView(PrimaryWindow primary, Segment segment) {
-        super(primary, segment);
+    QuoteEditorTextView(ComponentEditorWidget parent, Segment segment) {
+        super(parent, segment);
 
         view.modifyFont(fonts.serif);
         view.setMarginLeft(40);
