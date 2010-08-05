@@ -80,6 +80,8 @@ class ComponentEditorWidget extends ScrolledWindow
      */
     private PrimaryWindow parent;
 
+    private Series series;
+
     ComponentEditorWidget(PrimaryWindow primary) {
         super();
         scroll = this;
@@ -129,7 +131,9 @@ class ComponentEditorWidget extends ScrolledWindow
         }
     }
 
-    private Series series;
+    Series getSeries() {
+        return series;
+    }
 
     PrimaryWindow getPrimary() {
         return parent;
@@ -203,15 +207,15 @@ class ComponentEditorWidget extends ScrolledWindow
         final ScrolledWindow wide;
 
         if (segment instanceof NormalSegment) {
-            editor = new NormalEditorTextView(parent, segment);
+            editor = new NormalEditorTextView(this, segment);
 
             result = editor;
         } else if (segment instanceof QuoteSegment) {
-            editor = new QuoteEditorTextView(parent, segment);
+            editor = new QuoteEditorTextView(this, segment);
 
             result = editor;
         } else if (segment instanceof PreformatSegment) {
-            editor = new PreformatEditorTextView(parent, segment);
+            editor = new PreformatEditorTextView(this, segment);
 
             wide = new ScrolledWindow();
             wide.setPolicy(PolicyType.AUTOMATIC, PolicyType.NEVER);
@@ -247,12 +251,12 @@ class ComponentEditorWidget extends ScrolledWindow
             editor = image.getEditor();
             result = image;
         } else if (segment instanceof HeadingSegment) {
-            heading = new SectionHeadingBox(parent, segment);
+            heading = new SectionHeadingBox(this, segment);
 
             editor = heading.getEditor();
             result = heading;
         } else if (segment instanceof ComponentSegment) {
-            heading = new ChapterHeadingBox(parent, segment);
+            heading = new ChapterHeadingBox(this, segment);
 
             editor = heading.getEditor();
             result = heading;
@@ -305,7 +309,6 @@ class ComponentEditorWidget extends ScrolledWindow
         final Segment first;
         final Segment added;
         final Segment third;
-        final Series series;
         final Widget[] children;
         int i;
         final Widget view;
@@ -323,6 +326,8 @@ class ComponentEditorWidget extends ScrolledWindow
              * Find the index of the view into the VBox.
              */
             structural = (StructuralChange) change;
+
+            this.series = structural.getSeries();
 
             first = structural.getInto();
             added = structural.getAdded();
@@ -359,8 +364,6 @@ class ComponentEditorWidget extends ScrolledWindow
              * second piece... unless we did the split at the end of the last
              * segment.
              */
-
-            series = first.getParent();
 
             if (children.length + 1 == series.size()) {
                 return;

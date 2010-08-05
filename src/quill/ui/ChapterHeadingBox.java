@@ -24,8 +24,8 @@ import quill.textbase.Segment;
 
 public class ChapterHeadingBox extends HeadingBox
 {
-    public ChapterHeadingBox(final PrimaryWindow primary, final Segment segment) {
-        super(primary, segment);
+    public ChapterHeadingBox(final ComponentEditorWidget parent, final Segment segment) {
+        super(parent, segment);
         final EditorTextView editor;
 
         label.setLabel("Chapter");
@@ -33,6 +33,9 @@ public class ChapterHeadingBox extends HeadingBox
         editor = this.getEditor();
         editor.buffer.connect(new TextBuffer.Changed() {
             public void onChanged(TextBuffer source) {
+                final PrimaryWindow primary;
+
+                primary = parent.getPrimary();
                 primary.updateTitle();
             }
         });

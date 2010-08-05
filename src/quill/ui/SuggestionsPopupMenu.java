@@ -28,7 +28,7 @@ import org.gnome.gtk.Requisition;
 import org.gnome.gtk.SeparatorMenuItem;
 import org.gnome.gtk.Stock;
 
-import static quill.client.Quill.ui;
+import quill.client.Quill;
 
 /**
  * Since Enchant can get a bit out of control with the suggestions it offers,
@@ -39,6 +39,8 @@ import static quill.client.Quill.ui;
  */
 class SuggestionsPopupMenu extends Menu
 {
+    private UserInterface ui;
+
     private Menu menu;
 
     private MenuItem.Activate picked;
@@ -48,6 +50,7 @@ class SuggestionsPopupMenu extends Menu
     SuggestionsPopupMenu() {
         super();
         menu = this;
+        ui = Quill.getUserInterface();
 
         picked = new MenuItem.Activate() {
             public void onActivate(MenuItem source) {
