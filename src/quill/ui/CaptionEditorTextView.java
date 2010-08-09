@@ -39,8 +39,8 @@ class CaptionEditorTextView extends EditorTextView
         desc.setStyle(Style.ITALIC);
     }
 
-    CaptionEditorTextView(PrimaryWindow primary, Segment segment) {
-        super(primary, segment);
+    CaptionEditorTextView(ComponentEditorWidget parent, Segment segment) {
+        super(parent, segment);
 
         view.modifyFont(desc);
         view.setMarginLeft(40);

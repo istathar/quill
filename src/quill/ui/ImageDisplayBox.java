@@ -40,8 +40,9 @@ public class ImageDisplayBox extends VBox
 
     private EditorTextView caption;
 
-    public ImageDisplayBox(PrimaryWindow primary, Segment segment) {
+    public ImageDisplayBox(ComponentEditorWidget parent, Segment segment) {
         super(false, 0);
+        final PrimaryWindow primary;
         final Folio folio;
         final Manuscript manuscript;
         final String source, parentdir, filename;
@@ -58,6 +59,8 @@ public class ImageDisplayBox extends VBox
          */
 
         source = segment.getImage();
+
+        primary = parent.getPrimary();
         folio = primary.getDocument();
         manuscript = folio.getManuscript();
         parentdir = manuscript.getDirectory();
@@ -81,7 +84,7 @@ public class ImageDisplayBox extends VBox
         image.setTooltipMarkup(tooltip);
         box.packStart(image, false, false, 0);
 
-        caption = new CaptionEditorTextView(primary, segment);
+        caption = new CaptionEditorTextView(parent, segment);
         box.packStart(caption, true, true, 0);
     }
 

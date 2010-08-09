@@ -188,6 +188,17 @@ public class UserInterface
         primaries.add(primary);
     }
 
+    // is this necessary?
+    PrimaryWindow[] getPrimaries() {
+        final PrimaryWindow[] result;
+        final int len;
+
+        len = primaries.size();
+        result = new PrimaryWindow[len];
+
+        return primaries.toArray(result);
+    }
+
     /**
      * Change the UI to report a (fatal) error condition.
      */

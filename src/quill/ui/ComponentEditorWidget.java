@@ -247,7 +247,7 @@ class ComponentEditorWidget extends ScrolledWindow
 
             result = wide;
         } else if (segment instanceof ImageSegment) {
-            image = new ImageDisplayBox(parent, segment);
+            image = new ImageDisplayBox(this, segment);
 
             editor = image.getEditor();
             result = image;

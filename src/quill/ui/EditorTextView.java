@@ -1624,7 +1624,7 @@ abstract class EditorTextView extends TextView
                 return false;
             }
 
-            popup = new SuggestionsPopupMenu();
+            popup = new SuggestionsPopupMenu(parent);
             popup.populateSuggestions(word);
 
             /*

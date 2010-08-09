@@ -41,16 +41,19 @@ class SuggestionsPopupMenu extends Menu
 {
     private UserInterface ui;
 
+    private PrimaryWindow primary;
+
     private Menu menu;
 
     private MenuItem.Activate picked;
 
     private SuggestionsPopupMenu.WordSelected handler;
 
-    SuggestionsPopupMenu() {
+    SuggestionsPopupMenu(ComponentEditorWidget parent) {
         super();
         menu = this;
         ui = Quill.getUserInterface();
+        primary = parent.getPrimary();
 
         picked = new MenuItem.Activate() {
             public void onActivate(MenuItem source) {
@@ -150,11 +153,10 @@ class SuggestionsPopupMenu extends Menu
         /*
          * Get the available height. We use the user's screen rather than the
          * parent window because there's nothing wrong with a popup menu
-         * overlapping (say) the gnome-panel. Just use the the UserInterface
-         * global as an easily available toplevel Window.
+         * overlapping (say) the gnome-panel.
          */
 
-        screen = ui.primary.getScreen();
+        screen = primary.getScreen();
         H = screen.getHeight();
 
         req = menu.getRequisition();
