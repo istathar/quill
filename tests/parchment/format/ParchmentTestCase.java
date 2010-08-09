@@ -35,10 +35,10 @@ public abstract class ParchmentTestCase extends IOTestCase
         return result;
     }
 
-    protected static Chapter createChapter() {
+    protected static Chapter createChapter(Manuscript manuscript) {
         final Chapter result;
 
-        result = new Chapter();
+        result = new Chapter(manuscript);
 
         return result;
     }

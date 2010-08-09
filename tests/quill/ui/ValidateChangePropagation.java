@@ -164,7 +164,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
          * apply Changes.
          */
 
-        editor = (EditorTextView) findEditor(ui.primary.getChild());
+        editor = (EditorTextView) findEditor(primary.getChild());
 
         buffer = editor.getBuffer();
         start = buffer.getIter(9);
@@ -189,7 +189,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
          */
 
         out = new ByteArrayOutputStream();
-        data.saveChapter(out);
+        chapter.saveDocument(series, out);
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -203,8 +203,11 @@ public class ValidateChangePropagation extends GraphicalTestCase
     }
 
     public final void skipFormatOnInsertion() throws ValidityException, ParsingException, IOException {
-        final DataLayer data;
+        final Manuscript manuscript;
+        final PrimaryWindow primary;
         final Folio folio;
+        final Chapter chapter;
+        final Series series;
         final Segment segment;
         final TextChain chain;
         Change change;
@@ -216,12 +219,12 @@ public class ValidateChangePropagation extends GraphicalTestCase
         final TextBuffer buffer;
         TextIter start;
 
-        data = new DataLayer();
-        ui = new UserInterface(data);
-
-        data.createManuscript();
-        folio = data.getActiveDocument();
-        ui.displayDocument(folio);
+        primary = new PrimaryWindow();
+        manuscript = new Manuscript();
+        folio = manuscript.createDocument();
+        primary.displayDocument(folio);
+        chapter = folio.getChapter(0);
+        series = folio.getSeries(0);
 
         /*
          * Establish some starting text.
@@ -232,15 +235,15 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         span = createSpan("This is a test of the emergency broadcast system", null);
         change = new InsertTextualChange(chain, 0, span);
-        ui.apply(change);
+        primary.apply(change);
 
         span = createSpan("emergency", null);
         extract = Extract.create(span);
         change = new FormatTextualChange(chain, 22, extract, Common.ITALICS);
-        ui.apply(change);
+        primary.apply(change);
 
         out = new ByteArrayOutputStream();
-        data.saveChapter(out);
+        chapter.saveDocument(series, out);
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -259,7 +262,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
          * insertMarkup in EditorTextView.
          */
 
-        editor = (EditorTextView) findEditor(ui.primary.getChild());
+        editor = (EditorTextView) findEditor(primary.getChild());
 
         buffer = editor.getBuffer();
         start = buffer.getIter(22);
@@ -274,7 +277,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         buffer.endUserAction();
 
         out = new ByteArrayOutputStream();
-        data.saveChapter(out);
+        chapter.saveDocument(series, out);
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -304,7 +307,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         buffer.endUserAction();
 
         out = new ByteArrayOutputStream();
-        data.saveChapter(out);
+        chapter.saveDocument(series, out);
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",

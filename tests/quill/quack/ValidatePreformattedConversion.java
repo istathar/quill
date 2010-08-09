@@ -21,12 +21,10 @@ package quill.quack;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import parchment.format.Manuscript;
 import quill.client.IOTestCase;
-import quill.textbase.Change;
 import quill.textbase.Common;
-import quill.textbase.DataLayer;
 import quill.textbase.Folio;
-import quill.textbase.InsertTextualChange;
 import quill.textbase.NormalSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
@@ -47,26 +45,21 @@ import static quill.textbase.Span.createSpan;
  */
 public class ValidatePreformattedConversion extends IOTestCase
 {
-    private static void build(DataLayer data, Segment segment, Span[] spans) {
+    private static void build(Segment segment, Span[] spans) {
         final TextChain chain;
-        int offset;
-        Change change;
 
         chain = new TextChain();
-        offset = 0;
 
         for (Span span : spans) {
-            change = new InsertTextualChange(chain, offset, span);
-            data.apply(change);
-            offset += span.getWidth();
+            chain.append(span);
         }
 
         segment.setText(chain);
     }
 
     public final void testWritePreformatting() throws IOException {
+        final Manuscript manuscript;
         final QuackConverter converter;
-        final DataLayer data;
         Span[] spans;
         Segment segment;
         final Folio folio;
@@ -76,9 +69,8 @@ public class ValidatePreformattedConversion extends IOTestCase
         final ByteArrayOutputStream out;
         final String blob;
 
-        data = new DataLayer();
-        data.createManuscript();
-        folio = data.getActiveDocument();
+        manuscript = new Manuscript();
+        folio = manuscript.createDocument();
         series = folio.getSeries(0);
 
         /*
@@ -91,7 +83,7 @@ public class ValidatePreformattedConversion extends IOTestCase
                     null)
         };
         segment = new NormalSegment();
-        build(data, segment, spans);
+        build(segment, spans);
 
         spans = new Span[] {
                 createSpan("public class Hello {", null),
@@ -101,7 +93,7 @@ public class ValidatePreformattedConversion extends IOTestCase
                 createSpan("}", null)
         };
         segment = new PreformatSegment();
-        build(data, segment, spans);
+        build(segment, spans);
 
         spans = new Span[] {
                 createSpan("There really isn't anything like saying ", null),
@@ -109,7 +101,7 @@ public class ValidatePreformattedConversion extends IOTestCase
                 createSpan(" to a nice friendly programmer.", null),
         };
         segment = new NormalSegment();
-        build(data, segment, spans);
+        build(segment, spans);
 
         /*
          * Now run conversion process.
