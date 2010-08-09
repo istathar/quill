@@ -32,26 +32,15 @@ public class Series
     private final Segment[] segments;
 
     public Series(List<Segment> segments) {
-        Segment[] result;
-        int i;
+        final Segment[] result;
 
         result = new Segment[segments.size()];
         segments.toArray(result);
-
-        for (i = 0; i < result.length; i++) {
-            result[i].setParent(this);
-        }
 
         this.segments = result;
     }
 
     Series(Segment[] segments) {
-        int i;
-
-        for (i = 0; i < segments.length; i++) {
-            segments[i].setParent(this);
-        }
-
         this.segments = segments;
     }
 

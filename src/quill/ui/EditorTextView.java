@@ -608,7 +608,7 @@ abstract class EditorTextView extends TextView
      * Change makes sense.
      */
     void affect(Change change) {
-        final StructuralChange structural;
+        final SplitStructuralChange structural;
         final TextualChange textual;
         final TextIter start, finish;
         final int offset;
@@ -616,8 +616,8 @@ abstract class EditorTextView extends TextView
         Extract r;
         int i;
 
-        if (change instanceof StructuralChange) {
-            structural = (StructuralChange) change;
+        if (change instanceof SplitStructuralChange) {
+            structural = (SplitStructuralChange) change;
 
             offset = structural.getOffset();
             start = buffer.getIter(offset);
@@ -1195,11 +1195,13 @@ abstract class EditorTextView extends TextView
      * user interface facades on PrimaryWindow.
      */
     private void handleInsertSegment(Segment addition) {
+        final Series series;
         final Change change;
 
+        series = parent.getSeries();
         addition.setText(new TextChain());
 
-        change = new SplitStructuralChange(segment, insertOffset, addition);
+        change = new SplitStructuralChange(series, segment, insertOffset, addition);
 
         primary.apply(change);
     }

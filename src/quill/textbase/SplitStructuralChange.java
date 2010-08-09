@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -20,16 +20,35 @@ package quill.textbase;
 
 public class SplitStructuralChange extends StructuralChange
 {
-    public SplitStructuralChange(Segment into, int offset, Segment added) {
-        super(into, offset, added);
+    private final Segment into;
+
+    private final int offset;
+
+    private final Segment added;
+
+    public SplitStructuralChange(Series before, Segment into, int offset, Segment added) {
+        super(before, computeSplit(before, into, offset, added));
+        this.into = into;
+        this.offset = offset;
+        this.added = added;
     }
 
-    protected void apply() {
+    /**
+     * Work out the shape of the new Series, and create it, but do not apply
+     * the changes to the underlying TextChains. That happens in apply().
+     */
+    /*
+     * The usual do the work before the constructor trick
+     */
+    private static Series computeSplit(Series before, Segment into, int offset, Segment added) {
         final Segment twin;
         final TextChain original, twain;
         Extract tree;
-        final int i, width;
+        int i;
+        final int width;
         Series series;
+
+        i = before.indexOf(into);
 
         /*
          * Grab the underlying TextChain, figure out an Extract with the
@@ -41,14 +60,12 @@ public class SplitStructuralChange extends StructuralChange
 
         if (offset == 0) {
             tree = null;
-            i = index;
         } else if (width == 0) {
             tree = null;
-            i = index + 1;
+            i++;
         } else {
             tree = original.extractRange(offset, width);
-            original.delete(offset, width);
-            i = index + 1;
+            i++;
         }
 
         /*
@@ -56,15 +73,15 @@ public class SplitStructuralChange extends StructuralChange
          * place the extracted Spans there, and then whack it into the Series.
          */
 
-        series = into.getParent();
-
         if (tree != null) {
             twin = into.createSimilar();
             twain = new TextChain();
             twain.insert(0, tree);
             twin.setText(twain);
 
-            series = series.insert(i, twin);
+            series = before.insert(i, twin);
+        } else {
+            series = before;
         }
 
         /*
@@ -72,48 +89,69 @@ public class SplitStructuralChange extends StructuralChange
          * insertion point.
          */
 
-        series = series.insert(i, added);
+        return series.insert(i, added);
+    }
 
-        added.setParent(series);
+    protected void apply() {
+        Series before, after;
+        TextChain chain;
+        int width;
+
+        before = super.getBefore();
+        after = super.getAfter();
+
+        /*
+         * There was a twain if there are 2 more segments, rather than 1 more.
+         */
+
+        if (before.size() + 2 == after.size()) {
+            chain = into.getText();
+            width = chain.length() - offset;
+            chain.delete(offset, width);
+        }
     }
 
     protected void undo() {
-        Series series;
-        TextChain original;
-        int i;
-        final Segment following;
-        final TextChain first, second, third;
-        final Node tree;
+        Series before, after;
+        Segment third;
+        TextChain chain;
+        int index;
+        Extract all;
 
-        series = into.getParent();
+        before = super.getBefore();
+        after = super.getAfter();
 
         /*
-         * Was this a splice or an insert? If a splice, then get the index of
-         * the second Segment. Then get the contents of the third Segment,
-         * then empty it.
+         * There was a twain if there are 2 more segments, rather than 1 more.
          */
 
-        if (offset == 0) {
-            i = 0;
-        } else if (index + 2 == series.size()) {
-            i = index + 1;
-        } else {
-            i = index + 2;
+        if (before.size() + 2 == after.size()) {
+            index = after.indexOf(added);
 
-            following = series.get(i);
-            third = following.getText();
-            tree = third.extractAll();
+            third = after.get(index + 1);
+            chain = third.getText();
+            all = chain.extractAll();
 
-            third.delete(0, tree.getWidth());
-
-            first = into.getText();
-            first.insert(offset, tree);
-
-            series = series.delete(i);
-            i--;
+            chain = into.getText();
+            chain.insert(offset, all);
         }
+    }
 
-        series = series.delete(i);
-        into.setParent(series);
+    public Segment getInto() {
+        return into;
+    }
+
+    /**
+     * Offset into <code>into</code> that the split occured. Special cases are
+     * <code>0</code> which indicates an prepend at the beginning of the
+     * <code>into</code> Segment, and <code>-1</code> as the marker that an
+     * append after happened.
+     */
+    public int getOffset() {
+        return offset;
+    }
+
+    public Segment getAdded() {
+        return added;
     }
 }

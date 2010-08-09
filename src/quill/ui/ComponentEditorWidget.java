@@ -41,6 +41,7 @@ import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
+import quill.textbase.SplitStructuralChange;
 import quill.textbase.StructuralChange;
 import quill.textbase.TextualChange;
 
@@ -305,14 +306,7 @@ class ComponentEditorWidget extends ScrolledWindow
      * in this ComponentEditorWidget.
      */
     void affect(Change change) {
-        final StructuralChange structural;
         final Segment first;
-        final Segment added;
-        final Segment third;
-        final Widget[] children;
-        int i;
-        final Widget view;
-        Widget widget;
         EditorTextView editor;
 
         if (change instanceof TextualChange) {
@@ -321,72 +315,84 @@ class ComponentEditorWidget extends ScrolledWindow
             editor.affect(change);
 
         } else if (change instanceof StructuralChange) {
-
-            /*
-             * Find the index of the view into the VBox.
-             */
-            structural = (StructuralChange) change;
-
-            this.series = structural.getSeries();
-
-            first = structural.getInto();
-            added = structural.getAdded();
-
-            view = lookup(first);
-
-            children = box.getChildren();
-
-            for (i = 0; i < children.length; i++) {
-                if (doesContainerHaveChild(children[i], view)) {
-                    break;
-                }
+            if (change instanceof SplitStructuralChange) {
+                affect((SplitStructuralChange) change);
+            } else {
+                throw new UnsupportedOperationException("\n"
+                        + "Coverage needed for this StructuralChange type");
             }
-
-            if (i == children.length) {
-                throw new IllegalArgumentException("\n" + "view not in this ComponentEditorWidget");
-            }
-
-            /*
-             * Create the new editor
-             */
-
-            widget = createEditorForSegment(added);
-
-            box.packStart(widget, false, false, 0);
-            i++;
-            box.reorderChild(widget, i);
-            widget.showAll();
-            editor = (EditorTextView) lookup(added);
-            editor.grabFocus();
-
-            /*
-             * Split the old one in two pieces, adding a new editor for the
-             * second piece... unless we did the split at the end of the last
-             * segment.
-             */
-
-            if (children.length + 1 == series.size()) {
-                return;
-            }
-
-            if (i + 1 == series.size()) {
-                return;
-            }
-
-            third = series.get(i + 1);
-            widget = createEditorForSegment(third);
-            box.packStart(widget, false, false, 0);
-            i++;
-            box.reorderChild(widget, i);
-            widget.showAll();
-
-            /*
-             * Delete the third text out of the first.
-             */
-
-            editor = (EditorTextView) view;
-            editor.affect(change);
         }
+    }
+
+    private void affect(final SplitStructuralChange change) {
+        final Segment first, added, third;
+        final Widget[] children;
+        int i;
+        final Widget view;
+        Widget widget;
+        EditorTextView editor;
+
+        /*
+         * Find the index of the view into the VBox.
+         */
+        this.series = change.getAfter();
+
+        first = change.getInto();
+        added = change.getAdded();
+
+        view = lookup(first);
+
+        children = box.getChildren();
+
+        for (i = 0; i < children.length; i++) {
+            if (doesContainerHaveChild(children[i], view)) {
+                break;
+            }
+        }
+        if (i == children.length) {
+            throw new IllegalArgumentException("\n" + "view not in this ComponentEditorWidget");
+        }
+
+        /*
+         * Create the new editor
+         */
+
+        widget = createEditorForSegment(added);
+
+        box.packStart(widget, false, false, 0);
+        i++;
+        box.reorderChild(widget, i);
+        widget.showAll();
+        editor = (EditorTextView) lookup(added);
+        editor.grabFocus();
+
+        /*
+         * Split the old one in two pieces, adding a new editor for the second
+         * piece... unless we did the split at the end of the last segment.
+         */
+
+        if (children.length + 1 == series.size()) {
+            return;
+        }
+
+        if (i + 1 == series.size()) {
+            return;
+        }
+
+        third = series.get(i + 1);
+        widget = createEditorForSegment(third);
+        box.packStart(widget, false, false, 0);
+        i++;
+        box.reorderChild(widget, i);
+        widget.showAll();
+
+        /*
+         * Delete the third text out of the first.
+         */
+
+        editor = (EditorTextView) view;
+        editor.affect(change);
+
     }
 
     void reverse(Change change) {

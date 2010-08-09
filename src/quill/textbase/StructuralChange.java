@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -23,58 +23,24 @@ package quill.textbase;
  * 
  * @author Andrew Cowie
  */
+// immutable
 public abstract class StructuralChange extends Change
 {
-    final int index;
+    private final Series before;
 
-    final Segment into;
+    private final Series after;
 
-    final int offset;
-
-    final Segment added;
-
-    StructuralChange(Segment into, int offset, Segment added) {
-        super(into);
-
-        final Series series;
-        int i;
-
-        series = into.getParent();
-        this.into = into;
-        this.offset = offset;
-
-        added.setParent(series);
-        this.added = added;
-
-        for (i = 0; i < series.size(); i++) {
-            if (series.get(i) == into) {
-                this.index = i;
-                return;
-            }
-        }
-
-        throw new IllegalStateException();
+    StructuralChange(final Series before, final Series after) {
+        super(null); // FIXME
+        this.before = before;
+        this.after = after;
     }
 
-    public Segment getInto() {
-        return into;
+    public Series getBefore() {
+        return before;
     }
 
-    /**
-     * Offset into <code>into</code> that the split occured. Special cases are
-     * <code>0</code> which indicates an prepend at the beginning of the
-     * <code>into</code> Segment, and <code>-1</code> as the marker that an
-     * append after happened.
-     */
-    public int getOffset() {
-        return offset;
+    public Series getAfter() {
+        return after;
     }
-
-    public Segment getAdded() {
-        return added;
-    }
-
-    // public Segment getTwain() {
-    // return twain;
-    // }
 }

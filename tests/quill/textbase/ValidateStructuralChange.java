@@ -74,7 +74,7 @@ public class ValidateStructuralChange extends TestCase
         final Series before, after;
         final Segment inserted;
         TextChain chain;
-        final Change change;
+        final StructuralChange change;
 
         before = new Series(segments);
         assertEquals(3, before.size());
@@ -83,10 +83,10 @@ public class ValidateStructuralChange extends TestCase
         chain = new TextChain("cruel() ");
         inserted.setText(chain);
 
-        change = new SplitStructuralChange(segments[2], 6, inserted);
+        change = new SplitStructuralChange(before, segments[2], 6, inserted);
         change.apply();
 
-        after = chain.getEnclosingSegment().getParent();
+        after = change.getAfter();
 
         assertEquals(5, after.size());
         assertSame(after.get(0), segments[0]);
@@ -98,31 +98,37 @@ public class ValidateStructuralChange extends TestCase
     }
 
     public final void testRevertStructuralChange() {
-        final Series series;
+        final Series series, one, two;
         final Segment inserted;
         TextChain chain;
-        final Change change;
+        final StructuralChange change;
 
         series = new Series(segments);
         assertEquals(3, series.size());
+        assertEquals("Chapter 1The beginningHello World", concatonate(series));
 
         inserted = new PreformatSegment();
         chain = new TextChain("cruel() ");
         inserted.setText(chain);
 
-        change = new SplitStructuralChange(segments[2], 6, inserted);
+        change = new SplitStructuralChange(series, segments[2], 6, inserted);
         change.apply();
+        one = change.getAfter();
+        assertNotSame(series, one);
+        assertEquals("Chapter 1The beginningHello cruel() World", concatonate(one));
 
         change.undo();
+        two = change.getBefore();
+        assertSame(series, two);
 
-        assertEquals("Chapter 1The beginningHello World", concatonate(series));
+        assertEquals("Chapter 1The beginningHello World", concatonate(two));
     }
 
     public final void testSpliceSameSegmentEnd() {
         final Series before, middle, after;
         final Segment inserted;
         TextChain chain;
-        final Change change;
+        final StructuralChange change;
 
         before = new Series(segments);
         assertEquals(3, before.size());
@@ -131,10 +137,10 @@ public class ValidateStructuralChange extends TestCase
         chain = new TextChain("save()");
         inserted.setText(chain);
 
-        change = new SplitStructuralChange(segments[2], 11, inserted);
+        change = new SplitStructuralChange(before, segments[2], 11, inserted);
         change.apply();
 
-        middle = chain.getEnclosingSegment().getParent();
+        middle = change.getAfter();
 
         assertEquals(4, middle.size());
         assertSame(middle.get(0), segments[0]);
@@ -145,7 +151,8 @@ public class ValidateStructuralChange extends TestCase
 
         change.undo();
 
-        after = chain.getEnclosingSegment().getParent();
+        // IMPROVE
+        after = change.getBefore();
         assertEquals("Chapter 1The beginningHello World", concatonate(after));
     }
 
@@ -153,7 +160,7 @@ public class ValidateStructuralChange extends TestCase
         Series series;
         final Segment inserted;
         final TextChain chain;
-        final Change change;
+        final StructuralChange change;
 
         series = new Series(segments);
         assertEquals(3, series.size());
@@ -162,10 +169,10 @@ public class ValidateStructuralChange extends TestCase
         chain = new TextChain("init()");
         inserted.setText(chain);
 
-        change = new SplitStructuralChange(segments[0], 0, inserted);
+        change = new SplitStructuralChange(series, segments[0], 0, inserted);
         change.apply();
 
-        series = chain.getEnclosingSegment().getParent();
+        series = change.getAfter();
         assertEquals(4, series.size());
         assertTrue(series.get(0) instanceof PreformatSegment);
         assertSame(series.get(1), segments[0]);
@@ -176,7 +183,8 @@ public class ValidateStructuralChange extends TestCase
 
         change.undo();
 
-        series = chain.getEnclosingSegment().getParent();
+        // IMPROVE
+        series = change.getBefore();
         assertEquals("Chapter 1The beginningHello World", concatonate(series));
     }
 }

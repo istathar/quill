@@ -31,16 +31,16 @@ class HeadingBox extends HBox
 
     protected Label label;
 
-    public HeadingBox(PrimaryWindow primary, Segment segment) {
+    public HeadingBox(ComponentEditorWidget parent, Segment segment) {
         super(false, 0);
 
-        setupBox(primary, segment);
+        setupBox(parent, segment);
     }
 
-    private void setupBox(PrimaryWindow primary, Segment segment) {
+    private void setupBox(ComponentEditorWidget parent, Segment segment) {
         box = this;
 
-        title = new HeadingEditorTextView(primary, segment);
+        title = new HeadingEditorTextView(parent, segment);
         box.packStart(title, true, true, 0);
 
         label = new Label();
