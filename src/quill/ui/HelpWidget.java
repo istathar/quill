@@ -20,6 +20,8 @@ package quill.ui;
 
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
+import org.gnome.gtk.PolicyType;
+import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.VBox;
 
@@ -40,8 +42,10 @@ import static org.gnome.gtk.SizeGroupMode.HORIZONTAL;
  * 
  * @author Andrew Cowie
  */
-class HelpWidget extends HBox
+class HelpWidget extends ScrolledWindow
 {
+    private final ScrolledWindow scroll;
+
     private final HBox top;
 
     private VBox vbox;
@@ -49,9 +53,14 @@ class HelpWidget extends HBox
     private final SizeGroup group;
 
     HelpWidget() {
-        super(true, 0);
+        super();
         final String[][] views, actions, editing, markup;
-        top = this;
+
+        top = new HBox(true, 0);
+
+        scroll = this;
+        scroll.addWithViewport(top);
+        scroll.setPolicy(PolicyType.AUTOMATIC, PolicyType.AUTOMATIC);
 
         views = new String[][] {
                 new String[] {
