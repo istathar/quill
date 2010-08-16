@@ -48,6 +48,14 @@ public class TextChain
         root = Node.createNode(initial);
     }
 
+    public TextChain(Extract all) {
+        if (all instanceof Node) {
+            root = (Node) all;
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
     /**
      * The length of this Text, in characters.
      */
@@ -98,14 +106,14 @@ public class TextChain
     /**
      * Insert the given Java String at the specified offset.
      */
-    protected void insert(int offset, String what) {
+    void insert(int offset, String what) {
         insert(offset, Span.createSpan(what, null));
     }
 
     /**
      * Insert the given tree of Spans at the specified offset.
      */
-    protected void insert(int offset, Extract extract) {
+    public void insert(int offset, Extract extract) {
         final Node tree;
 
         if (offset < 0) {
@@ -123,7 +131,7 @@ public class TextChain
     /**
      * Splice a Span into the TextChain.
      */
-    void insert(int offset, Span addition) {
+    public void insert(int offset, Span addition) {
         if (offset < 0) {
             throw new IndexOutOfBoundsException();
         }
@@ -144,7 +152,7 @@ public class TextChain
      * DeleteChange, this will duplicate effort. So, TODO create one which
      * passes in a tree of the known bit to be removed.
      */
-    protected void delete(final int offset, final int wide) {
+    public void delete(final int offset, final int wide) {
         final Node preceeding, following;
         final int start, across;
 
@@ -384,22 +392,6 @@ public class TextChain
         }
 
         return nodes;
-    }
-
-    private Segment belongs;
-
-    /**
-     * Tell this TextChain what Segment it belongs to
-     */
-    void setEnclosingSegment(Segment segment) {
-        this.belongs = segment;
-    }
-
-    /**
-     * Get the Segment that this TextChain is backing
-     */
-    Segment getEnclosingSegment() {
-        return belongs;
     }
 
     // FIXME doc
