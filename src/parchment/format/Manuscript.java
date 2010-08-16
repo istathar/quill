@@ -187,7 +187,7 @@ public class Manuscript
      * check to make sure there isn't a RESCUED file lurking. Throws
      * RecoveryFileExistsException if one does.
      */
-    public File checkFilename() throws FileNotFoundException, RecoveryFileExistsException {
+    public void checkFilename() throws FileNotFoundException, RecoveryFileExistsException {
         final File source, probe;
 
         source = new File(filename).getAbsoluteFile();
@@ -199,8 +199,6 @@ public class Manuscript
         if (probe.exists()) {
             throw new RecoveryFileExistsException(probe.toString());
         }
-
-        return source;
     }
 
     /**
@@ -326,8 +324,8 @@ public class Manuscript
      * anything of its own.
      */
     public void emergencySave(final Folio folio) {
-        final String savename;
-        File target = null;
+        File marker;
+        boolean result;
         Chapter chapter;
         Series series;
         final PrintStream err;
@@ -335,45 +333,38 @@ public class Manuscript
 
         err = System.err;
         err.flush();
-        err.print("Attempting emergency save... ");
+        err.println("Attempting emergency save... ");
         err.flush();
 
-        if (filename == null) {
-            filename = "Untitled.xml"; // gotta call it something
-        }
+        /*
+         * Manuscripts are so simplistic we don't bother trying to write one
+         * out. We do leave a marker file.
+         */
 
+        marker = new File(filename + ".RESCUED");
         try {
-            savename = filename + ".RESCUED";
-            target = new File(savename);
-
-            if (target.exists()) {
-                err.println("inhibited.");
-                err.println("There's already a recovery file,\n" + savename + "\n"
-                        + "and we're not going to overwrite it.");
-                return;
-            }
-
-            for (i = 0; i < folio.size(); i++) {
-                chapter = folio.getChapter(i);
-                series = folio.getSeries(i);
-
-                chapter.saveDocument(series);
-            }
-        } catch (Throwable t) {
-            // well, we tried
-            err.println("failed.");
-            err.flush();
-
-            if (target != null) {
-                target.delete();
-            }
-
-            t.printStackTrace(err);
+            result = marker.createNewFile();
+        } catch (IOException e) {
+            result = false;
+        }
+        if (!result) {
+            err.println("Inhibited.");
             return;
         }
 
-        err.println("done. Wrote:");
-        err.println(savename);
+        /*
+         * Now the important part: Chapter content. Attmept to serialize each
+         * one out.
+         */
+
+        for (i = 0; i < folio.size(); i++) {
+            chapter = folio.getChapter(i);
+            series = folio.getSeries(i);
+
+            chapter.emergencySave(series, err, i);
+        }
+
+        err.println("Done.");
         err.flush();
     }
 }

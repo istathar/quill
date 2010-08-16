@@ -225,7 +225,7 @@ class PrimaryWindow extends Window
         outline = new OutlineWidget();
         right.add(outline);
 
-        two.packStart(right, false, false, 0);
+        two.packStart(right, true, true, 0);
     }
 
     private void initialPresentation() {

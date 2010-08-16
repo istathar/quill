@@ -53,7 +53,25 @@ public class Series
     }
 
     /**
-     * Update the Series with the given Segment inserted at position.
+     * Create a new Series by changing the Segment at position.
+     */
+    Series update(int position, Segment segment) {
+        final Segment[] original, replacement;
+
+        original = this.segments;
+
+        replacement = new Segment[original.length];
+
+        System.arraycopy(original, 0, replacement, 0, position);
+        replacement[position] = segment;
+        System.arraycopy(original, position + 1, replacement, position + 1, original.length - position
+                - 1);
+
+        return new Series(replacement);
+    }
+
+    /**
+     * Grow the Series by inserting the given Segment at position.
      */
     Series insert(int position, Segment segment) {
         final Segment[] original, replacement;
