@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,10 +36,13 @@ import quill.quack.QuackConverter;
 import quill.quack.QuackLoader;
 import quill.quack.QuackNodeFactory;
 import quill.textbase.ComponentSegment;
+import quill.textbase.Extract;
 import quill.textbase.NormalSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
-import quill.textbase.TextChain;
+import quill.textbase.Span;
+
+import static java.lang.String.format;
 
 /**
  * A chapter on disk in an .xml file containing a <chapter> root element.
@@ -71,17 +75,19 @@ public class Chapter
 
     public Series createDocument() {
         final Segment heading, para;
-        TextChain chain;
+        Span span;
+        Extract entire;
         final List<Segment> list;
         final Series result;
 
         heading = new ComponentSegment();
-        chain = new TextChain();
-        heading.setText(chain);
+        span = Span.createSpan("Chapter", null);
+        entire = Extract.create(span);
+        heading.setText(entire);
 
         para = new NormalSegment();
-        chain = new TextChain();
-        para.setText(chain);
+        entire = Extract.create(null);
+        para.setText(entire);
 
         list = new ArrayList<Segment>(2);
         list.add(heading);
@@ -98,7 +104,7 @@ public class Chapter
      */
     public Series loadDocument() throws ValidityException, ParsingException, IOException {
         final String filename;
-        final File source;
+        final File source, probe;
         final NodeFactory factory;
         final Builder parser;
         final Document doc;
@@ -106,6 +112,22 @@ public class Chapter
         final Series series;
 
         filename = this.getFilename();
+
+        /*
+         * Safety check. FIXME This is actually horrible; we should checking
+         * for all the recovery files at once in Manuscript's checkFilename(),
+         * but that implies doing some kind of recursive search for such files
+         * [ugly] or already having loaded the .parchment file [also ugly].
+         * Throwing an unchecked exception for something the user did wrong is
+         * WRONG.
+         */
+
+        probe = new File(filename + ".RESCUED");
+        if (probe.exists()) {
+            throw new UnsupportedOperationException("\n" + "There's still a recovery file," + "\n"
+                    + probe.getPath());
+        }
+
         source = new File(filename);
 
         factory = new QuackNodeFactory();
@@ -268,5 +290,45 @@ public class Chapter
         directory = parent.getDirectory();
 
         return directory + "/" + relative;
+    }
+
+    void emergencySave(Series series, PrintStream err, int index) {
+        final String savename;
+        File target = null;
+        final OutputStream out;
+
+        if (relative == null) {
+            // gotta call it something
+            relative = "Untitled" + format("%02d", index) + ".xml";
+        }
+
+        try {
+            savename = getFilename() + ".RESCUED";
+            target = new File(savename);
+
+            err.println(savename);
+
+            if (target.exists()) {
+                err.println("Inhibited.");
+                err.println("There's already a recovery file, and we're not going to overwrite it.");
+                return;
+            }
+
+            out = new FileOutputStream(target);
+            saveDocument(series, out);
+            out.close();
+
+        } catch (Throwable t) {
+            // well, we tried
+            err.println("Failed.");
+            err.flush();
+
+            if (target != null) {
+                target.delete();
+            }
+
+            t.printStackTrace(err);
+            return;
+        }
     }
 }
