@@ -243,6 +243,7 @@ public class UserInterface
         final MessageDialog dialog;
         final Button cancel, ok;
         final ResponseType response;
+        final String path;
 
         if (ae instanceof RecoveryFileExistsException) {
             dialog = new MessageDialog(null, true, MessageType.WARNING, ButtonsType.NONE,
@@ -257,7 +258,9 @@ public class UserInterface
             ok.setLabel("Load original anyway");
             dialog.addButton(ok, ResponseType.OK);
 
-            dialog.setSecondaryText("A recovery file exists:" + "\n<tt>" + ae.getMessage() + "</tt>\n\n"
+            path = ae.getMessage().replace(System.getenv("HOME"), "~");
+
+            dialog.setSecondaryText("A recovery file exists:" + "\n\n<tt>" + path + "</tt>\n\n"
                     + "It <i>may</i> contain what you were working on before Quill crashed. "
                     + "You should quit and review it against your actual document. Once you're sure "
                     + "the rescue file doesn't contain anything you need, you can delete it." + "\n\n"
