@@ -20,11 +20,11 @@ package quill.textbase;
 
 public final class HeadingSegment extends Segment
 {
-    public HeadingSegment() {
-        super();
+    public HeadingSegment(Extract entire) {
+        super(entire);
     }
 
-    Segment createSimilar() {
-        return new HeadingSegment();
+    public Segment createSimilar(Extract entire) {
+        return new HeadingSegment(entire);
     }
 }

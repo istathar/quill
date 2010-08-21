@@ -20,11 +20,11 @@ package quill.textbase;
 
 public final class ComponentSegment extends Segment
 {
-    public ComponentSegment() {
-        super();
+    public ComponentSegment(Extract entire) {
+        super(entire);
     }
 
-    Segment createSimilar() {
-        return new ComponentSegment();
+    public Segment createSimilar(Extract entire) {
+        return new ComponentSegment(entire);
     }
 }

@@ -80,14 +80,12 @@ public class Chapter
         final List<Segment> list;
         final Series result;
 
-        heading = new ComponentSegment();
         span = Span.createSpan("Chapter", null);
         entire = Extract.create(span);
-        heading.setText(entire);
+        heading = new ComponentSegment(entire);
 
-        para = new NormalSegment();
-        entire = Extract.create(null);
-        para.setText(entire);
+        entire = Extract.create();
+        para = new NormalSegment(entire);
 
         list = new ArrayList<Segment>(2);
         list.add(heading);

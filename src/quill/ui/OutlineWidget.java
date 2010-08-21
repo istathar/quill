@@ -69,7 +69,7 @@ class OutlineWidget extends VBox
     private void buildOutline() {
         Segment segment;
         int i;
-        TextChain text;
+        Extract text;
         StringBuilder str;
         Button button;
         Label label;
@@ -114,7 +114,7 @@ class OutlineWidget extends VBox
                 continue;
             } else {
                 text = segment.getText();
-                text.extractParagraphs();
+
                 if (segment instanceof PreformatSegment) {
                     lines = new CompressedLines(text, true);
                 } else {
@@ -167,16 +167,18 @@ class CompressedLines extends DrawingArea
 
     private static final int SPACING = 4;
 
-    CompressedLines(TextChain text, boolean program) {
+    CompressedLines(Extract entire, boolean program) {
         super();
         final DrawingArea self;
+        final TextChain chain;
         Extract[] paras;
         String line;
         int j, i, words, width;
 
         self = this;
 
-        paras = text.extractParagraphs();
+        chain = new TextChain(entire);
+        paras = chain.extractParagraphs();
         dots = new int[paras.length];
         j = 0;
 

@@ -36,26 +36,26 @@ package quill.textbase;
  */
 public abstract class Segment
 {
-    protected Segment() {}
+    protected Segment(Extract entire) {
+        this.entire = entire;
+    }
 
     /**
      * The internal representation of the text body of this Segment.
      */
-    private TextChain chain;
+    private final Extract entire;
 
-    public TextChain getText() {
-        return chain;
+    public Extract getText() {
+        return entire;
     }
 
-    public void setText(TextChain chain) {
-        this.chain = chain;
-        chain.setEnclosingSegment(this);
-    }
-
-    abstract Segment createSimilar();
+    public abstract Segment createSimilar(Extract entire);
 
     private String image;
 
+    /*
+     * TODO rename this to getMeta() or such.
+     */
     /*
      * This is called by RenderEngine...
      */

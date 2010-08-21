@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import nu.xom.Document;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
+import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.Markup;
@@ -89,16 +90,24 @@ public class QuackLoader
         chain = null;
     }
 
-    private void setSegment(Segment segment) {
-        chain = new TextChain();
-        segment.setText(chain);
-        this.segment = segment;
+    /*
+     * FIXME if Segments are to be immutable, then we need to switch the
+     * creation time around.
+     */
+    private void setSegment(Segment next) {
+        final Extract entire;
+
+        entire = chain.extractAll();
+        segment.setText(entire);
         list.add(segment);
+
+        chain = new TextChain();
+        segment = next;
     }
 
     /*
-     * TODO This assumes our documents have only one chapter in them. That's
-     * probably not correct.
+     * FIXME This assumes our documents have only one chapter in them. That's
+     * not correct!
      */
     /*
      * This kinda assumes we only load one Document; if that's not the case,

@@ -288,8 +288,8 @@ public abstract class RenderEngine
     public void processSegmentsIntoAreas(final Context cr) {
         int i, j;
         Segment segment;
-        TextChain text;
         Extract entire;
+        TextChain chain;
         Extract[] paras;
         String filename;
 
@@ -301,28 +301,27 @@ public abstract class RenderEngine
             currentOffset = 0;
 
             segment = series.get(i);
-            text = segment.getText();
+            entire = segment.getText();
 
             if (segment instanceof ComponentSegment) {
-                entire = text.extractAll();
                 appendHeading(cr, entire, 32.0);
                 appendBlankLine(cr);
             } else if (segment instanceof HeadingSegment) {
-                entire = text.extractAll();
                 appendHeading(cr, entire, 16.0);
                 appendBlankLine(cr);
             } else if (segment instanceof PreformatSegment) {
-                entire = text.extractAll();
                 appendProgramCode(cr, entire);
                 appendBlankLine(cr);
             } else if (segment instanceof QuoteSegment) {
-                paras = text.extractParagraphs();
+                chain = new TextChain(entire);
+                paras = chain.extractParagraphs();
                 for (j = 0; j < paras.length; j++) {
                     appendQuoteParagraph(cr, paras[j]);
                     appendBlankLine(cr);
                 }
             } else if (segment instanceof NormalSegment) {
-                paras = text.extractParagraphs();
+                chain = new TextChain(entire);
+                paras = chain.extractParagraphs();
                 for (j = 0; j < paras.length; j++) {
                     appendNormalParagraph(cr, segment, paras[j]);
                     appendBlankLine(cr);
@@ -330,7 +329,6 @@ public abstract class RenderEngine
             } else if (segment instanceof ImageSegment) {
                 filename = segment.getImage();
                 appendExternalGraphic(cr, filename);
-                entire = text.extractAll();
                 appendBlankLine(cr);
                 if (entire == null) {
                     continue;
