@@ -51,7 +51,7 @@ public class ValidateDocumentModified extends GraphicalTestCase
         series = folio.getSeries(0);
         segment = series.get(1);
         assertTrue(segment instanceof NormalSegment);
-        chain = segment.getText();
+        chain = segment.getEntire();
 
         spans = new Span[] {
                 createSpan("Hello", null), createSpan(" ", null), createSpan("World", Common.BOLD)

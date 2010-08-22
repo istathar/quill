@@ -82,7 +82,7 @@ public class ValidateCitationConversion extends IOTestCase
         segment = series.get(1);
         assertTrue(segment instanceof NormalSegment);
 
-        chain = segment.getText();
+        chain = segment.getEntire();
         entire = chain.extractAll();
         entire.visit(new SpanVisitor() {
             private int i = 0;

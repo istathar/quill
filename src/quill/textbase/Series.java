@@ -52,6 +52,14 @@ public class Series
         return segments[index];
     }
 
+    public Series update(Segment before, Segment after) {
+        int i;
+
+        i = indexOf(before);
+
+        return update(i, after);
+    }
+
     /**
      * Create a new Series by changing the Segment at position.
      */

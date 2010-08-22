@@ -68,7 +68,7 @@ public class ValidateSpellingOperations extends GraphicalTestCase
          */
 
         segment = folio.getSeries(0).get(1);
-        chain = segment.getText();
+        chain = segment.getEntire();
         span = createSpan("Test emrgency bro𝑎dcast system", null);
 
         change = new InsertTextualChange(chain, 0, span);
@@ -188,7 +188,7 @@ public class ValidateSpellingOperations extends GraphicalTestCase
         };
 
         segment = folio.getSeries(0).get(1);
-        chain = segment.getText();
+        chain = segment.getEntire();
 
         for (i = 0, j = 0; i < spans.length; i++) {
             span = spans[i];

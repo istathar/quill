@@ -45,7 +45,7 @@ public abstract class Segment
      */
     private final Extract entire;
 
-    public Extract getText() {
+    public Extract getEntire() {
         return entire;
     }
 
@@ -65,5 +65,36 @@ public abstract class Segment
 
     public void setImage(String filename) {
         this.image = filename;
+    }
+
+    /**
+     * Get a single String with the contents of the Span tree of text in this
+     * Segment.
+     */
+    /*
+     * This isn't exactly effecient given large amounts of text. Anything
+     * doing something heavy with this result should iterate over the Spans
+     * itself.
+     */
+    public String getText() {
+        final StringBuilder str;
+
+        str = new StringBuilder();
+
+        entire.visit(new CharacterVisitor() {
+            public boolean visit(int character, Markup markup) {
+                str.appendCodePoint(character);
+                return false;
+            }
+        });
+
+        return str.toString();
+    }
+
+    /*
+     * For debugging
+     */
+    public String toString() {
+        return getClass().getSimpleName() + " \"" + getText() + "\"";
     }
 }

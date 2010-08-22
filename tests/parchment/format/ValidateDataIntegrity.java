@@ -53,7 +53,7 @@ public class ValidateDataIntegrity extends IOTestCase
 
         segment = series.get(1);
         assertTrue(segment instanceof NormalSegment);
-        chain = segment.getText();
+        chain = segment.getEntire();
 
         spans = new Span[] {
                 createSpan("Hello ", Common.BOLD),
@@ -132,7 +132,7 @@ public class ValidateDataIntegrity extends IOTestCase
 
         series = chapter.loadDocument();
         segment = series.get(1);
-        chain = segment.getText();
+        chain = segment.getEntire();
         entire = chain.extractAll();
         assertNotNull(entire);
 
@@ -174,7 +174,7 @@ public class ValidateDataIntegrity extends IOTestCase
         chapter.setFilename("TwoBlocksMarkup.xml");
         series = chapter.loadDocument();
         segment = series.get(1);
-        chain = segment.getText();
+        chain = segment.getEntire();
         entire = chain.extractAll();
         assertNotNull(entire);
 

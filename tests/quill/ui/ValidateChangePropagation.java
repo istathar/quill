@@ -85,7 +85,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         series = folio.getSeries(0);
         segment = series.get(1);
-        chain = segment.getText();
+        chain = segment.getEntire();
         span = createSpan('h', null);
 
         change = new InsertTextualChange(chain, 0, span);
@@ -135,7 +135,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         series = folio.getSeries(0);
         segment = series.get(1);
-        chain = segment.getText();
+        chain = segment.getEntire();
         span = createSpan("This is a test of the emergency broadcast system", null);
 
         change = new InsertTextualChange(chain, 0, span);
@@ -231,7 +231,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
          */
 
         segment = folio.getSeries(0).get(1);
-        chain = segment.getText();
+        chain = segment.getEntire();
 
         span = createSpan("This is a test of the emergency broadcast system", null);
         change = new InsertTextualChange(chain, 0, span);
