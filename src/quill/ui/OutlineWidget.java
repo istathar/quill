@@ -69,7 +69,7 @@ class OutlineWidget extends VBox
     private void buildOutline() {
         Segment segment;
         int i;
-        Extract text;
+        Extract entire;
         StringBuilder str;
         Button button;
         Label label;
@@ -83,18 +83,18 @@ class OutlineWidget extends VBox
             segment = series.get(i);
 
             if (segment instanceof ComponentSegment) {
-                text = segment.getText();
+                entire = segment.getEntire();
 
                 str = new StringBuilder();
                 str.append("<span size=\"xx-large\"> ");
-                str.append(text.toString());
+                str.append(entire.getText());
                 str.append("</span>");
             } else if (segment instanceof HeadingSegment) {
-                text = segment.getText();
+                entire = segment.getEntire();
 
                 str = new StringBuilder();
                 str.append("      ");
-                str.append(text.toString());
+                str.append(entire.getText());
             } else if (segment instanceof ImageSegment) {
                 Image image;
                 Pixbuf pixbuf;
@@ -113,12 +113,12 @@ class OutlineWidget extends VBox
                 top.packStart(left, false, false, 0);
                 continue;
             } else {
-                text = segment.getText();
+                entire = segment.getEntire();
 
                 if (segment instanceof PreformatSegment) {
-                    lines = new CompressedLines(text, true);
+                    lines = new CompressedLines(entire, true);
                 } else {
-                    lines = new CompressedLines(text, false);
+                    lines = new CompressedLines(entire, false);
                 }
                 top.packStart(lines, false, false, 0);
                 continue;
