@@ -301,7 +301,7 @@ public abstract class RenderEngine
             currentOffset = 0;
 
             segment = series.get(i);
-            entire = segment.getText();
+            entire = segment.getEntire();
 
             if (segment instanceof ComponentSegment) {
                 appendHeading(cr, entire, 32.0);

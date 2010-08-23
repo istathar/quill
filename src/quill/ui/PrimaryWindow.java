@@ -56,8 +56,6 @@ import parchment.render.RenderEngine;
 import parchment.render.ReportRenderEngine;
 import quill.client.ImproperFilenameException;
 import quill.client.Quill;
-import quill.textbase.Change;
-import quill.textbase.ChangeStack;
 import quill.textbase.Folio;
 import quill.textbase.Origin;
 import quill.textbase.Segment;
@@ -107,19 +105,13 @@ class PrimaryWindow extends Window
      * as the Change object current at that point. The document is unmodified
      * if the current item on the ChangeStack is this object.
      */
-    private Change last;
+    private Folio last;
 
     /**
      * The root of the document currently being presented by this
      * PrimaryWindow.
      */
     private Folio folio;
-
-    /**
-     * The series of Components (the current chapter) currently being
-     * represented by this PrimaryWindow.
-     */
-    private Series series;
 
     PrimaryWindow() {
         super();
@@ -141,43 +133,87 @@ class PrimaryWindow extends Window
         stack = new ChangeStack();
     }
 
-    /**
-     * Apply a Change to the data layer and then to this user interface.
-     */
-    public void apply(Change change) {
-        stack.apply(change);
-        editor.affect(change);
+    void apply(Folio replacement) {
+        Folio previous;
+
+        /*
+         * Add to undo stack
+         */
+
+        previous = this.folio;
+        stack.apply(previous);
+
+        this.folio = replacement;
+
+        /*
+         * Propagate
+         */
+
+        this.affect();
     }
 
     /**
-     * Pick the latest Change off the ChangeStack, and then do something with
+     * General case of affecting the state currently given in this.folio.
+     */
+    private void affect() {
+        final int num;
+        int i;
+        Series series;
+
+        num = folio.size();
+
+        if (num != 1) {
+            // FIXME multiple chapters
+            throw new UnsupportedOperationException("TODO");
+        }
+
+        for (i = 0; i < num; i++) {
+            series = folio.getSeries(i);
+
+            // TODO FIXME propegate to each editor!
+            editor.affect(series);
+        }
+
+        // FIXME only if showing!
+        preview.affect(manuscript, folio);
+
+        // FIXME only if showing
+        outline.affect(folio);
+
+        updateTitle();
+    }
+
+    /**
+     * Pick the latest Folio off the ChangeStack, and then do something with
      * it
      */
     void undo() {
-        final Change change;
+        final Folio previous;
 
-        change = stack.undo();
+        previous = stack.undo();
 
-        if (change == null) {
+        if (folio == null) {
             return;
         }
 
-        editor.reverse(change);
+        this.folio = previous;
+        this.affect();
     }
 
     /**
      * Grab the Change that was most recently undone, and redo it.
      */
     void redo() {
-        final Change change;
+        final Folio following;
 
-        change = stack.redo();
+        following = stack.redo();
 
-        if (change == null) {
+        if (following == null) {
             return;
         }
 
-        editor.affect(change);
+        this.folio = following;
+        this.affect();
     }
 
     private void setupWindow() {
@@ -418,7 +454,13 @@ class PrimaryWindow extends Window
      * Change the right side to show the outline navigator.
      */
     void switchToOutline() {
+        final Series series;
+
         right.setCurrentPage(2);
+
+        // FIXME
+        series = folio.getSeries(0);
+
         outline.renderSeries(series);
     }
 
@@ -439,6 +481,8 @@ class PrimaryWindow extends Window
      */
     // FIXME rename?
     void displayDocument(Folio folio) {
+        Series series;
+
         this.manuscript = folio.getManuscript();
 
         if (folio.size() == 0) {
@@ -446,10 +490,12 @@ class PrimaryWindow extends Window
         }
 
         this.folio = folio;
-        this.series = folio.getSeries(0);
+
+        // FIXME
+        series = folio.getSeries(0);
 
         editor.initializeSeries(series);
-        preview.renderSeries(manuscript, folio);
+        preview.affect(manuscript, folio);
         outline.renderSeries(series);
         this.updateTitle();
     }
@@ -468,12 +514,20 @@ class PrimaryWindow extends Window
      * and have a window title with only one letter in it as you type.
      */
     void updateTitle() {
+        final Series series;
         final Segment first;
         final String title;
         final String str;
 
+        // FIXME
+        series = folio.getSeries(0);
         first = series.get(0);
-        title = first.getText().toString();
+
+        if (first == titleSegment) {
+            return;
+        }
+
+        title = first.getEntire().getText();
 
         if ((title == null) || (title.equals(""))) {
             str = "Quill";
@@ -482,7 +536,10 @@ class PrimaryWindow extends Window
         }
 
         super.setTitle(str);
+        titleSegment = first;
     }
+
+    private transient Segment titleSegment;
 
     public void grabFocus() {
         editor.grabFocus();
@@ -762,5 +819,18 @@ class PrimaryWindow extends Window
      */
     Folio getDocument() {
         return folio;
+    }
+
+    void update(ComponentEditorWidget widget, Series former, Series series) {
+        Folio anticedant, replacement;
+        int i;
+
+        anticedant = folio;
+
+        i = anticedant.indexOf(former);
+
+        replacement = anticedant.update(i, series);
+
+        this.apply(replacement);
     }
 }

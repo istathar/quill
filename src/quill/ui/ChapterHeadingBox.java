@@ -18,26 +18,13 @@
  */
 package quill.ui;
 
-import org.gnome.gtk.TextBuffer;
-
 import quill.textbase.Segment;
 
 public class ChapterHeadingBox extends HeadingBox
 {
     public ChapterHeadingBox(final ComponentEditorWidget parent, final Segment segment) {
         super(parent, segment);
-        final EditorTextView editor;
 
         label.setLabel("Chapter");
-
-        editor = this.getEditor();
-        editor.buffer.connect(new TextBuffer.Changed() {
-            public void onChanged(TextBuffer source) {
-                final PrimaryWindow primary;
-
-                primary = parent.getPrimary();
-                primary.updateTitle();
-            }
-        });
     }
 }

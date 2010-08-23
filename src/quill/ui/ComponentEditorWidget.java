@@ -31,7 +31,6 @@ import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
-import quill.textbase.Change;
 import quill.textbase.ComponentSegment;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
@@ -41,9 +40,6 @@ import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
-import quill.textbase.SplitStructuralChange;
-import quill.textbase.StructuralChange;
-import quill.textbase.TextualChange;
 
 /**
  * Left hand side of a PrimaryWindow for editing a Component (Article or
@@ -79,14 +75,14 @@ class ComponentEditorWidget extends ScrolledWindow
     /**
      * What is the top level UI holding this document?
      */
-    private PrimaryWindow parent;
+    private PrimaryWindow primary;
 
     private Series series;
 
     ComponentEditorWidget(PrimaryWindow primary) {
         super();
         scroll = this;
-        parent = primary;
+        this.primary = primary;
         setupMaps();
 
         setupScrolling();
@@ -137,7 +133,7 @@ class ComponentEditorWidget extends ScrolledWindow
     }
 
     PrimaryWindow getPrimary() {
-        return parent;
+        return primary;
     }
 
     void initializeSeries(Series series) {
@@ -302,30 +298,69 @@ class ComponentEditorWidget extends ScrolledWindow
     }
 
     /**
-     * Given a StructuralChange, figure out what it means in terms of the UI
-     * in this ComponentEditorWidget.
+     * Given a [new] state, apply it!
      */
-    void affect(Change change) {
-        final Segment first;
+    /*
+     * Much TODO here, dealing with structural change cases
+     */
+    void affect(Series series) {
+        final int num;
+        int i;
+        Segment segment;
+        EditorTextView[] editors;
         EditorTextView editor;
 
-        if (change instanceof TextualChange) {
-            first = change.affects();
-            editor = (EditorTextView) lookup(first);
-            editor.affect(change);
+        if (this.series == series) {
+            return;
+        }
+        this.series = series;
 
-        } else if (change instanceof StructuralChange) {
-            if (change instanceof SplitStructuralChange) {
-                affect((SplitStructuralChange) change);
-            } else {
-                throw new UnsupportedOperationException("\n"
-                        + "Coverage needed for this StructuralChange type");
+        num = series.size();
+        editors = findEditors();
+
+        for (i = 0; i < num; i++) {
+            segment = series.get(i);
+            editor = editors[i];
+
+            if (editor.affect(segment)) {
+                cursorSegment = segment;
             }
         }
     }
 
-    private void affect(final SplitStructuralChange change) {
-        final Segment first, added, third;
+    /**
+     * Entry point for an EditorTextView to inform its parent that its state
+     * has changed.
+     */
+    void update(EditorTextView editor, Segment previous, Segment segment) {
+        Series former;
+
+        former = series;
+
+        /*
+         * FIXME This is going to get expensive, updating the Maps every
+         * bloody time. Maybe replace these with a LinkedList of editors?
+         */
+
+        deeper.put(editor, segment);
+        rising.put(segment, editor);
+
+        series = former.update(previous, segment);
+        cursorSegment = segment;
+
+        /*
+         * TODO Anything else to change?
+         */
+
+        /*
+         * Now propegate that a state change has happened upwards.
+         */
+
+        primary.update(this, former, series);
+    }
+
+    private void affect(final Segment first, final Segment added) {
+        final Segment third;
         final Widget[] children;
         int i;
         final Widget view;
@@ -335,10 +370,6 @@ class ComponentEditorWidget extends ScrolledWindow
         /*
          * Find the index of the view into the VBox.
          */
-        this.series = change.getAfter();
-
-        first = change.getInto();
-        added = change.getAdded();
 
         view = lookup(first);
 
@@ -390,24 +421,7 @@ class ComponentEditorWidget extends ScrolledWindow
          * Delete the third text out of the first.
          */
 
-        editor = (EditorTextView) view;
-        editor.affect(change);
-
-    }
-
-    void reverse(Change change) {
-        final Segment first;
-        final EditorTextView editor;
-
-        if (change instanceof TextualChange) {
-            first = change.affects();
-            editor = (EditorTextView) lookup(first);
-            editor.reverse(change);
-
-        } else if (change instanceof StructuralChange) {
-            // FIXME
-            throw new UnsupportedOperationException("\n" + "Not yet implemented");
-        }
+        // TODO repair?
     }
 
     public void grabFocus() {
@@ -659,6 +673,28 @@ class ComponentEditorWidget extends ScrolledWindow
         children = box.getChildren();
         i = children.length - 1;
         return (EditorTextView) findEditorIn(children[i]);
+    }
+
+    /**
+     * This is mildly horrid; we should instead mainain this list.
+     */
+    private EditorTextView[] findEditors() {
+        final Widget[] children;
+        final EditorTextView[] editors;
+        final int num;
+        int i;
+        Widget child;
+
+        children = box.getChildren();
+        num = children.length;
+        editors = new EditorTextView[num];
+
+        for (i = 0; i < num; i++) {
+            child = children[i];
+            editors[i] = (EditorTextView) findEditorIn(child);
+        }
+
+        return editors;
     }
 
     void moveCursorStart() {

@@ -105,7 +105,7 @@ public class QuackConverter
         }
         inline = null;
 
-        entire = segment.getText();
+        entire = segment.getEntire();
         if ((entire == null) || (entire.getWidth() == 0)) {
             // FIXME is it ever null now?
             return;

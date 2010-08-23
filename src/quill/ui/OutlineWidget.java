@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -36,6 +36,7 @@ import org.gnome.gtk.Widget;
 
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
+import quill.textbase.Folio;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.PreformatSegment;
@@ -152,6 +153,19 @@ class OutlineWidget extends VBox
         }
 
         buildOutline();
+    }
+
+    /*
+     * FIXME Mockup! We actually need to evaluate the Series(s) against the
+     * ones being displayed, and rebuild if/as necessary, and presumably if
+     * we're actually showing.
+     */
+    void affect(Folio folio) {
+        Series series;
+
+        series = folio.getSeries(0);
+
+        this.series = series;
     }
 }
 
