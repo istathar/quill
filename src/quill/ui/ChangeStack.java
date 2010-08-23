@@ -16,18 +16,16 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.textbase;
+package quill.ui;
 
 import java.util.LinkedList;
+
+import quill.textbase.Folio;
 
 /**
  * An ordered list of Change instances which are the basis of our undo/redo
  * stack. There is one of these for each PrimaryWindow to track modifications
  * to its document.
- * 
- * Although public, it is only so in order that PrimaryWindow can see it; it
- * is in the textbase package in order that the restricted action methods on
- * Change objects can be accessed.
  * 
  * @author Andrew Cowie
  */
@@ -37,37 +35,35 @@ import java.util.LinkedList;
  * something will need to act to limit its size. A Queue, perhaps? Or maybe
  * discarding older operations at certain defined lifecycle points?
  */
-public class ChangeStack
+class ChangeStack
 {
-    private LinkedList<Change> stack;
+    private LinkedList<Folio> stack;
 
     private int pointer;
 
     public ChangeStack() {
-        stack = new LinkedList<Change>();
+        stack = new LinkedList<Folio>();
         pointer = 0;
     }
 
     /**
      * Apply a Change to the data layer.
      */
-    public void apply(Change change) {
+    public void apply(Folio folio) {
         while (pointer < stack.size()) {
             stack.removeLast();
         }
 
-        stack.add(pointer, change);
+        stack.add(pointer, folio);
         pointer++;
-
-        change.apply();
     }
 
     /**
      * Undo. Return the Change which represents the delta from current to one
      * before.
      */
-    public Change undo() {
-        final Change change;
+    Folio undo() {
+        final Folio folio;
 
         if (stack.size() == 0) {
             return null;
@@ -77,18 +73,17 @@ public class ChangeStack
         }
         pointer--;
 
-        change = stack.get(pointer);
-        change.undo();
+        folio = stack.get(pointer);
 
-        return change;
+        return folio;
     }
 
     /**
      * Redo a previous undo. Returns the Change which is the delta you will
      * need to [re]apply.
      */
-    public Change redo() {
-        final Change change;
+    Folio redo() {
+        final Folio folio;
 
         if (stack.size() == 0) {
             return null;
@@ -97,15 +92,14 @@ public class ChangeStack
             return null;
         }
 
-        change = stack.get(pointer);
-        change.apply();
+        folio = stack.get(pointer);
 
         pointer++;
 
-        return change;
+        return folio;
     }
 
-    public Change getCurrent() {
+    Folio getCurrent() {
         if (pointer == 0) {
             return null;
         } else {
