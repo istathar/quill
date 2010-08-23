@@ -465,18 +465,6 @@ class PrimaryWindow extends Window
     }
 
     /**
-     * Adjust the left side editor to show the supplied vertical location.
-     */
-    /*
-     * This probably doesn't need to be a UI function; an EditorTextView
-     * should know or be able to find out its parent and simply call its
-     * parent's ensureVisible() method.
-     */
-    void scrollEditorToShow(int from, int height) {
-        editor.ensureVisible(from, height);
-    }
-
-    /**
      * Show the nominated Series in this PrimaryWindow
      */
     // FIXME rename?

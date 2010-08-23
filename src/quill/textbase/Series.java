@@ -52,18 +52,10 @@ public class Series
         return segments[index];
     }
 
-    public Series update(Segment before, Segment after) {
-        int i;
-
-        i = indexOf(before);
-
-        return update(i, after);
-    }
-
     /**
      * Create a new Series by changing the Segment at position.
      */
-    Series update(int position, Segment segment) {
+    public Series update(int position, Segment segment) {
         final Segment[] original, replacement;
 
         original = this.segments;

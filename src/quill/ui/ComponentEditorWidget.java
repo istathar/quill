@@ -18,9 +18,6 @@
  */
 package quill.ui;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.Allocation;
@@ -55,17 +52,7 @@ class ComponentEditorWidget extends ScrolledWindow
 
     private VBox box;
 
-    /**
-     * A map going from user interface layer deeper into the internal
-     * representation layer.
-     */
-    private Map<Widget, Segment> deeper;
-
-    /**
-     * A map going from internal representations out to the corresponding user
-     * interface element; the opposite of deeper.
-     */
-    private Map<Segment, Widget> rising;
+    private EditorTextView[] editors;
 
     /**
      * Which Segment currently has the cursor?
@@ -83,15 +70,9 @@ class ComponentEditorWidget extends ScrolledWindow
         super();
         scroll = this;
         this.primary = primary;
-        setupMaps();
 
         setupScrolling();
         hookupAdjustmentReactions();
-    }
-
-    private void setupMaps() {
-        deeper = new HashMap<Widget, Segment>(16);
-        rising = new HashMap<Segment, Widget>(16);
     }
 
     private void setupScrolling() {
@@ -140,6 +121,7 @@ class ComponentEditorWidget extends ScrolledWindow
         Widget[] children;
         Segment segment;
         int i;
+        final int num;
         Widget widget;
 
         /*
@@ -157,13 +139,15 @@ class ComponentEditorWidget extends ScrolledWindow
         /*
          * Now set up the new Series.
          */
-
+        num = series.size();
         this.series = series;
 
-        for (i = 0; i < series.size(); i++) {
+        this.editors = new EditorTextView[num];
+
+        for (i = 0; i < num; i++) {
             segment = series.get(i);
 
-            widget = createEditorForSegment(segment);
+            widget = createEditorForSegment(i, segment);
 
             box.packStart(widget, false, false, 0);
         }
@@ -177,25 +161,40 @@ class ComponentEditorWidget extends ScrolledWindow
         this.cursorSegment = series.get(0);
     }
 
-    private void associate(Segment segment, Widget widget) {
-        rising.put(segment, widget);
-        deeper.put(widget, segment);
-    }
-
-    private void disassociate(Segment segment, Widget widget) {
-        rising.remove(segment);
-        deeper.remove(widget);
-    }
-
     private Segment lookup(Widget editor) {
-        return deeper.get(editor);
+        final int len;
+        int i;
+
+        len = editors.length;
+
+        if (len != series.size()) {
+            throw new AssertionError();
+        }
+
+        for (i = 0; i < len; i++) {
+            if (editors[i] == editor) {
+                return series.get(i);
+            }
+        }
+
+        throw new IllegalStateException("Can't find editor Widget in EditorTextView[]");
     }
 
-    private Widget lookup(Segment segment) {
-        return rising.get(segment);
+    /**
+     * Get the editor corresponding to the given Segment.
+     */
+    /*
+     * This one is easy; we can just ask the series
+     */
+    private EditorTextView lookup(Segment segment) {
+        final int i;
+
+        i = series.indexOf(segment);
+
+        return editors[i];
     }
 
-    private Widget createEditorForSegment(Segment segment) {
+    private Widget createEditorForSegment(int index, Segment segment) {
         final Widget result;
         final EditorTextView editor;
         final HeadingBox heading;
@@ -262,7 +261,7 @@ class ComponentEditorWidget extends ScrolledWindow
             throw new IllegalStateException("Unknown Segment type");
         }
 
-        associate(segment, editor);
+        editors[index] = editor;
 
         return result;
     }
@@ -321,10 +320,7 @@ class ComponentEditorWidget extends ScrolledWindow
         for (i = 0; i < num; i++) {
             segment = series.get(i);
             editor = editors[i];
-
-            if (editor.affect(segment)) {
-                cursorSegment = segment;
-            }
+            editor.affect(segment);
         }
     }
 
@@ -333,19 +329,14 @@ class ComponentEditorWidget extends ScrolledWindow
      * has changed.
      */
     void update(EditorTextView editor, Segment previous, Segment segment) {
-        Series former;
+        final Series former;
+        final int i;
 
         former = series;
 
-        /*
-         * FIXME This is going to get expensive, updating the Maps every
-         * bloody time. Maybe replace these with a LinkedList of editors?
-         */
+        i = former.indexOf(previous);
 
-        deeper.put(editor, segment);
-        rising.put(segment, editor);
-
-        series = former.update(previous, segment);
+        series = former.update(i, segment);
         cursorSegment = segment;
 
         /*
@@ -388,13 +379,13 @@ class ComponentEditorWidget extends ScrolledWindow
          * Create the new editor
          */
 
-        widget = createEditorForSegment(added);
+        widget = createEditorForSegment(i, added);
 
         box.packStart(widget, false, false, 0);
         i++;
         box.reorderChild(widget, i);
         widget.showAll();
-        editor = (EditorTextView) lookup(added);
+        editor = lookup(added);
         editor.grabFocus();
 
         /*
@@ -411,7 +402,7 @@ class ComponentEditorWidget extends ScrolledWindow
         }
 
         third = series.get(i + 1);
-        widget = createEditorForSegment(third);
+        widget = createEditorForSegment(i, third);
         box.packStart(widget, false, false, 0);
         i++;
         box.reorderChild(widget, i);
@@ -429,7 +420,7 @@ class ComponentEditorWidget extends ScrolledWindow
         final EditorTextView first;
 
         segment = series.get(0);
-        first = (EditorTextView) lookup(segment);
+        first = lookup(segment);
         first.placeCursorFirstLine(0);
         first.grabFocus();
 
@@ -461,7 +452,6 @@ class ComponentEditorWidget extends ScrolledWindow
 
     void moveCursorUp(final Widget from, final int position) {
         int i;
-        final Widget above;
         Segment segment;
         final EditorTextView editor;
 
@@ -473,10 +463,7 @@ class ComponentEditorWidget extends ScrolledWindow
         }
         i--;
 
-        segment = series.get(i);
-        above = lookup(segment);
-
-        editor = (EditorTextView) above;
+        editor = editors[i];
         editor.placeCursorLastLine(position);
         editor.grabFocus();
 

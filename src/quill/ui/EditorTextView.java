@@ -90,15 +90,12 @@ abstract class EditorTextView extends TextView
 
     private final UserInterface ui;
 
-    private final PrimaryWindow primary;
-
     private final ComponentEditorWidget parent;
 
     EditorTextView(ComponentEditorWidget parent, Segment segment) {
         super();
         this.view = this;
         this.ui = Quill.getUserInterface();
-        this.primary = parent.getPrimary();
         this.parent = parent;
         this.chain = new TextChain();
 
@@ -638,12 +635,12 @@ abstract class EditorTextView extends TextView
      * TODO this is horrible; we need to find the diff between the two trees
      * and only incrementally affect it.
      */
-    boolean affect(Segment segment) {
+    void affect(Segment segment) {
         final Extract entire;
         final TextIter start;
 
         if (this.segment == segment) {
-            return false;
+            return;
         }
 
         /*
@@ -670,9 +667,14 @@ abstract class EditorTextView extends TextView
         // start is at the end now, thaks to TextBuffer's insert()
         buffer.placeCursor(start);
 
-        this.segment = segment;
+        /*
+         * Set the global "cursor" which is used by OutlineWidget to know what
+         * page to display.
+         */
 
-        return true;
+        parent.setCursor(segment);
+
+        this.segment = segment;
     }
 
     private void copyText() {
@@ -837,7 +839,7 @@ abstract class EditorTextView extends TextView
                 rect = view.getLocation(pointer);
                 alloc = view.getAllocation();
 
-                primary.scrollEditorToShow(alloc.getY() + rect.getY(), rect.getHeight() + 5);
+                parent.ensureVisible(alloc.getY() + rect.getY(), rect.getHeight() + 5);
             }
         });
 
