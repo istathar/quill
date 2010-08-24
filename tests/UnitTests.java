@@ -29,7 +29,6 @@ import parchment.format.ValidateThereAndBackAgain;
 import quill.quack.ValidateCitationConversion;
 import quill.quack.ValidateEndnoteConversion;
 import quill.quack.ValidateTextChainToChapterConversion;
-import quill.textbase.ValidateApplyUndoRedo;
 import quill.textbase.ValidateExtracts;
 import quill.textbase.ValidateOriginOrdering;
 import quill.textbase.ValidateSpanOperations;
@@ -38,6 +37,7 @@ import quill.textbase.ValidateText;
 import quill.textbase.ValidateUnicode;
 import quill.textbase.ValidateWordExtraction;
 import quill.textbase.ValidateWrapperExpansions;
+import quill.ui.ValidateApplyUndoRedo;
 import quill.ui.ValidateChangePropagation;
 import quill.ui.ValidateDocumentModified;
 import quill.ui.ValidateSpellingOperations;
@@ -69,7 +69,6 @@ public class UnitTests
         suite.addTestSuite(ValidateUnicode.class);
         suite.addTestSuite(ValidateExtracts.class);
         suite.addTestSuite(ValidateOriginOrdering.class);
-        suite.addTestSuite(ValidateApplyUndoRedo.class);
         suite.addTestSuite(ValidateDocumentModified.class);
         suite.addTestSuite(ValidateManuscriptSerializing.class);
         suite.addTestSuite(ValidateManuscriptLoading.class);
@@ -84,6 +83,7 @@ public class UnitTests
         suite.addTestSuite(ValidateThereAndBackAgain.class);
         suite.addTestSuite(ValidateFileNaming.class);
         suite.addTestSuite(ValidateWordExtraction.class);
+        suite.addTestSuite(ValidateApplyUndoRedo.class);
         suite.addTestSuite(ValidateChangePropagation.class);
         suite.addTestSuite(ValidateSpellingOperations.class);
 
