@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -29,13 +29,10 @@ import org.gnome.gtk.TextTag;
 
 import parchment.format.Manuscript;
 import quill.client.Quill;
-import quill.textbase.Change;
 import quill.textbase.Common;
+import quill.textbase.Extract;
 import quill.textbase.Folio;
-import quill.textbase.InsertTextualChange;
-import quill.textbase.Segment;
 import quill.textbase.Span;
-import quill.textbase.TextChain;
 
 import static quill.textbase.Span.createSpan;
 
@@ -45,11 +42,10 @@ public class ValidateSpellingOperations extends GraphicalTestCase
         final Manuscript manuscript;
         final Folio folio;
         final PrimaryWindow primary;
-        final Segment segment;
-        final TextChain chain;
-        Change change;
-        final Span span;
+        final ComponentEditorWidget parent;
         final EditorTextView editor;
+        Extract entire;
+        final Span span;
         final TextBuffer buffer;
         TextIter start, finish, pointer;
         String word;
@@ -67,15 +63,16 @@ public class ValidateSpellingOperations extends GraphicalTestCase
          * Establish some starting text.
          */
 
-        segment = folio.getSeries(0).get(1);
-        chain = segment.getEntire();
+        parent = primary.testGetEditor();
+        editor = parent.testGetEditor(1);
+
         span = createSpan("Test emrgency bro𝑎dcast system", null);
 
-        change = new InsertTextualChange(chain, 0, span);
-        primary.apply(change);
+        editor.testAppendSpan(span);
 
-        assertEquals("Test emrgency bro𝑎dcast system", chain.toString());
-        assertEquals(30, chain.length());
+        entire = editor.testGetEntire();
+        assertEquals("Test emrgency bro𝑎dcast system", entire.getText());
+        assertEquals(30, entire.getWidth());
 
         /*
          * Initial state ok. Good. Now get a reference to the TextView, and
@@ -84,10 +81,7 @@ public class ValidateSpellingOperations extends GraphicalTestCase
          * insert.
          */
 
-        editor = (EditorTextView) findEditor(primary.getChild());
         buffer = editor.getBuffer();
-        pointer = buffer.getIterStart();
-
         start = buffer.getIterStart();
         finish = buffer.getIter(4);
 
@@ -158,16 +152,15 @@ public class ValidateSpellingOperations extends GraphicalTestCase
         final Folio folio;
         final UserInterface ui;
         final PrimaryWindow primary;
+        final ComponentEditorWidget parent;
         final Span[] spans;
-        final Segment segment;
-        final TextChain chain;
-        Change change;
+        final Extract entire;
         Span span;
         final EditorTextView editor;
         final TextBuffer buffer;
         TextIter start, finish, pointer;
         String word;
-        int i, j;
+        int i;
         TextTag[] tags;
         TextTag tag;
 
@@ -187,18 +180,17 @@ public class ValidateSpellingOperations extends GraphicalTestCase
                 createSpan(" speek.", null),
         };
 
-        segment = folio.getSeries(0).get(1);
-        chain = segment.getEntire();
+        parent = primary.testGetEditor();
+        editor = parent.testGetEditor(0);
 
-        for (i = 0, j = 0; i < spans.length; i++) {
+        for (i = 0; i < spans.length; i++) {
             span = spans[i];
-            change = new InsertTextualChange(chain, j, span);
-            primary.apply(change);
-            j += span.getWidth();
+            editor.testAppendSpan(span);
         }
 
-        assertEquals("Use dsmthng() speek.", chain.toString());
-        assertEquals(20, chain.length());
+        entire = editor.testGetEntire();
+        assertEquals("Use dsmthng() speek.", entire.getText());
+        assertEquals(20, entire.getWidth());
 
         /*
          * Verify that the thing we think is a spelling mistake actually is.
@@ -213,7 +205,6 @@ public class ValidateSpellingOperations extends GraphicalTestCase
          * see what it has done.
          */
 
-        editor = (EditorTextView) findEditor(primary.getChild());
         buffer = editor.getBuffer();
         pointer = buffer.getIterStart();
 

@@ -25,12 +25,16 @@ public class ValidateWrapperExpansions extends TestCase
     private Segment[] segments;
 
     public void setUp() {
+        final Extract blank;
+
+        blank = Extract.create();
+
         segments = new Segment[] {
-                new ComponentSegment(),
-                new HeadingSegment(),
-                new NormalSegment(),
-                new PreformatSegment(),
-                new NormalSegment(),
+                new ComponentSegment(blank),
+                new HeadingSegment(blank),
+                new NormalSegment(blank),
+                new PreformatSegment(blank),
+                new NormalSegment(blank),
         };
     }
 
@@ -44,12 +48,15 @@ public class ValidateWrapperExpansions extends TestCase
 
     public final void testSeriesInsertMid() {
         final Series before, after;
+        final Extract blank;
+
+        blank = Extract.create();
 
         before = new Series(segments);
         assertEquals(5, before.size());
         assertTrue(before.get(2) instanceof NormalSegment);
 
-        after = before.insert(2, new PreformatSegment());
+        after = before.insert(2, new PreformatSegment(blank));
 
         assertEquals(6, after.size());
         assertTrue(after.get(1) instanceof HeadingSegment);
@@ -64,12 +71,15 @@ public class ValidateWrapperExpansions extends TestCase
 
     public final void testSeriesInsertEnd() {
         final Series before, after;
+        final Extract blank;
+
+        blank = Extract.create();
 
         before = new Series(segments);
         assertEquals(5, before.size());
         assertTrue(before.get(4) instanceof NormalSegment);
 
-        after = before.insert(5, new PreformatSegment());
+        after = before.insert(5, new PreformatSegment(blank));
 
         assertEquals(6, after.size());
         assertSame(after.get(0), segments[0]);
@@ -82,13 +92,16 @@ public class ValidateWrapperExpansions extends TestCase
 
     public final void testSeriesInsertBegin() {
         final Series before, after;
+        final Extract blank;
+
+        blank = Extract.create();
 
         before = new Series(segments);
 
         assertEquals(5, before.size());
         assertTrue(before.get(0) instanceof ComponentSegment);
 
-        after = before.insert(0, new PreformatSegment());
+        after = before.insert(0, new PreformatSegment(blank));
 
         assertEquals(6, after.size());
         assertTrue(after.get(0) instanceof PreformatSegment);
@@ -101,11 +114,14 @@ public class ValidateWrapperExpansions extends TestCase
 
     public final void testSeriesInsertUndershoot() {
         final Series before;
+        final Extract blank;
+
+        blank = Extract.create();
 
         before = new Series(segments);
 
         try {
-            before.insert(-1, new PreformatSegment());
+            before.insert(-1, new PreformatSegment(blank));
             fail();
         } catch (IndexOutOfBoundsException ioobe) {
             // good
@@ -114,11 +130,14 @@ public class ValidateWrapperExpansions extends TestCase
 
     public final void testSeriesInsertOvershoot() {
         final Series before;
+        final Extract blank;
+
+        blank = Extract.create();
 
         before = new Series(segments);
 
         try {
-            before.insert(6, new PreformatSegment());
+            before.insert(6, new PreformatSegment(blank));
             fail();
         } catch (IndexOutOfBoundsException ioobe) {
             // good

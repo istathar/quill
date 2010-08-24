@@ -40,7 +40,6 @@ import quill.textbase.Extract;
 import quill.textbase.NormalSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
-import quill.textbase.Span;
 
 import static java.lang.String.format;
 
@@ -75,13 +74,11 @@ public class Chapter
 
     public Series createDocument() {
         final Segment heading, para;
-        Span span;
         Extract entire;
         final List<Segment> list;
         final Series result;
 
-        span = Span.createSpan("Chapter", null);
-        entire = Extract.create(span);
+        entire = Extract.create();
         heading = new ComponentSegment(entire);
 
         entire = Extract.create();

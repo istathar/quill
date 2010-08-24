@@ -74,6 +74,7 @@ public class QuackConverter
 
     public QuackConverter() {
         buf = new StringBuilder();
+        component = new ChapterElement();
     }
 
     /**
@@ -86,7 +87,6 @@ public class QuackConverter
         this.segment = segment;
 
         if (segment instanceof ComponentSegment) {
-            component = new ChapterElement();
             block = new TitleElement();
         } else if (segment instanceof HeadingSegment) {
             block = new HeadingElement();

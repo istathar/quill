@@ -24,7 +24,6 @@ import junit.framework.TestCase;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.client.ImproperFilenameException;
-import quill.textbase.ComponentSegment;
 import quill.textbase.NormalSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
@@ -32,7 +31,7 @@ import quill.textbase.Series;
 
 public class ValidateBlockquoteConversion extends TestCase
 {
-    public final void testLoadDocbook() throws IOException, ValidityException, ParsingException,
+    public final void testLoadSequences() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
         final Manuscript manuscript;
         final Chapter chapter;
@@ -45,15 +44,13 @@ public class ValidateBlockquoteConversion extends TestCase
         chapter.setFilename("Blockquote.xml");
         series = chapter.loadDocument();
 
-        assertEquals(4, series.size());
+        assertEquals(3, series.size());
 
         segment = series.get(0);
-        assertTrue(segment instanceof ComponentSegment);
-        segment = series.get(1);
         assertTrue(segment instanceof NormalSegment);
-        segment = series.get(2);
+        segment = series.get(1);
         assertTrue(segment instanceof QuoteSegment);
-        segment = series.get(3);
+        segment = series.get(2);
         assertTrue(segment instanceof NormalSegment);
     }
 }

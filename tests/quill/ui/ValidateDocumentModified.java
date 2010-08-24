@@ -22,15 +22,12 @@ import java.io.IOException;
 
 import parchment.format.Manuscript;
 import quill.client.ImproperFilenameException;
-import quill.textbase.Change;
 import quill.textbase.Common;
 import quill.textbase.Folio;
-import quill.textbase.InsertTextualChange;
 import quill.textbase.NormalSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
-import quill.textbase.TextChain;
 
 import static quill.client.IOTestCase.ensureDirectory;
 import static quill.textbase.Span.createSpan;
@@ -38,31 +35,30 @@ import static quill.textbase.Span.createSpan;
 public class ValidateDocumentModified extends GraphicalTestCase
 {
     private static final void insertThreeSpansIntoFirstSegment(final PrimaryWindow primary) {
-        final Folio folio;
-        final TextChain chain;
-        Span[] spans;
-        int i, j;
+        final ComponentEditorWidget parent;
+        final EditorTextView editor;
+        Folio folio;
+        final Span[] spans;
+        int i;
         Span span;
-        Change change;
-        final Series series;
-        final Segment segment;
+        Series series;
+        Segment segment;
 
         folio = primary.getDocument();
         series = folio.getSeries(0);
         segment = series.get(1);
         assertTrue(segment instanceof NormalSegment);
-        chain = segment.getEntire();
+
+        parent = primary.testGetEditor();
+        editor = parent.testGetEditor(1);
 
         spans = new Span[] {
                 createSpan("Hello", null), createSpan(" ", null), createSpan("World", Common.BOLD)
         };
 
-        j = 0;
         for (i = 0; i < spans.length; i++) {
             span = spans[i];
-            change = new InsertTextualChange(chain, j, span);
-            primary.apply(change);
-            j += span.getWidth();
+            editor.testAppendSpan(span);
         }
     }
 

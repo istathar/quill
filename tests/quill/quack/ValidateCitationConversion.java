@@ -28,7 +28,6 @@ import parchment.format.InvalidDocumentException;
 import parchment.format.Manuscript;
 import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
-import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
 import quill.textbase.MarkerSpan;
 import quill.textbase.NormalSegment;
@@ -38,7 +37,6 @@ import quill.textbase.Span;
 import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
 import quill.textbase.StringSpan;
-import quill.textbase.TextChain;
 
 public class ValidateCitationConversion extends IOTestCase
 {
@@ -58,7 +56,6 @@ public class ValidateCitationConversion extends IOTestCase
         final Chapter chapter;
         final Series series;
         Segment segment;
-        final TextChain chain;
         final Extract entire;
         final QuackConverter converter;
         int i;
@@ -75,15 +72,12 @@ public class ValidateCitationConversion extends IOTestCase
         chapter.setFilename("Citation.xml");
         series = chapter.loadDocument();
 
-        assertEquals(2, series.size());
+        assertEquals(1, series.size());
 
         segment = series.get(0);
-        assertTrue(segment instanceof ComponentSegment);
-        segment = series.get(1);
         assertTrue(segment instanceof NormalSegment);
 
-        chain = segment.getEntire();
-        entire = chain.extractAll();
+        entire = segment.getEntire();
         entire.visit(new SpanVisitor() {
             private int i = 0;
 

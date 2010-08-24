@@ -453,15 +453,18 @@ abstract class EditorTextView extends TextView
 
             start = buffer.getIter(offset);
             finish = buffer.getIter(offset + width);
-
             buffer.delete(start, finish);
         } else {
-            chain.insert(insertOffset, span);
-            start = buffer.getIter(insertOffset);
+            offset = insertOffset;
+            width = span.getWidth();
+
+            chain.insert(offset, span);
+            start = buffer.getIter(offset);
         }
 
         buffer.insert(start, text, tagForMarkup(insertMarkup));
-        propagateUpdate();
+
+        propagateUpdate(offset, width);
     }
 
     private void pasteText() {
@@ -480,17 +483,21 @@ abstract class EditorTextView extends TextView
 
             offset = normalizeOffset(insertOffset, selectionOffset);
             width = normalizeWidth(insertOffset, selectionOffset);
+            chain.delete(offset, width);
 
             start = buffer.getIter(offset);
             finish = buffer.getIter(offset + width);
             buffer.delete(start, finish);
         } else {
-            start = buffer.getIter(insertOffset);
+            offset = insertOffset;
+            start = buffer.getIter(offset);
         }
 
-        insertSpans(start, stash);
+        chain.insert(offset, stash);
 
-        propagateUpdate();
+        insertExtractIntoBuffer(start, stash);
+
+        propagateUpdate(offset, stash.getWidth());
     }
 
     private void deleteBack() {
@@ -542,9 +549,10 @@ abstract class EditorTextView extends TextView
         width = normalizeWidth(alpha, omega);
 
         chain.delete(offset, width);
+
         buffer.delete(start, finish);
 
-        propagateUpdate();
+        propagateUpdate(offset, width);
     }
 
     private void toggleMarkup(Markup format) {
@@ -656,7 +664,7 @@ abstract class EditorTextView extends TextView
 
         buffer.setText("");
         start = buffer.getIterStart();
-        insertSpans(start, entire);
+        insertExtractIntoBuffer(start, entire);
 
         /*
          * Spell check the whole thing
@@ -725,22 +733,27 @@ abstract class EditorTextView extends TextView
 
         chain.delete(offset, width);
 
-        propagateUpdate();
-
         buffer.delete(start, finish);
+
+        propagateUpdate(offset, width);
     }
 
     /**
      * Get (craete) a [new] Segment representing the state of this TextChain
      * as at the time you call this method, then pass it up to the parent
      * ComponentEditorWidget for further propagation.
+     * 
+     * The internal TextChain must be updated before you call this.
+     * 
+     * The two parameters are used to signal the range that was inserted,
+     * which drives spell re-checking.
      */
     /*
      * This changes this.segment before calling up. If we ever get a tree diff
      * algorithm in place, then we can have the field change happen AFTER the
      * return call to apply().
      */
-    private void propagateUpdate() {
+    private void propagateUpdate(int begin, int end) {
         final Extract entire;
         final Segment previous;
 
@@ -770,6 +783,7 @@ abstract class EditorTextView extends TextView
         // buffer.placeCursor(start);
         // }
 
+        checkSpellingRange(begin, end);
     }
 
     private static int normalizeOffset(int alpha, int omega) {
@@ -883,7 +897,7 @@ abstract class EditorTextView extends TextView
 
             chain.delete(offset, width);
             chain.insert(offset, replacement);
-            propagateUpdate();
+            propagateUpdate(offset, width);
         }
 
         /*
@@ -897,16 +911,16 @@ abstract class EditorTextView extends TextView
      * Insert all the Spans in the given extract into the underlying
      * TextBuffer at pointer.
      */
-    private void insertSpans(final TextIter pointer, final Extract extract) {
+    private void insertExtractIntoBuffer(final TextIter pointer, final Extract extract) {
         extract.visit(new SpanVisitor() {
             public boolean visit(Span span) {
-                insertSpan(pointer, span);
+                insertSpanIntoBuffer(pointer, span);
                 return false;
             }
         });
     }
 
-    private void insertSpan(TextIter pointer, Span span) {
+    private void insertSpanIntoBuffer(TextIter pointer, Span span) {
         if (span instanceof MarkerSpan) {
             buffer.insert(pointer, createEndnote(span), view);
             /*
@@ -1147,7 +1161,7 @@ abstract class EditorTextView extends TextView
 
         // TODO?
 
-        propagateUpdate();
+        propagateUpdate(offset, width);
 
         /*
          * Put the splcied text back in.
@@ -1448,10 +1462,10 @@ abstract class EditorTextView extends TextView
     }
 
     /**
-     * Iterate over words from before(begin) to after(end)
+     * Iterate over words from before(offset) to after(offset+width)
      */
-    private void checkSpellingRange(int begin, final int end) {
-        int alpha, omega;
+    private void checkSpellingRange(final int offset, final int width) {
+        int begin, end, alpha, omega;
         final TextIter start, finish;
 
         /*
@@ -1463,6 +1477,9 @@ abstract class EditorTextView extends TextView
         if (!isSpellChecked()) {
             return;
         }
+
+        begin = offset;
+        end = offset + width;
 
         /*
          * There's a corner case where if you type space to complete or split
@@ -1629,7 +1646,7 @@ abstract class EditorTextView extends TextView
                 buffer.delete(start, finish);
                 buffer.insert(start, word, tagForMarkup(insertMarkup));
 
-                propagateUpdate();
+                propagateUpdate(offset, offset + wide);
             } else {
                 // the word has been added, so we need to unmark it.
                 start = buffer.getIter(offset);
@@ -1643,7 +1660,27 @@ abstract class EditorTextView extends TextView
         return insertOffset;
     }
 
-    protected Extract getText() {
+    /*
+     * For testing only
+     */
+    final Extract testGetEntire() {
         return chain.extractAll();
+    }
+
+    /*
+     * For testing only
+     */
+    final void testAppendSpan(final Span span) {
+        final TextIter pointer;
+        final int offset, width;
+
+        offset = chain.length();
+        width = span.getWidth();
+        chain.append(span);
+
+        pointer = buffer.getIterEnd();
+        insertSpanIntoBuffer(pointer, span);
+
+        propagateUpdate(offset, width);
     }
 }

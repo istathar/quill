@@ -33,6 +33,7 @@ import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
+import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.NormalSegment;
 import quill.textbase.Segment;
@@ -49,23 +50,24 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         final Manuscript manuscript;
         final Chapter chapter;
         final Series series;
-        final TextChain text;
+        final Extract entire;
 
         manuscript = new Manuscript();
-        manuscript.setFilename("tests/quill/quack/HelloWorld.parchment"); // ignored
+        manuscript.setFilename("tests/quill/quack/HelloWorld.parchment"); // fake
         chapter = new Chapter(manuscript);
-        chapter.setFilename("HelloWorld.xml");
+        chapter.setFilename("HelloWorld.xml"); // real
         series = chapter.loadDocument();
-        assertEquals(2, series.size());
+        assertEquals(1, series.size());
 
-        text = series.get(1).getEntire();
-        assertNotNull(text);
-        assertEquals("Hello world", text.toString());
+        entire = series.get(0).getEntire();
+        assertNotNull(entire);
+        assertEquals("Hello world", entire.getText());
     }
 
     public final void testWritePlainParas() throws IOException {
         final TextChain chain;
         final Span span;
+        Extract entire;
         final Segment segment;
         final QuackConverter converter;
         final ByteArrayOutputStream out;
@@ -79,16 +81,17 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
 
         span = createSpan("Hello\nWorld", null);
         chain.append(span);
+        entire = chain.extractAll();
 
         /*
          * Now run conversion process.
          */
 
-        segment = new NormalSegment();
-        segment.setText(chain);
+        segment = new NormalSegment(entire);
 
+        entire = Extract.create();
         converter = new QuackConverter();
-        converter.append(new ComponentSegment());
+        converter.append(new ComponentSegment(entire));
         converter.append(segment);
 
         out = new ByteArrayOutputStream();
@@ -111,6 +114,7 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
     public final void testWriteComplexPara() throws IOException {
         final TextChain chain;
         final Span[] spans;
+        Extract entire;
         Segment segment;
         final QuackConverter converter;
         final ByteArrayOutputStream out;
@@ -147,14 +151,15 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
          * Now run conversion process.
          */
         converter = new QuackConverter();
+        entire = Extract.create();
 
-        segment = new ComponentSegment();
+        segment = new ComponentSegment(entire);
         converter.append(segment);
-        segment = new HeadingSegment();
+        segment = new HeadingSegment(entire);
         converter.append(segment);
 
-        segment = new NormalSegment();
-        segment.setText(chain);
+        entire = chain.extractAll();
+        segment = new NormalSegment(entire);
         converter.append(segment);
 
         out = new ByteArrayOutputStream();
@@ -185,27 +190,28 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         final Manuscript manuscript;
         final Chapter chapter;
         final Series series;
-        final TextChain chain;
+        final Extract entire;
 
         manuscript = new Manuscript();
         manuscript.setFilename("tests/quill/quack/HelloWorld.parchment"); // ignored
         chapter = new Chapter(manuscript);
         chapter.setFilename("TemporaryFiles.xml");
         series = chapter.loadDocument();
-        assertEquals(2, series.size());
+        assertEquals(1, series.size());
 
-        chain = series.get(1).getEntire();
+        entire = series.get(0).getEntire();
 
-        assertNotNull(chain);
+        assertNotNull(entire);
         assertEquals("Accessing the /tmp directory directly is fine, "
                 + "but you are often better off using File's createTempFile() function.",
-                chain.toString());
+                entire.getText());
     }
 
     public final void testWriteUnicode() throws IOException {
         final TextChain chain;
         final Span span;
         Segment segment;
+        Extract entire;
         final QuackConverter converter;
         final ByteArrayOutputStream out;
         final String blob;
@@ -221,12 +227,13 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         chain.append(span);
 
         converter = new QuackConverter();
+        entire = Extract.create();
 
-        segment = new ComponentSegment();
+        segment = new ComponentSegment(entire);
         converter.append(segment);
 
-        segment = new NormalSegment();
-        segment.setText(chain);
+        entire = chain.extractAll();
+        segment = new NormalSegment(entire);
         converter.append(segment);
 
         out = new ByteArrayOutputStream();

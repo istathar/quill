@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -16,20 +16,23 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.textbase;
+package quill.ui;
 
 import junit.framework.TestCase;
+import parchment.format.Chapter;
+import parchment.format.Manuscript;
+import quill.textbase.Folio;
+import quill.textbase.Series;
+import quill.textbase.Span;
+import quill.textbase.TextChain;
 
 import static quill.textbase.Span.createSpan;
 
 /**
- * Test applying Change instances, and that undo and redo of them works
- * satisfactorily.
+ * Test adding Folio instances to a ChangeStack, and that undo and redo of
+ * them works satisfactorily.
  * 
  * @author Andrew Cowie
- */
-/*
- * Assmes you've already done the Text tests.
  */
 public class ValidateApplyUndoRedo extends TestCase
 {
@@ -37,31 +40,33 @@ public class ValidateApplyUndoRedo extends TestCase
         final ChangeStack stack;
         final TextChain chain;
         final Span span;
-        final Node tree;
-        Extract extract;
-        Change change;
+        final Folio one, two, three, four;
+        Folio folio;
 
         stack = new ChangeStack();
         chain = new TextChain();
         span = createSpan("Hello World", null);
-        tree = Node.createNode(span);
+        chain.append(span);
 
-        change = new InsertTextualChange(chain, 0, tree);
-        stack.apply(change);
-        assertEquals("Hello World", chain.toString());
-        assertSame(change, stack.getCurrent());
+        folio = stack.getCurrent();
+        assertNull(folio);
 
-        extract = chain.extractRange(5, 6);
-        change = new DeleteTextualChange(chain, 5, extract);
-        stack.apply(change);
-        assertEquals("Hello", chain.toString());
-        assertSame(change, stack.getCurrent());
+        one = new Folio((Manuscript) null, (Chapter) null, (Series) null);
+        two = new Folio((Manuscript) null, (Chapter) null, (Series) null);
+        three = new Folio((Manuscript) null, (Chapter) null, (Series) null);
+        four = new Folio((Manuscript) null, (Chapter) null, (Series) null);
 
-        extract = chain.extractRange(1, 3);
-        change = new DeleteTextualChange(chain, 1, extract);
-        stack.apply(change);
-        assertEquals("Ho", chain.toString());
-        assertSame(change, stack.getCurrent());
+        stack.apply(one);
+        folio = stack.getCurrent();
+        assertSame(one, folio);
+
+        stack.apply(two);
+        folio = stack.getCurrent();
+        assertSame(two, folio);
+
+        stack.apply(three);
+        folio = stack.getCurrent();
+        assertSame(three, folio);
 
         /*
          * Now evaluate moving back and forth along the undo stack. redo at
@@ -69,14 +74,16 @@ public class ValidateApplyUndoRedo extends TestCase
          */
 
         stack.redo();
-        assertEquals("Ho", chain.toString());
-        assertSame(change, stack.getCurrent());
+        folio = stack.getCurrent();
+        assertSame(three, folio);
 
         stack.undo();
-        assertEquals("Hello", chain.toString());
+        folio = stack.getCurrent();
+        assertSame(two, folio);
 
         stack.redo();
-        assertEquals("Ho", chain.toString());
+        folio = stack.getCurrent();
+        assertSame(three, folio);
 
         /*
          * Test going back to the beginning, and that overshooting is a no-op.
@@ -84,19 +91,26 @@ public class ValidateApplyUndoRedo extends TestCase
 
         stack.undo();
         stack.undo();
-        assertEquals("Hello World", chain.toString());
-        stack.undo();
-        assertEquals("", chain.toString());
-        stack.undo();
-        assertEquals("", chain.toString());
-        stack.redo();
-        assertEquals("Hello World", chain.toString());
+        folio = stack.getCurrent();
+        assertSame(one, folio);
 
+        stack.undo();
+        folio = stack.getCurrent();
+        assertNull(folio);
+
+        stack.undo();
+        folio = stack.getCurrent();
+        assertNull(folio);
         stack.redo();
-        change = new InsertTextualChange(chain, 5, Extract.create(createSpan(" Santa Claus", null)));
-        stack.apply(change);
-        assertEquals("Hello Santa Claus", chain.toString());
-        assertSame(change, stack.getCurrent());
+        folio = stack.getCurrent();
+        assertSame(one, folio);
+        stack.redo();
+        folio = stack.getCurrent();
+        assertSame(two, folio);
+
+        stack.apply(four);
+        folio = stack.getCurrent();
+        assertSame(four, folio);
 
         /*
          * This new Change is a divergence and so creates a new branch of the
@@ -105,6 +119,7 @@ public class ValidateApplyUndoRedo extends TestCase
          */
 
         stack.redo();
-        assertEquals("Hello Santa Claus", chain.toString());
+        folio = stack.getCurrent();
+        assertSame(four, folio);
     }
 }

@@ -33,12 +33,8 @@ import org.gnome.gtk.TextIter;
 
 import parchment.format.Chapter;
 import parchment.format.Manuscript;
-import quill.textbase.Change;
-import quill.textbase.Common;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
-import quill.textbase.FormatTextualChange;
-import quill.textbase.InsertTextualChange;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
@@ -67,11 +63,12 @@ public class ValidateChangePropagation extends GraphicalTestCase
         final Manuscript manuscript;
         final Chapter chapter;
         final Folio folio;
-        final Series series;
+        Series series;
         final PrimaryWindow primary;
+        final ComponentEditorWidget parent;
+        final EditorTextView editor;
         final Segment segment;
-        final TextChain chain;
-        final Change change;
+        final Extract entire;
         final Span span;
         final OutputStream out;
         final String expected;
@@ -85,11 +82,13 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         series = folio.getSeries(0);
         segment = series.get(1);
-        chain = segment.getEntire();
+        entire = segment.getEntire();
         span = createSpan('h', null);
 
-        change = new InsertTextualChange(chain, 0, span);
-        primary.apply(change);
+        parent = primary.testGetEditor();
+        editor = parent.testGetEditor(0);
+        editor.testAppendSpan(span);
+        series = parent.getSeries();
 
         out = new ByteArrayOutputStream();
         chapter.saveDocument(series, out);
@@ -97,9 +96,9 @@ public class ValidateChangePropagation extends GraphicalTestCase
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
                 "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
-                "<text>",
+                "<title>",
                 "h",
-                "</text>",
+                "</title>",
                 "</chapter>"
         });
         assertEquals(expected, out.toString());
@@ -112,9 +111,8 @@ public class ValidateChangePropagation extends GraphicalTestCase
         final Series series;
         final PrimaryWindow primary;
         final Segment segment;
-        final TextChain chain;
-        Change change;
         final Span span;
+        Extract entire;
         OutputStream out;
         String expected;
         final EditorTextView editor;
@@ -135,11 +133,10 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         series = folio.getSeries(0);
         segment = series.get(1);
-        chain = segment.getEntire();
+        entire = segment.getEntire();
         span = createSpan("This is a test of the emergency broadcast system", null);
 
-        change = new InsertTextualChange(chain, 0, span);
-        primary.apply(change);
+        // FIXME
 
         out = new ByteArrayOutputStream();
         chapter.saveDocument(series, out);
@@ -176,12 +173,12 @@ public class ValidateChangePropagation extends GraphicalTestCase
         Test.cycleMainLoop();
 
         /*
-         * We've still got the TextChain backing the Segment of this
-         * EditorTextView, so first check to make sure it actually did what we
-         * want (thereby passing this test fixture)
+         * Check to make sure it actually did what we want (thereby passing
+         * this test fixture)
          */
 
-        assertEquals("This is an emergency broadcast system", chain.toString());
+        entire = editor.testGetEntire();
+        assertEquals("This is an emergency broadcast system", entire.getText());
 
         /*
          * Finally, just check the rest of the stack; the code was already
@@ -210,7 +207,6 @@ public class ValidateChangePropagation extends GraphicalTestCase
         final Series series;
         final Segment segment;
         final TextChain chain;
-        Change change;
         Span span;
         Extract extract;
         OutputStream out;
@@ -231,16 +227,14 @@ public class ValidateChangePropagation extends GraphicalTestCase
          */
 
         segment = folio.getSeries(0).get(1);
-        chain = segment.getEntire();
+        extract = segment.getEntire();
 
         span = createSpan("This is a test of the emergency broadcast system", null);
-        change = new InsertTextualChange(chain, 0, span);
-        primary.apply(change);
 
         span = createSpan("emergency", null);
         extract = Extract.create(span);
-        change = new FormatTextualChange(chain, 22, extract, Common.ITALICS);
-        primary.apply(change);
+        // change = new FormatTextualChange(chain, 22, extract,
+        // Common.ITALICS);
 
         out = new ByteArrayOutputStream();
         chapter.saveDocument(series, out);
