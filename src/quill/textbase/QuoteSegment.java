@@ -27,11 +27,11 @@ package quill.textbase;
  */
 public final class QuoteSegment extends Segment
 {
-    public QuoteSegment() {
-        super();
+    public QuoteSegment(Extract entire) {
+        super(entire);
     }
 
-    Segment createSimilar() {
-        return new QuoteSegment();
+    public Segment createSimilar(Extract entire) {
+        return new QuoteSegment(entire);
     }
 }

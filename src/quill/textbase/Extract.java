@@ -52,6 +52,10 @@ public abstract class Extract
         return Node.createNode(span);
     }
 
+    public static Extract create() {
+        return Node.createNode();
+    }
+
     /**
      * Invoke tourist's visit() method for each Span in this extract.
      */

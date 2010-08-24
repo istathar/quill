@@ -28,11 +28,11 @@ package quill.textbase;
  */
 public final class NormalSegment extends Segment
 {
-    public NormalSegment() {
-        super();
+    public NormalSegment(Extract entire) {
+        super(entire);
     }
 
-    Segment createSimilar() {
-        return new NormalSegment();
+    public Segment createSimilar(Extract entire) {
+        return new NormalSegment(entire);
     }
 }

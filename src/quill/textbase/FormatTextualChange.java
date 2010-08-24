@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -21,23 +21,12 @@ package quill.textbase;
 import java.util.ArrayList;
 
 /**
- * Add format to a range of Text.
+ * Manuipulate the formatting of a range of text.
  * 
  * @author Andrew Cowie
  */
-public class FormatTextualChange extends TextualChange
+public class FormatTextualChange
 {
-    Markup format;
-
-    /**
-     * Toggle format in the given range. This means applying it, unless the
-     * first Span in the Extract is that format, in which case toss it.
-     */
-    public FormatTextualChange(TextChain chain, int offset, Extract range, Markup format) {
-        super(chain, offset, range, toggleMarkup(range, format));
-        this.format = format;
-    }
-
     private static class FirstSpanFinder implements SpanVisitor
     {
         private Markup markup;
@@ -54,7 +43,11 @@ public class FormatTextualChange extends TextualChange
         }
     }
 
-    private static Extract toggleMarkup(Extract original, Markup format) {
+    /**
+     * Toggle format in the given range. This means applying it, unless the
+     * first Span in the Extract is that format, in which case toss it.
+     */
+    public static Extract toggleMarkup(Extract original, Markup format) {
         final FirstSpanFinder finder;
         final Markup markup;
 
@@ -169,7 +162,7 @@ public class FormatTextualChange extends TextualChange
      * and a word within it marked as <type>. You want to remove the italics,
      * but the marked up word will remain marked up.
      */
-    private static Extract removeMarkup(final Extract original, final Markup format) {
+    public static Extract removeMarkup(final Extract original, final Markup format) {
         final ArrayList<Span> list;
         Node node;
         Span span;
@@ -210,12 +203,7 @@ public class FormatTextualChange extends TextualChange
     /**
      * Clear all format in the given range.
      */
-    public FormatTextualChange(TextChain chain, int offset, Extract original) {
-        super(chain, offset, original, clearMarkup(original));
-        this.format = null;
-    }
-
-    private static Extract clearMarkup(Extract original) {
+    public static Extract clearMarkup(Extract original) {
         Accumulator tourist;
         Node node;
 
@@ -224,23 +212,5 @@ public class FormatTextualChange extends TextualChange
         node = tourist.getTree();
 
         return node;
-    }
-
-    /*
-     * Doing clear() this way is cumbersome.
-     */
-    protected void apply() {
-        chain.delete(offset, removed.getWidth());
-        chain.insert(offset, added);
-    }
-
-    /*
-     * What about having cleared? We should be restoring the range, maybe?
-     * Actually, this is wrong; if we're undoing we have the Span[] and should
-     * be able to just "replace" with it.
-     */
-    protected void undo() {
-        chain.delete(offset, added.getWidth());
-        chain.insert(offset, removed);
     }
 }

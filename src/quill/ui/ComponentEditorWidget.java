@@ -18,9 +18,6 @@
  */
 package quill.ui;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.Allocation;
@@ -31,7 +28,6 @@ import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
-import quill.textbase.Change;
 import quill.textbase.ComponentSegment;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
@@ -41,9 +37,6 @@ import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
-import quill.textbase.SplitStructuralChange;
-import quill.textbase.StructuralChange;
-import quill.textbase.TextualChange;
 
 /**
  * Left hand side of a PrimaryWindow for editing a Component (Article or
@@ -59,17 +52,7 @@ class ComponentEditorWidget extends ScrolledWindow
 
     private VBox box;
 
-    /**
-     * A map going from user interface layer deeper into the internal
-     * representation layer.
-     */
-    private Map<Widget, Segment> deeper;
-
-    /**
-     * A map going from internal representations out to the corresponding user
-     * interface element; the opposite of deeper.
-     */
-    private Map<Segment, Widget> rising;
+    private EditorTextView[] editors;
 
     /**
      * Which Segment currently has the cursor?
@@ -79,23 +62,17 @@ class ComponentEditorWidget extends ScrolledWindow
     /**
      * What is the top level UI holding this document?
      */
-    private PrimaryWindow parent;
+    private PrimaryWindow primary;
 
     private Series series;
 
     ComponentEditorWidget(PrimaryWindow primary) {
         super();
         scroll = this;
-        parent = primary;
-        setupMaps();
+        this.primary = primary;
 
         setupScrolling();
         hookupAdjustmentReactions();
-    }
-
-    private void setupMaps() {
-        deeper = new HashMap<Widget, Segment>(16);
-        rising = new HashMap<Segment, Widget>(16);
     }
 
     private void setupScrolling() {
@@ -137,13 +114,14 @@ class ComponentEditorWidget extends ScrolledWindow
     }
 
     PrimaryWindow getPrimary() {
-        return parent;
+        return primary;
     }
 
     void initializeSeries(Series series) {
         Widget[] children;
         Segment segment;
         int i;
+        final int num;
         Widget widget;
 
         /*
@@ -161,13 +139,15 @@ class ComponentEditorWidget extends ScrolledWindow
         /*
          * Now set up the new Series.
          */
-
+        num = series.size();
         this.series = series;
 
-        for (i = 0; i < series.size(); i++) {
+        this.editors = new EditorTextView[num];
+
+        for (i = 0; i < num; i++) {
             segment = series.get(i);
 
-            widget = createEditorForSegment(segment);
+            widget = createEditorForSegment(i, segment);
 
             box.packStart(widget, false, false, 0);
         }
@@ -181,25 +161,40 @@ class ComponentEditorWidget extends ScrolledWindow
         this.cursorSegment = series.get(0);
     }
 
-    private void associate(Segment segment, Widget widget) {
-        rising.put(segment, widget);
-        deeper.put(widget, segment);
-    }
-
-    private void disassociate(Segment segment, Widget widget) {
-        rising.remove(segment);
-        deeper.remove(widget);
-    }
-
     private Segment lookup(Widget editor) {
-        return deeper.get(editor);
+        final int len;
+        int i;
+
+        len = editors.length;
+
+        if (len != series.size()) {
+            throw new AssertionError();
+        }
+
+        for (i = 0; i < len; i++) {
+            if (editors[i] == editor) {
+                return series.get(i);
+            }
+        }
+
+        throw new IllegalStateException("Can't find editor Widget in EditorTextView[]");
     }
 
-    private Widget lookup(Segment segment) {
-        return rising.get(segment);
+    /**
+     * Get the editor corresponding to the given Segment.
+     */
+    /*
+     * This one is easy; we can just ask the series
+     */
+    private EditorTextView lookup(Segment segment) {
+        final int i;
+
+        i = series.indexOf(segment);
+
+        return editors[i];
     }
 
-    private Widget createEditorForSegment(Segment segment) {
+    private Widget createEditorForSegment(int index, Segment segment) {
         final Widget result;
         final EditorTextView editor;
         final HeadingBox heading;
@@ -266,7 +261,7 @@ class ComponentEditorWidget extends ScrolledWindow
             throw new IllegalStateException("Unknown Segment type");
         }
 
-        associate(segment, editor);
+        editors[index] = editor;
 
         return result;
     }
@@ -302,30 +297,61 @@ class ComponentEditorWidget extends ScrolledWindow
     }
 
     /**
-     * Given a StructuralChange, figure out what it means in terms of the UI
-     * in this ComponentEditorWidget.
+     * Given a [new] state, apply it!
      */
-    void affect(Change change) {
-        final Segment first;
+    /*
+     * Much TODO here, dealing with structural change cases
+     */
+    void affect(Series series) {
+        final int num;
+        int i;
+        Segment segment;
+        EditorTextView[] editors;
         EditorTextView editor;
 
-        if (change instanceof TextualChange) {
-            first = change.affects();
-            editor = (EditorTextView) lookup(first);
-            editor.affect(change);
+        if (this.series == series) {
+            return;
+        }
+        this.series = series;
 
-        } else if (change instanceof StructuralChange) {
-            if (change instanceof SplitStructuralChange) {
-                affect((SplitStructuralChange) change);
-            } else {
-                throw new UnsupportedOperationException("\n"
-                        + "Coverage needed for this StructuralChange type");
-            }
+        num = series.size();
+        editors = findEditors();
+
+        for (i = 0; i < num; i++) {
+            segment = series.get(i);
+            editor = editors[i];
+            editor.affect(segment);
         }
     }
 
-    private void affect(final SplitStructuralChange change) {
-        final Segment first, added, third;
+    /**
+     * Entry point for an EditorTextView to inform its parent that its state
+     * has changed.
+     */
+    void update(EditorTextView editor, Segment previous, Segment segment) {
+        final Series former;
+        final int i;
+
+        former = series;
+
+        i = former.indexOf(previous);
+
+        series = former.update(i, segment);
+        cursorSegment = segment;
+
+        /*
+         * TODO Anything else to change?
+         */
+
+        /*
+         * Now propegate that a state change has happened upwards.
+         */
+
+        primary.update(this, former, series);
+    }
+
+    private void affect(final Segment first, final Segment added) {
+        final Segment third;
         final Widget[] children;
         int i;
         final Widget view;
@@ -335,10 +361,6 @@ class ComponentEditorWidget extends ScrolledWindow
         /*
          * Find the index of the view into the VBox.
          */
-        this.series = change.getAfter();
-
-        first = change.getInto();
-        added = change.getAdded();
 
         view = lookup(first);
 
@@ -357,13 +379,13 @@ class ComponentEditorWidget extends ScrolledWindow
          * Create the new editor
          */
 
-        widget = createEditorForSegment(added);
+        widget = createEditorForSegment(i, added);
 
         box.packStart(widget, false, false, 0);
         i++;
         box.reorderChild(widget, i);
         widget.showAll();
-        editor = (EditorTextView) lookup(added);
+        editor = lookup(added);
         editor.grabFocus();
 
         /*
@@ -380,7 +402,7 @@ class ComponentEditorWidget extends ScrolledWindow
         }
 
         third = series.get(i + 1);
-        widget = createEditorForSegment(third);
+        widget = createEditorForSegment(i, third);
         box.packStart(widget, false, false, 0);
         i++;
         box.reorderChild(widget, i);
@@ -390,24 +412,7 @@ class ComponentEditorWidget extends ScrolledWindow
          * Delete the third text out of the first.
          */
 
-        editor = (EditorTextView) view;
-        editor.affect(change);
-
-    }
-
-    void reverse(Change change) {
-        final Segment first;
-        final EditorTextView editor;
-
-        if (change instanceof TextualChange) {
-            first = change.affects();
-            editor = (EditorTextView) lookup(first);
-            editor.reverse(change);
-
-        } else if (change instanceof StructuralChange) {
-            // FIXME
-            throw new UnsupportedOperationException("\n" + "Not yet implemented");
-        }
+        // TODO repair?
     }
 
     public void grabFocus() {
@@ -415,7 +420,7 @@ class ComponentEditorWidget extends ScrolledWindow
         final EditorTextView first;
 
         segment = series.get(0);
-        first = (EditorTextView) lookup(segment);
+        first = lookup(segment);
         first.placeCursorFirstLine(0);
         first.grabFocus();
 
@@ -447,7 +452,6 @@ class ComponentEditorWidget extends ScrolledWindow
 
     void moveCursorUp(final Widget from, final int position) {
         int i;
-        final Widget above;
         Segment segment;
         final EditorTextView editor;
 
@@ -459,10 +463,7 @@ class ComponentEditorWidget extends ScrolledWindow
         }
         i--;
 
-        segment = series.get(i);
-        above = lookup(segment);
-
-        editor = (EditorTextView) above;
+        editor = editors[i];
         editor.placeCursorLastLine(position);
         editor.grabFocus();
 
@@ -659,6 +660,28 @@ class ComponentEditorWidget extends ScrolledWindow
         children = box.getChildren();
         i = children.length - 1;
         return (EditorTextView) findEditorIn(children[i]);
+    }
+
+    /**
+     * This is mildly horrid; we should instead mainain this list.
+     */
+    private EditorTextView[] findEditors() {
+        final Widget[] children;
+        final EditorTextView[] editors;
+        final int num;
+        int i;
+        Widget child;
+
+        children = box.getChildren();
+        num = children.length;
+        editors = new EditorTextView[num];
+
+        for (i = 0; i < num; i++) {
+            child = children[i];
+            editors[i] = (EditorTextView) findEditorIn(child);
+        }
+
+        return editors;
     }
 
     void moveCursorStart() {

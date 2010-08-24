@@ -36,26 +36,35 @@ package quill.textbase;
  */
 public abstract class Segment
 {
-    protected Segment() {}
+    protected Segment(Extract entire) {
+        this.entire = entire;
+        this.image = "";
+    }
+
+    protected Segment(Extract entire, String extra) {
+        this.entire = entire;
+        this.image = extra;
+    }
 
     /**
      * The internal representation of the text body of this Segment.
      */
-    private TextChain chain;
+    private final Extract entire;
 
-    public TextChain getText() {
-        return chain;
+    public Extract getEntire() {
+        return entire;
     }
 
-    public void setText(TextChain chain) {
-        this.chain = chain;
-        chain.setEnclosingSegment(this);
-    }
+    public abstract Segment createSimilar(Extract entire);
 
-    abstract Segment createSimilar();
+    /**
+     * A single item of metadata, originally the filename for an ImageSegment.
+     */
+    private final String image;
 
-    private String image;
-
+    /*
+     * TODO rename this to getMeta() or such.
+     */
     /*
      * This is called by RenderEngine...
      */
@@ -63,7 +72,34 @@ public abstract class Segment
         return image;
     }
 
-    public void setImage(String filename) {
-        this.image = filename;
+    /**
+     * Get a single String with the contents of the Span tree of text in this
+     * Segment.
+     */
+    /*
+     * This isn't exactly effecient given large amounts of text. Anything
+     * doing something heavy with this result should iterate over the Spans
+     * itself.
+     */
+    public String getText() {
+        final StringBuilder str;
+
+        str = new StringBuilder();
+
+        entire.visit(new CharacterVisitor() {
+            public boolean visit(int character, Markup markup) {
+                str.appendCodePoint(character);
+                return false;
+            }
+        });
+
+        return str.toString();
+    }
+
+    /*
+     * For debugging
+     */
+    public String toString() {
+        return getClass().getSimpleName() + " \"" + getText() + "\"";
     }
 }

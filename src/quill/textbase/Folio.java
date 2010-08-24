@@ -82,6 +82,12 @@ public class Folio
         this.components = components.toArray(s);
     }
 
+    private Folio(Manuscript manuscript, Chapter[] chapters, Series[] components) {
+        this.manuscript = manuscript;
+        this.chapters = chapters;
+        this.components = components;
+    }
+
     public int size() {
         return components.length;
     }
@@ -105,4 +111,30 @@ public class Folio
         return chapters[index];
     }
 
+    public int indexOf(Series series) {
+        int i;
+
+        for (i = 0; i < components.length; i++) {
+            if (components[i] == series) {
+                return i;
+            }
+        }
+
+        throw new IllegalArgumentException("\n" + "Series not in this Folio");
+    }
+
+    public Folio update(int position, Series series) {
+        final Series[] original, replacement;
+
+        original = this.components;
+
+        replacement = new Series[original.length];
+
+        System.arraycopy(original, 0, replacement, 0, position);
+        replacement[position] = series;
+        System.arraycopy(original, position + 1, replacement, position + 1, original.length - position
+                - 1);
+
+        return new Folio(this.manuscript, this.chapters, replacement);
+    }
 }

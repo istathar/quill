@@ -46,7 +46,7 @@ public class ValidateStructuralChange extends TestCase
 
         series = new Series(segments);
         assertEquals(3, series.size());
-        assertEquals("Hello World", series.get(2).getText().toString());
+        assertEquals("Hello World", series.get(2).getEntire().toString());
     }
 
     /**
@@ -63,7 +63,7 @@ public class ValidateStructuralChange extends TestCase
 
         for (i = 0; i < series.size(); i++) {
             segment = series.get(i);
-            chain = segment.getText();
+            chain = segment.getEntire();
             str.append(chain.toString());
         }
 

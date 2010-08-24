@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -36,6 +36,7 @@ import org.gnome.gtk.Widget;
 
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
+import quill.textbase.Folio;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.PreformatSegment;
@@ -69,7 +70,7 @@ class OutlineWidget extends VBox
     private void buildOutline() {
         Segment segment;
         int i;
-        TextChain text;
+        Extract entire;
         StringBuilder str;
         Button button;
         Label label;
@@ -83,18 +84,18 @@ class OutlineWidget extends VBox
             segment = series.get(i);
 
             if (segment instanceof ComponentSegment) {
-                text = segment.getText();
+                entire = segment.getEntire();
 
                 str = new StringBuilder();
                 str.append("<span size=\"xx-large\"> ");
-                str.append(text.toString());
+                str.append(entire.getText());
                 str.append("</span>");
             } else if (segment instanceof HeadingSegment) {
-                text = segment.getText();
+                entire = segment.getEntire();
 
                 str = new StringBuilder();
                 str.append("      ");
-                str.append(text.toString());
+                str.append(entire.getText());
             } else if (segment instanceof ImageSegment) {
                 Image image;
                 Pixbuf pixbuf;
@@ -113,12 +114,12 @@ class OutlineWidget extends VBox
                 top.packStart(left, false, false, 0);
                 continue;
             } else {
-                text = segment.getText();
-                text.extractParagraphs();
+                entire = segment.getEntire();
+
                 if (segment instanceof PreformatSegment) {
-                    lines = new CompressedLines(text, true);
+                    lines = new CompressedLines(entire, true);
                 } else {
-                    lines = new CompressedLines(text, false);
+                    lines = new CompressedLines(entire, false);
                 }
                 top.packStart(lines, false, false, 0);
                 continue;
@@ -153,6 +154,19 @@ class OutlineWidget extends VBox
 
         buildOutline();
     }
+
+    /*
+     * FIXME Mockup! We actually need to evaluate the Series(s) against the
+     * ones being displayed, and rebuild if/as necessary, and presumably if
+     * we're actually showing.
+     */
+    void affect(Folio folio) {
+        Series series;
+
+        series = folio.getSeries(0);
+
+        this.series = series;
+    }
 }
 
 class CompressedLines extends DrawingArea
@@ -167,16 +181,18 @@ class CompressedLines extends DrawingArea
 
     private static final int SPACING = 4;
 
-    CompressedLines(TextChain text, boolean program) {
+    CompressedLines(Extract entire, boolean program) {
         super();
         final DrawingArea self;
+        final TextChain chain;
         Extract[] paras;
         String line;
         int j, i, words, width;
 
         self = this;
 
-        paras = text.extractParagraphs();
+        chain = new TextChain(entire);
+        paras = chain.extractParagraphs();
         dots = new int[paras.length];
         j = 0;
 

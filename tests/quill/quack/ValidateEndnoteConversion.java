@@ -79,7 +79,7 @@ public class ValidateEndnoteConversion extends IOTestCase
         segment = series.get(1);
         assertTrue(segment instanceof QuoteSegment);
 
-        chain = segment.getText();
+        chain = segment.getEntire();
         entire = chain.extractAll();
         entire.visit(new SpanVisitor() {
             private int i = 0;
@@ -212,7 +212,7 @@ public class ValidateEndnoteConversion extends IOTestCase
          */
 
         segment = series.get(1);
-        chain = segment.getText();
+        chain = segment.getEntire();
 
         span = Span.createMarker("[Einstein, 1905]", Special.NOTE);
         chain.append(span);

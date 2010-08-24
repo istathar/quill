@@ -28,11 +28,11 @@ package quill.textbase;
  */
 public final class PreformatSegment extends Segment
 {
-    public PreformatSegment() {
-        super();
+    public PreformatSegment(Extract entire) {
+        super(entire);
     }
 
-    Segment createSimilar() {
-        return new PreformatSegment();
+    public Segment createSimilar(Extract entire) {
+        return new PreformatSegment(entire);
     }
 }

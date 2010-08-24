@@ -194,9 +194,9 @@ class PreviewWidget extends DrawingArea
      * Given a Series in a Manuscript representing the Segments in a chapter
      * or article, instruct this Widget to render a preview of them.
      */
-    void renderSeries(Manuscript manuscript, Folio folio) {
+    void affect(Manuscript manuscript, Folio folio) {
         this.manuscript = manuscript;
         this.folio = folio;
-        this.queueDraw();
+        // this.queueDraw();
     }
 }

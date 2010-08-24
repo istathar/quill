@@ -40,7 +40,6 @@ import quill.textbase.Segment;
 import quill.textbase.Span;
 import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
-import quill.textbase.TextChain;
 
 /**
  * Build a DocBook XOM tree equivalent to the data in our textbase, ready for
@@ -81,7 +80,7 @@ public class QuackConverter
      * Append a Segment.
      */
     public void append(final Segment segment) {
-        final TextChain chain;
+        final Extract entire;
         final String value;
 
         this.segment = segment;
@@ -106,24 +105,20 @@ public class QuackConverter
         }
         inline = null;
 
-        chain = segment.getText();
-        if ((chain == null) || (chain.length() == 0)) {
+        entire = segment.getEntire();
+        if ((entire == null) || (entire.getWidth() == 0)) {
+            // FIXME is it ever null now?
             return;
         }
 
         component.add(block);
-        append(chain);
+        append(entire);
     }
 
-    private void append(final TextChain chain) {
-        final Extract entire;
+    private void append(final Extract entire) {
 
-        if (chain == null) {
-            return;
-        }
-
-        entire = chain.extractAll();
         if (entire == null) {
+            // FIXME ever?
             return;
         }
 

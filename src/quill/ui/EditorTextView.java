@@ -43,14 +43,10 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.WrapMode;
 
 import quill.client.Quill;
-import quill.textbase.Change;
 import quill.textbase.Common;
-import quill.textbase.DeleteTextualChange;
 import quill.textbase.Extract;
 import quill.textbase.FormatTextualChange;
-import quill.textbase.FullTextualChange;
 import quill.textbase.HeadingSegment;
-import quill.textbase.InsertTextualChange;
 import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
@@ -61,10 +57,7 @@ import quill.textbase.Series;
 import quill.textbase.Span;
 import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
-import quill.textbase.SplitStructuralChange;
-import quill.textbase.StructuralChange;
 import quill.textbase.TextChain;
-import quill.textbase.TextualChange;
 import quill.textbase.WordVisitor;
 
 import static org.gnome.gtk.TextWindowType.TEXT;
@@ -97,23 +90,20 @@ abstract class EditorTextView extends TextView
 
     private final UserInterface ui;
 
-    private final PrimaryWindow primary;
-
     private final ComponentEditorWidget parent;
 
     EditorTextView(ComponentEditorWidget parent, Segment segment) {
         super();
         this.view = this;
         this.ui = Quill.getUserInterface();
-        this.primary = parent.getPrimary();
         this.parent = parent;
-        this.segment = segment;
+        this.chain = new TextChain();
 
         setupTextView();
         setupInsertMenu();
         setupContextMenu();
 
-        displaySegment();
+        affect(segment);
 
         hookupKeybindings();
         hookupFormatManagement();
@@ -444,11 +434,10 @@ abstract class EditorTextView extends TextView
     }
 
     private void insertText(String text) {
-        final Extract removed;
         final Span span;
-        final TextualChange change;
         final TextIter selection;
         final int selectionOffset, offset, width;
+        TextIter start, finish;
 
         span = Span.createSpan(text, insertMarkup);
 
@@ -459,19 +448,25 @@ abstract class EditorTextView extends TextView
             offset = normalizeOffset(insertOffset, selectionOffset);
             width = normalizeWidth(insertOffset, selectionOffset);
 
-            removed = chain.extractRange(offset, width);
-            change = new FullTextualChange(chain, offset, removed, span);
+            chain.delete(offset, width);
+            chain.insert(offset, span);
+
+            start = buffer.getIter(offset);
+            finish = buffer.getIter(offset + width);
+
+            buffer.delete(start, finish);
         } else {
-            change = new InsertTextualChange(chain, insertOffset, span);
+            chain.insert(insertOffset, span);
+            start = buffer.getIter(insertOffset);
         }
 
-        primary.apply(change);
+        buffer.insert(start, text, tagForMarkup(insertMarkup));
+        propagateUpdate();
     }
 
     private void pasteText() {
-        final Extract stash, removed;
-        final TextualChange change;
-        final TextIter selection;
+        final Extract stash;
+        final TextIter selection, start, finish;
         final int selectionOffset, offset, width;
 
         stash = ui.getClipboard();
@@ -486,18 +481,16 @@ abstract class EditorTextView extends TextView
             offset = normalizeOffset(insertOffset, selectionOffset);
             width = normalizeWidth(insertOffset, selectionOffset);
 
-            removed = chain.extractRange(offset, width);
-            change = new FullTextualChange(chain, offset, removed, stash);
+            start = buffer.getIter(offset);
+            finish = buffer.getIter(offset + width);
+            buffer.delete(start, finish);
         } else {
-            change = new InsertTextualChange(chain, insertOffset, stash);
+            start = buffer.getIter(insertOffset);
         }
 
-        /*
-         * Propegate the change. After this wends its way though the layers,
-         * it will result in ComponentEditorWindow calling this.affect().
-         */
+        insertSpans(start, stash);
 
-        primary.apply(change);
+        propagateUpdate();
     }
 
     private void deleteBack() {
@@ -539,28 +532,26 @@ abstract class EditorTextView extends TextView
     /**
      * Effect a deletion from start to end.
      */
-    private void deleteRange(TextIter start, TextIter end) {
+    private void deleteRange(TextIter start, TextIter finish) {
         int alpha, omega, offset, width;
-        final Extract range;
-        final TextualChange change;
 
         alpha = start.getOffset();
-        omega = end.getOffset();
+        omega = finish.getOffset();
 
         offset = normalizeOffset(alpha, omega);
         width = normalizeWidth(alpha, omega);
 
-        range = chain.extractRange(offset, width);
-        change = new DeleteTextualChange(chain, offset, range);
+        chain.delete(offset, width);
+        buffer.delete(start, finish);
 
-        primary.apply(change);
+        propagateUpdate();
     }
 
     private void toggleMarkup(Markup format) {
         TextIter start, end;
         int alpha, omega, offset, width;
-        final TextualChange change;
-        final Extract original;
+        final int tmp;
+        final Extract original, replacement;
 
         /*
          * If there is a selection then toggle the markup applied there.
@@ -578,65 +569,12 @@ abstract class EditorTextView extends TextView
             width = normalizeWidth(alpha, omega);
 
             original = chain.extractRange(offset, width);
+            replacement = FormatTextualChange.toggleMarkup(original, format);
 
-            change = new FormatTextualChange(chain, offset, original, format);
-            primary.apply(change);
-            this.affect(change);
+            tmp = offset;
 
-            /*
-             * Force deselect the range - you want to SEE the markup you just
-             * applied! Also ensure the cursor is at the end (double click
-             * select seems to put insertBound at the beginning).
-             */
-
-            end = buffer.getIter(offset + width);
-            buffer.placeCursor(end);
-        } else {
-            if (insertMarkup == format) {
-                insertMarkup = null; // OR, something more block oriented?
-            } else {
-                insertMarkup = format;
-            }
-        }
-    }
-
-    private void insertImage() {}
-
-    /**
-     * Cause the given Change to be reflected in the TextView. The assumption
-     * is made that the backing TextBuffer is in a state where applying this
-     * Change makes sense.
-     */
-    void affect(Change change) {
-        final SplitStructuralChange structural;
-        final TextualChange textual;
-        final TextIter start, finish;
-        final int offset;
-        final int alpha, omega;
-        Extract r;
-        int i;
-
-        if (change instanceof SplitStructuralChange) {
-            structural = (SplitStructuralChange) change;
-
-            offset = structural.getOffset();
-            start = buffer.getIter(offset);
-            finish = buffer.getIterEnd();
-            buffer.delete(start, finish);
-
-        } else if (change instanceof FormatTextualChange) {
-            textual = (TextualChange) change;
-
-            r = textual.getAdded();
-            if (r == null) {
-                return;
-            }
-
-            offset = textual.getOffset();
-            alpha = offset;
-
-            r.visit(new SpanVisitor() {
-                private int offset = alpha;
+            replacement.visit(new SpanVisitor() {
+                private int offset = tmp;
 
                 public boolean visit(Span s) {
                     final TextIter start, finish;
@@ -669,108 +607,74 @@ abstract class EditorTextView extends TextView
             checkSpellingRange(alpha, omega);
 
             /*
-             * Toggling placed the cursor. Hm.
+             * Force deselect the range - you want to SEE the markup you just
+             * applied! Also ensure the cursor is at the end (double click
+             * select seems to put insertBound at the beginning).
              */
-        } else if (change instanceof TextualChange) {
-            textual = (TextualChange) change;
 
-            alpha = textual.getOffset();
-            i = alpha;
-
-            start = buffer.getIter(textual.getOffset());
-
-            r = textual.getRemoved();
-            if (r != null) {
-                finish = buffer.getIter(textual.getOffset() + r.getWidth());
-                buffer.delete(start, finish);
-                // start = finish;
-            }
-
-            r = textual.getAdded();
-            if (r != null) {
-                r.visit(new SpanVisitor() {
-                    public boolean visit(Span s) {
-                        insertSpan(start, s);
-                        return false;
-                    }
-                });
-                i += r.getWidth();
-            }
-            omega = i;
-            checkSpellingRange(alpha, omega);
-
-            // start is at the end now, thaks to TextBuffer's insert()
-            buffer.placeCursor(start);
-
+            end = buffer.getIter(offset + width);
+            buffer.placeCursor(end);
         } else {
-            throw new IllegalStateException("Unknown Change type");
+            if (insertMarkup == format) {
+                insertMarkup = null; // OR, something more block oriented?
+            } else {
+                insertMarkup = format;
+            }
         }
-        view.grabFocus();
     }
 
+    private void insertImage() {}
+
     /**
-     * Revert this Change, removing it's affect on the view. A
-     * DeleteTextualChange will cause an insertion, etc.
+     * Given a Segment, apply it!
      */
-    void reverse(Change obj) {
-        final StructuralChange structural;
-        final TextualChange textual;
-        final TextIter start, finish, pointer;
-        int alpha, omega;
-        Extract r;
+    /*
+     * If segment is already set, then the requirement is that whatever caused
+     * this to be called has already updated the TextBuffer to match the
+     * requirements of this state. Otherwise, we blat the entire segment down.
+     * TODO this is horrible; we need to find the diff between the two trees
+     * and only incrementally affect it.
+     */
+    void affect(Segment segment) {
+        final Extract entire;
+        final TextIter start;
 
-        if (obj instanceof StructuralChange) {
-            structural = (StructuralChange) obj;
-
-            throw new UnsupportedOperationException("Not yet implemented " + structural); // FIXME
-
-        } else if (obj instanceof TextualChange) {
-            textual = (TextualChange) obj;
-
-            /*
-             * And now do what is necessary to reflect the change in this UI.
-             */
-
-            alpha = textual.getOffset();
-            omega = alpha;
-
-            start = buffer.getIter(alpha);
-
-            r = textual.getAdded();
-            if (r != null) {
-                finish = buffer.getIter(alpha + r.getWidth());
-                buffer.delete(start, finish);
-            }
-
-            r = textual.getRemoved();
-            if (r != null) {
-                r.visit(new SpanVisitor() {
-                    public boolean visit(Span s) {
-                        insertSpan(start, s);
-                        return false;
-                    }
-                });
-                omega += r.getWidth();
-            }
-
-            checkSpellingRange(alpha, omega);
-
-            /*
-             * There is an usual experience we'd like to create: when applying
-             * a formatting, and then undoing it, you tend to want to apply a
-             * DIFFERENT formatting, and so [re]selecting the range that was
-             * picked makes that much easier. Otherwise we do what we do
-             * elsewhere: de-select and put the cursor at the end of the
-             * current operation range.
-             */
-            if (obj instanceof FormatTextualChange) {
-                pointer = buffer.getIter(alpha);
-                buffer.selectRange(pointer, start);
-            } else {
-                buffer.placeCursor(start);
-            }
-            view.grabFocus();
+        if (this.segment == segment) {
+            return;
         }
+
+        /*
+         * Set the internal state
+         */
+
+        entire = segment.getEntire();
+        chain.setTree(entire);
+
+        /*
+         * Clear the buffer, and replace it with the entire tree of Spans. BAD
+         */
+
+        buffer.setText("");
+        start = buffer.getIterStart();
+        insertSpans(start, entire);
+
+        /*
+         * Spell check the whole thing
+         */
+
+        checkSpellingRange(0, entire.getWidth());
+
+        // start is at the end now, thaks to TextBuffer's insert()
+        buffer.placeCursor(start);
+
+        /*
+         * Set the global "cursor" which is used by OutlineWidget to know what
+         * page to display.
+         */
+
+        parent.setCursor(segment);
+
+        this.segment = segment;
     }
 
     private void copyText() {
@@ -782,10 +686,9 @@ abstract class EditorTextView extends TextView
     }
 
     private void extractText(boolean copy) {
-        final TextIter start, end;
+        final TextIter start, finish;
         int alpha, omega, offset, width;
         final Extract extract;
-        final TextualChange change;
 
         /*
          * If there's no selection, we can't "Copy" or "Cut"
@@ -796,10 +699,10 @@ abstract class EditorTextView extends TextView
         }
 
         start = buffer.getIter(selectionBound);
-        end = buffer.getIter(insertBound);
+        finish = buffer.getIter(insertBound);
 
         alpha = start.getOffset();
-        omega = end.getOffset();
+        omega = finish.getOffset();
 
         offset = normalizeOffset(alpha, omega);
         width = normalizeWidth(alpha, omega);
@@ -820,8 +723,53 @@ abstract class EditorTextView extends TextView
          * behaviour.
          */
 
-        change = new DeleteTextualChange(chain, offset, ui.getClipboard());
-        primary.apply(change);
+        chain.delete(offset, width);
+
+        propagateUpdate();
+
+        buffer.delete(start, finish);
+    }
+
+    /**
+     * Get (craete) a [new] Segment representing the state of this TextChain
+     * as at the time you call this method, then pass it up to the parent
+     * ComponentEditorWidget for further propagation.
+     */
+    /*
+     * This changes this.segment before calling up. If we ever get a tree diff
+     * algorithm in place, then we can have the field change happen AFTER the
+     * return call to apply().
+     */
+    private void propagateUpdate() {
+        final Extract entire;
+        final Segment previous;
+
+        entire = chain.extractAll();
+        previous = segment;
+
+        segment = previous.createSimilar(entire);
+
+        parent.update(this, previous, segment);
+
+        // refugee
+        view.grabFocus();
+
+        // refugee
+        /*
+         * There is an usual experience we'd like to create: when applying a
+         * formatting, and then undoing it, you tend to want to apply a
+         * DIFFERENT formatting, and so [re]selecting the range that was
+         * picked makes that much easier. Otherwise we do what we do
+         * elsewhere: de-select and put the cursor at the end of the current
+         * operation range.
+         */
+        // if (obj instanceof FormatTextualChange) {
+        // pointer = buffer.getIter(alpha);
+        // buffer.selectRange(pointer, start);
+        // } else {
+        // buffer.placeCursor(start);
+        // }
+
     }
 
     private static int normalizeOffset(int alpha, int omega) {
@@ -891,7 +839,7 @@ abstract class EditorTextView extends TextView
                 rect = view.getLocation(pointer);
                 alloc = view.getAllocation();
 
-                primary.scrollEditorToShow(alloc.getY() + rect.getY(), rect.getHeight() + 5);
+                parent.ensureVisible(alloc.getY() + rect.getY(), rect.getHeight() + 5);
             }
         });
 
@@ -911,8 +859,7 @@ abstract class EditorTextView extends TextView
 
     private void clearFormat() {
         final TextIter start, end;
-        final Extract original;
-        final TextualChange change;
+        final Extract original, replacement;
         int alpha, omega, offset, width;
 
         /*
@@ -932,10 +879,11 @@ abstract class EditorTextView extends TextView
             width = normalizeWidth(alpha, omega);
 
             original = chain.extractRange(offset, width);
-            change = new FormatTextualChange(chain, offset, original);
+            replacement = FormatTextualChange.clearMarkup(original);
 
-            primary.apply(change);
-            this.affect(change);
+            chain.delete(offset, width);
+            chain.insert(offset, replacement);
+            propagateUpdate();
         }
 
         /*
@@ -946,40 +894,16 @@ abstract class EditorTextView extends TextView
     }
 
     /**
-     * Make this EditorTextView reflect the contents of the Segment this
-     * EditorTextView was initialized with.
+     * Insert all the Spans in the given extract into the underlying
+     * TextBuffer at pointer.
      */
-    private void displaySegment() {
-        final Extract entire;
-        final TextIter pointer;
-
-        /*
-         * Easy enough to just set the internal TextStack backing this editor
-         * to the one belonging to the Segment passed in.
-         */
-
-        chain = segment.getText();
-
-        /*
-         * But now we need to cycle over its Spans and place its content into
-         * the view.
-         */
-
-        entire = chain.extractAll();
-        if (entire == null) {
-            return;
-        }
-
-        pointer = buffer.getIterStart();
-
-        entire.visit(new SpanVisitor() {
+    private void insertSpans(final TextIter pointer, final Extract extract) {
+        extract.visit(new SpanVisitor() {
             public boolean visit(Span span) {
                 insertSpan(pointer, span);
                 return false;
             }
         });
-
-        checkSpellingRange(0, chain.length());
     }
 
     private void insertSpan(TextIter pointer, Span span) {
@@ -1194,16 +1118,42 @@ abstract class EditorTextView extends TextView
      * If we're at the end of the view we're appending. Jump the logic to the
      * user interface facades on PrimaryWindow.
      */
+    // TODO FIXME TODO
     private void handleInsertSegment(Segment addition) {
         final Series series;
-        final Change change;
+        final int offset, width;
+        final TextIter start, finish;
 
         series = parent.getSeries();
-        addition.setText(new TextChain());
 
-        change = new SplitStructuralChange(series, segment, insertOffset, addition);
+        /*
+         * Get rid of what we need rid of here.
+         */
 
-        primary.apply(change);
+        offset = insertOffset;
+        width = chain.length() - offset;
+
+        if (width > 0) {
+            chain.delete(offset, width);
+
+            start = buffer.getIter(offset);
+            finish = buffer.getIterEnd();
+            buffer.delete(start, finish);
+        }
+
+        /*
+         * Now change structure
+         */
+
+        // TODO?
+
+        propagateUpdate();
+
+        /*
+         * Put the splcied text back in.
+         */
+
+        // FIXME?
     }
 
     /*
@@ -1664,18 +1614,22 @@ abstract class EditorTextView extends TextView
 
         // similar to insertText()
         public void onWordSelected(String word, boolean replacement) {
-            final Extract removed;
             final Span span;
-            final Change change;
             final TextIter start, finish;
 
             if (replacement) {
                 // new text, so mutate, which will result in a recheck
-                removed = chain.extractRange(offset, wide);
-                span = Span.createSpan(word, insertMarkup);
-                change = new FullTextualChange(chain, offset, removed, span);
+                chain.delete(offset, wide);
 
-                primary.apply(change);
+                span = Span.createSpan(word, insertMarkup);
+                chain.insert(offset, span);
+
+                start = buffer.getIter(offset);
+                finish = buffer.getIter(offset + wide);
+                buffer.delete(start, finish);
+                buffer.insert(start, word, tagForMarkup(insertMarkup));
+
+                propagateUpdate();
             } else {
                 // the word has been added, so we need to unmark it.
                 start = buffer.getIter(offset);
@@ -1687,5 +1641,9 @@ abstract class EditorTextView extends TextView
 
     int getInsertOffset() {
         return insertOffset;
+    }
+
+    protected Extract getText() {
+        return chain.extractAll();
     }
 }

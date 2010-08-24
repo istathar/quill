@@ -55,7 +55,7 @@ public class Series
     /**
      * Create a new Series by changing the Segment at position.
      */
-    Series update(int position, Segment segment) {
+    public Series update(int position, Segment segment) {
         final Segment[] original, replacement;
 
         original = this.segments;

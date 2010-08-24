@@ -96,6 +96,10 @@ public class TextChain
         return root;
     }
 
+    public void setTree(Extract entire) {
+        root = (Node) entire;
+    }
+
     /**
      * Get the Span at a given offset, for testing purposes.
      */
@@ -147,10 +151,10 @@ public class TextChain
     }
 
     /**
-     * Delete a width wide segment starting at offset. Because people have to
-     * call extractRange() right before this in order to create a
-     * DeleteChange, this will duplicate effort. So, TODO create one which
-     * passes in a tree of the known bit to be removed.
+     * Delete a width wide segment starting at offset. People often have to
+     * call extractRange() right before this so this will duplicate effort.
+     * So, TODO create one which passes in a tree of the known bit to be
+     * removed?
      */
     public void delete(final int offset, final int wide) {
         final Node preceeding, following;
@@ -191,6 +195,9 @@ public class TextChain
 
     /**
      * Add or remove a Markup format from a range of text.
+     * 
+     * @deprecated This is tested, but unused! Replace with code from
+     *             FormatTextualChange?
      */
     protected void format(int offset, int wide, Markup format) {
         final Node preceeding, following;
