@@ -25,6 +25,7 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.client.ImproperFilenameException;
 import quill.textbase.Common;
+import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.NormalSegment;
 import quill.textbase.Segment;
@@ -38,14 +39,15 @@ public class ValidateProperNewlineHandling extends ParchmentTestCase
 {
     public final void testWriteChainWithTrainingBlankLine() throws IOException {
         final TextChain chain;
+        Extract entire;
         final Manuscript manuscript;
         final Chapter chapter;
         Span[] spans;
         int i;
         Span span;
         final Folio folio;
-        final Series series;
-        final Segment segment;
+        Series series;
+        Segment segment;
         final ByteArrayOutputStream out;
         final String blob;
 
@@ -59,7 +61,7 @@ public class ValidateProperNewlineHandling extends ParchmentTestCase
         series = folio.getSeries(0);
         segment = series.get(1);
         assertTrue(segment instanceof NormalSegment);
-        chain = segment.getEntire();
+        entire = segment.getEntire();
 
         spans = new Span[] {
                 createSpan("Hello\n", null),
@@ -69,6 +71,7 @@ public class ValidateProperNewlineHandling extends ParchmentTestCase
                 createSpan("\n", null)
         };
 
+        chain = new TextChain();
         for (i = 0; i < spans.length; i++) {
             span = spans[i];
             chain.append(span);
@@ -80,6 +83,10 @@ public class ValidateProperNewlineHandling extends ParchmentTestCase
         chapter = new Chapter(manuscript);
 
         out = new ByteArrayOutputStream();
+        entire = chain.extractAll();
+        segment = segment.createSimilar(entire);
+        series = series.update(1, segment);
+
         chapter.saveDocument(series, out);
 
         blob = combine(new String[] {
