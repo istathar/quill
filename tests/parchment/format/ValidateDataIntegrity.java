@@ -44,16 +44,16 @@ import static quill.textbase.Span.createSpan;
  */
 public class ValidateDataIntegrity extends IOTestCase
 {
-    private static final void insertThreeSpansIntoFirstSegment(final Series series) {
+    private static final Series insertThreeSpansIntoFirstSegment(final Series series) {
         final TextChain chain;
+        final Extract entire;
         Span[] spans;
         int i;
         Span span;
-        final Segment segment;
+        Segment segment;
 
         segment = series.get(1);
         assertTrue(segment instanceof NormalSegment);
-        chain = segment.getEntire();
 
         spans = new Span[] {
                 createSpan("Hello ", Common.BOLD),
@@ -61,10 +61,15 @@ public class ValidateDataIntegrity extends IOTestCase
                 createSpan(" world", Common.BOLD)
         };
 
+        chain = new TextChain();
         for (i = 0; i < spans.length; i++) {
             span = spans[i];
             chain.append(span);
         }
+
+        entire = chain.extractAll();
+        segment = segment.createSimilar(entire);
+        return series.update(1, segment);
     }
 
     /*
@@ -74,7 +79,7 @@ public class ValidateDataIntegrity extends IOTestCase
         final Manuscript manuscript;
         final Chapter chapter;
         final Folio folio;
-        final Series series;
+        Series series;
         final ByteArrayOutputStream out;
         final String expected;
 
@@ -83,7 +88,7 @@ public class ValidateDataIntegrity extends IOTestCase
         series = folio.getSeries(0);
         chapter = folio.getChapter(0);
 
-        insertThreeSpansIntoFirstSegment(series);
+        series = insertThreeSpansIntoFirstSegment(series);
 
         out = new ByteArrayOutputStream();
         chapter.saveDocument(series, out);
@@ -113,7 +118,6 @@ public class ValidateDataIntegrity extends IOTestCase
         final Span[] expected;
         final Series series;
         final Segment segment;
-        final TextChain chain;
         final Extract entire;
 
         expected = new Span[] {
@@ -128,12 +132,11 @@ public class ValidateDataIntegrity extends IOTestCase
         manuscript.setFilename("tests/quill/quack/ValidateDataIntegrity.parchment"); // junk
 
         chapter = new Chapter(manuscript);
-        chapter.setFilename("ContinuousMarkup.xml");
+        chapter.setFilename("ContinuousMarkup.xml"); // real
 
         series = chapter.loadDocument();
-        segment = series.get(1);
-        chain = segment.getEntire();
-        entire = chain.extractAll();
+        segment = series.get(0);
+        entire = segment.getEntire();
         assertNotNull(entire);
 
         entire.visit(new SpanVisitor() {
@@ -154,7 +157,6 @@ public class ValidateDataIntegrity extends IOTestCase
         final Span[] inbound;
         final Series series;
         final Segment segment;
-        final TextChain chain;
         final Extract entire;
         final ByteArrayOutputStream out;
         final String outbound;
@@ -173,9 +175,8 @@ public class ValidateDataIntegrity extends IOTestCase
         chapter = new Chapter(manuscript);
         chapter.setFilename("TwoBlocksMarkup.xml");
         series = chapter.loadDocument();
-        segment = series.get(1);
-        chain = segment.getEntire();
-        entire = chain.extractAll();
+        segment = series.get(0);
+        entire = segment.getEntire();
         assertNotNull(entire);
 
         entire.visit(new SpanVisitor() {
