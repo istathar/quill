@@ -58,8 +58,7 @@ public class ValidateEndnoteConversion extends IOTestCase
         final Chapter chapter;
         final Series series;
         Segment segment;
-        final TextChain chain;
-        final Extract entire;
+        final Extract entire, blank;
         final QuackConverter converter;
         final ByteArrayOutputStream out;
         final String original, result;
@@ -72,15 +71,12 @@ public class ValidateEndnoteConversion extends IOTestCase
         chapter.setFilename("Endnote.xml");
         series = chapter.loadDocument();
 
-        assertEquals(2, series.size());
+        assertEquals(1, series.size());
 
         segment = series.get(0);
-        assertTrue(segment instanceof ComponentSegment);
-        segment = series.get(1);
         assertTrue(segment instanceof QuoteSegment);
 
-        chain = segment.getEntire();
-        entire = chain.extractAll();
+        entire = segment.getEntire();
         entire.visit(new SpanVisitor() {
             private int i = 0;
 
@@ -102,7 +98,8 @@ public class ValidateEndnoteConversion extends IOTestCase
         });
 
         converter = new QuackConverter();
-        converter.append(new ComponentSegment());
+        blank = Extract.create();
+        converter.append(new ComponentSegment(blank));
         converter.append(segment);
 
         out = new ByteArrayOutputStream();
@@ -118,6 +115,7 @@ public class ValidateEndnoteConversion extends IOTestCase
         final Chapter chapter;
         final Series series;
         Segment segment;
+        final Extract blank;
         final QuackConverter converter;
         final ByteArrayOutputStream out;
         final String original, result;
@@ -135,15 +133,13 @@ public class ValidateEndnoteConversion extends IOTestCase
          */
 
         series = chapter.loadDocument();
-        assertEquals(4, series.size());
+        assertEquals(3, series.size());
 
         segment = series.get(0);
-        assertTrue(segment instanceof ComponentSegment);
-        segment = series.get(1);
         assertTrue(segment instanceof NormalSegment);
-        segment = series.get(2);
+        segment = series.get(1);
         assertTrue(segment instanceof QuoteSegment);
-        segment = series.get(3);
+        segment = series.get(2);
         assertTrue(segment instanceof NormalSegment);
 
         /*
@@ -151,9 +147,8 @@ public class ValidateEndnoteConversion extends IOTestCase
          */
 
         converter = new QuackConverter();
-        converter.append(new ComponentSegment());
 
-        for (i = 1; i < series.size(); i++) {
+        for (i = 0; i < series.size(); i++) {
             converter.append(series.get(i));
         }
 
@@ -172,13 +167,14 @@ public class ValidateEndnoteConversion extends IOTestCase
             ImproperFilenameException {
         final Manuscript manuscript;
         final Chapter chapter;
-        final Series series;
+        Series series;
         Segment segment;
         final TextChain chain;
         Span span;
         final int offset;
         final Markup markup;
         final Extract extract;
+        Extract entire;
         final QuackConverter converter;
         final ByteArrayOutputStream out;
         final String expected, result;
@@ -196,25 +192,24 @@ public class ValidateEndnoteConversion extends IOTestCase
          */
 
         series = chapter.loadDocument();
-        assertEquals(4, series.size());
+        assertEquals(3, series.size());
 
         segment = series.get(0);
-        assertTrue(segment instanceof ComponentSegment);
-        segment = series.get(1);
         assertTrue(segment instanceof NormalSegment);
-        segment = series.get(2);
+        segment = series.get(1);
         assertTrue(segment instanceof QuoteSegment);
-        segment = series.get(3);
+        segment = series.get(2);
         assertTrue(segment instanceof NormalSegment);
 
         /*
          * Append a <note> to the end of the first NormalSegment
          */
 
-        segment = series.get(1);
-        chain = segment.getEntire();
+        segment = series.get(0);
+        entire = segment.getEntire();
 
         span = Span.createMarker("[Einstein, 1905]", Special.NOTE);
+        chain = new TextChain(entire);
         chain.append(span);
 
         /*
@@ -237,10 +232,13 @@ public class ValidateEndnoteConversion extends IOTestCase
          * Now, write out, and test. We shouldn't have lost any markup.
          */
 
-        converter = new QuackConverter();
-        converter.append(new ComponentSegment());
+        entire = chain.extractAll();
+        segment = segment.createSimilar(entire);
+        series = series.update(0, segment);
 
-        for (i = 1; i < series.size(); i++) {
+        converter = new QuackConverter();
+
+        for (i = 0; i < series.size(); i++) {
             converter.append(series.get(i));
         }
 
