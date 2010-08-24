@@ -38,6 +38,12 @@ public abstract class Segment
 {
     protected Segment(Extract entire) {
         this.entire = entire;
+        this.image = "";
+    }
+
+    protected Segment(Extract entire, String extra) {
+        this.entire = entire;
+        this.image = extra;
     }
 
     /**
@@ -51,7 +57,10 @@ public abstract class Segment
 
     public abstract Segment createSimilar(Extract entire);
 
-    private String image;
+    /**
+     * A single item of metadata, originally the filename for an ImageSegment.
+     */
+    private final String image;
 
     /*
      * TODO rename this to getMeta() or such.
@@ -61,10 +70,6 @@ public abstract class Segment
      */
     public String getImage() {
         return image;
-    }
-
-    public void setImage(String filename) {
-        this.image = filename;
     }
 
     /**

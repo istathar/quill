@@ -70,6 +70,14 @@ public class QuackLoader
     private TextChain chain;
 
     /**
+     * The current metadata we have captured
+     */
+    /*
+     * This is horrid, only supporting one attribute.
+     */
+    private String attribute;
+
+    /**
      * Are we in a block where line endings and other whitespace is preserved?
      */
     private boolean preserve;
@@ -88,21 +96,6 @@ public class QuackLoader
     public QuackLoader() {
         list = new ArrayList<Segment>(5);
         chain = null;
-    }
-
-    /*
-     * FIXME if Segments are to be immutable, then we need to switch the
-     * creation time around.
-     */
-    private void setSegment(Segment next) {
-        final Extract entire;
-
-        entire = chain.extractAll();
-        segment.setText(entire);
-        list.add(segment);
-
-        chain = new TextChain();
-        segment = next;
     }
 
     /*
@@ -144,45 +137,53 @@ public class QuackLoader
         if (component instanceof ChapterElement) {
             start = true;
             preserve = false;
-            setSegment(new ComponentSegment());
         } else {
             throw new UnsupportedOperationException("Implement support for <article>?");
         }
     }
 
+    /*
+     * It's a bit ugly to be adding the Segment only to immediately remove it
+     * again in the common case of a continuing run of normal text.
+     */
     private void processBlock(Block block) {
+        Extract entire;
+        int i;
+
         start = true;
+        chain = new TextChain();
 
         if (block instanceof TextElement) {
             preserve = false;
             if (segment instanceof NormalSegment) {
+                entire = segment.getEntire();
+                chain.setTree(entire);
                 chain.append(Span.createSpan('\n', null));
-            } else {
-                setSegment(new NormalSegment());
+
+                i = list.size() - 1;
+                list.remove(i);
             }
         } else if (block instanceof CodeElement) {
             preserve = true;
-            if (!(segment instanceof PreformatSegment)) {
-                setSegment(new PreformatSegment());
-            }
         } else if (block instanceof QuoteElement) {
             preserve = false;
             if (segment instanceof QuoteSegment) {
+                entire = segment.getEntire();
+                chain.setTree(entire);
                 chain.append(Span.createSpan('\n', null));
-            } else {
-                setSegment(new QuoteSegment());
+
+                i = list.size() - 1;
+                list.remove(i);
             }
         } else if (block instanceof HeadingElement) {
             preserve = false;
-            setSegment(new HeadingSegment());
         } else if (block instanceof ImageElement) {
             preserve = false;
-            setSegment(new ImageSegment());
 
             processData(block);
         } else if (block instanceof TitleElement) {
             preserve = false;
-            if (!(segment instanceof ComponentSegment)) {
+            if (segment != null) {
                 throw new IllegalStateException("\n"
                         + "The <title> must be the first block in a Quack <chapter>");
             }
@@ -190,7 +191,37 @@ public class QuackLoader
             throw new IllegalStateException("\n" + "What kind of Block is " + block);
         }
 
+        /*
+         * Now iterate over the text and Inlines of the Block, accumulating
+         * into the TextChain.
+         */
+
         processBody(block);
+
+        /*
+         * With that done, form the [immutable] Segment based on the
+         * accumulated data.
+         */
+
+        entire = chain.extractAll();
+
+        if (block instanceof TextElement) {
+            segment = new NormalSegment(entire);
+        } else if (block instanceof CodeElement) {
+            segment = new PreformatSegment(entire);
+        } else if (block instanceof QuoteElement) {
+            segment = new QuoteSegment(entire);
+        } else if (block instanceof HeadingElement) {
+            segment = new HeadingSegment(entire);
+        } else if (block instanceof ImageElement) {
+            segment = new ImageSegment(entire, attribute);
+        } else if (block instanceof TitleElement) {
+            segment = new ComponentSegment(entire);
+        } else {
+            throw new IllegalStateException("\n" + "What kind of Block is " + block);
+        }
+
+        list.add(segment);
     }
 
     private void processData(final Block block) {
@@ -218,7 +249,7 @@ public class QuackLoader
 
         if (meta instanceof SourceAttribute) {
             str = meta.getValue();
-            segment.setImage(str);
+            attribute = str;
         } else {
             throw new IllegalStateException("Unknown Meta type");
         }
