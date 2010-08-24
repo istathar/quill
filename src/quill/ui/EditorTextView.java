@@ -1646,4 +1646,16 @@ abstract class EditorTextView extends TextView
     protected Extract getText() {
         return chain.extractAll();
     }
+
+    /*
+     * For testing only
+     */
+    final void testAppendSpan(final Span span) {
+        final TextIter pointer;
+
+        pointer = buffer.getIterEnd();
+        insertSpan(pointer, span);
+
+        propagateUpdate();
+    }
 }

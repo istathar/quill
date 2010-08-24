@@ -821,4 +821,11 @@ class PrimaryWindow extends Window
 
         this.apply(replacement);
     }
+
+    /*
+     * For testing only
+     */
+    final ComponentEditorWidget testGetEditor() {
+        return editor;
+    }
 }

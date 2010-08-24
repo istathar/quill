@@ -306,7 +306,6 @@ class ComponentEditorWidget extends ScrolledWindow
         final int num;
         int i;
         Segment segment;
-        EditorTextView[] editors;
         EditorTextView editor;
 
         if (this.series == series) {
@@ -315,7 +314,6 @@ class ComponentEditorWidget extends ScrolledWindow
         this.series = series;
 
         num = series.size();
-        editors = findEditors();
 
         for (i = 0; i < num; i++) {
             segment = series.get(i);
@@ -472,7 +470,6 @@ class ComponentEditorWidget extends ScrolledWindow
 
     void moveCursorDown(final Widget from, final int position) {
         int i;
-        final Widget below;
         Segment segment;
         final EditorTextView editor;
 
@@ -485,9 +482,8 @@ class ComponentEditorWidget extends ScrolledWindow
         }
 
         segment = series.get(i);
-        below = lookup(segment);
 
-        editor = (EditorTextView) below;
+        editor = editors[i];
         editor.placeCursorFirstLine(position);
         editor.grabFocus();
 
@@ -663,7 +659,7 @@ class ComponentEditorWidget extends ScrolledWindow
     }
 
     /**
-     * This is mildly horrid; we should instead mainain this list.
+     * @deprecated Replaced by editors[].
      */
     private EditorTextView[] findEditors() {
         final Widget[] children;
@@ -702,5 +698,12 @@ class ComponentEditorWidget extends ScrolledWindow
         editor.grabFocus();
 
         cursorSegment = series.get(series.size() - 1);
+    }
+
+    /*
+     * For testing only
+     */
+    final EditorTextView testGetEditor(int index) {
+        return editors[index];
     }
 }
