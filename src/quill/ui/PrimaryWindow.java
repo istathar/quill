@@ -192,7 +192,7 @@ class PrimaryWindow extends Window
 
         previous = stack.undo();
 
-        if (folio == null) {
+        if (previous == null) {
             return;
         }
 

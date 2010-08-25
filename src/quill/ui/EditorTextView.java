@@ -18,6 +18,8 @@
  */
 package quill.ui;
 
+import java.lang.reflect.Constructor;
+
 import org.gnome.gdk.Cursor;
 import org.gnome.gdk.EventButton;
 import org.gnome.gdk.EventCrossing;
@@ -464,7 +466,7 @@ abstract class EditorTextView extends TextView
 
         buffer.insert(start, text, tagForMarkup(insertMarkup));
 
-        propagateUpdate(offset, width);
+        propagateTextualChange(offset, width);
     }
 
     private void pasteText() {
@@ -497,7 +499,7 @@ abstract class EditorTextView extends TextView
 
         insertExtractIntoBuffer(start, stash);
 
-        propagateUpdate(offset, stash.getWidth());
+        propagateTextualChange(offset, stash.getWidth());
     }
 
     private void deleteBack() {
@@ -552,7 +554,7 @@ abstract class EditorTextView extends TextView
 
         buffer.delete(start, finish);
 
-        propagateUpdate(offset, width);
+        propagateTextualChange(offset, width);
     }
 
     private void toggleMarkup(Markup format) {
@@ -735,7 +737,7 @@ abstract class EditorTextView extends TextView
 
         buffer.delete(start, finish);
 
-        propagateUpdate(offset, width);
+        propagateTextualChange(offset, width);
     }
 
     /**
@@ -753,7 +755,7 @@ abstract class EditorTextView extends TextView
      * algorithm in place, then we can have the field change happen AFTER the
      * return call to apply().
      */
-    private void propagateUpdate(int begin, int end) {
+    private void propagateTextualChange(int offset, int width) {
         final Extract entire;
         final Segment previous;
 
@@ -762,7 +764,7 @@ abstract class EditorTextView extends TextView
 
         segment = previous.createSimilar(entire);
 
-        parent.update(this, previous, segment);
+        parent.propegateTextualChange(this, previous, segment);
 
         // refugee
         view.grabFocus();
@@ -783,7 +785,7 @@ abstract class EditorTextView extends TextView
         // buffer.placeCursor(start);
         // }
 
-        checkSpellingRange(begin, end);
+        checkSpellingRange(offset, width);
     }
 
     private static int normalizeOffset(int alpha, int omega) {
@@ -897,7 +899,7 @@ abstract class EditorTextView extends TextView
 
             chain.delete(offset, width);
             chain.insert(offset, replacement);
-            propagateUpdate(offset, width);
+            propagateTextualChange(offset, width);
         }
 
         /*
@@ -980,7 +982,7 @@ abstract class EditorTextView extends TextView
         result = new MenuItem(label, new MenuItem.Activate() {
             public void onActivate(MenuItem source) {
                 try {
-                    handleInsertSegment((Segment) type.newInstance());
+                    handleInsertSegment(type);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -1133,12 +1135,12 @@ abstract class EditorTextView extends TextView
      * user interface facades on PrimaryWindow.
      */
     // TODO FIXME TODO
-    private void handleInsertSegment(Segment addition) {
-        final Series series;
+    private void handleInsertSegment(Class<?> type) {
         final int offset, width;
         final TextIter start, finish;
-
-        series = parent.getSeries();
+        final Extract removed, remaining, blank;
+        final Segment first, second, third;
+        final Constructor<?> constructor;
 
         /*
          * Get rid of what we need rid of here.
@@ -1148,26 +1150,34 @@ abstract class EditorTextView extends TextView
         width = chain.length() - offset;
 
         if (width > 0) {
+            removed = chain.extractRange(offset, width);
+            third = segment.createSimilar(removed);
+
             chain.delete(offset, width);
+            remaining = chain.extractAll();
+            first = segment.createSimilar(remaining);
 
             start = buffer.getIter(offset);
             finish = buffer.getIterEnd();
             buffer.delete(start, finish);
+        } else {
+            first = segment;
+            third = null;
         }
 
         /*
          * Now change structure
          */
 
-        // TODO?
+        try {
+            blank = Extract.create();
+            constructor = type.getConstructor(Extract.class);
+            second = (Segment) constructor.newInstance(blank);
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
 
-        propagateUpdate(offset, width);
-
-        /*
-         * Put the splcied text back in.
-         */
-
-        // FIXME?
+        parent.propegateStructuralChange(this, first, second, third);
     }
 
     /*
@@ -1479,7 +1489,7 @@ abstract class EditorTextView extends TextView
         }
 
         begin = offset;
-        end = offset + width;
+        end = offset + width - 1;
 
         /*
          * There's a corner case where if you type space to complete or split
@@ -1646,7 +1656,7 @@ abstract class EditorTextView extends TextView
                 buffer.delete(start, finish);
                 buffer.insert(start, word, tagForMarkup(insertMarkup));
 
-                propagateUpdate(offset, offset + wide);
+                propagateTextualChange(offset, offset + wide);
             } else {
                 // the word has been added, so we need to unmark it.
                 start = buffer.getIter(offset);
@@ -1681,6 +1691,6 @@ abstract class EditorTextView extends TextView
         pointer = buffer.getIterEnd();
         insertSpanIntoBuffer(pointer, span);
 
-        propagateUpdate(offset, width);
+        propagateTextualChange(offset, width);
     }
 }
