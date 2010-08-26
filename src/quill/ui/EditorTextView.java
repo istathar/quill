@@ -1177,6 +1177,7 @@ abstract class EditorTextView extends TextView
             throw new AssertionError(e);
         }
 
+        segment = first;
         parent.propegateStructuralChange(this, first, second, third);
     }
 
