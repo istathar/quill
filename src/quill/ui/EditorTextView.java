@@ -466,7 +466,7 @@ abstract class EditorTextView extends TextView
 
         buffer.insert(start, text, tagForMarkup(insertMarkup));
 
-        propagateTextualChange(offset, width);
+        propagateTextualChange(offset, span.getWidth());
     }
 
     private void pasteText() {
@@ -673,9 +673,6 @@ abstract class EditorTextView extends TextView
          */
 
         checkSpellingRange(0, entire.getWidth());
-
-        // start is at the end now, thaks to TextBuffer's insert()
-        buffer.placeCursor(start);
 
         /*
          * Set the global "cursor" which is used by OutlineWidget to know what
@@ -1493,7 +1490,7 @@ abstract class EditorTextView extends TextView
         }
 
         begin = offset;
-        end = offset + width - 1;
+        end = offset + width;
 
         /*
          * There's a corner case where if you type space to complete or split
@@ -1506,6 +1503,10 @@ abstract class EditorTextView extends TextView
 
         if (begin > 0) {
             begin--;
+        }
+
+        if (end > chain.length()) {
+            end = chain.length();
         }
 
         /*
