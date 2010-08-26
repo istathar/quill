@@ -1134,7 +1134,6 @@ abstract class EditorTextView extends TextView
      * If we're at the end of the view we're appending. Jump the logic to the
      * user interface facades on PrimaryWindow.
      */
-    // TODO FIXME TODO
     private void handleInsertSegment(Class<?> type) {
         final int offset, width;
         final TextIter start, finish;
@@ -1179,6 +1178,10 @@ abstract class EditorTextView extends TextView
 
         segment = first;
         parent.propegateStructuralChange(this, first, second, third);
+
+        if (width > 0) {
+            checkSpellingRange(offset, 0);
+        }
     }
 
     /*
