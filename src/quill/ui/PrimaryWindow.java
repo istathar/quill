@@ -500,6 +500,7 @@ class PrimaryWindow extends Window
 
         stack = new ChangeStack(folio);
         this.folio = folio;
+        this.last = folio;
 
         // FIXME
         series = folio.getSeries(0);
