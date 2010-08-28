@@ -438,7 +438,7 @@ abstract class EditorTextView extends TextView
     private void insertText(String text) {
         final Span span;
         final TextIter selection;
-        final int selectionOffset, offset, width;
+        final int selectionOffset, offset, removed;
         TextIter start, finish;
 
         span = Span.createSpan(text, insertMarkup);
@@ -448,17 +448,17 @@ abstract class EditorTextView extends TextView
             selectionOffset = selection.getOffset();
 
             offset = normalizeOffset(insertOffset, selectionOffset);
-            width = normalizeWidth(insertOffset, selectionOffset);
+            removed = normalizeWidth(insertOffset, selectionOffset);
 
-            chain.delete(offset, width);
+            chain.delete(offset, removed);
             chain.insert(offset, span);
 
             start = buffer.getIter(offset);
-            finish = buffer.getIter(offset + width);
+            finish = buffer.getIter(offset + removed);
             buffer.delete(start, finish);
         } else {
             offset = insertOffset;
-            width = span.getWidth();
+            removed = 0;
 
             chain.insert(offset, span);
             start = buffer.getIter(offset);
@@ -466,7 +466,7 @@ abstract class EditorTextView extends TextView
 
         buffer.insert(start, text, tagForMarkup(insertMarkup));
 
-        propagateTextualChange(offset, 0, span.getWidth());
+        propagateTextualChange(offset, removed, span.getWidth());
     }
 
     private void pasteText() {
