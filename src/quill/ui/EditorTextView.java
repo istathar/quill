@@ -466,13 +466,13 @@ abstract class EditorTextView extends TextView
 
         buffer.insert(start, text, tagForMarkup(insertMarkup));
 
-        propagateTextualChange(offset, span.getWidth());
+        propagateTextualChange(offset, 0, span.getWidth());
     }
 
     private void pasteText() {
         final Extract stash;
         final TextIter selection, start, finish;
-        final int selectionOffset, offset, width;
+        final int selectionOffset, offset, removed, width;
 
         stash = ui.getClipboard();
         if (stash == null) {
@@ -484,22 +484,23 @@ abstract class EditorTextView extends TextView
             selectionOffset = selection.getOffset();
 
             offset = normalizeOffset(insertOffset, selectionOffset);
-            width = normalizeWidth(insertOffset, selectionOffset);
-            chain.delete(offset, width);
+            removed = normalizeWidth(insertOffset, selectionOffset);
+            chain.delete(offset, removed);
 
             start = buffer.getIter(offset);
-            finish = buffer.getIter(offset + width);
+            finish = buffer.getIter(offset + removed);
             buffer.delete(start, finish);
         } else {
             offset = insertOffset;
             start = buffer.getIter(offset);
+            removed = 0;
         }
 
         chain.insert(offset, stash);
 
         insertExtractIntoBuffer(start, stash);
 
-        propagateTextualChange(offset, stash.getWidth());
+        propagateTextualChange(offset, removed, stash.getWidth());
     }
 
     private void deleteBack() {
@@ -542,19 +543,19 @@ abstract class EditorTextView extends TextView
      * Effect a deletion from start to end.
      */
     private void deleteRange(TextIter start, TextIter finish) {
-        int alpha, omega, offset, width;
+        int alpha, omega, offset, removed;
 
         alpha = start.getOffset();
         omega = finish.getOffset();
 
         offset = normalizeOffset(alpha, omega);
-        width = normalizeWidth(alpha, omega);
+        removed = normalizeWidth(alpha, omega);
 
-        chain.delete(offset, width);
+        chain.delete(offset, removed);
 
         buffer.delete(start, finish);
 
-        propagateTextualChange(offset, width);
+        propagateTextualChange(offset, removed, 0);
     }
 
     private void toggleMarkup(Markup format) {
@@ -641,17 +642,18 @@ abstract class EditorTextView extends TextView
     /*
      * If segment is already set, then the requirement is that whatever caused
      * this to be called has already updated the TextBuffer to match the
-     * requirements of this state. Otherwise, we blat the entire segment down.
-     * TODO this is horrible; we need to find the diff between the two trees
-     * and only incrementally affect it.
+     * requirements of this state.
      */
     void affect(Segment segment) {
-        final Extract entire;
-        final TextIter start;
+        final Segment previous;
+        final Extract entire, extract;
+        final TextIter start, finish;
+        final int offset, removed, inserted;
 
         if (this.segment == segment) {
             return;
         }
+        previous = this.segment;
 
         /*
          * Set the internal state
@@ -664,15 +666,35 @@ abstract class EditorTextView extends TextView
          * Clear the buffer, and replace it with the entire tree of Spans. BAD
          */
 
-        buffer.setText("");
-        start = buffer.getIterStart();
-        insertExtractIntoBuffer(start, entire);
+        if (previous == null) {
+            offset = 0;
+            removed = entire.getWidth();
+            inserted = 0;
+        } else {
+            offset = previous.getOffset();
+            removed = previous.getRemoved();
+            inserted = previous.getInserted();
+        }
+
+        start = buffer.getIter(offset);
+
+        if (inserted > 0) {
+            finish = buffer.getIter(offset + inserted);
+            buffer.delete(start, finish);
+        }
+
+        if (removed > 0) {
+            extract = chain.extractRange(offset, offset + removed);
+            insertExtractIntoBuffer(start, extract);
+        }
+
+        buffer.placeCursor(start);
 
         /*
          * Spell check the whole thing
          */
 
-        checkSpellingRange(0, entire.getWidth());
+        checkSpellingRange(offset, inserted);
 
         /*
          * Set the global "cursor" which is used by OutlineWidget to know what
@@ -734,7 +756,7 @@ abstract class EditorTextView extends TextView
 
         buffer.delete(start, finish);
 
-        propagateTextualChange(offset, width);
+        propagateTextualChange(offset, width, 0);
     }
 
     /**
@@ -752,19 +774,17 @@ abstract class EditorTextView extends TextView
      * algorithm in place, then we can have the field change happen AFTER the
      * return call to apply().
      */
-    private void propagateTextualChange(int offset, int width) {
+    private void propagateTextualChange(final int offset, final int removed, final int inserted) {
         final Extract entire;
         final Segment previous;
 
         entire = chain.extractAll();
         previous = segment;
 
-        segment = previous.createSimilar(entire);
+        // FIXME removed!
+        segment = previous.createSimilar(entire, offset, removed, inserted);
 
         parent.propegateTextualChange(this, previous, segment);
-
-        // refugee
-        view.grabFocus();
 
         // refugee
         /*
@@ -782,7 +802,7 @@ abstract class EditorTextView extends TextView
         // buffer.placeCursor(start);
         // }
 
-        checkSpellingRange(offset, width);
+        checkSpellingRange(offset, inserted);
     }
 
     private static int normalizeOffset(int alpha, int omega) {
@@ -896,7 +916,7 @@ abstract class EditorTextView extends TextView
 
             chain.delete(offset, width);
             chain.insert(offset, replacement);
-            propagateTextualChange(offset, width);
+            propagateTextualChange(offset, width, width);
         }
 
         /*
@@ -1147,11 +1167,11 @@ abstract class EditorTextView extends TextView
 
         if (width > 0) {
             removed = chain.extractRange(offset, width);
-            third = segment.createSimilar(removed);
+            third = segment.createSimilar(removed, 0, 0, width);
 
             chain.delete(offset, width);
             remaining = chain.extractAll();
-            first = segment.createSimilar(remaining);
+            first = segment.createSimilar(remaining, offset, width, 0);
 
             start = buffer.getIter(offset);
             finish = buffer.getIterEnd();
@@ -1696,6 +1716,6 @@ abstract class EditorTextView extends TextView
         pointer = buffer.getIterEnd();
         insertSpanIntoBuffer(pointer, span);
 
-        propagateTextualChange(offset, width);
+        propagateTextualChange(offset, 0, width);
     }
 }

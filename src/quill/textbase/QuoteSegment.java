@@ -31,7 +31,11 @@ public final class QuoteSegment extends Segment
         super(entire);
     }
 
-    public Segment createSimilar(Extract entire) {
-        return new QuoteSegment(entire);
+    public QuoteSegment(Extract entire, int offset, int removed, int inserted) {
+        super(entire, offset, removed, inserted);
+    }
+
+    public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
+        return new QuoteSegment(entire, offset, removed, inserted);
     }
 }
