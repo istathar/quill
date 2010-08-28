@@ -472,7 +472,7 @@ abstract class EditorTextView extends TextView
     private void pasteText() {
         final Extract stash;
         final TextIter selection, start, finish;
-        final int selectionOffset, offset, removed, width;
+        final int selectionOffset, offset, removed;
 
         stash = ui.getClipboard();
         if (stash == null) {
@@ -684,7 +684,7 @@ abstract class EditorTextView extends TextView
         }
 
         if (removed > 0) {
-            extract = chain.extractRange(offset, offset + removed);
+            extract = chain.extractRange(offset, removed);
             insertExtractIntoBuffer(start, extract);
         }
 
@@ -781,7 +781,6 @@ abstract class EditorTextView extends TextView
         entire = chain.extractAll();
         previous = segment;
 
-        // FIXME removed!
         segment = previous.createSimilar(entire, offset, removed, inserted);
 
         parent.propegateTextualChange(this, previous, segment);
@@ -1681,7 +1680,7 @@ abstract class EditorTextView extends TextView
                 buffer.delete(start, finish);
                 buffer.insert(start, word, tagForMarkup(insertMarkup));
 
-                propagateTextualChange(offset, offset + wide);
+                propagateTextualChange(offset, wide, span.getWidth());
             } else {
                 // the word has been added, so we need to unmark it.
                 start = buffer.getIter(offset);
