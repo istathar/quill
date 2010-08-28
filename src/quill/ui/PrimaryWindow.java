@@ -116,7 +116,6 @@ class PrimaryWindow extends Window
     PrimaryWindow() {
         super();
         setupWindow();
-        setupUndoCapability();
         setupEditorSide();
         setupPreviewSide();
         hookupDefaultKeyhandlers();
@@ -129,19 +128,13 @@ class PrimaryWindow extends Window
      * to make sense here now, though; after all, undo and redo are user
      * interface artifacts.
      */
-    private void setupUndoCapability() {
-        stack = new ChangeStack();
-    }
 
     void apply(Folio replacement) {
-        Folio previous;
-
         /*
          * Add to undo stack
          */
 
-        previous = this.folio;
-        stack.apply(previous);
+        stack.apply(replacement);
 
         this.folio = replacement;
 
@@ -183,6 +176,34 @@ class PrimaryWindow extends Window
         updateTitle();
     }
 
+    private void reverse() {
+        final int num;
+        int i;
+        Series series;
+
+        num = folio.size();
+
+        if (num != 1) {
+            // FIXME multiple chapters
+            throw new UnsupportedOperationException("TODO");
+        }
+
+        for (i = 0; i < num; i++) {
+            series = folio.getSeries(i);
+
+            // TODO FIXME propegate to each editor!
+            editor.reveseTo(series);
+        }
+
+        // FIXME only if showing!
+        preview.affect(manuscript, folio);
+
+        // FIXME only if showing
+        outline.affect(folio);
+
+        updateTitle();
+    }
+
     /**
      * Pick the latest Folio off the ChangeStack, and then do something with
      * it
@@ -192,12 +213,12 @@ class PrimaryWindow extends Window
 
         previous = stack.undo();
 
-        if (previous == null) {
+        if (previous == this.folio) {
             return;
         }
 
         this.folio = previous;
-        this.affect();
+        this.reverse();
     }
 
     /**
@@ -208,7 +229,7 @@ class PrimaryWindow extends Window
 
         following = stack.redo();
 
-        if (following == null) {
+        if (following == this.folio) {
             return;
         }
 
@@ -477,6 +498,7 @@ class PrimaryWindow extends Window
             throw new IllegalStateException();
         }
 
+        stack = new ChangeStack(folio);
         this.folio = folio;
 
         // FIXME

@@ -23,9 +23,11 @@ import java.util.LinkedList;
 import quill.textbase.Folio;
 
 /**
- * An ordered list of Change instances which are the basis of our undo/redo
+ * An ordered list of Folio instances which are the basis of our undo/redo
  * stack. There is one of these for each PrimaryWindow to track modifications
  * to its document.
+ * 
+ * There is always at least one Folio in the ChangeStack.
  * 
  * @author Andrew Cowie
  */
@@ -41,36 +43,35 @@ class ChangeStack
 
     private int pointer;
 
-    public ChangeStack() {
+    public ChangeStack(Folio start) {
         stack = new LinkedList<Folio>();
+        stack.add(0, start);
         pointer = 0;
     }
 
     /**
-     * Apply a Change to the data layer.
+     * Add a state to the data layer.
      */
     public void apply(Folio folio) {
+        pointer++;
+
         while (pointer < stack.size()) {
             stack.removeLast();
         }
 
         stack.add(pointer, folio);
-        pointer++;
     }
 
     /**
-     * Undo. Return the Change which represents the delta from current to one
-     * before.
+     * Undo. Return the Folio which represents the state from one before.
      */
     Folio undo() {
         final Folio folio;
 
-        if (stack.size() == 0) {
-            return null;
-        }
         if (pointer == 0) {
-            return null;
+            return stack.get(0);
         }
+
         pointer--;
 
         folio = stack.get(pointer);
@@ -79,31 +80,23 @@ class ChangeStack
     }
 
     /**
-     * Redo a previous undo. Returns the Change which is the delta you will
-     * need to [re]apply.
+     * Redo a previous undo. Moves the state forward one.
      */
     Folio redo() {
         final Folio folio;
 
-        if (stack.size() == 0) {
-            return null;
+        if (pointer + 1 == stack.size()) {
+            return stack.get(pointer);
         }
-        if (pointer == stack.size()) {
-            return null;
-        }
-
-        folio = stack.get(pointer);
 
         pointer++;
+
+        folio = stack.get(pointer);
 
         return folio;
     }
 
     Folio getCurrent() {
-        if (pointer == 0) {
-            return null;
-        } else {
-            return stack.get(pointer - 1);
-        }
+        return stack.get(pointer);
     }
 }

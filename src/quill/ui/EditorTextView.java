@@ -668,13 +668,67 @@ abstract class EditorTextView extends TextView
 
         if (previous == null) {
             offset = 0;
-            removed = entire.getWidth();
-            inserted = 0;
+            removed = 0;
+            inserted = entire.getWidth();
         } else {
-            offset = previous.getOffset();
-            removed = previous.getRemoved();
-            inserted = previous.getInserted();
+            offset = segment.getOffset();
+            removed = segment.getRemoved();
+            inserted = segment.getInserted();
         }
+
+        start = buffer.getIter(offset);
+
+        if (removed > 0) {
+            finish = buffer.getIter(offset + removed);
+            buffer.delete(start, finish);
+        }
+
+        if (inserted > 0) {
+            extract = chain.extractRange(offset, inserted);
+
+            insertExtractIntoBuffer(start, extract);
+        }
+
+        buffer.placeCursor(start);
+        view.grabFocus();
+
+        /*
+         * Spell check the whole thing
+         */
+
+        checkSpellingRange(offset, inserted);
+
+        /*
+         * Set the global "cursor" which is used by OutlineWidget to know what
+         * page to display.
+         */
+
+        parent.setCursor(segment);
+
+        this.segment = segment;
+    }
+
+    void reverseTo(Segment segment) {
+        final Segment previous;
+        final Extract entire, extract;
+        final TextIter start, finish;
+        final int offset, removed, inserted;
+
+        if (this.segment == segment) {
+            return;
+        }
+        previous = this.segment;
+
+        /*
+         * Set the internal state
+         */
+
+        entire = segment.getEntire();
+        chain.setTree(entire);
+
+        offset = previous.getOffset();
+        removed = previous.getRemoved();
+        inserted = previous.getInserted();
 
         start = buffer.getIter(offset);
 
@@ -689,12 +743,13 @@ abstract class EditorTextView extends TextView
         }
 
         buffer.placeCursor(start);
+        view.grabFocus();
 
         /*
          * Spell check the whole thing
          */
 
-        checkSpellingRange(offset, inserted);
+        checkSpellingRange(offset, removed);
 
         /*
          * Set the global "cursor" which is used by OutlineWidget to know what

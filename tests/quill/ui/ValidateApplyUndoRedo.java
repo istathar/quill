@@ -23,10 +23,6 @@ import parchment.format.Chapter;
 import parchment.format.Manuscript;
 import quill.textbase.Folio;
 import quill.textbase.Series;
-import quill.textbase.Span;
-import quill.textbase.TextChain;
-
-import static quill.textbase.Span.createSpan;
 
 /**
  * Test adding Folio instances to a ChangeStack, and that undo and redo of
@@ -38,25 +34,15 @@ public class ValidateApplyUndoRedo extends TestCase
 {
     public final void testInsertionAndDeletion() {
         final ChangeStack stack;
-        final TextChain chain;
-        final Span span;
         final Folio one, two, three, four;
         Folio folio;
-
-        stack = new ChangeStack();
-        chain = new TextChain();
-        span = createSpan("Hello World", null);
-        chain.append(span);
-
-        folio = stack.getCurrent();
-        assertNull(folio);
 
         one = new Folio((Manuscript) null, (Chapter) null, (Series) null);
         two = new Folio((Manuscript) null, (Chapter) null, (Series) null);
         three = new Folio((Manuscript) null, (Chapter) null, (Series) null);
         four = new Folio((Manuscript) null, (Chapter) null, (Series) null);
 
-        stack.apply(one);
+        stack = new ChangeStack(one);
         folio = stack.getCurrent();
         assertSame(one, folio);
 
@@ -73,15 +59,18 @@ public class ValidateApplyUndoRedo extends TestCase
          * the end should have no effect.
          */
 
-        stack.redo();
+        folio = stack.redo();
+        assertSame(three, folio);
         folio = stack.getCurrent();
         assertSame(three, folio);
 
-        stack.undo();
+        folio = stack.undo();
+        assertSame(two, folio);
         folio = stack.getCurrent();
         assertSame(two, folio);
 
-        stack.redo();
+        folio = stack.redo();
+        assertSame(three, folio);
         folio = stack.getCurrent();
         assertSame(three, folio);
 
@@ -89,23 +78,20 @@ public class ValidateApplyUndoRedo extends TestCase
          * Test going back to the beginning, and that overshooting is a no-op.
          */
 
-        stack.undo();
-        stack.undo();
+        folio = stack.undo();
+        folio = stack.undo();
         folio = stack.getCurrent();
         assertSame(one, folio);
 
-        stack.undo();
-        folio = stack.getCurrent();
-        assertNull(folio);
-
-        stack.undo();
-        folio = stack.getCurrent();
-        assertNull(folio);
-        stack.redo();
+        folio = stack.undo();
+        assertSame(one, folio);
         folio = stack.getCurrent();
         assertSame(one, folio);
-        stack.redo();
-        folio = stack.getCurrent();
+
+        folio = stack.undo();
+        assertSame(one, folio);
+
+        folio = stack.redo();
         assertSame(two, folio);
 
         stack.apply(four);
@@ -118,8 +104,7 @@ public class ValidateApplyUndoRedo extends TestCase
          * have been discarded.
          */
 
-        stack.redo();
-        folio = stack.getCurrent();
+        folio = stack.redo();
         assertSame(four, folio);
     }
 }

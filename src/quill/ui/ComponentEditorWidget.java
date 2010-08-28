@@ -325,6 +325,32 @@ class ComponentEditorWidget extends ScrolledWindow
     }
 
     /**
+     * Given a [new] state, apply it!
+     */
+    void reveseTo(final Series series) {
+        int i;
+        Segment segment;
+        EditorTextView editor;
+
+        if (this.series == series) {
+            return;
+        }
+
+        /*
+         * As with EditorTextView, this is only active in undo/redo. Right now
+         * this is HORRID.
+         */
+
+        this.series = series;
+
+        for (i = 0; i < series.size(); i++) {
+            segment = series.get(i);
+            editor = editors.get(i);
+            editor.reverseTo(segment);
+        }
+    }
+
+    /**
      * Entry point for an EditorTextView to inform its parent that its state
      * has changed.
      * 
@@ -332,14 +358,14 @@ class ComponentEditorWidget extends ScrolledWindow
      */
     void propegateTextualChange(final EditorTextView editor, final Segment previous,
             final Segment segment) {
-        final Series former;
+        final Series former, replacement;
         final int i;
 
         former = series;
 
         i = former.indexOf(previous);
 
-        series = former.update(i, segment);
+        replacement = former.update(i, segment);
         cursorSegment = segment;
 
         /*
@@ -350,7 +376,7 @@ class ComponentEditorWidget extends ScrolledWindow
          * Now propegate that a state change has happened upwards.
          */
 
-        primary.update(this, former, series);
+        primary.update(this, former, replacement);
     }
 
     /**
@@ -415,9 +441,7 @@ class ComponentEditorWidget extends ScrolledWindow
             replacement = replacement.insert(i, third);
         }
 
-        series = replacement;
-
-        primary.update(this, former, series);
+        primary.update(this, former, replacement);
     }
 
     public void grabFocus() {
