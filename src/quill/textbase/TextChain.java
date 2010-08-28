@@ -195,15 +195,16 @@ public class TextChain
 
     /**
      * Add or remove a Markup format from a range of text.
-     * 
-     * @deprecated This is tested, but unused! Replace with code from
-     *             FormatTextualChange?
      */
-    protected void format(int offset, int wide, Markup format) {
-        final Node preceeding, following;
+    /*
+     * This is tested, but obviously calling code that used to live somewhere
+     * else. Move the logic from FormatTextualChange here? And, can we clean
+     * up the tree re-creation at all?
+     */
+    public void format(int offset, int wide, Markup format) {
+        final Node preceeding, center, following;
         final int start, across;
-        final Span span;
-        AccumulatingCharacterVisitor tourist;
+        final Node replacement, node;
 
         /*
          * Create subtrees for everything before and after the changed range
@@ -220,62 +221,16 @@ public class TextChain
          * with the supplied new Markup.
          */
 
-        tourist = new AccumulatingCharacterVisitor(wide, format);
+        center = root.subset(offset, wide);
 
-        root.visit(tourist, offset, wide);
-
-        span = tourist.toSpan();
+        replacement = (Node) FormatTextualChange.toggleMarkup(center, format);
 
         /*
-         * Now combine these subtrees to effect the deletion.
+         * Now combine these subtrees to effect the format change.
          */
 
-        root = Node.createNode(preceeding, span, following);
-    }
-
-    private static class AccumulatingCharacterVisitor implements CharacterVisitor
-    {
-        private final int[] characters;
-
-        private final Markup markup;
-
-        private int index;
-
-        /**
-         * Create an accumulator for a given number of characters, to
-         * subsequently have the supplied format.
-         */
-        private AccumulatingCharacterVisitor(final int num, Markup format) {
-            characters = new int[num];
-            markup = format;
-            index = 0;
-        }
-
-        public boolean visit(int character, Markup markup) {
-            characters[index] = character;
-            index++;
-            return false;
-        }
-
-        /**
-         * Convert the result of the accumulation into a single Span
-         */
-        /*
-         * FIXME This is awful; we need a Span constructor that works in
-         * character[]
-         */
-        private Span toSpan() {
-            StringBuilder str;
-            int i;
-
-            str = new StringBuilder(characters.length);
-
-            for (i = 0; i < characters.length; i++) {
-                str.appendCodePoint(characters[i]);
-            }
-
-            return Span.createSpan(str.toString(), markup);
-        }
+        node = Node.createNode(preceeding, following);
+        root = node.insertTreeAt(offset, replacement);
     }
 
     public Markup getMarkupAt(int offset) {

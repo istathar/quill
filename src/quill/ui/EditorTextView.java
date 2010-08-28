@@ -582,6 +582,8 @@ abstract class EditorTextView extends TextView
             original = chain.extractRange(offset, width);
             replacement = FormatTextualChange.toggleMarkup(original, format);
 
+            chain.format(offset, width, format);
+
             tmp = offset;
 
             replacement.visit(new SpanVisitor() {
@@ -612,10 +614,11 @@ abstract class EditorTextView extends TextView
                 }
             });
 
+            propagateTextualChange(offset, width, width);
             // BUG?
             omega = offset;
 
-            checkSpellingRange(alpha, omega);
+            // checkSpellingRange(alpha, omega);
 
             /*
              * Force deselect the range - you want to SEE the markup you just
