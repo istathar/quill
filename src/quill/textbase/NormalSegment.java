@@ -32,7 +32,11 @@ public final class NormalSegment extends Segment
         super(entire);
     }
 
-    public Segment createSimilar(Extract entire) {
-        return new NormalSegment(entire);
+    public NormalSegment(Extract entire, int offset, int removed, int inserted) {
+        super(entire, offset, removed, inserted);
+    }
+
+    public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
+        return new NormalSegment(entire, offset, removed, inserted);
     }
 }

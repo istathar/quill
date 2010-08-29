@@ -73,7 +73,7 @@ public class Series
     /**
      * Grow the Series by inserting the given Segment at position.
      */
-    Series insert(int position, Segment segment) {
+    public Series insert(int position, Segment segment) {
         final Segment[] original, replacement;
 
         original = this.segments;
@@ -90,7 +90,7 @@ public class Series
     /**
      * Remove the Segment at the given position.
      */
-    Series delete(int position) {
+    public Series delete(int position) {
         final Segment[] original, replacement;
 
         original = this.segments;

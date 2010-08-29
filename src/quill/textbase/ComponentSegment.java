@@ -24,7 +24,11 @@ public final class ComponentSegment extends Segment
         super(entire);
     }
 
-    public Segment createSimilar(Extract entire) {
-        return new ComponentSegment(entire);
+    public ComponentSegment(Extract entire, int offset, int removed, int inserted) {
+        super(entire, offset, removed, inserted);
+    }
+
+    public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
+        return new ComponentSegment(entire, offset, removed, inserted);
     }
 }

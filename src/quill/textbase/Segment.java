@@ -39,11 +39,25 @@ public abstract class Segment
     protected Segment(Extract entire) {
         this.entire = entire;
         this.image = "";
+        this.offset = 0;
+        this.removed = 0;
+        this.inserted = entire.getWidth();
     }
 
-    protected Segment(Extract entire, String extra) {
+    protected Segment(Extract entire, int offset, int removed, int inserted) {
+        this.entire = entire;
+        this.image = "";
+        this.offset = offset;
+        this.removed = removed;
+        this.inserted = inserted;
+    }
+
+    protected Segment(Extract entire, String extra, int offset, int removed, int inserted) {
         this.entire = entire;
         this.image = extra;
+        this.offset = offset;
+        this.removed = removed;
+        this.inserted = inserted;
     }
 
     /**
@@ -55,7 +69,41 @@ public abstract class Segment
         return entire;
     }
 
-    public abstract Segment createSimilar(Extract entire);
+    /*
+     * This is a legacy of our having removed Change and replaced it with a
+     * State based system; undo and redo became a nightmare. So, we cache
+     * "where" a change happened that took us to this state, with a view to
+     * being able to use this in EditorTextView's affect(Segment).
+     */
+
+    /**
+     * At what offset into this Segment the last change was made.
+     */
+    private final int offset;
+
+    /**
+     * How wide, from offset, that the last change was.
+     */
+    private final int inserted;
+
+    /**
+     * How many characters, from offset, that were removed in the last change.
+     */
+    private final int removed;
+
+    public int getOffset() {
+        return offset;
+    }
+
+    public int getInserted() {
+        return inserted;
+    }
+
+    public int getRemoved() {
+        return removed;
+    }
+
+    public abstract Segment createSimilar(Extract entire, int offset, int removed, int inserted);
 
     /**
      * A single item of metadata, originally the filename for an ImageSegment.

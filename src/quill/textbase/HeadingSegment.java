@@ -24,7 +24,11 @@ public final class HeadingSegment extends Segment
         super(entire);
     }
 
-    public Segment createSimilar(Extract entire) {
-        return new HeadingSegment(entire);
+    public HeadingSegment(Extract entire, int offset, int removed, int inserted) {
+        super(entire, offset, removed, inserted);
+    }
+
+    public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
+        return new HeadingSegment(entire, offset, removed, inserted);
     }
 }
