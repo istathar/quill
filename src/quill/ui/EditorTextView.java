@@ -1000,6 +1000,10 @@ abstract class EditorTextView extends TextView
     }
 
     private void insertSpanIntoBuffer(TextIter pointer, Span span) {
+        final TextIter start;
+        final TextTag tag;
+        final Markup format;
+
         if (span instanceof MarkerSpan) {
             buffer.insert(pointer, createEndnote(span), view);
             /*
@@ -1008,7 +1012,25 @@ abstract class EditorTextView extends TextView
              */
             buffer.placeCursor(pointer);
         } else {
-            buffer.insert(pointer, span.getText(), tagForMarkup(span.getMarkup()));
+            buffer.insert(pointer, span.getText());
+
+            /*
+             * Weird set of bugs; basically it's impossible to "clear" the
+             * format at a point and so TextTags that are present when
+             * inserting get carried through. So we have to jump through some
+             * hoops to go back and ensure only one TextTag is present after
+             * inserting.
+             */
+
+            start = pointer.copy();
+            start.backwardChars(span.getWidth());
+            buffer.removeAllTags(start, pointer);
+
+            format = span.getMarkup();
+            tag = tagForMarkup(format);
+            if (tag != null) {
+                buffer.applyTag(tag, start, pointer);
+            }
         }
     }
 
