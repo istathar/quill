@@ -973,6 +973,9 @@ abstract class EditorTextView extends TextView
 
             chain.delete(offset, width);
             chain.insert(offset, replacement);
+
+            buffer.removeAllTags(start, end);
+
             propagateTextualChange(offset, width, width);
         }
 
