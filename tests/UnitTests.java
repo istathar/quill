@@ -32,7 +32,6 @@ import quill.quack.ValidateTextChainToChapterConversion;
 import quill.textbase.ValidateExtracts;
 import quill.textbase.ValidateOriginOrdering;
 import quill.textbase.ValidateSpanOperations;
-import quill.textbase.ValidateStructuralChange;
 import quill.textbase.ValidateText;
 import quill.textbase.ValidateUnicode;
 import quill.textbase.ValidateWordExtraction;
@@ -59,6 +58,10 @@ public class UnitTests
         return suite(null);
     }
 
+    /**
+     * @param args
+     *            Ignored
+     */
     private static Test suite(String[] args) {
         ClassLoader.getSystemClassLoader().setDefaultAssertionStatus(true);
 
@@ -79,7 +82,6 @@ public class UnitTests
         suite.addTestSuite(ValidateCitationConversion.class);
         suite.addTestSuite(ValidateProperNewlineHandling.class);
         suite.addTestSuite(ValidateWrapperExpansions.class);
-        suite.addTestSuite(ValidateStructuralChange.class);
         suite.addTestSuite(ValidateThereAndBackAgain.class);
         suite.addTestSuite(ValidateFileNaming.class);
         suite.addTestSuite(ValidateWordExtraction.class);
