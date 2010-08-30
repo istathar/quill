@@ -59,7 +59,7 @@ public class ValidateProperNewlineHandling extends ParchmentTestCase
         folio = manuscript.createDocument();
 
         series = folio.getSeries(0);
-        segment = series.get(1);
+        segment = series.getSegment(1);
         assertTrue(segment instanceof NormalSegment);
         entire = segment.getEntire();
 

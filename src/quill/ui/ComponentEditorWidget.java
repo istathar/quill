@@ -147,7 +147,7 @@ class ComponentEditorWidget extends ScrolledWindow
         this.editors = new LinkedList<EditorTextView>();
 
         for (i = 0; i < num; i++) {
-            segment = series.get(i);
+            segment = series.getSegment(i);
 
             widget = createEditorForSegment(i, segment);
 
@@ -160,7 +160,7 @@ class ComponentEditorWidget extends ScrolledWindow
          * And make sure the cursor is a Segment from this Series.
          */
 
-        this.cursorSegment = series.get(0);
+        this.cursorSegment = series.getSegment(0);
     }
 
     private Segment lookup(Widget editor) {
@@ -175,7 +175,7 @@ class ComponentEditorWidget extends ScrolledWindow
 
         for (i = 0; i < len; i++) {
             if (editors.get(i) == editor) {
-                return series.get(i);
+                return series.getSegment(i);
             }
         }
 
@@ -318,7 +318,7 @@ class ComponentEditorWidget extends ScrolledWindow
         this.series = series;
 
         for (i = 0; i < series.size(); i++) {
-            segment = series.get(i);
+            segment = series.getSegment(i);
             editor = editors.get(i);
             editor.affect(segment);
         }
@@ -344,7 +344,7 @@ class ComponentEditorWidget extends ScrolledWindow
         this.series = series;
 
         for (i = 0; i < series.size(); i++) {
-            segment = series.get(i);
+            segment = series.getSegment(i);
             editor = editors.get(i);
             editor.reverseTo(segment);
         }
@@ -448,7 +448,7 @@ class ComponentEditorWidget extends ScrolledWindow
         final Segment segment;
         final EditorTextView first;
 
-        segment = series.get(0);
+        segment = series.getSegment(0);
         first = lookup(segment);
         first.placeCursorFirstLine(0);
         first.grabFocus();
@@ -512,7 +512,7 @@ class ComponentEditorWidget extends ScrolledWindow
             return;
         }
 
-        segment = series.get(i);
+        segment = series.getSegment(i);
 
         editor = editors.get(i);
         editor.placeCursorFirstLine(position);
@@ -718,7 +718,7 @@ class ComponentEditorWidget extends ScrolledWindow
         editor.placeCursorFirstLine(0);
         editor.grabFocus();
 
-        cursorSegment = series.get(0);
+        cursorSegment = series.getSegment(0);
     }
 
     void moveCursorEnd() {
@@ -728,7 +728,7 @@ class ComponentEditorWidget extends ScrolledWindow
         editor.placeCursorLastLine(-1);
         editor.grabFocus();
 
-        cursorSegment = series.get(series.size() - 1);
+        cursorSegment = series.getSegment(series.size() - 1);
     }
 
     /*

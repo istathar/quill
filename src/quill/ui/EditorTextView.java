@@ -1153,7 +1153,7 @@ abstract class EditorTextView extends TextView
 
             if (i < len - 1) {
                 i++;
-                next = series.get(i);
+                next = series.getSegment(i);
 
                 for (i = 0; i < types.length; i++) {
                     if (types[i].isInstance(next)) {

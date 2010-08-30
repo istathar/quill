@@ -74,7 +74,7 @@ public class ValidateCitationConversion extends IOTestCase
 
         assertEquals(1, series.size());
 
-        segment = series.get(0);
+        segment = series.getSegment(0);
         assertTrue(segment instanceof NormalSegment);
 
         entire = segment.getEntire();
@@ -101,7 +101,7 @@ public class ValidateCitationConversion extends IOTestCase
         converter = new QuackConverter();
 
         for (i = 0; i < series.size(); i++) {
-            converter.append(series.get(i));
+            converter.append(series.getSegment(i));
         }
 
         out = new ByteArrayOutputStream();

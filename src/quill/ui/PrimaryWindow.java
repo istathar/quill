@@ -532,7 +532,7 @@ class PrimaryWindow extends Window
 
         // FIXME
         series = folio.getSeries(0);
-        first = series.get(0);
+        first = series.getSegment(0);
 
         if (first == titleSegment) {
             return;

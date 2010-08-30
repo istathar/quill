@@ -73,7 +73,7 @@ public class ValidateEndnoteConversion extends IOTestCase
 
         assertEquals(1, series.size());
 
-        segment = series.get(0);
+        segment = series.getSegment(0);
         assertTrue(segment instanceof QuoteSegment);
 
         entire = segment.getEntire();
@@ -135,11 +135,11 @@ public class ValidateEndnoteConversion extends IOTestCase
         series = chapter.loadDocument();
         assertEquals(3, series.size());
 
-        segment = series.get(0);
+        segment = series.getSegment(0);
         assertTrue(segment instanceof NormalSegment);
-        segment = series.get(1);
+        segment = series.getSegment(1);
         assertTrue(segment instanceof QuoteSegment);
-        segment = series.get(2);
+        segment = series.getSegment(2);
         assertTrue(segment instanceof NormalSegment);
 
         /*
@@ -149,7 +149,7 @@ public class ValidateEndnoteConversion extends IOTestCase
         converter = new QuackConverter();
 
         for (i = 0; i < series.size(); i++) {
-            converter.append(series.get(i));
+            converter.append(series.getSegment(i));
         }
 
         out = new ByteArrayOutputStream();
@@ -194,18 +194,18 @@ public class ValidateEndnoteConversion extends IOTestCase
         series = chapter.loadDocument();
         assertEquals(3, series.size());
 
-        segment = series.get(0);
+        segment = series.getSegment(0);
         assertTrue(segment instanceof NormalSegment);
-        segment = series.get(1);
+        segment = series.getSegment(1);
         assertTrue(segment instanceof QuoteSegment);
-        segment = series.get(2);
+        segment = series.getSegment(2);
         assertTrue(segment instanceof NormalSegment);
 
         /*
          * Append a <note> to the end of the first NormalSegment
          */
 
-        segment = series.get(0);
+        segment = series.getSegment(0);
         entire = segment.getEntire();
 
         span = Span.createMarker("[Einstein, 1905]", Special.NOTE);
@@ -239,7 +239,7 @@ public class ValidateEndnoteConversion extends IOTestCase
         converter = new QuackConverter();
 
         for (i = 0; i < series.size(); i++) {
-            converter.append(series.get(i));
+            converter.append(series.getSegment(i));
         }
 
         out = new ByteArrayOutputStream();

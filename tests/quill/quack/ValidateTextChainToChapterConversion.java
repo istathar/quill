@@ -59,7 +59,7 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         series = chapter.loadDocument();
         assertEquals(1, series.size());
 
-        entire = series.get(0).getEntire();
+        entire = series.getSegment(0).getEntire();
         assertNotNull(entire);
         assertEquals("Hello world", entire.getText());
     }
@@ -199,7 +199,7 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         series = chapter.loadDocument();
         assertEquals(1, series.size());
 
-        entire = series.get(0).getEntire();
+        entire = series.getSegment(0).getEntire();
 
         assertNotNull(entire);
         assertEquals("Accessing the /tmp directory directly is fine, "

@@ -43,7 +43,7 @@ public class ValidateWrapperExpansions extends TestCase
 
         series = new Series(segments);
         assertEquals(5, series.size());
-        assertTrue(series.get(2) instanceof NormalSegment);
+        assertTrue(series.getSegment(2) instanceof NormalSegment);
     }
 
     public final void testSeriesInsertMid() {
@@ -54,19 +54,19 @@ public class ValidateWrapperExpansions extends TestCase
 
         before = new Series(segments);
         assertEquals(5, before.size());
-        assertTrue(before.get(2) instanceof NormalSegment);
+        assertTrue(before.getSegment(2) instanceof NormalSegment);
 
         after = before.insert(2, new PreformatSegment(blank));
 
         assertEquals(6, after.size());
-        assertTrue(after.get(1) instanceof HeadingSegment);
-        assertTrue(after.get(2) instanceof PreformatSegment);
-        assertTrue(after.get(3) instanceof NormalSegment);
-        assertSame(after.get(0), segments[0]);
-        assertSame(after.get(1), segments[1]);
-        assertSame(after.get(3), segments[2]);
-        assertSame(after.get(4), segments[3]);
-        assertSame(after.get(5), segments[4]);
+        assertTrue(after.getSegment(1) instanceof HeadingSegment);
+        assertTrue(after.getSegment(2) instanceof PreformatSegment);
+        assertTrue(after.getSegment(3) instanceof NormalSegment);
+        assertSame(after.getSegment(0), segments[0]);
+        assertSame(after.getSegment(1), segments[1]);
+        assertSame(after.getSegment(3), segments[2]);
+        assertSame(after.getSegment(4), segments[3]);
+        assertSame(after.getSegment(5), segments[4]);
     }
 
     public final void testSeriesInsertEnd() {
@@ -77,17 +77,17 @@ public class ValidateWrapperExpansions extends TestCase
 
         before = new Series(segments);
         assertEquals(5, before.size());
-        assertTrue(before.get(4) instanceof NormalSegment);
+        assertTrue(before.getSegment(4) instanceof NormalSegment);
 
         after = before.insert(5, new PreformatSegment(blank));
 
         assertEquals(6, after.size());
-        assertSame(after.get(0), segments[0]);
-        assertSame(after.get(1), segments[1]);
-        assertSame(after.get(2), segments[2]);
-        assertSame(after.get(3), segments[3]);
-        assertSame(after.get(4), segments[4]);
-        assertTrue(after.get(5) instanceof PreformatSegment);
+        assertSame(after.getSegment(0), segments[0]);
+        assertSame(after.getSegment(1), segments[1]);
+        assertSame(after.getSegment(2), segments[2]);
+        assertSame(after.getSegment(3), segments[3]);
+        assertSame(after.getSegment(4), segments[4]);
+        assertTrue(after.getSegment(5) instanceof PreformatSegment);
     }
 
     public final void testSeriesInsertBegin() {
@@ -99,17 +99,17 @@ public class ValidateWrapperExpansions extends TestCase
         before = new Series(segments);
 
         assertEquals(5, before.size());
-        assertTrue(before.get(0) instanceof ComponentSegment);
+        assertTrue(before.getSegment(0) instanceof ComponentSegment);
 
         after = before.insert(0, new PreformatSegment(blank));
 
         assertEquals(6, after.size());
-        assertTrue(after.get(0) instanceof PreformatSegment);
-        assertSame(after.get(1), segments[0]);
-        assertSame(after.get(2), segments[1]);
-        assertSame(after.get(3), segments[2]);
-        assertSame(after.get(4), segments[3]);
-        assertSame(after.get(5), segments[4]);
+        assertTrue(after.getSegment(0) instanceof PreformatSegment);
+        assertSame(after.getSegment(1), segments[0]);
+        assertSame(after.getSegment(2), segments[1]);
+        assertSame(after.getSegment(3), segments[2]);
+        assertSame(after.getSegment(4), segments[3]);
+        assertSame(after.getSegment(5), segments[4]);
     }
 
     public final void testSeriesInsertUndershoot() {
@@ -152,10 +152,10 @@ public class ValidateWrapperExpansions extends TestCase
         after = before.delete(2);
 
         assertEquals(4, after.size());
-        assertSame(after.get(0), segments[0]);
-        assertSame(after.get(1), segments[1]);
-        assertSame(after.get(2), segments[3]);
-        assertSame(after.get(3), segments[4]);
+        assertSame(after.getSegment(0), segments[0]);
+        assertSame(after.getSegment(1), segments[1]);
+        assertSame(after.getSegment(2), segments[3]);
+        assertSame(after.getSegment(3), segments[4]);
     }
 
     public final void testSeriesDeleteEnd() {
@@ -166,10 +166,10 @@ public class ValidateWrapperExpansions extends TestCase
         after = before.delete(4);
 
         assertEquals(4, after.size());
-        assertSame(after.get(0), segments[0]);
-        assertSame(after.get(1), segments[1]);
-        assertSame(after.get(2), segments[2]);
-        assertSame(after.get(3), segments[3]);
+        assertSame(after.getSegment(0), segments[0]);
+        assertSame(after.getSegment(1), segments[1]);
+        assertSame(after.getSegment(2), segments[2]);
+        assertSame(after.getSegment(3), segments[3]);
     }
 
     public final void testSeriesDeleteBegin() {
@@ -180,10 +180,10 @@ public class ValidateWrapperExpansions extends TestCase
         after = before.delete(0);
 
         assertEquals(4, after.size());
-        assertSame(after.get(0), segments[1]);
-        assertSame(after.get(1), segments[2]);
-        assertSame(after.get(2), segments[3]);
-        assertSame(after.get(3), segments[4]);
+        assertSame(after.getSegment(0), segments[1]);
+        assertSame(after.getSegment(1), segments[2]);
+        assertSame(after.getSegment(2), segments[3]);
+        assertSame(after.getSegment(3), segments[4]);
     }
 
     public final void testSeriesDeleteUndershoot() {
@@ -225,20 +225,20 @@ public class ValidateWrapperExpansions extends TestCase
         before = new Series(segments);
 
         assertEquals(5, before.size());
-        assertTrue(before.get(0) instanceof ComponentSegment);
-        assertTrue(before.get(1) instanceof HeadingSegment);
+        assertTrue(before.getSegment(0) instanceof ComponentSegment);
+        assertTrue(before.getSegment(1) instanceof HeadingSegment);
 
         after = before.splice(0, new ComponentSegment(blank), new QuoteSegment(blank),
                 new ComponentSegment(blank));
 
         assertEquals(7, after.size());
-        assertTrue(after.get(0) instanceof ComponentSegment);
-        assertTrue(after.get(1) instanceof QuoteSegment);
-        assertTrue(after.get(2) instanceof ComponentSegment);
-        assertSame(after.get(3), segments[1]);
-        assertSame(after.get(4), segments[2]);
-        assertSame(after.get(5), segments[3]);
-        assertSame(after.get(6), segments[4]);
+        assertTrue(after.getSegment(0) instanceof ComponentSegment);
+        assertTrue(after.getSegment(1) instanceof QuoteSegment);
+        assertTrue(after.getSegment(2) instanceof ComponentSegment);
+        assertSame(after.getSegment(3), segments[1]);
+        assertSame(after.getSegment(4), segments[2]);
+        assertSame(after.getSegment(5), segments[3]);
+        assertSame(after.getSegment(6), segments[4]);
     }
 
     public final void testSeriesSpliceMid() {
@@ -249,19 +249,19 @@ public class ValidateWrapperExpansions extends TestCase
 
         before = new Series(segments);
         assertEquals(5, before.size());
-        assertTrue(before.get(2) instanceof NormalSegment);
+        assertTrue(before.getSegment(2) instanceof NormalSegment);
 
         after = before.splice(2, new NormalSegment(blank), new QuoteSegment(blank), new NormalSegment(
                 blank));
 
         assertEquals(7, after.size());
-        assertSame(after.get(0), segments[0]);
-        assertSame(after.get(1), segments[1]);
-        assertTrue(after.get(2) instanceof NormalSegment);
-        assertTrue(after.get(3) instanceof QuoteSegment);
-        assertTrue(after.get(4) instanceof NormalSegment);
-        assertSame(after.get(5), segments[3]);
-        assertSame(after.get(6), segments[4]);
+        assertSame(after.getSegment(0), segments[0]);
+        assertSame(after.getSegment(1), segments[1]);
+        assertTrue(after.getSegment(2) instanceof NormalSegment);
+        assertTrue(after.getSegment(3) instanceof QuoteSegment);
+        assertTrue(after.getSegment(4) instanceof NormalSegment);
+        assertSame(after.getSegment(5), segments[3]);
+        assertSame(after.getSegment(6), segments[4]);
     }
 
     public final void testSeriesSpliceEnd() {
@@ -272,19 +272,19 @@ public class ValidateWrapperExpansions extends TestCase
 
         before = new Series(segments);
         assertEquals(5, before.size());
-        assertTrue(before.get(4) instanceof NormalSegment);
+        assertTrue(before.getSegment(4) instanceof NormalSegment);
 
         after = before.splice(4, new NormalSegment(blank), new QuoteSegment(blank), new NormalSegment(
                 blank));
 
         assertEquals(7, after.size());
-        assertSame(after.get(0), segments[0]);
-        assertSame(after.get(1), segments[1]);
-        assertSame(after.get(2), segments[2]);
-        assertSame(after.get(3), segments[3]);
-        assertTrue(after.get(4) instanceof NormalSegment);
-        assertTrue(after.get(5) instanceof QuoteSegment);
-        assertTrue(after.get(6) instanceof NormalSegment);
+        assertSame(after.getSegment(0), segments[0]);
+        assertSame(after.getSegment(1), segments[1]);
+        assertSame(after.getSegment(2), segments[2]);
+        assertSame(after.getSegment(3), segments[3]);
+        assertTrue(after.getSegment(4) instanceof NormalSegment);
+        assertTrue(after.getSegment(5) instanceof QuoteSegment);
+        assertTrue(after.getSegment(6) instanceof NormalSegment);
     }
 
     public final void testSeriesSpliceUndershoot() {
