@@ -68,7 +68,7 @@ public class ValidateDataIntegrity extends IOTestCase
         }
 
         entire = chain.extractAll();
-        segment = segment.createSimilar(entire);
+        segment = segment.createSimilar(entire, 0, 0, entire.getWidth());
         return series.update(1, segment);
     }
 

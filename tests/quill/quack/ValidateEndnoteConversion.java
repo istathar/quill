@@ -233,7 +233,7 @@ public class ValidateEndnoteConversion extends IOTestCase
          */
 
         entire = chain.extractAll();
-        segment = segment.createSimilar(entire);
+        segment = segment.createSimilar(entire, 0, 0, entire.getWidth());
         series = series.update(0, segment);
 
         converter = new QuackConverter();

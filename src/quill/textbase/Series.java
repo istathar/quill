@@ -22,7 +22,10 @@ import java.util.List;
 
 /**
  * A collection of Segments, comprising a visible section of a document. Like
- * other areas in textbase, is is a wrapper around an array.
+ * other areas in textbase, is is a wrapper around an array. \
+ * 
+ * It also has information about what changed from the previous Series, to
+ * facilitate undo and redo.
  * 
  * @author Andrew Cowie
  */
@@ -83,6 +86,30 @@ public class Series
         System.arraycopy(original, 0, replacement, 0, position);
         replacement[position] = segment;
         System.arraycopy(original, position, replacement, position + 1, original.length - position);
+
+        return new Series(replacement);
+    }
+
+    /**
+     * Grow the Series by replacing the first Segment, inserting the added
+     * Segment, and then following it with the second half of the original
+     * Segment, third.
+     */
+    public Series splice(int position, Segment first, Segment added, Segment third) {
+        final Segment[] original, replacement;
+
+        if (third == null) {
+            throw new AssertionError("Use insert() for the append case");
+        }
+
+        original = this.segments;
+        replacement = new Segment[original.length + 2];
+
+        System.arraycopy(original, 0, replacement, 0, position);
+        replacement[position] = first;
+        replacement[position + 1] = added;
+        replacement[position + 2] = third;
+        System.arraycopy(original, position, replacement, position + 2, original.length - position);
 
         return new Series(replacement);
     }

@@ -211,4 +211,115 @@ public class ValidateWrapperExpansions extends TestCase
             // good
         }
     }
+
+    /*
+     * This is quite contrived, since in standard components you are NOT
+     * allowed to splice the leading ComponentSegment.
+     */
+    public final void testSeriesSpliceBegin() {
+        final Series before, after;
+        final Extract blank;
+
+        blank = Extract.create();
+
+        before = new Series(segments);
+
+        assertEquals(5, before.size());
+        assertTrue(before.get(0) instanceof ComponentSegment);
+        assertTrue(before.get(1) instanceof HeadingSegment);
+
+        after = before.splice(0, new ComponentSegment(blank), new QuoteSegment(blank),
+                new ComponentSegment(blank));
+
+        assertEquals(7, after.size());
+        assertTrue(after.get(0) instanceof ComponentSegment);
+        assertTrue(after.get(1) instanceof QuoteSegment);
+        assertTrue(after.get(2) instanceof ComponentSegment);
+        assertSame(after.get(3), segments[1]);
+        assertSame(after.get(4), segments[2]);
+        assertSame(after.get(5), segments[3]);
+        assertSame(after.get(6), segments[4]);
+    }
+
+    public final void testSeriesSpliceMid() {
+        final Series before, after;
+        final Extract blank;
+
+        blank = Extract.create();
+
+        before = new Series(segments);
+        assertEquals(5, before.size());
+        assertTrue(before.get(2) instanceof NormalSegment);
+
+        after = before.splice(2, new NormalSegment(blank), new QuoteSegment(blank), new NormalSegment(
+                blank));
+
+        assertEquals(7, after.size());
+        assertSame(after.get(0), segments[0]);
+        assertSame(after.get(1), segments[1]);
+        assertTrue(after.get(2) instanceof NormalSegment);
+        assertTrue(after.get(3) instanceof QuoteSegment);
+        assertTrue(after.get(4) instanceof NormalSegment);
+        assertSame(after.get(5), segments[3]);
+        assertSame(after.get(6), segments[4]);
+    }
+
+    public final void testSeriesSpliceEnd() {
+        final Series before, after;
+        final Extract blank;
+
+        blank = Extract.create();
+
+        before = new Series(segments);
+        assertEquals(5, before.size());
+        assertTrue(before.get(4) instanceof NormalSegment);
+
+        after = before.splice(4, new NormalSegment(blank), new QuoteSegment(blank), new NormalSegment(
+                blank));
+
+        assertEquals(7, after.size());
+        assertSame(after.get(0), segments[0]);
+        assertSame(after.get(1), segments[1]);
+        assertSame(after.get(2), segments[2]);
+        assertSame(after.get(3), segments[3]);
+        assertTrue(after.get(4) instanceof NormalSegment);
+        assertTrue(after.get(5) instanceof QuoteSegment);
+        assertTrue(after.get(6) instanceof NormalSegment);
+    }
+
+    public final void testSeriesSpliceUndershoot() {
+        final Series before;
+        final Extract blank;
+
+        blank = Extract.create();
+
+        before = new Series(segments);
+
+        try {
+            before.splice(-1, new NormalSegment(blank), new QuoteSegment(blank),
+                    new NormalSegment(blank));
+
+            fail();
+        } catch (IndexOutOfBoundsException ioobe) {
+            // good
+        }
+    }
+
+    public final void testSeriesSpliceOvershoot() {
+        final Series before;
+        final Extract blank;
+
+        blank = Extract.create();
+
+        before = new Series(segments);
+
+        try {
+            before.splice(6, new NormalSegment(blank), new QuoteSegment(blank), new NormalSegment(blank));
+
+            fail();
+        } catch (IndexOutOfBoundsException ioobe) {
+            // good
+        }
+    }
+
 }
