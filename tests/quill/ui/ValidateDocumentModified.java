@@ -46,7 +46,7 @@ public class ValidateDocumentModified extends GraphicalTestCase
 
         folio = primary.getDocument();
         series = folio.getSeries(0);
-        segment = series.get(1);
+        segment = series.getSegment(1);
         assertTrue(segment instanceof NormalSegment);
 
         parent = primary.testGetEditor();

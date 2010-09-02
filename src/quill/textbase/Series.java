@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -22,7 +22,10 @@ import java.util.List;
 
 /**
  * A collection of Segments, comprising a visible section of a document. Like
- * other areas in textbase, is is a wrapper around an array.
+ * other areas in textbase, is is a wrapper around an array. \
+ * 
+ * It also has information about what changed from the previous Series, to
+ * facilitate undo and redo.
  * 
  * @author Andrew Cowie
  */
@@ -31,6 +34,14 @@ public class Series
 {
     private final Segment[] segments;
 
+    private final int updated;
+
+    private final int added;
+
+    private final int third;
+
+    private final int deleted;
+
     public Series(List<Segment> segments) {
         final Segment[] result;
 
@@ -38,17 +49,27 @@ public class Series
         segments.toArray(result);
 
         this.segments = result;
+
+        this.updated = 0;
+        this.added = 0;
+        this.third = 0;
+        this.deleted = 0;
     }
 
-    Series(Segment[] segments) {
+    Series(Segment[] segments, int deleted, int updated, int added, int third) {
         this.segments = segments;
+
+        this.deleted = deleted;
+        this.updated = updated;
+        this.added = added;
+        this.third = third;
     }
 
     public int size() {
         return segments.length;
     }
 
-    public Segment get(int index) {
+    public Segment getSegment(int index) {
         return segments[index];
     }
 
@@ -67,7 +88,7 @@ public class Series
         System.arraycopy(original, position + 1, replacement, position + 1, original.length - position
                 - 1);
 
-        return new Series(replacement);
+        return new Series(replacement, 0, position, 0, 0);
     }
 
     /**
@@ -84,7 +105,32 @@ public class Series
         replacement[position] = segment;
         System.arraycopy(original, position, replacement, position + 1, original.length - position);
 
-        return new Series(replacement);
+        return new Series(replacement, 0, 0, position, 0);
+    }
+
+    /**
+     * Grow the Series by replacing the first Segment, inserting the added
+     * Segment, and then following it with the second half of the original
+     * Segment, third.
+     */
+    public Series splice(int position, Segment first, Segment added, Segment third) {
+        final Segment[] original, replacement;
+
+        if (third == null) {
+            throw new AssertionError("Use insert() for the append case");
+        }
+
+        original = this.segments;
+        replacement = new Segment[original.length + 2];
+
+        System.arraycopy(original, 0, replacement, 0, position);
+        replacement[position] = first;
+        replacement[position + 1] = added;
+        replacement[position + 2] = third;
+        System.arraycopy(original, position + 1, replacement, position + 3, original.length - position
+                - 1);
+
+        return new Series(replacement, 0, position, position + 1, position + 2);
     }
 
     /**
@@ -100,7 +146,7 @@ public class Series
         System.arraycopy(original, 0, replacement, 0, position);
         System.arraycopy(original, position + 1, replacement, position, original.length - position - 1);
 
-        return new Series(replacement);
+        return new Series(replacement, position, 0, 0, 0);
     }
 
     public int indexOf(Segment segment) {
@@ -113,5 +159,21 @@ public class Series
         }
 
         throw new IllegalArgumentException("\n" + "Segment not in this Series");
+    }
+
+    public int getIndexUpdated() {
+        return updated;
+    }
+
+    public int getIndexAdded() {
+        return added;
+    }
+
+    public int getIndexThird() {
+        return third;
+    }
+
+    public int getIndexDeleted() {
+        return deleted;
     }
 }

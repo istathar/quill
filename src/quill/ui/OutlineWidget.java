@@ -81,7 +81,7 @@ class OutlineWidget extends VBox
         }
 
         for (i = 0; i < series.size(); i++) {
-            segment = series.get(i);
+            segment = series.getSegment(i);
 
             if (segment instanceof ComponentSegment) {
                 entire = segment.getEntire();

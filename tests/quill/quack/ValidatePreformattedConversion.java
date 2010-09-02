@@ -111,7 +111,7 @@ public class ValidatePreformattedConversion extends IOTestCase
         converter = new QuackConverter();
 
         for (i = 0; i < len; i++) {
-            segment = series.get(i);
+            segment = series.getSegment(i);
             converter.append(segment);
         }
 

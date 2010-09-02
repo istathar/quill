@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -41,9 +41,9 @@ public class ValidateWrapperExpansions extends TestCase
     public final void testSeriesStart() {
         final Series series;
 
-        series = new Series(segments);
+        series = new Series(segments, 0, 0, 0, 0);
         assertEquals(5, series.size());
-        assertTrue(series.get(2) instanceof NormalSegment);
+        assertTrue(series.getSegment(2) instanceof NormalSegment);
     }
 
     public final void testSeriesInsertMid() {
@@ -52,21 +52,21 @@ public class ValidateWrapperExpansions extends TestCase
 
         blank = Extract.create();
 
-        before = new Series(segments);
+        before = new Series(segments, 0, 0, 0, 0);
         assertEquals(5, before.size());
-        assertTrue(before.get(2) instanceof NormalSegment);
+        assertTrue(before.getSegment(2) instanceof NormalSegment);
 
         after = before.insert(2, new PreformatSegment(blank));
 
         assertEquals(6, after.size());
-        assertTrue(after.get(1) instanceof HeadingSegment);
-        assertTrue(after.get(2) instanceof PreformatSegment);
-        assertTrue(after.get(3) instanceof NormalSegment);
-        assertSame(after.get(0), segments[0]);
-        assertSame(after.get(1), segments[1]);
-        assertSame(after.get(3), segments[2]);
-        assertSame(after.get(4), segments[3]);
-        assertSame(after.get(5), segments[4]);
+        assertTrue(after.getSegment(1) instanceof HeadingSegment);
+        assertTrue(after.getSegment(2) instanceof PreformatSegment);
+        assertTrue(after.getSegment(3) instanceof NormalSegment);
+        assertSame(after.getSegment(0), segments[0]);
+        assertSame(after.getSegment(1), segments[1]);
+        assertSame(after.getSegment(3), segments[2]);
+        assertSame(after.getSegment(4), segments[3]);
+        assertSame(after.getSegment(5), segments[4]);
     }
 
     public final void testSeriesInsertEnd() {
@@ -75,19 +75,19 @@ public class ValidateWrapperExpansions extends TestCase
 
         blank = Extract.create();
 
-        before = new Series(segments);
+        before = new Series(segments, 0, 0, 0, 0);
         assertEquals(5, before.size());
-        assertTrue(before.get(4) instanceof NormalSegment);
+        assertTrue(before.getSegment(4) instanceof NormalSegment);
 
         after = before.insert(5, new PreformatSegment(blank));
 
         assertEquals(6, after.size());
-        assertSame(after.get(0), segments[0]);
-        assertSame(after.get(1), segments[1]);
-        assertSame(after.get(2), segments[2]);
-        assertSame(after.get(3), segments[3]);
-        assertSame(after.get(4), segments[4]);
-        assertTrue(after.get(5) instanceof PreformatSegment);
+        assertSame(after.getSegment(0), segments[0]);
+        assertSame(after.getSegment(1), segments[1]);
+        assertSame(after.getSegment(2), segments[2]);
+        assertSame(after.getSegment(3), segments[3]);
+        assertSame(after.getSegment(4), segments[4]);
+        assertTrue(after.getSegment(5) instanceof PreformatSegment);
     }
 
     public final void testSeriesInsertBegin() {
@@ -96,20 +96,20 @@ public class ValidateWrapperExpansions extends TestCase
 
         blank = Extract.create();
 
-        before = new Series(segments);
+        before = new Series(segments, 0, 0, 0, 0);
 
         assertEquals(5, before.size());
-        assertTrue(before.get(0) instanceof ComponentSegment);
+        assertTrue(before.getSegment(0) instanceof ComponentSegment);
 
         after = before.insert(0, new PreformatSegment(blank));
 
         assertEquals(6, after.size());
-        assertTrue(after.get(0) instanceof PreformatSegment);
-        assertSame(after.get(1), segments[0]);
-        assertSame(after.get(2), segments[1]);
-        assertSame(after.get(3), segments[2]);
-        assertSame(after.get(4), segments[3]);
-        assertSame(after.get(5), segments[4]);
+        assertTrue(after.getSegment(0) instanceof PreformatSegment);
+        assertSame(after.getSegment(1), segments[0]);
+        assertSame(after.getSegment(2), segments[1]);
+        assertSame(after.getSegment(3), segments[2]);
+        assertSame(after.getSegment(4), segments[3]);
+        assertSame(after.getSegment(5), segments[4]);
     }
 
     public final void testSeriesInsertUndershoot() {
@@ -118,7 +118,7 @@ public class ValidateWrapperExpansions extends TestCase
 
         blank = Extract.create();
 
-        before = new Series(segments);
+        before = new Series(segments, 0, 0, 0, 0);
 
         try {
             before.insert(-1, new PreformatSegment(blank));
@@ -134,7 +134,7 @@ public class ValidateWrapperExpansions extends TestCase
 
         blank = Extract.create();
 
-        before = new Series(segments);
+        before = new Series(segments, 0, 0, 0, 0);
 
         try {
             before.insert(6, new PreformatSegment(blank));
@@ -147,49 +147,49 @@ public class ValidateWrapperExpansions extends TestCase
     public final void testSeriesDeleteMid() {
         final Series before, after;
 
-        before = new Series(segments);
+        before = new Series(segments, 0, 0, 0, 0);
 
         after = before.delete(2);
 
         assertEquals(4, after.size());
-        assertSame(after.get(0), segments[0]);
-        assertSame(after.get(1), segments[1]);
-        assertSame(after.get(2), segments[3]);
-        assertSame(after.get(3), segments[4]);
+        assertSame(after.getSegment(0), segments[0]);
+        assertSame(after.getSegment(1), segments[1]);
+        assertSame(after.getSegment(2), segments[3]);
+        assertSame(after.getSegment(3), segments[4]);
     }
 
     public final void testSeriesDeleteEnd() {
         final Series before, after;
 
-        before = new Series(segments);
+        before = new Series(segments, 0, 0, 0, 0);
 
         after = before.delete(4);
 
         assertEquals(4, after.size());
-        assertSame(after.get(0), segments[0]);
-        assertSame(after.get(1), segments[1]);
-        assertSame(after.get(2), segments[2]);
-        assertSame(after.get(3), segments[3]);
+        assertSame(after.getSegment(0), segments[0]);
+        assertSame(after.getSegment(1), segments[1]);
+        assertSame(after.getSegment(2), segments[2]);
+        assertSame(after.getSegment(3), segments[3]);
     }
 
     public final void testSeriesDeleteBegin() {
         final Series before, after;
 
-        before = new Series(segments);
+        before = new Series(segments, 0, 0, 0, 0);
 
         after = before.delete(0);
 
         assertEquals(4, after.size());
-        assertSame(after.get(0), segments[1]);
-        assertSame(after.get(1), segments[2]);
-        assertSame(after.get(2), segments[3]);
-        assertSame(after.get(3), segments[4]);
+        assertSame(after.getSegment(0), segments[1]);
+        assertSame(after.getSegment(1), segments[2]);
+        assertSame(after.getSegment(2), segments[3]);
+        assertSame(after.getSegment(3), segments[4]);
     }
 
     public final void testSeriesDeleteUndershoot() {
         final Series before;
 
-        before = new Series(segments);
+        before = new Series(segments, 0, 0, 0, 0);
 
         try {
             before.delete(-1);
@@ -202,7 +202,7 @@ public class ValidateWrapperExpansions extends TestCase
     public final void testSeriesDeleteOvershoot() {
         final Series before;
 
-        before = new Series(segments);
+        before = new Series(segments, 0, 0, 0, 0);
 
         try {
             before.delete(5);
@@ -211,4 +211,155 @@ public class ValidateWrapperExpansions extends TestCase
             // good
         }
     }
+
+    /*
+     * This is quite contrived, since in standard components you are NOT
+     * allowed to splice the leading ComponentSegment.
+     */
+    public final void testSeriesSpliceBegin() {
+        final Series before, after;
+        final Extract blank;
+
+        blank = Extract.create();
+
+        before = new Series(segments, 0, 0, 0, 0);
+
+        assertEquals(5, before.size());
+        assertTrue(before.getSegment(0) instanceof ComponentSegment);
+        assertTrue(before.getSegment(1) instanceof HeadingSegment);
+        assertSame(before.getSegment(1), segments[1]);
+
+        after = before.splice(0, new ComponentSegment(blank), new QuoteSegment(blank),
+                new ComponentSegment(blank));
+
+        assertEquals(7, after.size());
+        assertTrue(after.getSegment(0) instanceof ComponentSegment);
+        assertTrue(after.getSegment(1) instanceof QuoteSegment);
+        assertTrue(after.getSegment(2) instanceof ComponentSegment);
+        assertSame(after.getSegment(3), segments[1]);
+        assertSame(after.getSegment(4), segments[2]);
+        assertSame(after.getSegment(5), segments[3]);
+        assertSame(after.getSegment(6), segments[4]);
+    }
+
+    public final void testSeriesSpliceMid() {
+        final Series before, after;
+        final Extract blank;
+
+        blank = Extract.create();
+
+        before = new Series(segments, 0, 0, 0, 0);
+        assertEquals(5, before.size());
+        assertTrue(before.getSegment(2) instanceof NormalSegment);
+
+        after = before.splice(2, new NormalSegment(blank), new QuoteSegment(blank), new NormalSegment(
+                blank));
+
+        assertEquals(7, after.size());
+        assertSame(after.getSegment(0), segments[0]);
+        assertSame(after.getSegment(1), segments[1]);
+        assertTrue(after.getSegment(2) instanceof NormalSegment);
+        assertTrue(after.getSegment(3) instanceof QuoteSegment);
+        assertTrue(after.getSegment(4) instanceof NormalSegment);
+        assertSame(after.getSegment(5), segments[3]);
+        assertSame(after.getSegment(6), segments[4]);
+    }
+
+    public final void testSeriesSpliceMidWithText() {
+        Span span1, span2, span3;
+        final Series before, after;
+        final Extract one, two, three;
+        final Segment une, deux, trois;
+
+        span1 = Span.createSpan("This is a test", null);
+        one = Extract.create(span1);
+
+        span2 = Span.createSpan("DO REI ME", null);
+        two = Extract.create(span2);
+
+        span3 = Span.createSpan(" of the emergency broadcast sytem", null);
+        three = Extract.create(span3);
+
+        before = new Series(segments, 0, 0, 0, 0);
+        assertEquals(5, before.size());
+        assertTrue(before.getSegment(2) instanceof NormalSegment);
+
+        une = new NormalSegment(one);
+
+        deux = new QuoteSegment(two);
+        trois = new NormalSegment(three);
+
+        after = before.splice(2, une, deux, trois);
+
+        assertEquals(7, after.size());
+        assertSame(after.getSegment(0), segments[0]);
+        assertSame(after.getSegment(1), segments[1]);
+        assertTrue(after.getSegment(2) instanceof NormalSegment);
+        assertSame(after.getSegment(2), une);
+        assertTrue(after.getSegment(3) instanceof QuoteSegment);
+        assertSame(after.getSegment(3), deux);
+        assertTrue(after.getSegment(4) instanceof NormalSegment);
+        assertSame(after.getSegment(4), trois);
+        assertSame(after.getSegment(5), segments[3]);
+        assertSame(after.getSegment(6), segments[4]);
+    }
+
+    public final void testSeriesSpliceEnd() {
+        final Series before, after;
+        final Extract blank;
+
+        blank = Extract.create();
+
+        before = new Series(segments, 0, 0, 0, 0);
+        assertEquals(5, before.size());
+        assertTrue(before.getSegment(4) instanceof NormalSegment);
+
+        after = before.splice(4, new NormalSegment(blank), new QuoteSegment(blank), new NormalSegment(
+                blank));
+
+        assertEquals(7, after.size());
+        assertSame(after.getSegment(0), segments[0]);
+        assertSame(after.getSegment(1), segments[1]);
+        assertSame(after.getSegment(2), segments[2]);
+        assertSame(after.getSegment(3), segments[3]);
+        assertTrue(after.getSegment(4) instanceof NormalSegment);
+        assertTrue(after.getSegment(5) instanceof QuoteSegment);
+        assertTrue(after.getSegment(6) instanceof NormalSegment);
+    }
+
+    public final void testSeriesSpliceUndershoot() {
+        final Series before;
+        final Extract blank;
+
+        blank = Extract.create();
+
+        before = new Series(segments, 0, 0, 0, 0);
+
+        try {
+            before.splice(-1, new NormalSegment(blank), new QuoteSegment(blank),
+                    new NormalSegment(blank));
+
+            fail();
+        } catch (IndexOutOfBoundsException ioobe) {
+            // good
+        }
+    }
+
+    public final void testSeriesSpliceOvershoot() {
+        final Series before;
+        final Extract blank;
+
+        blank = Extract.create();
+
+        before = new Series(segments, 0, 0, 0, 0);
+
+        try {
+            before.splice(6, new NormalSegment(blank), new QuoteSegment(blank), new NormalSegment(blank));
+
+            fail();
+        } catch (IndexOutOfBoundsException ioobe) {
+            // good
+        }
+    }
+
 }

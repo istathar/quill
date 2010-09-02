@@ -147,7 +147,7 @@ class ComponentEditorWidget extends ScrolledWindow
         this.editors = new LinkedList<EditorTextView>();
 
         for (i = 0; i < num; i++) {
-            segment = series.get(i);
+            segment = series.getSegment(i);
 
             widget = createEditorForSegment(i, segment);
 
@@ -160,7 +160,7 @@ class ComponentEditorWidget extends ScrolledWindow
          * And make sure the cursor is a Segment from this Series.
          */
 
-        this.cursorSegment = series.get(0);
+        this.cursorSegment = series.getSegment(0);
     }
 
     private Segment lookup(Widget editor) {
@@ -175,7 +175,7 @@ class ComponentEditorWidget extends ScrolledWindow
 
         for (i = 0; i < len; i++) {
             if (editors.get(i) == editor) {
-                return series.get(i);
+                return series.getSegment(i);
             }
         }
 
@@ -302,23 +302,64 @@ class ComponentEditorWidget extends ScrolledWindow
      * Given a [new] state, apply it!
      */
     void affect(final Series series) {
+        final Series former;
+        final int updated, added, third, deleted;
         int i;
-        Segment segment;
+        Widget widget;
+        Widget[] children;
         EditorTextView editor;
+        Segment segment;
 
         if (this.series == series) {
             return;
         }
+        former = this.series;
+
+        updated = series.getIndexUpdated();
+        added = series.getIndexAdded();
+        third = series.getIndexThird();
+        deleted = series.getIndexDeleted();
+
+        segment = series.getSegment(updated);
+        editor = editors.get(updated);
+        editor.affect(segment);
 
         /*
-         * As with EditorTextView, this is only active in undo/redo. Right now
-         * this is HORRID.
+         * Can't add at 0, can only update 0.
          */
+
+        if (added > 0) {
+            segment = series.getSegment(added);
+            widget = createEditorForSegment(added, segment);
+            box.packStart(widget, false, false, 0);
+            box.reorderChild(widget, added);
+            widget.showAll();
+            editor = findEditorIn(widget);
+            editor.grabFocus();
+        }
+
+        if (third > 0) {
+            segment = series.getSegment(third);
+            widget = createEditorForSegment(third, segment);
+            box.packStart(widget, false, false, 0);
+            box.reorderChild(widget, third);
+            widget.showAll();
+        }
+
+        if (deleted > 0) {
+            segment = series.getSegment(deleted);
+
+            children = box.getChildren();
+            widget = children[deleted];
+            box.remove(widget);
+
+            editors.remove(deleted);
+        }
 
         this.series = series;
 
         for (i = 0; i < series.size(); i++) {
-            segment = series.get(i);
+            segment = series.getSegment(i);
             editor = editors.get(i);
             editor.affect(segment);
         }
@@ -344,7 +385,7 @@ class ComponentEditorWidget extends ScrolledWindow
         this.series = series;
 
         for (i = 0; i < series.size(); i++) {
-            segment = series.get(i);
+            segment = series.getSegment(i);
             editor = editors.get(i);
             editor.reverseTo(segment);
         }
@@ -391,8 +432,6 @@ class ComponentEditorWidget extends ScrolledWindow
             final Segment added, final Segment third) {
         Series former, replacement;
         int i;
-        Widget widget;
-        EditorTextView editor;
 
         former = series;
 
@@ -409,36 +448,16 @@ class ComponentEditorWidget extends ScrolledWindow
             throw new AssertionError("originating EditorTextView not in this ComponentEditorWidget");
         }
 
-        replacement = series.update(i, first);
-        i++;
-
-        /*
-         * Create the new editor
-         */
-
-        widget = createEditorForSegment(i, added);
-        box.packStart(widget, false, false, 0);
-        box.reorderChild(widget, i);
-        widget.showAll();
-        editor = findEditorIn(widget);
-        editor.grabFocus();
-
-        replacement = replacement.insert(i, added);
-
         /*
          * Split the old one in two pieces, adding a new editor for the second
          * piece... unless we did the split at the end of the last segment.
          */
 
-        if (third != null) {
+        if (third == null) {
             i++;
-
-            widget = createEditorForSegment(i, third);
-            box.packStart(widget, false, false, 0);
-            box.reorderChild(widget, i);
-            widget.showAll();
-
-            replacement = replacement.insert(i, third);
+            replacement = former.insert(i, added);
+        } else {
+            replacement = former.splice(i, first, added, third);
         }
 
         primary.update(this, former, replacement);
@@ -448,7 +467,7 @@ class ComponentEditorWidget extends ScrolledWindow
         final Segment segment;
         final EditorTextView first;
 
-        segment = series.get(0);
+        segment = series.getSegment(0);
         first = lookup(segment);
         first.placeCursorFirstLine(0);
         first.grabFocus();
@@ -512,7 +531,7 @@ class ComponentEditorWidget extends ScrolledWindow
             return;
         }
 
-        segment = series.get(i);
+        segment = series.getSegment(i);
 
         editor = editors.get(i);
         editor.placeCursorFirstLine(position);
@@ -718,7 +737,7 @@ class ComponentEditorWidget extends ScrolledWindow
         editor.placeCursorFirstLine(0);
         editor.grabFocus();
 
-        cursorSegment = series.get(0);
+        cursorSegment = series.getSegment(0);
     }
 
     void moveCursorEnd() {
@@ -728,7 +747,7 @@ class ComponentEditorWidget extends ScrolledWindow
         editor.placeCursorLastLine(-1);
         editor.grabFocus();
 
-        cursorSegment = series.get(series.size() - 1);
+        cursorSegment = series.getSegment(series.size() - 1);
     }
 
     /*

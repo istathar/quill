@@ -300,7 +300,7 @@ public abstract class RenderEngine
             currentPosition = i;
             currentOffset = 0;
 
-            segment = series.get(i);
+            segment = series.getSegment(i);
             entire = segment.getEntire();
 
             if (segment instanceof ComponentSegment) {

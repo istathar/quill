@@ -46,11 +46,11 @@ public class ValidateBlockquoteConversion extends TestCase
 
         assertEquals(3, series.size());
 
-        segment = series.get(0);
+        segment = series.getSegment(0);
         assertTrue(segment instanceof NormalSegment);
-        segment = series.get(1);
+        segment = series.getSegment(1);
         assertTrue(segment instanceof QuoteSegment);
-        segment = series.get(2);
+        segment = series.getSegment(2);
         assertTrue(segment instanceof NormalSegment);
     }
 }

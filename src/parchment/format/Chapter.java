@@ -262,7 +262,7 @@ public class Chapter
         converter = new QuackConverter();
 
         for (i = 0; i < series.size(); i++) {
-            converter.append(series.get(i));
+            converter.append(series.getSegment(i));
         }
 
         /*
