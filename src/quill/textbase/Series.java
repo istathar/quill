@@ -127,7 +127,8 @@ public class Series
         replacement[position] = first;
         replacement[position + 1] = added;
         replacement[position + 2] = third;
-        System.arraycopy(original, position, replacement, position + 2, original.length - position);
+        System.arraycopy(original, position + 1, replacement, position + 3, original.length - position
+                - 1);
 
         return new Series(replacement, 0, position, position + 1, position + 2);
     }
