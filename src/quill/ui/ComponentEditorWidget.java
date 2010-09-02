@@ -454,8 +454,8 @@ class ComponentEditorWidget extends ScrolledWindow
          */
 
         if (third == null) {
-            // TODO
-            throw new Error();
+            i++;
+            replacement = former.insert(i, added);
         } else {
             replacement = former.splice(i, first, added, third);
         }
