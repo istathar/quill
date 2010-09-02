@@ -34,6 +34,14 @@ public class Series
 {
     private final Segment[] segments;
 
+    private final int updated;
+
+    private final int added;
+
+    private final int third;
+
+    private final int deleted;
+
     public Series(List<Segment> segments) {
         final Segment[] result;
 
@@ -41,10 +49,20 @@ public class Series
         segments.toArray(result);
 
         this.segments = result;
+
+        this.updated = 0;
+        this.added = 0;
+        this.third = 0;
+        this.deleted = 0;
     }
 
-    Series(Segment[] segments) {
+    Series(Segment[] segments, int deleted, int updated, int added, int third) {
         this.segments = segments;
+
+        this.deleted = deleted;
+        this.updated = updated;
+        this.added = added;
+        this.third = third;
     }
 
     public int size() {
@@ -70,7 +88,7 @@ public class Series
         System.arraycopy(original, position + 1, replacement, position + 1, original.length - position
                 - 1);
 
-        return new Series(replacement);
+        return new Series(replacement, 0, position, 0, 0);
     }
 
     /**
@@ -87,7 +105,7 @@ public class Series
         replacement[position] = segment;
         System.arraycopy(original, position, replacement, position + 1, original.length - position);
 
-        return new Series(replacement);
+        return new Series(replacement, 0, 0, position, 0);
     }
 
     /**
@@ -111,7 +129,7 @@ public class Series
         replacement[position + 2] = third;
         System.arraycopy(original, position, replacement, position + 2, original.length - position);
 
-        return new Series(replacement);
+        return new Series(replacement, 0, position, position + 1, position + 2);
     }
 
     /**
@@ -127,7 +145,7 @@ public class Series
         System.arraycopy(original, 0, replacement, 0, position);
         System.arraycopy(original, position + 1, replacement, position, original.length - position - 1);
 
-        return new Series(replacement);
+        return new Series(replacement, position, 0, 0, 0);
     }
 
     public int indexOf(Segment segment) {
@@ -140,5 +158,21 @@ public class Series
         }
 
         throw new IllegalArgumentException("\n" + "Segment not in this Series");
+    }
+
+    public int getIndexUpdated() {
+        return updated;
+    }
+
+    public int getIndexAdded() {
+        return added;
+    }
+
+    public int getIndexThird() {
+        return third;
+    }
+
+    public int getIndexDeleted() {
+        return deleted;
     }
 }
