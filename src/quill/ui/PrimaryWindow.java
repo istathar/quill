@@ -36,6 +36,7 @@ import org.gnome.gtk.ErrorMessageDialog;
 import org.gnome.gtk.FileChooserDialog;
 import org.gnome.gtk.FileFilter;
 import org.gnome.gtk.HBox;
+import org.gnome.gtk.Icon;
 import org.gnome.gtk.IconSize;
 import org.gnome.gtk.Image;
 import org.gnome.gtk.InfoMessageDialog;
@@ -44,7 +45,6 @@ import org.gnome.gtk.MessageType;
 import org.gnome.gtk.Notebook;
 import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.ResponseType;
-import org.gnome.gtk.Stock;
 import org.gnome.gtk.Unit;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
@@ -675,17 +675,17 @@ class PrimaryWindow extends Window
                 + "has been modified. Do you want to save it first?", true);
 
         discard = new Button();
-        discard.setImage(new Image(Stock.DELETE, IconSize.BUTTON));
+        discard.setImage(new Image(Icon.USER_TRASH, IconSize.BUTTON));
         discard.setLabel("Discard changes");
         dialog.addButton(discard, ResponseType.CLOSE);
 
         cancel = new Button();
-        cancel.setImage(new Image(Stock.CANCEL, IconSize.BUTTON));
+        cancel.setImage(new Image(Icon.DOCUMENT_REVERT, IconSize.BUTTON));
         cancel.setLabel("Return to editor");
         dialog.addButton(cancel, ResponseType.CANCEL);
 
         ok = new Button();
-        ok.setImage(new Image(Stock.SAVE, IconSize.BUTTON));
+        ok.setImage(new Image(Icon.DOCUMENT_SAVE, IconSize.BUTTON));
         ok.setLabel("Yes, save");
         dialog.addButton(ok, ResponseType.OK);
 
