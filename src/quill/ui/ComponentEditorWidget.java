@@ -333,8 +333,11 @@ class ComponentEditorWidget extends ScrolledWindow
             widget = createEditorForSegment(added, segment);
             box.packStart(widget, false, false, 0);
             box.reorderChild(widget, added);
+
+            editor = editors.get(added);
+            editor.affect(segment);
+
             widget.showAll();
-            editor = findEditorIn(widget);
             editor.grabFocus();
         }
 
@@ -343,9 +346,14 @@ class ComponentEditorWidget extends ScrolledWindow
             widget = createEditorForSegment(third, segment);
             box.packStart(widget, false, false, 0);
             box.reorderChild(widget, third);
+
+            editor = editors.get(third);
+            editor.affect(segment);
+
             widget.showAll();
         }
 
+        // UNTRIED
         if (deleted > 0) {
             segment = series.getSegment(deleted);
 
@@ -358,6 +366,13 @@ class ComponentEditorWidget extends ScrolledWindow
 
         this.series = series;
 
+        /*
+         * TODO This is now a no-op (and waste) given everything should have
+         * been applied courtesy of the above. Probably need to remove this,
+         * but what about the case of applying a full Series state, not just a
+         * known delta from a previous Series. Do we do that anywhere?
+         */
+
         for (i = 0; i < series.size(); i++) {
             segment = series.getSegment(i);
             editor = editors.get(i);
@@ -369,26 +384,59 @@ class ComponentEditorWidget extends ScrolledWindow
      * Given a [new] state, apply it!
      */
     void reveseTo(final Series series) {
+        final Series previous;
+        final int updated, added, third, deleted;
         int i;
-        Segment segment;
+        Widget widget;
+        Widget[] children;
         EditorTextView editor;
+        Segment segment;
 
         if (this.series == series) {
             return;
         }
+        previous = this.series;
 
-        /*
-         * As with EditorTextView, this is only active in undo/redo. Right now
-         * this is HORRID.
-         */
+        updated = previous.getIndexUpdated();
+        added = previous.getIndexAdded();
+        third = previous.getIndexThird();
+        deleted = previous.getIndexDeleted();
+
+        segment = series.getSegment(updated);
+        editor = editors.get(updated);
+        editor.reverseTo(segment);
+
+        if (third > 0) {
+            children = box.getChildren();
+            widget = children[third];
+            box.remove(widget);
+
+            editors.remove(third);
+        }
+
+        if (added > 0) {
+            children = box.getChildren();
+            widget = children[added];
+            box.remove(widget);
+
+            editors.remove(added);
+        }
+
+        // UNTRIED
+        if (deleted > 0) {
+            segment = previous.getSegment(deleted);
+            widget = createEditorForSegment(deleted, segment);
+            box.packStart(widget, false, false, 0);
+            box.reorderChild(widget, deleted);
+
+            editor = editors.get(deleted);
+            editor.affect(segment);
+
+            widget.showAll();
+            editor.grabFocus();
+        }
 
         this.series = series;
-
-        for (i = 0; i < series.size(); i++) {
-            segment = series.getSegment(i);
-            editor = editors.get(i);
-            editor.reverseTo(segment);
-        }
     }
 
     /**
