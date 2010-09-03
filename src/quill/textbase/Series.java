@@ -50,19 +50,30 @@ public class Series
 
         this.segments = result;
 
-        this.updated = 0;
-        this.added = 0;
-        this.third = 0;
-        this.deleted = 0;
+        this.updated = -1;
+        this.added = -1;
+        this.third = -1;
+        this.deleted = -1;
     }
 
-    Series(Segment[] segments, int deleted, int updated, int added, int third) {
+    // for real
+    private Series(Segment[] segments, int deleted, int updated, int added, int third) {
         this.segments = segments;
 
         this.deleted = deleted;
         this.updated = updated;
         this.added = added;
         this.third = third;
+    }
+
+    // for testing
+    Series(Segment[] segments) {
+        this.segments = segments;
+
+        this.updated = -1;
+        this.added = -1;
+        this.third = -1;
+        this.deleted = -1;
     }
 
     public int size() {
@@ -88,7 +99,7 @@ public class Series
         System.arraycopy(original, position + 1, replacement, position + 1, original.length - position
                 - 1);
 
-        return new Series(replacement, 0, position, 0, 0);
+        return new Series(replacement, -1, position, 0, 0);
     }
 
     /**
@@ -105,7 +116,7 @@ public class Series
         replacement[position] = segment;
         System.arraycopy(original, position, replacement, position + 1, original.length - position);
 
-        return new Series(replacement, 0, 0, position, 0);
+        return new Series(replacement, -1, -1, position, -1);
     }
 
     /**
@@ -130,7 +141,7 @@ public class Series
         System.arraycopy(original, position + 1, replacement, position + 3, original.length - position
                 - 1);
 
-        return new Series(replacement, 0, position, position + 1, position + 2);
+        return new Series(replacement, -1, position, position + 1, position + 2);
     }
 
     /**
@@ -146,7 +157,7 @@ public class Series
         System.arraycopy(original, 0, replacement, 0, position);
         System.arraycopy(original, position + 1, replacement, position, original.length - position - 1);
 
-        return new Series(replacement, position, 0, 0, 0);
+        return new Series(replacement, position, -1, -1, -1);
     }
 
     public int indexOf(Segment segment) {
