@@ -105,7 +105,7 @@ abstract class EditorTextView extends TextView
         setupInsertMenu();
         setupContextMenu();
 
-        affect(segment);
+        initializeSegment(segment);
 
         hookupKeybindings();
         hookupFormatManagement();
@@ -639,6 +639,34 @@ abstract class EditorTextView extends TextView
 
     private void insertImage() {}
 
+    /*
+     * This is essentially the same as advanceTo(), but it saves some
+     * unnecessary work.
+     */
+    private void initializeSegment(Segment segment) {
+        final Extract entire;
+        final TextIter start;
+
+        /*
+         * Set the internal state
+         */
+
+        entire = segment.getEntire();
+        chain.setTree(entire);
+
+        start = buffer.getIterStart();
+
+        insertExtractIntoBuffer(start, entire);
+
+        /*
+         * Spell check the whole thing
+         */
+
+        checkSpellingRange(0, entire.getWidth());
+
+        this.segment = segment;
+    }
+
     /**
      * Given a Segment, apply it!
      */
@@ -647,7 +675,7 @@ abstract class EditorTextView extends TextView
      * this to be called has already updated the TextBuffer to match the
      * requirements of this state.
      */
-    void affect(Segment segment) {
+    void advanceTo(Segment segment) {
         final Segment previous;
         final Extract entire, extract;
         final TextIter start, finish;
@@ -666,18 +694,19 @@ abstract class EditorTextView extends TextView
         chain.setTree(entire);
 
         /*
-         * Clear the buffer, and replace it with the entire tree of Spans. BAD
+         * Ask what the delta was to get here from previous, and then affect
+         * it. Obviously there is a BIG assumption here that the "change"
+         * recorded in segment is actually obtainable from previous, and the
+         * actual Segment currently in this EditorTextView did actually
+         * proceed it.
          */
 
         if (previous == null) {
-            offset = 0;
-            removed = 0;
-            inserted = entire.getWidth();
-        } else {
-            offset = segment.getOffset();
-            removed = segment.getRemoved();
-            inserted = segment.getInserted();
+            throw new AssertionError("should have been loaded with initializeSegment()");
         }
+        offset = segment.getOffset();
+        removed = segment.getRemoved();
+        inserted = segment.getInserted();
 
         start = buffer.getIter(offset);
 

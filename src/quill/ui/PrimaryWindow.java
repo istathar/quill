@@ -164,7 +164,7 @@ class PrimaryWindow extends Window
             series = folio.getSeries(i);
 
             // TODO FIXME propegate to each editor!
-            editor.affect(series);
+            editor.advanceTo(series);
         }
 
         // FIXME only if showing!

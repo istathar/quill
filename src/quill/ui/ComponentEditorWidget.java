@@ -301,8 +301,7 @@ class ComponentEditorWidget extends ScrolledWindow
     /**
      * Given a [new] state, apply it!
      */
-    void affect(final Series series) {
-        final Series former;
+    void advanceTo(final Series replacement) {
         final int updated, added, third, deleted;
         int i;
         Widget widget;
@@ -310,52 +309,51 @@ class ComponentEditorWidget extends ScrolledWindow
         EditorTextView editor;
         Segment segment;
 
-        if (this.series == series) {
+        if (this.series == replacement) {
             return;
         }
-        former = this.series;
 
-        updated = series.getIndexUpdated();
-        added = series.getIndexAdded();
-        third = series.getIndexThird();
-        deleted = series.getIndexDeleted();
+        updated = replacement.getIndexUpdated();
+        added = replacement.getIndexAdded();
+        third = replacement.getIndexThird();
+        deleted = replacement.getIndexDeleted();
 
-        segment = series.getSegment(updated);
+        segment = replacement.getSegment(updated);
         editor = editors.get(updated);
-        editor.affect(segment);
+        editor.advanceTo(segment);
 
         /*
          * Can't add at 0, can only update 0.
          */
 
         if (added > 0) {
-            segment = series.getSegment(added);
+            segment = replacement.getSegment(added);
             widget = createEditorForSegment(added, segment);
             box.packStart(widget, false, false, 0);
             box.reorderChild(widget, added);
 
             editor = editors.get(added);
-            editor.affect(segment);
+            editor.advanceTo(segment);
 
             widget.showAll();
             editor.grabFocus();
         }
 
         if (third > 0) {
-            segment = series.getSegment(third);
+            segment = replacement.getSegment(third);
             widget = createEditorForSegment(third, segment);
             box.packStart(widget, false, false, 0);
             box.reorderChild(widget, third);
 
             editor = editors.get(third);
-            editor.affect(segment);
+            editor.advanceTo(segment);
 
             widget.showAll();
         }
 
         // UNTRIED
         if (deleted > 0) {
-            segment = series.getSegment(deleted);
+            segment = replacement.getSegment(deleted);
 
             children = box.getChildren();
             widget = children[deleted];
@@ -364,7 +362,7 @@ class ComponentEditorWidget extends ScrolledWindow
             editors.remove(deleted);
         }
 
-        this.series = series;
+        this.series = replacement;
 
         /*
          * TODO This is now a no-op (and waste) given everything should have
@@ -373,20 +371,22 @@ class ComponentEditorWidget extends ScrolledWindow
          * known delta from a previous Series. Do we do that anywhere?
          */
 
-        for (i = 0; i < series.size(); i++) {
-            segment = series.getSegment(i);
+        for (i = 0; i < replacement.size(); i++) {
+            segment = replacement.getSegment(i);
             editor = editors.get(i);
-            editor.affect(segment);
+            editor.advanceTo(segment);
         }
     }
 
     /**
-     * Given a [new] state, apply it!
+     * Given the previous state, go back to it.
+     * 
+     * This is actually a misnomer; this method takes the currently active
+     * state and undoes what happened to get from series to current.
      */
     void reveseTo(final Series series) {
-        final Series previous;
+        final Series current;
         final int updated, added, third, deleted;
-        int i;
         Widget widget;
         Widget[] children;
         EditorTextView editor;
@@ -395,12 +395,12 @@ class ComponentEditorWidget extends ScrolledWindow
         if (this.series == series) {
             return;
         }
-        previous = this.series;
+        current = this.series;
 
-        updated = previous.getIndexUpdated();
-        added = previous.getIndexAdded();
-        third = previous.getIndexThird();
-        deleted = previous.getIndexDeleted();
+        updated = current.getIndexUpdated();
+        added = current.getIndexAdded();
+        third = current.getIndexThird();
+        deleted = current.getIndexDeleted();
 
         segment = series.getSegment(updated);
         editor = editors.get(updated);
@@ -424,13 +424,13 @@ class ComponentEditorWidget extends ScrolledWindow
 
         // UNTRIED
         if (deleted > 0) {
-            segment = previous.getSegment(deleted);
+            segment = current.getSegment(deleted);
             widget = createEditorForSegment(deleted, segment);
             box.packStart(widget, false, false, 0);
             box.reorderChild(widget, deleted);
 
             editor = editors.get(deleted);
-            editor.affect(segment);
+            editor.advanceTo(segment);
 
             widget.showAll();
             editor.grabFocus();
