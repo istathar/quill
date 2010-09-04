@@ -113,13 +113,11 @@ public class Chapter
          * for all the recovery files at once in Manuscript's checkFilename(),
          * but that implies doing some kind of recursive search for such files
          * [ugly] or already having loaded the .parchment file [also ugly].
-         * Throwing an unchecked exception for something the user did wrong is
-         * WRONG.
          */
 
         probe = new File(filename + ".RESCUED");
         if (probe.exists()) {
-            throw new UnsupportedOperationException("\n" + "There's still a recovery file," + "\n"
+            System.err.println("WARNING: " + "There's still a Chapter recovery file," + "\n"
                     + probe.getPath());
         }
 

@@ -475,14 +475,8 @@ class PrimaryWindow extends Window
      * Change the right side to show the outline navigator.
      */
     void switchToOutline() {
-        final Series series;
-
         right.setCurrentPage(2);
-
-        // FIXME
-        series = folio.getSeries(0);
-
-        outline.renderSeries(series);
+        outline.queueDraw();
     }
 
     /**
@@ -507,7 +501,7 @@ class PrimaryWindow extends Window
 
         editor.initializeSeries(series);
         preview.affect(manuscript, folio);
-        outline.renderSeries(series);
+        outline.affect(folio);
         this.updateTitle();
     }
 
@@ -832,6 +826,10 @@ class PrimaryWindow extends Window
         return folio;
     }
 
+    /**
+     * @param widget
+     *            Chapter editor calling in.
+     */
     void update(ComponentEditorWidget widget, Series former, Series series) {
         Folio anticedant, replacement;
         int i;

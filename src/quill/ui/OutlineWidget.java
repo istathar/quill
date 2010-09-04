@@ -59,113 +59,128 @@ class OutlineWidget extends VBox
 {
     private VBox top;
 
-    private Series series;
+    private Folio folio;
 
     public OutlineWidget() {
         super(false, 0);
         top = this;
-        series = null;
+        folio = null;
     }
 
     private void buildOutline() {
+        Series series;
         Segment segment;
-        int i;
+        int i, j;
         Extract entire;
         StringBuilder str;
         Button button;
         Label label;
         DrawingArea lines;
 
-        if (series == null) {
+        if (folio == null) {
             return;
         }
 
-        for (i = 0; i < series.size(); i++) {
-            segment = series.getSegment(i);
+        for (j = 0; j < folio.size(); j++) {
+            series = folio.getSeries(j);
 
-            if (segment instanceof ComponentSegment) {
-                entire = segment.getEntire();
+            for (i = 0; i < series.size(); i++) {
+                segment = series.getSegment(i);
 
-                str = new StringBuilder();
-                str.append("<span size=\"xx-large\"> ");
-                str.append(entire.getText());
-                str.append("</span>");
-            } else if (segment instanceof HeadingSegment) {
-                entire = segment.getEntire();
+                if (segment instanceof ComponentSegment) {
+                    entire = segment.getEntire();
 
-                str = new StringBuilder();
-                str.append("      ");
-                str.append(entire.getText());
-            } else if (segment instanceof ImageSegment) {
-                Image image;
-                Pixbuf pixbuf;
-                HBox left;
+                    str = new StringBuilder();
+                    str.append("<span size=\"xx-large\"> ");
+                    str.append(entire.getText());
+                    str.append("</span>");
+                } else if (segment instanceof HeadingSegment) {
+                    entire = segment.getEntire();
 
-                try {
-                    pixbuf = new Pixbuf("share/pixmaps/graphic-16x16.png", -1, 10, true);
-                } catch (FileNotFoundException e) {
-                    throw new Error(e);
-                }
-                image = new Image(pixbuf);
-                image.setAlignment(Alignment.LEFT, Alignment.TOP);
-                image.setPadding(40, 3);
-                left = new HBox(false, 0);
-                left.packStart(image, false, false, 0);
-                top.packStart(left, false, false, 0);
-                continue;
-            } else {
-                entire = segment.getEntire();
+                    str = new StringBuilder();
+                    str.append("      ");
+                    str.append(entire.getText());
+                } else if (segment instanceof ImageSegment) {
+                    Image image;
+                    Pixbuf pixbuf;
+                    HBox left;
 
-                if (segment instanceof PreformatSegment) {
-                    lines = new CompressedLines(entire, true);
+                    try {
+                        pixbuf = new Pixbuf("share/pixmaps/graphic-16x16.png", -1, 10, true);
+                    } catch (FileNotFoundException e) {
+                        throw new Error(e);
+                    }
+                    image = new Image(pixbuf);
+                    image.setAlignment(Alignment.LEFT, Alignment.TOP);
+                    image.setPadding(40, 3);
+                    left = new HBox(false, 0);
+                    left.packStart(image, false, false, 0);
+                    top.packStart(left, false, false, 0);
+                    continue;
                 } else {
-                    lines = new CompressedLines(entire, false);
+                    entire = segment.getEntire();
+
+                    if (segment instanceof PreformatSegment) {
+                        lines = new CompressedLines(entire, true);
+                    } else {
+                        lines = new CompressedLines(entire, false);
+                    }
+                    top.packStart(lines, false, false, 0);
+                    continue;
                 }
-                top.packStart(lines, false, false, 0);
-                continue;
+
+                button = new Button(str.toString());
+                button.setRelief(ReliefStyle.NONE);
+                label = (Label) button.getChild();
+                label.setUseMarkup(true);
+                label.setAlignment(Alignment.LEFT, Alignment.TOP);
+
+                top.packStart(button, false, false, 0);
             }
-
-            button = new Button(str.toString());
-            button.setRelief(ReliefStyle.NONE);
-            label = (Label) button.getChild();
-            label.setUseMarkup(true);
-            label.setAlignment(Alignment.LEFT, Alignment.TOP);
-
-            top.packStart(button, false, false, 0);
         }
 
         top.showAll();
     }
 
     /**
-     * Given a Series, display it.
+     * Given a Folio, display it.
+     */
+    /*
+     * FIXME Mockup! We actually need to evaluate the Series(s) against the
+     * ones being displayed, and rebuild if/as necessary, and presumably if
+     * we're actually showing.
      */
     /*
      * At the moment this is horribly inefficient; we should have something
      * more dynamic that merely updates the Labels rather than wholesale
      * recreates everything.
      */
-    void renderSeries(Series series) {
-        this.series = series;
+    void affect(Folio folio) {
+        if (this.folio == folio) {
+            return;
+        }
 
+        this.folio = folio;
+    }
+
+    /**
+     * Request the Widget actually (re)build itself. This is only called when
+     * to make a state visible, not on every state update.
+     */
+    /*
+     * Actually, if this whole thing was ExposeEvent driven, then we'd be
+     * doing this there and just having people call queueDraw(). But as we
+     * have strong Widgets in the composition of this display, we need to
+     * reconstruct and repack.
+     */
+    public void queueDraw() {
         for (Widget child : top.getChildren()) {
             top.remove(child);
         }
 
         buildOutline();
-    }
 
-    /*
-     * FIXME Mockup! We actually need to evaluate the Series(s) against the
-     * ones being displayed, and rebuild if/as necessary, and presumably if
-     * we're actually showing.
-     */
-    void affect(Folio folio) {
-        Series series;
-
-        series = folio.getSeries(0);
-
-        this.series = series;
+        super.queueDraw();
     }
 }
 
