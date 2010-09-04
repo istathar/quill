@@ -102,6 +102,8 @@ public class UserInterface
      * the application to terminate).
      */
     public void shutdown() {
+        clipboard.store();
+
         Gtk.mainQuit();
     }
 

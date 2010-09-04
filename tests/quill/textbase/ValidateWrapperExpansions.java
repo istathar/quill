@@ -41,7 +41,7 @@ public class ValidateWrapperExpansions extends TestCase
     public final void testSeriesStart() {
         final Series series;
 
-        series = new Series(segments, 0, 0, 0, 0);
+        series = new Series(segments);
         assertEquals(5, series.size());
         assertTrue(series.getSegment(2) instanceof NormalSegment);
     }
@@ -52,7 +52,7 @@ public class ValidateWrapperExpansions extends TestCase
 
         blank = Extract.create();
 
-        before = new Series(segments, 0, 0, 0, 0);
+        before = new Series(segments);
         assertEquals(5, before.size());
         assertTrue(before.getSegment(2) instanceof NormalSegment);
 
@@ -75,7 +75,7 @@ public class ValidateWrapperExpansions extends TestCase
 
         blank = Extract.create();
 
-        before = new Series(segments, 0, 0, 0, 0);
+        before = new Series(segments);
         assertEquals(5, before.size());
         assertTrue(before.getSegment(4) instanceof NormalSegment);
 
@@ -96,7 +96,7 @@ public class ValidateWrapperExpansions extends TestCase
 
         blank = Extract.create();
 
-        before = new Series(segments, 0, 0, 0, 0);
+        before = new Series(segments);
 
         assertEquals(5, before.size());
         assertTrue(before.getSegment(0) instanceof ComponentSegment);
@@ -118,7 +118,7 @@ public class ValidateWrapperExpansions extends TestCase
 
         blank = Extract.create();
 
-        before = new Series(segments, 0, 0, 0, 0);
+        before = new Series(segments);
 
         try {
             before.insert(-1, new PreformatSegment(blank));
@@ -134,7 +134,7 @@ public class ValidateWrapperExpansions extends TestCase
 
         blank = Extract.create();
 
-        before = new Series(segments, 0, 0, 0, 0);
+        before = new Series(segments);
 
         try {
             before.insert(6, new PreformatSegment(blank));
@@ -147,7 +147,7 @@ public class ValidateWrapperExpansions extends TestCase
     public final void testSeriesDeleteMid() {
         final Series before, after;
 
-        before = new Series(segments, 0, 0, 0, 0);
+        before = new Series(segments);
 
         after = before.delete(2);
 
@@ -161,7 +161,7 @@ public class ValidateWrapperExpansions extends TestCase
     public final void testSeriesDeleteEnd() {
         final Series before, after;
 
-        before = new Series(segments, 0, 0, 0, 0);
+        before = new Series(segments);
 
         after = before.delete(4);
 
@@ -175,7 +175,7 @@ public class ValidateWrapperExpansions extends TestCase
     public final void testSeriesDeleteBegin() {
         final Series before, after;
 
-        before = new Series(segments, 0, 0, 0, 0);
+        before = new Series(segments);
 
         after = before.delete(0);
 
@@ -189,7 +189,7 @@ public class ValidateWrapperExpansions extends TestCase
     public final void testSeriesDeleteUndershoot() {
         final Series before;
 
-        before = new Series(segments, 0, 0, 0, 0);
+        before = new Series(segments);
 
         try {
             before.delete(-1);
@@ -202,7 +202,7 @@ public class ValidateWrapperExpansions extends TestCase
     public final void testSeriesDeleteOvershoot() {
         final Series before;
 
-        before = new Series(segments, 0, 0, 0, 0);
+        before = new Series(segments);
 
         try {
             before.delete(5);
@@ -222,7 +222,7 @@ public class ValidateWrapperExpansions extends TestCase
 
         blank = Extract.create();
 
-        before = new Series(segments, 0, 0, 0, 0);
+        before = new Series(segments);
 
         assertEquals(5, before.size());
         assertTrue(before.getSegment(0) instanceof ComponentSegment);
@@ -248,7 +248,7 @@ public class ValidateWrapperExpansions extends TestCase
 
         blank = Extract.create();
 
-        before = new Series(segments, 0, 0, 0, 0);
+        before = new Series(segments);
         assertEquals(5, before.size());
         assertTrue(before.getSegment(2) instanceof NormalSegment);
 
@@ -280,7 +280,7 @@ public class ValidateWrapperExpansions extends TestCase
         span3 = Span.createSpan(" of the emergency broadcast sytem", null);
         three = Extract.create(span3);
 
-        before = new Series(segments, 0, 0, 0, 0);
+        before = new Series(segments);
         assertEquals(5, before.size());
         assertTrue(before.getSegment(2) instanceof NormalSegment);
 
@@ -310,7 +310,7 @@ public class ValidateWrapperExpansions extends TestCase
 
         blank = Extract.create();
 
-        before = new Series(segments, 0, 0, 0, 0);
+        before = new Series(segments);
         assertEquals(5, before.size());
         assertTrue(before.getSegment(4) instanceof NormalSegment);
 
@@ -333,7 +333,7 @@ public class ValidateWrapperExpansions extends TestCase
 
         blank = Extract.create();
 
-        before = new Series(segments, 0, 0, 0, 0);
+        before = new Series(segments);
 
         try {
             before.splice(-1, new NormalSegment(blank), new QuoteSegment(blank),
@@ -351,7 +351,7 @@ public class ValidateWrapperExpansions extends TestCase
 
         blank = Extract.create();
 
-        before = new Series(segments, 0, 0, 0, 0);
+        before = new Series(segments);
 
         try {
             before.splice(6, new NormalSegment(blank), new QuoteSegment(blank), new NormalSegment(blank));
