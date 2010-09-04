@@ -832,6 +832,10 @@ class PrimaryWindow extends Window
         return folio;
     }
 
+    /**
+     * @param widget
+     *            Chapter editor calling in.
+     */
     void update(ComponentEditorWidget widget, Series former, Series series) {
         Folio anticedant, replacement;
         int i;
