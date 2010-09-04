@@ -18,13 +18,10 @@
  */
 package quill.ui;
 
-import org.gnome.gdk.Screen;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.ImageMenuItem;
 import org.gnome.gtk.Label;
-import org.gnome.gtk.Menu;
 import org.gnome.gtk.MenuItem;
-import org.gnome.gtk.Requisition;
 import org.gnome.gtk.SeparatorMenuItem;
 import org.gnome.gtk.Stock;
 
@@ -37,23 +34,17 @@ import quill.client.Quill;
  * 
  * @author Andrew Cowie
  */
-class SuggestionsPopupMenu extends Menu
+class SuggestionsContextMenu extends ContextMenu
 {
     private UserInterface ui;
 
-    private PrimaryWindow primary;
-
-    private Menu menu;
-
     private MenuItem.Activate picked;
 
-    private SuggestionsPopupMenu.WordSelected handler;
+    private SuggestionsContextMenu.WordSelected handler;
 
-    SuggestionsPopupMenu(ComponentEditorWidget parent) {
-        super();
-        menu = this;
+    SuggestionsContextMenu(ComponentEditorWidget parent) {
+        super(parent);
         ui = Quill.getUserInterface();
-        primary = parent.getPrimary();
 
         picked = new MenuItem.Activate() {
             public void onActivate(MenuItem source) {
@@ -141,48 +132,9 @@ class SuggestionsPopupMenu extends Menu
     }
 
     /**
-     * Present the suggestions menu at x, y (and supplying current line's
-     * y-range [height] as R).
-     */
-    void presentAt(final int x, final int y, final int R) {
-        final Screen screen;
-        final int h, H;
-        int target;
-        final Requisition req;
-
-        /*
-         * Get the available height. We use the user's screen rather than the
-         * parent window because there's nothing wrong with a popup menu
-         * overlapping (say) the gnome-panel.
-         */
-
-        screen = primary.getScreen();
-        H = screen.getHeight();
-
-        req = menu.getRequisition();
-        h = req.getHeight();
-
-        /*
-         * Figure out if there is sufficient room for the popup below, as we
-         * would prefer. The plus 3 is sufficient to continue to show the red
-         * squiggle.
-         */
-
-        target = y + R + 3;
-
-        if (target + h > H) {
-            target = y - h;
-            if (target < 0) {
-                target = y;
-            }
-        }
-        menu.popup(x, target);
-    }
-
-    /**
      * Allow the parent EditorTextView to react to a selection being chosen
      */
-    void connect(SuggestionsPopupMenu.WordSelected handler) {
+    void connect(SuggestionsContextMenu.WordSelected handler) {
         this.handler = handler;
     }
 

@@ -32,7 +32,6 @@ import org.gnome.gtk.Allocation;
 import org.gnome.gtk.EventBox;
 import org.gnome.gtk.InputMethod;
 import org.gnome.gtk.Label;
-import org.gnome.gtk.Menu;
 import org.gnome.gtk.MenuItem;
 import org.gnome.gtk.SimpleInputMethod;
 import org.gnome.gtk.TextBuffer;
@@ -46,6 +45,7 @@ import org.gnome.gtk.WrapMode;
 
 import quill.client.Quill;
 import quill.textbase.Common;
+import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
 import quill.textbase.FormatTextualChange;
 import quill.textbase.HeadingSegment;
@@ -1098,7 +1098,7 @@ abstract class EditorTextView extends TextView
         return box;
     }
 
-    private Menu split;
+    private ContextMenu split;
 
     private Class<?>[] types;
 
@@ -1120,6 +1120,13 @@ abstract class EditorTextView extends TextView
         return result;
     }
 
+    private static class InsertContextMenu extends ContextMenu
+    {
+        private InsertContextMenu(ComponentEditorWidget parent) {
+            super(parent);
+        }
+    }
+
     /*
      * Yes it would be "better" to write this such that the two arrays weren't
      * coupled but instead strongly typed objects with two+ fields.
@@ -1128,7 +1135,7 @@ abstract class EditorTextView extends TextView
         int i;
         MenuItem item;
 
-        split = new Menu();
+        split = new InsertContextMenu(parent);
 
         types = new Class<?>[] {
                 NormalSegment.class, PreformatSegment.class, QuoteSegment.class, HeadingSegment.class
@@ -1152,9 +1159,12 @@ abstract class EditorTextView extends TextView
     private void popupInsertMenu() {
         final Widget[] children;
         int i;
-        final int len;
+        final int len, xr, yr, X, Y, R, xo, yo;
         final Segment next;
         final Series series;
+        final Rectangle rectangle;
+        final TextIter pointer;
+        final org.gnome.gdk.Window underlying;
 
         /*
          * Turn off the type that the current Segment is
@@ -1191,9 +1201,26 @@ abstract class EditorTextView extends TextView
                     }
                 }
             }
-
+        } else if (segment instanceof ComponentSegment) {
+            for (i = 0; i < types.length; i++) {
+                children[i].setSensitive(false);
+            }
         }
-        split.popup();
+
+        pointer = buffer.getIter(insertOffset);
+        rectangle = view.getLocation(pointer);
+        X = rectangle.getX();
+        Y = rectangle.getY();
+        R = rectangle.getHeight();
+
+        xr = view.convertBufferToWindowCoordsX(TEXT, X);
+        yr = view.convertBufferToWindowCoordsY(TEXT, Y);
+
+        underlying = view.getWindow();
+        xo = underlying.getOriginX();
+        yo = underlying.getOriginY();
+
+        split.presentAt(xo + xr, yo + yr, R);
     }
 
     private void setupContextMenu() {
@@ -1234,7 +1261,7 @@ abstract class EditorTextView extends TextView
                     ye = (int) event.getY();
 
                     X = view.convertWindowToBufferCoordsX(TEXT, xe);
-                    Y = view.convertBufferToWindowCoordsY(TEXT, ye);
+                    Y = view.convertWindowToBufferCoordsY(TEXT, ye);
 
                     pointer = view.getIterAtLocation(X, Y);
                     buffer.placeCursor(pointer);
@@ -1718,7 +1745,7 @@ abstract class EditorTextView extends TextView
     /*
      * Convenience for grouping the calls by offerSpellingSuggestions().
      */
-    private class SuggestionsWordVisitor implements WordVisitor, SuggestionsPopupMenu.WordSelected
+    private class SuggestionsWordVisitor implements WordVisitor, SuggestionsContextMenu.WordSelected
     {
         private int offset;
 
@@ -1728,7 +1755,7 @@ abstract class EditorTextView extends TextView
 
         public boolean visit(final String word, final boolean skip, final int begin, final int end) {
             final TextIter pointer;
-            final SuggestionsPopupMenu popup;
+            final SuggestionsContextMenu popup;
             final Rectangle rect;
             final int x, y, h, X, Y, xP, yP;
             final org.gnome.gdk.Window underlying;
@@ -1737,7 +1764,7 @@ abstract class EditorTextView extends TextView
                 return false;
             }
 
-            popup = new SuggestionsPopupMenu(parent);
+            popup = new SuggestionsContextMenu(parent);
             popup.populateSuggestions(word);
 
             /*
