@@ -160,13 +160,27 @@ class OutlineWidget extends VBox
             return;
         }
 
+        this.folio = folio;
+    }
+
+    /**
+     * Request the Widget actually (re)build itself. This is only called when
+     * to make a state visible, not on every state update.
+     */
+    /*
+     * Actually, if this whole thing was ExposeEvent driven, then we'd be
+     * doing this there and just having people call queueDraw(). But as we
+     * have strong Widgets in the composition of this display, we need to
+     * reconstruct and repack.
+     */
+    public void queueDraw() {
         for (Widget child : top.getChildren()) {
             top.remove(child);
         }
 
-        this.folio = folio;
-
         buildOutline();
+
+        super.queueDraw();
     }
 }
 

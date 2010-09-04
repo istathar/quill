@@ -475,11 +475,8 @@ class PrimaryWindow extends Window
      * Change the right side to show the outline navigator.
      */
     void switchToOutline() {
-        final Series series;
-
         right.setCurrentPage(2);
-
-        outline.affect(folio);
+        outline.queueDraw();
     }
 
     /**
