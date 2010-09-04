@@ -479,10 +479,7 @@ class PrimaryWindow extends Window
 
         right.setCurrentPage(2);
 
-        // FIXME
-        series = folio.getSeries(0);
-
-        outline.renderSeries(series);
+        outline.affect(folio);
     }
 
     /**
@@ -507,7 +504,7 @@ class PrimaryWindow extends Window
 
         editor.initializeSeries(series);
         preview.affect(manuscript, folio);
-        outline.renderSeries(series);
+        outline.affect(folio);
         this.updateTitle();
     }
 
