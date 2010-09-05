@@ -318,9 +318,11 @@ class ComponentEditorWidget extends ScrolledWindow
         third = replacement.getIndexThird();
         deleted = replacement.getIndexDeleted();
 
-        segment = replacement.getSegment(updated);
-        editor = editors.get(updated);
-        editor.advanceTo(segment);
+        if (updated >= 0) {
+            segment = replacement.getSegment(updated);
+            editor = editors.get(updated);
+            editor.advanceTo(segment);
+        }
 
         /*
          * Can't add at 0, can only update 0.
@@ -352,7 +354,7 @@ class ComponentEditorWidget extends ScrolledWindow
         }
 
         // UNTRIED
-        if (deleted > 0) {
+        if (deleted >= 0) {
             segment = replacement.getSegment(deleted);
 
             children = box.getChildren();
@@ -402,9 +404,11 @@ class ComponentEditorWidget extends ScrolledWindow
         third = current.getIndexThird();
         deleted = current.getIndexDeleted();
 
-        segment = series.getSegment(updated);
-        editor = editors.get(updated);
-        editor.reverseTo(segment);
+        if (updated >= 0) {
+            segment = series.getSegment(updated);
+            editor = editors.get(updated);
+            editor.reverseTo(segment);
+        }
 
         if (third > 0) {
             children = box.getChildren();
@@ -423,7 +427,7 @@ class ComponentEditorWidget extends ScrolledWindow
         }
 
         // UNTRIED
-        if (deleted > 0) {
+        if (deleted >= 0) {
             segment = current.getSegment(deleted);
             widget = createEditorForSegment(deleted, segment);
             box.packStart(widget, false, false, 0);
