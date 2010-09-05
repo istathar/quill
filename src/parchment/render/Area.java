@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -155,6 +155,17 @@ final class BlankArea extends Area
 {
     BlankArea(final Origin origin, final double height) {
         super(origin, 0, height);
+    }
+
+    void draw(Context cr, double y) {
+    // nothing :)
+    }
+}
+
+final class PageBreakArea extends Area
+{
+    PageBreakArea(final Origin origin) {
+        super(origin, 0, 0);
     }
 
     void draw(Context cr, double y) {
