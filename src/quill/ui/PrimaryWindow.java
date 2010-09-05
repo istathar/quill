@@ -149,28 +149,31 @@ class PrimaryWindow extends Window
      * General case of affecting the state currently given in this.folio.
      */
     private void affect() {
-        final int num;
-        int i;
-        Series series;
+        final int i;
+        final Series series;
 
-        num = folio.size();
+        /*
+         * Update the ComponentEditorWidget to the current state
+         */
 
-        if (num != 1) {
-            // FIXME multiple chapters
-            throw new UnsupportedOperationException("TODO");
-        }
+        i = folio.getIndexUpdated();
+        series = folio.getSeries(i);
 
-        for (i = 0; i < num; i++) {
-            series = folio.getSeries(i);
+        editor.advanceTo(series);
 
-            // TODO FIXME propegate to each editor!
-            editor.advanceTo(series);
-        }
+        // is this the right place to set this?
+        cursorSeries = series;
 
-        // FIXME only if showing!
+        /*
+         * Update the PreviewWidget's idea of the current state
+         */
+
         preview.affect(manuscript, folio);
 
-        // FIXME only if showing
+        /*
+         * Update the OutlineWidget's idea of the current state
+         */
+
         outline.affect(folio);
 
         updateTitle();

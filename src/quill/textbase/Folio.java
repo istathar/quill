@@ -37,6 +37,11 @@ public class Folio
 {
     private final Series[] components;
 
+    /**
+     * Which Series was updated to create this Folio?
+     */
+    private final int updated;
+
     private final Chapter[] chapters;
 
     /**
@@ -58,6 +63,7 @@ public class Folio
         this.components = new Series[] {
             component
         };
+        this.updated = -1;
     }
 
     /**
@@ -80,12 +86,14 @@ public class Folio
 
         s = new Series[num];
         this.components = components.toArray(s);
+        this.updated = -1;
     }
 
-    private Folio(Manuscript manuscript, Chapter[] chapters, Series[] components) {
+    private Folio(Manuscript manuscript, Chapter[] chapters, Series[] components, int updated) {
         this.manuscript = manuscript;
         this.chapters = chapters;
         this.components = components;
+        this.updated = updated;
     }
 
     public int size() {
@@ -135,6 +143,10 @@ public class Folio
         System.arraycopy(original, position + 1, replacement, position + 1, original.length - position
                 - 1);
 
-        return new Folio(this.manuscript, this.chapters, replacement);
+        return new Folio(this.manuscript, this.chapters, replacement, position);
+    }
+
+    public int getIndexUpdated() {
+        return updated;
     }
 }

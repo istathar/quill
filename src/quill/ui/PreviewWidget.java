@@ -197,6 +197,5 @@ class PreviewWidget extends DrawingArea
     void affect(Manuscript manuscript, Folio folio) {
         this.manuscript = manuscript;
         this.folio = folio;
-        // this.queueDraw();
     }
 }
