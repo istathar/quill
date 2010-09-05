@@ -400,6 +400,12 @@ class PrimaryWindow extends Window
                     } else if (key == Keyval.z) {
                         undo();
                         return true;
+                    } else if (key == Keyval.PageUp) {
+                        handleComponentPrevious();
+                        return true;
+                    } else if (key == Keyval.PageDown) {
+                        handleComponentNext();
+                        return true;
                     }
                 }
 
@@ -498,6 +504,7 @@ class PrimaryWindow extends Window
 
         // FIXME
         series = folio.getSeries(0);
+        cursorSeries = series;
 
         editor.initializeSeries(series);
         preview.affect(manuscript, folio);
@@ -550,8 +557,17 @@ class PrimaryWindow extends Window
         editor.grabFocus();
     }
 
+    private Series cursorSeries;
+
     Origin getCursor() {
-        return editor.getCursor();
+        final int folioPosition;
+
+        if (cursorSeries == null) {
+            return null;
+        }
+        folioPosition = folio.indexOf(cursorSeries);
+
+        return editor.getCursor(folioPosition);
     }
 
     /**
@@ -848,5 +864,37 @@ class PrimaryWindow extends Window
      */
     final ComponentEditorWidget testGetEditor() {
         return editor;
+    }
+
+    private void handleComponentPrevious() {
+        int i;
+
+        i = folio.indexOf(cursorSeries);
+
+        if (i == 0) {
+            return;
+        }
+
+        i--;
+        cursorSeries = folio.getSeries(i);
+
+        editor.initializeSeries(cursorSeries);
+    }
+
+    private void handleComponentNext() {
+        final int len;
+        int i;
+
+        len = folio.size();
+        i = folio.indexOf(cursorSeries);
+        i++;
+
+        if (i == len) {
+            return;
+        }
+
+        cursorSeries = folio.getSeries(i);
+
+        editor.initializeSeries(cursorSeries);
     }
 }

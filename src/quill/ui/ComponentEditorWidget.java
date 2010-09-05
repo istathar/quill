@@ -523,22 +523,22 @@ class ComponentEditorWidget extends ScrolledWindow
         cursorSegment = segment;
     }
 
-    Origin getCursor() {
+    Origin getCursor(final int folioPosition) {
         final Widget widget;
         final EditorTextView editor;
         final Origin result;
-        final int position, offset;
+        final int seriesPosition, segmentOffset;
 
         if (cursorSegment == null) {
             return null;
         }
-        position = series.indexOf(cursorSegment);
+        seriesPosition = series.indexOf(cursorSegment);
 
         widget = lookup(cursorSegment);
         editor = (EditorTextView) widget;
-        offset = editor.getInsertOffset();
+        segmentOffset = editor.getInsertOffset();
 
-        result = new Origin(position, offset);
+        result = new Origin(folioPosition, seriesPosition, segmentOffset);
         return result;
     }
 
