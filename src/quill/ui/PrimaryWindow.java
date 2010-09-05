@@ -879,6 +879,7 @@ class PrimaryWindow extends Window
         cursorSeries = folio.getSeries(i);
 
         editor.initializeSeries(cursorSeries);
+        preview.queueDraw();
     }
 
     private void handleComponentNext() {
@@ -896,5 +897,6 @@ class PrimaryWindow extends Window
         cursorSeries = folio.getSeries(i);
 
         editor.initializeSeries(cursorSeries);
+        preview.queueDraw();
     }
 }
