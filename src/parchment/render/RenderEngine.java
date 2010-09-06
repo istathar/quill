@@ -343,18 +343,10 @@ public abstract class RenderEngine
                         appendBlankLine(cr);
                     }
                 } else if (segment instanceof PoeticSegment) {
-                    chain = new TextChain(entire);
-                    paras = chain.extractParagraphs();
-                    for (k = 0; k < paras.length; k++) {
-                        appendNormalParagraph(cr, paras[k]);
-                    }
+                    appendNormalParagraph(cr, entire);
                     appendBlankLine(cr);
                 } else if (segment instanceof AttributionSegment) {
-                    chain = new TextChain(entire);
-                    paras = chain.extractParagraphs();
-                    for (k = 0; k < paras.length; k++) {
-                        appendSmallParagraph(cr, paras[k]);
-                    }
+                    appendAttributionParagraph(cr, entire);
                     appendBlankLine(cr);
                 } else if (segment instanceof ImageSegment) {
                     filename = segment.getImage();
@@ -442,7 +434,7 @@ public abstract class RenderEngine
         rightMargin = savedRight;
     }
 
-    protected void appendSmallParagraph(Context cr, Extract extract) {
+    protected void appendAttributionParagraph(Context cr, Extract extract) {
         final FontDescription desc;
         final Typeface face;
         final double savedLeft, savedRight;
