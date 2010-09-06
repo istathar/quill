@@ -55,6 +55,7 @@ import quill.textbase.ImageSegment;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.Origin;
+import quill.textbase.PoeticSegment;
 import quill.textbase.Preformat;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
@@ -340,6 +341,13 @@ public abstract class RenderEngine
                         appendNormalParagraph(cr, segment, paras[k]);
                         appendBlankLine(cr);
                     }
+                } else if (segment instanceof PoeticSegment) {
+                    chain = new TextChain(entire);
+                    paras = chain.extractParagraphs();
+                    for (k = 0; k < paras.length; k++) {
+                        appendNormalParagraph(cr, segment, paras[k]);
+                    }
+                    appendBlankLine(cr);
                 } else if (segment instanceof ImageSegment) {
                     filename = segment.getImage();
                     appendExternalGraphic(cr, filename);

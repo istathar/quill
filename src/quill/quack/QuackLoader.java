@@ -28,6 +28,7 @@ import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
+import quill.textbase.PoeticSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
@@ -175,6 +176,16 @@ public class QuackLoader
                 i = list.size() - 1;
                 list.remove(i);
             }
+        } else if (block instanceof PoemElement) {
+            preserve = false;
+            if (segment instanceof PoeticSegment) {
+                entire = segment.getEntire();
+                chain.setTree(entire);
+                chain.append(Span.createSpan('\n', null));
+
+                i = list.size() - 1;
+                list.remove(i);
+            }
         } else if (block instanceof HeadingElement) {
             preserve = false;
         } else if (block instanceof ImageElement) {
@@ -211,6 +222,8 @@ public class QuackLoader
             segment = new PreformatSegment(entire);
         } else if (block instanceof QuoteElement) {
             segment = new QuoteSegment(entire);
+        } else if (block instanceof PoemElement) {
+            segment = new PoeticSegment(entire);
         } else if (block instanceof HeadingElement) {
             segment = new HeadingSegment(entire);
         } else if (block instanceof ImageElement) {

@@ -33,6 +33,7 @@ import quill.textbase.ImageSegment;
 import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
+import quill.textbase.PoeticSegment;
 import quill.textbase.Preformat;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
@@ -96,6 +97,8 @@ public class QuackConverter
             block = new QuoteElement();
         } else if (segment instanceof NormalSegment) {
             block = new TextElement();
+        } else if (segment instanceof PoeticSegment) {
+            block = new PoemElement();
         } else if (segment instanceof ImageSegment) {
             block = new ImageElement();
             value = segment.getImage();
@@ -245,6 +248,8 @@ public class QuackConverter
                 return;
             } else if (segment instanceof QuoteSegment) {
                 block = new QuoteElement();
+            } else if (segment instanceof PoeticSegment) {
+                block = new PoemElement();
             } else {
                 throw new IllegalStateException("\n" + "Newlines aren't allowed in " + block.toString());
             }
