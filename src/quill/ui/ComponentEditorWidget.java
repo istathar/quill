@@ -318,9 +318,11 @@ class ComponentEditorWidget extends ScrolledWindow
         third = replacement.getIndexThird();
         deleted = replacement.getIndexDeleted();
 
-        segment = replacement.getSegment(updated);
-        editor = editors.get(updated);
-        editor.advanceTo(segment);
+        if (updated >= 0) {
+            segment = replacement.getSegment(updated);
+            editor = editors.get(updated);
+            editor.advanceTo(segment);
+        }
 
         /*
          * Can't add at 0, can only update 0.
@@ -352,7 +354,7 @@ class ComponentEditorWidget extends ScrolledWindow
         }
 
         // UNTRIED
-        if (deleted > 0) {
+        if (deleted >= 0) {
             segment = replacement.getSegment(deleted);
 
             children = box.getChildren();
@@ -402,9 +404,11 @@ class ComponentEditorWidget extends ScrolledWindow
         third = current.getIndexThird();
         deleted = current.getIndexDeleted();
 
-        segment = series.getSegment(updated);
-        editor = editors.get(updated);
-        editor.reverseTo(segment);
+        if (updated >= 0) {
+            segment = series.getSegment(updated);
+            editor = editors.get(updated);
+            editor.reverseTo(segment);
+        }
 
         if (third > 0) {
             children = box.getChildren();
@@ -423,7 +427,7 @@ class ComponentEditorWidget extends ScrolledWindow
         }
 
         // UNTRIED
-        if (deleted > 0) {
+        if (deleted >= 0) {
             segment = current.getSegment(deleted);
             widget = createEditorForSegment(deleted, segment);
             box.packStart(widget, false, false, 0);
@@ -523,22 +527,22 @@ class ComponentEditorWidget extends ScrolledWindow
         cursorSegment = segment;
     }
 
-    Origin getCursor() {
+    Origin getCursor(final int folioPosition) {
         final Widget widget;
         final EditorTextView editor;
         final Origin result;
-        final int position, offset;
+        final int seriesPosition, segmentOffset;
 
         if (cursorSegment == null) {
             return null;
         }
-        position = series.indexOf(cursorSegment);
+        seriesPosition = series.indexOf(cursorSegment);
 
         widget = lookup(cursorSegment);
         editor = (EditorTextView) widget;
-        offset = editor.getInsertOffset();
+        segmentOffset = editor.getInsertOffset();
 
-        result = new Origin(position, offset);
+        result = new Origin(folioPosition, seriesPosition, segmentOffset);
         return result;
     }
 

@@ -72,11 +72,11 @@ class PreviewWidget extends DrawingArea
     /**
      * What is the top level UI holding this document?
      */
-    private PrimaryWindow parent;
+    private PrimaryWindow primary;
 
-    PreviewWidget(PrimaryWindow primary) {
+    PreviewWidget(PrimaryWindow window) {
         super();
-        parent = primary;
+        this.primary = window;
 
         this.connect(new Widget.ExposeEvent() {
             public boolean onExposeEvent(Widget source, EventExpose event) {
@@ -97,7 +97,7 @@ class PreviewWidget extends DrawingArea
                 drawPageOutline(cr, engine);
                 drawCrosshairs(cr, engine);
 
-                cursor = parent.getCursor();
+                cursor = primary.getCursor();
                 engine.render(cr, cursor);
 
                 return true;
@@ -197,6 +197,5 @@ class PreviewWidget extends DrawingArea
     void affect(Manuscript manuscript, Folio folio) {
         this.manuscript = manuscript;
         this.folio = folio;
-        // this.queueDraw();
     }
 }

@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -27,31 +27,40 @@ package quill.textbase;
  */
 public final class Origin implements Comparable<Origin>
 {
-    private final int position;
+    private final int folioPosition;
 
-    private final int offset;
+    private final int seriesPosition;
+
+    private final int segmentOffset;
 
     /**
-     * The Segment and cursor position in that Segment that an Area is to be
-     * rendered from.
+     * The Series, Segment, and cursor position in that Segment that an Area
+     * is to be rendered from.
      */
-    public Origin(final int position, final int offset) {
-        this.position = position;
-        this.offset = offset;
+    public Origin(final int folioPosition, final int seriesPosition, final int offset) {
+        this.folioPosition = folioPosition;
+        this.seriesPosition = seriesPosition;
+        this.segmentOffset = offset;
     }
 
     public int compareTo(Origin other) {
-        if (this.position < other.position) {
+        if (this.folioPosition < other.folioPosition) {
             return -1;
-        } else if (this.position > other.position) {
-            return 1;
+        } else if (this.folioPosition > other.folioPosition) {
+            return +1;
         } else {
-            if (this.offset < other.offset) {
+            if (this.seriesPosition < other.seriesPosition) {
                 return -1;
-            } else if (this.offset > other.offset) {
-                return 1;
+            } else if (this.seriesPosition > other.seriesPosition) {
+                return +1;
             } else {
-                return 0;
+                if (this.segmentOffset < other.segmentOffset) {
+                    return -1;
+                } else if (this.segmentOffset > other.segmentOffset) {
+                    return +1;
+                } else {
+                    return 0;
+                }
             }
         }
     }
@@ -64,7 +73,8 @@ public final class Origin implements Comparable<Origin>
             return false;
         }
 
-        if ((this.position == other.position) && (this.offset == other.offset)) {
+        if ((this.folioPosition == other.folioPosition) && (this.seriesPosition == other.seriesPosition)
+                && (this.segmentOffset == other.segmentOffset)) {
             return true;
         } else {
             return false;
@@ -72,6 +82,7 @@ public final class Origin implements Comparable<Origin>
     }
 
     public String toString() {
-        return "(Segment: #" + position + ", offset: " + offset + ")";
+        return "(Series: #" + folioPosition + ", Segment: #" + seriesPosition + ", offset: "
+                + segmentOffset + ")";
     }
 }

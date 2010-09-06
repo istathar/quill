@@ -95,7 +95,7 @@ public abstract class RenderEngine
 
     private double footerHeight;
 
-    private Series series;
+    private Folio folio;
 
     private Manuscript manuscript;
 
@@ -123,9 +123,15 @@ public abstract class RenderEngine
     private TreeMap<Origin, Page> lookup;
 
     /**
+     * The index that the present Series is into the Folio (for composing
+     * Origins).
+     */
+    private int folioIndex;
+
+    /**
      * The current Segment's index into the Series (for composing Origins).
      */
-    private int currentPosition;
+    private int seriesIndex;
 
     /**
      * The current offset into the current Segment (for composing Origins).
@@ -140,7 +146,7 @@ public abstract class RenderEngine
     protected RenderEngine(final PaperSize paper, final Manuscript manuscript, final Folio folio) {
         specifySize(paper);
         this.manuscript = manuscript;
-        this.series = folio.getSeries(0); // HARDCODE
+        this.folio = folio;
     }
 
     /**
@@ -149,7 +155,7 @@ public abstract class RenderEngine
      * to the constructor, or b) has been scaled to that size.
      */
     public void render(final Context cr) {
-        if (series == null) {
+        if (folio == null) {
             return;
         }
 
@@ -166,7 +172,7 @@ public abstract class RenderEngine
      * subsequent calls here don't re-do everything.
      */
     public void render(Context cr, int pageNum) {
-        if (series == null) {
+        if (folio == null) {
             return;
         }
 
@@ -179,7 +185,10 @@ public abstract class RenderEngine
     }
 
     public void render(Context cr, Origin cursor) {
-        if (series == null) {
+        if (folio == null) {
+            return;
+        }
+        if (cursor == null) {
             return;
         }
 
@@ -286,7 +295,8 @@ public abstract class RenderEngine
     }
 
     public void processSegmentsIntoAreas(final Context cr) {
-        int i, j;
+        int i, j, k;
+        Series series;
         Segment segment;
         Extract entire;
         TextChain chain;
@@ -296,46 +306,53 @@ public abstract class RenderEngine
         areas = new ArrayList<Area>(64);
         footerHeight = serifFace.lineHeight;
 
-        for (i = 0; i < series.size(); i++) {
-            currentPosition = i;
-            currentOffset = 0;
+        for (i = 0; i < folio.size(); i++) {
+            series = folio.getSeries(i);
+            folioIndex = i;
 
-            segment = series.getSegment(i);
-            entire = segment.getEntire();
+            for (j = 0; j < series.size(); j++) {
+                seriesIndex = j;
+                currentOffset = 0;
 
-            if (segment instanceof ComponentSegment) {
-                appendHeading(cr, entire, 32.0);
-                appendBlankLine(cr);
-            } else if (segment instanceof HeadingSegment) {
-                appendHeading(cr, entire, 16.0);
-                appendBlankLine(cr);
-            } else if (segment instanceof PreformatSegment) {
-                appendProgramCode(cr, entire);
-                appendBlankLine(cr);
-            } else if (segment instanceof QuoteSegment) {
-                chain = new TextChain(entire);
-                paras = chain.extractParagraphs();
-                for (j = 0; j < paras.length; j++) {
-                    appendQuoteParagraph(cr, paras[j]);
+                segment = series.getSegment(j);
+                entire = segment.getEntire();
+
+                if (segment instanceof ComponentSegment) {
+                    appendHeading(cr, entire, 32.0);
+                    appendBlankLine(cr);
+                } else if (segment instanceof HeadingSegment) {
+                    appendHeading(cr, entire, 16.0);
+                    appendBlankLine(cr);
+                } else if (segment instanceof PreformatSegment) {
+                    appendProgramCode(cr, entire);
+                    appendBlankLine(cr);
+                } else if (segment instanceof QuoteSegment) {
+                    chain = new TextChain(entire);
+                    paras = chain.extractParagraphs();
+                    for (k = 0; k < paras.length; k++) {
+                        appendQuoteParagraph(cr, paras[k]);
+                        appendBlankLine(cr);
+                    }
+                } else if (segment instanceof NormalSegment) {
+                    chain = new TextChain(entire);
+                    paras = chain.extractParagraphs();
+                    for (k = 0; k < paras.length; k++) {
+                        appendNormalParagraph(cr, segment, paras[k]);
+                        appendBlankLine(cr);
+                    }
+                } else if (segment instanceof ImageSegment) {
+                    filename = segment.getImage();
+                    appendExternalGraphic(cr, filename);
+                    appendBlankLine(cr);
+                    if (entire == null) {
+                        continue;
+                    }
+                    appendCitationParagraph(cr, entire);
                     appendBlankLine(cr);
                 }
-            } else if (segment instanceof NormalSegment) {
-                chain = new TextChain(entire);
-                paras = chain.extractParagraphs();
-                for (j = 0; j < paras.length; j++) {
-                    appendNormalParagraph(cr, segment, paras[j]);
-                    appendBlankLine(cr);
-                }
-            } else if (segment instanceof ImageSegment) {
-                filename = segment.getImage();
-                appendExternalGraphic(cr, filename);
-                appendBlankLine(cr);
-                if (entire == null) {
-                    continue;
-                }
-                appendCitationParagraph(cr, entire);
-                appendBlankLine(cr);
             }
+
+            appendPageBreak(cr);
         }
     }
 
@@ -346,8 +363,17 @@ public abstract class RenderEngine
 
         request = serifFace.lineHeight * 0.7;
 
-        origin = new Origin(currentPosition, currentOffset++);
+        origin = new Origin(folioIndex, seriesIndex, currentOffset++);
         area = new BlankArea(origin, request);
+        accumulate(area);
+    }
+
+    protected void appendPageBreak(Context cr) {
+        final Origin origin;
+        final Area area;
+
+        origin = new Origin(folioIndex, seriesIndex, currentOffset);
+        area = new PageBreakArea(origin);
         accumulate(area);
     }
 
@@ -618,7 +644,7 @@ public abstract class RenderEngine
                 x = pageWidth / 2 - rect.getWidth() / 2;
             }
 
-            origin = new Origin(currentPosition, currentOffset);
+            origin = new Origin(folioIndex, seriesIndex, currentOffset);
             area = new TextArea(origin, x, face.lineHeight, face.lineAscent, line, error);
             result[k] = area;
 
@@ -687,6 +713,12 @@ public abstract class RenderEngine
 
             while (i < I) {
                 area = areas.get(i);
+
+                if (area instanceof PageBreakArea) {
+                    i++;
+                    break;
+                }
+
                 request = area.getHeight();
 
                 if (cursor + request > available) {
@@ -928,7 +960,7 @@ public abstract class RenderEngine
         }
         request = height * scaleFactor;
 
-        origin = new Origin(currentPosition, 0);
+        origin = new Origin(folioIndex, seriesIndex, 0);
         area = new ImageArea(origin, leftCorner, request, pixbuf, scaleFactor);
         return area;
     }
