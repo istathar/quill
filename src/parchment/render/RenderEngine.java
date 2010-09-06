@@ -46,6 +46,7 @@ import org.gnome.pango.WeightAttribute;
 import org.gnome.pango.WrapMode;
 
 import parchment.format.Manuscript;
+import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
@@ -348,6 +349,13 @@ public abstract class RenderEngine
                         appendNormalParagraph(cr, paras[k]);
                     }
                     appendBlankLine(cr);
+                } else if (segment instanceof AttributionSegment) {
+                    chain = new TextChain(entire);
+                    paras = chain.extractParagraphs();
+                    for (k = 0; k < paras.length; k++) {
+                        appendSmallParagraph(cr, paras[k]);
+                    }
+                    appendBlankLine(cr);
                 } else if (segment instanceof ImageSegment) {
                     filename = segment.getImage();
                     appendExternalGraphic(cr, filename);
@@ -428,6 +436,29 @@ public abstract class RenderEngine
         rightMargin += 45.0;
 
         list = layoutAreaText(cr, extract, serifFace, false, false, false);
+        accumulate(list);
+
+        leftMargin = savedLeft;
+        rightMargin = savedRight;
+    }
+
+    protected void appendSmallParagraph(Context cr, Extract extract) {
+        final FontDescription desc;
+        final Typeface face;
+        final double savedLeft, savedRight;
+        final Area[] list;
+
+        desc = serifFace.desc.copy();
+        desc.setSize(7.0);
+        face = new Typeface(cr, desc, 0.0);
+
+        savedLeft = leftMargin;
+        savedRight = rightMargin;
+
+        leftMargin = pageWidth / 2 + 50.0;
+        rightMargin += 10.0;
+
+        list = layoutAreaText(cr, extract, face, false, false, false);
         accumulate(list);
 
         leftMargin = savedLeft;

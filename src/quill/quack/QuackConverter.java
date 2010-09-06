@@ -25,6 +25,7 @@ package quill.quack;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
@@ -99,6 +100,8 @@ public class QuackConverter
             block = new TextElement();
         } else if (segment instanceof PoeticSegment) {
             block = new PoemElement();
+        } else if (segment instanceof AttributionSegment) {
+            block = new CreditElement();
         } else if (segment instanceof ImageSegment) {
             block = new ImageElement();
             value = segment.getImage();
@@ -251,6 +254,8 @@ public class QuackConverter
             } else if (segment instanceof PoeticSegment) {
                 buf.append('\n');
                 return;
+            } else if (segment instanceof AttributionSegment) {
+                block = new CreditElement();
             } else {
                 throw new IllegalStateException("\n" + "Newlines aren't allowed in " + block.toString());
             }

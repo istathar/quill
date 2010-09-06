@@ -21,6 +21,7 @@ package quill.quack;
 import java.util.ArrayList;
 
 import nu.xom.Document;
+import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
@@ -178,6 +179,16 @@ public class QuackLoader
             }
         } else if (block instanceof PoemElement) {
             preserve = true;
+        } else if (block instanceof CreditElement) {
+            preserve = false;
+            if (segment instanceof AttributionSegment) {
+                entire = segment.getEntire();
+                chain.setTree(entire);
+                chain.append(Span.createSpan('\n', null));
+
+                i = list.size() - 1;
+                list.remove(i);
+            }
         } else if (block instanceof HeadingElement) {
             preserve = false;
         } else if (block instanceof ImageElement) {
@@ -216,6 +227,8 @@ public class QuackLoader
             segment = new QuoteSegment(entire);
         } else if (block instanceof PoemElement) {
             segment = new PoeticSegment(entire);
+        } else if (block instanceof CreditElement) {
+            segment = new AttributionSegment(entire);
         } else if (block instanceof HeadingElement) {
             segment = new HeadingSegment(entire);
         } else if (block instanceof ImageElement) {

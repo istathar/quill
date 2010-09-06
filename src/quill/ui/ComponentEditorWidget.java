@@ -30,6 +30,7 @@ import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
+import quill.textbase.AttributionSegment;
 import quill.textbase.ComponentSegment;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
@@ -215,6 +216,10 @@ class ComponentEditorWidget extends ScrolledWindow
             result = editor;
         } else if (segment instanceof PoeticSegment) {
             editor = new PoeticEditorTextView(this, segment);
+
+            result = editor;
+        } else if (segment instanceof AttributionSegment) {
+            editor = new AttributionEditorTextView(this, segment);
 
             result = editor;
         } else if (segment instanceof PreformatSegment) {

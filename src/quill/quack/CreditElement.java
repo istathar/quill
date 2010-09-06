@@ -16,22 +16,16 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.ui;
+package quill.quack;
 
-import quill.textbase.Segment;
-
-class PoeticEditorTextView extends EditorTextView
+/**
+ * Attribution
+ * 
+ * @author Andrew Cowie
+ */
+public class CreditElement extends BlockElement implements Block
 {
-    PoeticEditorTextView(ComponentEditorWidget parent, Segment segment) {
-        super(parent, segment);
-
-        view.modifyFont(fonts.serif);
-        view.setMarginLeft(10);
-        view.setMarginRight(150);
-        view.setBorderWidth(10);
-    }
-
-    protected boolean isTabAllowed() {
-        return true;
+    public CreditElement() {
+        super("credit");
     }
 }

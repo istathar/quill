@@ -20,6 +20,7 @@ package quill.ui;
 
 import java.lang.reflect.Constructor;
 
+import org.gnome.gdk.Color;
 import org.gnome.gdk.Cursor;
 import org.gnome.gdk.EventButton;
 import org.gnome.gdk.EventCrossing;
@@ -34,6 +35,7 @@ import org.gnome.gtk.InputMethod;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.MenuItem;
 import org.gnome.gtk.SimpleInputMethod;
+import org.gnome.gtk.StateType;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
@@ -122,6 +124,7 @@ abstract class EditorTextView extends TextView
 
         view.setMarginLeft(3);
         view.setBorderWidth(2);
+        view.modifyBackground(StateType.NORMAL, Color.WHITE);
 
         view.setAcceptsTab(true);
     }

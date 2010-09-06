@@ -20,18 +20,15 @@ package quill.ui;
 
 import quill.textbase.Segment;
 
-class PoeticEditorTextView extends EditorTextView
+class AttributionEditorTextView extends EditorTextView
 {
-    PoeticEditorTextView(ComponentEditorWidget parent, Segment segment) {
+    AttributionEditorTextView(ComponentEditorWidget parent, Segment segment) {
         super(parent, segment);
 
         view.modifyFont(fonts.serif);
-        view.setMarginLeft(10);
-        view.setMarginRight(150);
-        view.setBorderWidth(10);
-    }
-
-    protected boolean isTabAllowed() {
-        return true;
+        view.setMarginLeft(350);
+        view.setMarginRight(0);
+        view.setPaddingAboveParagraph(0);
+        view.setPaddingBelowParagraph(0);
     }
 }

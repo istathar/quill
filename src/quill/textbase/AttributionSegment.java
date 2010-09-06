@@ -16,22 +16,24 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.ui;
+package quill.textbase;
 
-import quill.textbase.Segment;
-
-class PoeticEditorTextView extends EditorTextView
+/**
+ * Attribution or credit (for a passage or work).
+ * 
+ * @author Andrew Cowie
+ */
+public final class AttributionSegment extends Segment
 {
-    PoeticEditorTextView(ComponentEditorWidget parent, Segment segment) {
-        super(parent, segment);
-
-        view.modifyFont(fonts.serif);
-        view.setMarginLeft(10);
-        view.setMarginRight(150);
-        view.setBorderWidth(10);
+    public AttributionSegment(Extract entire) {
+        super(entire);
     }
 
-    protected boolean isTabAllowed() {
-        return true;
+    public AttributionSegment(Extract entire, int offset, int removed, int inserted) {
+        super(entire, offset, removed, inserted);
+    }
+
+    public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
+        return new AttributionSegment(entire, offset, removed, inserted);
     }
 }
