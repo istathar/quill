@@ -27,5 +27,6 @@ public class PoemElement extends BlockElement implements Block
 {
     public PoemElement() {
         super("poem");
+        super.setPreserveWhitespace();
     }
 }

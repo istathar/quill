@@ -177,15 +177,7 @@ public class QuackLoader
                 list.remove(i);
             }
         } else if (block instanceof PoemElement) {
-            preserve = false;
-            if (segment instanceof PoeticSegment) {
-                entire = segment.getEntire();
-                chain.setTree(entire);
-                chain.append(Span.createSpan('\n', null));
-
-                i = list.size() - 1;
-                list.remove(i);
-            }
+            preserve = true;
         } else if (block instanceof HeadingElement) {
             preserve = false;
         } else if (block instanceof ImageElement) {

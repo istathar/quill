@@ -249,7 +249,8 @@ public class QuackConverter
             } else if (segment instanceof QuoteSegment) {
                 block = new QuoteElement();
             } else if (segment instanceof PoeticSegment) {
-                block = new PoemElement();
+                buf.append('\n');
+                return;
             } else {
                 throw new IllegalStateException("\n" + "Newlines aren't allowed in " + block.toString());
             }

@@ -338,14 +338,14 @@ public abstract class RenderEngine
                     chain = new TextChain(entire);
                     paras = chain.extractParagraphs();
                     for (k = 0; k < paras.length; k++) {
-                        appendNormalParagraph(cr, segment, paras[k]);
+                        appendNormalParagraph(cr, paras[k]);
                         appendBlankLine(cr);
                     }
                 } else if (segment instanceof PoeticSegment) {
                     chain = new TextChain(entire);
                     paras = chain.extractParagraphs();
                     for (k = 0; k < paras.length; k++) {
-                        appendNormalParagraph(cr, segment, paras[k]);
+                        appendNormalParagraph(cr, paras[k]);
                     }
                     appendBlankLine(cr);
                 } else if (segment instanceof ImageSegment) {
@@ -410,7 +410,7 @@ public abstract class RenderEngine
         areas.add(area);
     }
 
-    protected void appendNormalParagraph(Context cr, Segment segment, Extract extract) {
+    protected void appendNormalParagraph(Context cr, Extract extract) {
         final Area[] list;
 
         list = layoutAreaText(cr, extract, serifFace, false, false, false);
