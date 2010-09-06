@@ -91,7 +91,7 @@ class PreviewWidget extends DrawingArea
 
                 engine = new ReportRenderEngine(paper, manuscript, folio);
 
-                cr = new Context(source.getWindow());
+                cr = new Context(event);
 
                 scaleOutput(cr, engine);
                 drawPageOutline(cr, engine);
