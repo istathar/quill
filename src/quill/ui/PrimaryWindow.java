@@ -136,21 +136,21 @@ class PrimaryWindow extends Window
 
         stack.apply(replacement);
 
-        this.folio = replacement;
-
         /*
          * Propagate
          */
 
-        this.affect();
+        this.advanceTo(replacement);
     }
 
     /**
      * General case of affecting the state currently given in this.folio.
      */
-    private void affect() {
+    private void advanceTo(Folio folio) {
         final int i;
         final Series series;
+
+        this.folio = folio;
 
         /*
          * Update the ComponentEditorWidget to the current state
@@ -179,29 +179,36 @@ class PrimaryWindow extends Window
         updateTitle();
     }
 
-    private void reverse() {
-        final int num;
+    private void reverseTo(Folio folio) {
+        Folio current;
         int i;
         Series series;
 
-        num = folio.size();
+        current = this.folio;
+        this.folio = folio;
 
-        if (num != 1) {
-            // FIXME multiple chapters
-            throw new UnsupportedOperationException("TODO");
-        }
+        /*
+         * Update the ComponentEditorWidget to the current state
+         */
 
-        for (i = 0; i < num; i++) {
-            series = folio.getSeries(i);
+        i = current.getIndexUpdated();
+        series = folio.getSeries(i);
 
-            // TODO FIXME propegate to each editor!
-            editor.reveseTo(series);
-        }
+        editor.reveseTo(series);
 
-        // FIXME only if showing!
+        // is this the right place to set this?
+        cursorSeries = series;
+
+        /*
+         * Update the PreviewWidget's idea of the current state
+         */
+
         preview.affect(manuscript, folio);
 
-        // FIXME only if showing
+        /*
+         * Update the OutlineWidget's idea of the current state
+         */
+
         outline.affect(folio);
 
         updateTitle();
@@ -220,8 +227,7 @@ class PrimaryWindow extends Window
             return;
         }
 
-        this.folio = previous;
-        this.reverse();
+        this.reverseTo(previous);
     }
 
     /**
@@ -236,8 +242,7 @@ class PrimaryWindow extends Window
             return;
         }
 
-        this.folio = following;
-        this.affect();
+        this.advanceTo(following);
     }
 
     private void setupWindow() {
@@ -529,14 +534,15 @@ class PrimaryWindow extends Window
      * and have a window title with only one letter in it as you type.
      */
     void updateTitle() {
-        final Series series;
         final Segment first;
         final String title;
         final String str;
 
-        // FIXME
-        series = folio.getSeries(0);
-        first = series.getSegment(0);
+        /*
+         * TODO include document title in window title
+         */
+
+        first = cursorSeries.getSegment(0);
 
         if (first == titleSegment) {
             return;
@@ -883,6 +889,7 @@ class PrimaryWindow extends Window
 
         editor.initializeSeries(cursorSeries);
         preview.queueDraw();
+        updateTitle();
     }
 
     private void handleComponentNext() {
@@ -901,5 +908,6 @@ class PrimaryWindow extends Window
 
         editor.initializeSeries(cursorSeries);
         preview.queueDraw();
+        updateTitle();
     }
 }
