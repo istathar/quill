@@ -46,6 +46,7 @@ import org.gnome.pango.WeightAttribute;
 import org.gnome.pango.WrapMode;
 
 import parchment.format.Manuscript;
+import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
@@ -55,6 +56,7 @@ import quill.textbase.ImageSegment;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.Origin;
+import quill.textbase.PoeticSegment;
 import quill.textbase.Preformat;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
@@ -337,9 +339,15 @@ public abstract class RenderEngine
                     chain = new TextChain(entire);
                     paras = chain.extractParagraphs();
                     for (k = 0; k < paras.length; k++) {
-                        appendNormalParagraph(cr, segment, paras[k]);
+                        appendNormalParagraph(cr, paras[k]);
                         appendBlankLine(cr);
                     }
+                } else if (segment instanceof PoeticSegment) {
+                    appendNormalParagraph(cr, entire);
+                    appendBlankLine(cr);
+                } else if (segment instanceof AttributionSegment) {
+                    appendAttributionParagraph(cr, entire);
+                    appendBlankLine(cr);
                 } else if (segment instanceof ImageSegment) {
                     filename = segment.getImage();
                     appendExternalGraphic(cr, filename);
@@ -402,7 +410,7 @@ public abstract class RenderEngine
         areas.add(area);
     }
 
-    protected void appendNormalParagraph(Context cr, Segment segment, Extract extract) {
+    protected void appendNormalParagraph(Context cr, Extract extract) {
         final Area[] list;
 
         list = layoutAreaText(cr, extract, serifFace, false, false, false);
@@ -420,6 +428,29 @@ public abstract class RenderEngine
         rightMargin += 45.0;
 
         list = layoutAreaText(cr, extract, serifFace, false, false, false);
+        accumulate(list);
+
+        leftMargin = savedLeft;
+        rightMargin = savedRight;
+    }
+
+    protected void appendAttributionParagraph(Context cr, Extract extract) {
+        final FontDescription desc;
+        final Typeface face;
+        final double savedLeft, savedRight;
+        final Area[] list;
+
+        desc = serifFace.desc.copy();
+        desc.setSize(7.0);
+        face = new Typeface(cr, desc, 0.0);
+
+        savedLeft = leftMargin;
+        savedRight = rightMargin;
+
+        leftMargin = pageWidth / 2 + 50.0;
+        rightMargin += 10.0;
+
+        list = layoutAreaText(cr, extract, face, false, false, false);
         accumulate(list);
 
         leftMargin = savedLeft;

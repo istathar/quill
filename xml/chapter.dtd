@@ -20,7 +20,7 @@
 
 -->
 
-<!ELEMENT chapter (title?,(heading | text | code | quote | image)*,endnote*,reference*)>
+<!ELEMENT chapter (title?,(heading | text | code | quote | image | poem | credit)*,endnote*,reference*)>
 <!ATTLIST chapter xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/0.2">
 
 <!-- block level  -->
@@ -38,6 +38,11 @@
 
 <!ELEMENT image (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
 <!ATTLIST image src CDATA #REQUIRED>
+
+<!ELEMENT poem (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
+<!ATTLIST poem xml:space CDATA #FIXED "preserve">
+
+<!ELEMENT credit (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
 
 <!ELEMENT endnote (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | cite)*>
 <!ATTLIST endnote name CDATA #REQUIRED>

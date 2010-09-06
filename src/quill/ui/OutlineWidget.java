@@ -246,7 +246,7 @@ class CompressedLines extends DrawingArea
                 final Context cr;
                 int i, j, width, rem;
 
-                cr = new Context(source.getWindow());
+                cr = new Context(event);
 
                 if (pre) {
                     cr.setSource(0.7, 0.7, 0.7);
