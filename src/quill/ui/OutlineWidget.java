@@ -30,7 +30,9 @@ import org.gnome.gtk.DrawingArea;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Image;
 import org.gnome.gtk.Label;
+import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ReliefStyle;
+import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
@@ -55,15 +57,18 @@ import quill.textbase.TextChain;
  * and reactive to changes to the DataLayer. The code to generate the
  * "compressed lines" is horrendous.
  */
-class OutlineWidget extends VBox
+class OutlineWidget extends ScrolledWindow
 {
+    private final ScrolledWindow scroll;
+
     private VBox top;
 
     private Folio folio;
 
     public OutlineWidget() {
-        super(false, 0);
-        top = this;
+        super();
+        scroll = this;
+        top = new VBox(false, 0);
         folio = null;
     }
 
@@ -139,7 +144,9 @@ class OutlineWidget extends VBox
             }
         }
 
-        top.showAll();
+        scroll.addWithViewport(top);
+        scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
+        scroll.showAll();
     }
 
     /**

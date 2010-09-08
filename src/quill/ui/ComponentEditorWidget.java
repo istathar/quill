@@ -20,6 +20,10 @@ package quill.ui;
 
 import java.util.LinkedList;
 
+import org.freedesktop.cairo.Context;
+import org.freedesktop.cairo.Surface;
+import org.gnome.gdk.Color;
+import org.gnome.gdk.EventExpose;
 import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.Allocation;
@@ -27,7 +31,9 @@ import org.gnome.gtk.Container;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.Scrollbar;
 import org.gnome.gtk.ScrolledWindow;
+import org.gnome.gtk.StateType;
 import org.gnome.gtk.VBox;
+import org.gnome.gtk.Viewport;
 import org.gnome.gtk.Widget;
 
 import quill.textbase.AttributionSegment;
@@ -80,10 +86,23 @@ class ComponentEditorWidget extends ScrolledWindow
     }
 
     private void setupScrolling() {
+        final Viewport port;
         box = new VBox(false, 3);
 
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
         scroll.addWithViewport(box);
+
+        /*
+         * Set the background color of the entire EditorWidget to white in
+         * order to hide the upper side of the horizontal Scrollbars in the
+         * preformatted blocks. Finding that this was the right place was
+         * traumatic, but it turns out that the Viewport has the underlying
+         * [org.gnome.gdk] Window where the drawing happens. Annoyingly,
+         * calling modifyBackground() on the ScolledWindow didn't work.
+         */
+
+        port = (Viewport) scroll.getChild();
+        port.modifyBackground(StateType.NORMAL, Color.WHITE);
 
         adj = scroll.getVAdjustment();
     }
@@ -226,14 +245,12 @@ class ComponentEditorWidget extends ScrolledWindow
             editor = new PreformatEditorTextView(this, segment);
 
             wide = new ScrolledWindow();
-            wide.setPolicy(PolicyType.AUTOMATIC, PolicyType.NEVER);
+            wide.setPolicy(PolicyType.ALWAYS, PolicyType.NEVER);
             wide.add(editor);
 
             /*
              * Having set up horizontal scrollbars for code blocks, we want to
-             * make them a bit less obtrusive in normal use. If we can come up
-             * with a way to limit the size without involving any horizontal
-             * scrollbar at all.
+             * make them a bit less obtrusive in normal use.
              */
 
             bar = wide.getHScrollbar();
@@ -251,6 +268,27 @@ class ComponentEditorWidget extends ScrolledWindow
                 }
             });
             bar.setSensitive(false);
+
+            bar.connect(new ExposeEvent() {
+                public boolean onExposeEvent(Widget source, EventExpose event) {
+                    final Context cr;
+                    final Surface surface;
+
+                    if (bar.getSensitive()) {
+                        return false;
+                    }
+
+                    cr = new Context(event);
+
+                    cr.setSource(Color.WHITE);
+                    cr.paint();
+
+                    surface = cr.getTarget();
+                    surface.flush();
+
+                    return true;
+                }
+            });
 
             result = wide;
         } else if (segment instanceof ImageSegment) {
