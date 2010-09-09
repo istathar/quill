@@ -68,7 +68,11 @@ class OutlineWidget extends ScrolledWindow
     public OutlineWidget() {
         super();
         scroll = this;
+
         top = new VBox(false, 0);
+        scroll.addWithViewport(top);
+        scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
+
         folio = null;
     }
 
@@ -144,9 +148,7 @@ class OutlineWidget extends ScrolledWindow
             }
         }
 
-        scroll.addWithViewport(top);
-        scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
-        scroll.showAll();
+        top.showAll();
     }
 
     /**
