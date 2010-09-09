@@ -28,6 +28,7 @@ import parchment.format.ValidateProperNewlineHandling;
 import parchment.format.ValidateThereAndBackAgain;
 import quill.quack.ValidateCitationConversion;
 import quill.quack.ValidateEndnoteConversion;
+import quill.quack.ValidatePreformattedConversion;
 import quill.quack.ValidateTextChainToChapterConversion;
 import quill.textbase.ValidateExtracts;
 import quill.textbase.ValidateOriginOrdering;
@@ -83,6 +84,7 @@ public class UnitTests
         suite.addTestSuite(ValidateProperNewlineHandling.class);
         suite.addTestSuite(ValidateWrapperExpansions.class);
         suite.addTestSuite(ValidateThereAndBackAgain.class);
+        suite.addTestSuite(ValidatePreformattedConversion.class);
         suite.addTestSuite(ValidateFileNaming.class);
         suite.addTestSuite(ValidateWordExtraction.class);
         suite.addTestSuite(ValidateApplyUndoRedo.class);
