@@ -19,33 +19,48 @@
 package quill.ui;
 
 import org.gnome.gtk.HBox;
+import org.gnome.gtk.HSeparator;
 import org.gnome.gtk.Label;
+import org.gnome.gtk.VBox;
 
 import quill.textbase.Segment;
 
-class HeadingBox extends HBox
+class HeadingBox extends VBox
 {
-    private HBox box;
+    private VBox top;
 
-    protected HeadingEditorTextView title;
+    private HeadingEditorTextView title;
 
-    protected Label label;
+    private Label label;
 
-    public HeadingBox(ComponentEditorWidget parent, Segment segment) {
+    public HeadingBox() {
         super(false, 0);
-
-        setupBox(parent, segment);
+        top = this;
     }
 
-    private void setupBox(ComponentEditorWidget parent, Segment segment) {
-        box = this;
+    protected void setupBox(final ComponentEditorWidget parent, final Segment segment, final String text) {
+        final HBox box;
+
+        box = new HBox(false, 0);
 
         title = new HeadingEditorTextView(parent, segment);
         box.packStart(title, true, true, 0);
 
         label = new Label();
         label.setWidthChars(20);
+        label.setUseMarkup(true);
+        label.setLabel("<span color='gray'>" + text + "</span>");
         box.packEnd(label, false, false, 0);
+
+        top.packStart(box, false, false, 0);
+    }
+
+    protected void setupLine() {
+        final HSeparator sep;
+
+        sep = new HSeparator();
+
+        top.packStart(sep, false, false, 0);
     }
 
     EditorTextView getEditor() {

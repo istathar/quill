@@ -18,22 +18,13 @@
  */
 package quill.ui;
 
-import org.gnome.pango.FontDescription;
-
 import quill.textbase.Segment;
 
 class HeadingEditorTextView extends EditorTextView
 {
-    private static FontDescription desc;
-
-    static {
-        desc = fonts.serif.copy();
-        desc.setSize(14.0);
-    }
-
     HeadingEditorTextView(ComponentEditorWidget parent, Segment segment) {
         super(parent, segment);
-        view.modifyFont(desc);
+        view.modifyFont(fonts.heading);
     }
 
     protected boolean isEnterAllowed() {

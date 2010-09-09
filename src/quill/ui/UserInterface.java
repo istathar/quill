@@ -85,6 +85,7 @@ public class UserInterface
         fonts.serif = new FontDescription("Deja Vu Serif, 11");
         fonts.sans = new FontDescription("Deja Vu Sans, 11");
         fonts.mono = new FontDescription("Deja Vu Sans Mono, 11");
+        fonts.heading = new FontDescription("Liberation Sans, Bold 14");
     }
 
     private void setupApplication() {
@@ -302,4 +303,6 @@ class fonts
     static FontDescription serif;
 
     static FontDescription mono;
+
+    static FontDescription heading;
 }

@@ -20,11 +20,12 @@ package quill.ui;
 
 import quill.textbase.Segment;
 
-public class ChapterHeadingBox extends HeadingBox
+class ChapterHeadingBox extends HeadingBox
 {
     public ChapterHeadingBox(final ComponentEditorWidget parent, final Segment segment) {
-        super(parent, segment);
+        super();
 
-        label.setLabel("Chapter");
+        super.setupBox(parent, segment, "Chapter");
+        super.setupLine();
     }
 }

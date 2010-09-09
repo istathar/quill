@@ -87,6 +87,8 @@ class PrimaryWindow extends Window
 
     private ComponentEditorWidget editor;
 
+    private IntroductionWidget intro;
+
     private HelpWidget help;
 
     private PreviewWidget preview;
@@ -290,11 +292,16 @@ class PrimaryWindow extends Window
         outline = new OutlineWidget();
         right.add(outline);
 
+        intro = new IntroductionWidget();
+        right.add(intro);
+
         two.packStart(right, true, true, 0);
     }
 
     private void initialPresentation() {
         window.showAll();
+        right.setCurrentPage(3);
+
         window.present();
     }
 
