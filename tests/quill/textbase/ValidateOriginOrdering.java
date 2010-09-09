@@ -31,12 +31,12 @@ public class ValidateOriginOrdering extends TestCase
         final Iterator<Origin> iter;
         Origin origin;
 
-        zero = new Origin(0, 0);
-        one = new Origin(0, 25);
-        two = new Origin(1, 0);
-        three = new Origin(1, 25);
-        four = new Origin(1, 60);
-        five = new Origin(2, 33);
+        zero = new Origin(0, 0, 0);
+        one = new Origin(0, 0, 25);
+        two = new Origin(0, 1, 0);
+        three = new Origin(0, 1, 25);
+        four = new Origin(0, 1, 60);
+        five = new Origin(0, 2, 33);
 
         /*
          * Spot check comparable behaviour

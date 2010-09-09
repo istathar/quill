@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -24,6 +24,7 @@ import java.io.IOException;
 import parchment.format.Manuscript;
 import quill.client.IOTestCase;
 import quill.textbase.Common;
+import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.NormalSegment;
 import quill.textbase.PreformatSegment;
@@ -35,8 +36,6 @@ import quill.textbase.TextChain;
 import static quill.textbase.Span.createSpan;
 
 /**
- * BROKEN
- * 
  * This tested matters when we doing programlisting blocks as a Markup. The
  * infrastructure is good, though, so keep this around until we can use it
  * properly.
@@ -45,25 +44,15 @@ import static quill.textbase.Span.createSpan;
  */
 public class ValidatePreformattedConversion extends IOTestCase
 {
-    private static void build(Segment segment, Span[] spans) {
-        final TextChain chain;
-
-        chain = new TextChain();
-
-        for (Span span : spans) {
-            chain.append(span);
-        }
-
-        segment.setText(chain);
-    }
-
     public final void testWritePreformatting() throws IOException {
         final Manuscript manuscript;
         final QuackConverter converter;
+        TextChain chain;
+        Extract entire;
         Span[] spans;
         Segment segment;
         final Folio folio;
-        final Series series;
+        Series series;
         int i;
         final int len;
         final ByteArrayOutputStream out;
@@ -82,26 +71,51 @@ public class ValidatePreformattedConversion extends IOTestCase
                     "Consider the following simple and yet profound expression of quality program code:",
                     null)
         };
-        segment = new NormalSegment();
-        build(segment, spans);
+
+        chain = new TextChain();
+        for (Span span : spans) {
+            chain.append(span);
+        }
+
+        entire = chain.extractAll();
+        segment = new NormalSegment(entire);
+        series = series.update(0, segment);
 
         spans = new Span[] {
                 createSpan("public class Hello {", null),
+                createSpan("\n", null),
                 createSpan("    public static void main(String[] args) {", null),
+                createSpan("\n", null),
                 createSpan("        System.out.println(\"Hello World\");", null),
+                createSpan("\n", null),
                 createSpan("    }", null),
+                createSpan("\n", null),
                 createSpan("}", null)
         };
-        segment = new PreformatSegment();
-        build(segment, spans);
+
+        chain = new TextChain();
+        for (Span span : spans) {
+            chain.append(span);
+        }
+
+        entire = chain.extractAll();
+        segment = new PreformatSegment(entire);
+        series = series.update(1, segment);
 
         spans = new Span[] {
                 createSpan("There really isn't anything like saying ", null),
                 createSpan("Hello World", Common.ITALICS),
                 createSpan(" to a nice friendly programmer.", null),
         };
-        segment = new NormalSegment();
-        build(segment, spans);
+
+        chain = new TextChain();
+        for (Span span : spans) {
+            chain.append(span);
+        }
+
+        entire = chain.extractAll();
+        segment = new NormalSegment(entire);
+        series = series.insert(2, segment);
 
         /*
          * Now run conversion process.
