@@ -23,7 +23,6 @@ import quill.textbase.Segment;
 class SectionHeadingBox extends HeadingBox
 {
     public SectionHeadingBox(ComponentEditorWidget parent, Segment segment) {
-        super(parent, segment);
-        label.setLabel("Section");
+        super(parent, segment, "Section");
     }
 }

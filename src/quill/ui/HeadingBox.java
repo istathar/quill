@@ -31,13 +31,13 @@ class HeadingBox extends HBox
 
     protected Label label;
 
-    public HeadingBox(ComponentEditorWidget parent, Segment segment) {
+    public HeadingBox(ComponentEditorWidget parent, Segment segment, String text) {
         super(false, 0);
 
-        setupBox(parent, segment);
+        setupBox(parent, segment, text);
     }
 
-    private void setupBox(ComponentEditorWidget parent, Segment segment) {
+    private void setupBox(ComponentEditorWidget parent, Segment segment, String text) {
         box = this;
 
         title = new HeadingEditorTextView(parent, segment);
@@ -45,6 +45,9 @@ class HeadingBox extends HBox
 
         label = new Label();
         label.setWidthChars(20);
+        label.setUseMarkup(true);
+        label.setLabel("<span color='gray'>" + text + "</span>");
+
         box.packEnd(label, false, false, 0);
     }
 
