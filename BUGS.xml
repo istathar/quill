@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter schema="0.1" xmlns="http://operationaldynamics.com/quack">
+<chapter xmlns="http://namespace.operationaldynamics.com/parchment/0.2">
 <title>
 BUGS
 </title>
@@ -65,7 +65,7 @@ If you select text in one editor, then you
 click in another, moving the focus, the TextView
 which looses focus sets the selected region
 the semi-tone "I'm inactive but still have
-a selection" color.
+a selection" colour.
 </text>
 <text>
 It should probably be cleared so the behaviour
