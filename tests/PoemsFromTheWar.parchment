@@ -7,8 +7,8 @@
     <renderer class="com.operationaldynamics.parchment.ReportRenderEngine"/>
     <paper size="A4"/>
     <margins top="10.00" left="57.75" right="25.00" bottom="10.00"/>
-    <font sans="Liberation Sans, 8.0"/>
     <font serif="Linux Libertine, 9.0"/>
+    <font sans="Liberation Sans, 8.0"/>
     <font mono="Inconsolata, 8.1"/>
     <font heading="Linux Libertine O C"/>
   </presentation>

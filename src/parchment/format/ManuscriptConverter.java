@@ -78,6 +78,11 @@ class ManuscriptConverter
         }
     }
 
+    /**
+     * A goodly chunk of the point of this is to enforce a consistent element
+     * order. Nothing worse than spurious diffs just because the runtime
+     * changed its sorting on output.
+     */
     // HARDCODE
     private void buildPresentation() {
         ManuscriptElement renderer, paper, margins, font;
@@ -105,12 +110,12 @@ class ManuscriptConverter
         presentation.appendChild(margins);
 
         font = new ManuscriptElement("font");
-        attribute = new Attribute("sans", "Liberation Sans, 8.0");
+        attribute = new Attribute("serif", "Linux Libertine, 9.0");
         font.addAttribute(attribute);
         presentation.appendChild(font);
 
         font = new ManuscriptElement("font");
-        attribute = new Attribute("serif", "Linux Libertine, 9.0");
+        attribute = new Attribute("sans", "Liberation Sans, 8.0");
         font.addAttribute(attribute);
         presentation.appendChild(font);
 
