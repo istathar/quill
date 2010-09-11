@@ -52,8 +52,10 @@ import org.gnome.gtk.Window;
 import org.gnome.pango.FontDescription;
 
 import parchment.format.Manuscript;
+import parchment.format.Stylesheet;
 import parchment.render.RenderEngine;
-import parchment.render.ReportRenderEngine;
+import parchment.render.RenderSettings;
+import quill.client.ApplicationException;
 import quill.client.ImproperFilenameException;
 import quill.client.Quill;
 import quill.textbase.Folio;
@@ -170,7 +172,7 @@ class PrimaryWindow extends Window
          * Update the PreviewWidget's idea of the current state
          */
 
-        preview.affect(manuscript, folio);
+        preview.affect(folio);
 
         /*
          * Update the OutlineWidget's idea of the current state
@@ -205,7 +207,7 @@ class PrimaryWindow extends Window
          * Update the PreviewWidget's idea of the current state
          */
 
-        preview.affect(manuscript, folio);
+        preview.affect(folio);
 
         /*
          * Update the OutlineWidget's idea of the current state
@@ -522,7 +524,7 @@ class PrimaryWindow extends Window
         cursorSeries = series;
 
         editor.initializeSeries(series);
-        preview.affect(manuscript, folio);
+        preview.affect(folio);
         outline.affect(folio);
         this.updateTitle();
     }
@@ -805,11 +807,11 @@ class PrimaryWindow extends Window
         final Context cr;
         final Surface surface;
         final PaperSize paper;
+        final Stylesheet style;
+        final RenderSettings settings;
         final RenderEngine engine;
 
         try {
-            paper = PaperSize.A4;
-
             fullname = manuscript.getFilename();
             if (fullname == null) {
                 dialog = new InfoMessageDialog(window, "Set filename first",
@@ -830,18 +832,25 @@ class PrimaryWindow extends Window
             basename = manuscript.getBasename();
             targetname = parentdir + "/" + basename + ".pdf";
 
+            style = folio.getStylesheet();
+            settings = new RenderSettings(style);
+            paper = settings.getPaper();
             surface = new PdfSurface(targetname, paper.getWidth(Unit.POINTS),
                     paper.getHeight(Unit.POINTS));
             cr = new Context(surface);
 
-            // HARDCODE
-            engine = new ReportRenderEngine(paper, manuscript, folio);
-            engine.render(cr);
+            engine = RenderEngine.createRenderer(settings);
+            engine.render(cr, folio);
 
             surface.finish();
         } catch (IOException ioe) {
             dialog = new ErrorMessageDialog(window, "Print failed", "There's some kind of I/O problem: "
                     + ioe.getMessage());
+            dialog.run();
+            dialog.hide();
+        } catch (ApplicationException ae) {
+            dialog = new ErrorMessageDialog(window, "Print failed", "Problem in the renderer!"
+                    + ae.getMessage());
             dialog.run();
             dialog.hide();
         }

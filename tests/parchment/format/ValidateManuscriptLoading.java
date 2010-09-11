@@ -188,12 +188,12 @@ public class ValidateManuscriptLoading extends IOTestCase
          */
 
         faces = new String[] {
-                "sans", "serif", "mono", "heading"
+                "serif", "sans", "mono", "heading"
         };
 
         desc = new String[] {
-                "Liberation Sans, 8.0",
                 "Linux Libertine, 9.0",
+                "Liberation Sans, 8.0",
                 "Inconsolata, 8.1",
                 "Linux Libertine O C"
         };

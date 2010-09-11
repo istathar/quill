@@ -19,6 +19,8 @@
 package parchment.render;
 
 import java.io.FileNotFoundException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -83,6 +85,8 @@ import static quill.textbase.Span.createSpan;
  */
 public abstract class RenderEngine
 {
+    private final RenderSettings settings;
+
     private double pageWidth;
 
     private double pageHeight;
@@ -98,8 +102,6 @@ public abstract class RenderEngine
     private double footerHeight;
 
     private Folio folio;
-
-    private Manuscript manuscript;
 
     Typeface sansFace;
 
@@ -142,13 +144,12 @@ public abstract class RenderEngine
 
     /**
      * Construct a new RenderEngine. Call {@link #render(Context) render()} to
-     * actually draw. Pass in the document being rendered (the target file
-     * will be derived from this) and the current document state root.
+     * actually draw. Pass in a settings cache; a RenderEngine is resuable so
+     * long as this doesn't change.
      */
-    protected RenderEngine(final PaperSize paper, final Manuscript manuscript, final Folio folio) {
-        specifySize(paper);
-        this.manuscript = manuscript;
-        this.folio = folio;
+    protected RenderEngine(final RenderSettings settings) {
+        this.settings = settings;
+        calculateMargins();
     }
 
     /**
@@ -156,10 +157,11 @@ public abstract class RenderEngine
      * that the target Surface either a) has the size as the PaperSize passed
      * to the constructor, or b) has been scaled to that size.
      */
-    public void render(final Context cr) {
+    public void render(final Context cr, final Folio folio) {
         if (folio == null) {
             return;
         }
+        this.folio = folio;
 
         synchronized (this) {
             specifyFonts(cr);
@@ -173,10 +175,11 @@ public abstract class RenderEngine
      * TODO needs to act to prepare and flow, caching the result so that
      * subsequent calls here don't re-do everything.
      */
-    public void render(Context cr, int pageNum) {
+    public void render(final Context cr, final Folio folio, final int pageNum) {
         if (folio == null) {
             return;
         }
+        this.folio = folio;
 
         synchronized (this) {
             specifyFonts(cr);
@@ -186,10 +189,12 @@ public abstract class RenderEngine
         }
     }
 
-    public void render(Context cr, Origin cursor) {
+    public void render(Context cr, Folio folio, Origin cursor) {
         if (folio == null) {
             return;
         }
+        this.folio = folio;
+
         if (cursor == null) {
             return;
         }
@@ -268,35 +273,32 @@ public abstract class RenderEngine
         surface.finish();
     }
 
-    /*
-     * This will move to the actual RenderEngine subclass, I expect.
-     */
     protected void specifyFonts(final Context cr) {
-        serifFace = new Typeface(cr, new FontDescription("Linux Libertine O, 9.0"), 0.2);
+        serifFace = new Typeface(cr, settings.getFontSerif(), 0.2);
 
-        monoFace = new Typeface(cr, new FontDescription("Inconsolata, 8.3"), 0.0);
+        sansFace = new Typeface(cr, settings.getFontSans(), 0.0);
 
-        sansFace = new Typeface(cr, new FontDescription("Liberation Sans, 7.3"), 0.0);
+        monoFace = new Typeface(cr, settings.getFontMono(), 0.0);
 
-        headingFace = new Typeface(cr, new FontDescription("Linux Libertine O C"), 0.0);
+        headingFace = new Typeface(cr, settings.getFontHeading(), 0.0);
 
         cr.setSource(0.0, 0.0, 0.0);
     }
 
-    /*
-     * 2 cm = 56.67 pt
-     */
-    private void specifySize(final PaperSize paper) {
+    private void calculateMargins() {
+        final PaperSize paper;
+
+        paper = settings.getPaper();
         pageWidth = paper.getWidth(Unit.POINTS);
         pageHeight = paper.getHeight(Unit.POINTS);
 
-        topMargin = 40.0;
-        bottomMargin = 30.0;
-        leftMargin = 56.67;
-        rightMargin = 45.0;
+        topMargin = settings.getMarginTop();
+        bottomMargin = settings.getMarginBottom();
+        leftMargin = settings.getMarginLeft();
+        rightMargin = settings.getMarginRight();
     }
 
-    public void processSegmentsIntoAreas(final Context cr) {
+    void processSegmentsIntoAreas(final Context cr) {
         int i, j, k;
         Series series;
         Segment segment;
@@ -905,12 +907,14 @@ public abstract class RenderEngine
     }
 
     protected void appendExternalGraphic(final Context cr, final String source) {
+        final Manuscript manuscript;
         final String parent, filename;
         final Pixbuf pixbuf;
         final TextChain chain;
         final Extract extract;
         final Area image;
 
+        manuscript = folio.getManuscript();
         parent = manuscript.getDirectory();
         filename = parent + "/" + source;
 
@@ -994,5 +998,31 @@ public abstract class RenderEngine
         origin = new Origin(folioIndex, seriesIndex, 0);
         area = new ImageArea(origin, leftCorner, request, pixbuf, scaleFactor);
         return area;
+    }
+
+    /**
+     * Create an instance of the RenderEngine specified by this presentation
+     * element.
+     */
+    @SuppressWarnings("unchecked")
+    public static RenderEngine createRenderer(final RenderSettings settings) {
+        final Class<? extends RenderEngine> type;
+        final Constructor<RenderEngine> constructor;
+        final RenderEngine result;
+        final Throwable t;
+
+        type = settings.getRendererClass();
+
+        try {
+            constructor = (Constructor<RenderEngine>) type.getConstructor(RenderSettings.class);
+            result = constructor.newInstance(settings);
+        } catch (InvocationTargetException ite) {
+            t = ite.getCause();
+            throw new RuntimeException(t);
+        } catch (Exception e) {
+            throw new AssertionError();
+        }
+
+        return result;
     }
 }

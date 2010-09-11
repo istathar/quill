@@ -35,30 +35,31 @@ import parchment.format.UnsupportedValueException;
 // immutable, not that it really matters.
 public class RenderSettings
 {
-    final Class<? extends RenderEngine> type;
+    private final Class<? extends RenderEngine> type;
 
-    final PaperSize paper;
+    private final PaperSize paper;
 
-    final double marginTop;
+    private final double marginTop;
 
-    final double marginLeft;
+    private final double marginLeft;
 
-    final double marginRight;
+    private final double marginRight;
 
-    final double marginBottom;
+    private final double marginBottom;
 
-    final FontDescription fontSerif;
+    private final FontDescription fontSerif;
 
-    final FontDescription fontSans;
+    private final FontDescription fontSans;
 
-    final FontDescription fontMono;
+    private final FontDescription fontMono;
 
-    final FontDescription fontHeading;
+    private final FontDescription fontHeading;
 
     /**
      * Given a Stylesheet state, parse and process it into Java objects.
      */
-    RenderSettings(final Stylesheet style) throws RendererNotFoundException, UnsupportedValueException {
+    public RenderSettings(final Stylesheet style) throws RendererNotFoundException,
+            UnsupportedValueException {
         final String renderer, size, serif, sans, mono, heading;
         final String top, left, right, bottom;
 
@@ -136,10 +137,54 @@ public class RenderSettings
     }
 
     /**
-     * It'd be nice if we could do real validation here, as in
-     * "can you actually get the font you are requesting?" because if
+     * FUTURE It'd be nice if we could do real validation here, as in
+     * "can you actually get the font you are requesting?" because if it falls
+     * back due to a missing font that's actually a pretty big (output
+     * visible) problem. Just checking the FontDescription's family isn't
+     * really sufficient; that's just initial parsing. The reqal question is
+     * how to access the actual font as chosen by fontconfig?
      */
     private static FontDescription loadDescription(String description) {
         return new FontDescription(description);
+    }
+
+    public Class<? extends RenderEngine> getRendererClass() {
+        return this.type;
+    }
+
+    public PaperSize getPaper() {
+        return this.paper;
+    }
+
+    public double getMarginTop() {
+        return this.marginTop;
+    }
+
+    public double getMarginLeft() {
+        return this.marginLeft;
+    }
+
+    public double getMarginRight() {
+        return this.marginRight;
+    }
+
+    public double getMarginBottom() {
+        return this.marginBottom;
+    }
+
+    public FontDescription getFontSerif() {
+        return this.fontSerif;
+    }
+
+    public FontDescription getFontSans() {
+        return this.fontSans;
+    }
+
+    public FontDescription getFontMono() {
+        return this.fontMono;
+    }
+
+    public FontDescription getFontHeading() {
+        return this.fontHeading;
     }
 }

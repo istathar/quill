@@ -22,6 +22,7 @@ import java.util.List;
 
 import parchment.format.Chapter;
 import parchment.format.Manuscript;
+import parchment.format.Stylesheet;
 
 /**
  * A sequence of Series making up a document.
@@ -42,7 +43,10 @@ public class Folio
      */
     private final int updated;
 
-    private final Chapter[] chapters;
+    /**
+     * The current settings regarding the presentation of this document.
+     */
+    private final Stylesheet style;
 
     /**
      * The file [reference] that this document was (orignally) loaded from.
@@ -50,6 +54,11 @@ public class Folio
      * same unless and until the underlying filename etc is changed.
      */
     private final Manuscript manuscript;
+
+    /**
+     * The file [reference] that each of the components was loaded from.
+     */
+    private final Chapter[] chapters;
 
     /**
      * Create a Folio with a single [presumably nigh-on-empty] component as
@@ -64,6 +73,7 @@ public class Folio
             component
         };
         this.updated = -1;
+        this.style = new Stylesheet(); // FIXME
     }
 
     /**
@@ -87,13 +97,16 @@ public class Folio
         s = new Series[num];
         this.components = components.toArray(s);
         this.updated = -1;
+        this.style = new Stylesheet(); // FIXME
     }
 
-    private Folio(Manuscript manuscript, Chapter[] chapters, Series[] components, int updated) {
+    private Folio(Manuscript manuscript, Chapter[] chapters, Series[] components, int updated,
+            Stylesheet style) {
         this.manuscript = manuscript;
         this.chapters = chapters;
         this.components = components;
         this.updated = updated;
+        this.style = style;
     }
 
     public int size() {
@@ -143,10 +156,14 @@ public class Folio
         System.arraycopy(original, position + 1, replacement, position + 1, original.length - position
                 - 1);
 
-        return new Folio(this.manuscript, this.chapters, replacement, position);
+        return new Folio(this.manuscript, this.chapters, replacement, position, this.style);
     }
 
     public int getIndexUpdated() {
         return updated;
+    }
+
+    public Stylesheet getStylesheet() {
+        return style;
     }
 }

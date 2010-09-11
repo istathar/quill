@@ -113,12 +113,12 @@ public class ValidateManuscriptSerializing extends IOTestCase
         presentation.appendChild(margins);
 
         font = new ParchmentElement("font");
-        attribute = new Attribute("sans", "Liberation Sans, 8.0");
+        attribute = new Attribute("serif", "Linux Libertine, 9.0");
         font.addAttribute(attribute);
         presentation.appendChild(font);
 
         font = new ParchmentElement("font");
-        attribute = new Attribute("serif", "Linux Libertine, 9.0");
+        attribute = new Attribute("sans", "Liberation Sans, 8.0");
         font.addAttribute(attribute);
         presentation.appendChild(font);
 

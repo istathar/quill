@@ -18,14 +18,9 @@
  */
 package parchment.render;
 
-import org.gnome.gtk.PaperSize;
-
-import parchment.format.Manuscript;
-import quill.textbase.Folio;
-
 public class ReportRenderEngine extends RenderEngine
 {
-    public ReportRenderEngine(PaperSize paper, Manuscript manuscript, Folio folio) {
-        super(paper, manuscript, folio);
+    public ReportRenderEngine(RenderSettings settings) {
+        super(settings);
     }
 }

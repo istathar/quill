@@ -23,12 +23,13 @@ import org.freedesktop.cairo.Matrix;
 import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.DrawingArea;
-import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.Widget;
 
-import parchment.format.Manuscript;
+import parchment.format.RendererNotFoundException;
+import parchment.format.Stylesheet;
+import parchment.format.UnsupportedValueException;
 import parchment.render.RenderEngine;
-import parchment.render.ReportRenderEngine;
+import parchment.render.RenderSettings;
 import quill.textbase.Folio;
 import quill.textbase.Origin;
 
@@ -65,8 +66,6 @@ class PreviewWidget extends DrawingArea
 
     private int pixelHeight;
 
-    private Manuscript manuscript;
-
     private Folio folio;
 
     /**
@@ -74,22 +73,18 @@ class PreviewWidget extends DrawingArea
      */
     private PrimaryWindow primary;
 
+    private RenderEngine engine;
+
+    private Stylesheet configuredStyle;
+
     PreviewWidget(PrimaryWindow window) {
         super();
         this.primary = window;
 
         this.connect(new Widget.ExposeEvent() {
             public boolean onExposeEvent(Widget source, EventExpose event) {
-                final PaperSize paper;
-                final RenderEngine engine;
                 final Context cr;
                 final Origin cursor;
-
-                // paper = new CustomPaperSize("Widescreen", 400, 300,
-                // Unit.MM);
-                paper = PaperSize.A4;
-
-                engine = new ReportRenderEngine(paper, manuscript, folio);
 
                 cr = new Context(event);
 
@@ -98,7 +93,7 @@ class PreviewWidget extends DrawingArea
                 drawCrosshairs(cr, engine);
 
                 cursor = primary.getCursor();
-                engine.render(cr, cursor);
+                engine.render(cr, folio, cursor);
 
                 return true;
             }
@@ -194,8 +189,34 @@ class PreviewWidget extends DrawingArea
      * Given a Series in a Manuscript representing the Segments in a chapter
      * or article, instruct this Widget to render a preview of them.
      */
-    void affect(Manuscript manuscript, Folio folio) {
-        this.manuscript = manuscript;
+    void affect(Folio folio) {
+        final Stylesheet style;
+        final RenderSettings settings;
+
         this.folio = folio;
+
+        /*
+         * Now reconfigure the renderer if necessary. TODO this needs to move
+         * even earlier, to load time, and or settings change UI. That would
+         * imply it's carried in Folio, though which would be WRONG.
+         */
+
+        style = folio.getStylesheet();
+        if (this.configuredStyle == style) {
+            return;
+        }
+
+        try {
+            settings = new RenderSettings(style);
+        } catch (RendererNotFoundException rnfe) {
+            // FIXME this has to be handled, but NOT here. Hm.
+            throw new Error(rnfe);
+        } catch (UnsupportedValueException uve) {
+            // FIXME this has to be handled, but NOT here. Hm.
+            throw new Error(uve);
+        }
+        this.configuredStyle = style;
+
+        engine = RenderEngine.createRenderer(settings);
     }
 }
