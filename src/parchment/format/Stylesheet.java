@@ -42,14 +42,21 @@ public class Stylesheet
 
     private final String paperSize;
 
-    private final double marginTop;
+    /**
+     * Margins are in milimeters
+     */
+    private final String marginTop;
 
-    private final double marginLeft;
+    private final String marginLeft;
 
-    private final double marginRight;
+    private final String marginRight;
 
-    private final double marginBottom;
+    private final String marginBottom;
 
+    /**
+     * Font sizes are in "points", not that it really means anything, as
+     * rendered height depends on the surface's DPI.
+     */
     private final String fontSerif;
 
     private final String fontSans;
@@ -61,18 +68,15 @@ public class Stylesheet
     /**
      * Construct a blank ("default") Stylesheet.
      */
-    /*
-     * 2 cm = 56.67 pt
-     */
-    Stylesheet() {
-        this.rendererClass = "parchment.render.RenderEngine";
+    public Stylesheet() {
+        this.rendererClass = "parchment.render.ReportRenderEngine";
 
         this.paperSize = "A4";
 
-        this.marginTop = 40.0;
-        this.marginLeft = 56.67;
-        this.marginRight = 45.0;
-        this.marginBottom = 30.0;
+        this.marginTop = "15.0";
+        this.marginLeft = "20.0";
+        this.marginRight = "12.5";
+        this.marginBottom = "10.0";
 
         this.fontSerif = "Linux Libertine, 9.0";
         this.fontSans = "Liberation Sans, 8.0";
@@ -88,19 +92,19 @@ public class Stylesheet
         return this.paperSize;
     }
 
-    public double getMarginTop() {
+    public String getMarginTop() {
         return marginTop;
     }
 
-    public double getMarginLeft() {
+    public String getMarginLeft() {
         return this.marginLeft;
     }
 
-    public double getMarginRight() {
+    public String getMarginRight() {
         return this.marginRight;
     }
 
-    public double getMarginBottom() {
+    public String getMarginBottom() {
         return this.marginBottom;
     }
 
