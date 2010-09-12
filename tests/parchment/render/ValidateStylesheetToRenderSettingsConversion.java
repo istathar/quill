@@ -64,33 +64,32 @@ public class ValidateStylesheetToRenderSettingsConversion extends GraphicalTestC
         style = new Stylesheet();
         settings = new RenderSettings(style);
 
-        assertEquals(parchment.render.ReportRenderEngine.class, settings.type);
-        assertEquals(PaperSize.A4, settings.paper);
+        assertEquals(PaperSize.A4, settings.getPaper());
 
-        assertEquals(42.52, settings.marginTop, 0.01);
-        assertEquals(56.69, settings.marginLeft, 0.01);
-        assertEquals(35.43, settings.marginRight, 0.01);
-        assertEquals(28.35, settings.marginBottom, 0.01);
+        assertEquals(42.52, settings.getMarginTop(), 0.01);
+        assertEquals(56.69, settings.getMarginLeft(), 0.01);
+        assertEquals(35.43, settings.getMarginRight(), 0.01);
+        assertEquals(28.35, settings.getMarginBottom(), 0.01);
 
-        assertEquals("Linux Libertine", settings.fontSerif.getFamily());
-        assertEquals(9.0, settings.fontSerif.getSize(), 0.01);
-        assertEquals(Style.NORMAL, settings.fontSerif.getStyle());
-        assertEquals(Weight.NORMAL, settings.fontSerif.getWeight());
+        assertEquals("Linux Libertine", settings.getFontSerif().getFamily());
+        assertEquals(9.0, settings.getFontSerif().getSize(), 0.01);
+        assertEquals(Style.NORMAL, settings.getFontSerif().getStyle());
+        assertEquals(Weight.NORMAL, settings.getFontSerif().getWeight());
 
-        assertEquals("Liberation Sans", settings.fontSans.getFamily());
-        assertEquals(8.0, settings.fontSans.getSize(), 0.01);
-        assertEquals(Style.NORMAL, settings.fontSans.getStyle());
-        assertEquals(Weight.NORMAL, settings.fontSans.getWeight());
+        assertEquals("Liberation Sans", settings.getFontSans().getFamily());
+        assertEquals(8.0, settings.getFontSans().getSize(), 0.01);
+        assertEquals(Style.NORMAL, settings.getFontSans().getStyle());
+        assertEquals(Weight.NORMAL, settings.getFontSans().getWeight());
 
-        assertEquals("Inconsolata", settings.fontMono.getFamily());
-        assertEquals(8.1, settings.fontMono.getSize(), 0.01);
-        assertEquals(Style.NORMAL, settings.fontMono.getStyle());
-        assertEquals(Weight.NORMAL, settings.fontMono.getWeight());
+        assertEquals("Inconsolata", settings.getFontMono().getFamily());
+        assertEquals(8.1, settings.getFontMono().getSize(), 0.01);
+        assertEquals(Style.NORMAL, settings.getFontMono().getStyle());
+        assertEquals(Weight.NORMAL, settings.getFontMono().getWeight());
 
-        assertEquals("Linux Libertine O C", settings.fontHeading.getFamily());
-        assertEquals(0.0, settings.fontHeading.getSize(), 0.01); // hm
-        assertEquals(Style.NORMAL, settings.fontHeading.getStyle());
-        assertEquals(Weight.NORMAL, settings.fontHeading.getWeight());
+        assertEquals("Linux Libertine O C", settings.getFontHeading().getFamily());
+        assertEquals(0.0, settings.getFontHeading().getSize(), 0.01); // hm
+        assertEquals(Style.NORMAL, settings.getFontHeading().getStyle());
+        assertEquals(Weight.NORMAL, settings.getFontHeading().getWeight());
 
     }
 }

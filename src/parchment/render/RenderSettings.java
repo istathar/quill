@@ -21,7 +21,6 @@ package parchment.render;
 import org.gnome.gtk.PaperSize;
 import org.gnome.pango.FontDescription;
 
-import parchment.format.RendererNotFoundException;
 import parchment.format.Stylesheet;
 import parchment.format.UnsupportedValueException;
 
@@ -33,9 +32,8 @@ import parchment.format.UnsupportedValueException;
  * @author Andrew Cowie
  */
 // immutable, not that it really matters.
-public class RenderSettings
+class RenderSettings
 {
-    private final Class<? extends RenderEngine> type;
 
     private final PaperSize paper;
 
@@ -58,13 +56,9 @@ public class RenderSettings
     /**
      * Given a Stylesheet state, parse and process it into Java objects.
      */
-    public RenderSettings(final Stylesheet style) throws RendererNotFoundException,
-            UnsupportedValueException {
-        final String renderer, size, serif, sans, mono, heading;
+    RenderSettings(final Stylesheet style) throws UnsupportedValueException {
+        final String size, serif, sans, mono, heading;
         final String top, left, right, bottom;
-
-        renderer = style.getRendererClass();
-        this.type = loadRenderEngine(renderer);
 
         size = style.getPaperSize();
         this.paper = loadPaperType(size);
@@ -92,16 +86,6 @@ public class RenderSettings
 
         heading = style.getFontHeading();
         this.fontHeading = loadDescription(heading);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Class<? extends RenderEngine> loadRenderEngine(String renderer)
-            throws RendererNotFoundException {
-        try {
-            return (Class<? extends RenderEngine>) Class.forName(renderer);
-        } catch (ClassNotFoundException e) {
-            throw new RendererNotFoundException(renderer);
-        }
     }
 
     private static PaperSize loadPaperType(String size) throws UnsupportedValueException {
@@ -148,43 +132,39 @@ public class RenderSettings
         return new FontDescription(description);
     }
 
-    public Class<? extends RenderEngine> getRendererClass() {
-        return this.type;
-    }
-
-    public PaperSize getPaper() {
+    PaperSize getPaper() {
         return this.paper;
     }
 
-    public double getMarginTop() {
+    double getMarginTop() {
         return this.marginTop;
     }
 
-    public double getMarginLeft() {
+    double getMarginLeft() {
         return this.marginLeft;
     }
 
-    public double getMarginRight() {
+    double getMarginRight() {
         return this.marginRight;
     }
 
-    public double getMarginBottom() {
+    double getMarginBottom() {
         return this.marginBottom;
     }
 
-    public FontDescription getFontSerif() {
+    FontDescription getFontSerif() {
         return this.fontSerif;
     }
 
-    public FontDescription getFontSans() {
+    FontDescription getFontSans() {
         return this.fontSans;
     }
 
-    public FontDescription getFontMono() {
+    FontDescription getFontMono() {
         return this.fontMono;
     }
 
-    public FontDescription getFontHeading() {
+    FontDescription getFontHeading() {
         return this.fontHeading;
     }
 }

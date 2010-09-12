@@ -25,11 +25,9 @@ import org.gnome.gtk.Allocation;
 import org.gnome.gtk.DrawingArea;
 import org.gnome.gtk.Widget;
 
-import parchment.format.RendererNotFoundException;
 import parchment.format.Stylesheet;
-import parchment.format.UnsupportedValueException;
 import parchment.render.RenderEngine;
-import parchment.render.RenderSettings;
+import quill.client.ApplicationException;
 import quill.textbase.Folio;
 import quill.textbase.Origin;
 
@@ -43,11 +41,10 @@ import quill.textbase.Origin;
  * @author Andrew Cowie
  */
 /*
- * TODO This is mostly a demonstrator at this point; we have yet to implement
- * the mechanism for communicating where the current editor point is. We also
- * have to define what the tracking behaviour is. Follow the cursor? Only when
- * F2 is pressed? PgUp/PgDown with PreviewWidget focused?
- * 
+ * TODO We have to define what the tracking behaviour is. Follow the cursor?
+ * Only when F2 is pressed? PgUp/PgDown with PreviewWidget focused?
+ */
+/*
  * FUTURE Also, one really nifty idea is that we could use the PreviewWidget
  * for navigation, ie, click on the area of a Segment as rendered and be taken
  * to the editor for that Segment! That will imply maintaining a table of
@@ -75,7 +72,11 @@ class PreviewWidget extends DrawingArea
 
     private RenderEngine engine;
 
-    private Stylesheet configuredStyle;
+    /**
+     * The Stylesheet that we have configured; so long as this is unchanged we
+     * can resuse the RenderEngine instance.
+     */
+    private Stylesheet style;
 
     PreviewWidget(PrimaryWindow window) {
         super();
@@ -191,32 +192,24 @@ class PreviewWidget extends DrawingArea
      */
     void affect(Folio folio) {
         final Stylesheet style;
-        final RenderSettings settings;
 
         this.folio = folio;
 
         /*
-         * Now reconfigure the renderer if necessary. TODO this needs to move
-         * even earlier, to load time, and or settings change UI. That would
-         * imply it's carried in Folio, though which would be WRONG.
+         * Now reconfigure the renderer if necessary.
          */
 
         style = folio.getStylesheet();
-        if (this.configuredStyle == style) {
+        if (this.style == style) {
             return;
         }
 
         try {
-            settings = new RenderSettings(style);
-        } catch (RendererNotFoundException rnfe) {
+            engine = RenderEngine.createRenderer(style);
+        } catch (ApplicationException rnfe) {
             // FIXME this has to be handled, but NOT here. Hm.
             throw new Error(rnfe);
-        } catch (UnsupportedValueException uve) {
-            // FIXME this has to be handled, but NOT here. Hm.
-            throw new Error(uve);
         }
-        this.configuredStyle = style;
-
-        engine = RenderEngine.createRenderer(settings);
+        this.style = style;
     }
 }

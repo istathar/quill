@@ -43,9 +43,7 @@ import org.gnome.gtk.InfoMessageDialog;
 import org.gnome.gtk.MessageDialog;
 import org.gnome.gtk.MessageType;
 import org.gnome.gtk.Notebook;
-import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.ResponseType;
-import org.gnome.gtk.Unit;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
@@ -54,7 +52,6 @@ import org.gnome.pango.FontDescription;
 import parchment.format.Manuscript;
 import parchment.format.Stylesheet;
 import parchment.render.RenderEngine;
-import parchment.render.RenderSettings;
 import quill.client.ApplicationException;
 import quill.client.ImproperFilenameException;
 import quill.client.Quill;
@@ -793,23 +790,16 @@ class PrimaryWindow extends Window
      * Cause the document to be printed.
      */
     /*
-     * Passing a target filename in from here is either correct, or should be
-     * sourced from the DataLayer. The code driving the renderer probably
-     * shouldn't be here. Should it be in RenderEngine instead? Improving this
-     * will also have to wait on our establishing a proper abstraction for
-     * documents as a whole, containing settings relating to publishing. This
-     * code copied from what is presently our command line driven
-     * RenderToPrintHarness.
+     * The code driving the renderer probably shouldn't be here.
      */
     void printDocument() {
         final String parentdir, fullname, basename, targetname;
         MessageDialog dialog;
         final Context cr;
         final Surface surface;
-        final PaperSize paper;
         final Stylesheet style;
-        final RenderSettings settings;
         final RenderEngine engine;
+        final double width, height;
 
         try {
             fullname = manuscript.getFilename();
@@ -828,19 +818,28 @@ class PrimaryWindow extends Window
              * instantiate the Cairo Surface we're going to be drawing to with
              * that basename.pdf as the target.
              */
+
             parentdir = manuscript.getDirectory();
             basename = manuscript.getBasename();
             targetname = parentdir + "/" + basename + ".pdf";
 
-            style = folio.getStylesheet();
-            settings = new RenderSettings(style);
-            paper = settings.getPaper();
-            surface = new PdfSurface(targetname, paper.getWidth(Unit.POINTS),
-                    paper.getHeight(Unit.POINTS));
-            cr = new Context(surface);
+            /*
+             * Setup the renderer
+             */
 
-            engine = RenderEngine.createRenderer(settings);
+            style = folio.getStylesheet();
+            engine = RenderEngine.createRenderer(style);
+
+            width = engine.getPageWidth();
+            height = engine.getPageHeight();
+            surface = new PdfSurface(targetname, width, height);
+
+            cr = new Context(surface);
             engine.render(cr, folio);
+
+            /*
+             * Flush out the PDF.
+             */
 
             surface.finish();
         } catch (IOException ioe) {

@@ -18,9 +18,15 @@
  */
 package parchment.render;
 
+/**
+ * The reference implementation of a RenderEngine. This is suitable for
+ * reports, manuscripts, just about anything, actually.
+ * 
+ * @author Andrew Cowie
+ */
 public class ReportRenderEngine extends RenderEngine
 {
-    public ReportRenderEngine(RenderSettings settings) {
-        super(settings);
+    public ReportRenderEngine() {
+        super();
     }
 }
