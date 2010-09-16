@@ -165,11 +165,13 @@ public class Manuscript
         final Series series1;
         final Folio folio;
         final Chapter chapter1;
+        final Stylesheet blank;
 
         chapter1 = new Chapter(this);
         series1 = chapter1.createDocument();
+        blank = new Stylesheet();
 
-        folio = new Folio(this, chapter1, series1);
+        folio = new Folio(this, chapter1, series1, blank);
 
         try {
             this.setFilename("Untitled.parchment");

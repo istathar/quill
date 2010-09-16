@@ -21,13 +21,13 @@ package parchment.format;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
-import nu.xom.Attribute;
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Serializer;
+import nu.xom.ParsingException;
+import nu.xom.ValidityException;
 import quill.client.IOTestCase;
+import quill.client.ImproperFilenameException;
+import quill.textbase.Folio;
+import quill.textbase.Series;
 
 /**
  * Evaluate XOM's Serializer to output our <code>&lt;manuscript&gt;</code>
@@ -38,115 +38,48 @@ import quill.client.IOTestCase;
 public class ValidateManuscriptSerializing extends IOTestCase
 {
     /*
-     * Just test the manual code we wrote in the prototype against the
-     * reference example in xml/.
+     * This is currently a round trip test. That's fine, but I'd rather create
+     * something
      */
-    public final void testManualSerializeOut() throws IOException {
+    public final void testSerializeOut() throws IOException, ImproperFilenameException,
+            ValidityException, InvalidDocumentException, ParsingException {
         String filename, reference, exercise;
         FileOutputStream out;
         File dir;
+        Manuscript manuscript;
+        Chapter chapter;
+        Series series;
+        Folio folio;
+        Stylesheet style;
+        ManuscriptConverter converter;
 
         dir = new File("tmp/unittests/parchment/format/");
 
         if (!dir.exists() && (!dir.isDirectory())) {
             dir.mkdirs();
         }
-        filename = "tmp/unittests/parchment/format/ValidateManuscriptSerializing.xml";
-
+        filename = "tmp/unittests/parchment/format/ValidateManuscriptSerializing.parchment";
         out = new FileOutputStream(filename);
-        serialize(out);
+
+        manuscript = new Manuscript();
+        folio = manuscript.createDocument();
+
+        chapter = folio.getChapter(0);
+        series = folio.getSeries(0);
+        style = new Stylesheet("parchment.render.ReportRenderEngine", "A4", "15.0", "20.0", "12.5",
+                "10.0", "Linux Libertine, 9.0", "Liberation Sans, 8.0", "Inconsolata, 8.1",
+                "Linux Libertine O C");
+
+        folio = new Folio(manuscript, chapter, series, style);
+
+        converter = new ManuscriptConverter(folio);
+        converter.writeManuscript(out);
+
         out.close();
 
         exercise = loadFileIntoString(filename);
-        reference = loadFileIntoString("xml/Example.parchment");
+        reference = loadFileIntoString("tests/parchment/format/ValidateManuscriptSerializing.parchment");
 
         assertEquals(reference, exercise);
-    }
-
-    /*
-     * This will be moved into a real tree builder, obviously.
-     */
-    private static void serialize(OutputStream out) throws IOException {
-        final Document document;
-        final Element manuscript, content, presentation;
-        final Element renderer, paper, margins;
-        Element chapter, font;
-        Attribute attribute;
-        final Serializer serializer;
-
-        manuscript = new ParchmentElement("manuscript");
-
-        content = new ParchmentElement("content");
-        presentation = new ParchmentElement("presentation");
-
-        chapter = new ParchmentElement("chapter");
-        attribute = new Attribute("src", "Introduction.xml");
-        chapter.addAttribute(attribute);
-        content.appendChild(chapter);
-
-        chapter = new ParchmentElement("chapter");
-        attribute = new Attribute("src", "Final Everywhere.xml");
-        chapter.addAttribute(attribute);
-        content.appendChild(chapter);
-
-        manuscript.appendChild(content);
-
-        renderer = new ParchmentElement("renderer");
-        attribute = new Attribute("class", "com.operationaldynamics.parchment.ReportRenderEngine");
-        renderer.addAttribute(attribute);
-        presentation.appendChild(renderer);
-
-        paper = new ParchmentElement("paper");
-        attribute = new Attribute("size", "A4");
-        paper.addAttribute(attribute);
-        presentation.appendChild(paper);
-
-        margins = new ParchmentElement("margins");
-        attribute = new Attribute("top", "10.00");
-        margins.addAttribute(attribute);
-        attribute = new Attribute("left", "57.75");
-        margins.addAttribute(attribute);
-        attribute = new Attribute("right", "25.00");
-        margins.addAttribute(attribute);
-        attribute = new Attribute("bottom", "10.00");
-        margins.addAttribute(attribute);
-        presentation.appendChild(margins);
-
-        font = new ParchmentElement("font");
-        attribute = new Attribute("serif", "Linux Libertine, 9.0");
-        font.addAttribute(attribute);
-        presentation.appendChild(font);
-
-        font = new ParchmentElement("font");
-        attribute = new Attribute("sans", "Liberation Sans, 8.0");
-        font.addAttribute(attribute);
-        presentation.appendChild(font);
-
-        font = new ParchmentElement("font");
-        attribute = new Attribute("mono", "Inconsolata, 8.1");
-        font.addAttribute(attribute);
-        presentation.appendChild(font);
-
-        font = new ParchmentElement("font");
-        attribute = new Attribute("heading", "Linux Libertine O C");
-        font.addAttribute(attribute);
-        presentation.appendChild(font);
-
-        manuscript.appendChild(presentation);
-
-        document = new Document(manuscript);
-
-        serializer = new Serializer(out);
-        serializer.setIndent(2);
-        serializer.setLineSeparator("\n");
-        serializer.setMaxLength(0);
-        serializer.write(document);
-    }
-}
-
-class ParchmentElement extends Element
-{
-    ParchmentElement(String name) {
-        super(name, "http://namespace.operationaldynamics.com/parchment/0.2");
     }
 }

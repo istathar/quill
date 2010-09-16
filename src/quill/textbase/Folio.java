@@ -64,7 +64,7 @@ public class Folio
      * Create a Folio with a single [presumably nigh-on-empty] component as
      * its body.
      */
-    public Folio(Manuscript manuscript, Chapter chapter, Series component) {
+    public Folio(Manuscript manuscript, Chapter chapter, Series component, Stylesheet style) {
         this.manuscript = manuscript;
         this.chapters = new Chapter[] {
             chapter
@@ -73,7 +73,7 @@ public class Folio
             component
         };
         this.updated = -1;
-        this.style = new Stylesheet(); // FIXME
+        this.style = style;
     }
 
     /**
