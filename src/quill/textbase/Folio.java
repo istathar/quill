@@ -79,7 +79,7 @@ public class Folio
     /**
      * Create a Folio with a list of components to be used as the body.
      */
-    public Folio(Manuscript manuscript, List<Chapter> chapters, List<Series> components) {
+    public Folio(Manuscript manuscript, List<Chapter> chapters, List<Series> components, Stylesheet style) {
         final int num;
         final Chapter[] c;
         final Series[] s;
@@ -97,7 +97,7 @@ public class Folio
         s = new Series[num];
         this.components = components.toArray(s);
         this.updated = -1;
-        this.style = new Stylesheet(); // FIXME
+        this.style = style;
     }
 
     private Folio(Manuscript manuscript, Chapter[] chapters, Series[] components, int updated,

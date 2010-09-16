@@ -84,6 +84,25 @@ public class Stylesheet
         this.fontHeading = "Linux Libertine O C";
     }
 
+    /**
+     * Build a new Stylesheet. Used when loading!
+     */
+    public Stylesheet(String rendererClass, String paperSize, String marginTop, String marginLeft,
+            String marginRight, String marginBottom, String fontSerif, String fontSans, String fontMono,
+            String fontHeading) {
+        super();
+        this.rendererClass = rendererClass;
+        this.paperSize = paperSize;
+        this.marginTop = marginTop;
+        this.marginLeft = marginLeft;
+        this.marginRight = marginRight;
+        this.marginBottom = marginBottom;
+        this.fontSerif = fontSerif;
+        this.fontSans = fontSans;
+        this.fontMono = fontMono;
+        this.fontHeading = fontHeading;
+    }
+
     public String getRendererClass() {
         return rendererClass;
     }

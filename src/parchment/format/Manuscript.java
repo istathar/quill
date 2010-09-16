@@ -30,7 +30,6 @@ import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import parchment.render.RenderEngine;
 import quill.client.ImproperFilenameException;
 import quill.client.RecoveryFileExistsException;
 import quill.textbase.Folio;
@@ -56,8 +55,6 @@ public class Manuscript
     private String basename;
 
     private String filename;
-
-    private Class<RenderEngine> engine;
 
     /**
      * Create a new Manuscript intermediary.
@@ -93,6 +90,7 @@ public class Manuscript
         Chapter chapter;
         final List<Series> components;
         final List<Chapter> chapters;
+        final Stylesheet style;
         final Folio folio;
 
         components = new ArrayList<Series>();
@@ -133,7 +131,8 @@ public class Manuscript
             components.add(series);
         }
 
-        folio = new Folio(this, chapters, components);
+        style = loader.getPresentationStylesheet();
+        folio = new Folio(this, chapters, components, style);
         return folio;
     }
 
