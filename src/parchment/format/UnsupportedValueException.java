@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -16,17 +16,22 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package parchment.render;
+package parchment.format;
+
+import quill.client.ApplicationException;
 
 /**
- * The reference implementation of a RenderEngine. This is suitable for
- * reports, manuscripts, just about anything, actually.
+ * Something in the loaded data is invalid.
+ * 
+ * This was originally written to support illegal paper sizes.
  * 
  * @author Andrew Cowie
  */
-public class ReportRenderEngine extends RenderEngine
+@SuppressWarnings("serial")
+public class UnsupportedValueException extends ApplicationException
 {
-    public ReportRenderEngine() {
-        super();
+    public UnsupportedValueException(String value) {
+        super(value);
     }
+
 }

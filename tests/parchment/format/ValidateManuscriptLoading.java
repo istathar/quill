@@ -139,7 +139,7 @@ public class ValidateManuscriptLoading extends IOTestCase
         name = attribute.getLocalName();
         assertEquals("class", name);
         value = attribute.getValue();
-        assertEquals("com.operationaldynamics.parchment.ReportRenderEngine", value);
+        assertEquals("parchment.render.ReportRenderEngine", value);
 
         /*
          * Check <paper> element
@@ -166,7 +166,7 @@ public class ValidateManuscriptLoading extends IOTestCase
         };
 
         widths = new String[] {
-                "10.00", "57.75", "25.00", "10.00"
+                "15.0", "20.0", "12.5", "10.0"
         };
 
         margins = elements.get(2);
@@ -188,12 +188,12 @@ public class ValidateManuscriptLoading extends IOTestCase
          */
 
         faces = new String[] {
-                "sans", "serif", "mono", "heading"
+                "serif", "sans", "mono", "heading"
         };
 
         desc = new String[] {
-                "Liberation Sans, 8.0",
                 "Linux Libertine, 9.0",
+                "Liberation Sans, 8.0",
                 "Inconsolata, 8.1",
                 "Linux Libertine O C"
         };

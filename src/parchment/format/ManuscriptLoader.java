@@ -36,6 +36,8 @@ class ManuscriptLoader
 {
     private String[] chapterSources;
 
+    private Stylesheet presentationStyle;
+
     ManuscriptLoader(Document document) throws InvalidDocumentException {
         final Element root;
 
@@ -98,12 +100,12 @@ class ManuscriptLoader
                                 + "> which is invalid");
             }
 
-            src = getValue(chapter, "src");
+            src = getContentValue(chapter, "src");
             chapterSources[i] = src;
         }
     }
 
-    private static String getValue(Element element, String name) throws InvalidDocumentException {
+    private static String getContentValue(Element element, String name) throws InvalidDocumentException {
         final Attribute a;
 
         a = element.getAttribute(name);
@@ -116,13 +118,58 @@ class ManuscriptLoader
         return a.getValue();
     }
 
-    private void processPresentation(Element presentation) {
-    // TODO Auto-generated method stub
+    private void processPresentation(final Element presentation) throws InvalidDocumentException {
+        final Elements children;
+        final String rendererClass, paperSize, marginsTop, marginsLeft, marginsRight, marginsBottom, fontSerif, fontSans, fontMono, fontHeading;
 
+        children = presentation.getChildElements();
+
+        rendererClass = getPresentationValue(children, 0, "renderer", "class");
+
+        paperSize = getPresentationValue(children, 1, "paper", "size");
+
+        marginsTop = getPresentationValue(children, 2, "margins", "top");
+        marginsLeft = getPresentationValue(children, 2, "margins", "left");
+        marginsRight = getPresentationValue(children, 2, "margins", "right");
+        marginsBottom = getPresentationValue(children, 2, "margins", "bottom");
+
+        fontSerif = getPresentationValue(children, 3, "font", "serif");
+        fontSans = getPresentationValue(children, 4, "font", "sans");
+        fontMono = getPresentationValue(children, 5, "font", "mono");
+        fontHeading = getPresentationValue(children, 6, "font", "heading");
+
+        presentationStyle = new Stylesheet(rendererClass, paperSize, marginsTop, marginsLeft,
+                marginsRight, marginsBottom, fontSerif, fontSans, fontMono, fontHeading);
+    }
+
+    private static String getPresentationValue(final Elements children, final int index,
+            final String requestedElementName, final String requestedAttributeName)
+            throws InvalidDocumentException {
+        final Element element;
+        final String localElementName;
+        final Attribute a;
+
+        element = children.get(index);
+        localElementName = element.getLocalName();
+        if (!localElementName.equals(requestedElementName)) {
+            throw new InvalidDocumentException("The #" + index + "element of <presentation> must be <"
+                    + requestedElementName + ">, not <" + localElementName + ">");
+        }
+
+        a = element.getAttribute(requestedAttributeName);
+        if (a == null) {
+            throw new InvalidDocumentException("Looked for attribute \"" + requestedAttributeName
+                    + "\" in <" + localElementName + "> but not found");
+        }
+
+        return a.getValue();
     }
 
     String[] getChapterSources() {
         return chapterSources;
     }
 
+    Stylesheet getPresentationStylesheet() {
+        return presentationStyle;
+    }
 }

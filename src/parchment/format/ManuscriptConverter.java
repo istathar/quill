@@ -45,7 +45,7 @@ class ManuscriptConverter
     public ManuscriptConverter(final Folio folio) {
         initialStructure();
         buildContent(folio);
-        buildPresentation();
+        buildPresentation(folio);
     }
 
     private void initialStructure() {
@@ -78,49 +78,67 @@ class ManuscriptConverter
         }
     }
 
-    // HARDCODE
-    private void buildPresentation() {
+    /**
+     * A goodly chunk of the point of this is to enforce a consistent element
+     * order. Nothing worse than spurious diffs just because the runtime
+     * changed its sorting on output.
+     */
+    private void buildPresentation(final Folio folio) {
+        final Stylesheet style;
         ManuscriptElement renderer, paper, margins, font;
         Attribute attribute;
+        String value;
+
+        style = folio.getStylesheet();
 
         renderer = new ManuscriptElement("renderer");
-        attribute = new Attribute("class", "com.operationaldynamics.parchment.ReportRenderEngine");
+        value = style.getRendererClass();
+        attribute = new Attribute("class", value);
         renderer.addAttribute(attribute);
         presentation.appendChild(renderer);
 
         paper = new ManuscriptElement("paper");
-        attribute = new Attribute("size", "A4");
+        value = style.getPaperSize();
+        attribute = new Attribute("size", value);
         paper.addAttribute(attribute);
         presentation.appendChild(paper);
 
         margins = new ManuscriptElement("margins");
-        attribute = new Attribute("top", "10.00");
+        value = style.getMarginTop();
+        attribute = new Attribute("top", value);
         margins.addAttribute(attribute);
-        attribute = new Attribute("left", "57.75");
+        value = style.getMarginLeft();
+        attribute = new Attribute("left", value);
         margins.addAttribute(attribute);
-        attribute = new Attribute("right", "25.00");
+        value = style.getMarginRight();
+        attribute = new Attribute("right", value);
         margins.addAttribute(attribute);
-        attribute = new Attribute("bottom", "10.00");
+        value = style.getMarginBottom();
+        attribute = new Attribute("bottom", value);
         margins.addAttribute(attribute);
         presentation.appendChild(margins);
 
         font = new ManuscriptElement("font");
-        attribute = new Attribute("sans", "Liberation Sans, 8.0");
+        value = style.getFontSerif();
+        attribute = new Attribute("serif", value);
         font.addAttribute(attribute);
         presentation.appendChild(font);
 
         font = new ManuscriptElement("font");
-        attribute = new Attribute("serif", "Linux Libertine, 9.0");
+        value = style.getFontSans();
+        attribute = new Attribute("sans", value);
         font.addAttribute(attribute);
         presentation.appendChild(font);
 
         font = new ManuscriptElement("font");
-        attribute = new Attribute("mono", "Inconsolata, 8.1");
+        value = style.getFontMono();
+        attribute = new Attribute("mono", value);
         font.addAttribute(attribute);
         presentation.appendChild(font);
 
         font = new ManuscriptElement("font");
-        attribute = new Attribute("heading", "Linux Libertine O C");
+        value = style.getFontHeading();
+        attribute = new Attribute("heading", value);
         font.addAttribute(attribute);
         presentation.appendChild(font);
     }

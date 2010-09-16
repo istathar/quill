@@ -23,12 +23,11 @@ import org.freedesktop.cairo.Matrix;
 import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.DrawingArea;
-import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.Widget;
 
-import parchment.format.Manuscript;
+import parchment.format.Stylesheet;
 import parchment.render.RenderEngine;
-import parchment.render.ReportRenderEngine;
+import quill.client.ApplicationException;
 import quill.textbase.Folio;
 import quill.textbase.Origin;
 
@@ -42,11 +41,10 @@ import quill.textbase.Origin;
  * @author Andrew Cowie
  */
 /*
- * TODO This is mostly a demonstrator at this point; we have yet to implement
- * the mechanism for communicating where the current editor point is. We also
- * have to define what the tracking behaviour is. Follow the cursor? Only when
- * F2 is pressed? PgUp/PgDown with PreviewWidget focused?
- * 
+ * TODO We have to define what the tracking behaviour is. Follow the cursor?
+ * Only when F2 is pressed? PgUp/PgDown with PreviewWidget focused?
+ */
+/*
  * FUTURE Also, one really nifty idea is that we could use the PreviewWidget
  * for navigation, ie, click on the area of a Segment as rendered and be taken
  * to the editor for that Segment! That will imply maintaining a table of
@@ -65,8 +63,6 @@ class PreviewWidget extends DrawingArea
 
     private int pixelHeight;
 
-    private Manuscript manuscript;
-
     private Folio folio;
 
     /**
@@ -74,22 +70,22 @@ class PreviewWidget extends DrawingArea
      */
     private PrimaryWindow primary;
 
+    private RenderEngine engine;
+
+    /**
+     * The Stylesheet that we have configured; so long as this is unchanged we
+     * can resuse the RenderEngine instance.
+     */
+    private Stylesheet style;
+
     PreviewWidget(PrimaryWindow window) {
         super();
         this.primary = window;
 
         this.connect(new Widget.ExposeEvent() {
             public boolean onExposeEvent(Widget source, EventExpose event) {
-                final PaperSize paper;
-                final RenderEngine engine;
                 final Context cr;
                 final Origin cursor;
-
-                // paper = new CustomPaperSize("Widescreen", 400, 300,
-                // Unit.MM);
-                paper = PaperSize.A4;
-
-                engine = new ReportRenderEngine(paper, manuscript, folio);
 
                 cr = new Context(event);
 
@@ -98,7 +94,7 @@ class PreviewWidget extends DrawingArea
                 drawCrosshairs(cr, engine);
 
                 cursor = primary.getCursor();
-                engine.render(cr, cursor);
+                engine.render(cr, folio, cursor);
 
                 return true;
             }
@@ -194,8 +190,26 @@ class PreviewWidget extends DrawingArea
      * Given a Series in a Manuscript representing the Segments in a chapter
      * or article, instruct this Widget to render a preview of them.
      */
-    void affect(Manuscript manuscript, Folio folio) {
-        this.manuscript = manuscript;
+    void affect(Folio folio) {
+        final Stylesheet style;
+
         this.folio = folio;
+
+        /*
+         * Now reconfigure the renderer if necessary.
+         */
+
+        style = folio.getStylesheet();
+        if (this.style == style) {
+            return;
+        }
+
+        try {
+            engine = RenderEngine.createRenderer(style);
+        } catch (ApplicationException rnfe) {
+            // FIXME this has to be handled, but NOT here. Hm.
+            throw new Error(rnfe);
+        }
+        this.style = style;
     }
 }

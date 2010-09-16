@@ -19,6 +19,7 @@
 package parchment.render;
 
 import java.io.FileNotFoundException;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -46,6 +47,10 @@ import org.gnome.pango.WeightAttribute;
 import org.gnome.pango.WrapMode;
 
 import parchment.format.Manuscript;
+import parchment.format.RendererNotFoundException;
+import parchment.format.Stylesheet;
+import parchment.format.UnsupportedValueException;
+import quill.client.ApplicationException;
 import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
@@ -83,6 +88,8 @@ import static quill.textbase.Span.createSpan;
  */
 public abstract class RenderEngine
 {
+    private RenderSettings settings;
+
     private double pageWidth;
 
     private double pageHeight;
@@ -98,8 +105,6 @@ public abstract class RenderEngine
     private double footerHeight;
 
     private Folio folio;
-
-    private Manuscript manuscript;
 
     Typeface sansFace;
 
@@ -140,15 +145,35 @@ public abstract class RenderEngine
      */
     private int currentOffset;
 
+    private Stylesheet style;
+
     /**
-     * Construct a new RenderEngine. Call {@link #render(Context) render()} to
-     * actually draw. Pass in the document being rendered (the target file
-     * will be derived from this) and the current document state root.
+     * Construct a new RenderEngine. Call {@link #configure(Stylesheet)
+     * configure()} with a Stylesheet to setup, then {@link #render(Context)
+     * render()} to actually draw. A RenderEngine is resuable so long as the
+     * Stylesheet doesn't change.
      */
-    protected RenderEngine(final PaperSize paper, final Manuscript manuscript, final Folio folio) {
-        specifySize(paper);
-        this.manuscript = manuscript;
-        this.folio = folio;
+    protected RenderEngine() {}
+
+    private void configure(Stylesheet style) throws UnsupportedValueException {
+        final PaperSize paper;
+
+        this.style = style;
+
+        settings = new RenderSettings(style);
+
+        paper = settings.getPaper();
+        pageWidth = paper.getWidth(Unit.POINTS);
+        pageHeight = paper.getHeight(Unit.POINTS);
+
+        topMargin = settings.getMarginTop();
+        bottomMargin = settings.getMarginBottom();
+        leftMargin = settings.getMarginLeft();
+        rightMargin = settings.getMarginRight();
+    }
+
+    public RenderSettings getRenderSettings() {
+        return settings;
     }
 
     /**
@@ -156,10 +181,11 @@ public abstract class RenderEngine
      * that the target Surface either a) has the size as the PaperSize passed
      * to the constructor, or b) has been scaled to that size.
      */
-    public void render(final Context cr) {
+    public void render(final Context cr, final Folio folio) {
         if (folio == null) {
             return;
         }
+        this.folio = folio;
 
         synchronized (this) {
             specifyFonts(cr);
@@ -173,10 +199,11 @@ public abstract class RenderEngine
      * TODO needs to act to prepare and flow, caching the result so that
      * subsequent calls here don't re-do everything.
      */
-    public void render(Context cr, int pageNum) {
+    public void render(final Context cr, final Folio folio, final int pageNum) {
         if (folio == null) {
             return;
         }
+        this.folio = folio;
 
         synchronized (this) {
             specifyFonts(cr);
@@ -186,10 +213,12 @@ public abstract class RenderEngine
         }
     }
 
-    public void render(Context cr, Origin cursor) {
+    public void render(Context cr, Folio folio, Origin cursor) {
         if (folio == null) {
             return;
         }
+        this.folio = folio;
+
         if (cursor == null) {
             return;
         }
@@ -268,35 +297,19 @@ public abstract class RenderEngine
         surface.finish();
     }
 
-    /*
-     * This will move to the actual RenderEngine subclass, I expect.
-     */
     protected void specifyFonts(final Context cr) {
-        serifFace = new Typeface(cr, new FontDescription("Linux Libertine O, 9.0"), 0.2);
+        serifFace = new Typeface(cr, settings.getFontSerif(), 0.2);
 
-        monoFace = new Typeface(cr, new FontDescription("Inconsolata, 8.3"), 0.0);
+        sansFace = new Typeface(cr, settings.getFontSans(), 0.0);
 
-        sansFace = new Typeface(cr, new FontDescription("Liberation Sans, 7.3"), 0.0);
+        monoFace = new Typeface(cr, settings.getFontMono(), 0.0);
 
-        headingFace = new Typeface(cr, new FontDescription("Linux Libertine O C"), 0.0);
+        headingFace = new Typeface(cr, settings.getFontHeading(), 0.0);
 
         cr.setSource(0.0, 0.0, 0.0);
     }
 
-    /*
-     * 2 cm = 56.67 pt
-     */
-    private void specifySize(final PaperSize paper) {
-        pageWidth = paper.getWidth(Unit.POINTS);
-        pageHeight = paper.getHeight(Unit.POINTS);
-
-        topMargin = 40.0;
-        bottomMargin = 30.0;
-        leftMargin = 56.67;
-        rightMargin = 45.0;
-    }
-
-    public void processSegmentsIntoAreas(final Context cr) {
+    void processSegmentsIntoAreas(final Context cr) {
         int i, j, k;
         Series series;
         Segment segment;
@@ -364,6 +377,9 @@ public abstract class RenderEngine
         }
     }
 
+    /**
+     * @param cr
+     */
     protected void appendBlankLine(Context cr) {
         final Origin origin;
         final Area area;
@@ -376,6 +392,9 @@ public abstract class RenderEngine
         accumulate(area);
     }
 
+    /**
+     * @param cr
+     */
     protected void appendPageBreak(Context cr) {
         final Origin origin;
         final Area area;
@@ -847,26 +866,20 @@ public abstract class RenderEngine
         throw new IllegalArgumentException("\n" + "Translation of " + m + " not yet implemented");
     }
 
-    /**
-     * Given a Series representing the Segments in a chapter or article,
-     * instruct this Widget to render a preview of them.
-     */
-    /*
-     * This will need refinement, obviously, once we start having live preview
-     * and start dealing with multiple pages.
-     */
-    void renderSeries(Series series) {
-
-    }
-
     /*
      * A series of getters for the calculated page dimension properties.
      * FUTURE should this become embedded in a wrapper object?
+     */
+    /**
+     * The page width of the target area, in points.
      */
     public double getPageWidth() {
         return pageWidth;
     }
 
+    /**
+     * The page height of the target area, in points.
+     */
     public double getPageHeight() {
         return pageHeight;
     }
@@ -905,12 +918,14 @@ public abstract class RenderEngine
     }
 
     protected void appendExternalGraphic(final Context cr, final String source) {
+        final Manuscript manuscript;
         final String parent, filename;
         final Pixbuf pixbuf;
         final TextChain chain;
         final Extract extract;
         final Area image;
 
+        manuscript = folio.getManuscript();
         parent = manuscript.getDirectory();
         filename = parent + "/" + source;
 
@@ -969,6 +984,8 @@ public abstract class RenderEngine
 
     /**
      * If the image is wider than the margins it will be scaled down.
+     * 
+     * @param cr
      */
     protected final Area layoutAreaImage(final Context cr, final Pixbuf pixbuf) {
         final double width, height;
@@ -994,5 +1011,36 @@ public abstract class RenderEngine
         origin = new Origin(folioIndex, seriesIndex, 0);
         area = new ImageArea(origin, leftCorner, request, pixbuf, scaleFactor);
         return area;
+    }
+
+    /**
+     * Create an instance of the RenderEngine specified by this presentation
+     * element.
+     */
+    @SuppressWarnings("unchecked")
+    public static RenderEngine createRenderer(final Stylesheet style) throws ApplicationException {
+        final String renderer;
+        final Class<? extends RenderEngine> type;
+        final Constructor<RenderEngine> constructor;
+        final RenderEngine result;
+
+        renderer = style.getRendererClass();
+        try {
+            type = (Class<? extends RenderEngine>) Class.forName(renderer);
+        } catch (ClassNotFoundException e) {
+            throw new RendererNotFoundException(renderer);
+        }
+
+        try {
+            constructor = (Constructor<RenderEngine>) type.getConstructor();
+            result = constructor.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new AssertionError();
+        }
+
+        result.configure(style);
+
+        return result;
     }
 }

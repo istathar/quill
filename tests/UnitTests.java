@@ -26,6 +26,7 @@ import parchment.format.ValidateManuscriptLoading;
 import parchment.format.ValidateManuscriptSerializing;
 import parchment.format.ValidateProperNewlineHandling;
 import parchment.format.ValidateThereAndBackAgain;
+import parchment.render.ValidateStylesheetToRenderSettingsConversion;
 import quill.quack.ValidateCitationConversion;
 import quill.quack.ValidateEndnoteConversion;
 import quill.quack.ValidatePreformattedConversion;
@@ -74,6 +75,7 @@ public class UnitTests
         suite.addTestSuite(ValidateExtracts.class);
         suite.addTestSuite(ValidateOriginOrdering.class);
         suite.addTestSuite(ValidateDocumentModified.class);
+        suite.addTestSuite(ValidateStylesheetToRenderSettingsConversion.class);
         suite.addTestSuite(ValidateManuscriptSerializing.class);
         suite.addTestSuite(ValidateManuscriptLoading.class);
         suite.addTestSuite(ValidateTextChainToChapterConversion.class);

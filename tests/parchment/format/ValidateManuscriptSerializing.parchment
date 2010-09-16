@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manuscript xmlns="http://namespace.operationaldynamics.com/parchment/0.2">
   <content>
-    <chapter src="SomeOfEverything.xml"/>
+    <chapter src="Chapter1.xml"/>
   </content>
   <presentation>
     <renderer class="parchment.render.ReportRenderEngine"/>
     <paper size="A4"/>
-    <margins top="10.00" left="57.75" right="25.00" bottom="10.00"/>
+    <margins top="15.0" left="20.0" right="12.5" bottom="10.0"/>
     <font serif="Linux Libertine, 9.0"/>
     <font sans="Liberation Sans, 8.0"/>
     <font mono="Inconsolata, 8.1"/>

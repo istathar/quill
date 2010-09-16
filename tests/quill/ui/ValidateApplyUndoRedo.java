@@ -21,6 +21,7 @@ package quill.ui;
 import junit.framework.TestCase;
 import parchment.format.Chapter;
 import parchment.format.Manuscript;
+import parchment.format.Stylesheet;
 import quill.textbase.Folio;
 import quill.textbase.Series;
 
@@ -37,10 +38,10 @@ public class ValidateApplyUndoRedo extends TestCase
         final Folio one, two, three, four;
         Folio folio;
 
-        one = new Folio((Manuscript) null, (Chapter) null, (Series) null);
-        two = new Folio((Manuscript) null, (Chapter) null, (Series) null);
-        three = new Folio((Manuscript) null, (Chapter) null, (Series) null);
-        four = new Folio((Manuscript) null, (Chapter) null, (Series) null);
+        one = new Folio((Manuscript) null, (Chapter) null, (Series) null, (Stylesheet) null);
+        two = new Folio((Manuscript) null, (Chapter) null, (Series) null, (Stylesheet) null);
+        three = new Folio((Manuscript) null, (Chapter) null, (Series) null, (Stylesheet) null);
+        four = new Folio((Manuscript) null, (Chapter) null, (Series) null, (Stylesheet) null);
 
         stack = new ChangeStack(one);
         folio = stack.getCurrent();
