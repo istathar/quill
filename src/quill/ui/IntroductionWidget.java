@@ -36,7 +36,8 @@ import org.gnome.gtk.Widget;
 
 /**
  * Introduction widget. Instead of a splash screen, this starts out being
- * displayed by the PrimaryWindow.
+ * displayed by the PrimaryWindow. Mostly this is here to tell you that F1 is
+ * what you need to press for help.
  * 
  * @author Andrew Cowie
  */
@@ -47,7 +48,6 @@ class IntroductionWidget extends VBox
     IntroductionWidget() {
         super(false, 0);
         final Label title, description, help;
-        VBox box;
         Widget bar;
         Label label;
         Alignment align;
@@ -87,7 +87,7 @@ class IntroductionWidget extends VBox
             top.packStart(help, true, false, 0);
 
             bar = new UnderConstruction();
-            top.packStart(bar, true, false, 0);
+            top.packStart(bar, false, false, 0);
 
             label = new Label("<b>Under Construction</b>");
             label.setUseMarkup(true);
@@ -97,20 +97,18 @@ class IntroductionWidget extends VBox
             label = new Label(
                     "This is experimental software and still under heavy development. "
                             + "It is not suitable for general use. Quill and Parchment <i>will</i> crash, and "
-                            + "it <i>will</i> eat your documents (though if possible we attempt to save what you "
-                            + "are doing in \"recovery\" files with a <tt>.RESCUED</tt> extension). The on-disk "
-                            + "format is text based, so we encourage you to store "
+                            + "it <i>will</i> eat your documents, though if possible we attempt to save what you "
+                            + "were doing in \"recovery\" files with a <tt>.RESCUED</tt> extension. The on-disk "
+                            + "format of manuscripts and chapters is text based, so we encourage you to store "
                             + "your documents in Bazaar or another distributed version control system.");
             label.setLineWrap(true);
             label.setUseMarkup(true);
-            label.setWidthChars(60);
-            label.setAlignment(0.5f, 0.0f);
+            label.setWidthChars(70);
+            label.setAlignment(Alignment.CENTER, Alignment.TOP);
             label.setPadding(0, 10);
             label.setJustify(Justification.CENTER);
             top.packStart(label, false, false, 0);
 
-            bar = new UnderConstruction();
-            top.packStart(bar, false, false, 0);
         } catch (URISyntaxException e) {
             e.printStackTrace();
             throw new AssertionError();
@@ -123,12 +121,12 @@ class UnderConstruction extends Alignment
     private final Alignment align;
 
     UnderConstruction() {
-        super(Alignment.CENTER, Alignment.BOTTOM, 1.0f, 0.0f);
+        super(Alignment.CENTER, Alignment.CENTER, 1.0f, 0.0f);
         final DrawingArea drawing;
         align = this;
 
         drawing = new DrawingArea();
-        drawing.setSizeRequest(300, 30);
+        drawing.setSizeRequest(-1, 30);
 
         drawing.connect(new Widget.ExposeEvent() {
             public boolean onExposeEvent(Widget source, EventExpose event) {
