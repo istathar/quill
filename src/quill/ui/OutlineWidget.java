@@ -18,12 +18,9 @@
  */
 package quill.ui;
 
-import java.io.FileNotFoundException;
-
 import org.freedesktop.cairo.Antialias;
 import org.freedesktop.cairo.Context;
 import org.gnome.gdk.EventExpose;
-import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.DrawingArea;
@@ -111,15 +108,9 @@ class OutlineWidget extends ScrolledWindow
                     str.append(entire.getText());
                 } else if (segment instanceof ImageSegment) {
                     Image image;
-                    Pixbuf pixbuf;
                     HBox left;
 
-                    try {
-                        pixbuf = new Pixbuf("share/pixmaps/graphic-16x16.png", -1, 10, true);
-                    } catch (FileNotFoundException e) {
-                        throw new Error(e);
-                    }
-                    image = new Image(pixbuf);
+                    image = new Image(images.graphic);
                     image.setAlignment(Alignment.LEFT, Alignment.TOP);
                     image.setPadding(40, 3);
                     left = new HBox(false, 0);
