@@ -86,6 +86,8 @@ class PrimaryWindow extends Window
 
     private ComponentEditorWidget editor;
 
+    private StylesheetEditorWidget stylist;
+
     private IntroductionWidget intro;
 
     private HelpWidget help;
@@ -165,6 +167,7 @@ class PrimaryWindow extends Window
         // is this the right place to set this?
         cursorSeries = series;
 
+        stylist.affect(folio);
         /*
          * Update the PreviewWidget's idea of the current state
          */
@@ -274,6 +277,9 @@ class PrimaryWindow extends Window
         editor = new ComponentEditorWidget(this);
         left.insertPage(editor, null, 0);
 
+        stylist = new StylesheetEditorWidget(this);
+        left.insertPage(stylist, null, 1);
+
         two.packStart(left, true, true, 0);
     }
 
@@ -337,11 +343,16 @@ class PrimaryWindow extends Window
                     } else if (key == Keyval.F3) {
                         switchToOutline();
                         return true;
+                    } else if (key == Keyval.F5) {
+                        switchToEditor();
+                        return true;
+                    } else if (key == Keyval.F6) {
+                        switchToStylesheet();
+                        return true;
                     }
 
-                    if ((key == Keyval.F4) || (key == Keyval.F5) || (key == Keyval.F6)
-                            || (key == Keyval.F7) || (key == Keyval.F8) || (key == Keyval.F9)
-                            || (key == Keyval.F10)) {
+                    if ((key == Keyval.F4) || (key == Keyval.F7) || (key == Keyval.F8)
+                            || (key == Keyval.F9) || (key == Keyval.F10)) {
                         // nothing yet
                         return true;
                     }
@@ -475,6 +486,10 @@ class PrimaryWindow extends Window
         left.setCurrentPage(0);
     }
 
+    void switchToStylesheet() {
+        left.setCurrentPage(1);
+    }
+
     /**
      * Change the right side to show the help pane.
      */
@@ -521,6 +536,7 @@ class PrimaryWindow extends Window
         cursorSeries = series;
 
         editor.initializeSeries(series);
+        stylist.affect(folio);
         preview.affect(folio);
         outline.affect(folio);
         this.updateTitle();
