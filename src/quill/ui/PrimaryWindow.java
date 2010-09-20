@@ -488,6 +488,7 @@ class PrimaryWindow extends Window
 
     void switchToStylesheet() {
         left.setCurrentPage(1);
+        right.setCurrentPage(0);
     }
 
     /**
