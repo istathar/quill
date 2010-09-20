@@ -21,13 +21,17 @@ package quill.ui;
 import org.gnome.gdk.Color;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.AttachOptions;
+import org.gnome.gtk.Button;
+import org.gnome.gtk.ButtonBoxStyle;
 import org.gnome.gtk.DrawingArea;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
+import org.gnome.gtk.HButtonBox;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.SizeGroupMode;
 import org.gnome.gtk.StateType;
+import org.gnome.gtk.Stock;
 import org.gnome.gtk.Table;
 import org.gnome.gtk.TextComboBoxEntry;
 import org.gnome.gtk.VBox;
@@ -59,7 +63,11 @@ class StylesheetEditorWidget extends VBox
 
     private Entry topMargin, leftMargin, rightMargin, bottomMargin;
 
-    private TextComboBoxEntry renderer;
+    private TextComboBoxEntry rendererList;
+
+    private Entry rendererClass;
+
+    private Button ok, revert;
 
     /**
      * SizeGroup to keep the subheading Labels aligned.
@@ -73,6 +81,7 @@ class StylesheetEditorWidget extends VBox
 
         setupRenderSelector();
         setupMarginPreview();
+        setupActionButtons();
     }
 
     private void setupRenderSelector() {
@@ -91,14 +100,13 @@ class StylesheetEditorWidget extends VBox
         box.packStart(label, false, false, 3);
         size.add(label);
 
-        renderer = new TextComboBoxEntry();
-        renderer.appendText("parchment.render.ReportRenderEngine");
-        renderer.setActive(0);
-        entry = (Entry) renderer.getChild();
-        entry.setWidthChars(50);
-        entry.selectRegion(0, 0);
-        entry.setPosition(0);
-        box.packStart(renderer, false, false, 3);
+        rendererList = new TextComboBoxEntry();
+        rendererList.appendText("parchment.render.ReportRenderEngine");
+        rendererList.setActive(0);
+        rendererClass = (Entry) rendererList.getChild();
+        rendererClass.setWidthChars(50);
+        rendererClass.setPosition(0);
+        box.packStart(rendererList, false, false, 3);
 
         top.packStart(box, false, false, 0);
     }
@@ -150,7 +158,7 @@ class StylesheetEditorWidget extends VBox
 
         align = new Alignment(CENTER, CENTER, 0.0f, 0.0f);
         align.add(table);
-        top.packStart(align, false, false, 6);
+        top.packStart(align, false, false, 0);
     }
 
     private static Alignment positionMarginEntry(final Entry entry, final float horizontal,
@@ -172,6 +180,24 @@ class StylesheetEditorWidget extends VBox
         return align;
     }
 
+    private void setupActionButtons() {
+        final HButtonBox box;
+
+        box = new HButtonBox();
+        box.setLayout(ButtonBoxStyle.END);
+        box.setSpacing(6);
+
+        revert = new Button(Stock.REVERT_TO_SAVED);
+        box.packStart(revert, false, false, 0);
+
+        ok = new Button(Stock.OK);
+        ok.setCanDefault(true);
+        ok.grabFocus();
+        box.packStart(ok, false, false, 0);
+
+        top.packEnd(box, false, false, 6);
+    }
+
     void affect(Folio folio) {
         String str, text;
 
@@ -179,9 +205,9 @@ class StylesheetEditorWidget extends VBox
 
         // FIXME
         str = style.getRendererClass();
-        text = renderer.getActiveText();
+        text = rendererList.getActiveText();
         if (!str.equals(text)) {
-            renderer.appendText(str);
+            rendererList.appendText(str);
         }
 
         str = style.getMarginTop();
@@ -195,5 +221,11 @@ class StylesheetEditorWidget extends VBox
 
         str = style.getMarginBottom();
         bottomMargin.setText(str);
+    }
+
+    public void grabDefault() {
+        ok.grabFocus();
+        ok.grabDefault();
+        rendererClass.selectRegion(0, 0);
     }
 }
