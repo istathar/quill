@@ -33,6 +33,7 @@ import org.gnome.gtk.SizeGroupMode;
 import org.gnome.gtk.StateType;
 import org.gnome.gtk.Stock;
 import org.gnome.gtk.Table;
+import org.gnome.gtk.TextComboBox;
 import org.gnome.gtk.TextComboBoxEntry;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
@@ -67,6 +68,8 @@ class StylesheetEditorWidget extends VBox
 
     private Entry rendererClass;
 
+    private TextComboBox paperList;
+
     private Button ok, revert;
 
     /**
@@ -80,6 +83,7 @@ class StylesheetEditorWidget extends VBox
         size = new SizeGroup(SizeGroupMode.HORIZONTAL);
 
         setupRenderSelector();
+        setupPaperSelector();
         setupMarginPreview();
         setupActionButtons();
     }
@@ -87,7 +91,6 @@ class StylesheetEditorWidget extends VBox
     private void setupRenderSelector() {
         final HBox box;
         final Label heading, label;
-        final Entry entry;
 
         box = new HBox(false, 0);
 
@@ -111,17 +114,43 @@ class StylesheetEditorWidget extends VBox
         top.packStart(box, false, false, 0);
     }
 
+    private void setupPaperSelector() {
+        final HBox box;
+        final Label heading, label;
+
+        box = new HBox(false, 0);
+
+        heading = new Label("<b>Paper</b>");
+        heading.setUseMarkup(true);
+        heading.setAlignment(LEFT, CENTER);
+        top.packStart(heading, false, false, 6);
+
+        label = new Label("Size:");
+        label.setAlignment(LEFT, CENTER);
+        box.packStart(label, false, false, 3);
+        size.add(label);
+
+        paperList = new TextComboBox();
+        paperList.appendText("A4");
+        paperList.appendText("Letter");
+        paperList.setActive(0);
+        box.packStart(paperList, false, false, 3);
+
+        top.packStart(box, false, false, 0);
+    }
+
     private void setupMarginPreview() {
-        final Label heading;
+        final Label label;
         final Table table;
         final Widget page;
         Widget widget;
         final Alignment align;
 
-        heading = new Label("<b>Margins</b>");
-        heading.setUseMarkup(true);
-        heading.setAlignment(LEFT, CENTER);
-        top.packStart(heading, false, false, 6);
+        label = new Label("Margins:");
+        label.setUseMarkup(true);
+        label.setAlignment(LEFT, CENTER);
+        top.packStart(label, false, false, 6);
+        size.add(label);
 
         /*
          * Surround a representation of a page with Entries for the margin
@@ -148,7 +177,7 @@ class StylesheetEditorWidget extends VBox
 
         // PLACEHOLDER
         page = new DrawingArea();
-        page.setSizeRequest(215, 297);
+        page.setSizeRequest(130, 180);
         page.modifyBackground(StateType.NORMAL, Color.BLUE);
         table.attach(page, 1, 2, 1, 2, AttachOptions.SHRINK, AttachOptions.SHRINK, 0, 0);
 
@@ -168,6 +197,7 @@ class StylesheetEditorWidget extends VBox
         final Label label;
 
         entry.setWidthChars(6);
+        entry.setAlignment(RIGHT);
         box = new HBox(false, 0);
         box.packStart(entry, false, false, 3);
         label = new Label("mm");
