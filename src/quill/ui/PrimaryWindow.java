@@ -28,6 +28,7 @@ import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gdk.WindowState;
+import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.ButtonsType;
@@ -269,6 +270,8 @@ class PrimaryWindow extends Window
     }
 
     private void setupEditorSide() {
+        final Alignment align;
+
         left = new Notebook();
         left.setShowTabs(false);
         left.setShowBorder(false);
@@ -278,7 +281,11 @@ class PrimaryWindow extends Window
         left.insertPage(editor, null, 0);
 
         stylist = new StylesheetEditorWidget(this);
-        left.insertPage(stylist, null, 1);
+        align = new Alignment();
+        align.setAlignment(Alignment.LEFT, Alignment.TOP, 1.0f, 1.0f);
+        align.setPadding(0, 0, 3, 0);
+        align.add(stylist);
+        left.insertPage(align, null, 1);
 
         two.packStart(left, true, true, 0);
     }

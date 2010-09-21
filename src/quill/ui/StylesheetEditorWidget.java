@@ -44,6 +44,7 @@ import quill.textbase.Folio;
 import static org.gnome.gtk.Alignment.CENTER;
 import static org.gnome.gtk.Alignment.LEFT;
 import static org.gnome.gtk.Alignment.RIGHT;
+import static org.gnome.gtk.Alignment.TOP;
 
 /**
  * UI for presenting and editing the active Stylesheet
@@ -80,12 +81,25 @@ class StylesheetEditorWidget extends VBox
     StylesheetEditorWidget(PrimaryWindow primary) {
         super(false, 0);
         top = this;
+
         size = new SizeGroup(SizeGroupMode.HORIZONTAL);
 
+        setupHeading();
         setupRenderSelector();
         setupPaperSelector();
         setupMarginPreview();
         setupActionButtons();
+    }
+
+    private void setupHeading() {
+        final Label heading;
+
+        heading = new Label();
+        heading.setUseMarkup(true);
+        heading.setLabel("<span size='xx-large'>Stylesheet</span>");
+        heading.setAlignment(LEFT, TOP);
+
+        top.packStart(heading, false, false, 6);
     }
 
     private void setupRenderSelector() {
@@ -100,6 +114,7 @@ class StylesheetEditorWidget extends VBox
         top.packStart(heading, false, false, 6);
 
         label = new Label("Class:");
+        label.setAlignment(RIGHT, TOP);
         box.packStart(label, false, false, 3);
         size.add(label);
 
@@ -126,7 +141,7 @@ class StylesheetEditorWidget extends VBox
         top.packStart(heading, false, false, 6);
 
         label = new Label("Size:");
-        label.setAlignment(LEFT, CENTER);
+        label.setAlignment(RIGHT, TOP);
         box.packStart(label, false, false, 3);
         size.add(label);
 
@@ -140,16 +155,19 @@ class StylesheetEditorWidget extends VBox
     }
 
     private void setupMarginPreview() {
+        final HBox box;
         final Label label;
         final Table table;
         final Widget page;
         Widget widget;
         final Alignment align;
 
+        box = new HBox(false, 0);
+
         label = new Label("Margins:");
         label.setUseMarkup(true);
-        label.setAlignment(LEFT, CENTER);
-        top.packStart(label, false, false, 6);
+        label.setAlignment(RIGHT, TOP);
+        box.packStart(label, false, false, 3);
         size.add(label);
 
         /*
@@ -187,7 +205,8 @@ class StylesheetEditorWidget extends VBox
 
         align = new Alignment(CENTER, CENTER, 0.0f, 0.0f);
         align.add(table);
-        top.packStart(align, false, false, 0);
+        box.packStart(align, true, true, 0);
+        top.packStart(box, false, false, 6);
     }
 
     private static Alignment positionMarginEntry(final Entry entry, final float horizontal,
