@@ -23,18 +23,25 @@ import org.gnome.gtk.Alignment;
 import org.gnome.gtk.AttachOptions;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.ButtonBoxStyle;
+import org.gnome.gtk.CellRendererPixbuf;
+import org.gnome.gtk.CellRendererText;
+import org.gnome.gtk.ComboBox;
+import org.gnome.gtk.DataColumn;
+import org.gnome.gtk.DataColumnPixbuf;
+import org.gnome.gtk.DataColumnString;
 import org.gnome.gtk.DrawingArea;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.HButtonBox;
 import org.gnome.gtk.Label;
+import org.gnome.gtk.ListStore;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.SizeGroupMode;
 import org.gnome.gtk.StateType;
 import org.gnome.gtk.Stock;
 import org.gnome.gtk.Table;
 import org.gnome.gtk.TextComboBox;
-import org.gnome.gtk.TextComboBoxEntry;
+import org.gnome.gtk.TreeIter;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
@@ -65,9 +72,7 @@ class StylesheetEditorWidget extends VBox
 
     private Entry topMargin, leftMargin, rightMargin, bottomMargin;
 
-    private TextComboBoxEntry rendererList;
-
-    private Entry rendererClass;
+    private RendererPicker rendererList;
 
     private TextComboBox paperList;
 
@@ -104,7 +109,7 @@ class StylesheetEditorWidget extends VBox
 
     private void setupRenderSelector() {
         final HBox box;
-        final Label heading, label;
+        final Label heading, label, label2;
 
         box = new HBox(false, 0);
 
@@ -114,18 +119,15 @@ class StylesheetEditorWidget extends VBox
         top.packStart(heading, false, false, 6);
 
         label = new Label("Class:");
-        label.setAlignment(RIGHT, TOP);
+        label.setAlignment(RIGHT, CENTER);
         box.packStart(label, false, false, 3);
         size.add(label);
 
-        rendererList = new TextComboBoxEntry();
-        rendererList.appendText("parchment.render.ReportRenderEngine");
-        rendererList.setActive(0);
-        rendererClass = (Entry) rendererList.getChild();
-        rendererClass.setWidthChars(50);
-        rendererClass.setPosition(0);
+        rendererList = new RendererPicker();
+        // rendererClass = (Entry) rendererList.getChild();
+        // rendererClass.setWidthChars(50);
+        // rendererClass.setPosition(0);
         box.packStart(rendererList, false, false, 3);
-
         top.packStart(box, false, false, 0);
     }
 
@@ -141,7 +143,7 @@ class StylesheetEditorWidget extends VBox
         top.packStart(heading, false, false, 6);
 
         label = new Label("Size:");
-        label.setAlignment(RIGHT, TOP);
+        label.setAlignment(RIGHT, CENTER);
         box.packStart(label, false, false, 3);
         size.add(label);
 
@@ -254,10 +256,6 @@ class StylesheetEditorWidget extends VBox
 
         // FIXME
         str = style.getRendererClass();
-        text = rendererList.getActiveText();
-        if (!str.equals(text)) {
-            rendererList.appendText(str);
-        }
 
         str = style.getMarginTop();
         topMargin.setText(str);
@@ -275,6 +273,92 @@ class StylesheetEditorWidget extends VBox
     public void grabDefault() {
         ok.grabFocus();
         ok.grabDefault();
-        rendererClass.selectRegion(0, 0);
+        // rendererClass.selectRegion(0, 0);
+    }
+}
+
+class RendererPicker extends VBox
+{
+    private final VBox top;
+
+    private final DataColumnString nameColumn;
+
+    private final DataColumnPixbuf defaultColumn;
+
+    private final DataColumnString classColumn;
+
+    private final ListStore model;
+
+    private final ComboBox combo;
+
+    private final Label renderer;
+
+    RendererPicker() {
+        super(false, 0);
+        CellRendererText text;
+        CellRendererPixbuf image;
+        top = this;
+
+        model = new ListStore(new DataColumn[] {
+                nameColumn = new DataColumnString(),
+                defaultColumn = new DataColumnPixbuf(),
+                classColumn = new DataColumnString()
+        });
+
+        combo = new ComboBox(model);
+        text = new CellRendererText(combo);
+        text.setMarkup(nameColumn);
+
+        image = new CellRendererPixbuf(combo);
+        image.setPixbuf(defaultColumn);
+        image.setAlignment(Alignment.LEFT, Alignment.CENTER);
+
+        combo.setSizeRequest(450, -1);
+
+        /*
+         * FIXME drive this based on some list of registered renderers!
+         */
+
+        populate("Manuscript", "Technical reports, conference papers, book manuscripts", true,
+                "parchment.render.ReportRenderEngine");
+        populate("Paperback Novel", "A printed novel, tradeback size", false, "FIXME");
+        populate("School paper", "University paper or School term report", false, "FIXME");
+
+        top.packStart(combo, true, true, 3);
+
+        combo.connect(new ComboBox.Changed() {
+            public void onChanged(ComboBox source) {
+                final TreeIter row;
+                final String str;
+
+                row = source.getActiveIter();
+
+                str = model.getValue(row, classColumn);
+                renderer.setLabel(str);
+            }
+        });
+        renderer = new Label("");
+        renderer.setAlignment(LEFT, CENTER);
+        renderer.setPadding(4, 0);
+        top.packStart(renderer, false, false, 3);
+
+        combo.setActive(0);
+    }
+
+    private void populate(String rendererName, String rendererDescription, boolean isDefault,
+            String typeName) {
+        final TreeIter row;
+
+        row = model.appendRow();
+        model.setValue(row, nameColumn, "<b>" + rendererName + "</b>" + "\n<span size='small'><i>"
+                + rendererDescription + "</i>" + (isDefault ? "  (default)" : "") + "</span>");
+
+        if (isDefault) {
+            model.setValue(row, defaultColumn, null);
+        } else {
+            model.setValue(row, defaultColumn, null);
+        }
+
+        model.setValue(row, classColumn, typeName);
     }
 }
