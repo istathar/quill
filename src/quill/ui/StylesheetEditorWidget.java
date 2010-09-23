@@ -18,8 +18,11 @@
  */
 package quill.ui;
 
-import org.gnome.gdk.Color;
+import org.freedesktop.cairo.Context;
+import org.freedesktop.cairo.Matrix;
+import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Alignment;
+import org.gnome.gtk.Allocation;
 import org.gnome.gtk.AttachOptions;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.ButtonBoxStyle;
@@ -37,7 +40,6 @@ import org.gnome.gtk.Label;
 import org.gnome.gtk.ListStore;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.SizeGroupMode;
-import org.gnome.gtk.StateType;
 import org.gnome.gtk.Stock;
 import org.gnome.gtk.Table;
 import org.gnome.gtk.TextComboBox;
@@ -46,6 +48,8 @@ import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
 import parchment.format.Stylesheet;
+import parchment.render.RenderEngine;
+import quill.client.ApplicationException;
 import quill.textbase.Folio;
 
 import static org.gnome.gtk.Alignment.CENTER;
@@ -75,6 +79,8 @@ class StylesheetEditorWidget extends VBox
     private RendererPicker rendererList;
 
     private TextComboBox paperList;
+
+    private MarginsDisplay page;
 
     private Button ok, revert;
 
@@ -150,7 +156,6 @@ class StylesheetEditorWidget extends VBox
         final HBox box;
         final Label label;
         final Table table;
-        final Widget page;
         Widget widget;
         final Alignment align;
 
@@ -179,10 +184,9 @@ class StylesheetEditorWidget extends VBox
         widget = positionMarginEntry(bottomMargin, CENTER, CENTER);
         table.attach(widget, 1, 2, 2, 3, AttachOptions.SHRINK, AttachOptions.SHRINK, 0, 0);
 
-        // PLACEHOLDER
-        page = new DrawingArea();
+        page = new MarginsDisplay(style);
+
         page.setSizeRequest(130, 180);
-        page.modifyBackground(StateType.NORMAL, Color.BLUE);
         table.attach(page, 1, 2, 1, 2, AttachOptions.SHRINK, AttachOptions.SHRINK, 0, 0);
 
         /*
@@ -255,6 +259,8 @@ class StylesheetEditorWidget extends VBox
 
         str = style.getMarginBottom();
         bottomMargin.setText(str);
+
+        page.setStyle(style);
     }
 
     public void grabDefault() {
@@ -378,5 +384,114 @@ class RendererPicker extends VBox
         }
 
         model.setValue(row, classColumn, "<tt>" + typeName + "</tt>");
+    }
+}
+
+class MarginsDisplay extends DrawingArea
+{
+    private final DrawingArea drawing;
+
+    private RenderEngine engine;
+
+    MarginsDisplay(Stylesheet style) {
+        drawing = this;
+
+        drawing.connect(new Widget.ExposeEvent() {
+            public boolean onExposeEvent(Widget source, EventExpose event) {
+                final Context cr;
+
+                cr = new Context(event);
+
+                scaleOutput(cr, engine);
+                drawPageOutline(cr, engine);
+                drawPageDimensions(cr, engine);
+
+                return true;
+            }
+        });
+    }
+
+    /*
+     * FIXME We should not be creating a new RenderEngine! And, once again
+     * this is NOT the place to be doing the valdiation trap.
+     */
+    void setStyle(Stylesheet style) {
+        try {
+            engine = RenderEngine.createRenderer(style);
+        } catch (ApplicationException ae) {
+            throw new Error(ae);
+        }
+    }
+
+    private void scaleOutput(Context cr, final RenderEngine engine) {
+        final Allocation rect;
+        final Matrix matrix;
+        final double scaleWidth, scaleHeight, scaleFactor;
+        final double pageWidth, pageHeight;
+        final double pixelWidth, pixelHeight;
+
+        rect = this.getAllocation();
+
+        pixelWidth = rect.getWidth();
+        pixelHeight = rect.getHeight();
+
+        pageWidth = engine.getPageWidth();
+        pageHeight = engine.getPageHeight();
+
+        scaleWidth = pixelWidth / (pageWidth + 10.0);
+        scaleHeight = pixelHeight / (pageHeight + 10.0);
+
+        if (scaleWidth > scaleHeight) {
+            scaleFactor = scaleHeight;
+        } else {
+            scaleFactor = scaleWidth;
+        }
+
+        matrix = new Matrix();
+        matrix.scale(scaleFactor, scaleFactor);
+
+        if (scaleWidth > scaleHeight) {
+            matrix.translate(((pixelWidth / scaleFactor) - pageWidth) / 2.0, 0.0);
+        } else {
+            matrix.translate(0.0, ((pixelHeight / scaleFactor) - pageHeight) / 2.0);
+        }
+
+        /*
+         * Bump the image off of the top left corner.
+         */
+        matrix.translate(0.5, 1.5);
+        cr.transform(matrix);
+    }
+
+    /*
+     * This code is almost identical to that in PreviewWidget
+     */
+    private void drawPageOutline(Context cr, RenderEngine engine) {
+        final double pageWidth, pageHeight;
+
+        pageWidth = engine.getPageWidth();
+        pageHeight = engine.getPageHeight();
+
+        cr.rectangle(0, 0, pageWidth, pageHeight);
+        cr.setSource(1.0, 1.0, 1.0);
+        cr.fillPreserve();
+        cr.setSource(0.0, 0.0, 0.0);
+        cr.setLineWidth(1.0);
+        cr.stroke();
+    }
+
+    private void drawPageDimensions(Context cr, RenderEngine engine) {
+        final double pageWidth, pageHeight;
+
+        pageWidth = engine.getPageWidth();
+        pageHeight = engine.getPageHeight();
+
+        cr.moveTo(0.0, 25.0);
+        cr.lineTo(pageWidth, 25.0);
+        cr.stroke();
+
+        cr.moveTo(25.0, 0.0);
+        cr.lineTo(25.0, pageHeight);
+        cr.stroke();
     }
 }
