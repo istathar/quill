@@ -108,34 +108,20 @@ class StylesheetEditorWidget extends VBox
     }
 
     private void setupRenderSelector() {
-        final HBox box;
-        final Label heading, label, label2;
-
-        box = new HBox(false, 0);
+        final Label heading;
 
         heading = new Label("<b>Render Engine</b>");
         heading.setUseMarkup(true);
         heading.setAlignment(LEFT, CENTER);
         top.packStart(heading, false, false, 6);
 
-        label = new Label("Class:");
-        label.setAlignment(RIGHT, CENTER);
-        box.packStart(label, false, false, 3);
-        size.add(label);
-
-        rendererList = new RendererPicker();
-        // rendererClass = (Entry) rendererList.getChild();
-        // rendererClass.setWidthChars(50);
-        // rendererClass.setPosition(0);
-        box.packStart(rendererList, false, false, 3);
-        top.packStart(box, false, false, 0);
+        rendererList = new RendererPicker(size);
+        top.packStart(rendererList, false, false, 0);
     }
 
     private void setupPaperSelector() {
         final HBox box;
         final Label heading, label;
-
-        box = new HBox(false, 0);
 
         heading = new Label("<b>Paper</b>");
         heading.setUseMarkup(true);
@@ -143,16 +129,20 @@ class StylesheetEditorWidget extends VBox
         top.packStart(heading, false, false, 6);
 
         label = new Label("Size:");
-        label.setAlignment(RIGHT, CENTER);
-        box.packStart(label, false, false, 3);
-        size.add(label);
+
+        /*
+         * TODO, replace this with a better source of sizes? Remember that
+         * we're deliberately not showing every paper size under the sun, just
+         * a couple obvious ones. There needs to be a java-gnome PaperSize
+         * constant for it...
+         */
 
         paperList = new TextComboBox();
         paperList.appendText("A4");
         paperList.appendText("Letter");
         paperList.setActive(0);
-        box.packStart(paperList, false, false, 3);
 
+        box = new KeyValueBox(size, label, paperList, false);
         top.packStart(box, false, false, 0);
     }
 
@@ -164,13 +154,7 @@ class StylesheetEditorWidget extends VBox
         Widget widget;
         final Alignment align;
 
-        box = new HBox(false, 0);
-
         label = new Label("Margins:");
-        label.setUseMarkup(true);
-        label.setAlignment(RIGHT, TOP);
-        box.packStart(label, false, false, 3);
-        size.add(label);
 
         /*
          * Surround a representation of a page with Entries for the margin
@@ -207,7 +191,10 @@ class StylesheetEditorWidget extends VBox
 
         align = new Alignment(CENTER, CENTER, 0.0f, 0.0f);
         align.add(table);
-        box.packStart(align, true, true, 0);
+
+        box = new KeyValueBox(size, label, align, true);
+        label.setAlignment(RIGHT, TOP);
+        label.setPadding(0, 10);
         top.packStart(box, false, false, 6);
     }
 
@@ -273,7 +260,23 @@ class StylesheetEditorWidget extends VBox
     public void grabDefault() {
         ok.grabFocus();
         ok.grabDefault();
-        // rendererClass.selectRegion(0, 0);
+    }
+}
+
+class KeyValueBox extends HBox
+{
+    /**
+     * @param expand
+     *            Whether or not to give extra space to value Widget
+     */
+    KeyValueBox(SizeGroup size, Label label, Widget value, boolean expand) {
+        super(false, 0);
+
+        super.packStart(label, false, false, 3);
+        label.setAlignment(RIGHT, CENTER);
+        size.add(label);
+
+        super.packStart(value, expand, expand, 3);
     }
 }
 
@@ -293,11 +296,15 @@ class RendererPicker extends VBox
 
     private final Label renderer;
 
-    RendererPicker() {
+    RendererPicker(SizeGroup size) {
         super(false, 0);
+        HBox box;
+        Label label;
         CellRendererText text;
         CellRendererPixbuf image;
         top = this;
+
+        label = new Label("Renderer:");
 
         model = new ListStore(new DataColumn[] {
                 nameColumn = new DataColumnString(),
@@ -324,7 +331,8 @@ class RendererPicker extends VBox
         populate("Paperback Novel", "A printed novel, tradeback size", false, "FIXME");
         populate("School paper", "University paper or School term report", false, "FIXME");
 
-        top.packStart(combo, true, true, 3);
+        box = new KeyValueBox(size, label, combo, false);
+        top.packStart(box, true, true, 0);
 
         combo.connect(new ComboBox.Changed() {
             public void onChanged(ComboBox source) {
@@ -337,10 +345,20 @@ class RendererPicker extends VBox
                 renderer.setLabel(str);
             }
         });
-        renderer = new Label("");
+
+        /*
+         * Now the display of the actual Java Class
+         */
+
+        label = new Label("Class:");
+
+        renderer = new Label("package.Class");
         renderer.setAlignment(LEFT, CENTER);
+        renderer.setUseMarkup(true);
         renderer.setPadding(4, 0);
-        top.packStart(renderer, false, false, 3);
+
+        box = new KeyValueBox(size, label, renderer, false);
+        top.packStart(box, false, false, 0);
 
         combo.setActive(0);
     }
@@ -350,8 +368,8 @@ class RendererPicker extends VBox
         final TreeIter row;
 
         row = model.appendRow();
-        model.setValue(row, nameColumn, "<b>" + rendererName + "</b>" + "\n<span size='small'><i>"
-                + rendererDescription + "</i>" + (isDefault ? "  (default)" : "") + "</span>");
+        model.setValue(row, nameColumn, "<b>" + rendererName + "</b>" + (isDefault ? "  (default)" : "")
+                + "\n<span size='small'><i>" + rendererDescription + "</i></span>");
 
         if (isDefault) {
             model.setValue(row, defaultColumn, null);
@@ -359,6 +377,6 @@ class RendererPicker extends VBox
             model.setValue(row, defaultColumn, null);
         }
 
-        model.setValue(row, classColumn, typeName);
+        model.setValue(row, classColumn, "<tt>" + typeName + "</tt>");
     }
 }
