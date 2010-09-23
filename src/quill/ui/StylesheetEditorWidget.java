@@ -74,6 +74,8 @@ class StylesheetEditorWidget extends VBox
 
     private Entry topMargin, leftMargin, rightMargin, bottomMargin;
 
+    private Entry serifFont, sansFont, monoFont, headingFont;
+
     private RendererPicker rendererList;
 
     private TextComboBox paperList;
@@ -97,6 +99,7 @@ class StylesheetEditorWidget extends VBox
         setupRenderSelector();
         setupPaperSelector();
         setupMarginPreview();
+        setupFontPreview();
         setupActionButtons();
     }
 
@@ -156,16 +159,14 @@ class StylesheetEditorWidget extends VBox
         HBox box;
         final Label heading;
         Label label;
-        Widget widget;
-        final Alignment align;
 
-        sides = new HBox(false, 0);
-        left = new VBox(false, 3);
-
-        heading = new Label("<b>Margins:</b>");
+        heading = new Label("<b>Margins</b>");
         heading.setUseMarkup(true);
         heading.setAlignment(LEFT, CENTER);
         top.packStart(heading, false, false, 6);
+
+        sides = new HBox(false, 0);
+        left = new VBox(false, 3);
 
         topMargin = new Entry();
         leftMargin = new Entry();
@@ -209,10 +210,46 @@ class StylesheetEditorWidget extends VBox
          * Ensure the whole thing floats in the center of the pane
          */
 
-        align = new Alignment(CENTER, CENTER, 0.0f, 0.0f);
-        // align.add(table);
-
         sides.packStart(page, true, true, 0);
+        top.packStart(sides, false, false, 6);
+    }
+
+    private void setupFontPreview() {
+        final HBox sides;
+        final VBox left;
+        HBox box;
+        final Label heading;
+        Label label;
+
+        heading = new Label("<b>Fonts</b>");
+        heading.setUseMarkup(true);
+        heading.setAlignment(LEFT, CENTER);
+        top.packStart(heading, false, false, 6);
+
+        sides = new HBox(false, 0);
+        left = new VBox(false, 3);
+
+        label = new Label("Serif:");
+        serifFont = new Entry();
+        box = new KeyValueBox(size, label, serifFont, false);
+        left.packStart(box, false, false, 0);
+
+        label = new Label("Sans:");
+        sansFont = new Entry();
+        box = new KeyValueBox(size, label, sansFont, false);
+        left.packStart(box, false, false, 0);
+
+        label = new Label("Mono:");
+        monoFont = new Entry();
+        box = new KeyValueBox(size, label, monoFont, false);
+        left.packStart(box, false, false, 0);
+
+        label = new Label("Heading:");
+        headingFont = new Entry();
+        box = new KeyValueBox(size, label, headingFont, false);
+        left.packStart(box, false, false, 0);
+
+        sides.packStart(left, true, true, 0);
         top.packStart(sides, false, false, 6);
     }
 
@@ -253,6 +290,18 @@ class StylesheetEditorWidget extends VBox
 
         str = style.getMarginBottom();
         bottomMargin.setText(str);
+
+        str = style.getFontSerif();
+        serifFont.setText(str);
+
+        str = style.getFontSans();
+        sansFont.setText(str);
+
+        str = style.getFontMono();
+        monoFont.setText(str);
+
+        str = style.getFontHeading();
+        headingFont.setText(str);
 
         page.setStyle(style);
     }
