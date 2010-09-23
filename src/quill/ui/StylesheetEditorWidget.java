@@ -40,6 +40,7 @@ import org.gnome.gtk.ListStore;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.SizeGroupMode;
 import org.gnome.gtk.Stock;
+import org.gnome.gtk.Table;
 import org.gnome.gtk.TextComboBox;
 import org.gnome.gtk.TreeIter;
 import org.gnome.gtk.VBox;
@@ -72,6 +73,11 @@ class StylesheetEditorWidget extends VBox
      */
     private Stylesheet style;
 
+    /**
+     * an instance of a renderer based on Style.
+     */
+    private RenderEngine engine;
+
     private Entry topMargin, leftMargin, rightMargin, bottomMargin;
 
     private Entry serifFont, sansFont, monoFont, headingFont;
@@ -79,6 +85,8 @@ class StylesheetEditorWidget extends VBox
     private RendererPicker rendererList;
 
     private TextComboBox paperList;
+
+    private Label paperWidth, paperHeight;
 
     private MarginsDisplay page;
 
@@ -149,6 +157,9 @@ class StylesheetEditorWidget extends VBox
         paperList.appendText("Letter");
         paperList.setActive(0);
 
+        paperWidth = new Label("000 mm");
+        paperHeight = new Label("000 mm");
+
         box = new KeyValueBox(size, label, paperList, false);
         top.packStart(box, false, false, 0);
     }
@@ -159,6 +170,7 @@ class StylesheetEditorWidget extends VBox
         HBox box;
         final Label heading;
         Label label;
+        final Table table;
 
         heading = new Label("<b>Margins</b>");
         heading.setUseMarkup(true);
@@ -203,14 +215,23 @@ class StylesheetEditorWidget extends VBox
          * values.
          */
 
-        page = new MarginsDisplay(style);
+        page = new MarginsDisplay();
         page.setSizeRequest(130, 180);
+
+        table = new Table(2, 2, false);
+        table.attach(page, 0, 1, 0, 1);
+
+        paperHeight.setAlignment(LEFT, CENTER);
+        table.attach(paperHeight, 1, 2, 0, 1);
+
+        paperWidth.setAlignment(CENTER, TOP);
+        table.attach(paperWidth, 0, 1, 1, 2);
 
         /*
          * Ensure the whole thing floats in the center of the pane
          */
 
-        sides.packStart(page, true, true, 0);
+        sides.packStart(table, true, false, 0);
         top.packStart(sides, false, false, 6);
     }
 
@@ -274,7 +295,12 @@ class StylesheetEditorWidget extends VBox
     void affect(Folio folio) {
         String str, text;
 
-        style = folio.getStylesheet();
+        try {
+            style = folio.getStylesheet();
+            engine = RenderEngine.createRenderer(style);
+        } catch (ApplicationException ae) {
+            throw new Error(ae);
+        }
 
         // FIXME
         str = style.getRendererClass();
@@ -303,7 +329,9 @@ class StylesheetEditorWidget extends VBox
         str = style.getFontHeading();
         headingFont.setText(str);
 
-        page.setStyle(style);
+        page.setStyle(engine);
+        paperWidth.setLabel(engine.getPageWidth() + " mm");
+        paperHeight.setLabel(engine.getPageHeight() + " mm");
     }
 
     public void grabDefault() {
@@ -441,7 +469,7 @@ class MarginsDisplay extends DrawingArea
 
     private RenderEngine engine;
 
-    MarginsDisplay(Stylesheet style) {
+    MarginsDisplay() {
         drawing = this;
 
         drawing.connect(new Widget.ExposeEvent() {
@@ -463,12 +491,8 @@ class MarginsDisplay extends DrawingArea
      * FIXME We should not be creating a new RenderEngine! And, once again
      * this is NOT the place to be doing the valdiation trap.
      */
-    void setStyle(Stylesheet style) {
-        try {
-            engine = RenderEngine.createRenderer(style);
-        } catch (ApplicationException ae) {
-            throw new Error(ae);
-        }
+    void setStyle(RenderEngine engine) {
+        this.engine = engine;
     }
 
     private static final double BUMP = 50.0;
