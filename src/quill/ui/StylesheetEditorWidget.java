@@ -23,7 +23,6 @@ import org.freedesktop.cairo.Matrix;
 import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
-import org.gnome.gtk.AttachOptions;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.ButtonBoxStyle;
 import org.gnome.gtk.CellRendererPixbuf;
@@ -41,7 +40,6 @@ import org.gnome.gtk.ListStore;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.SizeGroupMode;
 import org.gnome.gtk.Stock;
-import org.gnome.gtk.Table;
 import org.gnome.gtk.TextComboBox;
 import org.gnome.gtk.TreeIter;
 import org.gnome.gtk.VBox;
@@ -153,73 +151,69 @@ class StylesheetEditorWidget extends VBox
     }
 
     private void setupMarginPreview() {
-        final HBox box;
-        final Label label;
-        final Table table;
+        final HBox sides;
+        final VBox left;
+        HBox box;
+        final Label heading;
+        Label label;
         Widget widget;
         final Alignment align;
 
-        label = new Label("Margins:");
+        sides = new HBox(false, 0);
+        left = new VBox(false, 3);
+
+        heading = new Label("<b>Margins:</b>");
+        heading.setUseMarkup(true);
+        heading.setAlignment(LEFT, CENTER);
+        top.packStart(heading, false, false, 6);
+
+        topMargin = new Entry();
+        leftMargin = new Entry();
+        rightMargin = new Entry();
+        bottomMargin = new Entry();
+
+        label = new Label("Top:");
+        box = new KeyValueBox(size, label, topMargin, new Label("mm"));
+        topMargin.setWidthChars(6);
+        topMargin.setAlignment(RIGHT);
+        left.packStart(box, false, false, 0);
+
+        label = new Label("Left:");
+        box = new KeyValueBox(size, label, leftMargin, new Label("mm"));
+        leftMargin.setWidthChars(6);
+        leftMargin.setAlignment(RIGHT);
+        left.packStart(box, false, false, 0);
+
+        label = new Label("Right:");
+        box = new KeyValueBox(size, label, rightMargin, new Label("mm"));
+        rightMargin.setWidthChars(6);
+        rightMargin.setAlignment(RIGHT);
+        left.packStart(box, false, false, 0);
+
+        label = new Label("Bottom:");
+        box = new KeyValueBox(size, label, bottomMargin, new Label("mm"));
+        bottomMargin.setWidthChars(6);
+        bottomMargin.setAlignment(RIGHT);
+        left.packStart(box, false, false, 0);
+        sides.packStart(left, false, false, 0);
 
         /*
          * Surround a representation of a page with Entries for the margin
          * values.
          */
 
-        table = new Table(3, 3, false);
-
-        topMargin = new Entry();
-        widget = positionMarginEntry(topMargin, CENTER, CENTER);
-        table.attach(widget, 1, 2, 0, 1, AttachOptions.SHRINK, AttachOptions.SHRINK, 0, 0);
-
-        leftMargin = new Entry();
-        widget = positionMarginEntry(leftMargin, RIGHT, CENTER);
-        table.attach(widget, 0, 1, 1, 2, AttachOptions.SHRINK, AttachOptions.SHRINK, 0, 0);
-
-        rightMargin = new Entry();
-        widget = positionMarginEntry(rightMargin, LEFT, CENTER);
-        table.attach(widget, 2, 3, 1, 2, AttachOptions.SHRINK, AttachOptions.SHRINK, 0, 0);
-
-        bottomMargin = new Entry();
-        widget = positionMarginEntry(bottomMargin, CENTER, CENTER);
-        table.attach(widget, 1, 2, 2, 3, AttachOptions.SHRINK, AttachOptions.SHRINK, 0, 0);
-
         page = new MarginsDisplay(style);
-
         page.setSizeRequest(130, 180);
-        table.attach(page, 1, 2, 1, 2, AttachOptions.SHRINK, AttachOptions.SHRINK, 0, 0);
 
         /*
          * Ensure the whole thing floats in the center of the pane
          */
 
         align = new Alignment(CENTER, CENTER, 0.0f, 0.0f);
-        align.add(table);
+        // align.add(table);
 
-        box = new KeyValueBox(size, label, align, true);
-        label.setAlignment(RIGHT, TOP);
-        label.setPadding(0, 10);
-        top.packStart(box, false, false, 6);
-    }
-
-    private static Alignment positionMarginEntry(final Entry entry, final float horizontal,
-            final float vertical) {
-        final Alignment align;
-        final HBox box;
-        final Label label;
-
-        entry.setWidthChars(6);
-        entry.setAlignment(RIGHT);
-        box = new HBox(false, 0);
-        box.packStart(entry, false, false, 3);
-        label = new Label("mm");
-        box.packStart(label, false, false, 3);
-
-        align = new Alignment(horizontal, vertical, 0.0f, 0.0f);
-        align.setPadding(10, 10, 10, 10);
-        align.add(box);
-
-        return align;
+        sides.packStart(page, true, true, 0);
+        top.packStart(sides, false, false, 6);
     }
 
     private void setupActionButtons() {
@@ -283,6 +277,11 @@ class KeyValueBox extends HBox
         size.add(label);
 
         super.packStart(value, expand, expand, 3);
+    }
+
+    KeyValueBox(SizeGroup size, Label label, Widget value, Label suffix) {
+        this(size, label, value, false);
+        super.packStart(suffix, false, false, 3);
     }
 }
 
@@ -440,8 +439,8 @@ class MarginsDisplay extends DrawingArea
         pageWidth = engine.getPageWidth();
         pageHeight = engine.getPageHeight();
 
-        scaleWidth = pixelWidth / (pageWidth + (2.0 * BUMP));
-        scaleHeight = pixelHeight / (pageHeight + (2.0 * BUMP));
+        scaleWidth = pixelWidth / (pageWidth + (2.0 * BUMP) + 10.0);
+        scaleHeight = pixelHeight / (pageHeight + (2.0 * BUMP) + 10.0);
 
         if (scaleWidth > scaleHeight) {
             scaleFactor = scaleHeight;
