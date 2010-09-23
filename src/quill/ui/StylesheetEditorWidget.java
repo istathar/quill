@@ -423,6 +423,8 @@ class MarginsDisplay extends DrawingArea
         }
     }
 
+    private static final double BUMP = 50.0;
+
     private void scaleOutput(Context cr, final RenderEngine engine) {
         final Allocation rect;
         final Matrix matrix;
@@ -438,8 +440,8 @@ class MarginsDisplay extends DrawingArea
         pageWidth = engine.getPageWidth();
         pageHeight = engine.getPageHeight();
 
-        scaleWidth = pixelWidth / (pageWidth + 10.0);
-        scaleHeight = pixelHeight / (pageHeight + 10.0);
+        scaleWidth = pixelWidth / (pageWidth + (2.0 * BUMP));
+        scaleHeight = pixelHeight / (pageHeight + (2.0 * BUMP));
 
         if (scaleWidth > scaleHeight) {
             scaleFactor = scaleHeight;
@@ -456,10 +458,6 @@ class MarginsDisplay extends DrawingArea
             matrix.translate(0.0, ((pixelHeight / scaleFactor) - pageHeight) / 2.0);
         }
 
-        /*
-         * Bump the image off of the top left corner.
-         */
-        matrix.translate(0.5, 1.5);
         cr.transform(matrix);
     }
 
@@ -472,7 +470,7 @@ class MarginsDisplay extends DrawingArea
         pageWidth = engine.getPageWidth();
         pageHeight = engine.getPageHeight();
 
-        cr.rectangle(0, 0, pageWidth, pageHeight);
+        cr.rectangle(0.0, 0.0, pageWidth, pageHeight);
         cr.setSource(1.0, 1.0, 1.0);
         cr.fillPreserve();
         cr.setSource(0.0, 0.0, 0.0);
@@ -486,12 +484,67 @@ class MarginsDisplay extends DrawingArea
         pageWidth = engine.getPageWidth();
         pageHeight = engine.getPageHeight();
 
-        cr.moveTo(0.0, 25.0);
-        cr.lineTo(pageWidth, 25.0);
+        cr.setLineWidth(4.0);
+
+        /*
+         * Horizontal
+         */
+
+        cr.moveTo(0.0, pageHeight + BUMP);
+        cr.lineRelative(pageWidth, 0.0);
         cr.stroke();
 
-        cr.moveTo(25.0, 0.0);
-        cr.lineTo(25.0, pageHeight);
+        // left
+        cr.moveTo(0.0, pageHeight + BUMP);
+        cr.lineRelative(25.0, -15.0);
+        cr.lineRelative(0.0, 30.0);
+        cr.closePath();
+        cr.fill();
+
+        cr.moveTo(0.0, pageHeight + BUMP - 20.0);
+        cr.lineRelative(0.0, 40.0);
         cr.stroke();
+
+        // right
+        cr.moveTo(pageWidth, pageHeight + BUMP);
+        cr.lineRelative(-25.0, -15.0);
+        cr.lineRelative(0.0, 30.0);
+        cr.closePath();
+        cr.fill();
+
+        cr.moveTo(pageWidth, pageHeight + BUMP - 20.0);
+        cr.lineRelative(0.0, 40.0);
+        cr.stroke();
+
+        /*
+         * Vertical
+         */
+
+        cr.moveTo(pageWidth + BUMP, 0.0);
+        cr.lineRelative(0.0, pageHeight);
+        cr.stroke();
+
+        // top
+        cr.moveTo(pageWidth + BUMP, 0.0);
+        cr.lineRelative(-15.0, 25.0);
+        cr.lineRelative(30.0, 0.0);
+        cr.closePath();
+        cr.fill();
+
+        cr.moveTo(pageWidth + BUMP - 20.0, 0.0);
+        cr.lineRelative(40.0, 0.0);
+        cr.stroke();
+
+        // bottom
+        cr.moveTo(pageWidth + BUMP, pageHeight);
+        cr.lineRelative(-15.0, -25.0);
+        cr.lineRelative(30.0, 0.0);
+        cr.closePath();
+        cr.fill();
+
+        cr.moveTo(pageWidth + BUMP - 20.0, pageHeight);
+        cr.lineRelative(40.0, 0.0);
+        cr.stroke();
+
     }
 }
