@@ -120,7 +120,7 @@ class ManuscriptLoader
 
     private void processPresentation(final Element presentation) throws InvalidDocumentException {
         final Elements children;
-        final String rendererClass, paperSize, marginsTop, marginsLeft, marginsRight, marginsBottom, fontSerif, fontSans, fontMono, fontHeading;
+        final String rendererClass, paperSize, marginsTop, marginsLeft, marginsRight, marginsBottom, fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono, sizeHeading;
 
         children = presentation.getChildElements();
 
@@ -134,12 +134,17 @@ class ManuscriptLoader
         marginsBottom = getPresentationValue(children, 2, "margins", "bottom");
 
         fontSerif = getPresentationValue(children, 3, "font", "serif");
+        sizeSerif = getPresentationValue(children, 3, "font", "size");
         fontSans = getPresentationValue(children, 4, "font", "sans");
+        sizeSans = getPresentationValue(children, 4, "font", "size");
         fontMono = getPresentationValue(children, 5, "font", "mono");
+        sizeMono = getPresentationValue(children, 5, "font", "size");
         fontHeading = getPresentationValue(children, 6, "font", "heading");
+        sizeHeading = getPresentationValue(children, 6, "font", "size");
 
         presentationStyle = new Stylesheet(rendererClass, paperSize, marginsTop, marginsLeft,
-                marginsRight, marginsBottom, fontSerif, fontSans, fontMono, fontHeading);
+                marginsRight, marginsBottom, fontSerif, fontSans, fontMono, fontHeading, sizeSerif,
+                sizeSans, sizeMono, sizeHeading);
     }
 
     private static String getPresentationValue(final Elements children, final int index,

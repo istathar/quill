@@ -34,7 +34,6 @@ import parchment.format.UnsupportedValueException;
 // immutable, not that it really matters.
 class RenderSettings
 {
-
     private final PaperSize paper;
 
     private final double marginTop;
@@ -57,8 +56,9 @@ class RenderSettings
      * Given a Stylesheet state, parse and process it into Java objects.
      */
     RenderSettings(final Stylesheet style) throws UnsupportedValueException {
-        final String size, serif, sans, mono, heading;
+        final String serif, sans, mono, heading;
         final String top, left, right, bottom;
+        String size;
 
         size = style.getPaperSize();
         this.paper = loadPaperType(size);
@@ -76,16 +76,20 @@ class RenderSettings
         this.marginBottom = loadMargin(bottom);
 
         serif = style.getFontSerif();
-        this.fontSerif = loadDescription(serif);
+        size = style.getSizeSerif();
+        this.fontSerif = loadDescription(serif, size);
 
         sans = style.getFontSans();
-        this.fontSans = loadDescription(sans);
+        size = style.getSizeSans();
+        this.fontSans = loadDescription(sans, size);
 
         mono = style.getFontMono();
-        this.fontMono = loadDescription(mono);
+        size = style.getSizeMono();
+        this.fontMono = loadDescription(mono, size);
 
         heading = style.getFontHeading();
-        this.fontHeading = loadDescription(heading);
+        size = style.getSizeHeading();
+        this.fontHeading = loadDescription(heading, size);
     }
 
     private static PaperSize loadPaperType(String size) throws UnsupportedValueException {
@@ -106,16 +110,26 @@ class RenderSettings
      * Convert here. Note we never ask the user for margins in points, only in
      * metric.
      */
-    private static double loadMargin(String milimetres) {
-        final double mm, points;
-
-        mm = Double.valueOf(milimetres);
+    static double convertMilimetresToPoints(double mm) {
+        final double points;
 
         /*
          * 1 inch : 25.4 mm 72 points : 1 inch
          */
 
-        points = mm / 25.4 * 72.0 / 1.0;
+        points = mm / 25.4 * 72.0;
+
+        return points;
+    }
+
+    /**
+     * Take a size= value in milimetres, and convert it to points.
+     */
+    private static double loadMargin(String size) {
+        final double mm, points;
+
+        mm = Double.valueOf(size);
+        points = convertMilimetresToPoints(mm);
 
         return points;
     }
@@ -128,8 +142,16 @@ class RenderSettings
      * really sufficient; that's just initial parsing. The reqal question is
      * how to access the actual font as chosen by fontconfig?
      */
-    private static FontDescription loadDescription(String description) {
-        return new FontDescription(description);
+    private static FontDescription loadDescription(String description, String size) {
+        final FontDescription desc;
+        final double mm, points;
+
+        desc = new FontDescription(description);
+
+        mm = Double.valueOf(size); // * 130.0 / 96.0 ?
+        points = convertMilimetresToPoints(mm);
+        desc.setSize(points);
+        return desc;
     }
 
     PaperSize getPaper() {

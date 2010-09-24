@@ -18,8 +18,11 @@
  */
 package quill.ui;
 
+import java.math.BigDecimal;
+
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Matrix;
+import org.gnome.gdk.Color;
 import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
@@ -39,6 +42,7 @@ import org.gnome.gtk.Label;
 import org.gnome.gtk.ListStore;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.SizeGroupMode;
+import org.gnome.gtk.StateType;
 import org.gnome.gtk.Stock;
 import org.gnome.gtk.Table;
 import org.gnome.gtk.TextComboBox;
@@ -78,9 +82,11 @@ class StylesheetEditorWidget extends VBox
      */
     private RenderEngine engine;
 
-    private Entry topMargin, leftMargin, rightMargin, bottomMargin;
+    private MilimeterEntry topMargin, leftMargin, rightMargin, bottomMargin;
 
     private Entry serifFont, sansFont, monoFont, headingFont;
+
+    private MilimeterEntry serifSize, sansSize, monoSize, headingSize;
 
     private RendererPicker rendererList;
 
@@ -95,13 +101,13 @@ class StylesheetEditorWidget extends VBox
     /**
      * SizeGroup to keep the subheading Labels aligned.
      */
-    private final SizeGroup size;
+    private final SizeGroup group;
 
     StylesheetEditorWidget(PrimaryWindow primary) {
         super(false, 0);
         top = this;
 
-        size = new SizeGroup(SizeGroupMode.HORIZONTAL);
+        group = new SizeGroup(SizeGroupMode.HORIZONTAL);
 
         setupHeading();
         setupRenderSelector();
@@ -130,7 +136,7 @@ class StylesheetEditorWidget extends VBox
         heading.setAlignment(LEFT, CENTER);
         top.packStart(heading, false, false, 6);
 
-        rendererList = new RendererPicker(size);
+        rendererList = new RendererPicker(group);
         top.packStart(rendererList, false, false, 0);
     }
 
@@ -160,7 +166,7 @@ class StylesheetEditorWidget extends VBox
         paperWidth = new Label("000 mm");
         paperHeight = new Label("000 mm");
 
-        box = new KeyValueBox(size, label, paperList, false);
+        box = new KeyValueBox(group, label, paperList, false);
         top.packStart(box, false, false, 0);
     }
 
@@ -170,6 +176,7 @@ class StylesheetEditorWidget extends VBox
         HBox box;
         final Label heading;
         Label label;
+        HBox value;
         final Table table;
 
         heading = new Label("<b>Margins</b>");
@@ -180,33 +187,24 @@ class StylesheetEditorWidget extends VBox
         sides = new HBox(false, 0);
         left = new VBox(false, 3);
 
-        topMargin = new Entry();
-        leftMargin = new Entry();
-        rightMargin = new Entry();
-        bottomMargin = new Entry();
-
         label = new Label("Top:");
-        box = new KeyValueBox(size, label, topMargin, new Label("mm"));
-        topMargin.setWidthChars(6);
-        topMargin.setAlignment(RIGHT);
+        topMargin = new MilimeterEntry();
+        box = new KeyValueBox(group, label, topMargin, false);
         left.packStart(box, false, false, 0);
 
         label = new Label("Left:");
-        box = new KeyValueBox(size, label, leftMargin, new Label("mm"));
-        leftMargin.setWidthChars(6);
-        leftMargin.setAlignment(RIGHT);
+        leftMargin = new MilimeterEntry();
+        box = new KeyValueBox(group, label, leftMargin, false);
         left.packStart(box, false, false, 0);
 
         label = new Label("Right:");
-        box = new KeyValueBox(size, label, rightMargin, new Label("mm"));
-        rightMargin.setWidthChars(6);
-        rightMargin.setAlignment(RIGHT);
+        rightMargin = new MilimeterEntry();
+        box = new KeyValueBox(group, label, rightMargin, false);
         left.packStart(box, false, false, 0);
 
         label = new Label("Bottom:");
-        box = new KeyValueBox(size, label, bottomMargin, new Label("mm"));
-        bottomMargin.setWidthChars(6);
-        bottomMargin.setAlignment(RIGHT);
+        bottomMargin = new MilimeterEntry();
+        box = new KeyValueBox(group, label, bottomMargin, false);
         left.packStart(box, false, false, 0);
         sides.packStart(left, false, false, 0);
 
@@ -241,6 +239,7 @@ class StylesheetEditorWidget extends VBox
         HBox box;
         final Label heading;
         Label label;
+        HBox value;
 
         heading = new Label("<b>Fonts</b>");
         heading.setUseMarkup(true);
@@ -252,22 +251,30 @@ class StylesheetEditorWidget extends VBox
 
         label = new Label("Serif:");
         serifFont = new Entry();
-        box = new KeyValueBox(size, label, serifFont, false);
+        serifSize = new MilimeterEntry();
+        box = new KeyValueBox(group, label, serifFont, false);
+        box.packStart(serifSize, false, false, 0);
         left.packStart(box, false, false, 0);
 
         label = new Label("Sans:");
         sansFont = new Entry();
-        box = new KeyValueBox(size, label, sansFont, false);
+        sansSize = new MilimeterEntry();
+        box = new KeyValueBox(group, label, sansFont, false);
+        box.packStart(sansSize, false, false, 0);
         left.packStart(box, false, false, 0);
 
         label = new Label("Mono:");
         monoFont = new Entry();
-        box = new KeyValueBox(size, label, monoFont, false);
+        monoSize = new MilimeterEntry();
+        box = new KeyValueBox(group, label, monoFont, false);
+        box.packStart(monoSize, false, false, 0);
         left.packStart(box, false, false, 0);
 
         label = new Label("Heading:");
         headingFont = new Entry();
-        box = new KeyValueBox(size, label, headingFont, false);
+        headingSize = new MilimeterEntry();
+        box = new KeyValueBox(group, label, headingFont, false);
+        box.packStart(headingSize, false, false, 0);
         left.packStart(box, false, false, 0);
 
         sides.packStart(left, true, true, 0);
@@ -319,15 +326,23 @@ class StylesheetEditorWidget extends VBox
 
         str = style.getFontSerif();
         serifFont.setText(str);
+        str = style.getSizeSerif();
+        serifSize.setText(str);
 
         str = style.getFontSans();
         sansFont.setText(str);
+        str = style.getSizeSans();
+        sansSize.setText(str);
 
         str = style.getFontMono();
         monoFont.setText(str);
+        str = style.getSizeMono();
+        monoSize.setText(str);
 
         str = style.getFontHeading();
         headingFont.setText(str);
+        str = style.getSizeHeading();
+        headingSize.setText(str);
 
         page.setStyle(engine);
         paperWidth.setLabel(engine.getPageWidth() + " mm");
@@ -356,9 +371,96 @@ class KeyValueBox extends HBox
         super.packStart(value, expand, expand, 3);
     }
 
-    KeyValueBox(SizeGroup size, Label label, Widget value, Label suffix) {
+    KeyValueBox(SizeGroup size, Label label, Widget value, Widget suffix) {
         this(size, label, value, false);
         super.packStart(suffix, false, false, 3);
+    }
+}
+
+/**
+ * A simple Entry constrained to be 2 digits precision, and having a "mm"
+ * suffix indicating milimeters
+ * 
+ * @author Andrew Cowie
+ */
+class MilimeterEntry extends HBox
+{
+    private final Entry entry;
+
+    MilimeterEntry() {
+        super(false, 0);
+        final Label suffix;
+
+        this.entry = new Entry();
+        entry.setWidthChars(6);
+        entry.setAlignment(RIGHT);
+        super.packStart(entry, false, false, 3);
+
+        suffix = new Label("mm");
+        super.packStart(suffix, false, false, 3);
+
+        entry.connect(new Entry.Activate() {
+
+            public void onActivate(Entry source) {
+                final String str;
+
+                if (!source.getHasFocus()) {
+                    return;
+                }
+
+                str = source.getText();
+                if (str.equals("")) {
+                    return;
+                }
+
+                try {
+                    constrainDecimal(str);
+                    entry.modifyText(StateType.NORMAL, Color.BLACK);
+                } catch (NumberFormatException nfe) {
+                    /*
+                     * if the user input is invalid, then ignore it.
+                     */
+                    entry.modifyText(StateType.NORMAL, Color.RED);
+                    return;
+                }
+
+                /*
+                 * TODO actually set value?!?
+                 */
+            }
+        });
+    }
+
+    /**
+     * Given an input number, constrain to two decimal places
+     * 
+     * @param str
+     * @return
+     */
+    static String constrainDecimal(String str) {
+        final BigDecimal original, reduced;
+        final long num;
+        final StringBuffer buf;
+        final int i;
+
+        original = new BigDecimal(str);
+
+        reduced = original.setScale(1, BigDecimal.ROUND_HALF_UP);
+        num = reduced.unscaledValue().longValue();
+
+        str = Long.toString(num);
+        buf = new StringBuffer(str);
+        i = str.length() - 1;
+
+        buf.insert(i, ".");
+        return buf.toString();
+    }
+
+    void setText(String text) {
+        final String str;
+
+        str = constrainDecimal(text);
+        entry.setText(str);
     }
 }
 
@@ -530,6 +632,10 @@ class MarginsDisplay extends DrawingArea
             matrix.translate(0.0, ((pixelHeight / scaleFactor) - pageHeight) / 2.0);
         }
 
+        /*
+         * Bump the image off of the top left corner.
+         */
+        matrix.translate(0.5, 1.5);
         cr.transform(matrix);
     }
 
@@ -556,7 +662,7 @@ class MarginsDisplay extends DrawingArea
         pageWidth = engine.getPageWidth();
         pageHeight = engine.getPageHeight();
 
-        cr.setLineWidth(4.0);
+        cr.setLineWidth(2.0);
 
         /*
          * Horizontal
@@ -617,6 +723,5 @@ class MarginsDisplay extends DrawingArea
         cr.moveTo(pageWidth + BUMP - 20.0, pageHeight);
         cr.lineRelative(40.0, 0.0);
         cr.stroke();
-
     }
 }

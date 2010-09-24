@@ -7,9 +7,9 @@
     <renderer class="parchment.render.ReportRenderEngine"/>
     <paper size="A4"/>
     <margins top="15.0" left="20.0" right="12.5" bottom="10.0"/>
-    <font serif="Linux Libertine, 9.0"/>
-    <font sans="Liberation Sans, 8.0"/>
-    <font mono="Inconsolata, 8.1"/>
-    <font heading="Linux Libertine O C"/>
+    <font serif="Linux Libertine" size="3.2"/>
+    <font sans="Liberation Sans" size="2.9"/>
+    <font mono="Inconsolata" size="2.8"/>
+    <font heading="Linux Libertine O C" size="5.6"/>
   </presentation>
 </manuscript>

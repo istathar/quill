@@ -59,7 +59,7 @@
 <!ATTLIST font serif CDATA #IMPLIED>
 <!ATTLIST font mono CDATA #IMPLIED>
 <!ATTLIST font heading CDATA #IMPLIED>
-
+<!ATTLIST font size CDATA #REQUIRED>
 
 <!--
   vim: set textwidth=78 nowrap:

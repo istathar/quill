@@ -333,10 +333,10 @@ public abstract class RenderEngine
                 entire = segment.getEntire();
 
                 if (segment instanceof ComponentSegment) {
-                    appendHeading(cr, entire, 32.0);
+                    appendTitle(cr, entire);
                     appendBlankLine(cr);
                 } else if (segment instanceof HeadingSegment) {
-                    appendHeading(cr, entire, 16.0);
+                    appendHeading(cr, entire);
                     appendBlankLine(cr);
                 } else if (segment instanceof PreformatSegment) {
                     appendProgramCode(cr, entire);
@@ -404,13 +404,22 @@ public abstract class RenderEngine
         accumulate(area);
     }
 
-    protected void appendHeading(Context cr, Extract entire, double size) {
+    protected void appendHeading(Context cr, Extract entire) {
+        final Area[] list;
+
+        list = layoutAreaText(cr, entire, headingFace, false, false, false);
+        accumulate(list);
+    }
+
+    protected void appendTitle(Context cr, Extract entire) {
         final FontDescription desc;
         final Typeface face;
         final Area[] list;
+        final double size;
 
         desc = headingFace.desc.copy();
-        desc.setSize(size);
+        size = desc.getSize();
+        desc.setSize(size * 2);
         face = new Typeface(cr, desc, 0.0);
 
         list = layoutAreaText(cr, entire, face, false, false, false);

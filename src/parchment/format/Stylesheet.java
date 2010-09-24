@@ -65,6 +65,14 @@ public class Stylesheet
 
     private final String fontHeading;
 
+    private final String sizeSerif;
+
+    private final String sizeSans;
+
+    private final String sizeMono;
+
+    private final String sizeHeading;
+
     /**
      * Construct a blank ("default") Stylesheet.
      */
@@ -78,10 +86,15 @@ public class Stylesheet
         this.marginRight = "12.5";
         this.marginBottom = "10.0";
 
-        this.fontSerif = "Linux Libertine, 9.0";
-        this.fontSans = "Liberation Sans, 8.0";
-        this.fontMono = "Inconsolata, 8.1";
+        this.fontSerif = "Linux Libertine";
+        this.fontSans = "Liberation Sans";
+        this.fontMono = "Inconsolata";
         this.fontHeading = "Linux Libertine O C";
+
+        this.sizeSerif = "3.2";
+        this.sizeSans = "2.9";
+        this.sizeMono = "2.8";
+        this.sizeHeading = "5.6";
     }
 
     /**
@@ -89,7 +102,7 @@ public class Stylesheet
      */
     public Stylesheet(String rendererClass, String paperSize, String marginTop, String marginLeft,
             String marginRight, String marginBottom, String fontSerif, String fontSans, String fontMono,
-            String fontHeading) {
+            String fontHeading, String sizeSerif, String sizeSans, String sizeMono, String sizeHeading) {
         super();
         this.rendererClass = rendererClass;
         this.paperSize = paperSize;
@@ -101,6 +114,10 @@ public class Stylesheet
         this.fontSans = fontSans;
         this.fontMono = fontMono;
         this.fontHeading = fontHeading;
+        this.sizeSerif = sizeSerif;
+        this.sizeSans = sizeSans;
+        this.sizeMono = sizeMono;
+        this.sizeHeading = sizeHeading;
     }
 
     public String getRendererClass() {
@@ -141,5 +158,21 @@ public class Stylesheet
 
     public String getFontHeading() {
         return fontHeading;
+    }
+
+    public String getSizeSerif() {
+        return sizeSerif;
+    }
+
+    public String getSizeSans() {
+        return sizeSans;
+    }
+
+    public String getSizeMono() {
+        return sizeMono;
+    }
+
+    public String getSizeHeading() {
+        return sizeHeading;
     }
 }
