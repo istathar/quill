@@ -30,8 +30,8 @@ import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.Unit;
 
 import parchment.format.Manuscript;
+import parchment.format.Stylesheet;
 import parchment.render.RenderEngine;
-import parchment.render.ReportRenderEngine;
 import quill.textbase.Folio;
 import quill.ui.UserInterface;
 
@@ -117,6 +117,7 @@ public class Render
         final Context cr;
         final Surface surface;
         final PaperSize paper;
+        final Stylesheet style;
         final RenderEngine engine;
 
         paper = PaperSize.A4;
@@ -128,8 +129,15 @@ public class Render
         surface = new PdfSurface(targetname, paper.getWidth(Unit.POINTS), paper.getHeight(Unit.POINTS));
         cr = new Context(surface);
 
-        engine = new ReportRenderEngine(paper, manuscript, folio);
-        engine.render(cr);
+        style = folio.getStylesheet();
+
+        try {
+            engine = RenderEngine.createRenderer(style);
+        } catch (ApplicationException rnfe) {
+            // FIXME this has to be handled, but NOT here. Hm.
+            throw new Error(rnfe);
+        }
+        engine.render(cr, folio);
 
         surface.finish();
     }

@@ -92,8 +92,8 @@ public class Stylesheet
         this.fontHeading = "Linux Libertine O C";
 
         this.sizeSerif = "3.2";
-        this.sizeSans = "2.9";
-        this.sizeMono = "2.8";
+        this.sizeSans = "2.6";
+        this.sizeMono = "2.9";
         this.sizeHeading = "5.6";
     }
 
