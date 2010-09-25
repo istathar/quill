@@ -161,12 +161,15 @@ class PrimaryWindow extends Window
          */
 
         i = folio.getIndexUpdated();
-        series = folio.getSeries(i);
 
-        editor.advanceTo(series);
+        if (i >= 0) {
+            series = folio.getSeries(i);
 
-        // is this the right place to set this?
-        cursorSeries = series;
+            editor.advanceTo(series);
+
+            // is this the right place to set this?
+            cursorSeries = series;
+        }
 
         stylist.affect(folio);
         /*

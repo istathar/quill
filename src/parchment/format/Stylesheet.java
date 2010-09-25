@@ -128,6 +128,11 @@ public class Stylesheet
         return this.paperSize;
     }
 
+    public Stylesheet createWithPaperSize(String str) {
+        return new Stylesheet(rendererClass, str, marginTop, marginLeft, marginRight, marginBottom,
+                fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono, sizeHeading);
+    }
+
     public String getMarginTop() {
         return marginTop;
     }

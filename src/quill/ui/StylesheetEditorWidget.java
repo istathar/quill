@@ -103,11 +103,17 @@ class StylesheetEditorWidget extends VBox
      */
     private final SizeGroup group;
 
+    /**
+     * Reference to the enclosing document Window.
+     */
+    private final PrimaryWindow primary;
+
     StylesheetEditorWidget(PrimaryWindow primary) {
         super(false, 0);
         top = this;
 
-        group = new SizeGroup(SizeGroupMode.HORIZONTAL);
+        this.primary = primary;
+        this.group = new SizeGroup(SizeGroupMode.HORIZONTAL);
 
         setupHeading();
         setupRenderSelector();
@@ -163,11 +169,22 @@ class StylesheetEditorWidget extends VBox
         paperList.appendText("Letter");
         paperList.setActive(0);
 
-        paperWidth = new Label("000 mm");
-        paperHeight = new Label("000 mm");
+        paperWidth = new Label("000.0 mm");
+        paperHeight = new Label("000.0 mm");
 
         box = new KeyValueBox(group, label, paperList, false);
         top.packStart(box, false, false, 0);
+
+        paperList.connect(new ComboBox.Changed() {
+            public void onChanged(ComboBox source) {
+                final String str;
+                final Stylesheet replacement;
+
+                str = paperList.getActiveText();
+                replacement = style.createWithPaperSize(str);
+                affect(replacement);
+            }
+        });
     }
 
     private void setupMarginPreview() {
@@ -176,7 +193,6 @@ class StylesheetEditorWidget extends VBox
         HBox box;
         final Label heading;
         Label label;
-        HBox value;
         final Table table;
 
         heading = new Label("<b>Margins</b>");
@@ -239,7 +255,6 @@ class StylesheetEditorWidget extends VBox
         HBox box;
         final Label heading;
         Label label;
-        HBox value;
 
         heading = new Label("<b>Fonts</b>");
         heading.setUseMarkup(true);
@@ -297,14 +312,37 @@ class StylesheetEditorWidget extends VBox
         box.packStart(ok, false, false, 0);
 
         top.packEnd(box, false, false, 6);
+
+        ok.connect(new Button.Clicked() {
+            public void onClicked(Button source) {
+                final Folio replacement;
+
+                replacement = folio.update(style);
+                primary.apply(replacement);
+            }
+        });
     }
 
+    private Folio folio;
+
     void affect(Folio folio) {
-        String str, text;
+        final Stylesheet style;
+
+        this.folio = folio;
+
+        style = folio.getStylesheet();
+        affect(style);
+    }
+
+    void affect(Stylesheet style) {
+        String str;
         double width, height;
 
+        if (style == this.style) {
+            return;
+        }
+
         try {
-            style = folio.getStylesheet();
             engine = RenderEngine.createRenderer(style);
         } catch (ApplicationException ae) {
             throw new Error(ae);
@@ -346,19 +384,22 @@ class StylesheetEditorWidget extends VBox
         headingSize.setText(str);
 
         page.setStyle(engine);
+        page.queueDraw();
+
         width = engine.getPageWidth();
         height = engine.getPageHeight();
         paperWidth.setLabel(convertPageSize(width) + " mm");
         paperHeight.setLabel(convertPageSize(height) + " mm");
+
+        this.style = style;
     }
 
     private static String convertPageSize(double points) {
         final double mm;
-        final String str, trim;
+        final String trim;
 
         mm = points / 72.0 * 25.4;
-        str = Double.toString(mm);
-        trim = MilimeterEntry.constrainDecimal(str);
+        trim = MilimeterEntry.constrainDecimal(mm);
         return trim;
     }
 
@@ -413,7 +454,6 @@ class MilimeterEntry extends HBox
         super.packStart(suffix, false, false, 3);
 
         entry.connect(new Entry.Activate() {
-
             public void onActivate(Entry source) {
                 final String str;
 
@@ -427,7 +467,7 @@ class MilimeterEntry extends HBox
                 }
 
                 try {
-                    constrainDecimal(str);
+                    setText(str);
                     entry.modifyText(StateType.NORMAL, Color.BLACK);
                 } catch (NumberFormatException nfe) {
                     /*
@@ -450,13 +490,14 @@ class MilimeterEntry extends HBox
      * @param str
      * @return
      */
-    static String constrainDecimal(String str) {
+    static String constrainDecimal(double d) {
         final BigDecimal original, reduced;
         final long num;
+        final String str;
         final StringBuffer buf;
         final int i;
 
-        original = new BigDecimal(str);
+        original = new BigDecimal(d);
 
         reduced = original.setScale(1, BigDecimal.ROUND_HALF_UP);
         num = reduced.unscaledValue().longValue();
@@ -471,8 +512,10 @@ class MilimeterEntry extends HBox
 
     void setText(String text) {
         final String str;
+        final double d;
 
-        str = constrainDecimal(text);
+        d = Double.valueOf(text);
+        str = constrainDecimal(d);
         entry.setText(str);
     }
 }
