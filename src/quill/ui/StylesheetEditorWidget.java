@@ -301,6 +301,7 @@ class StylesheetEditorWidget extends VBox
 
     void affect(Folio folio) {
         String str, text;
+        double width, height;
 
         try {
             style = folio.getStylesheet();
@@ -345,8 +346,20 @@ class StylesheetEditorWidget extends VBox
         headingSize.setText(str);
 
         page.setStyle(engine);
-        paperWidth.setLabel(engine.getPageWidth() + " mm");
-        paperHeight.setLabel(engine.getPageHeight() + " mm");
+        width = engine.getPageWidth();
+        height = engine.getPageHeight();
+        paperWidth.setLabel(convertPageSize(width) + " mm");
+        paperHeight.setLabel(convertPageSize(height) + " mm");
+    }
+
+    private static String convertPageSize(double points) {
+        final double mm;
+        final String str, trim;
+
+        mm = points / 72.0 * 25.4;
+        str = Double.toString(mm);
+        trim = MilimeterEntry.constrainDecimal(str);
+        return trim;
     }
 
     public void grabDefault() {
