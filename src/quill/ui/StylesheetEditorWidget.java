@@ -142,7 +142,7 @@ class StylesheetEditorWidget extends VBox
         heading.setAlignment(LEFT, CENTER);
         top.packStart(heading, false, false, 6);
 
-        rendererList = new RendererPicker(group);
+        rendererList = new RendererPicker(this, group);
         top.packStart(rendererList, false, false, 0);
     }
 
@@ -204,22 +204,22 @@ class StylesheetEditorWidget extends VBox
         left = new VBox(false, 3);
 
         label = new Label("Top:");
-        topMargin = new MilimeterEntry();
+        topMargin = new MilimeterEntry(this);
         box = new KeyValueBox(group, label, topMargin, false);
         left.packStart(box, false, false, 0);
 
         label = new Label("Left:");
-        leftMargin = new MilimeterEntry();
+        leftMargin = new MilimeterEntry(this);
         box = new KeyValueBox(group, label, leftMargin, false);
         left.packStart(box, false, false, 0);
 
         label = new Label("Right:");
-        rightMargin = new MilimeterEntry();
+        rightMargin = new MilimeterEntry(this);
         box = new KeyValueBox(group, label, rightMargin, false);
         left.packStart(box, false, false, 0);
 
         label = new Label("Bottom:");
-        bottomMargin = new MilimeterEntry();
+        bottomMargin = new MilimeterEntry(this);
         box = new KeyValueBox(group, label, bottomMargin, false);
         left.packStart(box, false, false, 0);
         sides.packStart(left, false, false, 0);
@@ -266,28 +266,28 @@ class StylesheetEditorWidget extends VBox
 
         label = new Label("Serif:");
         serifFont = new Entry();
-        serifSize = new MilimeterEntry();
+        serifSize = new MilimeterEntry(this);
         box = new KeyValueBox(group, label, serifFont, false);
         box.packStart(serifSize, false, false, 0);
         left.packStart(box, false, false, 0);
 
         label = new Label("Sans:");
         sansFont = new Entry();
-        sansSize = new MilimeterEntry();
+        sansSize = new MilimeterEntry(this);
         box = new KeyValueBox(group, label, sansFont, false);
         box.packStart(sansSize, false, false, 0);
         left.packStart(box, false, false, 0);
 
         label = new Label("Mono:");
         monoFont = new Entry();
-        monoSize = new MilimeterEntry();
+        monoSize = new MilimeterEntry(this);
         box = new KeyValueBox(group, label, monoFont, false);
         box.packStart(monoSize, false, false, 0);
         left.packStart(box, false, false, 0);
 
         label = new Label("Heading:");
         headingFont = new Entry();
-        headingSize = new MilimeterEntry();
+        headingSize = new MilimeterEntry(this);
         box = new KeyValueBox(group, label, headingFont, false);
         box.packStart(headingSize, false, false, 0);
         left.packStart(box, false, false, 0);
@@ -407,6 +407,36 @@ class StylesheetEditorWidget extends VBox
         ok.grabFocus();
         ok.grabDefault();
     }
+
+    /**
+     * Read the current values from all UI elements, compose a new Stylesheet,
+     * and apply.
+     */
+    void processFields() {
+        final String rendererClass, paperSize, marginTop, marginLeft, marginRight, marginBottom, fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono, sizeHeading;
+
+        rendererClass = rendererList.getSelectedRenderer();
+
+        paperSize = paperList.getActiveText();
+
+        marginTop = topMargin.getText();
+        marginLeft = leftMargin.getText();
+        marginRight = rightMargin.getText();
+        marginBottom = bottomMargin.getText();
+
+        fontSerif = serifFont.getText();
+        fontSans = sansFont.getText();
+        fontMono = monoFont.getText();
+        fontHeading = headingFont.getText();
+
+        sizeSerif = serifSize.getText();
+        sizeSans = sansSize.getText();
+        sizeMono = monoSize.getText();
+        sizeHeading = headingSize.getText();
+
+        new Stylesheet(rendererClass, paperSize, marginTop, marginLeft, marginRight, marginBottom,
+                fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono, sizeHeading);
+    }
 }
 
 class KeyValueBox extends HBox
@@ -441,7 +471,7 @@ class MilimeterEntry extends HBox
 {
     private final Entry entry;
 
-    MilimeterEntry() {
+    MilimeterEntry(final StylesheetEditorWidget parent) {
         super(false, 0);
         final Label suffix;
 
@@ -477,9 +507,7 @@ class MilimeterEntry extends HBox
                     return;
                 }
 
-                /*
-                 * TODO actually set value?!?
-                 */
+                parent.processFields();
             }
         });
     }
@@ -518,6 +546,10 @@ class MilimeterEntry extends HBox
         str = constrainDecimal(d);
         entry.setText(str);
     }
+
+    String getText() {
+        return entry.getText();
+    }
 }
 
 class RendererPicker extends VBox
@@ -536,7 +568,7 @@ class RendererPicker extends VBox
 
     private final Label renderer;
 
-    RendererPicker(SizeGroup size) {
+    RendererPicker(final StylesheetEditorWidget parent, final SizeGroup size) {
         super(false, 0);
         HBox box;
         Label label;
@@ -583,6 +615,10 @@ class RendererPicker extends VBox
 
                 str = model.getValue(row, classColumn);
                 renderer.setLabel(str);
+
+                if (combo.getHasFocus()) {
+                    parent.processFields();
+                }
             }
         });
 
@@ -601,6 +637,19 @@ class RendererPicker extends VBox
         top.packStart(box, false, false, 0);
 
         combo.setActive(0);
+    }
+
+    /**
+     * Access the Java class name that has been selected by this Widget.
+     */
+    String getSelectedRenderer() {
+        final TreeIter row;
+        final String str;
+
+        row = combo.getActiveIter();
+        str = model.getValue(row, classColumn);
+
+        return str;
     }
 
     private void populate(String rendererName, String rendererDescription, boolean isDefault,
