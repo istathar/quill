@@ -26,6 +26,7 @@ import org.gnome.gdk.Color;
 import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
+import org.gnome.gtk.AttachOptions;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.ButtonBoxStyle;
 import org.gnome.gtk.CellRendererPixbuf;
@@ -204,24 +205,57 @@ class StylesheetEditorWidget extends VBox
         left = new VBox(false, 3);
 
         label = new Label("Top:");
-        topMargin = new MilimeterEntry(this);
+        topMargin = new MilimeterEntry();
         box = new KeyValueBox(group, label, topMargin, false);
         left.packStart(box, false, false, 0);
+        topMargin.connect(new MilimeterEntry.Changed() {
+            public void onChanged(String value) {
+                final Stylesheet replacement;
+
+                replacement = style.changeMarginTop(value);
+                affect(replacement);
+            }
+        });
 
         label = new Label("Left:");
-        leftMargin = new MilimeterEntry(this);
+        leftMargin = new MilimeterEntry();
         box = new KeyValueBox(group, label, leftMargin, false);
         left.packStart(box, false, false, 0);
+        leftMargin.connect(new MilimeterEntry.Changed() {
+            public void onChanged(String value) {
+                final Stylesheet replacement;
+
+                replacement = style.changeMarginLeft(value);
+                affect(replacement);
+            }
+        });
 
         label = new Label("Right:");
-        rightMargin = new MilimeterEntry(this);
+        rightMargin = new MilimeterEntry();
         box = new KeyValueBox(group, label, rightMargin, false);
         left.packStart(box, false, false, 0);
+        rightMargin.connect(new MilimeterEntry.Changed() {
+            public void onChanged(String value) {
+                final Stylesheet replacement;
+
+                replacement = style.changeMarginRight(value);
+                affect(replacement);
+            }
+        });
 
         label = new Label("Bottom:");
-        bottomMargin = new MilimeterEntry(this);
+        bottomMargin = new MilimeterEntry();
         box = new KeyValueBox(group, label, bottomMargin, false);
         left.packStart(box, false, false, 0);
+        bottomMargin.connect(new MilimeterEntry.Changed() {
+            public void onChanged(String value) {
+                final Stylesheet replacement;
+
+                replacement = style.changeMarginBottom(value);
+                affect(replacement);
+            }
+        });
+
         sides.packStart(left, false, false, 0);
 
         /*
@@ -233,7 +267,7 @@ class StylesheetEditorWidget extends VBox
         page.setSizeRequest(130, 180);
 
         table = new Table(2, 2, false);
-        table.attach(page, 0, 1, 0, 1);
+        table.attach(page, 0, 1, 0, 1, AttachOptions.SHRINK, AttachOptions.SHRINK, 0, 0);
 
         paperHeight.setAlignment(LEFT, CENTER);
         table.attach(paperHeight, 1, 2, 0, 1);
@@ -266,31 +300,63 @@ class StylesheetEditorWidget extends VBox
 
         label = new Label("Serif:");
         serifFont = new Entry();
-        serifSize = new MilimeterEntry(this);
+        serifSize = new MilimeterEntry();
         box = new KeyValueBox(group, label, serifFont, false);
         box.packStart(serifSize, false, false, 0);
         left.packStart(box, false, false, 0);
+        serifSize.connect(new MilimeterEntry.Changed() {
+            public void onChanged(String value) {
+                final Stylesheet replacement;
+
+                replacement = style.changeSizeSerif(value);
+                affect(replacement);
+            }
+        });
 
         label = new Label("Sans:");
         sansFont = new Entry();
-        sansSize = new MilimeterEntry(this);
+        sansSize = new MilimeterEntry();
         box = new KeyValueBox(group, label, sansFont, false);
         box.packStart(sansSize, false, false, 0);
         left.packStart(box, false, false, 0);
+        sansSize.connect(new MilimeterEntry.Changed() {
+            public void onChanged(String value) {
+                final Stylesheet replacement;
+
+                replacement = style.changeSizeSans(value);
+                affect(replacement);
+            }
+        });
 
         label = new Label("Mono:");
         monoFont = new Entry();
-        monoSize = new MilimeterEntry(this);
+        monoSize = new MilimeterEntry();
         box = new KeyValueBox(group, label, monoFont, false);
         box.packStart(monoSize, false, false, 0);
         left.packStart(box, false, false, 0);
+        monoSize.connect(new MilimeterEntry.Changed() {
+            public void onChanged(String value) {
+                final Stylesheet replacement;
+
+                replacement = style.changeSizeMono(value);
+                affect(replacement);
+            }
+        });
 
         label = new Label("Heading:");
         headingFont = new Entry();
-        headingSize = new MilimeterEntry(this);
+        headingSize = new MilimeterEntry();
         box = new KeyValueBox(group, label, headingFont, false);
         box.packStart(headingSize, false, false, 0);
         left.packStart(box, false, false, 0);
+        headingSize.connect(new MilimeterEntry.Changed() {
+            public void onChanged(String value) {
+                final Stylesheet replacement;
+
+                replacement = style.changeSizeHeading(value);
+                affect(replacement);
+            }
+        });
 
         sides.packStart(left, true, true, 0);
         top.packStart(sides, false, false, 6);
@@ -319,6 +385,7 @@ class StylesheetEditorWidget extends VBox
 
                 replacement = folio.update(style);
                 primary.apply(replacement);
+                primary.switchToPreview();
             }
         });
     }
@@ -414,6 +481,7 @@ class StylesheetEditorWidget extends VBox
      */
     void processFields() {
         final String rendererClass, paperSize, marginTop, marginLeft, marginRight, marginBottom, fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono, sizeHeading;
+        final Stylesheet replacement;
 
         rendererClass = rendererList.getSelectedRenderer();
 
@@ -434,8 +502,11 @@ class StylesheetEditorWidget extends VBox
         sizeMono = monoSize.getText();
         sizeHeading = headingSize.getText();
 
-        new Stylesheet(rendererClass, paperSize, marginTop, marginLeft, marginRight, marginBottom,
-                fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono, sizeHeading);
+        replacement = new Stylesheet(rendererClass, paperSize, marginTop, marginLeft, marginRight,
+                marginBottom, fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono,
+                sizeHeading);
+
+        affect(replacement);
     }
 }
 
@@ -471,11 +542,14 @@ class MilimeterEntry extends HBox
 {
     private final Entry entry;
 
-    MilimeterEntry(final StylesheetEditorWidget parent) {
+    private MilimeterEntry.Changed handler;
+
+    MilimeterEntry() {
         super(false, 0);
         final Label suffix;
 
         this.entry = new Entry();
+
         entry.setWidthChars(6);
         entry.setAlignment(RIGHT);
         super.packStart(entry, false, false, 3);
@@ -485,31 +559,44 @@ class MilimeterEntry extends HBox
 
         entry.connect(new Entry.Activate() {
             public void onActivate(Entry source) {
-                final String str;
-
                 if (!source.getHasFocus()) {
                     return;
                 }
 
-                str = source.getText();
-                if (str.equals("")) {
-                    return;
-                }
-
-                try {
-                    setText(str);
-                    entry.modifyText(StateType.NORMAL, Color.BLACK);
-                } catch (NumberFormatException nfe) {
-                    /*
-                     * if the user input is invalid, then ignore it.
-                     */
-                    entry.modifyText(StateType.NORMAL, Color.RED);
-                    return;
-                }
-
-                parent.processFields();
+                validate();
             }
         });
+    }
+
+    private void validate() {
+        final String str;
+
+        str = entry.getText();
+        if (str.equals("")) {
+            return;
+        }
+
+        try {
+            setText(str);
+            entry.modifyText(StateType.NORMAL, Color.BLACK);
+        } catch (NumberFormatException nfe) {
+            /*
+             * if the user input is invalid, then ignore it.
+             */
+            entry.modifyText(StateType.NORMAL, Color.RED);
+            return;
+        }
+
+        handler.onChanged(str);
+    }
+
+    interface Changed
+    {
+        void onChanged(String value);
+    }
+
+    void connect(MilimeterEntry.Changed handler) {
+        this.handler = handler;
     }
 
     /**
@@ -614,7 +701,7 @@ class RendererPicker extends VBox
                 row = source.getActiveIter();
 
                 str = model.getValue(row, classColumn);
-                renderer.setLabel(str);
+                renderer.setLabel("<tt>" + str + "</tt>");
 
                 if (combo.getHasFocus()) {
                     parent.processFields();
@@ -666,7 +753,7 @@ class RendererPicker extends VBox
             model.setValue(row, defaultColumn, null);
         }
 
-        model.setValue(row, classColumn, "<tt>" + typeName + "</tt>");
+        model.setValue(row, classColumn, typeName);
     }
 }
 
