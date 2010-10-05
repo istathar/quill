@@ -24,6 +24,7 @@ import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Matrix;
 import org.gnome.gdk.Color;
 import org.gnome.gdk.EventExpose;
+import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.AttachOptions;
@@ -36,6 +37,7 @@ import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnPixbuf;
 import org.gnome.gtk.DataColumnString;
 import org.gnome.gtk.DrawingArea;
+import org.gnome.gtk.Editable;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.HButtonBox;
@@ -385,6 +387,7 @@ class StylesheetEditorWidget extends VBox
 
                 replacement = folio.update(style);
                 primary.apply(replacement);
+                primary.switchToEditor();
                 primary.switchToPreview();
             }
         });
@@ -408,6 +411,7 @@ class StylesheetEditorWidget extends VBox
         if (style == this.style) {
             return;
         }
+        this.style = style;
 
         try {
             engine = RenderEngine.createRenderer(style);
@@ -457,8 +461,6 @@ class StylesheetEditorWidget extends VBox
         height = engine.getPageHeight();
         paperWidth.setLabel(convertPageSize(width) + " mm");
         paperHeight.setLabel(convertPageSize(height) + " mm");
-
-        this.style = style;
     }
 
     private static String convertPageSize(double points) {
@@ -544,6 +546,12 @@ class MilimeterEntry extends HBox
 
     private MilimeterEntry.Changed handler;
 
+    private String safeValue;
+
+    private String originalValue;
+
+    private boolean valid;
+
     MilimeterEntry() {
         super(false, 0);
         final Label suffix;
@@ -557,39 +565,76 @@ class MilimeterEntry extends HBox
         suffix = new Label("mm");
         super.packStart(suffix, false, false, 3);
 
-        entry.connect(new Entry.Activate() {
-            public void onActivate(Entry source) {
-                if (!source.getHasFocus()) {
+        /*
+         * Colourize the entry depending on whether it has meaningful digits
+         * in it. Will set safeValue if the value is valid.
+         */
+
+        entry.connect(new Entry.Changed() {
+            public void onChanged(Editable source) {
+                final String str;
+                final double d;
+
+                str = entry.getText();
+                if (str.equals("")) {
                     return;
                 }
 
-                validate();
+                try {
+                    d = Double.valueOf(str);
+                    safeValue = constrainDecimal(d);
+                    valid = true;
+                    entry.modifyText(StateType.NORMAL, Color.BLACK);
+                } catch (NumberFormatException nfe) {
+                    /*
+                     * if the user input is invalid, then we warn about it.
+                     */
+                    valid = false;
+                    entry.modifyText(StateType.NORMAL, Color.RED);
+                }
+            }
+        });
+
+        /*
+         * When the user "leaves" the Widget, we tidy up the number, and then
+         * call the handler which causes a new Stylesheet to be made,
+         * presumably.
+         */
+
+        entry.connect(new Widget.FocusOutEvent() {
+            public boolean onFocusOutEvent(Widget source, EventFocus event) {
+                if (!valid) {
+                    entry.setText(originalValue);
+                    return false;
+                }
+
+                if (originalValue.equals(safeValue)) {
+                    return false;
+                } else {
+                    source.activate();
+                    return false;
+                }
+            }
+        });
+        entry.connect(new Entry.Activate() {
+            public void onActivate(Entry source) {
+                if (originalValue.equals(safeValue)) {
+                    return;
+                }
+                entry.setText(safeValue);
+                handler.onChanged(safeValue);
+                originalValue = safeValue;
+                valid = true;
             }
         });
     }
 
-    private void validate() {
-        final String str;
-
-        str = entry.getText();
-        if (str.equals("")) {
-            return;
-        }
-
-        try {
-            setText(str);
-            entry.modifyText(StateType.NORMAL, Color.BLACK);
-        } catch (NumberFormatException nfe) {
-            /*
-             * if the user input is invalid, then ignore it.
-             */
-            entry.modifyText(StateType.NORMAL, Color.RED);
-            return;
-        }
-
-        handler.onChanged(str);
-    }
-
+    /**
+     * When the value has (commleted) being changed by the user. This is more
+     * a "commit" than Entry.Changed, but hey.
+     * 
+     * @author Andrew Cowie
+     */
     interface Changed
     {
         void onChanged(String value);
@@ -602,8 +647,7 @@ class MilimeterEntry extends HBox
     /**
      * Given an input number, constrain to two decimal places
      * 
-     * @param str
-     * @return
+     * @throws NumberFormatException
      */
     static String constrainDecimal(double d) {
         final BigDecimal original, reduced;
@@ -625,17 +669,29 @@ class MilimeterEntry extends HBox
         return buf.toString();
     }
 
-    void setText(String text) {
-        final String str;
-        final double d;
+    /**
+     * Given a String value, set the Entry to show it. We assume you are
+     * calling this with a valid value. This sets safeValue internally, which
+     * will be used when anything requests the value of this MilimeterEntry.
+     */
+    void setText(String str) {
+        if (str.equals(safeValue)) {
+            return;
+        }
 
-        d = Double.valueOf(text);
-        str = constrainDecimal(d);
         entry.setText(str);
+
+        /*
+         * Record a copy, so we can "revert" to a known good value if
+         * validation fails.
+         */
+
+        originalValue = str;
+        valid = true;
     }
 
     String getText() {
-        return entry.getText();
+        return safeValue;
     }
 }
 
