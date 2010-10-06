@@ -115,7 +115,6 @@ class StylesheetEditorWidget extends VBox
         setupHeading();
         setupRenderSelector();
         setupPaperSelector();
-        setupMarginPreview();
         setupFontPreview();
         setupActionButtons();
     }
@@ -144,8 +143,14 @@ class StylesheetEditorWidget extends VBox
     }
 
     private void setupPaperSelector() {
-        final HBox box;
-        final Label heading, label;
+        final HBox sides;
+        final VBox left;
+        Label heading, label;
+        final Table table;
+        HBox box;
+
+        sides = new HBox(false, 0);
+        left = new VBox(false, 3);
 
         heading = new Label("<b>Paper</b>");
         heading.setUseMarkup(true);
@@ -170,7 +175,8 @@ class StylesheetEditorWidget extends VBox
         paperHeight = new Label("000.0 mm");
 
         box = new KeyValueBox(group, label, paperList, false);
-        top.packStart(box, false, false, 0);
+        left.packStart(box, false, false, 0);
+        sides.packStart(left, false, false, 0);
 
         paperList.connect(new ComboBox.Changed() {
             public void onChanged(ComboBox source) {
@@ -182,23 +188,38 @@ class StylesheetEditorWidget extends VBox
                 affect(replacement);
             }
         });
-    }
 
-    private void setupMarginPreview() {
-        final HBox sides;
-        final VBox left;
-        HBox box;
-        final Label heading;
-        Label label;
-        final Table table;
+        /*
+         * On the right, include an illustration of the page size, showing
+         * dimensions.
+         */
+
+        page = new MarginsDisplay();
+        page.setSizeRequest(130, 180);
+
+        table = new Table(2, 2, false);
+        table.attach(page, 0, 1, 0, 1, AttachOptions.SHRINK, AttachOptions.SHRINK, 0, 0);
+
+        paperHeight.setAlignment(LEFT, CENTER);
+        table.attach(paperHeight, 1, 2, 0, 1);
+
+        paperWidth.setAlignment(CENTER, TOP);
+        table.attach(paperWidth, 0, 1, 1, 2);
+
+        /*
+         * Ensure the whole thing floats in the center of the pane
+         */
+
+        sides.packStart(table, true, false, 0);
+
+        /*
+         * Now, the margins
+         */
 
         heading = new Label("<b>Margins</b>");
         heading.setUseMarkup(true);
         heading.setAlignment(LEFT, CENTER);
-        top.packStart(heading, false, false, 6);
-
-        sides = new HBox(false, 0);
-        left = new VBox(false, 3);
+        left.packStart(heading, false, false, 6);
 
         label = new Label("Top:");
         topMargin = new MilimetreEntry();
@@ -252,30 +273,6 @@ class StylesheetEditorWidget extends VBox
             }
         });
 
-        sides.packStart(left, false, false, 0);
-
-        /*
-         * Surround a representation of a page with Entries for the margin
-         * values.
-         */
-
-        page = new MarginsDisplay();
-        page.setSizeRequest(130, 180);
-
-        table = new Table(2, 2, false);
-        table.attach(page, 0, 1, 0, 1, AttachOptions.SHRINK, AttachOptions.SHRINK, 0, 0);
-
-        paperHeight.setAlignment(LEFT, CENTER);
-        table.attach(paperHeight, 1, 2, 0, 1);
-
-        paperWidth.setAlignment(CENTER, TOP);
-        table.attach(paperWidth, 0, 1, 1, 2);
-
-        /*
-         * Ensure the whole thing floats in the center of the pane
-         */
-
-        sides.packStart(table, true, false, 0);
         top.packStart(sides, false, false, 6);
     }
 

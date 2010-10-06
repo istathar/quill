@@ -57,7 +57,7 @@ class MilimetreEntry extends HBox
 
         entry.setWidthChars(6);
         entry.setAlignment(RIGHT);
-        super.packStart(entry, false, false, 3);
+        super.packStart(entry, false, false, 0);
 
         suffix = new Label("mm");
         super.packStart(suffix, false, false, 3);
