@@ -200,10 +200,10 @@ class StylesheetEditorWidget extends VBox
         table = new Table(2, 2, false);
         table.attach(page, 0, 1, 0, 1, AttachOptions.SHRINK, AttachOptions.SHRINK, 0, 0);
 
-        paperHeight.setAlignment(LEFT, CENTER);
+        paperHeight.setAlignment(LEFT, 0.4f);
         table.attach(paperHeight, 1, 2, 0, 1);
 
-        paperWidth.setAlignment(CENTER, TOP);
+        paperWidth.setAlignment(0.4f, TOP);
         table.attach(paperWidth, 0, 1, 1, 2);
 
         /*
@@ -659,8 +659,8 @@ class MarginsDisplay extends DrawingArea
                 cr = new Context(event);
 
                 scaleOutput(cr, engine);
-                drawPageOutline(cr, engine);
-                drawPageDimensions(cr, engine);
+                drawPageOutline(cr);
+                drawPageDimensions(cr);
 
                 return true;
             }
@@ -675,25 +675,37 @@ class MarginsDisplay extends DrawingArea
         this.engine = engine;
     }
 
-    private static final double BUMP = 50.0;
+    private static final int BUMP = 20;
 
+    private static final int HEAD = 4;
+
+    /**
+     * Page width, in pixels! We round to integers so that we draw on pixels
+     * and don't get anti-aliasing.
+     */
+    private int pageWidth, pageHeight;
+
+    /**
+     * Calculate a scaling factor and width parameters. Unlike PreviewWidget
+     * we are not scaling the entire page. We're drawing in pixels.
+     */
     private void scaleOutput(Context cr, final RenderEngine engine) {
         final Allocation rect;
         final Matrix matrix;
-        final double scaleWidth, scaleHeight, scaleFactor;
-        final double pageWidth, pageHeight;
+        final double engineWidth, engineHeight;
         final double pixelWidth, pixelHeight;
+        final double scaleWidth, scaleHeight, scaleFactor;
 
         rect = this.getAllocation();
 
         pixelWidth = rect.getWidth();
         pixelHeight = rect.getHeight();
 
-        pageWidth = engine.getPageWidth();
-        pageHeight = engine.getPageHeight();
+        engineWidth = engine.getPageWidth();
+        engineHeight = engine.getPageHeight();
 
-        scaleWidth = pixelWidth / (pageWidth + (2.0 * BUMP) + 10.0);
-        scaleHeight = pixelHeight / (pageHeight + (2.0 * BUMP) + 10.0);
+        scaleWidth = (pixelWidth - 2.0 * BUMP) / engineWidth;
+        scaleHeight = (pixelHeight - 2.0 * BUMP) / engineHeight;
 
         if (scaleWidth > scaleHeight) {
             scaleFactor = scaleHeight;
@@ -701,31 +713,23 @@ class MarginsDisplay extends DrawingArea
             scaleFactor = scaleWidth;
         }
 
-        matrix = new Matrix();
-        matrix.scale(scaleFactor, scaleFactor);
-
-        if (scaleWidth > scaleHeight) {
-            matrix.translate(((pixelWidth / scaleFactor) - pageWidth) / 2.0, 0.0);
-        } else {
-            matrix.translate(0.0, ((pixelHeight / scaleFactor) - pageHeight) / 2.0);
-        }
+        pageWidth = (int) (engineWidth * scaleFactor);
+        pageHeight = (int) (engineHeight * scaleFactor);
 
         /*
-         * Bump the image off of the top left corner.
+         * Bump the image off of the top left corner. Adding (0.5, 0.5) means
+         * we are drawing on pixels, rather than in the trough between them.
          */
-        matrix.translate(0.5, 1.5);
+
+        matrix = new Matrix();
+        matrix.translate(0.5, 0.5);
         cr.transform(matrix);
     }
 
     /*
      * This code is almost identical to that in PreviewWidget
      */
-    private void drawPageOutline(Context cr, RenderEngine engine) {
-        final double pageWidth, pageHeight;
-
-        pageWidth = engine.getPageWidth();
-        pageHeight = engine.getPageHeight();
-
+    private void drawPageOutline(Context cr) {
         cr.rectangle(0.0, 0.0, pageWidth, pageHeight);
         cr.setSource(1.0, 1.0, 1.0);
         cr.fillPreserve();
@@ -734,72 +738,73 @@ class MarginsDisplay extends DrawingArea
         cr.stroke();
     }
 
-    private void drawPageDimensions(Context cr, RenderEngine engine) {
-        final double pageWidth, pageHeight;
-
-        pageWidth = engine.getPageWidth();
-        pageHeight = engine.getPageHeight();
-
-        cr.setLineWidth(2.0);
+    /*
+     * We're working in pixels, so fine, use ints, but the usual caveats about
+     * not doing so if we're dividing. This is all cosmetic, so it doesn't
+     * really matter. We work in proper doubles in the RenderEngines, of
+     * course.
+     */
+    private void drawPageDimensions(Context cr) {
+        cr.setLineWidth(1.0);
 
         /*
          * Horizontal
          */
 
-        cr.moveTo(0.0, pageHeight + BUMP);
-        cr.lineRelative(pageWidth, 0.0);
+        cr.moveTo(0, pageHeight + BUMP);
+        cr.lineRelative(pageWidth, 0);
         cr.stroke();
 
         // left
-        cr.moveTo(0.0, pageHeight + BUMP);
-        cr.lineRelative(25.0, -15.0);
-        cr.lineRelative(0.0, 30.0);
+        cr.moveTo(0, pageHeight + BUMP);
+        cr.lineRelative(2 * HEAD, -HEAD);
+        cr.lineRelative(0, HEAD * 2);
         cr.closePath();
         cr.fill();
 
-        cr.moveTo(0.0, pageHeight + BUMP - 20.0);
-        cr.lineRelative(0.0, 40.0);
+        cr.moveTo(0, pageHeight + BUMP - HEAD);
+        cr.lineRelative(0, 2 * HEAD);
         cr.stroke();
 
         // right
         cr.moveTo(pageWidth, pageHeight + BUMP);
-        cr.lineRelative(-25.0, -15.0);
-        cr.lineRelative(0.0, 30.0);
+        cr.lineRelative(-(2 * HEAD), -HEAD);
+        cr.lineRelative(0, 2 * HEAD);
         cr.closePath();
         cr.fill();
 
-        cr.moveTo(pageWidth, pageHeight + BUMP - 20.0);
-        cr.lineRelative(0.0, 40.0);
+        cr.moveTo(pageWidth, pageHeight + BUMP - HEAD);
+        cr.lineRelative(0, 2 * HEAD);
         cr.stroke();
 
         /*
          * Vertical
          */
 
-        cr.moveTo(pageWidth + BUMP, 0.0);
-        cr.lineRelative(0.0, pageHeight);
+        cr.moveTo(pageWidth + BUMP, 0);
+        cr.lineRelative(0, pageHeight);
         cr.stroke();
 
         // top
-        cr.moveTo(pageWidth + BUMP, 0.0);
-        cr.lineRelative(-15.0, 25.0);
-        cr.lineRelative(30.0, 0.0);
+        cr.moveTo(pageWidth + BUMP, 0);
+        cr.lineRelative(-HEAD, 2 * HEAD);
+        cr.lineRelative(2 * HEAD, 0);
         cr.closePath();
         cr.fill();
 
-        cr.moveTo(pageWidth + BUMP - 20.0, 0.0);
-        cr.lineRelative(40.0, 0.0);
+        cr.moveTo(pageWidth + BUMP - HEAD, 0);
+        cr.lineRelative(2 * HEAD, 0);
         cr.stroke();
 
         // bottom
         cr.moveTo(pageWidth + BUMP, pageHeight);
-        cr.lineRelative(-15.0, -25.0);
-        cr.lineRelative(30.0, 0.0);
+        cr.lineRelative(-HEAD, -(2 * HEAD));
+        cr.lineRelative(2 * HEAD, 0);
         cr.closePath();
         cr.fill();
 
-        cr.moveTo(pageWidth + BUMP - 20.0, pageHeight);
-        cr.lineRelative(40.0, 0.0);
+        cr.moveTo(pageWidth + BUMP - HEAD, pageHeight);
+        cr.lineRelative(2 * HEAD, 0);
         cr.stroke();
     }
 }
