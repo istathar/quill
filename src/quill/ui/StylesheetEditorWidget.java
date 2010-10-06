@@ -18,13 +18,9 @@
  */
 package quill.ui;
 
-import java.math.BigDecimal;
-
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Matrix;
-import org.gnome.gdk.Color;
 import org.gnome.gdk.EventExpose;
-import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.AttachOptions;
@@ -37,7 +33,6 @@ import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnPixbuf;
 import org.gnome.gtk.DataColumnString;
 import org.gnome.gtk.DrawingArea;
-import org.gnome.gtk.Editable;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.HButtonBox;
@@ -45,7 +40,6 @@ import org.gnome.gtk.Label;
 import org.gnome.gtk.ListStore;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.SizeGroupMode;
-import org.gnome.gtk.StateType;
 import org.gnome.gtk.Stock;
 import org.gnome.gtk.Table;
 import org.gnome.gtk.TextComboBox;
@@ -85,11 +79,11 @@ class StylesheetEditorWidget extends VBox
      */
     private RenderEngine engine;
 
-    private MilimeterEntry topMargin, leftMargin, rightMargin, bottomMargin;
+    private MilimetreEntry topMargin, leftMargin, rightMargin, bottomMargin;
 
     private Entry serifFont, sansFont, monoFont, headingFont;
 
-    private MilimeterEntry serifSize, sansSize, monoSize, headingSize;
+    private MilimetreEntry serifSize, sansSize, monoSize, headingSize;
 
     private RendererPicker rendererList;
 
@@ -207,10 +201,10 @@ class StylesheetEditorWidget extends VBox
         left = new VBox(false, 3);
 
         label = new Label("Top:");
-        topMargin = new MilimeterEntry();
+        topMargin = new MilimetreEntry();
         box = new KeyValueBox(group, label, topMargin, false);
         left.packStart(box, false, false, 0);
-        topMargin.connect(new MilimeterEntry.Changed() {
+        topMargin.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
 
@@ -220,10 +214,10 @@ class StylesheetEditorWidget extends VBox
         });
 
         label = new Label("Left:");
-        leftMargin = new MilimeterEntry();
+        leftMargin = new MilimetreEntry();
         box = new KeyValueBox(group, label, leftMargin, false);
         left.packStart(box, false, false, 0);
-        leftMargin.connect(new MilimeterEntry.Changed() {
+        leftMargin.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
 
@@ -233,10 +227,10 @@ class StylesheetEditorWidget extends VBox
         });
 
         label = new Label("Right:");
-        rightMargin = new MilimeterEntry();
+        rightMargin = new MilimetreEntry();
         box = new KeyValueBox(group, label, rightMargin, false);
         left.packStart(box, false, false, 0);
-        rightMargin.connect(new MilimeterEntry.Changed() {
+        rightMargin.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
 
@@ -246,10 +240,10 @@ class StylesheetEditorWidget extends VBox
         });
 
         label = new Label("Bottom:");
-        bottomMargin = new MilimeterEntry();
+        bottomMargin = new MilimetreEntry();
         box = new KeyValueBox(group, label, bottomMargin, false);
         left.packStart(box, false, false, 0);
-        bottomMargin.connect(new MilimeterEntry.Changed() {
+        bottomMargin.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
 
@@ -302,11 +296,11 @@ class StylesheetEditorWidget extends VBox
 
         label = new Label("Serif:");
         serifFont = new Entry();
-        serifSize = new MilimeterEntry();
+        serifSize = new MilimetreEntry();
         box = new KeyValueBox(group, label, serifFont, false);
         box.packStart(serifSize, false, false, 0);
         left.packStart(box, false, false, 0);
-        serifSize.connect(new MilimeterEntry.Changed() {
+        serifSize.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
 
@@ -317,11 +311,11 @@ class StylesheetEditorWidget extends VBox
 
         label = new Label("Sans:");
         sansFont = new Entry();
-        sansSize = new MilimeterEntry();
+        sansSize = new MilimetreEntry();
         box = new KeyValueBox(group, label, sansFont, false);
         box.packStart(sansSize, false, false, 0);
         left.packStart(box, false, false, 0);
-        sansSize.connect(new MilimeterEntry.Changed() {
+        sansSize.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
 
@@ -332,11 +326,11 @@ class StylesheetEditorWidget extends VBox
 
         label = new Label("Mono:");
         monoFont = new Entry();
-        monoSize = new MilimeterEntry();
+        monoSize = new MilimetreEntry();
         box = new KeyValueBox(group, label, monoFont, false);
         box.packStart(monoSize, false, false, 0);
         left.packStart(box, false, false, 0);
-        monoSize.connect(new MilimeterEntry.Changed() {
+        monoSize.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
 
@@ -347,11 +341,11 @@ class StylesheetEditorWidget extends VBox
 
         label = new Label("Heading:");
         headingFont = new Entry();
-        headingSize = new MilimeterEntry();
+        headingSize = new MilimetreEntry();
         box = new KeyValueBox(group, label, headingFont, false);
         box.packStart(headingSize, false, false, 0);
         left.packStart(box, false, false, 0);
-        headingSize.connect(new MilimeterEntry.Changed() {
+        headingSize.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
 
@@ -468,7 +462,7 @@ class StylesheetEditorWidget extends VBox
         final String trim;
 
         mm = points / 72.0 * 25.4;
-        trim = MilimeterEntry.constrainDecimal(mm);
+        trim = MilimetreEntry.constrainDecimal(mm);
         return trim;
     }
 
@@ -531,167 +525,6 @@ class KeyValueBox extends HBox
     KeyValueBox(SizeGroup size, Label label, Widget value, Widget suffix) {
         this(size, label, value, false);
         super.packStart(suffix, false, false, 3);
-    }
-}
-
-/**
- * A simple Entry constrained to be 2 digits precision, and having a "mm"
- * suffix indicating milimeters
- * 
- * @author Andrew Cowie
- */
-class MilimeterEntry extends HBox
-{
-    private final Entry entry;
-
-    private MilimeterEntry.Changed handler;
-
-    private String safeValue;
-
-    private String originalValue;
-
-    private boolean valid;
-
-    MilimeterEntry() {
-        super(false, 0);
-        final Label suffix;
-
-        this.entry = new Entry();
-
-        entry.setWidthChars(6);
-        entry.setAlignment(RIGHT);
-        super.packStart(entry, false, false, 3);
-
-        suffix = new Label("mm");
-        super.packStart(suffix, false, false, 3);
-
-        /*
-         * Colourize the entry depending on whether it has meaningful digits
-         * in it. Will set safeValue if the value is valid.
-         */
-
-        entry.connect(new Entry.Changed() {
-            public void onChanged(Editable source) {
-                final String str;
-                final double d;
-
-                str = entry.getText();
-                if (str.equals("")) {
-                    return;
-                }
-
-                try {
-                    d = Double.valueOf(str);
-                    safeValue = constrainDecimal(d);
-                    valid = true;
-                    entry.modifyText(StateType.NORMAL, Color.BLACK);
-                } catch (NumberFormatException nfe) {
-                    /*
-                     * if the user input is invalid, then we warn about it.
-                     */
-                    valid = false;
-                    entry.modifyText(StateType.NORMAL, Color.RED);
-                }
-            }
-        });
-
-        /*
-         * When the user "leaves" the Widget, we tidy up the number, and then
-         * call the handler which causes a new Stylesheet to be made,
-         * presumably.
-         */
-
-        entry.connect(new Widget.FocusOutEvent() {
-            public boolean onFocusOutEvent(Widget source, EventFocus event) {
-                if (!valid) {
-                    entry.setText(originalValue);
-                    return false;
-                }
-
-                if (originalValue.equals(safeValue)) {
-                    return false;
-                } else {
-                    source.activate();
-                    return false;
-                }
-            }
-        });
-        entry.connect(new Entry.Activate() {
-            public void onActivate(Entry source) {
-                if (originalValue.equals(safeValue)) {
-                    return;
-                }
-                entry.setText(safeValue);
-                handler.onChanged(safeValue);
-                originalValue = safeValue;
-                valid = true;
-            }
-        });
-    }
-
-    /**
-     * When the value has (commleted) being changed by the user. This is more
-     * a "commit" than Entry.Changed, but hey.
-     * 
-     * @author Andrew Cowie
-     */
-    interface Changed
-    {
-        void onChanged(String value);
-    }
-
-    void connect(MilimeterEntry.Changed handler) {
-        this.handler = handler;
-    }
-
-    /**
-     * Given an input number, constrain to two decimal places
-     * 
-     * @throws NumberFormatException
-     */
-    static String constrainDecimal(double d) {
-        final BigDecimal original, reduced;
-        final long num;
-        final String str;
-        final StringBuffer buf;
-        final int i;
-
-        original = new BigDecimal(d);
-
-        reduced = original.setScale(1, BigDecimal.ROUND_HALF_UP);
-        num = reduced.unscaledValue().longValue();
-
-        str = Long.toString(num);
-        buf = new StringBuffer(str);
-        i = str.length() - 1;
-
-        buf.insert(i, ".");
-        return buf.toString();
-    }
-
-    /**
-     * Given a String value, set the Entry to show it. We assume you are
-     * calling this with a valid value. This sets safeValue internally, which
-     * will be used when anything requests the value of this MilimeterEntry.
-     */
-    void setText(String str) {
-        if (str.equals(safeValue)) {
-            return;
-        }
-
-        entry.setText(str);
-
-        /*
-         * Record a copy, so we can "revert" to a known good value if
-         * validation fails.
-         */
-
-        originalValue = str;
-        valid = true;
-    }
-
-    String getText() {
-        return safeValue;
     }
 }
 

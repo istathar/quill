@@ -21,13 +21,13 @@ package quill.ui;
 public class ValidateConstrainedEntries extends GraphicalTestCase
 {
     public final void testSetup() {
-        MilimeterEntry.class.getName();
+        MilimetreEntry.class.getName();
     }
 
     public final void testTwoDecimalPlaces() {
         final String result;
 
-        result = MilimeterEntry.constrainDecimal("45.67");
+        result = MilimetreEntry.constrainDecimal("45.67");
         assertEquals("45.67", result);
     }
 
