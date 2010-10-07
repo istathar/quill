@@ -24,8 +24,6 @@ import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.AttachOptions;
-import org.gnome.gtk.Button;
-import org.gnome.gtk.ButtonBoxStyle;
 import org.gnome.gtk.CellRendererPixbuf;
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.ComboBox;
@@ -35,12 +33,10 @@ import org.gnome.gtk.DataColumnString;
 import org.gnome.gtk.DrawingArea;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
-import org.gnome.gtk.HButtonBox;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.ListStore;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.SizeGroupMode;
-import org.gnome.gtk.Stock;
 import org.gnome.gtk.Table;
 import org.gnome.gtk.TextComboBox;
 import org.gnome.gtk.TreeIter;
@@ -93,8 +89,6 @@ class StylesheetEditorWidget extends VBox
 
     private PageSizeDisplay page;
 
-    private Button ok, revert;
-
     /**
      * SizeGroup to keep the subheading Labels aligned.
      */
@@ -104,6 +98,8 @@ class StylesheetEditorWidget extends VBox
      * Reference to the enclosing document Window.
      */
     private final PrimaryWindow primary;
+
+    private Folio folio;
 
     StylesheetEditorWidget(PrimaryWindow primary) {
         super(false, 0);
@@ -116,7 +112,6 @@ class StylesheetEditorWidget extends VBox
         setupRenderSelector();
         setupPaperSelector();
         setupFontPreview();
-        setupActionButtons();
     }
 
     private void setupHeading() {
@@ -185,7 +180,7 @@ class StylesheetEditorWidget extends VBox
 
                 str = paperList.getActiveText();
                 replacement = style.createWithPaperSize(str);
-                affect(replacement);
+                propegateStylesheetChange(replacement);
             }
         });
 
@@ -230,7 +225,7 @@ class StylesheetEditorWidget extends VBox
                 final Stylesheet replacement;
 
                 replacement = style.changeMarginTop(value);
-                affect(replacement);
+                propegateStylesheetChange(replacement);
             }
         });
 
@@ -243,7 +238,7 @@ class StylesheetEditorWidget extends VBox
                 final Stylesheet replacement;
 
                 replacement = style.changeMarginLeft(value);
-                affect(replacement);
+                propegateStylesheetChange(replacement);
             }
         });
 
@@ -256,7 +251,7 @@ class StylesheetEditorWidget extends VBox
                 final Stylesheet replacement;
 
                 replacement = style.changeMarginRight(value);
-                affect(replacement);
+                propegateStylesheetChange(replacement);
             }
         });
 
@@ -269,7 +264,7 @@ class StylesheetEditorWidget extends VBox
                 final Stylesheet replacement;
 
                 replacement = style.changeMarginBottom(value);
-                affect(replacement);
+                propegateStylesheetChange(replacement);
             }
         });
 
@@ -302,7 +297,7 @@ class StylesheetEditorWidget extends VBox
                 final Stylesheet replacement;
 
                 replacement = style.changeSizeSerif(value);
-                affect(replacement);
+                propegateStylesheetChange(replacement);
             }
         });
 
@@ -317,7 +312,7 @@ class StylesheetEditorWidget extends VBox
                 final Stylesheet replacement;
 
                 replacement = style.changeSizeSans(value);
-                affect(replacement);
+                propegateStylesheetChange(replacement);
             }
         });
 
@@ -332,7 +327,7 @@ class StylesheetEditorWidget extends VBox
                 final Stylesheet replacement;
 
                 replacement = style.changeSizeMono(value);
-                affect(replacement);
+                propegateStylesheetChange(replacement);
             }
         });
 
@@ -347,7 +342,7 @@ class StylesheetEditorWidget extends VBox
                 final Stylesheet replacement;
 
                 replacement = style.changeSizeHeading(value);
-                affect(replacement);
+                propegateStylesheetChange(replacement);
             }
         });
 
@@ -355,50 +350,14 @@ class StylesheetEditorWidget extends VBox
         top.packStart(sides, false, false, 6);
     }
 
-    private void setupActionButtons() {
-        final HButtonBox box;
-
-        box = new HButtonBox();
-        box.setLayout(ButtonBoxStyle.END);
-        box.setSpacing(6);
-
-        revert = new Button(Stock.REVERT_TO_SAVED);
-        box.packStart(revert, false, false, 0);
-
-        ok = new Button(Stock.OK);
-        ok.setCanDefault(true);
-        ok.grabFocus();
-        box.packStart(ok, false, false, 0);
-
-        top.packEnd(box, false, false, 6);
-
-        ok.connect(new Button.Clicked() {
-            public void onClicked(Button source) {
-                final Folio replacement;
-
-                replacement = folio.update(style);
-                primary.apply(replacement);
-                primary.switchToEditor();
-                primary.switchToPreview();
-            }
-        });
-    }
-
-    private Folio folio;
-
     void affect(Folio folio) {
         final Stylesheet style;
+        String str;
+        final double width, height;
 
         this.folio = folio;
 
         style = folio.getStylesheet();
-        affect(style);
-    }
-
-    void affect(Stylesheet style) {
-        String str;
-        double width, height;
-
         if (style == this.style) {
             return;
         }
@@ -452,6 +411,24 @@ class StylesheetEditorWidget extends VBox
         height = engine.getPageHeight();
         paperWidth.setLabel(convertPageSize(width) + " mm");
         paperHeight.setLabel(convertPageSize(height) + " mm");
+
+    }
+
+    /**
+     * Create a new Folio, propegate it, and update the preview.
+     */
+    /*
+     * Calling switchToPreview() is probably not ideal as a way to trigger an
+     * update, as it really needs to be something asynchronous, but it works
+     * and will do for now.
+     */
+    private void propegateStylesheetChange(Stylesheet style) {
+        final Folio replacement;
+
+        replacement = folio.update(style);
+        primary.apply(replacement);
+        this.affect(replacement);
+        primary.switchToPreview();
     }
 
     private static String convertPageSize(double points) {
@@ -464,8 +441,7 @@ class StylesheetEditorWidget extends VBox
     }
 
     public void grabDefault() {
-        ok.grabFocus();
-        ok.grabDefault();
+        paperList.grabFocus();
     }
 
     /**
@@ -499,7 +475,7 @@ class StylesheetEditorWidget extends VBox
                 marginBottom, fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono,
                 sizeHeading);
 
-        affect(replacement);
+        propegateStylesheetChange(replacement);
     }
 }
 
