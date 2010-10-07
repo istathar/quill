@@ -19,6 +19,7 @@
 package quill.ui;
 
 import org.freedesktop.cairo.Context;
+import org.freedesktop.cairo.FontOptions;
 import org.freedesktop.cairo.Matrix;
 import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Allocation;
@@ -34,6 +35,9 @@ import org.gnome.pango.Rectangle;
 
 import parchment.render.RenderEngine;
 import parchment.render.RenderSettings;
+
+import static org.freedesktop.cairo.HintMetrics.OFF;
+import static org.freedesktop.cairo.HintStyle.NONE;
 
 class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
 {
@@ -131,6 +135,7 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
      * the two fields.
      */
     private void calculateMetrics() {
+        final FontOptions options;
         final double pixelWidth, pixelHeight;
         final Allocation alloc;
         final FontDescription serif;
@@ -138,6 +143,18 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
         Rectangle rect;
         final double scaleWidth, scaleHeight, fontWidth, fontHeight;
         final double ascent, height;
+
+        /*
+         * Turn off hinting, a) because we don't hint in RenderEngine, and b)
+         * because pixel alignment is silly at such large scale. In any case,
+         * the point is exactly consistent spacing and presentation across
+         * scales. So, off.
+         */
+
+        options = new FontOptions();
+        options.setHintMetrics(OFF);
+        options.setHintStyle(NONE);
+        layout.getContext().setFontOptions(options);
 
         /*
          * Work out the height of an 'x' for later use.

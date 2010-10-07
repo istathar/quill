@@ -73,6 +73,7 @@ import quill.textbase.Special;
 import quill.textbase.TextChain;
 
 import static org.freedesktop.cairo.HintMetrics.OFF;
+import static org.freedesktop.cairo.HintStyle.NONE;
 import static quill.textbase.Span.createSpan;
 
 /**
@@ -614,6 +615,7 @@ public abstract class RenderEngine
 
         options = new FontOptions();
         options.setHintMetrics(OFF);
+        options.setHintStyle(NONE);
         layout.getContext().setFontOptions(options);
 
         layout.setFontDescription(face.desc);

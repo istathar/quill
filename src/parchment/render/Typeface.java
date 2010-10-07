@@ -26,6 +26,7 @@ import org.gnome.pango.LayoutLine;
 import org.gnome.pango.Rectangle;
 
 import static org.freedesktop.cairo.HintMetrics.OFF;
+import static org.freedesktop.cairo.HintStyle.NONE;
 
 /**
  * Information about a font, including its description and metrics. Used for
@@ -65,6 +66,7 @@ class Typeface
         layout = new Layout(cr);
         options = new FontOptions();
         options.setHintMetrics(OFF);
+        options.setHintStyle(NONE);
         layout.getContext().setFontOptions(options);
 
         layout.setFontDescription(desc);
