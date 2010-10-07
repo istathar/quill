@@ -71,7 +71,7 @@ class StylesheetEditorWidget extends VBox
     private Stylesheet style;
 
     /**
-     * an instance of a renderer based on Style.
+     * An instance of a renderer based on style.
      */
     private RenderEngine engine;
 
@@ -88,6 +88,8 @@ class StylesheetEditorWidget extends VBox
     private Label paperWidth, paperHeight;
 
     private PageSizeDisplay page;
+
+    private FontHeightDisplay preview;
 
     /**
      * SizeGroup to keep the subheading Labels aligned.
@@ -110,7 +112,8 @@ class StylesheetEditorWidget extends VBox
 
         setupHeading();
         setupRenderSelector();
-        setupPaperSelector();
+        setupPaperAndMargins();
+        setupFontAndSizes();
         setupFontPreview();
     }
 
@@ -137,7 +140,7 @@ class StylesheetEditorWidget extends VBox
         top.packStart(rendererList, false, false, 0);
     }
 
-    private void setupPaperSelector() {
+    private void setupPaperAndMargins() {
         final HBox sides;
         final VBox left;
         Label heading, label;
@@ -271,7 +274,7 @@ class StylesheetEditorWidget extends VBox
         top.packStart(sides, false, false, 6);
     }
 
-    private void setupFontPreview() {
+    private void setupFontAndSizes() {
         final HBox sides;
         final VBox left;
         HBox box;
@@ -412,6 +415,8 @@ class StylesheetEditorWidget extends VBox
         paperWidth.setLabel(convertPageSize(width) + " mm");
         paperHeight.setLabel(convertPageSize(height) + " mm");
 
+        preview.setRenderer(engine);
+        preview.queueDraw();
     }
 
     /**
@@ -440,6 +445,10 @@ class StylesheetEditorWidget extends VBox
         return trim;
     }
 
+    /*
+     * Make sure that something other than one of the entries has default. For
+     * some reason calling grabDefault() on the Combo crashes?!?
+     */
     public void grabDefault() {
         paperList.grabFocus();
     }
@@ -477,6 +486,12 @@ class StylesheetEditorWidget extends VBox
 
         propegateStylesheetChange(replacement);
     }
+
+    private void setupFontPreview() {
+        preview = new FontHeightDisplay();
+        top.packStart(preview, true, true, 0);
+    }
+
 }
 
 class KeyValueBox extends HBox
@@ -652,7 +667,7 @@ class PageSizeDisplay extends DrawingArea
         this.engine = engine;
     }
 
-    private static final int BUMP = 20;
+    private static final int BUMP = 15;
 
     private static final int HEAD = 4;
 

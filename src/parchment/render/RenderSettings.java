@@ -32,7 +32,7 @@ import parchment.format.UnsupportedValueException;
  * @author Andrew Cowie
  */
 // immutable, not that it really matters.
-class RenderSettings
+public class RenderSettings
 {
     private final PaperSize paper;
 
@@ -174,19 +174,19 @@ class RenderSettings
         return this.marginBottom;
     }
 
-    FontDescription getFontSerif() {
+    public FontDescription getFontSerif() {
         return this.fontSerif;
     }
 
-    FontDescription getFontSans() {
+    public FontDescription getFontSans() {
         return this.fontSans;
     }
 
-    FontDescription getFontMono() {
+    public FontDescription getFontMono() {
         return this.fontMono;
     }
 
-    FontDescription getFontHeading() {
+    public FontDescription getFontHeading() {
         return this.fontHeading;
     }
 }
