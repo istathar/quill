@@ -48,7 +48,7 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
     FontHeightDisplay() {
         drawing = this;
         drawing.connect(this);
-        drawing.setSizeRequest(-1, 100);
+        drawing.setSizeRequest(-1, 150);
     }
 
     void setRenderer(RenderEngine engine) {
@@ -61,6 +61,8 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
         final Context cr;
 
         cr = new Context(event);
+        layout = new Layout(cr);
+        list = new AttributeList();
 
         setupText(cr);
         calculateMetrics(cr);
@@ -70,8 +72,14 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
         scaleOutput(cr);
         drawText(cr);
 
+        layout = null;
+        list = null;
         return true;
     }
+
+    private String text;
+
+    private AttributeList list;
 
     private Layout layout;
 
@@ -81,16 +89,13 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
      */
     private void setupText(final Context cr) {
         final StringBuffer buf;
-        final AttributeList list;
         FontDescription desc;
         String str;
         int offset, width;
         Attribute attr;
         int i;
 
-        layout = new Layout(cr);
         buf = new StringBuffer();
-        list = new AttributeList();
 
         offset = 0;
 
@@ -117,9 +122,7 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
             offset += width;
         }
 
-        str = buf.toString();
-        layout.setText(str);
-        layout.setAttributes(list);
+        text = buf.toString();
     }
 
     /**
@@ -130,20 +133,40 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
     private void calculateMetrics(final Context cr) {
         final double pixelWidth, pixelHeight;
         final Allocation alloc;
+        final FontDescription serif;
         LayoutLine line;
         Rectangle rect;
         final double scaleWidth, scaleHeight, fontWidth, fontHeight;
         final double ascent, height;
-        final FontDescription serif;
-        Layout other;
+
+        /*
+         * Work out the height of an 'x' for later use.
+         */
+
+        layout.setText("x");
+        serif = settings.getFontSerif();
+        layout.setFontDescription(serif);
+
+        line = layout.getLineReadonly(0);
+        rect = line.getExtentsInk();
+        height = rect.getAscent();
+
+        /*
+         * Now work out the scaling factor. We want something that is wider
+         * than the actual rendered text, and yet stable. Start with the text
+         * String in all serif as an assumption.
+         */
 
         alloc = super.getAllocation();
         pixelWidth = alloc.getWidth();
         pixelHeight = alloc.getHeight();
 
+        layout.setText(text);
+
         line = layout.getLineReadonly(0);
         rect = line.getExtentsLogical();
-        fontWidth = rect.getWidth() + 1.0; // extend line beyond last character.
+
+        fontWidth = rect.getWidth();
         fontHeight = rect.getHeight();
         scaleWidth = pixelWidth / fontWidth;
         scaleHeight = pixelHeight / fontHeight;
@@ -155,27 +178,19 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
         }
 
         /*
-         * Now calculate the baseline position.
+         * Now calculate the baseline and the x-height positions.
          */
 
         ascent = rect.getAscent();
-
         baseline = (int) (ascent * scaleFactor);
+        xheight = (int) ((ascent - height) * scaleFactor);
 
         /*
-         * And the x-height position
+         * Finally, set the actual text and attributes.
          */
 
-        other = new Layout(cr);
-        serif = settings.getFontSerif();
-        other.setFontDescription(serif);
-
-        other.setText("x");
-        line = other.getLineReadonly(0);
-        rect = line.getExtentsInk();
-        height = rect.getAscent();
-
-        xheight = (int) ((ascent - height) * scaleFactor);
+        layout.setText(text);
+        layout.setAttributes(list);
     }
 
     /**
