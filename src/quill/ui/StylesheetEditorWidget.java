@@ -91,7 +91,7 @@ class StylesheetEditorWidget extends VBox
 
     private Label paperWidth, paperHeight;
 
-    private MarginsDisplay page;
+    private PageSizeDisplay page;
 
     private Button ok, revert;
 
@@ -194,7 +194,7 @@ class StylesheetEditorWidget extends VBox
          * dimensions.
          */
 
-        page = new MarginsDisplay();
+        page = new PageSizeDisplay();
         page.setSizeRequest(130, 180);
 
         table = new Table(2, 2, false);
@@ -643,13 +643,18 @@ class RendererPicker extends VBox
     }
 }
 
-class MarginsDisplay extends DrawingArea
+/*
+ * This was originally envisioned as something that would show margins, but it
+ * turned out to just be an interesting way of illustrating the dimensions of
+ * a page.
+ */
+class PageSizeDisplay extends DrawingArea
 {
     private final DrawingArea drawing;
 
     private RenderEngine engine;
 
-    MarginsDisplay() {
+    PageSizeDisplay() {
         drawing = this;
 
         drawing.connect(new Widget.ExposeEvent() {
@@ -667,10 +672,6 @@ class MarginsDisplay extends DrawingArea
         });
     }
 
-    /*
-     * FIXME We should not be creating a new RenderEngine! And, once again
-     * this is NOT the place to be doing the valdiation trap.
-     */
     void setStyle(RenderEngine engine) {
         this.engine = engine;
     }
@@ -693,25 +694,24 @@ class MarginsDisplay extends DrawingArea
         final Allocation rect;
         final Matrix matrix;
         final double engineWidth, engineHeight;
-        final double pixelWidth, pixelHeight;
-        final double scaleWidth, scaleHeight, scaleFactor;
+        final double pixelWidth;
+        final double scaleFactor;
 
         rect = this.getAllocation();
 
         pixelWidth = rect.getWidth();
-        pixelHeight = rect.getHeight();
 
         engineWidth = engine.getPageWidth();
         engineHeight = engine.getPageHeight();
 
-        scaleWidth = (pixelWidth - 2.0 * BUMP) / engineWidth;
-        scaleHeight = (pixelHeight - 2.0 * BUMP) / engineHeight;
+        /*
+         * FUTURE This calculation is messy. We used to pick one of height or
+         * width, except that meant that when you changed paper size one of
+         * width or height stayed fixed, thereby not graphically representing
+         * the different paper sizes. So we've somewhat hardcoded it.
+         */
 
-        if (scaleWidth > scaleHeight) {
-            scaleFactor = scaleHeight;
-        } else {
-            scaleFactor = scaleWidth;
-        }
+        scaleFactor = (pixelWidth - 2.0 * BUMP) / 600.0; // HARDCODE
 
         pageWidth = (int) (engineWidth * scaleFactor);
         pageHeight = (int) (engineHeight * scaleFactor);
