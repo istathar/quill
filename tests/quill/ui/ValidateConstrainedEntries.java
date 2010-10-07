@@ -27,7 +27,7 @@ public class ValidateConstrainedEntries extends GraphicalTestCase
     public final void testTwoDecimalPlaces() {
         final String result;
 
-        result = MilimetreEntry.constrainDecimal("45.67");
+        result = MilimetreEntry.constrainDecimal(45.67);
         assertEquals("45.67", result);
     }
 

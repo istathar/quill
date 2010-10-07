@@ -65,7 +65,7 @@ public class ValidateManuscriptLoading extends IOTestCase
         Element chapter, font;
         Attribute attribute;
         String name, value;
-        String[] expected, sides, widths, faces, desc;
+        String[] expected, sides, widths, faces, desc, sizes;
         int i, num;
 
         document = load("xml/Example.parchment");
@@ -192,10 +192,10 @@ public class ValidateManuscriptLoading extends IOTestCase
         };
 
         desc = new String[] {
-                "Linux Libertine, 9.0",
-                "Liberation Sans, 8.0",
-                "Inconsolata, 8.1",
-                "Linux Libertine O C"
+                "Linux Libertine", "Liberation Sans", "Inconsolata", "Linux Libertine O C"
+        };
+        sizes = new String[] {
+                "3.2", "2.6", "3.0", "5.6"
         };
 
         for (i = 0; i < 4; i++) {
@@ -204,12 +204,19 @@ public class ValidateManuscriptLoading extends IOTestCase
             assertEquals("font", name);
 
             num = font.getAttributeCount();
-            assertEquals(1, num);
+            assertEquals(2, num);
+
             attribute = font.getAttribute(0);
             name = attribute.getLocalName();
             assertEquals(faces[i], name);
             value = attribute.getValue();
             assertEquals(desc[i], value);
+
+            attribute = font.getAttribute(1);
+            name = attribute.getLocalName();
+            assertEquals("size", name);
+            value = attribute.getValue();
+            assertEquals(sizes[i], value);
         }
     }
 }

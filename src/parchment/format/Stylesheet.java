@@ -93,7 +93,7 @@ public class Stylesheet
 
         this.sizeSerif = "3.2";
         this.sizeSans = "2.6";
-        this.sizeMono = "2.9";
+        this.sizeMono = "3.0";
         this.sizeHeading = "5.6";
     }
 
