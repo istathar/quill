@@ -122,11 +122,17 @@ class ManuscriptConverter
         value = style.getFontSerif();
         attribute = new Attribute("serif", value);
         font.addAttribute(attribute);
+        value = style.getSizeSerif();
+        attribute = new Attribute("size", value);
+        font.addAttribute(attribute);
         presentation.appendChild(font);
 
         font = new ManuscriptElement("font");
         value = style.getFontSans();
         attribute = new Attribute("sans", value);
+        font.addAttribute(attribute);
+        value = style.getSizeSans();
+        attribute = new Attribute("size", value);
         font.addAttribute(attribute);
         presentation.appendChild(font);
 
@@ -134,11 +140,17 @@ class ManuscriptConverter
         value = style.getFontMono();
         attribute = new Attribute("mono", value);
         font.addAttribute(attribute);
+        value = style.getSizeMono();
+        attribute = new Attribute("size", value);
+        font.addAttribute(attribute);
         presentation.appendChild(font);
 
         font = new ManuscriptElement("font");
         value = style.getFontHeading();
         attribute = new Attribute("heading", value);
+        font.addAttribute(attribute);
+        value = style.getSizeHeading();
+        attribute = new Attribute("size", value);
         font.addAttribute(attribute);
         presentation.appendChild(font);
     }

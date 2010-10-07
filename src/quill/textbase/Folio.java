@@ -166,4 +166,8 @@ public class Folio
     public Stylesheet getStylesheet() {
         return style;
     }
+
+    public Folio update(Stylesheet style) {
+        return new Folio(this.manuscript, this.chapters, this.components, -1, style);
+    }
 }

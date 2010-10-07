@@ -28,6 +28,7 @@ import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gdk.WindowState;
+import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.ButtonsType;
@@ -85,6 +86,8 @@ class PrimaryWindow extends Window
     private Notebook right;
 
     private ComponentEditorWidget editor;
+
+    private StylesheetEditorWidget stylist;
 
     private IntroductionWidget intro;
 
@@ -158,13 +161,17 @@ class PrimaryWindow extends Window
          */
 
         i = folio.getIndexUpdated();
-        series = folio.getSeries(i);
 
-        editor.advanceTo(series);
+        if (i >= 0) {
+            series = folio.getSeries(i);
 
-        // is this the right place to set this?
-        cursorSeries = series;
+            editor.advanceTo(series);
 
+            // is this the right place to set this?
+            cursorSeries = series;
+        }
+
+        stylist.affect(folio);
         /*
          * Update the PreviewWidget's idea of the current state
          */
@@ -266,6 +273,8 @@ class PrimaryWindow extends Window
     }
 
     private void setupEditorSide() {
+        final Alignment align;
+
         left = new Notebook();
         left.setShowTabs(false);
         left.setShowBorder(false);
@@ -273,6 +282,13 @@ class PrimaryWindow extends Window
 
         editor = new ComponentEditorWidget(this);
         left.insertPage(editor, null, 0);
+
+        stylist = new StylesheetEditorWidget(this);
+        align = new Alignment();
+        align.setAlignment(Alignment.LEFT, Alignment.TOP, 1.0f, 1.0f);
+        align.setPadding(0, 0, 3, 0);
+        align.add(stylist);
+        left.insertPage(align, null, 1);
 
         two.packStart(left, true, true, 0);
     }
@@ -337,11 +353,16 @@ class PrimaryWindow extends Window
                     } else if (key == Keyval.F3) {
                         switchToOutline();
                         return true;
+                    } else if (key == Keyval.F5) {
+                        switchToEditor();
+                        return true;
+                    } else if (key == Keyval.F6) {
+                        switchToStylesheet();
+                        return true;
                     }
 
-                    if ((key == Keyval.F4) || (key == Keyval.F5) || (key == Keyval.F6)
-                            || (key == Keyval.F7) || (key == Keyval.F8) || (key == Keyval.F9)
-                            || (key == Keyval.F10)) {
+                    if ((key == Keyval.F4) || (key == Keyval.F7) || (key == Keyval.F8)
+                            || (key == Keyval.F9) || (key == Keyval.F10)) {
                         // nothing yet
                         return true;
                     }
@@ -475,6 +496,11 @@ class PrimaryWindow extends Window
         left.setCurrentPage(0);
     }
 
+    void switchToStylesheet() {
+        left.setCurrentPage(1);
+        stylist.grabDefault();
+    }
+
     /**
      * Change the right side to show the help pane.
      */
@@ -521,6 +547,7 @@ class PrimaryWindow extends Window
         cursorSeries = series;
 
         editor.initializeSeries(series);
+        stylist.affect(folio);
         preview.affect(folio);
         outline.affect(folio);
         this.updateTitle();

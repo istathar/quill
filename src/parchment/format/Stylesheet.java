@@ -65,6 +65,14 @@ public class Stylesheet
 
     private final String fontHeading;
 
+    private final String sizeSerif;
+
+    private final String sizeSans;
+
+    private final String sizeMono;
+
+    private final String sizeHeading;
+
     /**
      * Construct a blank ("default") Stylesheet.
      */
@@ -78,10 +86,15 @@ public class Stylesheet
         this.marginRight = "12.5";
         this.marginBottom = "10.0";
 
-        this.fontSerif = "Linux Libertine, 9.0";
-        this.fontSans = "Liberation Sans, 8.0";
-        this.fontMono = "Inconsolata, 8.1";
+        this.fontSerif = "Linux Libertine";
+        this.fontSans = "Liberation Sans";
+        this.fontMono = "Inconsolata";
         this.fontHeading = "Linux Libertine O C";
+
+        this.sizeSerif = "3.2";
+        this.sizeSans = "2.6";
+        this.sizeMono = "3.0";
+        this.sizeHeading = "5.6";
     }
 
     /**
@@ -89,7 +102,7 @@ public class Stylesheet
      */
     public Stylesheet(String rendererClass, String paperSize, String marginTop, String marginLeft,
             String marginRight, String marginBottom, String fontSerif, String fontSans, String fontMono,
-            String fontHeading) {
+            String fontHeading, String sizeSerif, String sizeSans, String sizeMono, String sizeHeading) {
         super();
         this.rendererClass = rendererClass;
         this.paperSize = paperSize;
@@ -101,6 +114,10 @@ public class Stylesheet
         this.fontSans = fontSans;
         this.fontMono = fontMono;
         this.fontHeading = fontHeading;
+        this.sizeSerif = sizeSerif;
+        this.sizeSans = sizeSans;
+        this.sizeMono = sizeMono;
+        this.sizeHeading = sizeHeading;
     }
 
     public String getRendererClass() {
@@ -111,35 +128,125 @@ public class Stylesheet
         return this.paperSize;
     }
 
+    public Stylesheet createWithPaperSize(String value) {
+        return new Stylesheet(rendererClass, value, marginTop, marginLeft, marginRight, marginBottom,
+                fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono, sizeHeading);
+    }
+
     public String getMarginTop() {
         return marginTop;
+    }
+
+    public Stylesheet changeMarginTop(String value) {
+        return new Stylesheet(rendererClass, paperSize, value, marginLeft, marginRight, marginBottom,
+                fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono, sizeHeading);
     }
 
     public String getMarginLeft() {
         return this.marginLeft;
     }
 
+    public Stylesheet changeMarginLeft(String value) {
+        return new Stylesheet(rendererClass, paperSize, marginTop, value, marginRight, marginBottom,
+                fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono, sizeHeading);
+    }
+
     public String getMarginRight() {
         return this.marginRight;
+    }
+
+    public Stylesheet changeMarginRight(String value) {
+        return new Stylesheet(rendererClass, paperSize, marginTop, marginLeft, value, marginBottom,
+                fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono, sizeHeading);
     }
 
     public String getMarginBottom() {
         return this.marginBottom;
     }
 
+    public Stylesheet changeMarginBottom(String value) {
+        return new Stylesheet(rendererClass, paperSize, marginTop, marginLeft, marginRight, value,
+                fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono, sizeHeading);
+    }
+
     public String getFontSerif() {
         return fontSerif;
+    }
+
+    public Stylesheet changeFontSerif(String value) {
+        return new Stylesheet(rendererClass, paperSize, marginTop, marginLeft, marginRight,
+                marginBottom, value, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono,
+                sizeHeading);
     }
 
     public String getFontSans() {
         return fontSans;
     }
 
+    public Stylesheet changeFontSans(String value) {
+        return new Stylesheet(rendererClass, paperSize, marginTop, marginLeft, marginRight,
+                marginBottom, fontSerif, value, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono,
+                sizeHeading);
+    }
+
     public String getFontMono() {
         return fontMono;
+    }
+
+    public Stylesheet changeFontMono(String value) {
+        return new Stylesheet(rendererClass, paperSize, marginTop, marginLeft, marginRight,
+                marginBottom, fontSerif, fontSans, value, fontHeading, sizeSerif, sizeSans, sizeMono,
+                sizeHeading);
     }
 
     public String getFontHeading() {
         return fontHeading;
     }
+
+    public Stylesheet changeFontHeading(String value) {
+        return new Stylesheet(rendererClass, paperSize, marginTop, marginLeft, marginRight,
+                marginBottom, fontSerif, fontSans, fontMono, value, sizeSerif, sizeSans, sizeMono,
+                sizeHeading);
+    }
+
+    public String getSizeSerif() {
+        return sizeSerif;
+    }
+
+    public Stylesheet changeSizeSerif(String value) {
+        return new Stylesheet(rendererClass, paperSize, marginTop, marginLeft, marginRight,
+                marginBottom, fontSerif, fontSans, fontMono, fontHeading, value, sizeSans, sizeMono,
+                sizeHeading);
+    }
+
+    public String getSizeSans() {
+        return sizeSans;
+    }
+
+    public Stylesheet changeSizeSans(String value) {
+        return new Stylesheet(rendererClass, paperSize, marginTop, marginLeft, marginRight,
+                marginBottom, fontSerif, fontSans, fontMono, fontHeading, sizeSerif, value, sizeMono,
+                sizeHeading);
+    }
+
+    public String getSizeMono() {
+        return sizeMono;
+    }
+
+    public Stylesheet changeSizeMono(String value) {
+        return new Stylesheet(rendererClass, paperSize, marginTop, marginLeft, marginRight,
+                marginBottom, fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, value,
+                sizeHeading);
+    }
+
+    public String getSizeHeading() {
+        return sizeHeading;
+    }
+
+    public Stylesheet changeSizeHeading(String value) {
+        return new Stylesheet(rendererClass, paperSize, marginTop, marginLeft, marginRight,
+                marginBottom, fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono,
+                value);
+    }
+
 }

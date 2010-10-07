@@ -27,6 +27,8 @@ import parchment.format.Stylesheet;
 import parchment.format.UnsupportedValueException;
 import quill.ui.GraphicalTestCase;
 
+import static parchment.render.RenderSettings.convertMilimetresToPoints;
+
 /**
  * Check the validation logic when converting from Stylesheets to
  * RenderSettings.
@@ -50,10 +52,14 @@ public class ValidateStylesheetToRenderSettingsConversion extends GraphicalTestC
         assertEquals("20.0", style.getMarginLeft());
         assertEquals("12.5", style.getMarginRight());
         assertEquals("10.0", style.getMarginBottom());
-        assertEquals("Linux Libertine, 9.0", style.getFontSerif());
-        assertEquals("Liberation Sans, 8.0", style.getFontSans());
-        assertEquals("Inconsolata, 8.1", style.getFontMono());
+        assertEquals("Linux Libertine", style.getFontSerif());
+        assertEquals("Liberation Sans", style.getFontSans());
+        assertEquals("Inconsolata", style.getFontMono());
         assertEquals("Linux Libertine O C", style.getFontHeading());
+        assertEquals("3.2", style.getSizeSerif());
+        assertEquals("2.6", style.getSizeSans());
+        assertEquals("3.0", style.getSizeMono());
+        assertEquals("5.6", style.getSizeHeading());
     }
 
     public final void testRenderSettingsFromDefault() throws RendererNotFoundException,
@@ -72,24 +78,25 @@ public class ValidateStylesheetToRenderSettingsConversion extends GraphicalTestC
         assertEquals(28.35, settings.getMarginBottom(), 0.01);
 
         assertEquals("Linux Libertine", settings.getFontSerif().getFamily());
-        assertEquals(9.0, settings.getFontSerif().getSize(), 0.01);
+        assertEquals(convertMilimetresToPoints(3.2), settings.getFontSerif().getSize(), 0.01);
         assertEquals(Style.NORMAL, settings.getFontSerif().getStyle());
         assertEquals(Weight.NORMAL, settings.getFontSerif().getWeight());
 
         assertEquals("Liberation Sans", settings.getFontSans().getFamily());
-        assertEquals(8.0, settings.getFontSans().getSize(), 0.01);
+        assertEquals(convertMilimetresToPoints(2.6), settings.getFontSans().getSize(), 0.01);
         assertEquals(Style.NORMAL, settings.getFontSans().getStyle());
         assertEquals(Weight.NORMAL, settings.getFontSans().getWeight());
 
         assertEquals("Inconsolata", settings.getFontMono().getFamily());
-        assertEquals(8.1, settings.getFontMono().getSize(), 0.01);
+        assertEquals(convertMilimetresToPoints(3.0), settings.getFontMono().getSize(), 0.01);
         assertEquals(Style.NORMAL, settings.getFontMono().getStyle());
         assertEquals(Weight.NORMAL, settings.getFontMono().getWeight());
 
         assertEquals("Linux Libertine O C", settings.getFontHeading().getFamily());
-        assertEquals(0.0, settings.getFontHeading().getSize(), 0.01); // hm
+        assertEquals(convertMilimetresToPoints(5.6), settings.getFontHeading().getSize(), 0.01); // hm
         assertEquals(Style.NORMAL, settings.getFontHeading().getStyle());
         assertEquals(Weight.NORMAL, settings.getFontHeading().getWeight());
 
     }
+
 }

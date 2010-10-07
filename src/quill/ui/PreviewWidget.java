@@ -59,10 +59,6 @@ class PreviewWidget extends DrawingArea
      * Work in "points", which makes sense since the target back end is PDF.
      */
 
-    private int pixelWidth;
-
-    private int pixelHeight;
-
     private Folio folio;
 
     /**
@@ -151,6 +147,7 @@ class PreviewWidget extends DrawingArea
         final Allocation rect;
         final Matrix matrix;
         final double scaleWidth, scaleHeight, scaleFactor;
+        final double pixelWidth, pixelHeight;
         final double pageWidth, pageHeight;
 
         rect = this.getAllocation();
