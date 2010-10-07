@@ -35,11 +35,6 @@ import static org.gnome.gtk.SizeGroupMode.HORIZONTAL;
  * improvements would be to only display those accelerators which are
  * applicable to the currently pressed modifiers (Inkscpae style).
  * 
- * <p>
- * There is nothing that requires that this display the equivalent DocBook
- * tags - see Bold and Italic for an idea of the limitations of this -
- * currently but it seemed a nice idea for starters.
- * 
  * @author Andrew Cowie
  */
 class HelpWidget extends ScrolledWindow
@@ -64,7 +59,7 @@ class HelpWidget extends ScrolledWindow
 
         views = new String[][] {
                 new String[] {
-                        "F1", "Help", "This help screen"
+                        "F1", "Help", "This help screen."
                 },
                 new String[] {
                         "F2",
@@ -77,9 +72,15 @@ class HelpWidget extends ScrolledWindow
                         "An outline of the document's chapters and section headings allowing you to navigate."
                 },
                 new String[] {
+                        "F5", "Editor", "Edit your manuscript!"
+                },
+                new String[] {
+                        "F6", "Stylesheet", "Change the settings being used to render your document."
+                },
+                new String[] {
                         "F11",
                         "Fullscreen",
-                        "Work in fullscreen mode, giving you an even better view of your document."
+                        "Work in fullscreen mode, giving you a better view of your document."
                 }
         };
 
@@ -102,6 +103,10 @@ class HelpWidget extends ScrolledWindow
                         "Ctrl+Z", "Undo", ""
                 }, new String[] {
                         "Ctrl+Y", "Redo", ""
+                }, new String[] {
+                        "Ctrl+PgUp", "Next", "Go forward to the next chapter."
+                }, new String[] {
+                        "Ctrl+PgDn", "Previous", "Go back to the previous chapter."
                 }
         };
 
