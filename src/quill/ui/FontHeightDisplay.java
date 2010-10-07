@@ -48,7 +48,7 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
     FontHeightDisplay() {
         drawing = this;
         drawing.connect(this);
-        drawing.setSizeRequest(-1, 150);
+        drawing.setSizeRequest(-1, -1);
     }
 
     void setRenderer(RenderEngine engine) {
@@ -103,7 +103,7 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
         FontDescription[] fonts;
 
         texts = new String[] {
-                "Serif x, ", "Sans x, ", "Mono x"
+                "x Serif, ", "Sans, ", "Mono"
         };
 
         fonts = new FontDescription[] {
@@ -222,7 +222,7 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
         line = layout.getLineReadonly(0);
 
         cr.setSource(0.0, 0.0, 0.0);
-        cr.moveTo(0.0, baseline / scaleFactor);
+        cr.moveTo(1.0, baseline / scaleFactor);
         cr.showLayout(line);
     }
 
