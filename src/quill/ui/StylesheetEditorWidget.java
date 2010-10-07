@@ -295,6 +295,16 @@ class StylesheetEditorWidget extends VBox
         box = new KeyValueBox(group, label, serifFont, false);
         box.packStart(serifSize, false, false, 0);
         left.packStart(box, false, false, 0);
+        serifFont.connect(new Entry.Activate() {
+            public void onActivate(Entry source) {
+                final String value;
+                final Stylesheet replacement;
+
+                value = source.getText();
+                replacement = style.changeFontSerif(value);
+                propegateStylesheetChange(replacement);
+            }
+        });
         serifSize.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
@@ -310,6 +320,16 @@ class StylesheetEditorWidget extends VBox
         box = new KeyValueBox(group, label, sansFont, false);
         box.packStart(sansSize, false, false, 0);
         left.packStart(box, false, false, 0);
+        sansFont.connect(new Entry.Activate() {
+            public void onActivate(Entry source) {
+                final String value;
+                final Stylesheet replacement;
+
+                value = source.getText();
+                replacement = style.changeFontSans(value);
+                propegateStylesheetChange(replacement);
+            }
+        });
         sansSize.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
@@ -325,6 +345,16 @@ class StylesheetEditorWidget extends VBox
         box = new KeyValueBox(group, label, monoFont, false);
         box.packStart(monoSize, false, false, 0);
         left.packStart(box, false, false, 0);
+        monoFont.connect(new Entry.Activate() {
+            public void onActivate(Entry source) {
+                final String value;
+                final Stylesheet replacement;
+
+                value = source.getText();
+                replacement = style.changeFontMono(value);
+                propegateStylesheetChange(replacement);
+            }
+        });
         monoSize.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
@@ -340,6 +370,16 @@ class StylesheetEditorWidget extends VBox
         box = new KeyValueBox(group, label, headingFont, false);
         box.packStart(headingSize, false, false, 0);
         left.packStart(box, false, false, 0);
+        headingFont.connect(new Entry.Activate() {
+            public void onActivate(Entry source) {
+                final String value;
+                final Stylesheet replacement;
+
+                value = source.getText();
+                replacement = style.changeFontHeading(value);
+                propegateStylesheetChange(replacement);
+            }
+        });
         headingSize.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;

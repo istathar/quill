@@ -64,8 +64,8 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
         layout = new Layout(cr);
         list = new AttributeList();
 
-        setupText(cr);
-        calculateMetrics(cr);
+        setupText();
+        calculateMetrics();
         shiftOutput(cr);
         drawLines(cr);
 
@@ -87,7 +87,7 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
      * Build up the string of text with Pango Attributes to be displayed. We
      * need this for rendering, of course, but also to scale the Widget.
      */
-    private void setupText(final Context cr) {
+    private void setupText() {
         final StringBuffer buf;
         FontDescription desc;
         String str;
@@ -130,7 +130,7 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
      * This is done before scaling, and results in integral pixel values for
      * the two fields.
      */
-    private void calculateMetrics(final Context cr) {
+    private void calculateMetrics() {
         final double pixelWidth, pixelHeight;
         final Allocation alloc;
         final FontDescription serif;
