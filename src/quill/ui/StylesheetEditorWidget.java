@@ -138,6 +138,15 @@ class StylesheetEditorWidget extends VBox
 
         rendererList = new RendererPicker(this, group);
         top.packStart(rendererList, false, false, 0);
+
+        rendererList.connect(new RendererPicker.Changed() {
+            public void onChanged(String value) {
+                final Stylesheet replacement;
+
+                replacement = style.changeRendererClass(value);
+                propegateStylesheetChange(replacement);
+            }
+        });
     }
 
     private void setupPaperAndMargins() {
@@ -182,7 +191,7 @@ class StylesheetEditorWidget extends VBox
                 final Stylesheet replacement;
 
                 str = paperList.getActiveText();
-                replacement = style.createWithPaperSize(str);
+                replacement = style.changePaperSize(str);
                 propegateStylesheetChange(replacement);
             }
         });
@@ -412,9 +421,6 @@ class StylesheetEditorWidget extends VBox
             throw new Error(ae);
         }
 
-        // FIXME
-        str = style.getRendererClass();
-
         str = style.getMarginTop();
         topMargin.setText(str);
 
@@ -493,40 +499,6 @@ class StylesheetEditorWidget extends VBox
         paperList.grabFocus();
     }
 
-    /**
-     * Read the current values from all UI elements, compose a new Stylesheet,
-     * and apply.
-     */
-    void processFields() {
-        final String rendererClass, paperSize, marginTop, marginLeft, marginRight, marginBottom, fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono, sizeHeading;
-        final Stylesheet replacement;
-
-        rendererClass = rendererList.getSelectedRenderer();
-
-        paperSize = paperList.getActiveText();
-
-        marginTop = topMargin.getText();
-        marginLeft = leftMargin.getText();
-        marginRight = rightMargin.getText();
-        marginBottom = bottomMargin.getText();
-
-        fontSerif = serifFont.getText();
-        fontSans = sansFont.getText();
-        fontMono = monoFont.getText();
-        fontHeading = headingFont.getText();
-
-        sizeSerif = serifSize.getText();
-        sizeSans = sansSize.getText();
-        sizeMono = monoSize.getText();
-        sizeHeading = headingSize.getText();
-
-        replacement = new Stylesheet(rendererClass, paperSize, marginTop, marginLeft, marginRight,
-                marginBottom, fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono,
-                sizeHeading);
-
-        propegateStylesheetChange(replacement);
-    }
-
     private void setupFontPreview() {
         preview = new FontHeightDisplay();
         top.packStart(preview, true, true, 0);
@@ -572,6 +544,8 @@ class RendererPicker extends VBox
 
     private final Label renderer;
 
+    private RendererPicker.Changed handler;
+
     RendererPicker(final StylesheetEditorWidget parent, final SizeGroup size) {
         super(false, 0);
         HBox box;
@@ -604,8 +578,10 @@ class RendererPicker extends VBox
 
         populate("Manuscript", "Technical reports, conference papers, book manuscripts", true,
                 "parchment.render.ReportRenderEngine");
-        populate("Paperback Novel", "A printed novel, tradeback size", false, "FIXME");
-        populate("School paper", "University paper or School term report", false, "FIXME");
+        populate("Paperback Novel", "A printed novel, tradeback size", false,
+                "parchment.render.NovelRenderEngine");
+        populate("School paper", "University paper or School term report", false,
+                "parchment.render.PaperRenderEngine");
 
         box = new KeyValueBox(size, label, combo, false);
         top.packStart(box, true, true, 0);
@@ -620,9 +596,10 @@ class RendererPicker extends VBox
                 str = model.getValue(row, classColumn);
                 renderer.setLabel("<tt>" + str + "</tt>");
 
-                if (combo.getHasFocus()) {
-                    parent.processFields();
+                if (handler == null) {
+                    return;
                 }
+                handler.onChanged(str);
             }
         });
 
@@ -654,6 +631,15 @@ class RendererPicker extends VBox
         str = model.getValue(row, classColumn);
 
         return str;
+    }
+
+    interface Changed
+    {
+        void onChanged(String value);
+    }
+
+    void connect(RendererPicker.Changed handler) {
+        this.handler = handler;
     }
 
     private void populate(String rendererName, String rendererDescription, boolean isDefault,

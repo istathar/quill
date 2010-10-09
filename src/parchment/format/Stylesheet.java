@@ -124,11 +124,16 @@ public class Stylesheet
         return rendererClass;
     }
 
+    public Stylesheet changeRendererClass(String value) {
+        return new Stylesheet(value, paperSize, marginTop, marginLeft, marginRight, marginBottom,
+                fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono, sizeHeading);
+    }
+
     public String getPaperSize() {
         return this.paperSize;
     }
 
-    public Stylesheet createWithPaperSize(String value) {
+    public Stylesheet changePaperSize(String value) {
         return new Stylesheet(rendererClass, value, marginTop, marginLeft, marginRight, marginBottom,
                 fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono, sizeHeading);
     }
