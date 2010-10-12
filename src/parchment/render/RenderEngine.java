@@ -335,42 +335,42 @@ public abstract class RenderEngine
 
                 if (segment instanceof ComponentSegment) {
                     appendTitle(cr, entire);
-                    appendBlankLine(cr);
+                    appendSegmentBreak(cr);
                 } else if (segment instanceof HeadingSegment) {
                     appendHeading(cr, entire);
-                    appendBlankLine(cr);
+                    appendSegmentBreak(cr);
                 } else if (segment instanceof PreformatSegment) {
                     appendProgramCode(cr, entire);
-                    appendBlankLine(cr);
+                    appendSegmentBreak(cr);
                 } else if (segment instanceof QuoteSegment) {
                     chain = new TextChain(entire);
                     paras = chain.extractParagraphs();
                     for (k = 0; k < paras.length; k++) {
                         appendQuoteParagraph(cr, paras[k]);
-                        appendBlankLine(cr);
+                        appendParagraphBreak(cr);
                     }
                 } else if (segment instanceof NormalSegment) {
                     chain = new TextChain(entire);
                     paras = chain.extractParagraphs();
                     for (k = 0; k < paras.length; k++) {
                         appendNormalParagraph(cr, paras[k]);
-                        appendBlankLine(cr);
+                        appendParagraphBreak(cr);
                     }
                 } else if (segment instanceof PoeticSegment) {
                     appendNormalParagraph(cr, entire);
-                    appendBlankLine(cr);
+                    appendSegmentBreak(cr);
                 } else if (segment instanceof AttributionSegment) {
                     appendAttributionParagraph(cr, entire);
-                    appendBlankLine(cr);
+                    appendSegmentBreak(cr);
                 } else if (segment instanceof ImageSegment) {
                     filename = segment.getImage();
                     appendExternalGraphic(cr, filename);
-                    appendBlankLine(cr);
+                    appendSegmentBreak(cr);
                     if (entire == null) {
                         continue;
                     }
                     appendCitationParagraph(cr, entire);
-                    appendBlankLine(cr);
+                    appendSegmentBreak(cr);
                 }
             }
 
@@ -379,9 +379,27 @@ public abstract class RenderEngine
     }
 
     /**
+     * Append the blank line that comes between Segment blocks. Contrast this
+     * to appendParaBreak, the blank line that comes between paras.
+     * 
      * @param cr
      */
-    protected void appendBlankLine(Context cr) {
+    protected void appendSegmentBreak(Context cr) {
+        appendBlankLine();
+    }
+
+    /**
+     * Append the blank line that comes between Segment blocks. Contrast this
+     * to appendSegmentBreak, the blank line that comes between blocks of
+     * various types.
+     * 
+     * @param cr
+     */
+    protected void appendParagraphBreak(Context cr) {
+        appendBlankLine();
+    }
+
+    private void appendBlankLine() {
         final Origin origin;
         final Area area;
         final double request;
@@ -391,6 +409,7 @@ public abstract class RenderEngine
         origin = new Origin(folioIndex, seriesIndex, currentOffset++);
         area = new BlankArea(origin, request);
         accumulate(area);
+
     }
 
     /**

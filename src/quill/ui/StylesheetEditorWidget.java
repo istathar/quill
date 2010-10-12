@@ -503,7 +503,6 @@ class StylesheetEditorWidget extends VBox
         preview = new FontHeightDisplay();
         top.packStart(preview, true, true, 0);
     }
-
 }
 
 class KeyValueBox extends HBox
