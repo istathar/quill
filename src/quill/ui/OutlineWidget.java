@@ -164,8 +164,8 @@ class OutlineWidget extends ScrolledWindow
     }
 
     /**
-     * Request the Widget actually (re)build itself. This is only called when
-     * to make a state visible, not on every state update.
+     * Request the Widget actually (re)build itself. This is only called to
+     * make a state visible, not on every state update.
      */
     /*
      * Actually, if this whole thing was ExposeEvent driven, then we'd be

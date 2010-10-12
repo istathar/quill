@@ -404,8 +404,9 @@ class StylesheetEditorWidget extends VBox
 
     void affect(Folio folio) {
         final Stylesheet style;
-        String str;
+        String str, s;
         final double width, height;
+        int i;
 
         this.folio = folio;
 
@@ -419,6 +420,20 @@ class StylesheetEditorWidget extends VBox
             engine = RenderEngine.createRenderer(style);
         } catch (ApplicationException ae) {
             throw new Error(ae);
+        }
+
+        str = style.getPaperSize();
+
+        /*
+         * FIXME This is horrid, and shouldn't be here. Worse it duplicates
+         * code in RenderSettings, and there isn't the right place either.
+         */
+        if (str.equals("A4")) {
+            paperList.setActive(0);
+        } else if (str.equals("Letter")) {
+            paperList.setActive(1);
+        } else {
+            throw new AssertionError("Unknown paper size");
         }
 
         str = style.getMarginTop();
@@ -479,7 +494,7 @@ class StylesheetEditorWidget extends VBox
         replacement = folio.update(style);
         primary.apply(replacement);
         this.affect(replacement);
-        primary.switchToPreview();
+        primary.refreshPreview();
     }
 
     private static String convertPageSize(double points) {

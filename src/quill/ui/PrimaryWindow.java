@@ -514,6 +514,19 @@ class PrimaryWindow extends Window
      */
     void switchToPreview() {
         right.setCurrentPage(0);
+        this.refreshPreview();
+    }
+
+    /**
+     * Request that the document preview be updated.
+     */
+    /*
+     * The implementation here (or in PreviewWidget as called from here) or
+     * will change dramatically when we start doing asynchonous rendering. At
+     * the moment, if the Widget isn't showing, nothing will happen (which is
+     * good, actually).
+     */
+    void refreshPreview() {
         preview.queueDraw();
     }
 
@@ -526,7 +539,21 @@ class PrimaryWindow extends Window
     }
 
     /**
-     * Show the nominated Series in this PrimaryWindow
+     * Request that the document outline be updated.
+     */
+    /*
+     * There's a certain confusion of ideas here; we also have the affect()
+     * series of methods for passing in a new Folio. Presumably that should
+     * actually also cause the widget to update, except that we don't need to
+     * be doing that on each character stroke!
+     */
+    void refreshOutline() {
+        outline.queueDraw();
+    }
+
+    /**
+     * Show the nominated Series in this PrimaryWindow. Switches the left side
+     * to editor, and refreshes the preview if it's showing.
      */
     // FIXME rename?
     void displayDocument(Folio folio) {
@@ -547,9 +574,14 @@ class PrimaryWindow extends Window
         cursorSeries = series;
 
         editor.initializeSeries(series);
+
         stylist.affect(folio);
         preview.affect(folio);
         outline.affect(folio);
+
+        this.switchToEditor();
+        this.refreshPreview();
+        this.refreshOutline();
         this.updateTitle();
     }
 
