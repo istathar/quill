@@ -335,42 +335,41 @@ public abstract class RenderEngine
 
                 if (segment instanceof ComponentSegment) {
                     appendTitle(cr, entire);
-                    appendSegmentBreak(cr);
                 } else if (segment instanceof HeadingSegment) {
+                    appendSegmentBreak(cr);
                     appendHeading(cr, entire);
-                    appendSegmentBreak(cr);
                 } else if (segment instanceof PreformatSegment) {
-                    appendProgramCode(cr, entire);
                     appendSegmentBreak(cr);
+                    appendProgramCode(cr, entire);
                 } else if (segment instanceof QuoteSegment) {
                     chain = new TextChain(entire);
                     paras = chain.extractParagraphs();
                     for (k = 0; k < paras.length; k++) {
-                        appendQuoteParagraph(cr, paras[k]);
                         appendParagraphBreak(cr);
+                        appendQuoteParagraph(cr, paras[k]);
                     }
                 } else if (segment instanceof NormalSegment) {
                     chain = new TextChain(entire);
                     paras = chain.extractParagraphs();
                     for (k = 0; k < paras.length; k++) {
-                        appendNormalParagraph(cr, paras[k]);
                         appendParagraphBreak(cr);
+                        appendNormalParagraph(cr, paras[k]);
                     }
                 } else if (segment instanceof PoeticSegment) {
+                    appendSegmentBreak(cr);
                     appendNormalParagraph(cr, entire);
-                    appendSegmentBreak(cr);
                 } else if (segment instanceof AttributionSegment) {
-                    appendAttributionParagraph(cr, entire);
                     appendSegmentBreak(cr);
+                    appendAttributionParagraph(cr, entire);
                 } else if (segment instanceof ImageSegment) {
                     filename = segment.getImage();
-                    appendExternalGraphic(cr, filename);
                     appendSegmentBreak(cr);
+                    appendExternalGraphic(cr, filename);
                     if (entire == null) {
                         continue;
                     }
-                    appendCitationParagraph(cr, entire);
                     appendSegmentBreak(cr);
+                    appendCitationParagraph(cr, entire);
                 }
             }
 

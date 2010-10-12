@@ -7,21 +7,6 @@ BUGS
 User Interface
 </heading>
 <text>
-<bold>Splitting </bold>
-<type>ComponentSegments</type><bold> forbidden</bold>
-</text>
-<text>
-If the cursor is in the chapter title, you
-shouldn't be able to do an <bold>Ins</bold>
-causing a split in that text (which ends
-up as <literal>&lt;title&gt;</literal>) with
-the result that a subsequent
-<type>ComponentSegment</type> is created;
-there's only supposed to be one. So it needs
-to be restricted to appending a new Segment
-only?
-</text>
-<text>
 <type>StructuralChange</type><bold> at first
 character misplaces new Segment</bold>
 </text>
