@@ -514,7 +514,6 @@ class PrimaryWindow extends Window
      */
     void switchToPreview() {
         right.setCurrentPage(0);
-        this.refreshPreview();
     }
 
     /**
@@ -526,8 +525,8 @@ class PrimaryWindow extends Window
      * the moment, if the Widget isn't showing, nothing will happen (which is
      * good, actually).
      */
-    void refreshPreview() {
-        preview.queueDraw();
+    void forceRefresh() {
+        preview.refreshDisplay();
     }
 
     /**
@@ -535,20 +534,7 @@ class PrimaryWindow extends Window
      */
     void switchToOutline() {
         right.setCurrentPage(2);
-        outline.queueDraw();
-    }
-
-    /**
-     * Request that the document outline be updated.
-     */
-    /*
-     * There's a certain confusion of ideas here; we also have the affect()
-     * series of methods for passing in a new Folio. Presumably that should
-     * actually also cause the widget to update, except that we don't need to
-     * be doing that on each character stroke!
-     */
-    void refreshOutline() {
-        outline.queueDraw();
+        outline.refreshDisplay();
     }
 
     /**
@@ -579,9 +565,8 @@ class PrimaryWindow extends Window
         preview.affect(folio);
         outline.affect(folio);
 
-        this.switchToEditor();
-        this.refreshPreview();
-        this.refreshOutline();
+        preview.refreshDisplay();
+        outline.refreshDisplay();
         this.updateTitle();
     }
 

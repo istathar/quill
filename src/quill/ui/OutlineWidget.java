@@ -173,14 +173,12 @@ class OutlineWidget extends ScrolledWindow
      * have strong Widgets in the composition of this display, we need to
      * reconstruct and repack.
      */
-    public void queueDraw() {
+    void refreshDisplay() {
         for (Widget child : top.getChildren()) {
             top.remove(child);
         }
 
         buildOutline();
-
-        super.queueDraw();
     }
 }
 

@@ -209,4 +209,17 @@ class PreviewWidget extends DrawingArea
         }
         this.style = style;
     }
+
+    /**
+     * Hook to request that the renderer be run.
+     */
+    /*
+     * At the moment this is synchronous, with the render step happening in
+     * the Widget.ExposeEvent handler. In due course we want to make this
+     * asynchronous, though the relationship between ahead of time and needing
+     * a Cairo Context will be tricky.
+     */
+    void refreshDisplay() {
+        super.queueDraw();
+    }
 }

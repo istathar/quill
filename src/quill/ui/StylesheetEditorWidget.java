@@ -136,12 +136,16 @@ class StylesheetEditorWidget extends VBox
         heading.setAlignment(LEFT, CENTER);
         top.packStart(heading, false, false, 6);
 
-        rendererList = new RendererPicker(this, group);
+        rendererList = new RendererPicker(group);
         top.packStart(rendererList, false, false, 0);
 
         rendererList.connect(new RendererPicker.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
+
+                if (!rendererList.getHasFocus()) {
+                    return;
+                }
 
                 replacement = style.changeRendererClass(value);
                 propegateStylesheetChange(replacement);
@@ -189,6 +193,10 @@ class StylesheetEditorWidget extends VBox
             public void onChanged(ComboBox source) {
                 final String str;
                 final Stylesheet replacement;
+
+                if (!paperList.getHasFocus()) {
+                    return;
+                }
 
                 str = paperList.getActiveText();
                 replacement = style.changePaperSize(str);
@@ -404,9 +412,8 @@ class StylesheetEditorWidget extends VBox
 
     void affect(Folio folio) {
         final Stylesheet style;
-        String str, s;
+        String str;
         final double width, height;
-        int i;
 
         this.folio = folio;
 
@@ -494,7 +501,7 @@ class StylesheetEditorWidget extends VBox
         replacement = folio.update(style);
         primary.apply(replacement);
         this.affect(replacement);
-        primary.refreshPreview();
+        primary.forceRefresh();
     }
 
     private static String convertPageSize(double points) {
@@ -560,12 +567,13 @@ class RendererPicker extends VBox
 
     private RendererPicker.Changed handler;
 
-    RendererPicker(final StylesheetEditorWidget parent, final SizeGroup size) {
+    RendererPicker(final SizeGroup size) {
         super(false, 0);
         HBox box;
         Label label;
         CellRendererText text;
         CellRendererPixbuf image;
+
         top = this;
 
         label = new Label("Renderer:");
