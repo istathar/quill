@@ -5,11 +5,16 @@ To work on Quill, import this source tree as an Eclipse project called
 checkout of `~/src/quill/mainline` as you have done following java-gnome's
 `HACKING` instructions.
 
-See TODO and BUGS.
+The TODO and BUGS files are actually maintained as chapters in a .parchment
+manuscript which you can render with Parchment and edit with Quill. Run:
+
+    $ ./quill doc/about/HackingOnQuill.parchment
+
+to see these files as chapters. It's a good example document.
 
 <!--
 
-  Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd 
+  Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd 
 
   As project documentation, this file forms an integral part of the source
   code of the program it accompanies, and thus is made available to you by its
