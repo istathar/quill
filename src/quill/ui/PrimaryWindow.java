@@ -560,8 +560,7 @@ class PrimaryWindow extends Window
         cursorSeries = series;
 
         editor.initializeSeries(series);
-
-        stylist.affect(folio);
+        stylist.initializeStylesheet(folio);
         preview.affect(folio);
         outline.affect(folio);
 

@@ -103,12 +103,18 @@ class StylesheetEditorWidget extends VBox
 
     private Folio folio;
 
+    /**
+     * Are we in the midst of loading a new document? If so, ignore events.
+     */
+    private boolean loading;
+
     StylesheetEditorWidget(PrimaryWindow primary) {
         super(false, 0);
         top = this;
 
         this.primary = primary;
         this.group = new SizeGroup(SizeGroupMode.HORIZONTAL);
+        this.loading = false;
 
         setupHeading();
         setupRenderSelector();
@@ -143,7 +149,7 @@ class StylesheetEditorWidget extends VBox
             public void onChanged(String value) {
                 final Stylesheet replacement;
 
-                if (!rendererList.getHasFocus()) {
+                if (loading) {
                     return;
                 }
 
@@ -194,7 +200,7 @@ class StylesheetEditorWidget extends VBox
                 final String str;
                 final Stylesheet replacement;
 
-                if (!paperList.getHasFocus()) {
+                if (loading) {
                     return;
                 }
 
@@ -244,6 +250,10 @@ class StylesheetEditorWidget extends VBox
             public void onChanged(String value) {
                 final Stylesheet replacement;
 
+                if (loading) {
+                    return;
+                }
+
                 replacement = style.changeMarginTop(value);
                 propegateStylesheetChange(replacement);
             }
@@ -256,6 +266,10 @@ class StylesheetEditorWidget extends VBox
         leftMargin.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
+
+                if (loading) {
+                    return;
+                }
 
                 replacement = style.changeMarginLeft(value);
                 propegateStylesheetChange(replacement);
@@ -270,6 +284,10 @@ class StylesheetEditorWidget extends VBox
             public void onChanged(String value) {
                 final Stylesheet replacement;
 
+                if (loading) {
+                    return;
+                }
+
                 replacement = style.changeMarginRight(value);
                 propegateStylesheetChange(replacement);
             }
@@ -282,6 +300,10 @@ class StylesheetEditorWidget extends VBox
         bottomMargin.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
+
+                if (loading) {
+                    return;
+                }
 
                 replacement = style.changeMarginBottom(value);
                 propegateStylesheetChange(replacement);
@@ -317,6 +339,10 @@ class StylesheetEditorWidget extends VBox
                 final String value;
                 final Stylesheet replacement;
 
+                if (loading) {
+                    return;
+                }
+
                 value = source.getText();
                 replacement = style.changeFontSerif(value);
                 propegateStylesheetChange(replacement);
@@ -325,6 +351,10 @@ class StylesheetEditorWidget extends VBox
         serifSize.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
+
+                if (loading) {
+                    return;
+                }
 
                 replacement = style.changeSizeSerif(value);
                 propegateStylesheetChange(replacement);
@@ -342,6 +372,10 @@ class StylesheetEditorWidget extends VBox
                 final String value;
                 final Stylesheet replacement;
 
+                if (loading) {
+                    return;
+                }
+
                 value = source.getText();
                 replacement = style.changeFontSans(value);
                 propegateStylesheetChange(replacement);
@@ -350,6 +384,10 @@ class StylesheetEditorWidget extends VBox
         sansSize.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
+
+                if (loading) {
+                    return;
+                }
 
                 replacement = style.changeSizeSans(value);
                 propegateStylesheetChange(replacement);
@@ -367,6 +405,10 @@ class StylesheetEditorWidget extends VBox
                 final String value;
                 final Stylesheet replacement;
 
+                if (loading) {
+                    return;
+                }
+
                 value = source.getText();
                 replacement = style.changeFontMono(value);
                 propegateStylesheetChange(replacement);
@@ -375,6 +417,10 @@ class StylesheetEditorWidget extends VBox
         monoSize.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
+
+                if (loading) {
+                    return;
+                }
 
                 replacement = style.changeSizeMono(value);
                 propegateStylesheetChange(replacement);
@@ -392,6 +438,10 @@ class StylesheetEditorWidget extends VBox
                 final String value;
                 final Stylesheet replacement;
 
+                if (loading) {
+                    return;
+                }
+
                 value = source.getText();
                 replacement = style.changeFontHeading(value);
                 propegateStylesheetChange(replacement);
@@ -401,6 +451,10 @@ class StylesheetEditorWidget extends VBox
             public void onChanged(String value) {
                 final Stylesheet replacement;
 
+                if (loading) {
+                    return;
+                }
+
                 replacement = style.changeSizeHeading(value);
                 propegateStylesheetChange(replacement);
             }
@@ -408,6 +462,12 @@ class StylesheetEditorWidget extends VBox
 
         sides.packStart(left, true, true, 0);
         top.packStart(sides, false, false, 6);
+    }
+
+    void initializeStylesheet(Folio folio) {
+        loading = true;
+        this.affect(folio);
+        loading = false;
     }
 
     void affect(Folio folio) {
@@ -428,6 +488,9 @@ class StylesheetEditorWidget extends VBox
         } catch (ApplicationException ae) {
             throw new Error(ae);
         }
+
+        str = engine.getClass().getName();
+        rendererList.setActiveRenderer(str);
 
         str = style.getPaperSize();
 
@@ -567,6 +630,8 @@ class RendererPicker extends VBox
 
     private RendererPicker.Changed handler;
 
+    private String value;
+
     RendererPicker(final SizeGroup size) {
         super(false, 0);
         HBox box;
@@ -621,6 +686,11 @@ class RendererPicker extends VBox
                 if (handler == null) {
                     return;
                 }
+                if (str.equals(value)) {
+                    return;
+                }
+                value = str;
+
                 handler.onChanged(str);
             }
         });
@@ -653,6 +723,23 @@ class RendererPicker extends VBox
         str = model.getValue(row, classColumn);
 
         return str;
+    }
+
+    void setActiveRenderer(String renderer) {
+        final TreeIter row;
+        String str;
+
+        row = model.getIterFirst();
+        do {
+            str = model.getValue(row, classColumn);
+            if (str.equals(renderer)) {
+                combo.setActiveIter(row);
+                return;
+            }
+        } while (row.iterNext());
+
+        throw new AssertionError("We haven't handled the case where you've loaded "
+                + "a renderer we don't already know about");
     }
 
     interface Changed
