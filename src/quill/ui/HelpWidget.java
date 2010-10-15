@@ -28,7 +28,6 @@ import org.gnome.gtk.VBox;
 import static org.gnome.gtk.Alignment.LEFT;
 import static org.gnome.gtk.Alignment.TOP;
 import static org.gnome.gtk.PolicyType.AUTOMATIC;
-import static org.gnome.gtk.PolicyType.NEVER;
 import static org.gnome.gtk.SizeGroupMode.HORIZONTAL;
 
 /**
@@ -64,7 +63,7 @@ class HelpWidget extends ScrolledWindow
         top = new HBox(true, 0);
 
         scroll.addWithViewport(top);
-        scroll.setPolicy(NEVER, AUTOMATIC);
+        scroll.setPolicy(AUTOMATIC, AUTOMATIC);
         scroll.setShadowType(ShadowType.NONE);
 
         views = new String[][] {

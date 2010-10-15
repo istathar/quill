@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter xmlns="http://namespace.operationaldynamics.com/parchment/0.2">
 <title>
-GNU GENERAL PUBLIC LICENCE
+Licence
 </title>
+<heading>
+GNU GENERAL PUBLIC LICENCE
+</heading>
 <text>
 <italics>Version 2, June 1991</italics>
 </text>

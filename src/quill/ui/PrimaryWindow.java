@@ -263,7 +263,7 @@ class PrimaryWindow extends Window
         window.add(top);
 
         pane = new HPaned();
-        pane.setPosition(680);
+        pane.setPosition(690);
         top.packStart(pane, true, true, 0);
     }
 
@@ -942,7 +942,7 @@ class PrimaryWindow extends Window
         cursorSeries = folio.getSeries(i);
 
         editor.initializeSeries(cursorSeries);
-        preview.queueDraw();
+        preview.refreshDisplay();
         updateTitle();
     }
 
