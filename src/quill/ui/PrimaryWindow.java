@@ -514,6 +514,7 @@ class PrimaryWindow extends Window
      */
     void switchToPreview() {
         right.setCurrentPage(0);
+        preview.refreshDisplay();
     }
 
     /**
