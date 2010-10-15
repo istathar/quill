@@ -45,6 +45,25 @@ It should probably be cleared so the behaviour
 is consistent with there only being one
 <type>TextView</type>.
 </text>
+<text>
+<bold>Pasting when a format in effect should
+inherit that format.</bold>
+</text>
+<text>
+For some reason, if you set a format (say
+<filename>filename</filename> with
+<bold>Ctrl+Shift+F</bold>) and then you paste
+some text, that format is not picked up and
+instead it seems to be given
+<literal>null</literal> formatting.
+</text>
+<text>
+I thought this used to work. But perhaps
+the <literal>TextView.NotifyCursorPosition
+</literal>handler in <type>EditorTextView</type>
+is clearing the formatting? Or check
+<function>paste()</function> there.
+</text>
 <heading>
 Internal
 </heading>

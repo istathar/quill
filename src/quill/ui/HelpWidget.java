@@ -20,13 +20,15 @@ package quill.ui;
 
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
-import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ScrolledWindow;
+import org.gnome.gtk.ShadowType;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.VBox;
 
 import static org.gnome.gtk.Alignment.LEFT;
 import static org.gnome.gtk.Alignment.TOP;
+import static org.gnome.gtk.PolicyType.AUTOMATIC;
+import static org.gnome.gtk.PolicyType.NEVER;
 import static org.gnome.gtk.SizeGroupMode.HORIZONTAL;
 
 /**
@@ -36,6 +38,13 @@ import static org.gnome.gtk.SizeGroupMode.HORIZONTAL;
  * applicable to the currently pressed modifiers (Inkscpae style).
  * 
  * @author Andrew Cowie
+ */
+/*
+ * We don't actually want this to be in a scrolling Viewport; the idea is a
+ * fixed single notebook page of text. The dynamics of Labels, however, make
+ * this difficult since they demand space rather than wrapping based on
+ * allocation. Thus this should either be replaced by a TextView (or a
+ * WebView!), or a custom Label be cooked up.
  */
 class HelpWidget extends ScrolledWindow
 {
@@ -51,11 +60,12 @@ class HelpWidget extends ScrolledWindow
         super();
         final String[][] views, actions, editing, markup;
 
+        scroll = this;
         top = new HBox(true, 0);
 
-        scroll = this;
         scroll.addWithViewport(top);
-        scroll.setPolicy(PolicyType.AUTOMATIC, PolicyType.AUTOMATIC);
+        scroll.setPolicy(NEVER, AUTOMATIC);
+        scroll.setShadowType(ShadowType.NONE);
 
         views = new String[][] {
                 new String[] {
@@ -209,7 +219,7 @@ class HelpWidget extends ScrolledWindow
 
         label = new Label(keys);
         label.setAlignment(LEFT, TOP);
-        spread.packStart(label, true, true, 0);
+        spread.packStart(label, false, false, 0);
         group.add(label);
 
         str = new StringBuilder();
@@ -226,9 +236,9 @@ class HelpWidget extends ScrolledWindow
         label.setUseMarkup(true);
         label.setUseUnderline(true);
         label.setLineWrap(true);
-        label.setWidthChars(25);
+        label.setSizeRequest(200, -1);
         label.setAlignment(LEFT, TOP);
-        spread.packStart(label, true, true, 6);
+        spread.packStart(label, false, false, 6);
 
         vbox.packStart(spread, false, false, 6);
     }

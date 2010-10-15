@@ -64,28 +64,28 @@ class Format
 
     static {
         filename = new TextTag();
-        filename.setFamily("DejaVu Sans Mono");
+        filename.setFontDescription(fonts.mono);
         filename.setForeground("darkgreen");
         filename.setStyle(Style.ITALIC);
 
         classname = new TextTag();
-        classname.setFamily("DejaVu Sans");
+        classname.setFontDescription(fonts.sans);
         classname.setForeground("blue");
 
         function = new TextTag();
-        function.setFamily("DejaVu Sans Mono");
+        function.setFontDescription(fonts.mono);
         function.setForeground("darkblue");
 
         code = new TextTag();
-        code.setFamily("DejaVu Sans Mono");
+        code.setFontDescription(fonts.mono);
 
         application = new TextTag();
-        application.setFamily("DejaVu Sans");
+        application.setFontDescription(fonts.sans);
         application.setWeight(Weight.BOLD);
         application.setForeground("#444444");
 
         command = new TextTag();
-        command.setFamily("DejaVu Sans Mono");
+        command.setFontDescription(fonts.mono);
         command.setWeight(Weight.BOLD);
         command.setForeground("#444444");
 

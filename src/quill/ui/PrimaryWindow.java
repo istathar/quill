@@ -36,7 +36,7 @@ import org.gnome.gtk.Dialog;
 import org.gnome.gtk.ErrorMessageDialog;
 import org.gnome.gtk.FileChooserDialog;
 import org.gnome.gtk.FileFilter;
-import org.gnome.gtk.HBox;
+import org.gnome.gtk.HPaned;
 import org.gnome.gtk.Icon;
 import org.gnome.gtk.IconSize;
 import org.gnome.gtk.Image;
@@ -48,7 +48,6 @@ import org.gnome.gtk.ResponseType;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
-import org.gnome.pango.FontDescription;
 
 import parchment.format.Manuscript;
 import parchment.format.Stylesheet;
@@ -79,7 +78,7 @@ class PrimaryWindow extends Window
 
     private VBox top;
 
-    private HBox two;
+    private HPaned pane;
 
     private Notebook left;
 
@@ -254,22 +253,18 @@ class PrimaryWindow extends Window
     }
 
     private void setupWindow() {
-        final FontDescription desc;
-
         ui = Quill.getUserInterface();
 
         window = this;
         window.setMaximize(true);
         window.setTitle("Quill");
 
-        desc = new FontDescription("Deja Vu Serif, 11");
-        window.modifyFont(desc);
-
         top = new VBox(false, 0);
         window.add(top);
 
-        two = new HBox(true, 0);
-        top.packStart(two, true, true, 0);
+        pane = new HPaned();
+        pane.setPosition(680);
+        top.packStart(pane, true, true, 0);
     }
 
     private void setupEditorSide() {
@@ -278,7 +273,7 @@ class PrimaryWindow extends Window
         left = new Notebook();
         left.setShowTabs(false);
         left.setShowBorder(false);
-        left.setSizeRequest(640, -1);
+        left.setSizeRequest(400, -1);
 
         editor = new ComponentEditorWidget(this);
         left.insertPage(editor, null, 0);
@@ -290,7 +285,7 @@ class PrimaryWindow extends Window
         align.add(stylist);
         left.insertPage(align, null, 1);
 
-        two.packStart(left, true, true, 0);
+        pane.add1(left);
     }
 
     private void setupPreviewSide() {
@@ -310,7 +305,7 @@ class PrimaryWindow extends Window
         intro = new IntroductionWidget();
         right.add(intro);
 
-        two.packStart(right, true, true, 0);
+        pane.add2(right);
     }
 
     private void initialPresentation() {
