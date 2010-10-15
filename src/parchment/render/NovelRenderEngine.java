@@ -41,4 +41,8 @@ public class NovelRenderEngine extends RenderEngine
      * between them.
      */
     }
+
+    protected double getNormalIndent() {
+        return 20.0;
+    }
 }

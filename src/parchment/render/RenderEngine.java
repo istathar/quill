@@ -426,7 +426,7 @@ public abstract class RenderEngine
     protected void appendHeading(Context cr, Extract entire) {
         final Area[] list;
 
-        list = layoutAreaText(cr, entire, headingFace, false, false, false);
+        list = layoutAreaText(cr, entire, headingFace, false, false, 0.0, false);
         accumulate(list);
     }
 
@@ -441,7 +441,7 @@ public abstract class RenderEngine
         desc.setSize(size * 2);
         face = new Typeface(cr, desc, 0.0);
 
-        list = layoutAreaText(cr, entire, face, false, false, false);
+        list = layoutAreaText(cr, entire, face, false, false, 0.0, false);
         accumulate(list);
     }
 
@@ -459,14 +459,25 @@ public abstract class RenderEngine
 
     protected void appendNormalParagraph(Context cr, Extract extract) {
         final Area[] list;
+        final double indent;
 
-        list = layoutAreaText(cr, extract, serifFace, false, false, false);
+        indent = getNormalIndent();
+
+        list = layoutAreaText(cr, extract, serifFace, false, false, indent, false);
         accumulate(list);
+    }
+
+    /**
+     * Override this if you want to indent the paragraph...
+     */
+    protected double getNormalIndent() {
+        return 0.0;
     }
 
     protected void appendQuoteParagraph(Context cr, Extract extract) {
         final double savedLeft, savedRight;
         final Area[] list;
+        final double indent;
 
         savedLeft = leftMargin;
         savedRight = rightMargin;
@@ -474,11 +485,17 @@ public abstract class RenderEngine
         leftMargin += 45.0;
         rightMargin += 45.0;
 
-        list = layoutAreaText(cr, extract, serifFace, false, false, false);
+        indent = getQuoteIndent();
+
+        list = layoutAreaText(cr, extract, serifFace, false, false, indent, false);
         accumulate(list);
 
         leftMargin = savedLeft;
         rightMargin = savedRight;
+    }
+
+    protected double getQuoteIndent() {
+        return 0.0;
     }
 
     protected void appendAttributionParagraph(Context cr, Extract extract) {
@@ -497,7 +514,7 @@ public abstract class RenderEngine
         leftMargin = pageWidth / 2 + 50.0;
         rightMargin += 10.0;
 
-        list = layoutAreaText(cr, extract, face, false, false, false);
+        list = layoutAreaText(cr, extract, face, false, false, 0.0, false);
         accumulate(list);
 
         leftMargin = savedLeft;
@@ -507,7 +524,7 @@ public abstract class RenderEngine
     protected void appendProgramCode(Context cr, Extract entire) {
         final Area[] list;
 
-        list = layoutAreaText(cr, entire, monoFace, true, false, false);
+        list = layoutAreaText(cr, entire, monoFace, true, false, 0.0, false);
         accumulate(list);
     }
 
@@ -610,7 +627,7 @@ public abstract class RenderEngine
      * occur if not preformatted text.
      */
     protected final Area[] layoutAreaText(final Context cr, final Extract extract, final Typeface face,
-            final boolean preformatted, final boolean centered, boolean error) {
+            final boolean preformatted, final boolean centered, final double indent, boolean error) {
         final Layout layout;
         final FontOptions options;
         final StringBuilder buf;
@@ -640,6 +657,7 @@ public abstract class RenderEngine
 
         layout.setWidth(pageWidth - (leftMargin + rightMargin));
         layout.setWrapMode(WrapMode.WORD_CHAR);
+        layout.setIndent(indent); // see note below
 
         buf = new StringBuilder();
 
@@ -716,11 +734,23 @@ public abstract class RenderEngine
         for (k = 0; k < K; k++) {
             line = layout.getLineReadonly(k);
 
+            /*
+             * If you've told the Layout you're indenting, you still have to
+             * manually offset the LayouLine's drawing point. This is weird,
+             * but whatever.
+             */
+
             if (!centered) {
                 x = leftMargin;
+                if ((k == 0) && (indent > 0.0)) {
+                    x += indent;
+                }
             } else {
                 rect = line.getExtentsLogical();
                 x = pageWidth / 2 - rect.getWidth() / 2;
+                if ((k == 0) && (indent > 0.0)) {
+                    x += indent;
+                }
             }
 
             origin = new Origin(folioIndex, seriesIndex, currentOffset);
@@ -980,7 +1010,7 @@ public abstract class RenderEngine
     protected void appendErrorParagraph(Context cr, Extract extract) {
         final Area[] list;
 
-        list = layoutAreaText(cr, extract, sansFace, false, true, true);
+        list = layoutAreaText(cr, extract, sansFace, false, true, 0.0, true);
         accumulate(list);
     }
 
@@ -1004,7 +1034,7 @@ public abstract class RenderEngine
         desc.setStyle(Style.ITALIC);
         face = new Typeface(cr, desc, 0.0);
 
-        list = layoutAreaText(cr, extract, face, false, true, false);
+        list = layoutAreaText(cr, extract, face, false, true, 0.0, false);
         accumulate(list);
 
         leftMargin = savedLeft;
