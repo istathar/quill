@@ -103,12 +103,18 @@ class StylesheetEditorWidget extends VBox
 
     private Folio folio;
 
+    /**
+     * Are we in the midst of loading a new document? If so, ignore events.
+     */
+    private boolean loading;
+
     StylesheetEditorWidget(PrimaryWindow primary) {
         super(false, 0);
         top = this;
 
         this.primary = primary;
         this.group = new SizeGroup(SizeGroupMode.HORIZONTAL);
+        this.loading = false;
 
         setupHeading();
         setupRenderSelector();
@@ -136,8 +142,21 @@ class StylesheetEditorWidget extends VBox
         heading.setAlignment(LEFT, CENTER);
         top.packStart(heading, false, false, 6);
 
-        rendererList = new RendererPicker(this, group);
+        rendererList = new RendererPicker(group);
         top.packStart(rendererList, false, false, 0);
+
+        rendererList.connect(new RendererPicker.Changed() {
+            public void onChanged(String value) {
+                final Stylesheet replacement;
+
+                if (loading) {
+                    return;
+                }
+
+                replacement = style.changeRendererClass(value);
+                propegateStylesheetChange(replacement);
+            }
+        });
     }
 
     private void setupPaperAndMargins() {
@@ -181,8 +200,12 @@ class StylesheetEditorWidget extends VBox
                 final String str;
                 final Stylesheet replacement;
 
+                if (loading) {
+                    return;
+                }
+
                 str = paperList.getActiveText();
-                replacement = style.createWithPaperSize(str);
+                replacement = style.changePaperSize(str);
                 propegateStylesheetChange(replacement);
             }
         });
@@ -227,6 +250,10 @@ class StylesheetEditorWidget extends VBox
             public void onChanged(String value) {
                 final Stylesheet replacement;
 
+                if (loading) {
+                    return;
+                }
+
                 replacement = style.changeMarginTop(value);
                 propegateStylesheetChange(replacement);
             }
@@ -239,6 +266,10 @@ class StylesheetEditorWidget extends VBox
         leftMargin.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
+
+                if (loading) {
+                    return;
+                }
 
                 replacement = style.changeMarginLeft(value);
                 propegateStylesheetChange(replacement);
@@ -253,6 +284,10 @@ class StylesheetEditorWidget extends VBox
             public void onChanged(String value) {
                 final Stylesheet replacement;
 
+                if (loading) {
+                    return;
+                }
+
                 replacement = style.changeMarginRight(value);
                 propegateStylesheetChange(replacement);
             }
@@ -265,6 +300,10 @@ class StylesheetEditorWidget extends VBox
         bottomMargin.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
+
+                if (loading) {
+                    return;
+                }
 
                 replacement = style.changeMarginBottom(value);
                 propegateStylesheetChange(replacement);
@@ -300,6 +339,10 @@ class StylesheetEditorWidget extends VBox
                 final String value;
                 final Stylesheet replacement;
 
+                if (loading) {
+                    return;
+                }
+
                 value = source.getText();
                 replacement = style.changeFontSerif(value);
                 propegateStylesheetChange(replacement);
@@ -308,6 +351,10 @@ class StylesheetEditorWidget extends VBox
         serifSize.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
+
+                if (loading) {
+                    return;
+                }
 
                 replacement = style.changeSizeSerif(value);
                 propegateStylesheetChange(replacement);
@@ -325,6 +372,10 @@ class StylesheetEditorWidget extends VBox
                 final String value;
                 final Stylesheet replacement;
 
+                if (loading) {
+                    return;
+                }
+
                 value = source.getText();
                 replacement = style.changeFontSans(value);
                 propegateStylesheetChange(replacement);
@@ -333,6 +384,10 @@ class StylesheetEditorWidget extends VBox
         sansSize.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
+
+                if (loading) {
+                    return;
+                }
 
                 replacement = style.changeSizeSans(value);
                 propegateStylesheetChange(replacement);
@@ -350,6 +405,10 @@ class StylesheetEditorWidget extends VBox
                 final String value;
                 final Stylesheet replacement;
 
+                if (loading) {
+                    return;
+                }
+
                 value = source.getText();
                 replacement = style.changeFontMono(value);
                 propegateStylesheetChange(replacement);
@@ -358,6 +417,10 @@ class StylesheetEditorWidget extends VBox
         monoSize.connect(new MilimetreEntry.Changed() {
             public void onChanged(String value) {
                 final Stylesheet replacement;
+
+                if (loading) {
+                    return;
+                }
 
                 replacement = style.changeSizeMono(value);
                 propegateStylesheetChange(replacement);
@@ -375,6 +438,10 @@ class StylesheetEditorWidget extends VBox
                 final String value;
                 final Stylesheet replacement;
 
+                if (loading) {
+                    return;
+                }
+
                 value = source.getText();
                 replacement = style.changeFontHeading(value);
                 propegateStylesheetChange(replacement);
@@ -384,6 +451,10 @@ class StylesheetEditorWidget extends VBox
             public void onChanged(String value) {
                 final Stylesheet replacement;
 
+                if (loading) {
+                    return;
+                }
+
                 replacement = style.changeSizeHeading(value);
                 propegateStylesheetChange(replacement);
             }
@@ -391,6 +462,12 @@ class StylesheetEditorWidget extends VBox
 
         sides.packStart(left, true, true, 0);
         top.packStart(sides, false, false, 6);
+    }
+
+    void initializeStylesheet(Folio folio) {
+        loading = true;
+        this.affect(folio);
+        loading = false;
     }
 
     void affect(Folio folio) {
@@ -412,8 +489,22 @@ class StylesheetEditorWidget extends VBox
             throw new Error(ae);
         }
 
-        // FIXME
-        str = style.getRendererClass();
+        str = engine.getClass().getName();
+        rendererList.setActiveRenderer(str);
+
+        str = style.getPaperSize();
+
+        /*
+         * FIXME This is horrid, and shouldn't be here. Worse it duplicates
+         * code in RenderSettings, and there isn't the right place either.
+         */
+        if (str.equals("A4")) {
+            paperList.setActive(0);
+        } else if (str.equals("Letter")) {
+            paperList.setActive(1);
+        } else {
+            throw new AssertionError("Unknown paper size");
+        }
 
         str = style.getMarginTop();
         topMargin.setText(str);
@@ -473,7 +564,7 @@ class StylesheetEditorWidget extends VBox
         replacement = folio.update(style);
         primary.apply(replacement);
         this.affect(replacement);
-        primary.switchToPreview();
+        primary.forceRefresh();
     }
 
     private static String convertPageSize(double points) {
@@ -493,45 +584,10 @@ class StylesheetEditorWidget extends VBox
         paperList.grabFocus();
     }
 
-    /**
-     * Read the current values from all UI elements, compose a new Stylesheet,
-     * and apply.
-     */
-    void processFields() {
-        final String rendererClass, paperSize, marginTop, marginLeft, marginRight, marginBottom, fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono, sizeHeading;
-        final Stylesheet replacement;
-
-        rendererClass = rendererList.getSelectedRenderer();
-
-        paperSize = paperList.getActiveText();
-
-        marginTop = topMargin.getText();
-        marginLeft = leftMargin.getText();
-        marginRight = rightMargin.getText();
-        marginBottom = bottomMargin.getText();
-
-        fontSerif = serifFont.getText();
-        fontSans = sansFont.getText();
-        fontMono = monoFont.getText();
-        fontHeading = headingFont.getText();
-
-        sizeSerif = serifSize.getText();
-        sizeSans = sansSize.getText();
-        sizeMono = monoSize.getText();
-        sizeHeading = headingSize.getText();
-
-        replacement = new Stylesheet(rendererClass, paperSize, marginTop, marginLeft, marginRight,
-                marginBottom, fontSerif, fontSans, fontMono, fontHeading, sizeSerif, sizeSans, sizeMono,
-                sizeHeading);
-
-        propegateStylesheetChange(replacement);
-    }
-
     private void setupFontPreview() {
         preview = new FontHeightDisplay();
         top.packStart(preview, true, true, 0);
     }
-
 }
 
 class KeyValueBox extends HBox
@@ -572,12 +628,17 @@ class RendererPicker extends VBox
 
     private final Label renderer;
 
-    RendererPicker(final StylesheetEditorWidget parent, final SizeGroup size) {
+    private RendererPicker.Changed handler;
+
+    private String value;
+
+    RendererPicker(final SizeGroup size) {
         super(false, 0);
         HBox box;
         Label label;
         CellRendererText text;
         CellRendererPixbuf image;
+
         top = this;
 
         label = new Label("Renderer:");
@@ -604,8 +665,10 @@ class RendererPicker extends VBox
 
         populate("Manuscript", "Technical reports, conference papers, book manuscripts", true,
                 "parchment.render.ReportRenderEngine");
-        populate("Paperback Novel", "A printed novel, tradeback size", false, "FIXME");
-        populate("School paper", "University paper or School term report", false, "FIXME");
+        populate("Paperback Novel", "A printed novel, tradeback size", false,
+                "parchment.render.NovelRenderEngine");
+        populate("School paper", "University paper or School term report", false,
+                "parchment.render.PaperRenderEngine");
 
         box = new KeyValueBox(size, label, combo, false);
         top.packStart(box, true, true, 0);
@@ -620,9 +683,15 @@ class RendererPicker extends VBox
                 str = model.getValue(row, classColumn);
                 renderer.setLabel("<tt>" + str + "</tt>");
 
-                if (combo.getHasFocus()) {
-                    parent.processFields();
+                if (handler == null) {
+                    return;
                 }
+                if (str.equals(value)) {
+                    return;
+                }
+                value = str;
+
+                handler.onChanged(str);
             }
         });
 
@@ -654,6 +723,32 @@ class RendererPicker extends VBox
         str = model.getValue(row, classColumn);
 
         return str;
+    }
+
+    void setActiveRenderer(String renderer) {
+        final TreeIter row;
+        String str;
+
+        row = model.getIterFirst();
+        do {
+            str = model.getValue(row, classColumn);
+            if (str.equals(renderer)) {
+                combo.setActiveIter(row);
+                return;
+            }
+        } while (row.iterNext());
+
+        throw new AssertionError("We haven't handled the case where you've loaded "
+                + "a renderer we don't already know about");
+    }
+
+    interface Changed
+    {
+        void onChanged(String value);
+    }
+
+    void connect(RendererPicker.Changed handler) {
+        this.handler = handler;
     }
 
     private void populate(String rendererName, String rendererDescription, boolean isDefault,

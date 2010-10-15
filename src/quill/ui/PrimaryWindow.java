@@ -514,7 +514,20 @@ class PrimaryWindow extends Window
      */
     void switchToPreview() {
         right.setCurrentPage(0);
-        preview.queueDraw();
+        preview.refreshDisplay();
+    }
+
+    /**
+     * Request that the document preview be updated.
+     */
+    /*
+     * The implementation here (or in PreviewWidget as called from here) or
+     * will change dramatically when we start doing asynchonous rendering. At
+     * the moment, if the Widget isn't showing, nothing will happen (which is
+     * good, actually).
+     */
+    void forceRefresh() {
+        preview.refreshDisplay();
     }
 
     /**
@@ -522,11 +535,12 @@ class PrimaryWindow extends Window
      */
     void switchToOutline() {
         right.setCurrentPage(2);
-        outline.queueDraw();
+        outline.refreshDisplay();
     }
 
     /**
-     * Show the nominated Series in this PrimaryWindow
+     * Show the nominated Series in this PrimaryWindow. Switches the left side
+     * to editor, and refreshes the preview if it's showing.
      */
     // FIXME rename?
     void displayDocument(Folio folio) {
@@ -547,9 +561,12 @@ class PrimaryWindow extends Window
         cursorSeries = series;
 
         editor.initializeSeries(series);
-        stylist.affect(folio);
+        stylist.initializeStylesheet(folio);
         preview.affect(folio);
         outline.affect(folio);
+
+        preview.refreshDisplay();
+        outline.refreshDisplay();
         this.updateTitle();
     }
 

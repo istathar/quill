@@ -1,38 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter xmlns="http://namespace.operationaldynamics.com/parchment/0.2">
 <title>
-BUGS
+Bugs
 </title>
 <heading>
 User Interface
 </heading>
-<text>
-<bold>Splitting </bold>
-<type>ComponentSegments</type><bold> forbidden</bold>
-</text>
-<text>
-If the cursor is in the chapter title, you
-shouldn't be able to do an <bold>Ins</bold>
-causing a split in that text (which ends
-up as <literal>&lt;title&gt;</literal>) with
-the result that a subsequent
-<type>ComponentSegment</type> is created;
-there's only supposed to be one. So it needs
-to be restricted to appending a new Segment
-only?
-</text>
-<text>
-<type>StructuralChange</type><bold> at first
-character misplaces new Segment</bold>
-</text>
-<text>
-For some reason, if you're at offset
-<literal>0</literal> of a
-<type>NormalEditorTextView</type> and you
-<bold>Ins</bold> you end up with a new Segment
-not prepended in front of that Segment, but
-appended after the Segment.
-</text>
 <text>
 <bold>Scrolling on new </bold><type>Segment</type>
 <bold> insert</bold>

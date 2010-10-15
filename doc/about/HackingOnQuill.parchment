@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manuscript xmlns="http://namespace.operationaldynamics.com/parchment/0.2">
   <content>
-    <chapter src="AFewNotesOnTheCulture.xml"/>
+    <chapter src="TODO.xml"/>
+    <chapter src="BUGS.xml"/>
+    <chapter src="COPYING.xml"/>
   </content>
   <presentation>
     <renderer class="parchment.render.ReportRenderEngine"/>

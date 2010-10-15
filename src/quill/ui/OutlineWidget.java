@@ -164,8 +164,8 @@ class OutlineWidget extends ScrolledWindow
     }
 
     /**
-     * Request the Widget actually (re)build itself. This is only called when
-     * to make a state visible, not on every state update.
+     * Request the Widget actually (re)build itself. This is only called to
+     * make a state visible, not on every state update.
      */
     /*
      * Actually, if this whole thing was ExposeEvent driven, then we'd be
@@ -173,14 +173,12 @@ class OutlineWidget extends ScrolledWindow
      * have strong Widgets in the composition of this display, we need to
      * reconstruct and repack.
      */
-    public void queueDraw() {
+    void refreshDisplay() {
         for (Widget child : top.getChildren()) {
             top.remove(child);
         }
 
         buildOutline();
-
-        super.queueDraw();
     }
 }
 
