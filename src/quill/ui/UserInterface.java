@@ -22,6 +22,7 @@ package quill.ui;
  * Adapted from code in Compendium.
  */
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.Set;
@@ -285,7 +286,18 @@ public class UserInterface
         }
     }
 
+    /*
+     * As an undocumented conveninece for hacking on Quill, if .norescue
+     * exists, then don't bother creating .RESCUED files on crashes. Useful
+     * when debugging with GDB.
+     */
     public void emergencySave() {
+        final File target;
+        target = new File(".norescue");
+        if (target.exists()) {
+            return;
+        }
+
         for (PrimaryWindow primary : primaries) {
             primary.emergencySave();
         }

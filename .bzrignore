@@ -2,3 +2,4 @@ tmp
 .config
 tests/*.pdf
 quill-*
+.norescue
