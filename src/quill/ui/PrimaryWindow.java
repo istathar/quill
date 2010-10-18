@@ -509,7 +509,7 @@ class PrimaryWindow extends Window
      */
     void switchToPreview() {
         right.setCurrentPage(0);
-        preview.refreshDisplay();
+        preview.refreshDisplayAtCursor();
     }
 
     /**
@@ -961,7 +961,7 @@ class PrimaryWindow extends Window
         cursorSeries = folio.getSeries(i);
 
         editor.initializeSeries(cursorSeries);
-        preview.queueDraw();
+        preview.refreshDisplay();
         updateTitle();
     }
 }

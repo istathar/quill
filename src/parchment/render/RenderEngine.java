@@ -87,6 +87,11 @@ import static quill.textbase.Span.createSpan;
  * 
  * @author Andrew Cowie
  */
+/*
+ * There's a bit too much in this class. It now seems to be both the actual
+ * layout engine, as well as the harness for driving a rendering run. Adding
+ * caching to this makes this even worse.
+ */
 public abstract class RenderEngine
 {
     private RenderSettings settings;
@@ -124,6 +129,11 @@ public abstract class RenderEngine
      * This chapter's content, as flowed into Pages.
      */
     private ArrayList<Page> pages;
+
+    /**
+     * After a render, what page are we on?
+     */
+    private int pageIndex;
 
     /**
      * Where is a given (Segment, offset) pair?
@@ -262,7 +272,7 @@ public abstract class RenderEngine
         surface.finish();
     }
 
-    private void renderSinglePage(Context cr, int pageNum) {
+    private void renderSinglePage(final Context cr, final int pageNum) {
         final Surface surface;
         final Page page;
 
@@ -272,6 +282,8 @@ public abstract class RenderEngine
         page.render(cr);
 
         surface.finish();
+
+        pageIndex = pageNum - 1;
     }
 
     private void renderSinglePage(final Context cr, final Origin target) {
@@ -296,6 +308,8 @@ public abstract class RenderEngine
         page.render(cr);
 
         surface.finish();
+
+        pageIndex = page.getPageNumber() - 1;
     }
 
     protected void specifyFonts(final Context cr) {
@@ -957,6 +971,21 @@ public abstract class RenderEngine
 
     public double getMarginBottom() {
         return bottomMargin;
+    }
+
+    /**
+     * The number of pages in this document, as rendered.
+     */
+    public int getPageCount() {
+        return pages.size();
+    }
+
+    /**
+     * The page number currently being shown (in the case of a single page
+     * render). These are for internal use, and are 0 origin.
+     */
+    public int getPageIndex() {
+        return pageIndex;
     }
 
     protected Area layoutAreaFooter(Context cr, int pageNumber) {
