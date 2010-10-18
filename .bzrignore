@@ -3,3 +3,4 @@ tmp
 tests/*.pdf
 quill-*
 .norescue
+share/locale
