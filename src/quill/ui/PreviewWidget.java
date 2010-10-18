@@ -131,7 +131,7 @@ class PreviewWidget extends HBox
 
         adj.connect(new Adjustment.ValueChanged() {
             public void onValueChanged(Adjustment source) {
-                final double value, clamped;
+                final double value;
                 final int num;
 
                 if (internal) {
@@ -139,8 +139,7 @@ class PreviewWidget extends HBox
                 }
 
                 value = source.getValue();
-                clamped = Math.floor(value);
-                num = (int) clamped;
+                num = (int) Math.round(value);
 
                 if (num == target) {
                     return;
