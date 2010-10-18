@@ -20,8 +20,11 @@ package quill.ui;
 
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.HBox;
+import org.gnome.gtk.Justification;
+import org.gnome.gtk.Label;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ScrolledWindow;
+import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextView;
 import org.gnome.gtk.VBox;
@@ -29,13 +32,19 @@ import org.gnome.gtk.Viewport;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.WrapMode;
 
+import static org.gnome.gtk.Alignment.LEFT;
+import static org.gnome.gtk.Alignment.TOP;
+import static org.gnome.gtk.SizeGroupMode.HORIZONTAL;
+
 class NotesEditorWidget extends ScrolledWindow
 {
     private ScrolledWindow scroll;
 
     private Adjustment adj;
 
-    private VBox box;
+    private VBox top;
+
+    private SizeGroup group;
 
     /**
      * What is the top level UI holding this document?
@@ -48,15 +57,32 @@ class NotesEditorWidget extends ScrolledWindow
         this.primary = primary;
 
         setupScrolling();
+        addHeading("Endnotes");
         mockupSeveralNotes();
+        addHeading("References");
+        mockupSeveralReferences();
     }
 
     private void setupScrolling() {
         final Viewport port;
-        box = new VBox(false, 3);
+        top = new VBox(false, 3);
 
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
-        scroll.addWithViewport(box);
+        scroll.addWithViewport(top);
+
+        group = new SizeGroup(HORIZONTAL);
+    }
+
+    private void addHeading(String title) {
+        final Label heading;
+
+        heading = new Label();
+        heading.setUseMarkup(true);
+        heading.setLineWrap(true);
+        heading.setLabel("<span size='xx-large'>" + title + "</span>");
+        heading.setAlignment(LEFT, TOP);
+
+        top.packStart(heading, false, false, 6);
     }
 
     private void mockupSeveralNotes() {
@@ -65,13 +91,26 @@ class NotesEditorWidget extends ScrolledWindow
         widget = createFakeEndnote(
                 "42",
                 "From \"A Victory For Democracy\", an episode of the popular television series Yes Prime Minister. This passage taken from the book version [2], page 165.");
-        box.packStart(widget, false, false, 0);
+        top.packStart(widget, false, false, 0);
+        widget = createFakeEndnote("43", "");
+        top.packStart(widget, false, false, 0);
+    }
+
+    private void mockupSeveralReferences() {
+        Widget widget;
+
         widget = createFakeEndnote(
-                "43",
-                "Typesetting text (the fake latin verse) known as \"Lorum Ipsum\" created by an online generator program available at [3]");
-        box.packStart(widget, false, false, 0);
-        widget = createFakeEndnote("44", "");
-        box.packStart(widget, false, false, 0);
+                "[1]",
+                "Andrew Cowie, \"Surviving Change\" in Proceedings of the 12th Australian Systems Administrators Conference (Brisbane: SAGE-AU, 2004), pages 23-40.");
+        top.packStart(widget, false, false, 0);
+        widget = createFakeEndnote(
+                "[2]",
+                "Antony Jay and Jonathan Lynn, The Complete Yes Prime Minister (London: BBC Books, 1989). ISBN 0563207736.");
+        top.packStart(widget, false, false, 0);
+        widget = createFakeEndnote(
+                "[Lorem]",
+                "Generator of typesetting text (the fake latin verse known as \"Lorum Ipsum\") available at http://www.lipsum.com");
+        top.packStart(widget, false, false, 0);
     }
 
     /*
@@ -80,7 +119,7 @@ class NotesEditorWidget extends ScrolledWindow
     /*
      * TODO change body to a NormalEditorTextView? Constrained how?
      */
-    private static Widget createFakeEndnote(String left, String right) {
+    private Widget createFakeEndnote(String left, String right) {
         final HBox hbox;
         final VBox vbox;
         final TextView ref, body;
@@ -94,9 +133,11 @@ class NotesEditorWidget extends ScrolledWindow
         ref.setAcceptsTab(false);
         ref.setWrapMode(WrapMode.NONE);
         ref.setMarginLeft(10);
+        ref.setJustify(Justification.RIGHT);
         vbox = new VBox(false, 0);
         vbox.packStart(ref, false, false, 0);
         hbox.packStart(vbox, false, false, 10);
+        group.add(ref);
 
         two = new TextBuffer();
         two.setText(right);

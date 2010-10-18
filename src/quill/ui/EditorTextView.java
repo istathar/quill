@@ -1067,7 +1067,7 @@ abstract class EditorTextView extends TextView
         }
     }
 
-    private static Widget createEndnote(Span span) {
+    private Widget createEndnote(Span span) {
         final String ref;
         final FontDescription desc;
         final Label label;
@@ -1084,7 +1084,7 @@ abstract class EditorTextView extends TextView
 
         box.connect(new Widget.ButtonPressEvent() {
             public boolean onButtonPressEvent(Widget source, EventButton event) {
-                // TODO
+                parent.getPrimary().switchToEndnotes();
                 return false;
             }
         });
