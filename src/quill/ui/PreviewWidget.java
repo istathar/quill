@@ -84,6 +84,15 @@ class PreviewWidget extends HBox
      */
     private Stylesheet style;
 
+    private boolean internal;
+
+    /**
+     * If set to -1, then the requested page will be that driven by where the
+     * cursor is in the editor (the normal case) if 0 or greater, it means the
+     * value was set by the user sliding the Scrollbar.
+     */
+    private int target;
+
     PreviewWidget(PrimaryWindow window) {
         super(false, 0);
 
@@ -107,16 +116,40 @@ class PreviewWidget extends HBox
                 drawPageOutline(cr, engine);
                 drawCrosshairs(cr, engine);
 
-                cursor = primary.getCursor();
-                engine.render(cr, folio, cursor);
+                if (target == -1) {
+                    cursor = primary.getCursor();
+                    engine.render(cr, folio, cursor);
+                } else {
+                    engine.render(cr, folio, target + 1);
+                }
 
                 updateScrollbar();
 
                 return true;
             }
         });
-        
-        
+
+        adj.connect(new Adjustment.ValueChanged() {
+            public void onValueChanged(Adjustment source) {
+                final double value, clamped;
+                final int num;
+
+                if (internal) {
+                    return;
+                }
+
+                value = source.getValue();
+                clamped = Math.floor(value);
+                num = (int) clamped;
+
+                if (num == target) {
+                    return;
+                }
+
+                target = num;
+                drawing.queueDraw();
+            }
+        });
     }
 
     private void drawPageOutline(Context cr, RenderEngine engine) {
@@ -245,13 +278,23 @@ class PreviewWidget extends HBox
         super.queueDraw();
     }
 
+    /*
+     * F2
+     */
+    void refreshDisplayAtCursor() {
+        this.target = -1;
+        super.queueDraw();
+    }
+
     private void updateScrollbar() {
         final int num, i;
-        
+
         num = engine.getPageCount();
         i = engine.getPageIndex();
 
+        internal = true;
         adj.setUpper(num);
         adj.setValue(i);
+        internal = false;
     }
 }
