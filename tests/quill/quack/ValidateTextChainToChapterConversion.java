@@ -169,9 +169,8 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
                 "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
                 "<text>",
-                "Accessing the " + "<filename>/tmp</filename>" + " directory",
-                "directly is fine, but you are often better",
-                "off using " + "<type>" + "File" + "</type>'s",
+                "Accessing the " + "<filename>/tmp</filename>" + " directory directly is",
+                "fine, but you are often better off using " + "<type>" + "File" + "</type>'s",
                 "<function>" + "createTempFile()" + "</function> function.",
                 "</text>",
                 "</chapter>"
@@ -202,8 +201,8 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         entire = series.getSegment(0).getEntire();
 
         assertNotNull(entire);
-        assertEquals("Accessing the /tmp directory directly is fine, "
-                + "but you are often better off using File's createTempFile() function.",
+        assertEquals("Accessing the /tmp directory directly is "
+                + "fine, but you are often better off using File's createTempFile() function.",
                 entire.getText());
     }
 

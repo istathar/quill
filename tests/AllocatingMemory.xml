@@ -4,53 +4,43 @@
 Allocating Memory
 </title>
 <text>
-Thus far, we have used
-<function>kmalloc</function> and
-<function>kfree</function> for the allocation
-and freeing of memory. The Linux kernel offers
-a richer set of memory allocation primitives,
-however. In this chapter, we look at other
-ways of using memory in device drivers and
-how to optimize your system's memory resources.
-We do not get into how the different architectures
-actually administer memory. Modules are not
-involved in issues of segmentation, paging,
-and so on, since the kernel offers a unified
-memory management interface to the drivers.
-In addition, we won't describe the internal
-details of memory management in this chapter,
-but defer it to Chapter 15.
+Thus far, we have used <function>kmalloc</function> and
+<function>kfree</function> for the allocation and freeing of
+memory. The Linux kernel offers a richer set of memory allocation
+primitives, however. In this chapter, we look at other ways of
+using memory in device drivers and how to optimize your system's
+memory resources. We do not get into how the different architectures
+actually administer memory. Modules are not involved in issues
+of segmentation, paging, and so on, since the kernel offers a
+unified memory management interface to the drivers. In addition,
+we won't describe the internal details of memory management in
+this chapter, but defer it to Chapter 15.
 </text>
 <heading>
 The Real Story of kmalloc
 </heading>
 <text>
-The <function>kmalloc</function> allocation
-engine is a powerful tool and easily learned
-because of its similarity to 
-<function>malloc</function>. The function
-is fast (unless it blocks) and doesn't clear
-the memory it obtains; the allocated region
-still holds its previous content.
+The <function>kmalloc</function> allocation engine is a powerful
+tool and easily learned because of its similarity to 
+<function>malloc</function>. The function is fast (unless it
+blocks) and doesn't clear the memory it obtains; the allocated
+region still holds its previous content.
 </text>
 <text>
-Among other things, this implies that you
-should explicitly clear any memory that might
-be exposed to user space or written to a
-device; otherwise, you risk disclosing information
-that should be kept private. The allocated
-region is also contiguous in physical memory.
-In the next few sections, we talk in detail
-about <function>kmalloc</function>, so you
-can compare it with the memory allocation
-techniques that we discuss later.
+Among other things, this implies that you should explicitly clear
+any memory that might be exposed to user space or written to
+a device; otherwise, you risk disclosing information that should
+be kept private. The allocated region is also contiguous in physical
+memory. In the next few sections, we talk in detail about
+<function>kmalloc</function>, so you can compare it with the
+memory allocation techniques that we discuss later.
 </text>
 <heading>
 The Flags Argument
 </heading>
 <text>
-Remember that the prototype for
-<function>kmalloc</function> is:
+Remember that the prototype for <function>kmalloc</function>
+is:
 </text>
 <code xml:space="preserve">
 #include &lt;linux/slab.h&gt;
@@ -58,143 +48,108 @@ Remember that the prototype for
 void *kmalloc(size_t size, int flags);
 </code>
 <text>
-The first argument to <function>kmalloc</function>
-is the size of the block to be allocated.
-The second argument, the allocation flags,
-is much more interesting, because it controls
-the behaviour of <function>kmalloc</function>
-in a number of ways.
+The first argument to <function>kmalloc</function> is the size
+of the block to be allocated. The second argument, the allocation
+flags, is much more interesting, because it controls the behaviour
+of <function>kmalloc</function> in a number of ways.
 </text>
 <text>
-The most commonly used flag,
-<literal>GFP_KERNEL</literal>, means that
-the allocation (internally performed by calling,
-eventually, <function>__get_free_pages</function>,
-which is the source of the <literal>GFP_</literal>
-prefix) is performed on behalf of a process
-running in kernel space. In other words,
-this means that the calling function is executing
-a system call on behalf of a process. Using
-<literal>GFP_KERNEL</literal> means that
-<function>kmalloc</function> can put the
-current process to sleep waiting for a page
-when called in low-memory situations. A function
-that allocates memory using
-<literal>GFP_KERNEL</literal> must, therefore,
-be reentrant and cannot be running in atomic
-context. While the current process sleeps,
-the kernel takes proper action to locate
-some free memory, either by flushing buffers
-to disk or by swapping out memory from a
-user process.
+The most commonly used flag, <literal>GFP_KERNEL</literal>, means
+that the allocation (internally performed by calling, eventually,
+<function>__get_free_pages</function>, which is the source of
+the <literal>GFP_</literal> prefix) is performed on behalf of
+a process running in kernel space. In other words, this means
+that the calling function is executing a system call on behalf
+of a process. Using <literal>GFP_KERNEL</literal> means that
+<function>kmalloc</function> can put the current process to sleep
+waiting for a page when called in low-memory situations. A function
+that allocates memory using <literal>GFP_KERNEL</literal> must,
+therefore, be reentrant and cannot be running in atomic context.
+While the current process sleeps, the kernel takes proper action
+to locate some free memory, either by flushing buffers to disk
+or by swapping out memory from a user process.
 </text>
 <text>
-<literal>GFP_KERNEL</literal> isn't always
-the right allocation flag to use; sometimes
-<function>kmalloc</function> is called from
-outside a process's context. This type of
-call can happen, for instance, in interrupt
-handlers, tasklets, and kernel timers. In
-this case, the <literal>current</literal>
-process should not be put to sleep, and the
-driver should use a flag of 
-<literal>GFP_ATOMIC</literal> instead. The
-kernel normally tries to keep some free pages
-around in order to fulfil atomic allocation.
+<literal>GFP_KERNEL</literal> isn't always the right allocation
+flag to use; sometimes <function>kmalloc</function> is called
+from outside a process's context. This type of call can happen,
+for instance, in interrupt handlers, tasklets, and kernel timers.
+In this case, the <literal>current</literal> process should not
+be put to sleep, and the driver should use a flag of 
+<literal>GFP_ATOMIC</literal> instead. The kernel normally tries
+to keep some free pages around in order to fulfil atomic allocation.
 When <literal>GFP_ATOMIC</literal> is used,
-<function>kmalloc</function> can use even
-the last free page. If that last page does
-not exist, however, the allocation fails.
+<function>kmalloc</function> can use even the last free page.
+If that last page does not exist, however, the allocation fails.
 </text>
 <text>
-Other flags can be used in place of or in
-addition to <literal>GFP_KERNEL</literal>
-and <literal>GFP_ATOMIC</literal>, although
-those two cover most of the needs of device
-drivers. All the flags are defined in
-<filename>linux/gfp.h</filename>, and individual
-flags are prefixed with a double underscore,
-such as <literal>__GFP_DMA</literal>. In
-addition, there are symbols that represent
-frequently used combinations of flags; these
-lack the prefix and are sometimes called
-<italics>allocation priorities</italics>.
+Other flags can be used in place of or in addition to
+<literal>GFP_KERNEL</literal> and <literal>GFP_ATOMIC</literal>,
+although those two cover most of the needs of device drivers.
+All the flags are defined in <filename>linux/gfp.h</filename>,
+and individual flags are prefixed with a double underscore, such
+as <literal>__GFP_DMA</literal>. In addition, there are symbols
+that represent frequently used combinations of flags; these lack
+the prefix and are sometimes called <italics>allocation priorities</italics>.
 </text>
 <heading>
 Memory zones
 </heading>
 <text>
-Both <literal>__GFP_DMA</literal> and
-<literal>__GFP_HIGHMEM</literal> have a platform-dependent
-role, although their use is valid for all
-platforms.
+Both <literal>__GFP_DMA</literal> and <literal>__GFP_HIGHMEM</literal>
+have a platform-dependent role, although their use is valid for
+all platforms.
 </text>
 <text>
-The Linux kernel knows about a minimum of
-three <italics>memory zones</italics>: DMA-capable
-memory, normal memory, and high memory. While
-allocation normally happens in the
-<italics>normal</italics> zone, setting either
-of the bits just mentioned requires memory
-to be allocated from a different zone. The
-idea is that every computer platform that
-must know about special memory ranges (instead
-of considering all RAM equivalents) will
-fall into this abstraction.
+The Linux kernel knows about a minimum of three <italics>memory
+zones</italics>: DMA-capable memory, normal memory, and high
+memory. While allocation normally happens in the
+<italics>normal</italics> zone, setting either of the bits just
+mentioned requires memory to be allocated from a different zone.
+The idea is that every computer platform that must know about
+special memory ranges (instead of considering all RAM equivalents)
+will fall into this abstraction.
 </text>
 <text>
-<italics>DMA-capable memory</italics> is
-memory that lives in a preferential address
-range, where peripherals can perform DMA
-access. On most sane platforms, all memory
-lives in this zone. On the x86, the DMA zone
-is used for the first 16 MB of RAM, where
-legacy ISA devices can perform DMA; PCI devices
-have no such limit.
+<italics>DMA-capable memory</italics> is memory that lives in
+a preferential address range, where peripherals can perform DMA
+access. On most sane platforms, all memory lives in this zone.
+On the x86, the DMA zone is used for the first 16 MB of RAM,
+where legacy ISA devices can perform DMA; PCI devices have no
+such limit.
 </text>
 <text>
-<italics>High memory</italics> is a mechanism
-used to allow access to (relatively) large
-amounts of memory on 32-bit platforms. This
-memory cannot be directly accessed from the
-kernel without first setting up a special
-mapping and is generally harder to work with.
-If your driver uses large amounts of memory,
-however, it will work better on large systems
-if it can use high memory. See the Section
-1.8 in Chapter 15 for a detailed description
+<italics>High memory</italics> is a mechanism used to allow access
+to (relatively) large amounts of memory on 32-bit platforms.
+This memory cannot be directly accessed from the kernel without
+first setting up a special mapping and is generally harder to
+work with. If your driver uses large amounts of memory, however,
+it will work better on large systems if it can use high memory.
+See the Section 1.8 in Chapter 15 for a detailed description
 of how high memory works and how to use it.
 </text>
 <text>
-Whenever a new page is allocated to fulfil
-a memory allocation request, the kernel builds
-a list of zones that can be used in the search.
-If <literal>__GFP_DMA</literal> is specified,
-only the DMA zone is searched: if no memory
-is available at low addresses, allocation
-fails. If no special flag is present, both
-normal and DMA memory are searched; if
-<literal>__GFP_HIGHMEM</literal> is set,
-all three zones are used to search a free
-page. (Note, however, that
-<function>kmalloc</function> cannot allocate
-high memory.)
+Whenever a new page is allocated to fulfil a memory allocation
+request, the kernel builds a list of zones that can be used in
+the search. If <literal>__GFP_DMA</literal> is specified, only
+the DMA zone is searched: if no memory is available at low addresses,
+allocation fails. If no special flag is present, both normal
+and DMA memory are searched; if <literal>__GFP_HIGHMEM</literal>
+is set, all three zones are used to search a free page. (Note,
+however, that <function>kmalloc</function> cannot allocate high
+memory.)
 </text>
 <text>
-The situation is more complicated on nonuniform
-memory access (NUMA) systems. As a general
-rule, the allocator attempts to locate memory
-local to the processor performing the allocation,
-although there are ways of changing that
-behaviour.
+The situation is more complicated on nonuniform memory access
+(NUMA) systems. As a general rule, the allocator attempts to
+locate memory local to the processor performing the allocation,
+although there are ways of changing that behaviour.
 </text>
 <text>
-The mechanism behind memory zones is implemented
-in <filename>mm/page_alloc.c</filename>,
-while initialization of the zone resides
-in platform-specific files, usually in 
-<filename>mm/init.c</filename> within the
-<filename>arch</filename> tree. We'll revisit
-these topics in Chapter 15.
+The mechanism behind memory zones is implemented in
+<filename>mm/page_alloc.c</filename>, while initialization of
+the zone resides in platform-specific files, usually in 
+<filename>mm/init.c</filename> within the <filename>arch</filename>
+tree. We'll revisit these topics in Chapter 15.
 </text>
 </chapter>
