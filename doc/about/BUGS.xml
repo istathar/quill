@@ -7,61 +7,51 @@ Bugs
 User Interface
 </heading>
 <text>
-<bold>Scrolling on new </bold><type>Segment</type>
-<bold> insert</bold>
+<bold>Scrolling on new </bold><type>Segment</type><bold> insert</bold>
 </text>
 <text>
-Inserting a Section heading from last line
-of last <type>NormalEditorTextView</type>,
-then cursor <bold>Down</bold> doesn't cause
-the new line to be scrolled into visible
-area of <type>ComponentEditorWidget</type>.
+Inserting a Section heading from last line of last
+<type>NormalEditorTextView</type>, then cursor <bold>Down</bold>
+doesn't cause the new line to be scrolled into visible area of
+<type>ComponentEditorWidget</type>.
 </text>
 <text>
-<type>Segment</type><bold> text needs escaping
-before passing to GTK </bold><type>Label</type>
-<bold>?</bold>
+<type>Segment</type><bold> text needs escaping before passing
+to GTK </bold><type>Label</type><bold>?</bold>
 </text>
 <text>
-If you put the text <literal>&lt;!--</literal>
-into a section heading, then <bold>F3</bold>
-Outline, the application crashes with an
-error from <type>Label</type>'s
+If you put the text <literal>&lt;!--</literal> into a section
+heading, then <bold>F3</bold> Outline, the application crashes
+with an error from <type>Label</type>'s
 <literal>setUseMarkup()</literal>.
 </text>
 <text>
-<bold>Selection should be cleared when leaving
-</bold><type>EditorTextView</type>
+<bold>Selection should be cleared when leaving </bold>
+<type>EditorTextView</type>
 </text>
 <text>
-If you select text in one editor, then you
-click in another, moving the focus, the TextView
-which looses focus sets the selected region
-the semi-tone "I'm inactive but still have
-a selection" colour.
+If you select text in one editor, then you click in another,
+moving the focus, the TextView which looses focus sets the selected
+region the semi-tone "I'm inactive but still have a selection"
+colour.
 </text>
 <text>
-It should probably be cleared so the behaviour
-is consistent with there only being one
-<type>TextView</type>.
+It should probably be cleared so the behaviour is consistent
+with there only being one <type>TextView</type>.
 </text>
 <text>
-<bold>Pasting when a format in effect should
-inherit that format.</bold>
+<bold>Pasting when a format in effect should inherit that format.</bold>
 </text>
 <text>
 For some reason, if you set a format (say
-<filename>filename</filename> with
-<bold>Ctrl+Shift+F</bold>) and then you paste
-some text, that format is not picked up and
-instead it seems to be given
-<literal>null</literal> formatting.
+<filename>filename</filename> with <bold>Ctrl+Shift+F</bold>)
+and then you paste some text, that format is not picked up and
+instead it seems to be given <literal>null</literal> formatting.
 </text>
 <text>
-I thought this used to work. But perhaps
-the <literal>TextView.NotifyCursorPosition
-</literal>handler in <type>EditorTextView</type>
-is clearing the formatting? Or check
+I thought this used to work. But perhaps the
+<literal>TextView.NotifyCursorPosition </literal>handler in
+<type>EditorTextView</type> is clearing the formatting? Or check
 <function>paste()</function> there.
 </text>
 <heading>
@@ -71,16 +61,14 @@ Internal
 <bold>Undo stack is unbounded</bold>
 </text>
 <text>
-The undo stack is a <type>LinkedList</type>
-right now; nothing is acting to constrain
-its size or clean off older entries. Unlimited
-undo steps is cool; unconstrained memory
-consumption until exhaustion is not.
+The undo stack is a <type>LinkedList</type> right now; nothing
+is acting to constrain its size or clean off older entries. Unlimited
+undo steps is cool; unconstrained memory consumption until exhaustion
+is not.
 </text>
 <text>
-Making it <type>WeakReference</type> doesn't
-quite seem sufficient; we can't have items
-arbitrarily disappearing. Perhaps an
+Making it <type>WeakReference</type> doesn't quite seem sufficient;
+we can't have items arbitrarily disappearing. Perhaps an
 <type>ArrayDequeue</type>?
 </text>
 <text>
@@ -89,12 +77,10 @@ arbitrarily disappearing. Perhaps an
 <text>
 Right now the <type>PreviewWidget</type>'s
 <literal>ExposeEvent</literal> runs the entire
-<type>RenderEngine</type>; we need to cache
-the result and only update the result of
-processing Segments into <type>Area</type>s
-and <type>Page</type>s if the current
-<type>Change</type> object is no longer the
-same as that when the render happened.
+<type>RenderEngine</type>; we need to cache the result and only
+update the result of processing Segments into <type>Area</type>s
+and <type>Page</type>s if the current <type>Change</type> object
+is no longer the same as that when the render happened.
 </text>
 <heading>
 Render Engine
@@ -103,14 +89,11 @@ Render Engine
 <bold>Markup in headings is not scaled properly</bold>
 </text>
 <text>
-The current method of making the heading
-larger applies only on the actual
-<literal>headingFont</literal>. If you put
-markup (Type, for example) into a
-<type>HeadingSegment</type> then when it
-renders it will use <literal>sansFont</literal>
-at whatever that font is sized at, not at
-the larger size of the heading.
+The current method of making the heading larger applies only
+on the actual <literal>headingFont</literal>. If you put markup
+(Type, for example) into a <type>HeadingSegment</type> then when
+it renders it will use <literal>sansFont</literal> at whatever
+that font is sized at, not at the larger size of the heading.
 </text>
 <heading>
 Copyright
@@ -119,23 +102,19 @@ Copyright
 <bold>Need strong copyright handling</bold>
 </text>
 <text>
-The mere presence of this section as text
-in a <type>QuoteSegment</type>, and not metadata
-or otherwise with a purpose built UI, is
-a bug. <literal>:)</literal>
+The mere presence of this section as text in a
+<type>QuoteSegment</type>, and not metadata or otherwise with
+a purpose built UI, is a bug. <literal>:)</literal>
 </text>
 <quote>
-Copyright © 2008-2010 Operational Dynamics
-Consulting, Pty Ltd 
+Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
+
 </quote>
 <quote>
-As project documentation, this file forms
-an integral part of the source code of the
-program it accompanies, and thus is made
-available to you by its authors under the
-terms of the "GNU General Public Licence
-version 2". See the <filename>LICENCE</filename>
-file for the terms governing usage, copying
-and redistribution.
+As project documentation, this file forms an integral part of
+the source code of the program it accompanies, and thus is made
+available to you by its authors under the terms of the "GNU General
+Public Licence version 2". See the <filename>LICENCE</filename>
+file for the terms governing usage, copying and redistribution.
 </quote>
 </chapter>
