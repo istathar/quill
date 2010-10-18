@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter xmlns="http://namespace.operationaldynamics.com/parchment/0.2">
 <title>
-Chapter 1
+An Example Chapter
 </title>
 <text>
 This is not a real document. This is a series
@@ -9,22 +9,26 @@ of unrelated fragments that are assembled
 here to exercise the different features of
 Quill and Parchment that are implemented
 so far. So if it looks like nonsense, that's
-because it is. <literal>:)</literal>
+because it is. <literal>:)</literal> But
+it includes a little bit of everything.
 </text>
 <heading>
-Getting started
+Techincal writing
 </heading>
 <text>
-This is a simple
-<application>java-gnome</application> program
-with 𝑛-way permutations.
+This application was originally designed
+for about writing reports, technical documentation,
+and books about software development, and
+systems administration, and other computer
+engineering topics. One of the characteristics
+of such work is constantly switching back
+and forth between prose and blocks of code.
 </text>
 <text>
-As you will see in the following definition
-of <type>GtkButton</type>'s
-<function>setLabel()</function> there's really
-nothing to it that you need to be worried
-about:
+For example, the simplest program you could
+write with the excellent
+<application>java-gnome</application> user
+interface library is this:
 </text>
 <code xml:space="preserve">
 public class Example
@@ -36,15 +40,45 @@ public class Example
 }
 </code>
 <text>
-Place this code in
+If you were to place this code in
 <filename>Example.java</filename> and compile
-it.
+it with <command>javac</command>, you'd then
+face the real question: whether you know
+how to <italics>run</italics> the program...
 </text>
 <text>
 This program has the drawback of
 <italics>not</italics> doing very much and
 even worse, <bold>not</bold> telling you
-that that's not what it's doing.
+that that's not what it's doing. The problem
+is the call to <literal>Gtk.main()</literal>
+which blocks. To be interesting, though,
+this program needs a little love. Like a
+button! That's the <type>Button</type> class,
+as you'd expect, and to put text on the button
+we use the <function>setLabel()</function>
+method. In general you'll probably call it
+in code like <literal>button.setLabel("Hello
+World");</literal> which isn't terribly original
+but is very important as a starting point.
+More importantly, though, these passages
+shows us putting program code in
+<type>PreformatSegment</type> blocks as well
+as inline as a literal in the text.
+</text>
+<heading>
+Quotes
+</heading>
+<text>
+Regardless of the kind of writing you do,
+there are often quotations from other works.
+One of my favourite television programs is
+the British comedy, <italics>Yes Prime Minister</italics>,
+aired by BBC. The authors later wrote a book,
+but rather than just being a screenplay,
+it's done up as if it were historical research,
+with "excerpts" from cabinet meetings, private
+diaries, newspaper articles and so on:
 </text>
 <quote>
 <italics>The potential problem with the PM:</italics>
@@ -65,22 +99,16 @@ himself to the hospitality and ceremonial
 role.<note ref="42"/>
 </quote>
 <text>
-The way you fix that is by not making the
-call to <literal>Gtk.main()</literal> and
-instead just letting the program exit. Then
-just compile it with <command>javac</command>
-and you're on your way.
+Here we see a <type>BlockquoteSegment</type>,
+along with a footnote anchor at the end.
 </text>
 <text>
-The real question is whether or not you know
-enough to <italics>run</italics> the program,
-or if you'd rather just "run away screaming"
-now...
+<highlight>TODO</highlight> clicking on the
+footnote to actually edit the not text.
 </text>
-<text>
-<highlight>TODO</highlight> Get a better
-example document!
-</text>
+<heading>
+Illuminating the past
+</heading>
 <text>
 <italics>Lor</italics>em ip<italics>sum</italics>
 dolor sit amet, consectetuer adipiscing elit.
@@ -103,64 +131,24 @@ consequat, nisl ante lobortis dolor, ut hendrerit
 tortor "quam id augue." per <cite ref="[Lorem]"/>.
 </text>
 <text>
-"Phasellus mollis", ante quis tincidunt rutrum,
-augue nisl malesuada ipsum, sit amet condimentum
-dolor felis nec lorem. Nulla ante. Etiam
-vulputate lorem quis orci. Duis mattis odio
-sit amet erat. Maecenas eu sem et nunc mollis
-dapibus. Quisque a dui. Pellentesque a arcu
-in eros pellentesque iaculis. Vestibulum
-ante ipsum primis in faucibus orci luctus
-et ultrices posuere cubilia Curae; Cras nulla
-pede, consequat quis, tincidunt eget, fermentum
-ac, sapien. Integer nec mi. Sed elementum
-iaculis justo. Suspendisse arcu arcu, facilisis
-quis, viverra aliquam, dapibus quis, magna.
-Nulla facilisi. Quisque dui ipsum, eleifend
-ut, ultrices vel, aliquet ac, turpis. Pellentesque
-volutpat lorem eget pede. Proin dapibus,
-ornare suscipit, magna nunc pharetra lorem,
-eget ornare velit sem vel tortor. Ut dolor.
-Fusce tincidunt.
+Which is the sort of thing you write when
+you want to have filler text. Of course,
+we don't have Latin installed as a dictionary,
+so we just see a lot of misspelled words.
+Note that the first two words have varying
+inline markup (italics to normal and back);
+this tests that when loading from disk and
+serializing out again that the XML library
+does not insert a space at markup change
+boundaries.
 </text>
 <text>
-Curabitur viverra. Proin lectus nunc, elementum
-a, consequat vel, interdum non, mauris. Cras
-diam. Maecenas magna augue, tristique sed,
-mollis quis, tincidunt at, ante. Cras in
-metus eget tortor adipiscing egestas. In
-aliquet massa sollicitudin quam. Cras arcu.
-Vestibulum lorem felis, vestibulum laoreet,
-convallis in, suscipit eu, felis. Integer
-tincidunt. Nullam tempor. Phasellus vel lorem.
-Suspendisse congue odio sit amet ligula.
-Donec rhoncus eleifend nisl. Fusce congue
-nunc quis lectus. Quisque vel nisl ornare
-magna interdum convallis.
-</text>
-<heading>
-And continuing
-</heading>
-<text>
-We mentioned <function>setLabel()</function>.
-In general you'll probably call it in code
-like <literal>button.setLabel("Hello World");</literal>
-which isn't terribly original but is very
-important as a starting point.
-</text>
-<text>
-In tincidunt nunc a leo. In id sem vitae
-lectus feugiat veh. Donec nisl justo, aliquet
-lobortis, dignissim non, sagittis eget, orci.
-Integer iaculis sapien vel diam sollicitudin
-facilisis. Morbi varius eros quis justo.
-Vivamus id leo eget metus accumsan dignissim.
-Nullam a est vitae erat elementum bibendum.
-Suspendisse a ante at nulla aliquet egestas.
-Donec ante lectus, ullamcorper id, egestas
-et, ultricies lacinia, nibh, non tincidunt
-nibh purus sit amet dui. Congue dictum augue.
-Donec sit amet velit quis augue aliquam pulvinar.
+That passage also shows the other kind of
+reference, an in-line citation. They are
+presented in the editor with the same UI
+for footnotes providing some indication that
+they are special, but when rendered they
+appear inline as normal text.
 </text>
 <text>
 And in keeping with the feel of ancient civilization,
@@ -169,14 +157,31 @@ And in keeping with the feel of ancient civilization,
 An old map.
 </image>
 <text>
-Etiam rutrum velit in nunc porta auctor.
-Nullam fringilla velit volutpat felis. Etiam
-vestibulum condimentum augue. In ante quis
-neque laoreet pulvinar. Integer pharetra
-ligula eget magna. Morbi condimentum lectus
-commodo nunc. Sed suscipit, elit quis condimentum
-malesuada, erat arcu pulvinar tortor, vitae
-rhoncus justo est ut ipsum. Sed sagittis
-mi sit amet mauris.
+A image caption isn't always necessary, but
+it's a nice touch. If you don't write a caption
+it won't take up space when you render. Also
+evident here is our emphasis on
+<italics>writing</italics>. When you put
+an image in your document, we just show a
+small placeholder thumbnail instead of taking
+up a huge amount of vertical space in the
+editor canvas.
+</text>
+<text>
+Images are rendered at their native resolution
+if they fit, otherwise they are scaled down
+to fit within the left and right margins.
+Which is exactly what you'd want - photos
+are typically way too big, but if you have
+a smaller illustration there's no point in
+making it any bigger.
+</text>
+<text>
+<highlight>TODO</highlight> while loading
+and saving files with <type>ImageSegment</type>
+blocks clearly works (hover over the image
+to see the filename), there isn't any UI
+for inserting images and/or changing the
+source file yet.
 </text>
 </chapter>
