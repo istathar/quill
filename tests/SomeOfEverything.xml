@@ -18,11 +18,12 @@ Techincal writing
 <text>
 This application was originally designed
 for about writing reports, technical documentation,
-and books about software development, and
+and someday books about software development,
 systems administration, and other computer
 engineering topics. One of the characteristics
 of such work is constantly switching back
-and forth between prose and blocks of code.
+and forth between normal prose and blocks
+of code.
 </text>
 <text>
 For example, the simplest program you could
@@ -31,6 +32,8 @@ write with the excellent
 interface library is this:
 </text>
 <code xml:space="preserve">
+import org.gnome.gtk.Gtk;
+
 public class Example
 {
     public static void main(String[] args) {
@@ -52,19 +55,18 @@ This program has the drawback of
 even worse, <bold>not</bold> telling you
 that that's not what it's doing. The problem
 is the call to <literal>Gtk.main()</literal>
-which blocks. To be interesting, though,
-this program needs a little love. Like a
-button! That's the <type>Button</type> class,
-as you'd expect, and to put text on the button
-we use the <function>setLabel()</function>
-method. In general you'll probably call it
-in code like <literal>button.setLabel("Hello
-World");</literal> which isn't terribly original
-but is very important as a starting point.
-More importantly, though, these passages
-shows us putting program code in
-<type>PreformatSegment</type> blocks as well
-as inline as a literal in the text.
+which blocks. This program needs a little
+love. Like a button! That's the
+<type>Button</type> class, as you'd expect,
+and to put text on the button we use the
+<function>setLabel()</function> method. In
+general you'll probably call it in code like
+<literal>button.setLabel("Hello World");</literal>
+which isn't terribly original but is very
+important as a starting point. More importantly,
+though, these passages shows us putting program
+code in <type>PreformatSegment</type> blocks
+as well as inline as a literal in the text.
 </text>
 <heading>
 Quotes
@@ -103,8 +105,10 @@ Here we see a <type>BlockquoteSegment</type>,
 along with a footnote anchor at the end.
 </text>
 <text>
-<highlight>TODO</highlight> clicking on the
-footnote to actually edit the not text.
+<highlight>TODO</highlight> when you click
+on the footnote, you should to actually be
+taken to where you can edit the note text.
+We haven't written the UI for that yet.
 </text>
 <heading>
 Illuminating the past
