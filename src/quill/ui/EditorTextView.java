@@ -47,6 +47,7 @@ import org.gnome.gtk.WrapMode;
 import org.gnome.pango.FontDescription;
 
 import quill.client.Quill;
+import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
@@ -55,6 +56,7 @@ import quill.textbase.HeadingSegment;
 import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
+import quill.textbase.PoeticSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
@@ -1145,11 +1147,21 @@ abstract class EditorTextView extends TextView
         split = new InsertContextMenu(parent);
 
         types = new Class<?>[] {
-                NormalSegment.class, PreformatSegment.class, QuoteSegment.class, HeadingSegment.class
+                NormalSegment.class,
+                PreformatSegment.class,
+                QuoteSegment.class,
+                PoeticSegment.class,
+                AttributionSegment.class,
+                HeadingSegment.class
         };
 
         texts = new String[] {
-                "Normal _paragraphs", "Preformatted _code block", "Block _quote", "Section _heading"
+                "Normal _paragraphs",
+                "_Code (preformatted source)",
+                "_Quote",
+                "Poe_m (preformatted quote)",
+                "_Attribution",
+                "Section _heading"
         };
 
         for (i = 0; i < types.length; i++) {
