@@ -21,8 +21,12 @@ package quill.ui;
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Matrix;
 import org.gnome.gdk.EventExpose;
+import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.DrawingArea;
+import org.gnome.gtk.HBox;
+import org.gnome.gtk.Scrollbar;
+import org.gnome.gtk.VScrollbar;
 import org.gnome.gtk.Widget;
 
 import parchment.format.Stylesheet;
@@ -53,8 +57,14 @@ import quill.textbase.Origin;
  * this rerenders after a change, it should be mostly up to date, and we can
  * always force an invalidation on Segment creation/deletion.
  */
-class PreviewWidget extends DrawingArea
+class PreviewWidget extends HBox
 {
+    private final DrawingArea drawing;
+
+    private final Scrollbar scrollbar;
+
+    private final Adjustment adj;
+
     /*
      * Work in "points", which makes sense since the target back end is PDF.
      */
@@ -75,10 +85,18 @@ class PreviewWidget extends DrawingArea
     private Stylesheet style;
 
     PreviewWidget(PrimaryWindow window) {
-        super();
+        super(false, 0);
+
+        this.drawing = new DrawingArea();
+        this.packStart(drawing, true, true, 0);
+
+        adj = new Adjustment(0.0, 0.0, 1.0, 1.0, 1.0, 1.0);
+        scrollbar = new VScrollbar(adj);
+        this.packEnd(scrollbar, false, false, 0);
+
         this.primary = window;
 
-        this.connect(new Widget.ExposeEvent() {
+        drawing.connect(new Widget.ExposeEvent() {
             public boolean onExposeEvent(Widget source, EventExpose event) {
                 final Context cr;
                 final Origin cursor;
@@ -150,7 +168,7 @@ class PreviewWidget extends DrawingArea
         final double pixelWidth, pixelHeight;
         final double pageWidth, pageHeight;
 
-        rect = this.getAllocation();
+        rect = drawing.getAllocation();
 
         pixelWidth = rect.getWidth();
         pixelHeight = rect.getHeight();
