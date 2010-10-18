@@ -110,9 +110,13 @@ class PreviewWidget extends HBox
                 cursor = primary.getCursor();
                 engine.render(cr, folio, cursor);
 
+                updateScrollbar();
+
                 return true;
             }
         });
+        
+        
     }
 
     private void drawPageOutline(Context cr, RenderEngine engine) {
@@ -239,5 +243,15 @@ class PreviewWidget extends HBox
      */
     void refreshDisplay() {
         super.queueDraw();
+    }
+
+    private void updateScrollbar() {
+        final int num, i;
+        
+        num = engine.getPageCount();
+        i = engine.getPageIndex();
+
+        adj.setUpper(num);
+        adj.setValue(i);
     }
 }
