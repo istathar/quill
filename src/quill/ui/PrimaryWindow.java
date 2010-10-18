@@ -96,6 +96,8 @@ class PrimaryWindow extends Window
 
     private OutlineWidget outline;
 
+    private NotesEditorWidget endnotes;
+
     /**
      * The document this PrimaryWindow is displaying.
      */
@@ -302,6 +304,9 @@ class PrimaryWindow extends Window
         outline = new OutlineWidget();
         right.add(outline);
 
+        endnotes = new NotesEditorWidget(this);
+        right.add(endnotes);
+
         intro = new IntroductionWidget();
         right.add(intro);
 
@@ -310,7 +315,7 @@ class PrimaryWindow extends Window
 
     private void initialPresentation() {
         window.showAll();
-        right.setCurrentPage(3);
+        right.setCurrentPage(4);
 
         window.present();
     }
@@ -348,6 +353,9 @@ class PrimaryWindow extends Window
                     } else if (key == Keyval.F3) {
                         switchToOutline();
                         return true;
+                    } else if (key == Keyval.F4) {
+                        switchToEndnotes();
+                        return true;
                     } else if (key == Keyval.F5) {
                         switchToEditor();
                         return true;
@@ -356,8 +364,8 @@ class PrimaryWindow extends Window
                         return true;
                     }
 
-                    if ((key == Keyval.F4) || (key == Keyval.F7) || (key == Keyval.F8)
-                            || (key == Keyval.F9) || (key == Keyval.F10)) {
+                    if ((key == Keyval.F7) || (key == Keyval.F8) || (key == Keyval.F9)
+                            || (key == Keyval.F10)) {
                         // nothing yet
                         return true;
                     }
@@ -531,6 +539,14 @@ class PrimaryWindow extends Window
     void switchToOutline() {
         right.setCurrentPage(2);
         outline.refreshDisplay();
+    }
+
+    /**
+     * Change the right side to show the outline navigator.
+     */
+    void switchToEndnotes() {
+        right.setCurrentPage(3);
+        endnotes.refreshDisplay();
     }
 
     /**
