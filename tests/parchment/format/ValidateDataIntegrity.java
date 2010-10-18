@@ -97,8 +97,7 @@ public class ValidateDataIntegrity extends IOTestCase
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
                 "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
                 "<text>",
-                "<bold>Hello </bold><type>GtkButton</type><bold>",
-                "world</bold>",
+                "<bold>Hello </bold><type>GtkButton</type><bold> world</bold>",
                 "</text>",
                 "</chapter>"
         });

@@ -136,8 +136,8 @@ public class ValidatePreformattedConversion extends IOTestCase
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
                 "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
                 "<text>",
-                "Consider the following simple and yet profound",
-                "expression of quality program code:",
+                "Consider the following simple and yet profound expression of",
+                "quality program code:",
                 "</text>",
                 "<code xml:space=\"preserve\">",
                 "public class Hello {",
@@ -147,9 +147,8 @@ public class ValidatePreformattedConversion extends IOTestCase
                 "}",
                 "</code>",
                 "<text>",
-                "There really isn't anything like saying",
-                "<italics>Hello World</italics> to a nice",
-                "friendly programmer.",
+                "There really isn't anything like saying <italics>Hello World</italics>",
+                "to a nice friendly programmer.",
                 "</text>",
                 "</chapter>"
         });

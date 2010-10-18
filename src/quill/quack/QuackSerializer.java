@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -31,8 +31,9 @@ import nu.xom.Text;
  * @author Andrew Cowie
  */
 /*
- * FIXME 50 is a convenient width for debugging, but we will of course set it
- * to 78 for production use.
+ * We would have set this to 78 which is our habit for text files, but a)
+ * XOM's line wrapping is a bit weak, and b) this gives us room for a \t in an
+ * 80 column wide terminal.
  */
 class QuackSerializer extends Serializer
 {
@@ -43,7 +44,7 @@ class QuackSerializer extends Serializer
     QuackSerializer(OutputStream out, QuackElement root) {
         super(out);
         super.setLineSeparator("\n");
-        super.setMaxLength(50);
+        super.setMaxLength(70);
         this.root = root;
         this.swollowed = "";
     }
