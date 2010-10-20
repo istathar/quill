@@ -1,0 +1,3 @@
+#: src/quill/ui/IntroductionWidget.java:107
+msgid "Under Construction"
+msgstr "En construcción"

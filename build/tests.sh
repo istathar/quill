@@ -2,7 +2,7 @@
 #
 # tests.sh
 #
-# Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+# Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
 # 
 # The code in this file, and the library it is a part of, are made available
 # to you by the authors under the terms of the "GNU General Public Licence
@@ -12,8 +12,8 @@
 
 source .config
 
-echo -e "JAVA\tUnitTests"
-${JAVA} \
+echo -e "${JAVA_CMD}\tUnitTests"
+exec ${JAVA} \
 	-classpath ${GNOME_JARS}:${XOM_JARS}:${JUNIT_JARS}:tmp/classes \
 	UnitTests
 

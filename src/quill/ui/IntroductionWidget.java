@@ -37,6 +37,8 @@ import org.gnome.gtk.LinkButton;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
+import static org.freedesktop.bindings.Internationalization._;
+
 /**
  * Introduction widget. Instead of a splash screen, this starts out being
  * displayed by the PrimaryWindow. Mostly this is here to tell you that F1 is
@@ -101,7 +103,9 @@ class IntroductionWidget extends VBox
             top.packStart(bar, false, false, 0);
 
             warning = new Label(
-                    "<b>Under Construction</b>\n\n"
+                    "<b>"
+                            + _("Under Construction")
+                            + "</b>\n\n"
                             + "This is experimental software and still under heavy development. "
                             + "It is <i>not</i> suitable for general use. "
                             + "Quill and Parchment <i>will</i> crash, "

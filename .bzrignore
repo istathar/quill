@@ -1,5 +1,7 @@
 tmp
 .config
 tests/*.pdf
-quill-*
+./quill
+./quill-*
 .norescue
+share/locale

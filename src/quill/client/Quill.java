@@ -20,6 +20,7 @@ package quill.client;
 
 import java.io.FileNotFoundException;
 
+import org.freedesktop.bindings.Internationalization;
 import org.gnome.glib.Glib;
 import org.gnome.gtk.Gtk;
 
@@ -33,10 +34,6 @@ import quill.ui.UserInterface;
  * produce printable output.
  * 
  * @author Andrew Cowie
- */
-/*
- * TODO the ui singleton really needs to move somewhere else, or better yet be
- * passed along when instantiating things.
  */
 public class Quill
 {
@@ -56,6 +53,7 @@ public class Quill
     static void initializeUserInterface(String[] args) {
         Glib.setProgramName("quill");
         Gtk.init(args);
+        Internationalization.init("quill", "share/locale/");
 
         ui = new UserInterface();
     }
