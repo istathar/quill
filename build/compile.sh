@@ -43,7 +43,7 @@ if [ -s tmp/list-core ] ; then
 fi
 
 if [ -s tmp/list-tests ] ; then
-	echo -n "JAVAC"
+	echo -n "${JAVAC_CMD}"
 	sed -e 's/^/\t/' < tmp/list-tests	
 	${JAVAC} \
 		-classpath ${GNOME_JARS}:${XOM_JARS}:${JUNIT_JARS} \
