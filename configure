@@ -487,6 +487,7 @@ output "\n";
 
 my @gnome_jars;
 my @xom_jars;
+my @junit_jars;
 
 output "Check for required jar files:\n";
 
@@ -510,13 +511,18 @@ if ($os eq "gentoo") {
 			"dev-java/xom",
 			"/usr/share/xom-1.2/lib/xom.jar");
 	check_prereq(@xom_jars,
-			"Xerces XML library",
+			"Xerces XML parser",
 			"dev-java/xerces",
 			"/usr/share/xerces-2/lib/xercesImpl.jar");
 	check_prereq(@xom_jars,
 			"Jaxen XPath engine",
 			"dev-java/jaxen",
 			"/usr/share/jaxen/lib/jaxen.jar");
+
+	check_prereq(@junit_jars,
+			"JUnit test framework",
+			"dev-java/junit",
+			"/usr/share/junit/lib/junit.jar");
 
 
 } elsif ($os eq "debian") {
@@ -542,7 +548,7 @@ if ($os eq "gentoo") {
 			"$prefix/share/java/xom.jar",
 			"/usr/share/java/xom.jar");
 	check_prereq(@xom_jars,
-			"Xerces XML library",
+			"Xerces XML parser",
 			"libxerces2-java",
 			"$prefix/share/java/xercesImpl.jar",
 			"/usr/share/java/xercesImpl.jar");
@@ -552,21 +558,26 @@ if ($os eq "gentoo") {
 			"$prefix/share/java/jaxen.jar",
 			"/usr/share/java/jaxen.jar");
 
+	check_prereq(@junit_jars,
+			"JUnit test framework",
+			"junit",
+			"/usr/share/java/junit.jar");
+
 	
 } elsif ($os eq "fedora") {
 
 	check_prereq(@gnome_jars,
-		"java-gnome UI library",
-		"java-gnome",
-		"$java_gnome_home/share/java/gtk-4.0.jar",
-		"~/share/java/gtk-4.0.jar");
+			"java-gnome UI library",
+			"java-gnome",
+			"$java_gnome_home/share/java/gtk-4.0.jar",
+			"~/share/java/gtk-4.0.jar");
 
 	check_prereq(@xom_jars,
 			"Xom XML library",
 			"FIXME",
 			"$prefix/share/java/xom.jar");
 	check_prereq(@xom_jars,
-			"Xerces XML library",
+			"Xerces XML parser",
 			"FIXME",
 			"$prefix/share/java/xercesImpl.jar");
 	check_prereq(@xom_jars,
@@ -574,7 +585,10 @@ if ($os eq "gentoo") {
 			"FIXME",
 			"$prefix/share/java/jaxen.jar");
 
-
+	check_prereq(@junit_jars,
+			"JUnit test framework",
+			"junit",
+			"/usr/share/java/junit.jar");
 	
 } else {
 	bail "failed!", "This OS not configured with defaults!\nTHIS IS AN INTERNAL ERROR, PLEASE FILE A BUG.";
@@ -594,6 +608,7 @@ HERE
 
 print CONFIG "GNOME_JARS=".join(":",@gnome_jars)."\n";
 print CONFIG "XOM_JARS=".join(":",@xom_jars)."\n";
+print CONFIG "JUNIT_JARS=".join(":",@junit_jars)."\n";
 
 output "\n";
 
@@ -682,7 +697,7 @@ if ($os eq "gentoo") {
 	# paths, or...? `which` is lame
 
 	# check ecj, the standalone Eclipse compiler.
-	check_compiler($ecj, "Eclipse ecj", which("ecj"), "-g -preserveAllLocals -nowarn -source 1.6 -target 1.6");
+	check_compiler($ecj, "Eclipse ecj", which("ecj"), "-g -preserveAllLocals -nowarn -source 1.5 -target 1.5");
 
 	# check for a proper "real" JDK's javac as installed (and maybe
 	# selected in the alternatives system) by the user. In other words,
@@ -1085,7 +1100,7 @@ print LAUNCHER "#! /bin/sh\n";
 print LAUNCHER join (" ",
 	"exec",
 	"$JAVA",
-	"-classpath tmp/classes:$GNOME_JARS:$XOM_JARS ",
+	"-classpath tmp/classes:$GNOME_JARS:$XOM_JARS",
 	"quill.client.Quill",
 	"\$*") . "\n";
 
@@ -1103,7 +1118,7 @@ print LAUNCHER "cd $prefix\n";
 print LAUNCHER join (" ",
 	"exec",
 	"$JAVA",
-	"-classpath $QUILL_JARS:$GNOME_JARS:$XOM_JARS ",
+	"-classpath $QUILL_JARS:$GNOME_JARS:$XOM_JARS",
 	"quill.client.Quill",
 	"\$*") . "\n";
 
@@ -1116,8 +1131,8 @@ print DESKTOP <<HERE ;
 Version=1.0
 Type=Application
 Name=Quill and Parchment
-GenericName="Document Editor"
-Comment=Document Editor
+GenericName="Quill and Parchment"
+Comment=Content Presentation Publishing separation
 Categories=GNOME;GTK;Office;
 Path=$prefix
 Exec=$prefix/bin/quill
