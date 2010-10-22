@@ -16,9 +16,9 @@ MAKEFLAGS=-s -R
 REDIRECT=>/dev/null
 endif
 
-.PHONY: all dirs compile test translation install clean distclean
+.PHONY: all dirs compile test install clean distclean
 
-all: .config dirs compile translation quill
+all: .config dirs compile 
 
 .config: src/quill/client/Version.java
 	/bin/echo
@@ -43,10 +43,6 @@ tmp/stamp:
 	@/bin/echo -e "MKDIR\t$@"
 	mkdir $@
 
-tmp/i18n:
-	@/bin/echo -e "MKDIR\t$@"
-	mkdir $@
-
 # --------------------------------------------------------------------
 # Source compilation
 # --------------------------------------------------------------------
@@ -63,32 +59,13 @@ test: compile
 	build/tests.sh
 
 
-translation: tmp/i18n/quill.pot $(TRANSLATIONS)
-
-# strictly speaking, not necessary to generate the .pot file, but this has to
-# go somewhere and might as well get it done
-
-tmp/i18n/quill.pot: $(SOURCES_DIST)
-	@/bin/echo -e "EXTRACT\t$@"
-	xgettext -o $@ --omit-header --from-code=UTF-8 --keyword=_ --keyword=N_ $^
-
-share/locale/%/LC_MESSAGES/quill.mo: po/%.po
-	mkdir -p $(dir $@)
-	@/bin/echo -e "MSGFMT\t$@"
-	msgfmt -o $@ $<
-
-
-quill: tmp/launcher/quill-local
-	@/bin/echo -e "CP\t$@"
-	cp -f $< $@
-	chmod +x $@
 
 
 # --------------------------------------------------------------------
 # Installation
 # --------------------------------------------------------------------
 
-install: compile translation
+install: compile
 	build/install.sh
 
 
@@ -109,6 +86,7 @@ clean:
 	-rm -f quill
 	@/bin/echo -e "RM\tgenerated message files"
 	-rm -rf share/locale
+	-rm -f tmp/i18n/quill.pot
 
 distclean: clean
 	@/bin/echo -e "RM\tbuild configuration information"
