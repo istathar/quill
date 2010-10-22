@@ -16,17 +16,18 @@ source .config
 if [ ! -d  tmp/classes ] ; then
 	echo -e "MKDIR\ttmp/"
 	mkdir -p tmp/classes
+	mkdir -p tmp/unittests
 fi
 
-if [ ! -f tmp/build-core ] ; then
-	touch -d "2001-01-01" tmp/build-core
+if [ ! -f tmp/stamp/build-core ] ; then
+	touch -d "2001-01-01" tmp/stamp/build-core
 fi
-find src -type f -name '*.java' -newer tmp/build-core > tmp/list-core
+find src -type f -name '*.java' -newer tmp/stamp/build-core > tmp/list-core
 
-if [ ! -f tmp/build-tests ] ; then
-	touch -d "2001-01-01" tmp/build-tests
+if [ ! -f tmp/stamp/build-tests ] ; then
+	touch -d "2001-01-01" tmp/stamp/build-tests
 fi
-find tests -type f -name '*.java' -newer tmp/build-tests > tmp/list-tests
+find tests -type f -name '*.java' -newer tmp/stamp/build-tests > tmp/list-tests
 
 if [ -s tmp/list-core ] ; then
 	echo -n "${JAVAC_CMD}"
@@ -39,20 +40,20 @@ if [ -s tmp/list-core ] ; then
 	if [ $? -ne 0 ] ; then
 		exit $?
 	fi
-	touch tmp/build-core
+	touch tmp/stamp/build-core
 fi
 
 if [ -s tmp/list-tests ] ; then
 	echo -n "${JAVAC_CMD}"
 	sed -e 's/^/\t/' < tmp/list-tests	
 	${JAVAC} \
-		-classpath ${GNOME_JARS}:${XOM_JARS}:${JUNIT_JARS} \
-		-d tmp/classes \
+		-classpath ${GNOME_JARS}:${XOM_JARS}:${JUNIT_JARS}:tmp/classes \
+		-d tmp/unittests \
 		-sourcepath src:tests \
 		`cat tmp/list-tests`
 	if [ $? -ne 0 ] ; then
 		exit $?
 	fi
-	touch tmp/build-tests
+	touch tmp/stamp/build-tests
 fi
 

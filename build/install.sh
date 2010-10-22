@@ -19,7 +19,7 @@ source .config
 # --------------------------------------------------------------------
 
 if [ tmp/stamp/build-core -nt tmp/quill.jar ] ; then
-	echo -e "$(JAR_CMD)\ttmp/quill.jar"
+	echo -e "${JAR_CMD}\ttmp/quill.jar"
 	${JAR} -cf tmp/quill.jar -C tmp/classes .
 fi
 
@@ -38,18 +38,19 @@ install_file () {
 	fi
 }
 
-install_exec () {
-	if [ $1 -nt $2 ] ; then
-		echo -e "INSTALL\t$2"
-		cp -f $1 $2
-		chmod +x $2
+install_chmod () {
+	if [ ! -x $1 ] ; then
+		echo -e "CHMOD\t$1"
+		chmod +x $1
 	fi
 }
 
 install_mkdir ${DESTDIR}${PREFIX}/bin
 install_mkdir ${DESTDIR}${PREFIX}/share/applications
 
-install_exec tmp/launcher/quill-install ${DESTDIR}${PREFIX}/bin/quill
+install_file tmp/launcher/quill-install ${DESTDIR}${PREFIX}/bin/quill
+install_chmod ${DESTDIR}${PREFIX}/bin/quill
+
 install_file tmp/launcher/quill.desktop ${DESTDIR}${PREFIX}/share/applications/
 
 for i in share/pixmaps/*.png
