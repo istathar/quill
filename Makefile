@@ -56,10 +56,10 @@ tmp/i18n:
 #
 
 
-compile:
+compile: dirs
 	build/compile.sh
 
-test: all
+test: compile
 	build/tests.sh
 
 
@@ -88,7 +88,7 @@ quill: tmp/launcher/quill-local
 # Installation
 # --------------------------------------------------------------------
 
-install: all
+install: compile translation
 	build/install.sh
 
 

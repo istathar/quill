@@ -24,11 +24,6 @@ if [ ! -f tmp/stamp/build-core ] ; then
 fi
 find src -type f -name '*.java' -newer tmp/stamp/build-core > tmp/list-core
 
-if [ ! -f tmp/stamp/build-tests ] ; then
-	touch -d "2001-01-01" tmp/stamp/build-tests
-fi
-find tests -type f -name '*.java' -newer tmp/stamp/build-tests > tmp/list-tests
-
 if [ -s tmp/list-core ] ; then
 	echo -n "${JAVAC_CMD}"
 	sed -e 's/^/\t/' < tmp/list-core
@@ -42,18 +37,3 @@ if [ -s tmp/list-core ] ; then
 	fi
 	touch tmp/stamp/build-core
 fi
-
-if [ -s tmp/list-tests ] ; then
-	echo -n "${JAVAC_CMD}"
-	sed -e 's/^/\t/' < tmp/list-tests	
-	${JAVAC} \
-		-classpath ${GNOME_JARS}:${XOM_JARS}:${JUNIT_JARS}:tmp/classes \
-		-d tmp/unittests \
-		-sourcepath src:tests \
-		`cat tmp/list-tests`
-	if [ $? -ne 0 ] ; then
-		exit $?
-	fi
-	touch tmp/stamp/build-tests
-fi
-
