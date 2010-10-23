@@ -1132,7 +1132,7 @@ print DESKTOP <<HERE ;
 Version=1.0
 Type=Application
 Name=Quill and Parchment
-GenericName="Quill and Parchment"
+GenericName=Document Editor
 Comment=Content Presentation Publishing separation
 Categories=GNOME;GTK;Office;
 Path=$prefix
