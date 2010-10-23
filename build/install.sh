@@ -46,12 +46,16 @@ install_chmod () {
 }
 
 install_mkdir ${DESTDIR}${PREFIX}/bin
-install_mkdir ${DESTDIR}${PREFIX}/share/applications
-
 install_file tmp/launcher/quill-install ${DESTDIR}${PREFIX}/bin/quill
 install_chmod ${DESTDIR}${PREFIX}/bin/quill
 
-install_file tmp/launcher/quill.desktop ${DESTDIR}${PREFIX}/share/applications/
+install_mkdir ${DESTDIR}${PREFIX}/share/applications
+install_file tmp/launcher/quill.desktop ${DESTDIR}${PREFIX}/share/applications/quill.desktop
+
+install_mkdir ${DESTDIR}${PREFIX}/share/mime/packages
+install_file tmp/launcher/quill.xml ${DESTDIR}${PREFIX}/share/mime/packages/quill.xml
+install_mkdir ${DESTDIR}${PREFIX}/share/icons/hicolor/48x48/mimetypes
+install_file share/pixmaps/quill-and-parchment.png ${DESTDIR}${PREFIX}/share/icons/hicolor/48x48/mimetypes/application-x-parchment.png
 
 for i in share/pixmaps/*.png
 do

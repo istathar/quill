@@ -1132,15 +1132,35 @@ print DESKTOP <<HERE ;
 Version=1.0
 Type=Application
 Name=Quill and Parchment
-GenericName="Quill and Parchment"
+GenericName=Document Editor
 Comment=Content Presentation Publishing separation
 Categories=GNOME;GTK;Office;
 Path=$prefix
 Exec=$prefix/bin/quill
 Icon=$prefix/share/pixmaps/quill-and-parchment.png
+StartupNotify=true
+MimeType=application/x-parchment
 HERE
 
 close DESKTOP;
+
+open MIMETYPE, ">tmp/launcher/quill.xml";
+
+print MIMETYPE <<HERE; 
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
+  <mime-type type="application/x-parchment">
+     <sub-class-of type="text/xml"/>
+     <comment>Quill and Parchment document</comment>
+     <glob pattern="*.parchment"/>
+     <magic priority="90">
+       <match value="&lt;manuscript" type="string" offset="40"/>
+     </magic>
+   </mime-type>
+</mime-info>
+HERE
+
+close MIMETYPE;
 
 output "ok\n";
 output "\n";
