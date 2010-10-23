@@ -1138,6 +1138,7 @@ Categories=GNOME;GTK;Office;
 Path=$prefix
 Exec=$prefix/bin/quill
 Icon=$prefix/share/pixmaps/quill-and-parchment.png
+StartupNotify=true
 HERE
 
 close DESKTOP;
