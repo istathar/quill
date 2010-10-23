@@ -1153,8 +1153,8 @@ print MIMETYPE <<HERE;
      <sub-class-of type="text/xml"/>
      <comment>Quill and Parchment document</comment>
      <glob pattern="*.parchment"/>
-     <magic priority="20">
-       <match value="&lt;manuscript" type="string" offset="38"/>
+     <magic priority="90">
+       <match value="&lt;manuscript" type="string" offset="40"/>
      </magic>
    </mime-type>
 </mime-info>
