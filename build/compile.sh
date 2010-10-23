@@ -16,43 +16,60 @@ source .config
 if [ ! -d  tmp/classes ] ; then
 	echo -e "MKDIR\ttmp/"
 	mkdir -p tmp/classes
+	mkdir -p tmp/unittests
 fi
 
-if [ ! -f tmp/build-core ] ; then
-	touch -d "2001-01-01" tmp/build-core
+if [ ! -f tmp/stamp/build-core ] ; then
+	touch -d "2001-01-01" tmp/stamp/build-core
 fi
-find src -type f -name '*.java' -newer tmp/build-core > tmp/list-core
+find src -type f -name '*.java' -newer tmp/stamp/build-core > tmp/stamp/list-core
 
-if [ ! -f tmp/build-tests ] ; then
-	touch -d "2001-01-01" tmp/build-tests
-fi
-find tests -type f -name '*.java' -newer tmp/build-tests > tmp/list-tests
-
-if [ -s tmp/list-core ] ; then
+if [ -s tmp/stamp/list-core ] ; then
 	echo -n "${JAVAC_CMD}"
-	sed -e 's/^/\t/' < tmp/list-core
+	sed -e 's/^/\t/' < tmp/stamp/list-core
 	${JAVAC} \
 		-classpath ${GNOME_JARS}:${XOM_JARS} \
 		-d tmp/classes \
 		-sourcepath src \
-		`cat tmp/list-core`
+		`cat tmp/stamp/list-core`
 	if [ $? -ne 0 ] ; then
 		exit $?
 	fi
-	touch tmp/build-core
+	touch tmp/stamp/build-core
 fi
 
-if [ -s tmp/list-tests ] ; then
-	echo -n "${JAVAC_CMD}"
-	sed -e 's/^/\t/' < tmp/list-tests	
-	${JAVAC} \
-		-classpath ${GNOME_JARS}:${XOM_JARS}:${JUNIT_JARS} \
-		-d tmp/classes \
-		-sourcepath src:tests \
-		`cat tmp/list-tests`
-	if [ $? -ne 0 ] ; then
-		exit $?
+# strictly speaking, not necessary to generate the .pot file, but this has to
+# go somewhere and might as well get it done
+
+if [ ! -f tmp/i18n/quill.pot ] ; then
+	touch -d "2001-01-01" tmp/i18n/quill.pot
+fi
+find src -type f -name '*.java' -newer tmp/i18n/quill.pot > tmp/stamp/list-i18n
+if [ -s tmp/stamp/list-i18n ] ; then
+	echo -e "EXTRACT\ttmp/i18n/quill.pot"
+	xgettext -o tmp/i18n/quill.pot --omit-header --from-code=UTF-8 --keyword=_ --keyword=N_ `cat tmp/stamp/list-i18n`
+fi
+
+#
+# Compile translations
+#
+
+for i in po/*.po
+do
+	lang=`basename $i .po`
+	if [ ! -d share/locale/$lang/LC_MESSAGES ] ; then
+		echo -e "MKDIR\tshare/locale/$lang/LC_MESSAGES"
+		mkdir -p share/locale/$lang/LC_MESSAGES
 	fi
-	touch tmp/build-tests
-fi
+	if [ $i -nt share/locale/$lang/LC_MESSAGES ] ; then
+		echo -e "MSGFMT\tshare/locale/$lang/LC_MESSAGES/quill.mo"
+		msgfmt -o share/locale/$lang/LC_MESSAGES/quill.mo $i
+	fi
+done
 
+if [ tmp/launcher/quill-local -nt quill ] ; then
+	echo -e "CP\tquill"
+	cp -f tmp/launcher/quill-local quill
+	echo -e "CHMOD\tquill"
+	chmod +x quill
+fi

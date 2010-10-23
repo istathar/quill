@@ -16,9 +16,9 @@ MAKEFLAGS=-s -R
 REDIRECT=>/dev/null
 endif
 
-.PHONY: all dirs compile test translation install clean distclean
+.PHONY: all dirs compile test install clean distclean
 
-all: .config dirs compile translation quill
+all: .config dirs compile 
 
 .config: src/quill/client/Version.java
 	/bin/echo
@@ -43,10 +43,6 @@ tmp/stamp:
 	@/bin/echo -e "MKDIR\t$@"
 	mkdir $@
 
-tmp/i18n:
-	@/bin/echo -e "MKDIR\t$@"
-	mkdir $@
-
 # --------------------------------------------------------------------
 # Source compilation
 # --------------------------------------------------------------------
@@ -56,105 +52,21 @@ tmp/i18n:
 #
 
 
-compile:
+compile: dirs
 	build/compile.sh
 
 test: compile
 	build/tests.sh
 
 
-translation: tmp/i18n/quill.pot $(TRANSLATIONS)
-
-# strictly speaking, not necessary to generate the .pot file, but this has to
-# go somewhere and might as well get it done
-
-tmp/i18n/quill.pot: $(SOURCES_DIST)
-	@/bin/echo -e "EXTRACT\t$@"
-	xgettext -o $@ --omit-header --from-code=UTF-8 --keyword=_ --keyword=N_ $^
-
-share/locale/%/LC_MESSAGES/quill.mo: po/%.po
-	mkdir -p $(dir $@)
-	@/bin/echo -e "MSGFMT\t$@"
-	msgfmt -o $@ $<
-
-
-quill: tmp/launcher/quill-local
-	@/bin/echo -e "CP\t$@"
-	cp -f $< $@
-	chmod +x $@
 
 
 # --------------------------------------------------------------------
 # Installation
 # --------------------------------------------------------------------
 
-install: all \
-		$(DESTDIR)$(JARDIR)/quill-$(APIVERSION).jar \
-	 	tmp/stamp/install-pixmaps \
-	 	tmp/stamp/install-translations \
-		$(DESTDIR)$(PREFIX)/share/applications/quill.desktop \
-		$(DESTDIR)$(PREFIX)/bin/quill
-
-$(DESTDIR)$(PREFIX):
-	@/bin/echo -e "MKDIR\t$(DESTDIR)$(PREFIX)/"
-	-mkdir -p $(DESTDIR)$(PREFIX)
-
-$(DESTDIR)$(PREFIX)/bin:
-	@/bin/echo -e "MKDIR\t$@/"
-	-mkdir -p $@
-
-$(DESTDIR)$(JARDIR):
-	@/bin/echo -e "MKDIR\t$@/"
-	-mkdir -p $@
-
-$(DESTDIR)$(PREFIX)/share/applications:
-	@/bin/echo -e "MKDIR\t$@/"
-	-mkdir -p $@
-
-$(DESTDIR)$(PREFIX)/bin/quill: \
-		$(DESTDIR)$(PREFIX)/bin \
-		tmp/launcher/quill-install
-	@/bin/echo -e "INSTALL\t$@"
-	cp -f tmp/launcher/quill-install $@
-	chmod +x $@
-
-$(DESTDIR)$(PREFIX)/share/applications/quill.desktop: \
-		$(DESTDIR)$(PREFIX)/share/applications \
-		tmp/launcher/quill.desktop
-	@/bin/echo -e "INSTALL\t$@"
-	cp -f tmp/launcher/quill.desktop $@
-
-tmp/quill.jar: compile
-	@/bin/echo -e "$(JAR_CMD)\t$@"
-	$(JAR) -cf $@ -C tmp/classes .
-
-$(DESTDIR)$(PREFIX)/share/pixmaps: 
-	@/bin/echo -e "MKDIR\t$@/"
-	-mkdir $@
-
-$(DESTDIR)$(PREFIX)/share/locale: 
-	@/bin/echo -e "MKDIR\t$@/"
-	-mkdir $@
-
-tmp/stamp/install-pixmaps: \
-		$(DESTDIR)$(PREFIX)/share/pixmaps \
-		share/pixmaps/*.png
-	@/bin/echo -e "INSTALL\t$(DESTDIR)$(PREFIX)/share/pixmaps/*.png"
-	cp -f share/pixmaps/*.png $(DESTDIR)$(PREFIX)/share/pixmaps
-	touch $@
-
-tmp/stamp/install-translations: \
-		$(DESTDIR)$(PREFIX)/share/locale \
-		share/locale/*/LC_MESSAGES/quill.mo
-	@/bin/echo -e "INSTALL\t$(DESTDIR)$(PREFIX)/share/locale/*/LC_MESSAGES/quill.mo"
-	cp -af share/locale/* $(DESTDIR)$(PREFIX)/share/locale
-	touch $@
-
-$(DESTDIR)$(JARDIR)/quill-$(APIVERSION).jar: \
-		$(DESTDIR)$(JARDIR) \
-		tmp/quill.jar
-	@/bin/echo -e "INSTALL\t$@"
-	cp -f tmp/quill.jar $@
+install: compile
+	build/install.sh
 
 
 # --------------------------------------------------------------------
@@ -174,6 +86,7 @@ clean:
 	-rm -f quill
 	@/bin/echo -e "RM\tgenerated message files"
 	-rm -rf share/locale
+	-rm -f tmp/i18n/quill.pot
 
 distclean: clean
 	@/bin/echo -e "RM\tbuild configuration information"
