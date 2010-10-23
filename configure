@@ -354,6 +354,8 @@ my $cacao_bin;
 foreach my $arg (@ARGV) {
 	my ($key, $value) = split /=/, "$arg";
 
+	$value =~ s/\/$//;
+
 	if ($key eq "quiet") {
 		$quiet = 1;
 	} elsif (($key =~ /^-\?$/) ||
@@ -407,7 +409,6 @@ if (!$jardir) {
 # later (at the end) against choices that have been validated.
 
 if ($jdk_home) {
-	$jdk_home =~ s/\/$//;
 	if (! -x "$jdk_home/bin/javac") {
 		bail "bad override", "jdk_home specified doesn't seem to be a Java Development Kit home directory!";
 	}
