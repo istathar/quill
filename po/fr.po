@@ -10,6 +10,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: src/quill/ui/StylesheetEditorWidget.java:132
+#: src/quill/ui/HelpWidget.java:89
 msgid "Stylesheet"
 msgstr ""
 
@@ -99,4 +100,231 @@ msgstr ""
 
 #: src/quill/ui/StylesheetEditorWidget.java:761
 msgid "default"
+msgstr ""
+
+#: src/quill/ui/IntroductionWidget.java:96
+msgid "Press F1 for help"
+msgstr ""
+
+#: src/quill/ui/IntroductionWidget.java:107
+msgid "Under Construction"
+msgstr ""
+
+#: src/quill/ui/IntroductionWidget.java:109
+msgid ""
+"This is experimental software and still under heavy development. It is "
+"<i>not</i> suitable for general use."
+msgstr ""
+
+#: src/quill/ui/IntroductionWidget.java:112
+msgid ""
+"Quill and Parchment <i>will</i> crash, and it <i>will</i> eat your "
+"documents, though if possible we attempt to save what you were doing in "
+"\"recovery\" files with a"
+msgstr ""
+
+#: src/quill/ui/IntroductionWidget.java:117
+msgid "extension."
+msgstr ""
+
+#: src/quill/ui/IntroductionWidget.java:119
+msgid ""
+"The on-disk format of manuscripts and chapters is text based, so we "
+"encourage you to store your documents in Bazaar or another version control "
+"system."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:72
+msgid "Help"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:72
+msgid "This help screen."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:76
+msgid "Preview"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:77
+msgid ""
+"A preview of what the current page will look like in its final rendered form."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:81
+msgid "Outline"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:82
+msgid ""
+"An outline of the document's chapters and section headings allowing you to "
+"navigate."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:85
+msgid "Editor"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:85
+msgid "Edit your manuscript!"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:90
+msgid "Change the settings being used to render your document."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:94
+msgid "Fullscreen"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:95
+msgid "Work in fullscreen mode, giving you a better view of your document."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:101
+msgid "Save"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:101
+msgid "_Save the document."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:103
+msgid "Print"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:103
+msgid "Render the document to PDF so you can _print it."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:109
+msgid "Copy"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:111
+msgid "Cut"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:113
+msgid "Paste"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:115
+msgid "Undo"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:117
+msgid "Redo"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:119
+msgid "Next"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:119
+msgid "Go forward to the next chapter."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:121
+msgid "Previous"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:121
+msgid "Go back to the previous chapter."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:128
+msgid "Clear!"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:129
+msgid "Remove any inline formatting from the currently selected range."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:132
+msgid "Italics"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:132
+msgid "Make the text appear in _italics."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:135
+msgid "Bold"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:135
+msgid "Make the text appear in _bold face."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:138
+msgid "File"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:138
+msgid "A path on the _filesystem."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:142
+msgid "Class or Type"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:143
+msgid "The name of an object-oriented class or similar _type."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:147
+msgid "Method or Function"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:148
+msgid "The name of a _method or function call."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:152
+msgid "Application"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:153
+msgid "The proper name of a program, _application suite, or project."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:157
+msgid "Command"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:158
+msgid "The name of a c_ommand or program you'd run from the command line."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:162
+msgid "Code fragment"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:163
+msgid "An inline source code frament or _literal value."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:166
+msgid "Highlight"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:166
+msgid "Mark an inline work-in-progress comment."
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:174
+msgid "View selection"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:179
+msgid "Actions"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:184
+msgid "Editing"
+msgstr ""
+
+#: src/quill/ui/HelpWidget.java:197
+msgid "Markup keys"
 msgstr ""
