@@ -175,7 +175,7 @@ class StylesheetEditorWidget extends VBox
         heading.setAlignment(LEFT, CENTER);
         top.packStart(heading, false, false, 6);
 
-        label = new Label(_("Size:"));
+        label = new Label(_("Size") + ":");
 
         /*
          * TODO, replace this with a better source of sizes? Remember that
@@ -243,7 +243,7 @@ class StylesheetEditorWidget extends VBox
         heading.setAlignment(LEFT, CENTER);
         left.packStart(heading, false, false, 6);
 
-        label = new Label(_("Top:"));
+        label = new Label(_("Top") + ":");
         topMargin = new MilimetreEntry();
         box = new KeyValueBox(group, label, topMargin, false);
         left.packStart(box, false, false, 0);
@@ -260,7 +260,7 @@ class StylesheetEditorWidget extends VBox
             }
         });
 
-        label = new Label(_("Left:"));
+        label = new Label(_("Left") + ":");
         leftMargin = new MilimetreEntry();
         box = new KeyValueBox(group, label, leftMargin, false);
         left.packStart(box, false, false, 0);
@@ -277,7 +277,7 @@ class StylesheetEditorWidget extends VBox
             }
         });
 
-        label = new Label(_("Right:"));
+        label = new Label(_("Right") + ":");
         rightMargin = new MilimetreEntry();
         box = new KeyValueBox(group, label, rightMargin, false);
         left.packStart(box, false, false, 0);
@@ -294,7 +294,7 @@ class StylesheetEditorWidget extends VBox
             }
         });
 
-        label = new Label(_("Bottom:"));
+        label = new Label(_("Bottom:") + ":");
         bottomMargin = new MilimetreEntry();
         box = new KeyValueBox(group, label, bottomMargin, false);
         left.packStart(box, false, false, 0);
@@ -329,7 +329,7 @@ class StylesheetEditorWidget extends VBox
         sides = new HBox(false, 0);
         left = new VBox(false, 3);
 
-        label = new Label(_("Serif:"));
+        label = new Label(_("Serif") + ":");
         serifFont = new Entry();
         serifSize = new MilimetreEntry();
         box = new KeyValueBox(group, label, serifFont, false);
@@ -362,7 +362,7 @@ class StylesheetEditorWidget extends VBox
             }
         });
 
-        label = new Label(_("Sans:"));
+        label = new Label(_("Sans") + ":");
         sansFont = new Entry();
         sansSize = new MilimetreEntry();
         box = new KeyValueBox(group, label, sansFont, false);
@@ -395,7 +395,7 @@ class StylesheetEditorWidget extends VBox
             }
         });
 
-        label = new Label(_("Mono:"));
+        label = new Label(_("Mono") + ":");
         monoFont = new Entry();
         monoSize = new MilimetreEntry();
         box = new KeyValueBox(group, label, monoFont, false);
@@ -428,7 +428,7 @@ class StylesheetEditorWidget extends VBox
             }
         });
 
-        label = new Label(_("Heading:"));
+        label = new Label(_("Heading") + ":");
         headingFont = new Entry();
         headingSize = new MilimetreEntry();
         box = new KeyValueBox(group, label, headingFont, false);
@@ -642,7 +642,7 @@ class RendererPicker extends VBox
 
         top = this;
 
-        label = new Label(_("Renderer:"));
+        label = new Label(_("Renderer") + ":");
 
         model = new ListStore(new DataColumn[] {
                 nameColumn = new DataColumnString(),
@@ -700,7 +700,7 @@ class RendererPicker extends VBox
          * Now the display of the actual Java Class
          */
 
-        label = new Label("Class:");
+        label = new Label(_("Class") + ":");
 
         renderer = new Label("package.Class");
         renderer.setAlignment(LEFT, CENTER);
