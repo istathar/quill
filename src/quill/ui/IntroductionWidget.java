@@ -93,7 +93,7 @@ class IntroductionWidget extends VBox
             description.setJustify(Justification.CENTER);
             top.packStart(description, false, false, 20);
 
-            help = new Label("Press F1 for help");
+            help = new Label(_("Press F1 for help"));
             help.setLineWrap(true);
             help.setUseMarkup(true);
 
@@ -106,14 +106,19 @@ class IntroductionWidget extends VBox
                     "<b>"
                             + _("Under Construction")
                             + "</b>\n\n"
-                            + "This is experimental software and still under heavy development. "
-                            + "It is <i>not</i> suitable for general use. "
-                            + "Quill and Parchment <i>will</i> crash, "
-                            + "and it <i>will</i> eat your documents, "
-                            + "though if possible we attempt to save what you "
-                            + "were doing in \"recovery\" files with a <tt>.RESCUED</tt> extension. "
-                            + "The on-disk format of manuscripts and chapters is text based, "
-                            + "so we encourage you to store your documents in Bazaar or another version control system.\n");
+                            + _("This is experimental software and still under heavy development. "
+                                    + "It is <i>not</i> suitable for general use.")
+                            + " "
+                            + _("Quill and Parchment <i>will</i> crash, "
+                                    + "and it <i>will</i> eat your documents, "
+                                    + "though if possible we attempt to save what you "
+                                    + "were doing in \"recovery\" files with a")
+                            + " <tt>.RESCUED</tt> "
+                            + _("extension.")
+                            + " "
+                            + _("The on-disk format of manuscripts and chapters is text based, "
+                                    + "so we encourage you to store your documents in Bazaar or another version control system.")
+                            + "\n");
             warning.setLineWrap(true);
             warning.setUseMarkup(true);
             warning.setWidthChars(70);
