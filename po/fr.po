@@ -43,7 +43,7 @@ msgid "Right"
 msgstr ""
 
 #: src/quill/ui/StylesheetEditorWidget.java:297
-msgid "Bottom:"
+msgid "Bottom"
 msgstr ""
 
 #: src/quill/ui/StylesheetEditorWidget.java:324
@@ -104,11 +104,11 @@ msgstr ""
 
 #: src/quill/ui/IntroductionWidget.java:96
 msgid "Press F1 for help"
-msgstr ""
+msgstr "Appuyez F1 for aide"
 
 #: src/quill/ui/IntroductionWidget.java:107
 msgid "Under Construction"
-msgstr ""
+msgstr "En Construction"
 
 #: src/quill/ui/IntroductionWidget.java:109
 msgid ""

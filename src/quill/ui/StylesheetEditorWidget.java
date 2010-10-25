@@ -294,7 +294,7 @@ class StylesheetEditorWidget extends VBox
             }
         });
 
-        label = new Label(_("Bottom:") + ":");
+        label = new Label(_("Bottom") + ":");
         bottomMargin = new MilimetreEntry();
         box = new KeyValueBox(group, label, bottomMargin, false);
         left.packStart(box, false, false, 0);
