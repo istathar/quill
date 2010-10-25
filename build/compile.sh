@@ -61,7 +61,7 @@ do
 		echo -e "MKDIR\tshare/locale/$lang/LC_MESSAGES"
 		mkdir -p share/locale/$lang/LC_MESSAGES
 	fi
-	if [ $i -nt share/locale/$lang/LC_MESSAGES ] ; then
+	if [ $i -nt share/locale/$lang/LC_MESSAGES/quill.mo ] ; then
 		echo -e "MSGFMT\tshare/locale/$lang/LC_MESSAGES/quill.mo"
 		msgfmt -o share/locale/$lang/LC_MESSAGES/quill.mo $i
 	fi
