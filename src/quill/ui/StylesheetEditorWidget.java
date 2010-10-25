@@ -48,6 +48,7 @@ import parchment.render.RenderEngine;
 import quill.client.ApplicationException;
 import quill.textbase.Folio;
 
+import static org.freedesktop.bindings.Internationalization._;
 import static org.gnome.gtk.Alignment.CENTER;
 import static org.gnome.gtk.Alignment.LEFT;
 import static org.gnome.gtk.Alignment.RIGHT;
@@ -128,7 +129,7 @@ class StylesheetEditorWidget extends VBox
 
         heading = new Label();
         heading.setUseMarkup(true);
-        heading.setLabel("<span size='xx-large'>Stylesheet</span>");
+        heading.setLabel("<span size='xx-large'>" + _("Stylesheet") + "</span>");
         heading.setAlignment(LEFT, TOP);
 
         top.packStart(heading, false, false, 6);
@@ -137,7 +138,7 @@ class StylesheetEditorWidget extends VBox
     private void setupRenderSelector() {
         final Label heading;
 
-        heading = new Label("<b>Render Engine</b>");
+        heading = new Label("<b>" + _("Render Engine") + "</b>");
         heading.setUseMarkup(true);
         heading.setAlignment(LEFT, CENTER);
         top.packStart(heading, false, false, 6);
@@ -169,12 +170,12 @@ class StylesheetEditorWidget extends VBox
         sides = new HBox(false, 0);
         left = new VBox(false, 3);
 
-        heading = new Label("<b>Paper</b>");
+        heading = new Label("<b>" + _("Paper") + "</b>");
         heading.setUseMarkup(true);
         heading.setAlignment(LEFT, CENTER);
         top.packStart(heading, false, false, 6);
 
-        label = new Label("Size:");
+        label = new Label(_("Size") + ":");
 
         /*
          * TODO, replace this with a better source of sizes? Remember that
@@ -237,12 +238,12 @@ class StylesheetEditorWidget extends VBox
          * Now, the margins
          */
 
-        heading = new Label("<b>Margins</b>");
+        heading = new Label("<b>" + _("Margins") + "</b>");
         heading.setUseMarkup(true);
         heading.setAlignment(LEFT, CENTER);
         left.packStart(heading, false, false, 6);
 
-        label = new Label("Top:");
+        label = new Label(_("Top") + ":");
         topMargin = new MilimetreEntry();
         box = new KeyValueBox(group, label, topMargin, false);
         left.packStart(box, false, false, 0);
@@ -259,7 +260,7 @@ class StylesheetEditorWidget extends VBox
             }
         });
 
-        label = new Label("Left:");
+        label = new Label(_("Left") + ":");
         leftMargin = new MilimetreEntry();
         box = new KeyValueBox(group, label, leftMargin, false);
         left.packStart(box, false, false, 0);
@@ -276,7 +277,7 @@ class StylesheetEditorWidget extends VBox
             }
         });
 
-        label = new Label("Right:");
+        label = new Label(_("Right") + ":");
         rightMargin = new MilimetreEntry();
         box = new KeyValueBox(group, label, rightMargin, false);
         left.packStart(box, false, false, 0);
@@ -293,7 +294,7 @@ class StylesheetEditorWidget extends VBox
             }
         });
 
-        label = new Label("Bottom:");
+        label = new Label(_("Bottom") + ":");
         bottomMargin = new MilimetreEntry();
         box = new KeyValueBox(group, label, bottomMargin, false);
         left.packStart(box, false, false, 0);
@@ -320,7 +321,7 @@ class StylesheetEditorWidget extends VBox
         final Label heading;
         Label label;
 
-        heading = new Label("<b>Fonts</b>");
+        heading = new Label("<b>" + _("Fonts") + "</b>");
         heading.setUseMarkup(true);
         heading.setAlignment(LEFT, CENTER);
         top.packStart(heading, false, false, 6);
@@ -328,7 +329,7 @@ class StylesheetEditorWidget extends VBox
         sides = new HBox(false, 0);
         left = new VBox(false, 3);
 
-        label = new Label("Serif:");
+        label = new Label(_("Serif") + ":");
         serifFont = new Entry();
         serifSize = new MilimetreEntry();
         box = new KeyValueBox(group, label, serifFont, false);
@@ -361,7 +362,7 @@ class StylesheetEditorWidget extends VBox
             }
         });
 
-        label = new Label("Sans:");
+        label = new Label(_("Sans") + ":");
         sansFont = new Entry();
         sansSize = new MilimetreEntry();
         box = new KeyValueBox(group, label, sansFont, false);
@@ -394,7 +395,7 @@ class StylesheetEditorWidget extends VBox
             }
         });
 
-        label = new Label("Mono:");
+        label = new Label(_("Mono") + ":");
         monoFont = new Entry();
         monoSize = new MilimetreEntry();
         box = new KeyValueBox(group, label, monoFont, false);
@@ -427,7 +428,7 @@ class StylesheetEditorWidget extends VBox
             }
         });
 
-        label = new Label("Heading:");
+        label = new Label(_("Heading") + ":");
         headingFont = new Entry();
         headingSize = new MilimetreEntry();
         box = new KeyValueBox(group, label, headingFont, false);
@@ -641,7 +642,7 @@ class RendererPicker extends VBox
 
         top = this;
 
-        label = new Label("Renderer:");
+        label = new Label(_("Renderer") + ":");
 
         model = new ListStore(new DataColumn[] {
                 nameColumn = new DataColumnString(),
@@ -663,11 +664,11 @@ class RendererPicker extends VBox
          * FIXME drive this based on some list of registered renderers!
          */
 
-        populate("Manuscript", "Technical reports, conference papers, book manuscripts", true,
+        populate(_("Manuscript"), _("Technical reports, conference papers, book manuscripts"), true,
                 "parchment.render.ReportRenderEngine");
-        populate("Paperback Novel", "A printed novel, tradeback size", false,
+        populate(_("Paperback Novel"), _("A printed novel, tradeback size"), false,
                 "parchment.render.NovelRenderEngine");
-        populate("School paper", "University paper or School term report", false,
+        populate(_("School paper"), _("University paper or School term report"), false,
                 "parchment.render.PaperRenderEngine");
 
         box = new KeyValueBox(size, label, combo, false);
@@ -699,7 +700,7 @@ class RendererPicker extends VBox
          * Now the display of the actual Java Class
          */
 
-        label = new Label("Class:");
+        label = new Label(_("Class") + ":");
 
         renderer = new Label("package.Class");
         renderer.setAlignment(LEFT, CENTER);
@@ -756,8 +757,9 @@ class RendererPicker extends VBox
         final TreeIter row;
 
         row = model.appendRow();
-        model.setValue(row, nameColumn, "<b>" + rendererName + "</b>" + (isDefault ? "  (default)" : "")
-                + "\n<span size='small'><i>" + rendererDescription + "</i></span>");
+        model.setValue(row, nameColumn, "<b>" + rendererName + "</b>"
+                + (isDefault ? "  (" + _("default") + ")" : "") + "\n<span size='small'><i>"
+                + rendererDescription + "</i></span>");
 
         if (isDefault) {
             model.setValue(row, defaultColumn, null);

@@ -44,7 +44,8 @@ fi
 if [ ! -f tmp/i18n/quill.pot ] ; then
 	touch -d "2001-01-01" tmp/i18n/quill.pot
 fi
-find src -type f -name '*.java' -newer tmp/i18n/quill.pot > tmp/stamp/list-i18n
+#find src -type f -name '*.java' -newer tmp/i18n/quill.pot > tmp/stamp/list-i18n
+find src -type f -name '*.java' > tmp/stamp/list-i18n
 if [ -s tmp/stamp/list-i18n ] ; then
 	echo -e "EXTRACT\ttmp/i18n/quill.pot"
 	xgettext -o tmp/i18n/quill.pot --omit-header --from-code=UTF-8 --keyword=_ --keyword=N_ `cat tmp/stamp/list-i18n`
@@ -61,7 +62,7 @@ do
 		echo -e "MKDIR\tshare/locale/$lang/LC_MESSAGES"
 		mkdir -p share/locale/$lang/LC_MESSAGES
 	fi
-	if [ $i -nt share/locale/$lang/LC_MESSAGES ] ; then
+	if [ $i -nt share/locale/$lang/LC_MESSAGES/quill.mo ] ; then
 		echo -e "MSGFMT\tshare/locale/$lang/LC_MESSAGES/quill.mo"
 		msgfmt -o share/locale/$lang/LC_MESSAGES/quill.mo $i
 	fi

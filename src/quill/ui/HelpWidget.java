@@ -25,6 +25,7 @@ import org.gnome.gtk.ShadowType;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.VBox;
 
+import static org.freedesktop.bindings.Internationalization._;
 import static org.gnome.gtk.Alignment.LEFT;
 import static org.gnome.gtk.Alignment.TOP;
 import static org.gnome.gtk.PolicyType.AUTOMATIC;
@@ -68,97 +69,101 @@ class HelpWidget extends ScrolledWindow
 
         views = new String[][] {
                 new String[] {
-                        "F1", "Help", "This help screen."
+                        "F1", _("Help"), _("This help screen.")
                 },
                 new String[] {
                         "F2",
-                        "Preview",
-                        "A preview of what the current page will look like in its final rendered form."
+                        _("Preview"),
+                        _("A preview of what the current page will look like in its final rendered form.")
                 },
                 new String[] {
                         "F3",
-                        "Outline",
-                        "An outline of the document's chapters and section headings allowing you to navigate."
+                        _("Outline"),
+                        _("An outline of the document's chapters and section headings allowing you to navigate.")
                 },
                 new String[] {
-                        "F5", "Editor", "Edit your manuscript!"
+                        "F5", _("Editor"), _("Edit your manuscript!")
                 },
                 new String[] {
-                        "F6", "Stylesheet", "Change the settings being used to render your document."
+                        "F6",
+                        _("Stylesheet"),
+                        _("Change the settings being used to render your document.")
                 },
                 new String[] {
                         "F11",
-                        "Fullscreen",
-                        "Work in fullscreen mode, giving you a better view of your document."
+                        _("Fullscreen"),
+                        _("Work in fullscreen mode, giving you a better view of your document.")
                 }
         };
 
         actions = new String[][] {
                 new String[] {
-                        "Ctrl+S", "Save", "_Save the document."
+                        "Ctrl+S", _("Save"), _("_Save the document.")
                 }, new String[] {
-                        "Ctrl+P", "Print", "Render the document to PDF so you can _print it."
+                        "Ctrl+P", _("Print"), _("Render the document to PDF so you can _print it.")
                 }
         };
 
         editing = new String[][] {
                 new String[] {
-                        "Ctrl+C", "Copy", ""
+                        "Ctrl+C", _("Copy"), ""
                 }, new String[] {
-                        "Ctrl+X", "Cut", ""
+                        "Ctrl+X", _("Cut"), ""
                 }, new String[] {
-                        "Ctrl+V", "Paste", ""
+                        "Ctrl+V", _("Paste"), ""
                 }, new String[] {
-                        "Ctrl+Z", "Undo", ""
+                        "Ctrl+Z", _("Undo"), ""
                 }, new String[] {
-                        "Ctrl+Y", "Redo", ""
+                        "Ctrl+Y", _("Redo"), ""
                 }, new String[] {
-                        "Ctrl+PgUp", "Next", "Go forward to the next chapter."
+                        "Ctrl+PgUp", _("Next"), _("Go forward to the next chapter.")
                 }, new String[] {
-                        "Ctrl+PgDn", "Previous", "Go back to the previous chapter."
+                        "Ctrl+PgDn", _("Previous"), _("Go back to the previous chapter.")
                 }
         };
 
         markup = new String[][] {
                 new String[] {
                         "Ctrl+Shift+\nSpace",
-                        "Clear!",
-                        "Remove any inline formatting from the currently selected range."
+                        _("Clear!"),
+                        _("Remove any inline formatting from the currently selected range.")
                 },
                 new String[] {
-                        "Ctrl+I", "Italics", "Make the text appear in _italics."
+                        "Ctrl+I", _("Italics"), _("Make the text appear in _italics.")
                 },
                 new String[] {
-                        "Ctrl+B", "Bold", "Make the text appear in _bold face."
+                        "Ctrl+B", _("Bold"), _("Make the text appear in _bold face.")
                 },
                 new String[] {
-                        "Ctrl+Shift+F", "File", "A path on the _filesystem."
+                        "Ctrl+Shift+F", _("File"), _("A path on the _filesystem.")
                 },
                 new String[] {
                         "Ctrl+Shift+T",
-                        "Class or Type",
-                        "The name of an object-oriented class or similar _type."
+                        _("Class or Type"),
+                        _("The name of an object-oriented class or similar _type.")
                 },
                 new String[] {
-                        "Ctrl+Shift+M", "Method or Function", "The name of a _method or function call."
+                        "Ctrl+Shift+M",
+                        _("Method or Function"),
+                        _("The name of a _method or function call.")
                 },
                 new String[] {
                         "Ctrl+Shift+A",
-                        "Application",
-                        "The proper name of a program, _application suite, or project."
+                        _("Application"),
+                        _("The proper name of a program, _application suite, or project.")
                 },
                 new String[] {
                         "Ctrl+Shift+O",
-                        "Command",
-                        "The name of a c_ommand or program you'd run from the command line."
+                        _("Command"),
+                        _("The name of a c_ommand or program you'd run from the command line.")
                 },
                 new String[] {
                         "Ctrl+Shift+L",
-                        "Code fragment",
-                        "An inline source code frament or _literal value."
+                        _("Code fragment"),
+                        _("An inline source code frament or _literal value.")
                 },
                 new String[] {
-                        "Ctrl+Shift+H", "Highlight", "Mark an inline work-in-progress comment."
+                        "Ctrl+Shift+H", _("Highlight"), _("Mark an inline work-in-progress comment.")
                 },
         };
 
@@ -166,17 +171,17 @@ class HelpWidget extends ScrolledWindow
 
         vbox = new VBox(false, 0);
 
-        addHeading("View selection");
+        addHeading(_("View selection"));
         for (String[] line : views) {
             addHelpLine(line[0], line[1], line[2]);
         }
 
-        addHeading("Actions");
+        addHeading(_("Actions"));
         for (String[] line : actions) {
             addHelpLine(line[0], line[1], line[2]);
         }
 
-        addHeading("Editing");
+        addHeading(_("Editing"));
         for (String[] line : editing) {
             addHelpLine(line[0], line[1], line[2]);
         }
@@ -189,7 +194,7 @@ class HelpWidget extends ScrolledWindow
 
         vbox = new VBox(false, 0);
 
-        addHeading("Markup keys");
+        addHeading(_("Markup keys"));
         for (String[] line : markup) {
             addHelpLine(line[0], line[1], line[2]);
         }
