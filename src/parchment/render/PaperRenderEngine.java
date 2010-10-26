@@ -18,31 +18,22 @@
  */
 package parchment.render;
 
-import org.freedesktop.cairo.Context;
-
 /**
- * A RenderEngine for novels. This has no space between paragraphs, paragraphs
- * are indented, and each page has a header with the author and title...
+ * A RenderEngine for university papers, term reports, high-school essays,
+ * etc. This has double spacing in normal text.
  * 
  * @author Andrew Cowie
  */
 /*
  * TODO work in progress
  */
-public class NovelRenderEngine extends RenderEngine
+public class PaperRenderEngine extends RenderEngine
 {
-    public NovelRenderEngine() {
+    public PaperRenderEngine() {
         super();
     }
 
-    protected void appendParagraphBreak(Context cr) {
-    /*
-     * Do nothing. In a novel, we indent paras, but don't have blank lines
-     * between them.
-     */
-    }
-
-    protected double getNormalIndent() {
-        return 20.0;
+    protected int getNormalSpacing() {
+        return 2;
     }
 }
