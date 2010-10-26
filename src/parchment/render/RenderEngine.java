@@ -828,11 +828,12 @@ public abstract class RenderEngine
      */
     private void flowAreasIntoPages(Context cr) {
         final int I;
-        int i, num;
+        int i, num, j;
         final double available;
         double cursor, request;
         Page page;
-        Area area, footer;
+        Area area;
+        Area[] footer;
         Origin origin;
 
         pages = new ArrayList<Page>(8);
@@ -894,7 +895,11 @@ public abstract class RenderEngine
              */
 
             footer = layoutAreaFooter(cr, num);
-            page.append(available, footer);
+
+            for (j = 0; j < footer.length; j++) {
+                area = footer[j];
+                page.append(available, area);
+            }
 
             /*
              * Accumulate the Page, then end the loop.
@@ -1027,10 +1032,11 @@ public abstract class RenderEngine
         return pageIndex;
     }
 
-    protected Area layoutAreaFooter(Context cr, int pageNumber) {
+    protected Area[] layoutAreaFooter(Context cr, int pageNumber) {
         final Layout layout;
         final Rectangle ink;
         final LayoutLine line;
+        final Area area;
 
         layout = new Layout(cr);
         layout.setFontDescription(serifFace.desc);
@@ -1038,8 +1044,11 @@ public abstract class RenderEngine
         ink = layout.getExtentsInk();
 
         line = layout.getLineReadonly(0);
-        return new TextArea(null, pageWidth - rightMargin - ink.getWidth(), footerHeight,
+        area = new TextArea(null, pageWidth - rightMargin - ink.getWidth(), footerHeight,
                 serifFace.lineAscent, line, false);
+        return new Area[] {
+            area
+        };
     }
 
     protected void appendExternalGraphic(final Context cr, final String source) {
