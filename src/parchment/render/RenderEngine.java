@@ -1008,6 +1008,10 @@ public abstract class RenderEngine
         return bottomMargin;
     }
 
+    protected double getFooterHeight() {
+        return footerHeight;
+    }
+
     /**
      * The number of pages in this document, as rendered.
      */
@@ -1033,11 +1037,9 @@ public abstract class RenderEngine
         layout.setText(Integer.toString(pageNumber));
         ink = layout.getExtentsInk();
 
-        // switch to a layout, not just a line?
         line = layout.getLineReadonly(0);
         return new TextArea(null, pageWidth - rightMargin - ink.getWidth(), footerHeight,
                 serifFace.lineAscent, line, false);
-
     }
 
     protected void appendExternalGraphic(final Context cr, final String source) {

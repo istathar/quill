@@ -19,6 +19,9 @@
 package parchment.render;
 
 import org.freedesktop.cairo.Context;
+import org.gnome.pango.Layout;
+import org.gnome.pango.LayoutLine;
+import org.gnome.pango.Rectangle;
 
 /**
  * A RenderEngine for novels. This has no space between paragraphs, paragraphs
@@ -44,5 +47,27 @@ public class NovelRenderEngine extends RenderEngine
 
     protected double getNormalIndent() {
         return 20.0;
+    }
+
+    /*
+     * Code copied from overridden layoutAreaFooter()
+     */
+    protected Area layoutAreaFooter(Context cr, int pageNumber) {
+        final Layout layout;
+        final Rectangle ink;
+        final LayoutLine line;
+        final double pageWidth, footerHeight;
+
+        layout = new Layout(cr);
+        layout.setFontDescription(serifFace.desc);
+        layout.setText(Integer.toString(pageNumber));
+        ink = layout.getExtentsInk();
+
+        pageWidth = super.getPageWidth();
+        footerHeight = super.getFooterHeight();
+
+        line = layout.getLineReadonly(0);
+        return new TextArea(null, (pageWidth - ink.getWidth()) / 2.0, footerHeight,
+                serifFace.lineAscent, line, false);
     }
 }
