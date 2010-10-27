@@ -19,6 +19,7 @@
 package parchment.render;
 
 import org.freedesktop.cairo.Context;
+import org.gnome.pango.Layout;
 
 /**
  * A RenderEngine for novels. This has no space between paragraphs, paragraphs
@@ -35,22 +36,32 @@ public class NovelRenderEngine extends RenderEngine
         super();
     }
 
-    protected void appendParagraphBreak(Context cr) {
     /*
-     * Do nothing. In a novel, we indent paras, but don't have blank lines
+     * Do nothing! In a novel, we indent paras, but don't have blank lines
      * between them.
      */
-    }
+    protected void appendParagraphBreak(Context cr) {}
 
+    /*
+     * Set an indent on the first line of paragraphs.
+     */
     protected double getNormalIndent() {
         return 20.0;
     }
 
-    protected String getFooterCenter(final int pageNum) {
-        return Integer.toString(pageNum);
-    }
+    /*
+     * Put the current page number centered at the bottom of the page.
+     */
+    protected Layout getFooterCenter(final Context cr, final int pageNumber) {
+        final Layout result;
+        final String text;
 
-    protected String getFooterRight(final int pageNum) {
-        return null;
+        result = new Layout(cr);
+        result.setFontDescription(serifFace.desc);
+
+        text = Integer.toString(pageNumber);
+        result.setText(text);
+
+        return result;
     }
 }

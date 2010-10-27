@@ -1041,87 +1041,106 @@ public abstract class RenderEngine
      * elements.
      */
     protected Area[] layoutAreaFooter(final Context cr, final int pageNumber) {
-        final String one, two, three;
         final Area right, center, left;
 
-        one = getFooterLeft(pageNumber);
-        if (one == null) {
-            right = null;
-        } else {
-            right = layoutAreaFooterLeft(cr, one);
-        }
-
-        two = getFooterCenter(pageNumber);
-        if (two == null) {
-            center = null;
-        } else {
-            center = layoutAreaFooterCenter(cr, two);
-        }
-
-        three = getFooterRight(pageNumber);
-        if (three == null) {
-            left = null;
-        } else {
-            left = layoutAreaFooterRight(cr, three);
-        }
+        right = layoutAreaFooterLeft(cr, pageNumber);
+        center = layoutAreaFooterCenter(cr, pageNumber);
+        left = layoutAreaFooterRight(cr, pageNumber);
 
         return new Area[] {
                 right, center, left
         };
     }
 
-    protected Area layoutAreaFooterLeft(final Context cr, final String text) {
+    private Area layoutAreaFooterLeft(final Context cr, final int pageNumber) {
         final Layout layout;
         final LayoutLine line;
+        final Area area;
 
-        layout = new Layout(cr);
-        layout.setFontDescription(serifFace.desc);
-        layout.setText(text);
-
-        line = layout.getLineReadonly(0);
-        return new TextArea(null, leftMargin, footerHeight, serifFace.lineAscent, line, false);
-    }
-
-    protected Area layoutAreaFooterCenter(final Context cr, final String text) {
-        final Layout layout;
-        final Rectangle ink;
-        final LayoutLine line;
-
-        layout = new Layout(cr);
-        layout.setFontDescription(serifFace.desc);
-        layout.setText(text);
-        ink = layout.getExtentsInk();
+        layout = getFooterLeft(cr, pageNumber);
+        if (layout == null) {
+            return null;
+        }
 
         line = layout.getLineReadonly(0);
-        return new TextArea(null, (pageWidth - ink.getWidth()) / 2.0, footerHeight,
-                serifFace.lineAscent, line, false);
+
+        area = new TextArea(null, leftMargin, footerHeight, serifFace.lineAscent, line, false);
+
+        return area;
     }
 
-    protected Area layoutAreaFooterRight(final Context cr, final String text) {
+    private Area layoutAreaFooterCenter(final Context cr, final int pageNumber) {
         final Layout layout;
         final Rectangle ink;
         final LayoutLine line;
+        final Area area;
 
-        layout = new Layout(cr);
-        layout.setFontDescription(serifFace.desc);
-        layout.setText(text);
-        ink = layout.getExtentsInk();
+        layout = getFooterCenter(cr, pageNumber);
+        if (layout == null) {
+            return null;
+        }
 
         line = layout.getLineReadonly(0);
-        return new TextArea(null, pageWidth - rightMargin - ink.getWidth(), footerHeight,
+        ink = line.getExtentsInk();
+
+        area = new TextArea(null, (pageWidth - ink.getWidth()) / 2.0, footerHeight,
                 serifFace.lineAscent, line, false);
+
+        return area;
     }
 
-    protected String getFooterLeft(final int pageNumber) {
+    private Area layoutAreaFooterRight(final Context cr, final int pageNumber) {
+        final Layout layout;
+        final LayoutLine line;
+        final Rectangle ink;
+        final Area area;
+
+        layout = getFooterRight(cr, pageNumber);
+        if (layout == null) {
+            return null;
+        }
+
+        line = layout.getLineReadonly(0);
+        ink = line.getExtentsInk();
+
+        area = new TextArea(null, pageWidth - rightMargin - ink.getWidth(), footerHeight,
+                serifFace.lineAscent, line, false);
+
+        return area;
+    }
+
+    /**
+     * The text on the left-hand of the footer. Only the first line of the
+     * Layout will be used. Return <code>null</code> if you want to skip this
+     * footer.
+     * 
+     * @param cr
+     * @param pageNumber
+     */
+    protected Layout getFooterLeft(final Context cr, final int pageNumber) {
         return null;
     }
 
-    protected String getFooterCenter(final int pageNumber) {
+    /**
+     * The text at the center of the footer. Only the first line of the Layout
+     * will be used. Return <code>null</code> if you want to skip this footer.
+     * 
+     * @param cr
+     * @param pageNumber
+     */
+    protected Layout getFooterCenter(final Context cr, final int pageNumber) {
         return null;
     }
 
-    protected String getFooterRight(final int pageNumber) {
-        return Integer.toString(pageNumber);
+    /**
+     * The right-hand text for the footer. Only the first line of the Layout
+     * will be used. Return <code>null</code> if you want to skip this footer.
+     * 
+     * @param cr
+     * @param pageNumber
+     */
+    protected Layout getFooterRight(final Context cr, final int pageNumber) {
+        return null;
     }
 
     protected void appendExternalGraphic(final Context cr, final String source) {

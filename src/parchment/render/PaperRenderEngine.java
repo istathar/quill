@@ -18,6 +18,9 @@
  */
 package parchment.render;
 
+import org.freedesktop.cairo.Context;
+import org.gnome.pango.Layout;
+
 /**
  * A RenderEngine for university papers, term reports, high-school essays,
  * etc. This has double spacing in normal text.
@@ -33,7 +36,27 @@ public class PaperRenderEngine extends RenderEngine
         super();
     }
 
+    /*
+     * Set double spacing
+     */
     protected int getNormalSpacing() {
         return 2;
+    }
+
+    /*
+     * Put page number bottom right.
+     */
+    // cloned from parchment.render.ReportRenderEngine
+    protected Layout getFooterRight(final Context cr, final int pageNumber) {
+        final Layout result;
+        final String text;
+
+        result = new Layout(cr);
+        result.setFontDescription(serifFace.desc);
+
+        text = Integer.toString(pageNumber);
+        result.setText(text);
+
+        return result;
     }
 }

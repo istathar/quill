@@ -18,6 +18,9 @@
  */
 package parchment.render;
 
+import org.freedesktop.cairo.Context;
+import org.gnome.pango.Layout;
+
 /**
  * The reference implementation of a RenderEngine. This is suitable for
  * reports, manuscripts, just about anything, actually.
@@ -28,5 +31,18 @@ public class ReportRenderEngine extends RenderEngine
 {
     public ReportRenderEngine() {
         super();
+    }
+
+    protected Layout getFooterRight(final Context cr, final int pageNumber) {
+        final Layout result;
+        final String text;
+
+        result = new Layout(cr);
+        result.setFontDescription(serifFace.desc);
+
+        text = Integer.toString(pageNumber);
+        result.setText(text);
+
+        return result;
     }
 }
