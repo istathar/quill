@@ -898,6 +898,10 @@ public abstract class RenderEngine
 
             for (j = 0; j < footer.length; j++) {
                 area = footer[j];
+
+                if (area == null) {
+                    continue;
+                }
                 page.append(available, area);
             }
 
@@ -1032,23 +1036,92 @@ public abstract class RenderEngine
         return pageIndex;
     }
 
-    protected Area[] layoutAreaFooter(Context cr, int pageNumber) {
+    /**
+     * Return the set of Areas making up the footer. You CAN return null
+     * elements.
+     */
+    protected Area[] layoutAreaFooter(final Context cr, final int pageNumber) {
+        final String one, two, three;
+        final Area right, center, left;
+
+        one = getFooterLeft(pageNumber);
+        if (one == null) {
+            right = null;
+        } else {
+            right = layoutAreaFooterLeft(cr, one);
+        }
+
+        two = getFooterCenter(pageNumber);
+        if (two == null) {
+            center = null;
+        } else {
+            center = layoutAreaFooterCenter(cr, two);
+        }
+
+        three = getFooterRight(pageNumber);
+        if (three == null) {
+            left = null;
+        } else {
+            left = layoutAreaFooterRight(cr, three);
+        }
+
+        return new Area[] {
+                right, center, left
+        };
+    }
+
+    protected Area layoutAreaFooterLeft(final Context cr, final String text) {
         final Layout layout;
-        final Rectangle ink;
         final LayoutLine line;
-        final Area area;
 
         layout = new Layout(cr);
         layout.setFontDescription(serifFace.desc);
-        layout.setText(Integer.toString(pageNumber));
+        layout.setText(text);
+
+        line = layout.getLineReadonly(0);
+        return new TextArea(null, leftMargin, footerHeight, serifFace.lineAscent, line, false);
+    }
+
+    protected Area layoutAreaFooterCenter(final Context cr, final String text) {
+        final Layout layout;
+        final Rectangle ink;
+        final LayoutLine line;
+
+        layout = new Layout(cr);
+        layout.setFontDescription(serifFace.desc);
+        layout.setText(text);
         ink = layout.getExtentsInk();
 
         line = layout.getLineReadonly(0);
-        area = new TextArea(null, pageWidth - rightMargin - ink.getWidth(), footerHeight,
+        return new TextArea(null, (pageWidth - ink.getWidth()) / 2.0, footerHeight,
                 serifFace.lineAscent, line, false);
-        return new Area[] {
-            area
-        };
+    }
+
+    protected Area layoutAreaFooterRight(final Context cr, final String text) {
+        final Layout layout;
+        final Rectangle ink;
+        final LayoutLine line;
+
+        layout = new Layout(cr);
+        layout.setFontDescription(serifFace.desc);
+        layout.setText(text);
+        ink = layout.getExtentsInk();
+
+        line = layout.getLineReadonly(0);
+        return new TextArea(null, pageWidth - rightMargin - ink.getWidth(), footerHeight,
+                serifFace.lineAscent, line, false);
+    }
+
+    protected String getFooterLeft(final int pageNumber) {
+        return null;
+    }
+
+    protected String getFooterCenter(final int pageNumber) {
+        return null;
+    }
+
+    protected String getFooterRight(final int pageNumber) {
+        return Integer.toString(pageNumber);
     }
 
     protected void appendExternalGraphic(final Context cr, final String source) {

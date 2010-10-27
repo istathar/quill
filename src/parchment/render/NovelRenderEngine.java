@@ -19,9 +19,6 @@
 package parchment.render;
 
 import org.freedesktop.cairo.Context;
-import org.gnome.pango.Layout;
-import org.gnome.pango.LayoutLine;
-import org.gnome.pango.Rectangle;
 
 /**
  * A RenderEngine for novels. This has no space between paragraphs, paragraphs
@@ -49,34 +46,11 @@ public class NovelRenderEngine extends RenderEngine
         return 20.0;
     }
 
-    /*
-     * Code copied from overridden layoutAreaFooter()
-     */
-    protected Area[] layoutAreaFooter(Context cr, int pageNumber) {
-        final Layout layout;
-        final Rectangle ink;
-        final LayoutLine line;
-        final double pageWidth, footerHeight, rightMargin;
-        Area area1, area2;
+    protected String getFooterCenter(final int pageNum) {
+        return Integer.toString(pageNum);
+    }
 
-        layout = new Layout(cr);
-        layout.setFontDescription(serifFace.desc);
-        layout.setText(Integer.toString(pageNumber));
-        ink = layout.getExtentsInk();
-
-        pageWidth = super.getPageWidth();
-        footerHeight = super.getFooterHeight();
-
-        line = layout.getLineReadonly(0);
-        area1 = new TextArea(null, (pageWidth - ink.getWidth()) / 2.0, footerHeight,
-                serifFace.lineAscent, line, false);
-
-        rightMargin = super.getMarginRight();
-        area2 = new TextArea(null, pageWidth - rightMargin - ink.getWidth(), footerHeight,
-                serifFace.lineAscent, line, false);
-
-        return new Area[] {
-                area1, area2
-        };
+    protected String getFooterRight(final int pageNum) {
+        return null;
     }
 }
