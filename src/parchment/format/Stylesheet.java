@@ -100,9 +100,11 @@ public class Stylesheet
     /**
      * Build a new Stylesheet. Used when loading!
      */
-    public Stylesheet(String rendererClass, String paperSize, String marginTop, String marginLeft,
-            String marginRight, String marginBottom, String fontSerif, String fontSans, String fontMono,
-            String fontHeading, String sizeSerif, String sizeSans, String sizeMono, String sizeHeading) {
+    public Stylesheet(final String rendererClass, final String paperSize, final String marginTop,
+            final String marginLeft, final String marginRight, final String marginBottom,
+            final String fontSerif, final String fontSans, final String fontMono,
+            final String fontHeading, final String sizeSerif, final String sizeSans,
+            final String sizeMono, final String sizeHeading) {
         super();
         this.rendererClass = rendererClass;
         this.paperSize = paperSize;

@@ -23,7 +23,6 @@ import java.io.OutputStream;
 
 import nu.xom.Attribute;
 import quill.textbase.Folio;
-import quill.textbase.Series;
 
 /**
  * Utility to create a XOM document for a Manuscript and drive serializing it
@@ -42,10 +41,13 @@ class ManuscriptConverter
 
     private ManuscriptElement presentation;
 
+    private ManuscriptElement metadata;
+
     public ManuscriptConverter(final Folio folio) {
         initialStructure();
         buildContent(folio);
         buildPresentation(folio);
+        buildMetadata(folio);
     }
 
     private void initialStructure() {
@@ -56,18 +58,19 @@ class ManuscriptConverter
 
         presentation = new ManuscriptElement("presentation");
         root.appendChild(presentation);
+
+        metadata = new ManuscriptElement("metadata");
+        root.appendChild(metadata);
     }
 
     private void buildContent(final Folio folio) {
         int i;
-        Series series;
         Chapter chapter;
         ManuscriptElement element;
         Attribute attribute;
         String filename;
 
         for (i = 0; i < folio.size(); i++) {
-            series = folio.getSeries(i);
             chapter = folio.getChapter(i);
             filename = chapter.getRelative();
 
@@ -153,6 +156,30 @@ class ManuscriptConverter
         attribute = new Attribute("size", value);
         font.addAttribute(attribute);
         presentation.appendChild(font);
+    }
+
+    private void buildMetadata(final Folio folio) {
+        final Metadata meta;
+        ManuscriptElement document, author;
+        Attribute attribute;
+        String value;
+
+        meta = folio.getMetadata();
+
+        document = new ManuscriptElement("document");
+        value = meta.getDocumentTitle();
+        attribute = new Attribute("title", value);
+        document.addAttribute(attribute);
+        value = meta.getDocumentLang();
+        attribute = new Attribute("lang", value);
+        document.addAttribute(attribute);
+        metadata.appendChild(document);
+
+        author = new ManuscriptElement("author");
+        value = meta.getAuthorName();
+        attribute = new Attribute("name", value);
+        author.addAttribute(attribute);
+        metadata.appendChild(author);
     }
 
     /**
