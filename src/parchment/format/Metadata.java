@@ -50,15 +50,23 @@ public class Metadata
         return this.documentTitle;
     }
 
+    public Metadata changeDocumentTitle(String value) {
+        return new Metadata(value, this.documentLang, this.authorName);
+    }
+
     public String getDocumentLang() {
         return this.documentLang;
+    }
+
+    public Metadata changeDocumentLang(String value) {
+        return new Metadata(this.documentTitle, value, this.authorName);
     }
 
     public String getAuthorName() {
         return this.authorName;
     }
 
-    public Metadata changeDocumentTitle(String value) {
-        return new Metadata(value, this.documentLang, this.authorName);
+    public Metadata changeAuthorName(String value) {
+        return new Metadata(this.documentTitle, this.documentLang, value);
     }
 }

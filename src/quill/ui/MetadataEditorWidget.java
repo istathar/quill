@@ -94,7 +94,7 @@ class MetadataEditorWidget extends VBox
     }
 
     private void setupDocumentProperties() {
-        Label heading, label;
+        Label heading, label, suffix;
         HBox box;
 
         heading = new Label("<b>" + _("Document") + "</b>");
@@ -105,7 +105,7 @@ class MetadataEditorWidget extends VBox
         label = new Label(_("Title") + ":");
 
         documentTitle = new Entry();
-        documentTitle.setWidthChars(60);
+        documentTitle.setWidthChars(50);
         box = new KeyValueBox(group, label, documentTitle, false);
         top.packStart(box, false, false, 0);
         documentTitle.connect(new Entry.Activate() {
@@ -120,6 +120,52 @@ class MetadataEditorWidget extends VBox
                 value = source.getText();
 
                 replacement = meta.changeDocumentTitle(value);
+                propegateMetadataChange(replacement);
+            }
+        });
+
+        label = new Label(_("Language") + ":");
+
+        documentLang = new Entry();
+        documentLang.setWidthChars(8);
+        suffix = new Label("<i>(" + _("for spell checking") + ")</i>");
+        suffix.setUseMarkup(true);
+        box = new KeyValueBox(group, label, documentLang, suffix);
+        top.packStart(box, false, false, 0);
+        documentLang.connect(new Entry.Activate() {
+            public void onActivate(Entry source) {
+                final String value;
+                final Metadata replacement;
+
+                if (loading) {
+                    return;
+                }
+
+                value = source.getText();
+
+                replacement = meta.changeDocumentLang(value);
+                propegateMetadataChange(replacement);
+            }
+        });
+
+        label = new Label(_("Author") + ":");
+
+        authorName = new Entry();
+        authorName.setWidthChars(50);
+        box = new KeyValueBox(group, label, authorName, false);
+        top.packStart(box, false, false, 0);
+        authorName.connect(new Entry.Activate() {
+            public void onActivate(Entry source) {
+                final String value;
+                final Metadata replacement;
+
+                if (loading) {
+                    return;
+                }
+
+                value = source.getText();
+
+                replacement = meta.changeAuthorName(value);
                 propegateMetadataChange(replacement);
             }
         });
@@ -145,6 +191,12 @@ class MetadataEditorWidget extends VBox
 
         str = meta.getDocumentTitle();
         documentTitle.setText(str);
+
+        str = meta.getDocumentLang();
+        documentLang.setText(str);
+
+        str = meta.getAuthorName();
+        authorName.setText(str);
     }
 
     /**
@@ -160,10 +212,8 @@ class MetadataEditorWidget extends VBox
     }
 
     public void grabDefault() {
-        final String str;
         documentTitle.grabFocus();
         documentTitle.selectRegion(0, 0);
-        str = meta.getDocumentTitle();
-        documentTitle.setPosition(str.length());
+        documentTitle.setPosition(0);
     }
 }
