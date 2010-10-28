@@ -28,6 +28,7 @@ import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gdk.WindowState;
+import org.gnome.glib.Glib;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Button;
@@ -826,7 +827,8 @@ class PrimaryWindow extends Window
                             + filename
                             + "</tt>\n\n"
                             + "Worse, it wasn't something we were expecting. Here's the internal message, which might help a developer fix the problem:\n\n<tt>"
-                            + e.getClass().getSimpleName() + "</tt>:\n<tt>" + e.getMessage() + "</tt>");
+                            + e.getClass().getSimpleName() + "</tt>:\n<tt>"
+                            + Glib.markupEscapeText(e.getMessage()) + "</tt>");
             error.setSecondaryUseMarkup(true);
 
             error.run();
