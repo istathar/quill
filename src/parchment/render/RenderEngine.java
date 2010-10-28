@@ -108,8 +108,6 @@ public abstract class RenderEngine
 
     private double rightMargin;
 
-    private double footerHeight;
-
     private Folio folio;
 
     Typeface sansFace;
@@ -156,8 +154,6 @@ public abstract class RenderEngine
      */
     private int currentOffset;
 
-    private Stylesheet style;
-
     /**
      * Construct a new RenderEngine. Call {@link #configure(Stylesheet)
      * configure()} with a Stylesheet to setup, then {@link #render(Context)
@@ -168,8 +164,6 @@ public abstract class RenderEngine
 
     private void configure(Stylesheet style) throws UnsupportedValueException {
         final PaperSize paper;
-
-        this.style = style;
 
         settings = new RenderSettings(style);
 
@@ -334,7 +328,6 @@ public abstract class RenderEngine
         String filename;
 
         areas = new ArrayList<Area>(64);
-        footerHeight = serifFace.lineHeight;
 
         for (i = 0; i < folio.size(); i++) {
             series = folio.getSeries(i);
@@ -829,11 +822,11 @@ public abstract class RenderEngine
     private void flowAreasIntoPages(Context cr) {
         final int I;
         int i, num, j;
-        final double available;
+        double headerHeight, footerHeight, available;
         double cursor, request;
         Page page;
         Area area;
-        Area[] footer;
+        Area[] header, footer;
         Origin origin;
 
         pages = new ArrayList<Page>(8);
@@ -843,12 +836,51 @@ public abstract class RenderEngine
         i = 0;
         num = 1;
 
-        available = pageHeight - bottomMargin - footerHeight;
-
         while (i < I) {
             area = null; // hm
             page = new Page(num);
-            cursor = topMargin;
+            headerHeight = 0;
+            footerHeight = 0;
+
+            /*
+             * Create a header (if there is one), and add it to the Page.
+             */
+
+            header = layoutAreaHeader(cr, num);
+
+            for (j = 0; j < header.length; j++) {
+                area = header[j];
+
+                if (area == null) {
+                    continue;
+                }
+                headerHeight = serifFace.lineHeight;
+                page.append(topMargin, area);
+            }
+
+            /*
+             * Create a footer (if there is to be one).
+             */
+
+            footer = layoutAreaFooter(cr, num);
+            for (j = 0; j < footer.length; j++) {
+                area = footer[j];
+
+                if (area == null) {
+                    continue;
+                }
+                footerHeight = serifFace.lineHeight;
+                page.append(pageHeight - bottomMargin - footerHeight, area);
+            }
+
+            /*
+             * available is the y position when we run out of space (ie not
+             * scalar, which is why topMargin and headerHeight are not
+             * included).
+             */
+
+            available = pageHeight - bottomMargin - footerHeight;
+            cursor = topMargin + headerHeight;
 
             /*
              * Absorb whitespace if it turns up at the top of a new Page
@@ -888,21 +920,6 @@ public abstract class RenderEngine
 
                 cursor += request;
                 i++;
-            }
-
-            /*
-             * Finally, create a footer and add it to the end of the Page.
-             */
-
-            footer = layoutAreaFooter(cr, num);
-
-            for (j = 0; j < footer.length; j++) {
-                area = footer[j];
-
-                if (area == null) {
-                    continue;
-                }
-                page.append(available, area);
             }
 
             /*
@@ -1017,10 +1034,6 @@ public abstract class RenderEngine
         return bottomMargin;
     }
 
-    protected double getFooterHeight() {
-        return footerHeight;
-    }
-
     /**
      * The number of pages in this document, as rendered.
      */
@@ -1064,7 +1077,7 @@ public abstract class RenderEngine
 
         line = layout.getLineReadonly(0);
 
-        area = new TextArea(null, leftMargin, footerHeight, serifFace.lineAscent, line, false);
+        area = new TextArea(null, leftMargin, serifFace.lineHeight, serifFace.lineAscent, line, false);
 
         return area;
     }
@@ -1083,7 +1096,7 @@ public abstract class RenderEngine
         line = layout.getLineReadonly(0);
         ink = line.getExtentsInk();
 
-        area = new TextArea(null, (pageWidth - ink.getWidth()) / 2.0, footerHeight,
+        area = new TextArea(null, (pageWidth - ink.getWidth()) / 2.0, serifFace.lineHeight,
                 serifFace.lineAscent, line, false);
 
         return area;
@@ -1103,7 +1116,7 @@ public abstract class RenderEngine
         line = layout.getLineReadonly(0);
         ink = line.getExtentsInk();
 
-        area = new TextArea(null, pageWidth - rightMargin - ink.getWidth(), footerHeight,
+        area = new TextArea(null, pageWidth - rightMargin - ink.getWidth(), serifFace.lineHeight,
                 serifFace.lineAscent, line, false);
 
         return area;
@@ -1140,6 +1153,113 @@ public abstract class RenderEngine
      * @param pageNumber
      */
     protected Layout getFooterRight(final Context cr, final int pageNumber) {
+        return null;
+    }
+
+    /**
+     * Return the set of Areas making up the header. You CAN return null
+     * elements.
+     */
+    protected Area[] layoutAreaHeader(final Context cr, final int pageNumber) {
+        final Area right, center, left;
+
+        right = layoutAreaHeaderLeft(cr, pageNumber);
+        center = layoutAreaHeaderCenter(cr, pageNumber);
+        left = layoutAreaHeaderRight(cr, pageNumber);
+
+        return new Area[] {
+                right, center, left
+        };
+    }
+
+    private Area layoutAreaHeaderLeft(final Context cr, final int pageNumber) {
+        final Layout layout;
+        final LayoutLine line;
+        final Area area;
+
+        layout = getHeaderLeft(cr, pageNumber);
+        if (layout == null) {
+            return null;
+        }
+
+        line = layout.getLineReadonly(0);
+
+        area = new TextArea(null, leftMargin, serifFace.lineHeight, serifFace.lineAscent, line, false);
+
+        return area;
+    }
+
+    private Area layoutAreaHeaderCenter(final Context cr, final int pageNumber) {
+        final Layout layout;
+        final Rectangle ink;
+        final LayoutLine line;
+        final Area area;
+
+        layout = getHeaderCenter(cr, pageNumber);
+        if (layout == null) {
+            return null;
+        }
+
+        line = layout.getLineReadonly(0);
+        ink = line.getExtentsInk();
+
+        area = new TextArea(null, (pageWidth - ink.getWidth()) / 2.0, serifFace.lineHeight,
+                serifFace.lineAscent, line, false);
+
+        return area;
+    }
+
+    private Area layoutAreaHeaderRight(final Context cr, final int pageNumber) {
+        final Layout layout;
+        final LayoutLine line;
+        final Rectangle ink;
+        final Area area;
+
+        layout = getHeaderRight(cr, pageNumber);
+        if (layout == null) {
+            return null;
+        }
+
+        line = layout.getLineReadonly(0);
+        ink = line.getExtentsInk();
+
+        area = new TextArea(null, pageWidth - rightMargin - ink.getWidth(), serifFace.lineHeight,
+                serifFace.lineAscent, line, false);
+
+        return area;
+    }
+
+    /**
+     * The text on the left-hand of the header. Only the first line of the
+     * Layout will be used. Return <code>null</code> if you want to skip this
+     * one.
+     * 
+     * @param cr
+     * @param pageNumber
+     */
+    protected Layout getHeaderLeft(final Context cr, final int pageNumber) {
+        return null;
+    }
+
+    /**
+     * The text at the center of the header. Only the first line of the Layout
+     * will be used. Return <code>null</code> if you want to skip this one.
+     * 
+     * @param cr
+     * @param pageNumber
+     */
+    protected Layout getHeaderCenter(final Context cr, final int pageNumber) {
+        return null;
+    }
+
+    /**
+     * The right-hand text for the header. Only the first line of the Layout
+     * will be used. Return <code>null</code> if you want to skip this one.
+     * 
+     * @param cr
+     * @param pageNumber
+     */
+    protected Layout getHeaderRight(final Context cr, final int pageNumber) {
         return null;
     }
 
