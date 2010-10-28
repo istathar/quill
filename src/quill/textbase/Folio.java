@@ -189,5 +189,4 @@ public class Folio
     public Folio update(Metadata meta) {
         return new Folio(this.manuscript, this.chapters, this.components, -1, this.style, meta);
     }
-
 }

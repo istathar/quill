@@ -21,6 +21,9 @@ package parchment.render;
 import org.freedesktop.cairo.Context;
 import org.gnome.pango.Layout;
 
+import parchment.format.Metadata;
+import quill.textbase.Folio;
+
 /**
  * A RenderEngine for novels. This has no space between paragraphs, paragraphs
  * are indented, and each page has a header with the author and title...
@@ -28,7 +31,10 @@ import org.gnome.pango.Layout;
  * @author Andrew Cowie
  */
 /*
- * TODO work in progress
+ * TODO Alternate between author/title on even/odd pages
+ */
+/*
+ * TODO Do not render a header on chapter starts?
  */
 public class NovelRenderEngine extends RenderEngine
 {
@@ -61,6 +67,46 @@ public class NovelRenderEngine extends RenderEngine
 
         text = Integer.toString(pageNumber);
         result.setText(text);
+
+        return result;
+    }
+
+    /*
+     * Puit the book title top
+     */
+    protected Layout getHeaderLeft(final Context cr, final int pageNumber) {
+        final Folio folio;
+        final Metadata meta;
+        final String title;
+        final Layout result;
+
+        folio = super.getFolio();
+        meta = folio.getMetadata();
+        title = meta.getDocumentTitle();
+
+        result = new Layout(cr);
+        result.setFontDescription(sansFace.desc);
+        result.setMarkup("<i>" + title + "</i>");
+
+        return result;
+    }
+
+    /*
+     * Put the author name top
+     */
+    protected Layout getHeaderRight(final Context cr, final int pageNumber) {
+        final Folio folio;
+        final Metadata meta;
+        final String author;
+        final Layout result;
+
+        folio = super.getFolio();
+        meta = folio.getMetadata();
+        author = meta.getAuthorName();
+
+        result = new Layout(cr);
+        result.setFontDescription(sansFace.desc);
+        result.setMarkup(author);
 
         return result;
     }

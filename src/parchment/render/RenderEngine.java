@@ -854,7 +854,7 @@ public abstract class RenderEngine
                 if (area == null) {
                     continue;
                 }
-                headerHeight = serifFace.lineHeight;
+                headerHeight = serifFace.lineHeight + 5.0;
                 page.append(topMargin, area);
             }
 
@@ -1047,6 +1047,13 @@ public abstract class RenderEngine
      */
     public int getPageIndex() {
         return pageIndex;
+    }
+
+    /**
+     * Make the Folio currently being rendered available to subclasses.
+     */
+    protected Folio getFolio() {
+        return folio;
     }
 
     /**
