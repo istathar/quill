@@ -38,6 +38,8 @@ class ManuscriptLoader
 
     private Stylesheet presentationStyle;
 
+    private Metadata metadataDetails;
+
     ManuscriptLoader(Document document) throws InvalidDocumentException {
         final Element root;
 
@@ -52,12 +54,13 @@ class ManuscriptLoader
         String name;
         final Element content;
         final Element presentation;
+        final Element metadata;
 
         children = root.getChildElements();
         num = children.size();
 
-        if (num != 2) {
-            throw new InvalidDocumentException("Should be exactly 2 elements in <manuscript>, not "
+        if (num != 3) {
+            throw new InvalidDocumentException("Should be exactly 3 elements in <manuscript>, not "
                     + num);
         }
 
@@ -75,8 +78,16 @@ class ManuscriptLoader
                     "The second element of <manuscript> should be <presentation>, not <" + name + ">");
         }
 
+        metadata = children.get(2);
+        name = metadata.getLocalName();
+        if (!name.equals("metadata")) {
+            throw new InvalidDocumentException(
+                    "The third element of <manuscript> should be <metadata>, not <" + name + ">");
+        }
+
         processContent(content);
         processPresentation(presentation);
+        processMetadata(metadata);
     }
 
     private void processContent(Element content) throws InvalidDocumentException {
@@ -176,5 +187,46 @@ class ManuscriptLoader
 
     Stylesheet getPresentationStylesheet() {
         return presentationStyle;
+    }
+
+    Metadata getMetadataDetails() {
+        return metadataDetails;
+    }
+
+    private void processMetadata(final Element metadata) throws InvalidDocumentException {
+        final Elements children;
+        final String documentTitle, documentLang, authorName;
+
+        children = metadata.getChildElements();
+
+        documentTitle = getMetadataValue(children, 0, "document", "title");
+        documentLang = getMetadataValue(children, 0, "document", "lang");
+        authorName = getMetadataValue(children, 1, "author", "name");
+
+        metadataDetails = new Metadata(documentTitle, documentLang, authorName);
+    }
+
+    // this is a clone of getPresentationValue with errors tuned
+    private static String getMetadataValue(final Elements children, final int index,
+            final String requestedElementName, final String requestedAttributeName)
+            throws InvalidDocumentException {
+        final Element element;
+        final String localElementName;
+        final Attribute a;
+
+        element = children.get(index);
+        localElementName = element.getLocalName();
+        if (!localElementName.equals(requestedElementName)) {
+            throw new InvalidDocumentException("The #" + index + "element of <metadata> must be <"
+                    + requestedElementName + ">, not <" + localElementName + ">");
+        }
+
+        a = element.getAttribute(requestedAttributeName);
+        if (a == null) {
+            throw new InvalidDocumentException("Looked for attribute \"" + requestedAttributeName
+                    + "\" in <" + localElementName + "> but not found");
+        }
+
+        return a.getValue();
     }
 }
