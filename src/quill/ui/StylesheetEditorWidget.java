@@ -554,11 +554,6 @@ class StylesheetEditorWidget extends VBox
     /**
      * Create a new Folio, propegate it, and update the preview.
      */
-    /*
-     * Calling switchToPreview() is probably not ideal as a way to trigger an
-     * update, as it really needs to be something asynchronous, but it works
-     * and will do for now.
-     */
     private void propegateStylesheetChange(Stylesheet style) {
         final Folio replacement;
 

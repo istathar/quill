@@ -57,4 +57,8 @@ public class Metadata
     public String getAuthorName() {
         return this.authorName;
     }
+
+    public Metadata changeDocumentTitle(String value) {
+        return new Metadata(value, this.documentLang, this.authorName);
+    }
 }

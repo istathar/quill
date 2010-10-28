@@ -89,6 +89,8 @@ class PrimaryWindow extends Window
 
     private StylesheetEditorWidget stylist;
 
+    private MetadataEditorWidget metaditor;
+
     private IntroductionWidget intro;
 
     private HelpWidget help;
@@ -288,6 +290,9 @@ class PrimaryWindow extends Window
         align.add(stylist);
         left.insertPage(align, null, 1);
 
+        metaditor = new MetadataEditorWidget(this);
+        left.insertPage(metaditor, null, 2);
+
         pane.add1(left);
     }
 
@@ -363,10 +368,11 @@ class PrimaryWindow extends Window
                     } else if (key == Keyval.F6) {
                         switchToStylesheet();
                         return true;
+                    } else if (key == Keyval.F7) {
+                        switchToMetadata();
                     }
 
-                    if ((key == Keyval.F7) || (key == Keyval.F8) || (key == Keyval.F9)
-                            || (key == Keyval.F10)) {
+                    if ((key == Keyval.F8) || (key == Keyval.F9) || (key == Keyval.F10)) {
                         // nothing yet
                         return true;
                     }
@@ -500,9 +506,20 @@ class PrimaryWindow extends Window
         left.setCurrentPage(0);
     }
 
+    /**
+     * Change the left side to show the Stylesheet editor.
+     */
     void switchToStylesheet() {
         left.setCurrentPage(1);
         stylist.grabDefault();
+    }
+
+    /**
+     * Change the left side to show the Metadata editor.
+     */
+    void switchToMetadata() {
+        left.setCurrentPage(2);
+        metaditor.grabDefault();
     }
 
     /**
@@ -574,6 +591,7 @@ class PrimaryWindow extends Window
 
         editor.initializeSeries(series);
         stylist.initializeStylesheet(folio);
+        metaditor.initializeMetadata(folio);
         preview.affect(folio);
         outline.affect(folio);
 
