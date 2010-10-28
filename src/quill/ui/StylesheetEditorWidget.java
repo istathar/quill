@@ -559,7 +559,6 @@ class StylesheetEditorWidget extends VBox
 
         replacement = folio.update(style);
         primary.apply(replacement);
-        this.affect(replacement);
         primary.forceRefresh();
     }
 

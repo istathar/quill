@@ -176,6 +176,7 @@ class PrimaryWindow extends Window
         }
 
         stylist.affect(folio);
+        metaditor.affect(folio);
         /*
          * Update the PreviewWidget's idea of the current state
          */
