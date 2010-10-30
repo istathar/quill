@@ -18,15 +18,20 @@
  */
 package quill.ui;
 
+import org.freedesktop.enchant.Enchant;
+import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnString;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.ListStore;
 import org.gnome.gtk.SelectionMode;
+import org.gnome.gtk.TreeIter;
 import org.gnome.gtk.TreeModelFilter;
 import org.gnome.gtk.TreeModelSort;
+import org.gnome.gtk.TreePath;
 import org.gnome.gtk.TreeSelection;
 import org.gnome.gtk.TreeView;
+import org.gnome.gtk.TreeViewColumn;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Window;
 
@@ -40,15 +45,15 @@ class DictionarySelectionWindow extends Window
 
     private ListStore store;
 
-    private TreeModelFilter filter;
+    private TreeModelFilter filtered;
 
-    private TreeModelSort sort;
+    private TreeModelSort sorted;
 
     private DataColumnString tagColumn;
 
     private DataColumnString displayColumn;
 
-    public DictionarySelectionWindow() {
+    DictionarySelectionWindow() {
         super();
 
         top = new VBox(false, 0);
@@ -57,6 +62,10 @@ class DictionarySelectionWindow extends Window
         buildModel();
         setupSearch();
         setupView();
+
+        populateModel();
+
+        hookupSelectionSignals();
     }
 
     private void buildModel() {
@@ -66,8 +75,8 @@ class DictionarySelectionWindow extends Window
         store = new ListStore(new DataColumn[] {
                 tagColumn, displayColumn
         });
-        filter = new TreeModelFilter(store, null);
-        sort = new TreeModelSort(filter);
+        filtered = new TreeModelFilter(store, null);
+        sorted = new TreeModelSort(filtered);
     }
 
     private void setupSearch() {
@@ -77,16 +86,55 @@ class DictionarySelectionWindow extends Window
     }
 
     private void setupView() {
-        final TreeSelection selection;
+        final TreeViewColumn vertical;
+        final CellRendererText renderer;
 
-        view = new TreeView(sort);
+        view = new TreeView(sorted);
         view.setRulesHint(false);
         view.setEnableSearch(false);
         view.setReorderable(false);
+        view.setHeadersVisible(false);
+
+        vertical = view.appendColumn();
+        vertical.setReorderable(false);
+        vertical.setResizable(false);
+        vertical.setSortColumn(displayColumn);
+        vertical.emitClicked();
+
+        renderer = new CellRendererText(vertical);
+        renderer.setText(displayColumn);
+
+        top.packStart(view, false, false, 0);
+    }
+
+    private void populateModel() {
+        final String[] list;
+        int i;
+        TreeIter row;
+
+        list = Enchant.listDictionaries();
+
+        for (i = 0; i < list.length; i++) {
+            row = store.appendRow();
+            store.setValue(row, tagColumn, list[i]);
+            store.setValue(row, displayColumn, list[i]); // FIXME
+        }
+    }
+
+    private void hookupSelectionSignals() {
+        final TreeSelection selection;
 
         selection = view.getSelection();
         selection.setMode(SelectionMode.SINGLE);
 
-        top.packStart(view, false, false, 0);
+        view.connect(new TreeView.RowActivated() {
+            public void onRowActivated(TreeView source, TreePath path, TreeViewColumn vertical) {
+                final TreeIter row;
+
+                row = sorted.getIter(path);
+
+                // TODO
+            }
+        });
     }
 }
