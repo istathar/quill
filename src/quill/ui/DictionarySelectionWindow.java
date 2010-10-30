@@ -134,6 +134,10 @@ class DictionarySelectionWindow extends Window
         for (i = 0; i < list.length; i++) {
             code = list[i];
 
+            /*
+             * Parse [sic] the language tags to pull out ISO 639 language and
+             * ISO 3166 country codes.
+             */
             if (code.length() == 2) {
                 languageCode = code;
                 countryCode = null;
@@ -197,6 +201,7 @@ class TagToTranslationTable
 
         try {
             loadLanguageNames();
+            loadCountryNames();
         } catch (Exception e) {
             /*
              * Handle the file not being present...
@@ -236,7 +241,9 @@ class TagToTranslationTable
 
         /*
          * Iterate through list. For any entry with a _1 code, we store its
-         * name.
+         * name (there are a fair number of languages that don't have a two
+         * character code; some day we may need to support that by changing
+         * the parser [sic] above).
          */
 
         children = root.getChildElements("iso_639_entry");
@@ -259,6 +266,57 @@ class TagToTranslationTable
 
     String getName(String code) {
         return languages.get(code);
+    }
+
+    private void loadCountryNames() throws ValidityException, ParsingException, IOException {
+        final File source;
+        final Builder parser;
+        final Document doc;
+        final Element root;
+        final Elements children;
+        String local;
+        final int I;
+        int i;
+        Element child;
+        Attribute attr;
+        String code, name;
+
+        source = new File("/usr/share/xml/iso-codes/iso_3166.xml");
+        parser = new Builder();
+        doc = parser.build(source);
+
+        root = doc.getRootElement();
+
+        /*
+         * Sanity check
+         */
+
+        local = root.getLocalName();
+        if (!local.equals("iso_3166_entries")) {
+            throw new IllegalStateException();
+        }
+
+        /*
+         * Iterate through list. For any entry with an alpha_2 code, we store
+         * its name.
+         */
+
+        children = root.getChildElements("iso_3166_entry");
+        I = children.size();
+        for (i = 0; i < I; i++) {
+            child = children.get(i);
+
+            attr = child.getAttribute("alpha_2_code");
+            if (attr == null) {
+                continue;
+            }
+            code = attr.getValue();
+
+            attr = child.getAttribute("name");
+            name = attr.getValue();
+
+            countries.put(code, name);
+        }
     }
 
     String getCountryName(String code) {
