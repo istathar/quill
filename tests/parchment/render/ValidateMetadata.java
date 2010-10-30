@@ -39,7 +39,7 @@ public class ValidateMetadata extends GraphicalTestCase
         meta = new Metadata();
 
         assertEquals("Untitled", meta.getDocumentTitle());
-        assertEquals("en_CA", meta.getDocumentLang());
+        assertEquals("en_CA", meta.getDocumentLanguage());
         assertEquals("", meta.getAuthorName());
     }
 }

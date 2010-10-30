@@ -54,11 +54,16 @@ public class Metadata
         return new Metadata(value, this.documentLang, this.authorName);
     }
 
-    public String getDocumentLang() {
+    /**
+     * This is NOT a locale. It is a language code and a country code, spaced
+     * by an '_' which indicates the spelling dictionary to be loaded, ie
+     * Australian English (en_AU) and Canadian French (fr_CA).
+     */
+    public String getDocumentLanguage() {
         return this.documentLang;
     }
 
-    public Metadata changeDocumentLang(String value) {
+    public Metadata changeDocumentLanguage(String value) {
         return new Metadata(this.documentTitle, value, this.authorName);
     }
 

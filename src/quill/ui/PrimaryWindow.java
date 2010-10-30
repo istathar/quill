@@ -23,6 +23,8 @@ import java.io.IOException;
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.PdfSurface;
 import org.freedesktop.cairo.Surface;
+import org.freedesktop.enchant.Dictionary;
+import org.freedesktop.enchant.Enchant;
 import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
@@ -51,6 +53,7 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 
 import parchment.format.Manuscript;
+import parchment.format.Metadata;
 import parchment.format.Stylesheet;
 import parchment.render.RenderEngine;
 import quill.client.ApplicationException;
@@ -120,6 +123,8 @@ class PrimaryWindow extends Window
      * PrimaryWindow.
      */
     private Folio folio;
+
+    private Dictionary dict;
 
     PrimaryWindow() {
         super();
@@ -585,6 +590,7 @@ class PrimaryWindow extends Window
         stack = new ChangeStack(folio);
         this.folio = folio;
         this.last = folio;
+        this.loadDictionary();
 
         // FIXME
         series = folio.getSeries(0);
@@ -1000,5 +1006,29 @@ class PrimaryWindow extends Window
         editor.initializeSeries(cursorSeries);
         preview.refreshDisplay();
         updateTitle();
+    }
+
+    private void loadDictionary() {
+        final Metadata meta;
+        final String lang;
+
+        meta = folio.getMetadata();
+        lang = meta.getDocumentLanguage();
+
+        dict = Enchant.requestDictionary(lang);
+
+        if (dict == null) {
+            /*
+             * FIXME Replace this! We need to be resilient in the face of
+             * someone else loading the document. As it stands now, though,
+             * Bad Things™ will happen if we don't have a dictionary.
+             */
+            throw new AssertionError(
+                    "You specified a language that we don't know, so how can we spell check?!?");
+        }
+    }
+
+    Dictionary getDictionary() {
+        return dict;
     }
 }

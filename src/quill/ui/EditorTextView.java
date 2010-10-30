@@ -20,6 +20,7 @@ package quill.ui;
 
 import java.lang.reflect.Constructor;
 
+import org.freedesktop.enchant.Dictionary;
 import org.gnome.gdk.Color;
 import org.gnome.gdk.Cursor;
 import org.gnome.gdk.EventButton;
@@ -96,6 +97,8 @@ abstract class EditorTextView extends TextView
     private final UserInterface ui;
 
     private final ComponentEditorWidget parent;
+
+    private Dictionary dict;
 
     EditorTextView(ComponentEditorWidget parent, Segment segment) {
         super();
@@ -1231,6 +1234,11 @@ abstract class EditorTextView extends TextView
     }
 
     private void setupContextMenu() {
+        final PrimaryWindow primary;
+
+        primary = parent.getPrimary();
+        dict = primary.getDictionary();
+
         /*
          * The default context menu created by TextView on a right click popup
          * is annoying in that it contains stuff about input methods and
@@ -1707,7 +1715,7 @@ abstract class EditorTextView extends TextView
                     return false;
                 }
 
-                if (!ui.dict.check(word)) {
+                if (!dict.check(word)) {
                     start = buffer.getIter(begin);
                     finish = buffer.getIter(end);
                     buffer.applyTag(spelling, start, finish);

@@ -18,6 +18,7 @@
  */
 package quill.ui;
 
+import org.freedesktop.enchant.Dictionary;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.ImageMenuItem;
 import org.gnome.gtk.Label;
@@ -25,7 +26,7 @@ import org.gnome.gtk.MenuItem;
 import org.gnome.gtk.SeparatorMenuItem;
 import org.gnome.gtk.Stock;
 
-import quill.client.Quill;
+import static org.freedesktop.bindings.Internationalization._;
 
 /**
  * Since Enchant can get a bit out of control with the suggestions it offers,
@@ -36,7 +37,7 @@ import quill.client.Quill;
  */
 class SuggestionsContextMenu extends ContextMenu
 {
-    private UserInterface ui;
+    private final Dictionary dict;
 
     private MenuItem.Activate picked;
 
@@ -44,7 +45,7 @@ class SuggestionsContextMenu extends ContextMenu
 
     SuggestionsContextMenu(ComponentEditorWidget parent) {
         super(parent);
-        ui = Quill.getUserInterface();
+        dict = primary.getDictionary();
 
         picked = new MenuItem.Activate() {
             public void onActivate(MenuItem source) {
@@ -75,10 +76,10 @@ class SuggestionsContextMenu extends ContextMenu
          * passed in by the EditorTextView if it is Activated.
          */
 
-        suggestions = ui.dict.suggest(word);
+        suggestions = dict.suggest(word);
 
         if (suggestions == null) {
-            label = new Label("<i>no suggestions</i>");
+            label = new Label("<i>" + _("no suggestions") + "</i>");
             label.setUseMarkup(true);
             label.setAlignment(Alignment.LEFT, Alignment.CENTER);
 
@@ -112,7 +113,7 @@ class SuggestionsContextMenu extends ContextMenu
          * need to NOT offer to add the word to a custom dictionary if the
          * word is not already unknown.
          */
-        if (!ui.dict.check(word)) {
+        if (!dict.check(word)) {
             item = new SeparatorMenuItem();
             menu.append(item);
             item = new ImageMenuItem(Stock.ADD);
@@ -121,7 +122,7 @@ class SuggestionsContextMenu extends ContextMenu
             item.connect(new MenuItem.Activate() {
                 public void onActivate(MenuItem source) {
                     menu.hide();
-                    ui.dict.add(word);
+                    dict.add(word);
 
                     handler.onWordSelected(word, false);
                 }

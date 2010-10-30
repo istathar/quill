@@ -27,7 +27,6 @@ import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.freedesktop.enchant.Dictionary;
 import org.freedesktop.enchant.Enchant;
 import org.gnome.gdk.EventOwnerChange;
 import org.gnome.gdk.Pixbuf;
@@ -59,15 +58,13 @@ public class UserInterface
 {
     private Set<PrimaryWindow> primaries;
 
-    Dictionary dict;
-
     public UserInterface() {
         loadImages();
         loadFonts();
         setupApplication();
         setupWindows();
         hookupExternalClipboard();
-        loadDictionary();
+        initializeSpellChecking();
     }
 
     private void setupWindows() {
@@ -239,9 +236,8 @@ public class UserInterface
         }
     }
 
-    private void loadDictionary() {
+    private void initializeSpellChecking() {
         Enchant.init();
-        dict = Enchant.requestDictionary("en_CA");
     }
 
     public void warning(ApplicationException ae) throws SafelyTerminateException {

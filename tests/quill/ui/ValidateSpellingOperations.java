@@ -23,12 +23,12 @@ import java.io.IOException;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 
+import org.freedesktop.enchant.Dictionary;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextTag;
 
 import parchment.format.Manuscript;
-import quill.client.Quill;
 import quill.textbase.Common;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
@@ -153,6 +153,7 @@ public class ValidateSpellingOperations extends GraphicalTestCase
         final UserInterface ui;
         final PrimaryWindow primary;
         final ComponentEditorWidget parent;
+        final Dictionary dict;
         final Span[] spans;
         final Extract entire;
         Span span;
@@ -196,9 +197,9 @@ public class ValidateSpellingOperations extends GraphicalTestCase
          * Verify that the thing we think is a spelling mistake actually is.
          */
 
-        ui = Quill.getUserInterface();
+        dict = primary.getDictionary();
 
-        assertFalse(ui.dict.check("dsmthng"));
+        assertFalse(dict.check("dsmthng"));
 
         /*
          * Initial state ok. Good. Now get a reference to the TextView, and

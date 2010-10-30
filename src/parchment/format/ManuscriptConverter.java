@@ -170,7 +170,7 @@ class ManuscriptConverter
         value = meta.getDocumentTitle();
         attribute = new Attribute("title", value);
         document.addAttribute(attribute);
-        value = meta.getDocumentLang();
+        value = meta.getDocumentLanguage();
         attribute = new Attribute("lang", value);
         document.addAttribute(attribute);
         metadata.appendChild(document);
