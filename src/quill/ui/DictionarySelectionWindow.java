@@ -125,7 +125,7 @@ class DictionarySelectionWindow extends Window
         int i;
         TreeIter row;
         TagToTranslationTable table;
-        String code, name;
+        String code, languageCode, languageName, countryCode, countryName, displayName;
 
         table = new TagToTranslationTable();
 
@@ -133,14 +133,34 @@ class DictionarySelectionWindow extends Window
 
         for (i = 0; i < list.length; i++) {
             code = list[i];
-            name = table.getName(code);
-            if (name == null) {
-                continue; // huh?
+
+            if (code.length() == 2) {
+                languageCode = code;
+                countryCode = null;
+            } else if (code.length() == 5) {
+                languageCode = code.substring(0, 2);
+                countryCode = code.substring(3, 5);
+            } else {
+                throw new AssertionError(
+                        "There's nothing wrong with an Enchant lang_tag being longer than fr_CA, but how do we handle it?");
+            }
+
+            languageName = table.getName(languageCode);
+
+            if (languageName == null) {
+                continue; // huh, but ok
+            }
+
+            countryName = table.getCountryName(countryCode);
+            if (countryName == null) {
+                displayName = languageName;
+            } else {
+                displayName = languageName + " (" + countryName + ")";
             }
 
             row = store.appendRow();
-            store.setValue(row, tagColumn, code);
-            store.setValue(row, displayColumn, name);
+            store.setValue(row, tagColumn, languageCode);
+            store.setValue(row, displayColumn, displayName);
         }
     }
 
@@ -239,5 +259,9 @@ class TagToTranslationTable
 
     String getName(String code) {
         return languages.get(code);
+    }
+
+    String getCountryName(String code) {
+        return countries.get(code);
     }
 }
