@@ -18,6 +18,19 @@
  */
 package quill.ui;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import nu.xom.Attribute;
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.Elements;
+import nu.xom.ParsingException;
+import nu.xom.ValidityException;
+
 import org.freedesktop.enchant.Enchant;
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
@@ -111,13 +124,23 @@ class DictionarySelectionWindow extends Window
         final String[] list;
         int i;
         TreeIter row;
+        TagToTranslationTable table;
+        String code, name;
+
+        table = new TagToTranslationTable();
 
         list = Enchant.listDictionaries();
 
         for (i = 0; i < list.length; i++) {
+            code = list[i];
+            name = table.getName(code);
+            if (name == null) {
+                continue; // huh?
+            }
+
             row = store.appendRow();
-            store.setValue(row, tagColumn, list[i]);
-            store.setValue(row, displayColumn, list[i]); // FIXME
+            store.setValue(row, tagColumn, code);
+            store.setValue(row, displayColumn, name);
         }
     }
 
@@ -132,9 +155,89 @@ class DictionarySelectionWindow extends Window
                 final TreeIter row;
 
                 row = sorted.getIter(path);
-
+                row.getClass();
                 // TODO
             }
         });
+    }
+}
+
+class TagToTranslationTable
+{
+    Map<String, String> languages;
+
+    Map<String, String> countries;
+
+    TagToTranslationTable() {
+        // 185 languages
+        languages = new HashMap<String, String>(190, 1.0f);
+
+        // 246 countries
+        countries = new HashMap<String, String>(255, 1.0f);
+
+        try {
+            loadLanguageNames();
+        } catch (Exception e) {
+            /*
+             * Handle the file not being present...
+             */
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    private void loadLanguageNames() throws ValidityException, ParsingException, IOException {
+        final File source;
+        final Builder parser;
+        final Document doc;
+        final Element root;
+        final Elements children;
+        String local;
+        final int I;
+        int i;
+        Element child;
+        Attribute attr;
+        String code, name;
+
+        source = new File("/usr/share/xml/iso-codes/iso_639.xml");
+        parser = new Builder();
+        doc = parser.build(source);
+
+        root = doc.getRootElement();
+
+        /*
+         * Sanity check
+         */
+
+        local = root.getLocalName();
+        if (!local.equals("iso_639_entries")) {
+            throw new IllegalStateException();
+        }
+
+        /*
+         * Iterate through list. For any entry with a _1 code, we store its
+         * name.
+         */
+
+        children = root.getChildElements("iso_639_entry");
+        I = children.size();
+        for (i = 0; i < I; i++) {
+            child = children.get(i);
+
+            attr = child.getAttribute("iso_639_1_code");
+            if (attr == null) {
+                continue;
+            }
+            code = attr.getValue();
+
+            attr = child.getAttribute("name");
+            name = attr.getValue();
+
+            languages.put(code, name);
+        }
+    }
+
+    String getName(String code) {
+        return languages.get(code);
     }
 }
