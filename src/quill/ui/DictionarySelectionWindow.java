@@ -48,6 +48,15 @@ import org.gnome.gtk.TreeViewColumn;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Window;
 
+import static org.freedesktop.bindings.Internationalization.translateCountryName;
+import static org.freedesktop.bindings.Internationalization.translateLanguageName;
+
+/**
+ * Popup a window to allow the user to select which (of the installed)
+ * dictionaries they wish the document language to be.
+ * 
+ * @author Andrew Cowie
+ */
 class DictionarySelectionWindow extends Window
 {
     private final VBox top;
@@ -138,6 +147,7 @@ class DictionarySelectionWindow extends Window
              * Parse [sic] the language tags to pull out ISO 639 language and
              * ISO 3166 country codes.
              */
+
             if (code.length() == 2) {
                 languageCode = code;
                 countryCode = null;
@@ -157,9 +167,10 @@ class DictionarySelectionWindow extends Window
 
             countryName = table.getCountryName(countryCode);
             if (countryName == null) {
-                displayName = languageName;
+                displayName = translateLanguageName(languageName);
             } else {
-                displayName = languageName + " (" + countryName + ")";
+                displayName = translateLanguageName(languageName) + " ("
+                        + translateCountryName(countryName) + ")";
             }
 
             row = store.appendRow();
@@ -186,6 +197,17 @@ class DictionarySelectionWindow extends Window
     }
 }
 
+/**
+ * Build a table of language code to standardized ("official") language names
+ * and country code to country names.
+ * 
+ * <p>
+ * The existence of the class is a shame; ideally we could do this work inside
+ * java-gnome seeing as how the only reason to look up the ISO names is to use
+ * them as <code>msgid</code>s in translations.
+ * 
+ * @author Andrew Cowie
+ */
 class TagToTranslationTable
 {
     Map<String, String> languages;
