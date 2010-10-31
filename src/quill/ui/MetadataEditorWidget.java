@@ -31,6 +31,7 @@ import parchment.format.Metadata;
 import quill.textbase.Folio;
 
 import static org.freedesktop.bindings.Internationalization._;
+import static org.gnome.glib.Glib.markupEscapeText;
 import static org.gnome.gtk.Alignment.CENTER;
 import static org.gnome.gtk.Alignment.LEFT;
 import static org.gnome.gtk.Alignment.TOP;
@@ -56,6 +57,8 @@ class MetadataEditorWidget extends VBox
     private Entry documentTitle, authorName;
 
     private LanguageSelectionButton documentLang;
+
+    private Label enchantCode;
 
     /**
      * SizeGroup to keep the subheading Labels aligned.
@@ -100,6 +103,7 @@ class MetadataEditorWidget extends VBox
     private void setupDocumentProperties() {
         Label heading, label, suffix;
         HBox box;
+        VBox pair;
 
         heading = new Label("<b>" + _("Document") + "</b>");
         heading.setUseMarkup(true);
@@ -142,13 +146,14 @@ class MetadataEditorWidget extends VBox
             }
         });
 
+        pair = new VBox(false, 0);
         label = new Label(_("Language") + ":");
 
         documentLang = new LanguageSelectionButton(primary);
         suffix = new Label("<i>(" + _("for spell checking") + ")</i>");
         suffix.setUseMarkup(true);
         box = new KeyValueBox(group, label, documentLang, suffix);
-        top.packStart(box, false, false, 6);
+        pair.packStart(box, false, false, 0);
         documentLang.connect(new LanguageSelectionButton.Changed() {
             public void onChanged(LanguageSelectionButton source) {
                 final String value;
@@ -158,8 +163,20 @@ class MetadataEditorWidget extends VBox
 
                 replacement = meta.changeDocumentLanguage(value);
                 propegateMetadataChange(replacement);
+
+                enchantCode.setLabel("<tt>" + markupEscapeText(value) + "</tt>");
             }
         });
+
+        label = new Label(_("Dictionary") + ":");
+        enchantCode = new Label("<tt>xx_YY</tt>");
+        enchantCode.setUseMarkup(true);
+        enchantCode.setAlignment(LEFT, CENTER);
+        enchantCode.setPadding(4, 0);
+
+        box = new KeyValueBox(group, label, enchantCode, false);
+        pair.packStart(box, false, false, 0);
+        top.packStart(pair, false, false, 6);
 
         label = new Label(_("Author") + ":");
 
@@ -196,7 +213,6 @@ class MetadataEditorWidget extends VBox
                 return false;
             }
         });
-
     }
 
     void initializeMetadata(Folio folio) {
@@ -222,6 +238,7 @@ class MetadataEditorWidget extends VBox
 
         str = meta.getDocumentLanguage();
         documentLang.setCode(str);
+        enchantCode.setLabel("<tt>" + markupEscapeText(str) + "</tt>");
 
         str = meta.getAuthorName();
         authorName.setText(str);
