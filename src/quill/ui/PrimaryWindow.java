@@ -1028,16 +1028,10 @@ class PrimaryWindow extends Window
             throw new AssertionError("Document specified an empty language code!");
         }
 
-        dict = Enchant.requestDictionary(lang);
-
-        if (dict == null) {
-            /*
-             * FIXME Replace this! We need to be resilient in the face of
-             * someone else loading the document. As it stands now, though,
-             * Bad Things™ will happen if we don't have a dictionary.
-             */
-            throw new AssertionError(
-                    "You specified a language that we don't know, so how can we spell check?!?");
+        if (Enchant.existsDictionary(lang)) {
+            dict = Enchant.requestDictionary(lang);
+        } else {
+            dict = null;
         }
     }
 

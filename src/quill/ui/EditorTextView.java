@@ -1653,6 +1653,14 @@ abstract class EditorTextView extends TextView
         final TextIter start, finish;
 
         /*
+         * Sometimes we just don't have a dictionary, so bail out.
+         */
+
+        if (dict == null) {
+            return;
+        }
+
+        /*
          * Some blocks (ie PreformatSegment as presented by
          * PreformatEditorTextView) are, by design, entirely unchecked, so
          * bail out if so.

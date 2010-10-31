@@ -20,6 +20,7 @@ package quill.ui;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -274,51 +275,59 @@ class DictionarySelectionWindow extends Window
     private void populateModel() {
         final String[] list;
         int i;
-        TreeIter row;
-        TagToTranslationTable table;
-        String tag, languageCode, languageName, countryCode, countryName, displayName;
-
-        table = new TagToTranslationTable();
 
         list = Enchant.listDictionaries();
 
         for (i = 0; i < list.length; i++) {
-            tag = list[i];
-
-            /*
-             * Parse [sic] the language tags to pull out ISO 639 language and
-             * ISO 3166 country codes.
-             */
-
-            if (tag.length() == 2) {
-                languageCode = tag;
-                countryCode = null;
-            } else if (tag.length() == 5) {
-                languageCode = tag.substring(0, 2);
-                countryCode = tag.substring(3, 5);
-            } else {
-                throw new AssertionError(
-                        "There's nothing wrong with an Enchant lang_tag being longer than \"fr_CA\", but how do we handle it?");
-            }
-
-            languageName = table.getName(languageCode);
-
-            if (languageName == null) {
-                continue; // huh, but ok
-            }
-
-            countryName = table.getCountryName(countryCode);
-            if (countryName == null) {
-                displayName = translateLanguageName(languageName);
-            } else {
-                displayName = translateLanguageName(languageName) + " ("
-                        + translateCountryName(countryName) + ")";
-            }
-
-            row = store.appendRow();
-            store.setValue(row, tagColumn, tag);
-            store.setValue(row, displayColumn, displayName);
+            insertTagIntoModel(list[i]);
         }
+    }
+
+    /**
+     * This is called during normal population of the popup, of course, but is
+     * also available to be called if the document specifies a language we
+     * don't know about.
+     */
+    private void insertTagIntoModel(String tag) {
+        final LanguageTagTranslationTable table;
+        final TreeIter row;
+        final String languageCode, languageName, countryCode, countryName, displayName;
+
+        table = LanguageTagTranslationTable.getInstance();
+
+        /*
+         * Parse [sic] the language tags to pull out ISO 639 language and ISO
+         * 3166 country codes.
+         */
+
+        if (tag.length() == 2) {
+            languageCode = tag;
+            countryCode = null;
+        } else if (tag.length() == 5) {
+            languageCode = tag.substring(0, 2);
+            countryCode = tag.substring(3, 5);
+        } else {
+            throw new AssertionError(
+                    "There's nothing wrong with an Enchant lang_tag being longer than \"fr_CA\", but how do we handle it?");
+        }
+
+        languageName = table.getName(languageCode);
+
+        if (languageName == null) {
+            return; // huh? but ok
+        }
+
+        countryName = table.getCountryName(countryCode);
+        if (countryName == null) {
+            displayName = translateLanguageName(languageName);
+        } else {
+            displayName = translateLanguageName(languageName) + " (" + translateCountryName(countryName)
+                    + ")";
+        }
+
+        row = store.appendRow();
+        store.setValue(row, tagColumn, tag);
+        store.setValue(row, displayColumn, displayName);
     }
 
     private void hookupKeyboardSignals() {
@@ -398,7 +407,8 @@ class DictionarySelectionWindow extends Window
             path = sorted.getPath(row);
             view.setCursor(path, null, false);
         } else {
-            selection.unselectAll();
+            insertTagIntoModel(code);
+            setCode(code);
         }
     }
 
@@ -450,13 +460,34 @@ class DictionarySelectionWindow extends Window
  * 
  * @author Andrew Cowie
  */
-class TagToTranslationTable
+class LanguageTagTranslationTable
 {
+    private static WeakReference<LanguageTagTranslationTable> ref;
+
+    static {
+        ref = new WeakReference<LanguageTagTranslationTable>(null);
+    }
+
+    /**
+     * Get the singleton instance of the translation table, reloading it if
+     * necessary.
+     */
+    static LanguageTagTranslationTable getInstance() {
+        LanguageTagTranslationTable table;
+
+        table = ref.get();
+        if (table == null) {
+            table = new LanguageTagTranslationTable();
+            ref = new WeakReference<LanguageTagTranslationTable>(table);
+        }
+        return table;
+    }
+
     Map<String, String> languages;
 
     Map<String, String> countries;
 
-    TagToTranslationTable() {
+    private LanguageTagTranslationTable() {
         // 185 languages
         languages = new HashMap<String, String>(190, 1.0f);
 
