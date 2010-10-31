@@ -20,8 +20,8 @@
 
 -->
 
-<!ELEMENT manuscript (content, presentation)>
-<!ATTLIST manuscript xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/0.2">
+<!ELEMENT manuscript (content, presentation, metadata)>
+<!ATTLIST manuscript xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/0.3">
 
 <!-- document source -->
 
@@ -60,6 +60,18 @@
 <!ATTLIST font mono CDATA #IMPLIED>
 <!ATTLIST font heading CDATA #IMPLIED>
 <!ATTLIST font size CDATA #REQUIRED>
+
+
+<!-- document metadata -->
+
+<!ELEMENT metadata (document, author)>
+
+<!ELEMENT document EMPTY>
+<!ATTLIST document title CDATA #REQUIRED>
+<!ATTLIST document lang CDATA #REQUIRED>
+
+<!ELEMENT author EMPTY>
+<!ATTLIST author name CDATA #REQUIRED>
 
 <!--
   vim: set textwidth=78 nowrap:

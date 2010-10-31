@@ -22,6 +22,7 @@ import java.util.List;
 
 import parchment.format.Chapter;
 import parchment.format.Manuscript;
+import parchment.format.Metadata;
 import parchment.format.Stylesheet;
 
 /**
@@ -49,6 +50,11 @@ public class Folio
     private final Stylesheet style;
 
     /**
+     * The current metadata about this document.
+     */
+    private final Metadata meta;
+
+    /**
      * The file [reference] that this document was (orignally) loaded from.
      * While Folio states evolve, importantly the Manuscript will stay the
      * same unless and until the underlying filename etc is changed.
@@ -64,7 +70,8 @@ public class Folio
      * Create a Folio with a single [presumably nigh-on-empty] component as
      * its body.
      */
-    public Folio(Manuscript manuscript, Chapter chapter, Series component, Stylesheet style) {
+    public Folio(Manuscript manuscript, Chapter chapter, Series component, Stylesheet style,
+            Metadata meta) {
         this.manuscript = manuscript;
         this.chapters = new Chapter[] {
             chapter
@@ -74,12 +81,14 @@ public class Folio
         };
         this.updated = -1;
         this.style = style;
+        this.meta = meta;
     }
 
     /**
      * Create a Folio with a list of components to be used as the body.
      */
-    public Folio(Manuscript manuscript, List<Chapter> chapters, List<Series> components, Stylesheet style) {
+    public Folio(Manuscript manuscript, List<Chapter> chapters, List<Series> components,
+            Stylesheet style, Metadata meta) {
         final int num;
         final Chapter[] c;
         final Series[] s;
@@ -98,15 +107,17 @@ public class Folio
         this.components = components.toArray(s);
         this.updated = -1;
         this.style = style;
+        this.meta = meta;
     }
 
     private Folio(Manuscript manuscript, Chapter[] chapters, Series[] components, int updated,
-            Stylesheet style) {
+            Stylesheet style, Metadata meta) {
         this.manuscript = manuscript;
         this.chapters = chapters;
         this.components = components;
         this.updated = updated;
         this.style = style;
+        this.meta = meta;
     }
 
     public int size() {
@@ -156,7 +167,7 @@ public class Folio
         System.arraycopy(original, position + 1, replacement, position + 1, original.length - position
                 - 1);
 
-        return new Folio(this.manuscript, this.chapters, replacement, position, this.style);
+        return new Folio(this.manuscript, this.chapters, replacement, position, this.style, this.meta);
     }
 
     public int getIndexUpdated() {
@@ -167,7 +178,15 @@ public class Folio
         return style;
     }
 
+    public Metadata getMetadata() {
+        return meta;
+    }
+
     public Folio update(Stylesheet style) {
-        return new Folio(this.manuscript, this.chapters, this.components, -1, style);
+        return new Folio(this.manuscript, this.chapters, this.components, -1, style, this.meta);
+    }
+
+    public Folio update(Metadata meta) {
+        return new Folio(this.manuscript, this.chapters, this.components, -1, this.style, meta);
     }
 }

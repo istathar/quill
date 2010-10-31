@@ -108,8 +108,6 @@ public abstract class RenderEngine
 
     private double rightMargin;
 
-    private double footerHeight;
-
     private Folio folio;
 
     Typeface sansFace;
@@ -156,8 +154,6 @@ public abstract class RenderEngine
      */
     private int currentOffset;
 
-    private Stylesheet style;
-
     /**
      * Construct a new RenderEngine. Call {@link #configure(Stylesheet)
      * configure()} with a Stylesheet to setup, then {@link #render(Context)
@@ -168,8 +164,6 @@ public abstract class RenderEngine
 
     private void configure(Stylesheet style) throws UnsupportedValueException {
         final PaperSize paper;
-
-        this.style = style;
 
         settings = new RenderSettings(style);
 
@@ -334,7 +328,6 @@ public abstract class RenderEngine
         String filename;
 
         areas = new ArrayList<Area>(64);
-        footerHeight = serifFace.lineHeight;
 
         for (i = 0; i < folio.size(); i++) {
             series = folio.getSeries(i);
@@ -383,7 +376,7 @@ public abstract class RenderEngine
                         continue;
                     }
                     appendSegmentBreak(cr);
-                    appendCitationParagraph(cr, entire);
+                    appendCaptionParagraph(cr, entire);
                 }
             }
 
@@ -422,7 +415,6 @@ public abstract class RenderEngine
         origin = new Origin(folioIndex, seriesIndex, currentOffset++);
         area = new BlankArea(origin, request);
         accumulate(area);
-
     }
 
     /**
@@ -440,7 +432,7 @@ public abstract class RenderEngine
     protected void appendHeading(Context cr, Extract entire) {
         final Area[] list;
 
-        list = layoutAreaText(cr, entire, headingFace, false, false, 0.0, false);
+        list = layoutAreaText(cr, entire, headingFace, false, false, 0.0, 1, false);
         accumulate(list);
     }
 
@@ -455,7 +447,7 @@ public abstract class RenderEngine
         desc.setSize(size * 2);
         face = new Typeface(cr, desc, 0.0);
 
-        list = layoutAreaText(cr, entire, face, false, false, 0.0, false);
+        list = layoutAreaText(cr, entire, face, false, false, 0.0, 1, false);
         accumulate(list);
     }
 
@@ -474,10 +466,12 @@ public abstract class RenderEngine
     protected void appendNormalParagraph(Context cr, Extract extract) {
         final Area[] list;
         final double indent;
+        final int spacing;
 
         indent = getNormalIndent();
+        spacing = getNormalSpacing();
 
-        list = layoutAreaText(cr, extract, serifFace, false, false, indent, false);
+        list = layoutAreaText(cr, extract, serifFace, false, false, indent, spacing, false);
         accumulate(list);
     }
 
@@ -488,10 +482,19 @@ public abstract class RenderEngine
         return 0.0;
     }
 
+    /**
+     * Override this if you want to change the spacing between lines in a
+     * paragraph... Acceptable values are {1,2}.
+     */
+    protected int getNormalSpacing() {
+        return 1;
+    }
+
     protected void appendQuoteParagraph(Context cr, Extract extract) {
         final double savedLeft, savedRight;
         final Area[] list;
         final double indent;
+        final int spacing;
 
         savedLeft = leftMargin;
         savedRight = rightMargin;
@@ -500,8 +503,9 @@ public abstract class RenderEngine
         rightMargin += 45.0;
 
         indent = getQuoteIndent();
+        spacing = getQuoteSpacing();
 
-        list = layoutAreaText(cr, extract, serifFace, false, false, indent, false);
+        list = layoutAreaText(cr, extract, serifFace, false, false, indent, spacing, false);
         accumulate(list);
 
         leftMargin = savedLeft;
@@ -510,6 +514,10 @@ public abstract class RenderEngine
 
     protected double getQuoteIndent() {
         return 0.0;
+    }
+
+    protected int getQuoteSpacing() {
+        return 1;
     }
 
     protected void appendAttributionParagraph(Context cr, Extract extract) {
@@ -528,7 +536,7 @@ public abstract class RenderEngine
         leftMargin = pageWidth / 2 + 50.0;
         rightMargin += 10.0;
 
-        list = layoutAreaText(cr, extract, face, false, false, 0.0, false);
+        list = layoutAreaText(cr, extract, face, false, false, 0.0, 1, false);
         accumulate(list);
 
         leftMargin = savedLeft;
@@ -538,7 +546,7 @@ public abstract class RenderEngine
     protected void appendProgramCode(Context cr, Extract entire) {
         final Area[] list;
 
-        list = layoutAreaText(cr, entire, monoFace, true, false, 0.0, false);
+        list = layoutAreaText(cr, entire, monoFace, true, false, 0.0, 1, false);
         accumulate(list);
     }
 
@@ -641,7 +649,8 @@ public abstract class RenderEngine
      * occur if not preformatted text.
      */
     protected final Area[] layoutAreaText(final Context cr, final Extract extract, final Typeface face,
-            final boolean preformatted, final boolean centered, final double indent, boolean error) {
+            final boolean preformatted, final boolean centered, final double indent, final int spacing,
+            boolean error) {
         final Layout layout;
         final FontOptions options;
         final StringBuilder buf;
@@ -743,7 +752,14 @@ public abstract class RenderEngine
          */
 
         K = layout.getLineCount();
-        result = new Area[K];
+
+        if (spacing == 1) {
+            result = new Area[K];
+        } else if (spacing == 2) {
+            result = new Area[2 * K - 1];
+        } else {
+            throw new AssertionError();
+        }
 
         for (k = 0; k < K; k++) {
             line = layout.getLineReadonly(k);
@@ -769,7 +785,19 @@ public abstract class RenderEngine
 
             origin = new Origin(folioIndex, seriesIndex, currentOffset);
             area = new TextArea(origin, x, face.lineHeight, face.lineAscent, line, error);
-            result[k] = area;
+
+            /*
+             * Handle double spacing, if that's specified.
+             */
+
+            if (spacing == 1) {
+                result[k] = area;
+            } else if (spacing == 2) {
+                result[2 * k] = area;
+                if (k > 0) {
+                    result[2 * k - 1] = new BlankArea(origin, face.lineHeight * 0.7);
+                }
+            }
 
             /*
              * Query the layoutline for it's width, thereby finding out where
@@ -793,11 +821,12 @@ public abstract class RenderEngine
      */
     private void flowAreasIntoPages(Context cr) {
         final int I;
-        int i, num;
-        final double available;
+        int i, num, j;
+        double headerHeight, footerHeight, available;
         double cursor, request;
         Page page;
-        Area area, footer;
+        Area area;
+        Area[] header, footer;
         Origin origin;
 
         pages = new ArrayList<Page>(8);
@@ -807,12 +836,51 @@ public abstract class RenderEngine
         i = 0;
         num = 1;
 
-        available = pageHeight - bottomMargin - footerHeight;
-
         while (i < I) {
             area = null; // hm
             page = new Page(num);
-            cursor = topMargin;
+            headerHeight = 0;
+            footerHeight = 0;
+
+            /*
+             * Create a header (if there is one), and add it to the Page.
+             */
+
+            header = layoutAreaHeader(cr, num);
+
+            for (j = 0; j < header.length; j++) {
+                area = header[j];
+
+                if (area == null) {
+                    continue;
+                }
+                headerHeight = serifFace.lineHeight + 5.0;
+                page.append(topMargin, area);
+            }
+
+            /*
+             * Create a footer (if there is to be one).
+             */
+
+            footer = layoutAreaFooter(cr, num);
+            for (j = 0; j < footer.length; j++) {
+                area = footer[j];
+
+                if (area == null) {
+                    continue;
+                }
+                footerHeight = serifFace.lineHeight;
+                page.append(pageHeight - bottomMargin - footerHeight, area);
+            }
+
+            /*
+             * available is the y position when we run out of space (ie not
+             * scalar, which is why topMargin and headerHeight are not
+             * included).
+             */
+
+            available = pageHeight - bottomMargin - footerHeight;
+            cursor = topMargin + headerHeight;
 
             /*
              * Absorb whitespace if it turns up at the top of a new Page
@@ -853,13 +921,6 @@ public abstract class RenderEngine
                 cursor += request;
                 i++;
             }
-
-            /*
-             * Finally, create a footer and add it to the end of the Page.
-             */
-
-            footer = layoutAreaFooter(cr, num);
-            page.append(available, footer);
 
             /*
              * Accumulate the Page, then end the loop.
@@ -988,21 +1049,225 @@ public abstract class RenderEngine
         return pageIndex;
     }
 
-    protected Area layoutAreaFooter(Context cr, int pageNumber) {
+    /**
+     * Make the Folio currently being rendered available to subclasses.
+     */
+    protected Folio getFolio() {
+        return folio;
+    }
+
+    /**
+     * Return the set of Areas making up the footer. You CAN return null
+     * elements.
+     */
+    protected Area[] layoutAreaFooter(final Context cr, final int pageNumber) {
+        final Area right, center, left;
+
+        right = layoutAreaFooterLeft(cr, pageNumber);
+        center = layoutAreaFooterCenter(cr, pageNumber);
+        left = layoutAreaFooterRight(cr, pageNumber);
+
+        return new Area[] {
+                right, center, left
+        };
+    }
+
+    private Area layoutAreaFooterLeft(final Context cr, final int pageNumber) {
+        final Layout layout;
+        final LayoutLine line;
+        final Area area;
+
+        layout = getFooterLeft(cr, pageNumber);
+        if (layout == null) {
+            return null;
+        }
+
+        line = layout.getLineReadonly(0);
+
+        area = new TextArea(null, leftMargin, serifFace.lineHeight, serifFace.lineAscent, line, false);
+
+        return area;
+    }
+
+    private Area layoutAreaFooterCenter(final Context cr, final int pageNumber) {
         final Layout layout;
         final Rectangle ink;
         final LayoutLine line;
+        final Area area;
 
-        layout = new Layout(cr);
-        layout.setFontDescription(serifFace.desc);
-        layout.setText(Integer.toString(pageNumber));
-        ink = layout.getExtentsInk();
+        layout = getFooterCenter(cr, pageNumber);
+        if (layout == null) {
+            return null;
+        }
 
-        // switch to a layout, not just a line?
         line = layout.getLineReadonly(0);
-        return new TextArea(null, pageWidth - rightMargin - ink.getWidth(), footerHeight,
+        ink = line.getExtentsInk();
+
+        area = new TextArea(null, (pageWidth - ink.getWidth()) / 2.0, serifFace.lineHeight,
                 serifFace.lineAscent, line, false);
 
+        return area;
+    }
+
+    private Area layoutAreaFooterRight(final Context cr, final int pageNumber) {
+        final Layout layout;
+        final LayoutLine line;
+        final Rectangle ink;
+        final Area area;
+
+        layout = getFooterRight(cr, pageNumber);
+        if (layout == null) {
+            return null;
+        }
+
+        line = layout.getLineReadonly(0);
+        ink = line.getExtentsInk();
+
+        area = new TextArea(null, pageWidth - rightMargin - ink.getWidth(), serifFace.lineHeight,
+                serifFace.lineAscent, line, false);
+
+        return area;
+    }
+
+    /**
+     * The text on the left-hand of the footer. Only the first line of the
+     * Layout will be used. Return <code>null</code> if you want to skip this
+     * footer.
+     * 
+     * @param cr
+     * @param pageNumber
+     */
+    protected Layout getFooterLeft(final Context cr, final int pageNumber) {
+        return null;
+    }
+
+    /**
+     * The text at the center of the footer. Only the first line of the Layout
+     * will be used. Return <code>null</code> if you want to skip this footer.
+     * 
+     * @param cr
+     * @param pageNumber
+     */
+    protected Layout getFooterCenter(final Context cr, final int pageNumber) {
+        return null;
+    }
+
+    /**
+     * The right-hand text for the footer. Only the first line of the Layout
+     * will be used. Return <code>null</code> if you want to skip this footer.
+     * 
+     * @param cr
+     * @param pageNumber
+     */
+    protected Layout getFooterRight(final Context cr, final int pageNumber) {
+        return null;
+    }
+
+    /**
+     * Return the set of Areas making up the header. You CAN return null
+     * elements.
+     */
+    protected Area[] layoutAreaHeader(final Context cr, final int pageNumber) {
+        final Area right, center, left;
+
+        right = layoutAreaHeaderLeft(cr, pageNumber);
+        center = layoutAreaHeaderCenter(cr, pageNumber);
+        left = layoutAreaHeaderRight(cr, pageNumber);
+
+        return new Area[] {
+                right, center, left
+        };
+    }
+
+    private Area layoutAreaHeaderLeft(final Context cr, final int pageNumber) {
+        final Layout layout;
+        final LayoutLine line;
+        final Area area;
+
+        layout = getHeaderLeft(cr, pageNumber);
+        if (layout == null) {
+            return null;
+        }
+
+        line = layout.getLineReadonly(0);
+
+        area = new TextArea(null, leftMargin, serifFace.lineHeight, serifFace.lineAscent, line, false);
+
+        return area;
+    }
+
+    private Area layoutAreaHeaderCenter(final Context cr, final int pageNumber) {
+        final Layout layout;
+        final Rectangle ink;
+        final LayoutLine line;
+        final Area area;
+
+        layout = getHeaderCenter(cr, pageNumber);
+        if (layout == null) {
+            return null;
+        }
+
+        line = layout.getLineReadonly(0);
+        ink = line.getExtentsInk();
+
+        area = new TextArea(null, (pageWidth - ink.getWidth()) / 2.0, serifFace.lineHeight,
+                serifFace.lineAscent, line, false);
+
+        return area;
+    }
+
+    private Area layoutAreaHeaderRight(final Context cr, final int pageNumber) {
+        final Layout layout;
+        final LayoutLine line;
+        final Rectangle ink;
+        final Area area;
+
+        layout = getHeaderRight(cr, pageNumber);
+        if (layout == null) {
+            return null;
+        }
+
+        line = layout.getLineReadonly(0);
+        ink = line.getExtentsInk();
+
+        area = new TextArea(null, pageWidth - rightMargin - ink.getWidth(), serifFace.lineHeight,
+                serifFace.lineAscent, line, false);
+
+        return area;
+    }
+
+    /**
+     * The text on the left-hand of the header. Only the first line of the
+     * Layout will be used. Return <code>null</code> if you want to skip this
+     * one.
+     * 
+     * @param cr
+     * @param pageNumber
+     */
+    protected Layout getHeaderLeft(final Context cr, final int pageNumber) {
+        return null;
+    }
+
+    /**
+     * The text at the center of the header. Only the first line of the Layout
+     * will be used. Return <code>null</code> if you want to skip this one.
+     * 
+     * @param cr
+     * @param pageNumber
+     */
+    protected Layout getHeaderCenter(final Context cr, final int pageNumber) {
+        return null;
+    }
+
+    /**
+     * The right-hand text for the header. Only the first line of the Layout
+     * will be used. Return <code>null</code> if you want to skip this one.
+     * 
+     * @param cr
+     * @param pageNumber
+     */
+    protected Layout getHeaderRight(final Context cr, final int pageNumber) {
+        return null;
     }
 
     protected void appendExternalGraphic(final Context cr, final String source) {
@@ -1039,7 +1304,7 @@ public abstract class RenderEngine
     protected void appendErrorParagraph(Context cr, Extract extract) {
         final Area[] list;
 
-        list = layoutAreaText(cr, extract, sansFace, false, true, 0.0, true);
+        list = layoutAreaText(cr, extract, sansFace, false, true, 0.0, 1, true);
         accumulate(list);
     }
 
@@ -1047,7 +1312,7 @@ public abstract class RenderEngine
      * Indentation copied from drawQuoteParagraph(). And face setting copied
      * from drawHeading(). Both of these should probably be abstracted.
      */
-    protected void appendCitationParagraph(Context cr, Extract extract) {
+    protected void appendCaptionParagraph(Context cr, Extract extract) {
         final double savedLeft, savedRight;
         final FontDescription desc;
         final Typeface face;
@@ -1063,7 +1328,7 @@ public abstract class RenderEngine
         desc.setStyle(Style.ITALIC);
         face = new Typeface(cr, desc, 0.0);
 
-        list = layoutAreaText(cr, extract, face, false, true, 0.0, false);
+        list = layoutAreaText(cr, extract, face, false, true, 0.0, 1, false);
         accumulate(list);
 
         leftMargin = savedLeft;

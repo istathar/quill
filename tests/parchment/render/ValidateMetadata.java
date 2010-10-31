@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -18,31 +18,28 @@
  */
 package parchment.render;
 
-import org.freedesktop.cairo.Context;
-import org.gnome.pango.Layout;
+import parchment.format.Metadata;
+import quill.ui.GraphicalTestCase;
 
 /**
- * The reference implementation of a RenderEngine. This is suitable for
- * reports, manuscripts, just about anything, actually.
+ * Check the validation logic when converting from Stylesheets to
+ * RenderSettings.
  * 
  * @author Andrew Cowie
  */
-public class ReportRenderEngine extends RenderEngine
+public class ValidateMetadata extends GraphicalTestCase
 {
-    public ReportRenderEngine() {
-        super();
-    }
+    /*
+     * The values here don't matter; they just have to match the ones in
+     * Stylesheet so that our subsequent tests have known (here) values.
+     */
+    public final void testMetadataDefault() {
+        final Metadata meta;
 
-    protected Layout getFooterRight(final Context cr, final int pageNumber) {
-        final Layout result;
-        final String text;
+        meta = new Metadata();
 
-        result = new Layout(cr);
-        result.setFontDescription(serifFace.desc);
-
-        text = Integer.toString(pageNumber);
-        result.setText(text);
-
-        return result;
+        assertEquals("Untitled", meta.getDocumentTitle());
+        assertEquals("en_CA", meta.getDocumentLanguage());
+        assertEquals("", meta.getAuthorName());
     }
 }

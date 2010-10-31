@@ -23,11 +23,14 @@ import java.io.IOException;
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.PdfSurface;
 import org.freedesktop.cairo.Surface;
+import org.freedesktop.enchant.Dictionary;
+import org.freedesktop.enchant.Enchant;
 import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gdk.WindowState;
+import org.gnome.glib.Glib;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Button;
@@ -50,6 +53,7 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 
 import parchment.format.Manuscript;
+import parchment.format.Metadata;
 import parchment.format.Stylesheet;
 import parchment.render.RenderEngine;
 import quill.client.ApplicationException;
@@ -88,6 +92,8 @@ class PrimaryWindow extends Window
 
     private StylesheetEditorWidget stylist;
 
+    private MetadataEditorWidget metaditor;
+
     private IntroductionWidget intro;
 
     private HelpWidget help;
@@ -117,6 +123,8 @@ class PrimaryWindow extends Window
      * PrimaryWindow.
      */
     private Folio folio;
+
+    private Dictionary dict;
 
     PrimaryWindow() {
         super();
@@ -173,6 +181,7 @@ class PrimaryWindow extends Window
         }
 
         stylist.affect(folio);
+        metaditor.affect(folio);
         /*
          * Update the PreviewWidget's idea of the current state
          */
@@ -287,6 +296,9 @@ class PrimaryWindow extends Window
         align.add(stylist);
         left.insertPage(align, null, 1);
 
+        metaditor = new MetadataEditorWidget(this);
+        left.insertPage(metaditor, null, 2);
+
         pane.add1(left);
     }
 
@@ -362,10 +374,11 @@ class PrimaryWindow extends Window
                     } else if (key == Keyval.F6) {
                         switchToStylesheet();
                         return true;
+                    } else if (key == Keyval.F7) {
+                        switchToMetadata();
                     }
 
-                    if ((key == Keyval.F7) || (key == Keyval.F8) || (key == Keyval.F9)
-                            || (key == Keyval.F10)) {
+                    if ((key == Keyval.F8) || (key == Keyval.F9) || (key == Keyval.F10)) {
                         // nothing yet
                         return true;
                     }
@@ -499,9 +512,20 @@ class PrimaryWindow extends Window
         left.setCurrentPage(0);
     }
 
+    /**
+     * Change the left side to show the Stylesheet editor.
+     */
     void switchToStylesheet() {
         left.setCurrentPage(1);
         stylist.grabDefault();
+    }
+
+    /**
+     * Change the left side to show the Metadata editor.
+     */
+    void switchToMetadata() {
+        left.setCurrentPage(2);
+        metaditor.grabDefault();
     }
 
     /**
@@ -566,6 +590,7 @@ class PrimaryWindow extends Window
         stack = new ChangeStack(folio);
         this.folio = folio;
         this.last = folio;
+        this.loadDictionary();
 
         // FIXME
         series = folio.getSeries(0);
@@ -573,6 +598,7 @@ class PrimaryWindow extends Window
 
         editor.initializeSeries(series);
         stylist.initializeStylesheet(folio);
+        metaditor.initializeMetadata(folio);
         preview.affect(folio);
         outline.affect(folio);
 
@@ -826,7 +852,8 @@ class PrimaryWindow extends Window
                             + filename
                             + "</tt>\n\n"
                             + "Worse, it wasn't something we were expecting. Here's the internal message, which might help a developer fix the problem:\n\n<tt>"
-                            + e.getClass().getSimpleName() + "</tt>:\n<tt>" + e.getMessage() + "</tt>");
+                            + e.getClass().getSimpleName() + "</tt>:\n<tt>"
+                            + Glib.markupEscapeText(e.getMessage()) + "</tt>");
             error.setSecondaryUseMarkup(true);
 
             error.run();
@@ -979,5 +1006,29 @@ class PrimaryWindow extends Window
         editor.initializeSeries(cursorSeries);
         preview.refreshDisplay();
         updateTitle();
+    }
+
+    private void loadDictionary() {
+        final Metadata meta;
+        final String lang;
+
+        meta = folio.getMetadata();
+        lang = meta.getDocumentLanguage();
+
+        dict = Enchant.requestDictionary(lang);
+
+        if (dict == null) {
+            /*
+             * FIXME Replace this! We need to be resilient in the face of
+             * someone else loading the document. As it stands now, though,
+             * Bad Things™ will happen if we don't have a dictionary.
+             */
+            throw new AssertionError(
+                    "You specified a language that we don't know, so how can we spell check?!?");
+        }
+    }
+
+    Dictionary getDictionary() {
+        return dict;
     }
 }

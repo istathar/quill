@@ -96,7 +96,5 @@ public class ValidateStylesheetToRenderSettingsConversion extends GraphicalTestC
         assertEquals(convertMilimetresToPoints(5.6), settings.getFontHeading().getSize(), 0.01); // hm
         assertEquals(Style.NORMAL, settings.getFontHeading().getStyle());
         assertEquals(Weight.NORMAL, settings.getFontHeading().getWeight());
-
     }
-
 }

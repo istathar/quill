@@ -35,7 +35,7 @@ import nu.xom.Serializer;
 class ManuscriptElement extends Element
 {
     ManuscriptElement(String name) {
-        super(name, "http://namespace.operationaldynamics.com/parchment/0.2");
+        super(name, "http://namespace.operationaldynamics.com/parchment/0.3");
     }
 
     void setValue(String name, String value) {

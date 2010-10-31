@@ -91,6 +91,7 @@ public class Manuscript
         final List<Series> components;
         final List<Chapter> chapters;
         final Stylesheet style;
+        final Metadata meta;
         final Folio folio;
 
         components = new ArrayList<Series>();
@@ -132,7 +133,8 @@ public class Manuscript
         }
 
         style = loader.getPresentationStylesheet();
-        folio = new Folio(this, chapters, components, style);
+        meta = loader.getMetadataDetails();
+        folio = new Folio(this, chapters, components, style, meta);
         return folio;
     }
 
@@ -166,12 +168,14 @@ public class Manuscript
         final Folio folio;
         final Chapter chapter1;
         final Stylesheet blank;
+        final Metadata none;
 
         chapter1 = new Chapter(this);
         series1 = chapter1.createDocument();
         blank = new Stylesheet();
+        none = new Metadata();
 
-        folio = new Folio(this, chapter1, series1, blank);
+        folio = new Folio(this, chapter1, series1, blank, none);
 
         try {
             this.setFilename("Untitled.parchment");

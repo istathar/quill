@@ -99,7 +99,7 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
 
         blob = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.3\">",
                 "<text>",
                 "Hello",
                 "</text>",
@@ -167,7 +167,7 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
 
         blob = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.3\">",
                 "<text>",
                 "Accessing the " + "<filename>/tmp</filename>" + " directory directly is",
                 "fine, but you are often better off using " + "<type>" + "File" + "</type>'s",
@@ -240,7 +240,7 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
 
         blob = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.2\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.3\">",
                 "<text>",
                 ":𝑛:",
                 "</text>",

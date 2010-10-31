@@ -119,6 +119,10 @@ class HelpWidget extends ScrolledWindow
                         "Ctrl+PgUp", _("Next"), _("Go forward to the next chapter.")
                 }, new String[] {
                         "Ctrl+PgDn", _("Previous"), _("Go back to the previous chapter.")
+                }, new String[] {
+                        "Ins", _("Insert Segment"), _("Insert a new block into the current chapter.")
+                }, new String[] {
+                        "Menu", _("Check Spelling"), _("Suggest alternate words.")
                 }
         };
 

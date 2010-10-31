@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -22,17 +22,31 @@ import org.freedesktop.cairo.Context;
 import org.gnome.pango.Layout;
 
 /**
- * The reference implementation of a RenderEngine. This is suitable for
- * reports, manuscripts, just about anything, actually.
+ * A RenderEngine for university papers, term reports, high-school essays,
+ * etc. This has double spacing in normal text.
  * 
  * @author Andrew Cowie
  */
-public class ReportRenderEngine extends RenderEngine
+/*
+ * TODO work in progress
+ */
+public class PaperRenderEngine extends RenderEngine
 {
-    public ReportRenderEngine() {
+    public PaperRenderEngine() {
         super();
     }
 
+    /*
+     * Set double spacing
+     */
+    protected int getNormalSpacing() {
+        return 2;
+    }
+
+    /*
+     * Put page number bottom right.
+     */
+    // cloned from parchment.render.ReportRenderEngine
     protected Layout getFooterRight(final Context cr, final int pageNumber) {
         final Layout result;
         final String text;
