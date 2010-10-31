@@ -32,6 +32,7 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 
 import org.freedesktop.enchant.Enchant;
+import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
@@ -52,19 +53,36 @@ import org.gnome.gtk.Window;
 import static org.freedesktop.bindings.Internationalization._;
 import static org.freedesktop.bindings.Internationalization.translateCountryName;
 import static org.freedesktop.bindings.Internationalization.translateLanguageName;
+import static org.gnome.gtk.Alignment.CENTER;
+import static org.gnome.gtk.Alignment.LEFT;
 
 class LanguageSelectionButton extends Button
 {
+    private final Button button;
+
     private DictionarySelectionWindow window;
 
     private String tag;
 
     LanguageSelectionButton() {
         super("xx_YY");
+        final int width;
+
+        button = this;
 
         window = new DictionarySelectionWindow(this);
 
-        super.connect(new Button.Clicked() {
+        /*
+         * Set the size of the button to be the width of the widest display
+         * string. This is what ComboBox does by itself, but here we have to
+         * create a similar effect by hand.
+         */
+
+        width = window.getWidestDisplay();
+        button.setSizeRequest(width, -1);
+        button.setAlignment(LEFT, CENTER);
+
+        button.connect(new Button.Clicked() {
             public void onClicked(Button source) {
                 window.show();
             }
@@ -125,7 +143,7 @@ class LanguageSelectionButton extends Button
  */
 class DictionarySelectionWindow extends Window
 {
-    private final DictionarySelectionWindow self;
+    private final DictionarySelectionWindow window;
 
     private final LanguageSelectionButton enclosing;
 
@@ -147,7 +165,7 @@ class DictionarySelectionWindow extends Window
 
     DictionarySelectionWindow(LanguageSelectionButton button) {
         super();
-        self = this;
+        window = this;
         enclosing = button;
         top = new VBox(false, 0);
         super.add(top);
@@ -161,6 +179,19 @@ class DictionarySelectionWindow extends Window
         hookupSelectionSignals();
         super.showAll();
         super.hide();
+    }
+
+    int getWidestDisplay() {
+        final Allocation alloc;
+        final int width;
+
+        alloc = window.getAllocation();
+        width = alloc.getWidth();
+
+        if (width < 10) {
+            throw new AssertionError();
+        }
+        return width;
     }
 
     private void buildModel() {
@@ -263,7 +294,7 @@ class DictionarySelectionWindow extends Window
                 final TreeIter row;
                 final String code, display;
 
-                self.hide();
+                window.hide();
 
                 row = sorted.getIter(path);
 
