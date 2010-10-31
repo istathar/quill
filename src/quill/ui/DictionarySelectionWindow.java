@@ -57,7 +57,7 @@ class LanguageSelectionButton extends Button
 {
     private DictionarySelectionWindow window;
 
-    private String code;
+    private String tag;
 
     LanguageSelectionButton() {
         super("xx_YY");
@@ -88,26 +88,30 @@ class LanguageSelectionButton extends Button
     void setLanguage(String code, String display) {
         super.setLabel(display);
 
-        if (code.equals(this.code)) {
+        if (code.equals(this.tag)) {
             return;
         }
+        this.tag = code;
 
         handler.onChanged(this);
     }
 
-    String getCode() {
-        return code;
+    String getTag() {
+        return tag;
     }
 
-    public void setCode(String code) {
+    /**
+     * Entry point from MetadataEditorWidget
+     */
+    void setTag(String tag) {
         final String display;
 
-        if (code.equals(this.code)) {
+        if (tag.equals(this.tag)) {
             return;
         }
-        this.code = code;
+        this.tag = tag;
 
-        display = window.lookupDisplayFor(code);
+        display = window.lookupDisplayFor(tag);
 
         super.setLabel(display);
     }
@@ -203,26 +207,26 @@ class DictionarySelectionWindow extends Window
         int i;
         TreeIter row;
         TagToTranslationTable table;
-        String code, languageCode, languageName, countryCode, countryName, displayName;
+        String tag, languageCode, languageName, countryCode, countryName, displayName;
 
         table = new TagToTranslationTable();
 
         list = Enchant.listDictionaries();
 
         for (i = 0; i < list.length; i++) {
-            code = list[i];
+            tag = list[i];
 
             /*
              * Parse [sic] the language tags to pull out ISO 639 language and
              * ISO 3166 country codes.
              */
 
-            if (code.length() == 2) {
-                languageCode = code;
+            if (tag.length() == 2) {
+                languageCode = tag;
                 countryCode = null;
-            } else if (code.length() == 5) {
-                languageCode = code.substring(0, 2);
-                countryCode = code.substring(3, 5);
+            } else if (tag.length() == 5) {
+                languageCode = tag.substring(0, 2);
+                countryCode = tag.substring(3, 5);
             } else {
                 throw new AssertionError(
                         "There's nothing wrong with an Enchant lang_tag being longer than \"fr_CA\", but how do we handle it?");
@@ -243,7 +247,7 @@ class DictionarySelectionWindow extends Window
             }
 
             row = store.appendRow();
-            store.setValue(row, tagColumn, languageCode);
+            store.setValue(row, tagColumn, tag);
             store.setValue(row, displayColumn, displayName);
         }
     }
@@ -272,16 +276,16 @@ class DictionarySelectionWindow extends Window
     }
 
     /**
-     * // * Called on initial document load.
+     * Called on initial document load.
      */
-    String lookupDisplayFor(String code) {
+    String lookupDisplayFor(String str) {
         final TreeIter row;
         String tag, display;
 
         row = store.getIterFirst();
         do {
             tag = store.getValue(row, tagColumn);
-            if (tag.equals(code)) {
+            if (str.equals(tag)) {
                 display = store.getValue(row, displayColumn);
                 return display;
             }
