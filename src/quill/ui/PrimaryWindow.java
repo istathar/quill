@@ -558,6 +558,15 @@ class PrimaryWindow extends Window
     }
 
     /**
+     * Request that the entire document spelling be rechecked. This is
+     * necessary after a language change in MetadataEditorWidget.
+     */
+    void forceRecheck() {
+        this.loadDictionary();
+        editor.forceRecheck();
+    }
+
+    /**
      * Change the right side to show the outline navigator.
      */
     void switchToOutline() {
@@ -1014,6 +1023,10 @@ class PrimaryWindow extends Window
 
         meta = folio.getMetadata();
         lang = meta.getDocumentLanguage();
+
+        if (lang.equals("")) {
+            throw new AssertionError("Document specified an empty language code!");
+        }
 
         dict = Enchant.requestDictionary(lang);
 

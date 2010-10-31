@@ -40,7 +40,6 @@ import org.gnome.gtk.Button;
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnString;
-import org.gnome.gtk.Entry;
 import org.gnome.gtk.ListStore;
 import org.gnome.gtk.SelectionMode;
 import org.gnome.gtk.Statusbar;
@@ -178,8 +177,6 @@ class DictionarySelectionWindow extends Window
 
     private VBox top;
 
-    private Entry search;
-
     private TreeView view;
 
     private Statusbar status;
@@ -205,7 +202,6 @@ class DictionarySelectionWindow extends Window
 
         setupWindow();
         buildModel();
-        setupSearch();
         setupView();
         setupStatusbar();
 
@@ -243,12 +239,6 @@ class DictionarySelectionWindow extends Window
         });
         filtered = new TreeModelFilter(store, null);
         sorted = new TreeModelSort(filtered);
-    }
-
-    private void setupSearch() {
-        search = new Entry();
-
-        top.packStart(search, false, false, 0);
     }
 
     private void setupView() {
@@ -350,7 +340,7 @@ class DictionarySelectionWindow extends Window
 
     private void hookupSelectionSignals() {
         selection = view.getSelection();
-        selection.setMode(SelectionMode.SINGLE);
+        selection.setMode(SelectionMode.BROWSE);
         selection.unselectAll();
 
         view.connect(new TreeView.RowActivated() {
@@ -380,21 +370,6 @@ class DictionarySelectionWindow extends Window
                 setTagOnStatusbar(tag);
             }
         });
-
-        view.connect(new Widget.FocusInEvent() {
-            public boolean onFocusInEvent(Widget source, EventFocus event) {
-                TreeIter row;
-
-                row = selection.getSelected();
-                if (row != null) {
-                    selection.selectRow(row);
-                } else {
-                    row = sorted.getIterFirst();
-                    selection.selectRow(row);
-                }
-                return false;
-            }
-        });
     }
 
     private void setTagOnStatusbar(String tag) {
@@ -406,6 +381,7 @@ class DictionarySelectionWindow extends Window
      */
     void setCode(String code) {
         final TreeIter row;
+        final TreePath path;
 
         this.code = code;
 
@@ -413,7 +389,14 @@ class DictionarySelectionWindow extends Window
         row = findTag(sorted, code);
 
         if (row != null) {
-            selection.selectRow(row);
+            /*
+             * Setting the selection is not enough. We also need to set the
+             * "cursor" which is the dotted marking of the current keyboard
+             * focus.
+             */
+
+            path = sorted.getPath(row);
+            view.setCursor(path, null, false);
         } else {
             selection.unselectAll();
         }

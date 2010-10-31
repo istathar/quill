@@ -1871,4 +1871,13 @@ abstract class EditorTextView extends TextView
 
         propagateTextualChange(offset, 0, width);
     }
+
+    void forceRecheck() {
+        final PrimaryWindow primary;
+
+        primary = parent.getPrimary();
+        dict = primary.getDictionary();
+
+        checkSpellingRange(0, chain.length());
+    }
 }

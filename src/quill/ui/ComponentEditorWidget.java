@@ -856,4 +856,16 @@ class ComponentEditorWidget extends ScrolledWindow
     final EditorTextView testGetEditor(int index) {
         return editors.get(index);
     }
+
+    void forceRecheck() {
+        final int I;
+        int i;
+        EditorTextView editor;
+
+        I = editors.size();
+        for (i = 0; i < I; i++) {
+            editor = editors.get(i);
+            editor.forceRecheck();
+        }
+    }
 }

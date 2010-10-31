@@ -205,6 +205,7 @@ class MetadataEditorWidget extends VBox
         replacement = folio.update(meta);
         primary.apply(replacement);
         primary.forceRefresh();
+        primary.forceRecheck();
     }
 
     public void grabDefault() {
