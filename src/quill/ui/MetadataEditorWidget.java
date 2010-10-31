@@ -18,12 +18,14 @@
  */
 package quill.ui;
 
+import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.SizeGroupMode;
 import org.gnome.gtk.VBox;
+import org.gnome.gtk.Widget;
 
 import parchment.format.Metadata;
 import quill.textbase.Folio;
@@ -125,6 +127,20 @@ class MetadataEditorWidget extends VBox
                 propegateMetadataChange(replacement);
             }
         });
+        documentTitle.connect(new Widget.FocusOutEvent() {
+            public boolean onFocusOutEvent(Widget source, EventFocus event) {
+                String value, existing;
+
+                existing = meta.getDocumentTitle();
+                value = documentTitle.getText();
+
+                if (!existing.equals(value)) {
+                    documentTitle.activate();
+                }
+
+                return false;
+            }
+        });
 
         label = new Label(_("Language") + ":");
 
@@ -132,7 +148,7 @@ class MetadataEditorWidget extends VBox
         suffix = new Label("<i>(" + _("for spell checking") + ")</i>");
         suffix.setUseMarkup(true);
         box = new KeyValueBox(group, label, documentLang, suffix);
-        top.packStart(box, false, false, 0);
+        top.packStart(box, false, false, 6);
         documentLang.connect(new LanguageSelectionButton.Changed() {
             public void onChanged(LanguageSelectionButton source) {
                 final String value;
@@ -150,7 +166,7 @@ class MetadataEditorWidget extends VBox
         authorName = new Entry();
         authorName.setWidthChars(50);
         box = new KeyValueBox(group, label, authorName, false);
-        top.packStart(box, false, false, 0);
+        top.packStart(box, false, false, 6);
         authorName.connect(new Entry.Activate() {
             public void onActivate(Entry source) {
                 final String value;
@@ -166,6 +182,21 @@ class MetadataEditorWidget extends VBox
                 propegateMetadataChange(replacement);
             }
         });
+        authorName.connect(new Widget.FocusOutEvent() {
+            public boolean onFocusOutEvent(Widget source, EventFocus event) {
+                String value, existing;
+
+                existing = meta.getDocumentTitle();
+                value = authorName.getText();
+
+                if (!existing.equals(value)) {
+                    authorName.activate();
+                }
+
+                return false;
+            }
+        });
+
     }
 
     void initializeMetadata(Folio folio) {

@@ -630,33 +630,48 @@ class PrimaryWindow extends Window
      * and have a window title with only one letter in it as you type.
      */
     void updateTitle() {
+        final Metadata meta;
         final Segment first;
-        final String title;
+        final String documentTitle, chapterTitle;
         final String str;
 
-        /*
-         * TODO include document title in window title
-         */
-
+        meta = folio.getMetadata();
         first = cursorSeries.getSegment(0);
 
-        if (first == titleSegment) {
+        if ((meta == cachedDocumentTitle) && (first == cachedChapterTitle)) {
             return;
         }
 
-        title = first.getEntire().getText();
+        documentTitle = meta.getDocumentTitle();
+        chapterTitle = first.getEntire().getText();
 
-        if ((title == null) || (title.equals(""))) {
-            str = "Quill";
+        if (chapterTitle == null) {
+            throw new AssertionError();
+        }
+
+        if (documentTitle.equals("")) {
+            if (chapterTitle.equals("")) {
+                str = "Quill";
+            } else {
+                str = chapterTitle + " - Quill";
+            }
         } else {
-            str = title + " - Quill";
+            if (chapterTitle.equals("")) {
+                str = documentTitle + " - Quill";
+            } else {
+                str = chapterTitle + " - " + documentTitle + " - Quill";
+            }
         }
 
         super.setTitle(str);
-        titleSegment = first;
+
+        cachedDocumentTitle = meta;
+        cachedChapterTitle = first;
     }
 
-    private transient Segment titleSegment;
+    private transient Metadata cachedDocumentTitle;
+
+    private transient Segment cachedChapterTitle;
 
     public void grabFocus() {
         editor.grabFocus();
