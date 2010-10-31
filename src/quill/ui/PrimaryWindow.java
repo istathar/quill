@@ -658,7 +658,18 @@ class PrimaryWindow extends Window
         } else {
             if (chapterTitle.equals("")) {
                 str = documentTitle + " - Quill";
+            } else if (chapterTitle.equalsIgnoreCase(documentTitle)) {
+                /*
+                 * Special case, but when you've got an essay with a single
+                 * chapter and the document title and the chapter title are
+                 * the same, seeing the same text twice looks silly. So just
+                 * use one.
+                 */
+                str = documentTitle + " - Quill";
             } else {
+                /*
+                 * Normal usage: show chapter and document title.
+                 */
                 str = chapterTitle + " - " + documentTitle + " - Quill";
             }
         }
