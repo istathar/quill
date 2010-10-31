@@ -13,7 +13,7 @@
     <font heading="Linux Libertine O C" size="5.6"/>
   </presentation>
   <metadata>
-    <document title="Linux Device Drivers" lang="en_CA"/>
+    <document title="Linux Device Drivers" lang="en_US"/>
     <author name="Jonathan Corbet, Alessandro Rubini, and Greg Kroah-Hartman"/>
   </metadata>
 </manuscript>
