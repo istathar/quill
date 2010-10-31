@@ -33,6 +33,8 @@ import nu.xom.ValidityException;
 
 import org.freedesktop.enchant.Enchant;
 import org.gnome.gdk.EventFocus;
+import org.gnome.gdk.EventKey;
+import org.gnome.gdk.Keyval;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.CellRendererText;
@@ -90,6 +92,8 @@ class LanguageSelectionButton extends Button
                 final Allocation alloc;
                 final org.gnome.gdk.Window underlying;
                 int x, y;
+
+                window.setCode(code);
 
                 underlying = button.getWindow();
                 x = underlying.getOriginX();
@@ -199,6 +203,7 @@ class DictionarySelectionWindow extends Window
 
         populateModel();
 
+        hookupKeyboardSignals();
         hookupSelectionSignals();
         window.showAll();
         window.hide();
@@ -316,6 +321,23 @@ class DictionarySelectionWindow extends Window
             store.setValue(row, tagColumn, tag);
             store.setValue(row, displayColumn, displayName);
         }
+    }
+
+    private void hookupKeyboardSignals() {
+        window.connect(new Widget.KeyPressEvent() {
+
+            public boolean onKeyPressEvent(Widget source, EventKey event) {
+                Keyval key;
+
+                key = event.getKeyval();
+                if (key == Keyval.Escape) {
+                    window.hide();
+                    return true;
+                }
+
+                return false;
+            }
+        });
     }
 
     private void hookupSelectionSignals() {
