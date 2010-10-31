@@ -70,12 +70,13 @@ class LanguageSelectionButton extends Button
 
     private String code;
 
-    LanguageSelectionButton() {
+    LanguageSelectionButton(PrimaryWindow primary) {
         super("xx_YY");
         final int width;
 
         button = this;
         window = new DictionarySelectionWindow(this);
+        window.setTransientFor(primary);
 
         /*
          * Set the size of the button to be the width of the widest display
@@ -105,6 +106,13 @@ class LanguageSelectionButton extends Button
 
                 window.move(x, y);
                 window.show();
+            }
+        });
+
+        window.connect(new Widget.FocusOutEvent() {
+            public boolean onFocusOutEvent(Widget source, EventFocus event) {
+                window.hide();
+                return false;
             }
         });
     }

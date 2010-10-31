@@ -128,7 +128,7 @@ class MetadataEditorWidget extends VBox
 
         label = new Label(_("Language") + ":");
 
-        documentLang = new LanguageSelectionButton();
+        documentLang = new LanguageSelectionButton(primary);
         suffix = new Label("<i>(" + _("for spell checking") + ")</i>");
         suffix.setUseMarkup(true);
         box = new KeyValueBox(group, label, documentLang, suffix);
