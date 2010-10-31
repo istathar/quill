@@ -558,6 +558,15 @@ class PrimaryWindow extends Window
     }
 
     /**
+     * Request that the entire document spelling be rechecked. This is
+     * necessary after a language change in MetadataEditorWidget.
+     */
+    void forceRecheck() {
+        this.loadDictionary();
+        editor.forceRecheck();
+    }
+
+    /**
      * Change the right side to show the outline navigator.
      */
     void switchToOutline() {
@@ -621,33 +630,48 @@ class PrimaryWindow extends Window
      * and have a window title with only one letter in it as you type.
      */
     void updateTitle() {
+        final Metadata meta;
         final Segment first;
-        final String title;
+        final String documentTitle, chapterTitle;
         final String str;
 
-        /*
-         * TODO include document title in window title
-         */
-
+        meta = folio.getMetadata();
         first = cursorSeries.getSegment(0);
 
-        if (first == titleSegment) {
+        if ((meta == cachedDocumentTitle) && (first == cachedChapterTitle)) {
             return;
         }
 
-        title = first.getEntire().getText();
+        documentTitle = meta.getDocumentTitle();
+        chapterTitle = first.getEntire().getText();
 
-        if ((title == null) || (title.equals(""))) {
-            str = "Quill";
+        if (chapterTitle == null) {
+            throw new AssertionError();
+        }
+
+        if (documentTitle.equals("")) {
+            if (chapterTitle.equals("")) {
+                str = "Quill";
+            } else {
+                str = chapterTitle + " - Quill";
+            }
         } else {
-            str = title + " - Quill";
+            if (chapterTitle.equals("")) {
+                str = documentTitle + " - Quill";
+            } else {
+                str = chapterTitle + " - " + documentTitle + " - Quill";
+            }
         }
 
         super.setTitle(str);
-        titleSegment = first;
+
+        cachedDocumentTitle = meta;
+        cachedChapterTitle = first;
     }
 
-    private transient Segment titleSegment;
+    private transient Metadata cachedDocumentTitle;
+
+    private transient Segment cachedChapterTitle;
 
     public void grabFocus() {
         editor.grabFocus();
@@ -1015,16 +1039,14 @@ class PrimaryWindow extends Window
         meta = folio.getMetadata();
         lang = meta.getDocumentLanguage();
 
-        dict = Enchant.requestDictionary(lang);
+        if (lang.equals("")) {
+            throw new AssertionError("Document specified an empty language code!");
+        }
 
-        if (dict == null) {
-            /*
-             * FIXME Replace this! We need to be resilient in the face of
-             * someone else loading the document. As it stands now, though,
-             * Bad Things™ will happen if we don't have a dictionary.
-             */
-            throw new AssertionError(
-                    "You specified a language that we don't know, so how can we spell check?!?");
+        if (Enchant.existsDictionary(lang)) {
+            dict = Enchant.requestDictionary(lang);
+        } else {
+            dict = null;
         }
     }
 

@@ -20,6 +20,7 @@ package quill.ui;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,14 +33,19 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 
 import org.freedesktop.enchant.Enchant;
+import org.gnome.gdk.EventFocus;
+import org.gnome.gdk.EventKey;
+import org.gnome.gdk.Keyval;
+import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnString;
-import org.gnome.gtk.Entry;
 import org.gnome.gtk.ListStore;
 import org.gnome.gtk.SelectionMode;
+import org.gnome.gtk.Statusbar;
 import org.gnome.gtk.TreeIter;
+import org.gnome.gtk.TreeModel;
 import org.gnome.gtk.TreeModelFilter;
 import org.gnome.gtk.TreeModelSort;
 import org.gnome.gtk.TreePath;
@@ -47,26 +53,66 @@ import org.gnome.gtk.TreeSelection;
 import org.gnome.gtk.TreeView;
 import org.gnome.gtk.TreeViewColumn;
 import org.gnome.gtk.VBox;
+import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 
 import static org.freedesktop.bindings.Internationalization._;
 import static org.freedesktop.bindings.Internationalization.translateCountryName;
 import static org.freedesktop.bindings.Internationalization.translateLanguageName;
+import static org.gnome.gtk.Alignment.CENTER;
+import static org.gnome.gtk.Alignment.LEFT;
 
 class LanguageSelectionButton extends Button
 {
+    private final Button button;
+
     private DictionarySelectionWindow window;
 
-    private String tag;
+    private String code;
 
-    LanguageSelectionButton() {
+    LanguageSelectionButton(PrimaryWindow primary) {
         super("xx_YY");
+        final int width;
 
+        button = this;
         window = new DictionarySelectionWindow(this);
+        window.setTransientFor(primary);
 
-        super.connect(new Button.Clicked() {
+        /*
+         * Set the size of the button to be the width of the widest display
+         * string. This is what ComboBox does by itself, but here we have to
+         * create a similar effect by hand.
+         */
+
+        width = window.getWidestDisplay();
+        button.setSizeRequest(width, -1);
+        button.setAlignment(LEFT, CENTER);
+
+        button.connect(new Button.Clicked() {
             public void onClicked(Button source) {
+                final Allocation alloc;
+                final org.gnome.gdk.Window underlying;
+                int x, y;
+
+                window.setCode(code);
+
+                underlying = button.getWindow();
+                x = underlying.getOriginX();
+                y = underlying.getOriginY();
+
+                alloc = button.getAllocation();
+                x += alloc.getX();
+                y += alloc.getY();
+
+                window.move(x, y);
                 window.show();
+            }
+        });
+
+        window.connect(new Widget.FocusOutEvent() {
+            public boolean onFocusOutEvent(Widget source, EventFocus event) {
+                window.hide();
+                return false;
             }
         });
     }
@@ -86,34 +132,35 @@ class LanguageSelectionButton extends Button
      * Callback from DictionarySelectionWindow
      */
     void setLanguage(String code, String display) {
-        super.setLabel(display);
+        button.setLabel(display);
 
-        if (code.equals(this.tag)) {
+        if (code.equals(this.code)) {
             return;
         }
-        this.tag = code;
+        this.code = code;
 
         handler.onChanged(this);
     }
 
-    String getTag() {
-        return tag;
+    String getCode() {
+        return code;
     }
 
     /**
      * Entry point from MetadataEditorWidget
      */
-    void setTag(String tag) {
+    void setCode(String tag) {
         final String display;
 
-        if (tag.equals(this.tag)) {
+        if (tag.equals(this.code)) {
             return;
         }
-        this.tag = tag;
+        this.code = tag;
 
-        display = window.lookupDisplayFor(tag);
+        window.setCode(tag);
+        display = window.getDisplayForSelected();
 
-        super.setLabel(display);
+        button.setLabel(display);
     }
 }
 
@@ -125,15 +172,15 @@ class LanguageSelectionButton extends Button
  */
 class DictionarySelectionWindow extends Window
 {
-    private final DictionarySelectionWindow self;
+    private final DictionarySelectionWindow window;
 
     private final LanguageSelectionButton enclosing;
 
-    private final VBox top;
-
-    private Entry search;
+    private VBox top;
 
     private TreeView view;
+
+    private Statusbar status;
 
     private ListStore store;
 
@@ -145,22 +192,43 @@ class DictionarySelectionWindow extends Window
 
     private DataColumnString displayColumn;
 
+    private TreeSelection selection;
+
+    private String code;
+
     DictionarySelectionWindow(LanguageSelectionButton button) {
         super();
-        self = this;
+        window = this;
         enclosing = button;
-        top = new VBox(false, 0);
-        super.add(top);
 
+        setupWindow();
         buildModel();
-        setupSearch();
         setupView();
+        setupStatusbar();
 
         populateModel();
 
+        hookupKeyboardSignals();
         hookupSelectionSignals();
-        super.showAll();
-        super.hide();
+        window.showAll();
+        window.hide();
+    }
+
+    private void setupWindow() {
+        window.setDecorated(false);
+
+        top = new VBox(false, 0);
+        window.add(top);
+    }
+
+    int getWidestDisplay() {
+        final Allocation alloc;
+        final int width;
+
+        alloc = window.getAllocation();
+        width = alloc.getWidth();
+
+        return width;
     }
 
     private void buildModel() {
@@ -172,12 +240,6 @@ class DictionarySelectionWindow extends Window
         });
         filtered = new TreeModelFilter(store, null);
         sorted = new TreeModelSort(filtered);
-    }
-
-    private void setupSearch() {
-        search = new Entry();
-
-        top.packStart(search, false, false, 0);
     }
 
     private void setupView() {
@@ -202,68 +264,108 @@ class DictionarySelectionWindow extends Window
         top.packStart(view, false, false, 0);
     }
 
+    private void setupStatusbar() {
+        status = new Statusbar();
+        status.setHasResizeGrip(false);
+        status.setBorderWidth(0);
+
+        top.packStart(status, false, false, 0);
+    }
+
     private void populateModel() {
         final String[] list;
         int i;
-        TreeIter row;
-        TagToTranslationTable table;
-        String tag, languageCode, languageName, countryCode, countryName, displayName;
-
-        table = new TagToTranslationTable();
 
         list = Enchant.listDictionaries();
 
         for (i = 0; i < list.length; i++) {
-            tag = list[i];
-
-            /*
-             * Parse [sic] the language tags to pull out ISO 639 language and
-             * ISO 3166 country codes.
-             */
-
-            if (tag.length() == 2) {
-                languageCode = tag;
-                countryCode = null;
-            } else if (tag.length() == 5) {
-                languageCode = tag.substring(0, 2);
-                countryCode = tag.substring(3, 5);
-            } else {
-                throw new AssertionError(
-                        "There's nothing wrong with an Enchant lang_tag being longer than \"fr_CA\", but how do we handle it?");
-            }
-
-            languageName = table.getName(languageCode);
-
-            if (languageName == null) {
-                continue; // huh, but ok
-            }
-
-            countryName = table.getCountryName(countryCode);
-            if (countryName == null) {
-                displayName = translateLanguageName(languageName);
-            } else {
-                displayName = translateLanguageName(languageName) + " ("
-                        + translateCountryName(countryName) + ")";
-            }
-
-            row = store.appendRow();
-            store.setValue(row, tagColumn, tag);
-            store.setValue(row, displayColumn, displayName);
+            insertTagIntoModel(list[i]);
         }
     }
 
-    private void hookupSelectionSignals() {
-        final TreeSelection selection;
+    /**
+     * This is called during normal population of the popup, of course, but is
+     * also available to be called if the document specifies a language we
+     * don't know about.
+     */
+    private void insertTagIntoModel(String tag) {
+        final LanguageTagTranslationTable table;
+        final TreeIter row;
+        final String languageCode;
+        final String languageName;
+        final String countryCode, countryName, displayName;
 
+        table = LanguageTagTranslationTable.getInstance();
+
+        /*
+         * Parse [sic] the language tags to pull out ISO 639 language and ISO
+         * 3166 country codes.
+         */
+
+        if (tag.length() == 2) {
+            languageCode = tag;
+            countryCode = null;
+        } else if (tag.length() == 5) {
+            languageCode = tag.substring(0, 2);
+            countryCode = tag.substring(3, 5);
+        } else {
+            /*
+             * There's nothing wrong with an Enchant lang_tag being longer
+             * than "fr_CA", but how do we handle it?
+             */
+            languageCode = null;
+            countryCode = null;
+        }
+
+        languageName = table.getLanguageName(languageCode);
+        countryName = table.getCountryName(countryCode);
+
+        if (languageName == null) {
+            /*
+             * Uncommon but possible case where the document language is
+             * something we have no understanding of.
+             */
+            displayName = _("Unknown");
+        } else if (countryName == null) {
+            displayName = translateLanguageName(languageName);
+        } else {
+            displayName = translateLanguageName(languageName) + " (" + translateCountryName(countryName)
+                    + ")";
+        }
+
+        row = store.appendRow();
+        store.setValue(row, tagColumn, tag);
+        store.setValue(row, displayColumn, displayName);
+    }
+
+    private void hookupKeyboardSignals() {
+        window.connect(new Widget.KeyPressEvent() {
+
+            public boolean onKeyPressEvent(Widget source, EventKey event) {
+                Keyval key;
+
+                key = event.getKeyval();
+                if (key == Keyval.Escape) {
+                    window.hide();
+                    return true;
+                }
+
+                return false;
+            }
+        });
+    }
+
+    private void hookupSelectionSignals() {
         selection = view.getSelection();
-        selection.setMode(SelectionMode.SINGLE);
+        selection.setMode(SelectionMode.BROWSE);
+        selection.unselectAll();
 
         view.connect(new TreeView.RowActivated() {
             public void onRowActivated(TreeView source, TreePath path, TreeViewColumn vertical) {
                 final TreeIter row;
                 final String code, display;
 
-                self.hide();
+                window.hide();
 
                 row = sorted.getIter(path);
 
@@ -273,29 +375,84 @@ class DictionarySelectionWindow extends Window
                 enclosing.setLanguage(code, display);
             }
         });
+
+        selection.connect(new TreeSelection.Changed() {
+            public void onChanged(TreeSelection source) {
+                final TreeIter row;
+                final String tag;
+
+                row = source.getSelected();
+                tag = sorted.getValue(row, tagColumn);
+
+                setTagOnStatusbar(tag);
+            }
+        });
+    }
+
+    private void setTagOnStatusbar(String tag) {
+        status.setMessage(" " + tag);
     }
 
     /**
      * Called on initial document load.
      */
-    String lookupDisplayFor(String str) {
-        final TreeIter row;
-        String tag, display;
+    void setCode(String code) {
+        TreeIter row;
+        final TreePath path;
 
-        row = store.getIterFirst();
+        this.code = code;
+
+        this.setTagOnStatusbar(code);
+        row = findTag(sorted, code);
+
+        if (row == null) {
+            this.insertTagIntoModel(code);
+            return;
+        }
+
+        /*
+         * Setting the selection is not enough. We also need to set the
+         * "cursor" which is the dotted marking of the current keyboard focus.
+         */
+
+        path = sorted.getPath(row);
+        view.setCursor(path, null, false);
+    }
+
+    private TreeIter findTag(TreeModel model, String code) {
+        final TreeIter row;
+        String tag;
+
+        row = model.getIterFirst();
         do {
-            tag = store.getValue(row, tagColumn);
-            if (str.equals(tag)) {
-                display = store.getValue(row, displayColumn);
-                return display;
+            tag = model.getValue(row, tagColumn);
+            if (code.equals(tag)) {
+                return row;
             }
         } while (row.iterNext());
 
-        /*
-         * If the language is unknown, we need to say so. But this should
-         * never occur!
-         */
-        return _("Unknown language");
+        return null;
+    }
+
+    /**
+     * Called on initial document load.
+     */
+    String getDisplayForSelected() {
+        final TreeIter row;
+        final String display;
+
+        row = findTag(store, code);
+
+        if (row != null) {
+            display = store.getValue(row, displayColumn);
+            return display;
+        } else {
+            /*
+             * If the language is unknown, we need to say so. But this should
+             * never occur!
+             */
+            return _("Unknown language");
+        }
     }
 }
 
@@ -310,13 +467,34 @@ class DictionarySelectionWindow extends Window
  * 
  * @author Andrew Cowie
  */
-class TagToTranslationTable
+class LanguageTagTranslationTable
 {
+    private static WeakReference<LanguageTagTranslationTable> ref;
+
+    static {
+        ref = new WeakReference<LanguageTagTranslationTable>(null);
+    }
+
+    /**
+     * Get the singleton instance of the translation table, reloading it if
+     * necessary.
+     */
+    static LanguageTagTranslationTable getInstance() {
+        LanguageTagTranslationTable table;
+
+        table = ref.get();
+        if (table == null) {
+            table = new LanguageTagTranslationTable();
+            ref = new WeakReference<LanguageTagTranslationTable>(table);
+        }
+        return table;
+    }
+
     Map<String, String> languages;
 
     Map<String, String> countries;
 
-    TagToTranslationTable() {
+    private LanguageTagTranslationTable() {
         // 185 languages
         languages = new HashMap<String, String>(190, 1.0f);
 
@@ -388,7 +566,7 @@ class TagToTranslationTable
         }
     }
 
-    String getName(String code) {
+    String getLanguageName(String code) {
         return languages.get(code);
     }
 

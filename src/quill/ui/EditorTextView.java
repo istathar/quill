@@ -1653,6 +1653,14 @@ abstract class EditorTextView extends TextView
         final TextIter start, finish;
 
         /*
+         * Sometimes we just don't have a dictionary, so bail out.
+         */
+
+        if (dict == null) {
+            return;
+        }
+
+        /*
          * Some blocks (ie PreformatSegment as presented by
          * PreformatEditorTextView) are, by design, entirely unchecked, so
          * bail out if so.
@@ -1870,5 +1878,14 @@ abstract class EditorTextView extends TextView
         insertSpanIntoBuffer(pointer, span);
 
         propagateTextualChange(offset, 0, width);
+    }
+
+    void forceRecheck() {
+        final PrimaryWindow primary;
+
+        primary = parent.getPrimary();
+        dict = primary.getDictionary();
+
+        checkSpellingRange(0, chain.length());
     }
 }
