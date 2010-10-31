@@ -32,6 +32,7 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 
 import org.freedesktop.enchant.Enchant;
+import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.CellRendererText;
@@ -40,7 +41,9 @@ import org.gnome.gtk.DataColumnString;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.ListStore;
 import org.gnome.gtk.SelectionMode;
+import org.gnome.gtk.Statusbar;
 import org.gnome.gtk.TreeIter;
+import org.gnome.gtk.TreeModel;
 import org.gnome.gtk.TreeModelFilter;
 import org.gnome.gtk.TreeModelSort;
 import org.gnome.gtk.TreePath;
@@ -48,6 +51,7 @@ import org.gnome.gtk.TreeSelection;
 import org.gnome.gtk.TreeView;
 import org.gnome.gtk.TreeViewColumn;
 import org.gnome.gtk.VBox;
+import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 
 import static org.freedesktop.bindings.Internationalization._;
@@ -62,14 +66,13 @@ class LanguageSelectionButton extends Button
 
     private DictionarySelectionWindow window;
 
-    private String tag;
+    private String code;
 
     LanguageSelectionButton() {
         super("xx_YY");
         final int width;
 
         button = this;
-
         window = new DictionarySelectionWindow(this);
 
         /*
@@ -84,6 +87,19 @@ class LanguageSelectionButton extends Button
 
         button.connect(new Button.Clicked() {
             public void onClicked(Button source) {
+                final Allocation alloc;
+                final org.gnome.gdk.Window underlying;
+                int x, y;
+
+                underlying = button.getWindow();
+                x = underlying.getOriginX();
+                y = underlying.getOriginY();
+
+                alloc = button.getAllocation();
+                x += alloc.getX();
+                y += alloc.getY();
+
+                window.move(x, y);
                 window.show();
             }
         });
@@ -104,34 +120,35 @@ class LanguageSelectionButton extends Button
      * Callback from DictionarySelectionWindow
      */
     void setLanguage(String code, String display) {
-        super.setLabel(display);
+        button.setLabel(display);
 
-        if (code.equals(this.tag)) {
+        if (code.equals(this.code)) {
             return;
         }
-        this.tag = code;
+        this.code = code;
 
         handler.onChanged(this);
     }
 
-    String getTag() {
-        return tag;
+    String getCode() {
+        return code;
     }
 
     /**
      * Entry point from MetadataEditorWidget
      */
-    void setTag(String tag) {
+    void setCode(String tag) {
         final String display;
 
-        if (tag.equals(this.tag)) {
+        if (tag.equals(this.code)) {
             return;
         }
-        this.tag = tag;
+        this.code = tag;
 
-        display = window.lookupDisplayFor(tag);
+        window.setCode(tag);
+        display = window.getDisplayForSelected();
 
-        super.setLabel(display);
+        button.setLabel(display);
     }
 }
 
@@ -147,11 +164,13 @@ class DictionarySelectionWindow extends Window
 
     private final LanguageSelectionButton enclosing;
 
-    private final VBox top;
+    private VBox top;
 
     private Entry search;
 
     private TreeView view;
+
+    private Statusbar status;
 
     private ListStore store;
 
@@ -163,22 +182,33 @@ class DictionarySelectionWindow extends Window
 
     private DataColumnString displayColumn;
 
+    private TreeSelection selection;
+
+    private String code;
+
     DictionarySelectionWindow(LanguageSelectionButton button) {
         super();
         window = this;
         enclosing = button;
-        top = new VBox(false, 0);
-        super.add(top);
 
+        setupWindow();
         buildModel();
         setupSearch();
         setupView();
+        setupStatusbar();
 
         populateModel();
 
         hookupSelectionSignals();
-        super.showAll();
-        super.hide();
+        window.showAll();
+        window.hide();
+    }
+
+    private void setupWindow() {
+        window.setDecorated(false);
+
+        top = new VBox(false, 0);
+        window.add(top);
     }
 
     int getWidestDisplay() {
@@ -188,9 +218,6 @@ class DictionarySelectionWindow extends Window
         alloc = window.getAllocation();
         width = alloc.getWidth();
 
-        if (width < 10) {
-            throw new AssertionError();
-        }
         return width;
     }
 
@@ -231,6 +258,14 @@ class DictionarySelectionWindow extends Window
         renderer.setText(displayColumn);
 
         top.packStart(view, false, false, 0);
+    }
+
+    private void setupStatusbar() {
+        status = new Statusbar();
+        status.setHasResizeGrip(false);
+        status.setBorderWidth(0);
+
+        top.packStart(status, false, false, 0);
     }
 
     private void populateModel() {
@@ -284,10 +319,9 @@ class DictionarySelectionWindow extends Window
     }
 
     private void hookupSelectionSignals() {
-        final TreeSelection selection;
-
         selection = view.getSelection();
         selection.setMode(SelectionMode.SINGLE);
+        selection.unselectAll();
 
         view.connect(new TreeView.RowActivated() {
             public void onRowActivated(TreeView source, TreePath path, TreeViewColumn vertical) {
@@ -304,29 +338,91 @@ class DictionarySelectionWindow extends Window
                 enclosing.setLanguage(code, display);
             }
         });
+
+        selection.connect(new TreeSelection.Changed() {
+            public void onChanged(TreeSelection source) {
+                final TreeIter row;
+                final String tag;
+
+                row = source.getSelected();
+                tag = sorted.getValue(row, tagColumn);
+
+                setTagOnStatusbar(tag);
+            }
+        });
+
+        view.connect(new Widget.FocusInEvent() {
+            public boolean onFocusInEvent(Widget source, EventFocus event) {
+                TreeIter row;
+
+                row = selection.getSelected();
+                if (row != null) {
+                    selection.selectRow(row);
+                } else {
+                    row = sorted.getIterFirst();
+                    selection.selectRow(row);
+                }
+                return false;
+            }
+        });
+    }
+
+    private void setTagOnStatusbar(String tag) {
+        status.setMessage(" " + tag);
     }
 
     /**
      * Called on initial document load.
      */
-    String lookupDisplayFor(String str) {
+    void setCode(String code) {
         final TreeIter row;
-        String tag, display;
 
-        row = store.getIterFirst();
+        this.code = code;
+
+        this.setTagOnStatusbar(code);
+        row = findTag(sorted, code);
+
+        if (row != null) {
+            selection.selectRow(row);
+        } else {
+            selection.unselectAll();
+        }
+    }
+
+    private TreeIter findTag(TreeModel model, String code) {
+        final TreeIter row;
+        String tag;
+
+        row = model.getIterFirst();
         do {
-            tag = store.getValue(row, tagColumn);
-            if (str.equals(tag)) {
-                display = store.getValue(row, displayColumn);
-                return display;
+            tag = model.getValue(row, tagColumn);
+            if (code.equals(tag)) {
+                return row;
             }
         } while (row.iterNext());
 
-        /*
-         * If the language is unknown, we need to say so. But this should
-         * never occur!
-         */
-        return _("Unknown language");
+        return null;
+    }
+
+    /**
+     * Called on initial document load.
+     */
+    String getDisplayForSelected() {
+        final TreeIter row;
+        final String display;
+
+        row = findTag(store, code);
+
+        if (row != null) {
+            display = store.getValue(row, displayColumn);
+            return display;
+        } else {
+            /*
+             * If the language is unknown, we need to say so. But this should
+             * never occur!
+             */
+            return _("Unknown language");
+        }
     }
 }
 

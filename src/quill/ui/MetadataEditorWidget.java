@@ -138,7 +138,7 @@ class MetadataEditorWidget extends VBox
                 final String value;
                 final Metadata replacement;
 
-                value = source.getTag();
+                value = source.getCode();
 
                 replacement = meta.changeDocumentLanguage(value);
                 propegateMetadataChange(replacement);
@@ -190,7 +190,7 @@ class MetadataEditorWidget extends VBox
         documentTitle.setText(str);
 
         str = meta.getDocumentLanguage();
-        documentLang.setTag(str);
+        documentLang.setCode(str);
 
         str = meta.getAuthorName();
         authorName.setText(str);
