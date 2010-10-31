@@ -51,7 +51,9 @@ class MetadataEditorWidget extends VBox
      */
     private Metadata meta;
 
-    private Entry documentTitle, documentLang, authorName;
+    private Entry documentTitle, authorName;
+
+    private LanguageSelectionButton documentLang;
 
     /**
      * SizeGroup to keep the subheading Labels aligned.
@@ -126,22 +128,17 @@ class MetadataEditorWidget extends VBox
 
         label = new Label(_("Language") + ":");
 
-        documentLang = new Entry();
-        documentLang.setWidthChars(8);
+        documentLang = new LanguageSelectionButton();
         suffix = new Label("<i>(" + _("for spell checking") + ")</i>");
         suffix.setUseMarkup(true);
         box = new KeyValueBox(group, label, documentLang, suffix);
         top.packStart(box, false, false, 0);
-        documentLang.connect(new Entry.Activate() {
-            public void onActivate(Entry source) {
+        documentLang.connect(new LanguageSelectionButton.Changed() {
+            public void onChanged(LanguageSelectionButton source) {
                 final String value;
                 final Metadata replacement;
 
-                if (loading) {
-                    return;
-                }
-
-                value = source.getText();
+                value = source.getCode();
 
                 replacement = meta.changeDocumentLanguage(value);
                 propegateMetadataChange(replacement);
@@ -193,7 +190,7 @@ class MetadataEditorWidget extends VBox
         documentTitle.setText(str);
 
         str = meta.getDocumentLanguage();
-        documentLang.setText(str);
+        documentLang.setCode(str);
 
         str = meta.getAuthorName();
         authorName.setText(str);

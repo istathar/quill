@@ -32,6 +32,7 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 
 import org.freedesktop.enchant.Enchant;
+import org.gnome.gtk.Button;
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnString;
@@ -48,8 +49,69 @@ import org.gnome.gtk.TreeViewColumn;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Window;
 
+import static org.freedesktop.bindings.Internationalization._;
 import static org.freedesktop.bindings.Internationalization.translateCountryName;
 import static org.freedesktop.bindings.Internationalization.translateLanguageName;
+
+class LanguageSelectionButton extends Button
+{
+    private DictionarySelectionWindow window;
+
+    private String code;
+
+    LanguageSelectionButton() {
+        super("xx_YY");
+
+        window = new DictionarySelectionWindow(this);
+
+        super.connect(new Button.Clicked() {
+            public void onClicked(Button source) {
+                window.show();
+            }
+        });
+    }
+
+    private LanguageSelectionButton.Changed handler;
+
+    interface Changed
+    {
+        void onChanged(LanguageSelectionButton source);
+    }
+
+    void connect(LanguageSelectionButton.Changed handler) {
+        this.handler = handler;
+    }
+
+    /**
+     * Callback from DictionarySelectionWindow
+     */
+    void setLanguage(String code, String display) {
+        super.setLabel(display);
+
+        if (code.equals(this.code)) {
+            return;
+        }
+
+        handler.onChanged(this);
+    }
+
+    String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        final String display;
+
+        if (code.equals(this.code)) {
+            return;
+        }
+        this.code = code;
+
+        display = window.lookupDisplayFor(code);
+
+        super.setLabel(display);
+    }
+}
 
 /**
  * Popup a window to allow the user to select which (of the installed)
@@ -59,6 +121,10 @@ import static org.freedesktop.bindings.Internationalization.translateLanguageNam
  */
 class DictionarySelectionWindow extends Window
 {
+    private final DictionarySelectionWindow self;
+
+    private final LanguageSelectionButton enclosing;
+
     private final VBox top;
 
     private Entry search;
@@ -75,9 +141,10 @@ class DictionarySelectionWindow extends Window
 
     private DataColumnString displayColumn;
 
-    DictionarySelectionWindow() {
+    DictionarySelectionWindow(LanguageSelectionButton button) {
         super();
-
+        self = this;
+        enclosing = button;
         top = new VBox(false, 0);
         super.add(top);
 
@@ -88,6 +155,8 @@ class DictionarySelectionWindow extends Window
         populateModel();
 
         hookupSelectionSignals();
+        super.showAll();
+        super.hide();
     }
 
     private void buildModel() {
@@ -156,7 +225,7 @@ class DictionarySelectionWindow extends Window
                 countryCode = code.substring(3, 5);
             } else {
                 throw new AssertionError(
-                        "There's nothing wrong with an Enchant lang_tag being longer than fr_CA, but how do we handle it?");
+                        "There's nothing wrong with an Enchant lang_tag being longer than \"fr_CA\", but how do we handle it?");
             }
 
             languageName = table.getName(languageCode);
@@ -188,12 +257,41 @@ class DictionarySelectionWindow extends Window
         view.connect(new TreeView.RowActivated() {
             public void onRowActivated(TreeView source, TreePath path, TreeViewColumn vertical) {
                 final TreeIter row;
+                final String code, display;
+
+                self.hide();
 
                 row = sorted.getIter(path);
-                row.getClass();
-                // TODO
+
+                code = sorted.getValue(row, tagColumn);
+                display = sorted.getValue(row, displayColumn);
+
+                enclosing.setLanguage(code, display);
             }
         });
+    }
+
+    /**
+     * // * Called on initial document load.
+     */
+    String lookupDisplayFor(String code) {
+        final TreeIter row;
+        String tag, display;
+
+        row = store.getIterFirst();
+        do {
+            tag = store.getValue(row, tagColumn);
+            if (tag.equals(code)) {
+                display = store.getValue(row, displayColumn);
+                return display;
+            }
+        } while (row.iterNext());
+
+        /*
+         * If the language is unknown, we need to say so. But this should
+         * never occur!
+         */
+        return _("Unknown language");
     }
 }
 
