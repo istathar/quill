@@ -291,7 +291,9 @@ class DictionarySelectionWindow extends Window
     private void insertTagIntoModel(String tag) {
         final LanguageTagTranslationTable table;
         final TreeIter row;
-        final String languageCode, languageName, countryCode, countryName, displayName;
+        final String languageCode;
+        final String languageName;
+        final String countryCode, countryName, displayName;
 
         table = LanguageTagTranslationTable.getInstance();
 
@@ -307,18 +309,24 @@ class DictionarySelectionWindow extends Window
             languageCode = tag.substring(0, 2);
             countryCode = tag.substring(3, 5);
         } else {
-            throw new AssertionError(
-                    "There's nothing wrong with an Enchant lang_tag being longer than \"fr_CA\", but how do we handle it?");
+            /*
+             * There's nothing wrong with an Enchant lang_tag being longer
+             * than "fr_CA", but how do we handle it?
+             */
+            languageCode = null;
+            countryCode = null;
         }
 
-        languageName = table.getName(languageCode);
+        languageName = table.getLanguageName(languageCode);
+        countryName = table.getCountryName(countryCode);
 
         if (languageName == null) {
-            return; // huh? but ok
-        }
-
-        countryName = table.getCountryName(countryCode);
-        if (countryName == null) {
+            /*
+             * Uncommon but possible case where the document language is
+             * something we have no understanding of.
+             */
+            displayName = _("Unknown");
+        } else if (countryName == null) {
             displayName = translateLanguageName(languageName);
         } else {
             displayName = translateLanguageName(languageName) + " (" + translateCountryName(countryName)
@@ -389,7 +397,7 @@ class DictionarySelectionWindow extends Window
      * Called on initial document load.
      */
     void setCode(String code) {
-        final TreeIter row;
+        TreeIter row;
         final TreePath path;
 
         this.code = code;
@@ -397,19 +405,18 @@ class DictionarySelectionWindow extends Window
         this.setTagOnStatusbar(code);
         row = findTag(sorted, code);
 
-        if (row != null) {
-            /*
-             * Setting the selection is not enough. We also need to set the
-             * "cursor" which is the dotted marking of the current keyboard
-             * focus.
-             */
-
-            path = sorted.getPath(row);
-            view.setCursor(path, null, false);
-        } else {
-            insertTagIntoModel(code);
-            setCode(code);
+        if (row == null) {
+            this.insertTagIntoModel(code);
+            return;
         }
+
+        /*
+         * Setting the selection is not enough. We also need to set the
+         * "cursor" which is the dotted marking of the current keyboard focus.
+         */
+
+        path = sorted.getPath(row);
+        view.setCursor(path, null, false);
     }
 
     private TreeIter findTag(TreeModel model, String code) {
@@ -559,7 +566,7 @@ class LanguageTagTranslationTable
         }
     }
 
-    String getName(String code) {
+    String getLanguageName(String code) {
         return languages.get(code);
     }
 
