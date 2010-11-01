@@ -47,6 +47,7 @@ import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.TextChain;
 
+import static org.gnome.glib.Glib.markupEscapeText;
 import static org.gnome.gtk.SizeGroupMode.HORIZONTAL;
 
 /**
@@ -89,8 +90,7 @@ class OutlineWidget extends ScrolledWindow
         Chapter chapter;
         String str;
         Series series;
-        HBox sides;
-        VBox left, right;
+        HBox box;
         Segment segment;
         int i, j;
         Extract entire;
@@ -118,33 +118,39 @@ class OutlineWidget extends ScrolledWindow
         buf.append("</span>");
         buf.append("</span>");
 
-        label = createHeadingLabel(buf.toString());
+        label = createHeadingButton(buf.toString());
         top.packStart(label, false, false, 3);
         buf.setLength(0);
 
         for (j = 0; j < folio.size(); j++) {
             series = folio.getSeries(j);
 
-            left = new VBox(false, 0);
-            right = new VBox(false, 0);
-
-            chapter = folio.getChapter(j);
-            str = chapter.getRelative();
-            label = new Label(str);
-            label.setAlignment(Alignment.LEFT, Alignment.CENTER);
-            right.packStart(label, false, false, 0);
-
             for (i = 0; i < series.size(); i++) {
                 segment = series.getSegment(i);
 
                 buf.setLength(0);
+                box = new HBox(false, 0);
 
                 if (segment instanceof ComponentSegment) {
+
                     entire = segment.getEntire();
 
                     buf.append("<span size='x-large'> ");
                     buf.append(entire.getText());
                     buf.append("</span>");
+
+                    button = new Button();
+                    button.setRelief(ReliefStyle.NONE);
+                    label = createHeadingButton(buf.toString());
+                    button.add(label);
+                    box.packStart(button, false, false, 0);
+
+                    chapter = folio.getChapter(j);
+                    str = chapter.getRelative();
+                    label = createFilenameLabel(str);
+                    label.setAlignment(Alignment.LEFT, Alignment.CENTER);
+                    box.packStart(label, false, false, 0);
+
                 } else if (segment instanceof HeadingSegment) {
                     entire = segment.getEntire();
 
@@ -152,17 +158,20 @@ class OutlineWidget extends ScrolledWindow
                     buf.append("      ");
                     buf.append(entire.getText());
 
+                    button = new Button();
+                    button.setRelief(ReliefStyle.NONE);
+                    label = createHeadingButton(buf.toString());
+                    button.add(label);
+                    box.packStart(button, false, false, 0);
+
                 } else if (segment instanceof ImageSegment) {
                     Image image;
-                    HBox spacer;
 
                     image = new Image(images.graphic);
                     image.setAlignment(Alignment.LEFT, Alignment.TOP);
                     image.setPadding(40, 3);
-                    spacer = new HBox(false, 0);
-                    spacer.packStart(image, false, false, 0);
-                    left.packStart(spacer, false, false, 0);
-                    continue;
+
+                    box.packStart(image, false, false, 0);
                 } else {
                     entire = segment.getEntire();
 
@@ -171,28 +180,17 @@ class OutlineWidget extends ScrolledWindow
                     } else {
                         lines = new CompressedLines(entire, false);
                     }
-                    left.packStart(lines, false, false, 0);
-                    continue;
+                    box.packStart(lines, false, false, 0);
                 }
 
-                button = new Button();
-                button.setRelief(ReliefStyle.NONE);
-                label = createHeadingLabel(buf.toString());
-                button.add(label);
-
-                left.packStart(button, false, false, 0);
+                top.packStart(box, false, false, 0);
             }
-
-            sides = new HBox(false, 0);
-            sides.packStart(left, false, false, 0);
-            sides.packStart(right, false, false, 0);
-            top.packStart(sides, false, false, 0);
         }
 
         top.showAll();
     }
 
-    private Label createHeadingLabel(String str) {
+    private Label createHeadingButton(String str) {
         final Label result;
 
         result = new Label(str);
@@ -214,6 +212,25 @@ class OutlineWidget extends ScrolledWindow
         result.setMaxWidthChars(32);
 
         group.add(result);
+
+        return result;
+    }
+
+    private Label createFilenameLabel(String str) {
+        final Label result;
+
+        /*
+         * It would be better if this colour was taken from quill.ui.Format,
+         * seeing as how we're using the same visual as used for <filename>
+         * markup in EditorTextView.
+         */
+        result = new Label("<span color='darkgreen'><tt>" + markupEscapeText(str) + "</tt></span>");
+        result.setUseMarkup(true);
+
+        result.setAlignment(Alignment.LEFT, Alignment.TOP);
+
+        result.setEllipsize(EllipsizeMode.START);
+        result.setMaxWidthChars(32);
 
         return result;
     }
