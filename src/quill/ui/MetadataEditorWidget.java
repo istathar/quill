@@ -182,13 +182,16 @@ class MetadataEditorWidget extends VBox
             }
         });
 
+        heading = new Label("<b>" + _("Language") + "</b>");
+        heading.setUseMarkup(true);
+        heading.setAlignment(LEFT, CENTER);
+        top.packStart(heading, false, false, 6);
+
         pair = new VBox(false, 0);
-        label = new Label(_("Language") + ":");
+        label = new Label(_("Spelling") + ":");
 
         documentLang = new LanguageSelectionButton(primary);
-        suffix = new Label("<i>(" + _("for spell checking") + ")</i>");
-        suffix.setUseMarkup(true);
-        box = new KeyValueBox(group, label, documentLang, suffix);
+        box = new KeyValueBox(group, label, documentLang, false);
         pair.packStart(box, false, false, 0);
         documentLang.connect(new LanguageSelectionButton.Changed() {
             public void onChanged(LanguageSelectionButton source) {
