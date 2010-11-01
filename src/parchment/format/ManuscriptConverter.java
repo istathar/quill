@@ -160,7 +160,7 @@ class ManuscriptConverter
 
     private void buildMetadata(final Folio folio) {
         final Metadata meta;
-        ManuscriptElement document, author;
+        ManuscriptElement document, author, spelling;
         Attribute attribute;
         String value;
 
@@ -170,9 +170,6 @@ class ManuscriptConverter
         value = meta.getDocumentTitle();
         attribute = new Attribute("title", value);
         document.addAttribute(attribute);
-        value = meta.getDocumentLanguage();
-        attribute = new Attribute("lang", value);
-        document.addAttribute(attribute);
         metadata.appendChild(document);
 
         author = new ManuscriptElement("author");
@@ -180,6 +177,12 @@ class ManuscriptConverter
         attribute = new Attribute("name", value);
         author.addAttribute(attribute);
         metadata.appendChild(author);
+
+        spelling = new ManuscriptElement("spelling");
+        value = meta.getSpellingLanguage();
+        attribute = new Attribute("lang", value);
+        spelling.addAttribute(attribute);
+        metadata.appendChild(spelling);
     }
 
     /**

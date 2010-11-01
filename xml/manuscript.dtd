@@ -64,14 +64,16 @@
 
 <!-- document metadata -->
 
-<!ELEMENT metadata (document, author)>
+<!ELEMENT metadata (document, author, spelling)>
 
 <!ELEMENT document EMPTY>
 <!ATTLIST document title CDATA #REQUIRED>
-<!ATTLIST document lang CDATA #REQUIRED>
 
 <!ELEMENT author EMPTY>
 <!ATTLIST author name CDATA #REQUIRED>
+
+<!ELEMENT spelling EMPTY>
+<!ATTLIST spelling lang CDATA #REQUIRED>
 
 <!--
   vim: set textwidth=78 nowrap:

@@ -195,15 +195,15 @@ class ManuscriptLoader
 
     private void processMetadata(final Element metadata) throws InvalidDocumentException {
         final Elements children;
-        final String documentTitle, documentLang, authorName;
+        final String documentTitle, spellingLang, authorName;
 
         children = metadata.getChildElements();
 
         documentTitle = getMetadataValue(children, 0, "document", "title");
-        documentLang = getMetadataValue(children, 0, "document", "lang");
         authorName = getMetadataValue(children, 1, "author", "name");
+        spellingLang = getMetadataValue(children, 2, "spelling", "lang");
 
-        metadataDetails = new Metadata(documentTitle, documentLang, authorName);
+        metadataDetails = new Metadata(documentTitle, authorName, spellingLang);
     }
 
     // this is a clone of getPresentationValue with errors tuned

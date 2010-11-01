@@ -16,30 +16,40 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package parchment.render;
+package quill.ui;
 
-import parchment.format.Metadata;
-import quill.ui.GraphicalTestCase;
+import org.gnome.gtk.HBox;
+import org.gnome.gtk.Label;
+import org.gnome.gtk.SizeGroup;
+import org.gnome.gtk.Widget;
+
+import static org.gnome.gtk.Alignment.CENTER;
+import static org.gnome.gtk.Alignment.RIGHT;
 
 /**
- * Check the validation logic when converting from Stylesheets to
- * RenderSettings.
+ * Simple convenience wrapper to put a label and an active control into a
+ * consistently spaced HBox.
  * 
  * @author Andrew Cowie
  */
-public class ValidateMetadata extends GraphicalTestCase
+class KeyValueBox extends HBox
 {
-    /*
-     * The values here don't matter; they just have to match the ones in
-     * Stylesheet so that our subsequent tests have known (here) values.
+    /**
+     * @param expand
+     *            Whether or not to give extra space to value Widget
      */
-    public final void testMetadataDefault() {
-        final Metadata meta;
+    KeyValueBox(SizeGroup size, Label label, Widget value, boolean expand) {
+        super(false, 0);
 
-        meta = new Metadata();
+        super.packStart(label, false, false, 3);
+        label.setAlignment(RIGHT, CENTER);
+        size.add(label);
 
-        assertEquals("Untitled", meta.getDocumentTitle());
-        assertEquals("en_CA", meta.getSpellingLanguage());
-        assertEquals("", meta.getAuthorName());
+        super.packStart(value, expand, expand, 3);
+    }
+
+    KeyValueBox(SizeGroup size, Label label, Widget value, Widget suffix) {
+        this(size, label, value, false);
+        super.packStart(suffix, false, false, 3);
     }
 }

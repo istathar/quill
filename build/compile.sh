@@ -29,7 +29,7 @@ if [ -s tmp/stamp/list-core ] ; then
 	echo -n "${JAVAC_CMD}"
 	sed -e 's/^/\t/' < tmp/stamp/list-core
 	${JAVAC} \
-		-classpath ${GNOME_JARS}:${XOM_JARS} \
+		-classpath ${GNOME_JARS}:${XOM_JARS}:tmp/classes \
 		-d tmp/classes \
 		-sourcepath src \
 		`cat tmp/stamp/list-core`

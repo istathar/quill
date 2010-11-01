@@ -279,7 +279,7 @@ class PrimaryWindow extends Window
     }
 
     private void setupEditorSide() {
-        final Alignment align;
+        Alignment align;
 
         left = new Notebook();
         left.setShowTabs(false);
@@ -297,7 +297,11 @@ class PrimaryWindow extends Window
         left.insertPage(align, null, 1);
 
         metaditor = new MetadataEditorWidget(this);
-        left.insertPage(metaditor, null, 2);
+        align = new Alignment();
+        align.setAlignment(Alignment.LEFT, Alignment.TOP, 1.0f, 1.0f);
+        align.setPadding(0, 0, 3, 0);
+        align.add(metaditor);
+        left.insertPage(align, null, 2);
 
         pane.add1(left);
     }
@@ -658,7 +662,18 @@ class PrimaryWindow extends Window
         } else {
             if (chapterTitle.equals("")) {
                 str = documentTitle + " - Quill";
+            } else if (chapterTitle.equalsIgnoreCase(documentTitle)) {
+                /*
+                 * Special case, but when you've got an essay with a single
+                 * chapter and the document title and the chapter title are
+                 * the same, seeing the same text twice looks silly. So just
+                 * use one.
+                 */
+                str = documentTitle + " - Quill";
             } else {
+                /*
+                 * Normal usage: show chapter and document title.
+                 */
                 str = chapterTitle + " - " + documentTitle + " - Quill";
             }
         }
@@ -1037,7 +1052,7 @@ class PrimaryWindow extends Window
         final String lang;
 
         meta = folio.getMetadata();
-        lang = meta.getDocumentLanguage();
+        lang = meta.getSpellingLanguage();
 
         if (lang.equals("")) {
             throw new AssertionError("Document specified an empty language code!");

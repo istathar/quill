@@ -146,38 +146,6 @@ class MetadataEditorWidget extends VBox
             }
         });
 
-        pair = new VBox(false, 0);
-        label = new Label(_("Language") + ":");
-
-        documentLang = new LanguageSelectionButton(primary);
-        suffix = new Label("<i>(" + _("for spell checking") + ")</i>");
-        suffix.setUseMarkup(true);
-        box = new KeyValueBox(group, label, documentLang, suffix);
-        pair.packStart(box, false, false, 0);
-        documentLang.connect(new LanguageSelectionButton.Changed() {
-            public void onChanged(LanguageSelectionButton source) {
-                final String value;
-                final Metadata replacement;
-
-                value = source.getCode();
-
-                replacement = meta.changeDocumentLanguage(value);
-                propegateMetadataChange(replacement);
-
-                enchantCode.setLabel("<tt>" + markupEscapeText(value) + "</tt>");
-            }
-        });
-
-        label = new Label(_("Dictionary") + ":");
-        enchantCode = new Label("<tt>xx_YY</tt>");
-        enchantCode.setUseMarkup(true);
-        enchantCode.setAlignment(LEFT, CENTER);
-        enchantCode.setPadding(4, 0);
-
-        box = new KeyValueBox(group, label, enchantCode, false);
-        pair.packStart(box, false, false, 0);
-        top.packStart(pair, false, false, 6);
-
         label = new Label(_("Author") + ":");
 
         authorName = new Entry();
@@ -213,6 +181,41 @@ class MetadataEditorWidget extends VBox
                 return false;
             }
         });
+
+        heading = new Label("<b>" + _("Language") + "</b>");
+        heading.setUseMarkup(true);
+        heading.setAlignment(LEFT, CENTER);
+        top.packStart(heading, false, false, 6);
+
+        pair = new VBox(false, 0);
+        label = new Label(_("Spelling") + ":");
+
+        documentLang = new LanguageSelectionButton(primary);
+        box = new KeyValueBox(group, label, documentLang, false);
+        pair.packStart(box, false, false, 0);
+        documentLang.connect(new LanguageSelectionButton.Changed() {
+            public void onChanged(LanguageSelectionButton source) {
+                final String value;
+                final Metadata replacement;
+
+                value = source.getCode();
+
+                replacement = meta.changeSpellingLanguage(value);
+                propegateMetadataChange(replacement);
+
+                enchantCode.setLabel("<tt>" + markupEscapeText(value) + "</tt>");
+            }
+        });
+
+        label = new Label(_("Dictionary") + ":");
+        enchantCode = new Label("<tt>xx_YY</tt>");
+        enchantCode.setUseMarkup(true);
+        enchantCode.setAlignment(LEFT, CENTER);
+        enchantCode.setPadding(4, 0);
+
+        box = new KeyValueBox(group, label, enchantCode, false);
+        pair.packStart(box, false, false, 0);
+        top.packStart(pair, false, false, 6);
     }
 
     void initializeMetadata(Folio folio) {
@@ -236,7 +239,7 @@ class MetadataEditorWidget extends VBox
         str = meta.getDocumentTitle();
         documentTitle.setText(str);
 
-        str = meta.getDocumentLanguage();
+        str = meta.getSpellingLanguage();
         documentLang.setCode(str);
         enchantCode.setLabel("<tt>" + markupEscapeText(str) + "</tt>");
 
