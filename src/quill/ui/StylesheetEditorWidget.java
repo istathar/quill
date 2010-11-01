@@ -51,7 +51,6 @@ import quill.textbase.Folio;
 import static org.freedesktop.bindings.Internationalization._;
 import static org.gnome.gtk.Alignment.CENTER;
 import static org.gnome.gtk.Alignment.LEFT;
-import static org.gnome.gtk.Alignment.RIGHT;
 import static org.gnome.gtk.Alignment.TOP;
 
 /**
@@ -582,28 +581,6 @@ class StylesheetEditorWidget extends VBox
     private void setupFontPreview() {
         preview = new FontHeightDisplay();
         top.packStart(preview, true, true, 0);
-    }
-}
-
-class KeyValueBox extends HBox
-{
-    /**
-     * @param expand
-     *            Whether or not to give extra space to value Widget
-     */
-    KeyValueBox(SizeGroup size, Label label, Widget value, boolean expand) {
-        super(false, 0);
-
-        super.packStart(label, false, false, 3);
-        label.setAlignment(RIGHT, CENTER);
-        size.add(label);
-
-        super.packStart(value, expand, expand, 3);
-    }
-
-    KeyValueBox(SizeGroup size, Label label, Widget value, Widget suffix) {
-        this(size, label, value, false);
-        super.packStart(suffix, false, false, 3);
     }
 }
 
