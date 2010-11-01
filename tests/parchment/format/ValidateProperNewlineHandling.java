@@ -91,7 +91,7 @@ public class ValidateProperNewlineHandling extends ParchmentTestCase
 
         blob = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.3\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
                 "<text>",
                 "Hello",
                 "</text>",

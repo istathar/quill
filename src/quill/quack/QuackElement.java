@@ -34,7 +34,7 @@ import nu.xom.Serializer;
 abstract class QuackElement extends Element
 {
     QuackElement(String name) {
-        super(name, "http://namespace.operationaldynamics.com/parchment/0.3");
+        super(name, "http://namespace.operationaldynamics.com/parchment/0.4");
     }
 
     void add(Tag tag) {

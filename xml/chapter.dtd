@@ -21,7 +21,7 @@
 -->
 
 <!ELEMENT chapter (title?,(heading | text | code | quote | image | poem | credit)*,endnote*,reference*)>
-<!ATTLIST chapter xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/0.3">
+<!ATTLIST chapter xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/0.4">
 
 <!-- block level  -->
 
