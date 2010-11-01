@@ -73,13 +73,10 @@ class OutlineWidget extends ScrolledWindow
 
     public OutlineWidget() {
         super();
-        final HBox spacer;
         scroll = this;
 
-        spacer = new HBox(false, 0);
         top = new VBox(false, 0);
-        spacer.packStart(top, false, false, 0);
-        scroll.addWithViewport(spacer);
+        scroll.addWithViewport(top);
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
 
         folio = null;
@@ -118,9 +115,18 @@ class OutlineWidget extends ScrolledWindow
         buf.append("</span>");
         buf.append("</span>");
 
-        label = createHeadingButton(buf.toString());
-        top.packStart(label, false, false, 3);
+        label = createHeadingLabel(buf.toString());
+
+        box = new HBox(false, 0);
+        box.packStart(label, false, false, 3);
+
         buf.setLength(0);
+        buf.append(folio.getManuscript().getBasename());
+        buf.append(".parchment");
+        label = createFilenameLabel(buf.toString());
+        box.packStart(label, true, true, 3);
+
+        top.packStart(box, false, false, 3);
 
         for (j = 0; j < folio.size(); j++) {
             series = folio.getSeries(j);
@@ -141,7 +147,7 @@ class OutlineWidget extends ScrolledWindow
 
                     button = new Button();
                     button.setRelief(ReliefStyle.NONE);
-                    label = createHeadingButton(buf.toString());
+                    label = createHeadingLabel(buf.toString());
                     button.add(label);
                     box.packStart(button, false, false, 0);
 
@@ -149,7 +155,7 @@ class OutlineWidget extends ScrolledWindow
                     str = chapter.getRelative();
                     label = createFilenameLabel(str);
                     label.setAlignment(Alignment.LEFT, Alignment.CENTER);
-                    box.packStart(label, false, false, 0);
+                    box.packStart(label, true, true, 0);
 
                 } else if (segment instanceof HeadingSegment) {
                     entire = segment.getEntire();
@@ -160,7 +166,7 @@ class OutlineWidget extends ScrolledWindow
 
                     button = new Button();
                     button.setRelief(ReliefStyle.NONE);
-                    label = createHeadingButton(buf.toString());
+                    label = createHeadingLabel(buf.toString());
                     button.add(label);
                     box.packStart(button, false, false, 0);
 
@@ -190,7 +196,7 @@ class OutlineWidget extends ScrolledWindow
         top.showAll();
     }
 
-    private Label createHeadingButton(String str) {
+    private Label createHeadingLabel(String str) {
         final Label result;
 
         result = new Label(str);
@@ -227,10 +233,9 @@ class OutlineWidget extends ScrolledWindow
         result = new Label("<span color='darkgreen'><tt>" + markupEscapeText(str) + "</tt></span>");
         result.setUseMarkup(true);
 
-        result.setAlignment(Alignment.LEFT, Alignment.TOP);
+        result.setAlignment(Alignment.LEFT, Alignment.CENTER);
 
         result.setEllipsize(EllipsizeMode.START);
-        result.setMaxWidthChars(32);
 
         return result;
     }
