@@ -36,6 +36,7 @@ import org.gnome.gtk.Widget;
 import org.gnome.pango.EllipsizeMode;
 
 import parchment.format.Chapter;
+import parchment.format.Manuscript;
 import parchment.format.Metadata;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
@@ -83,9 +84,10 @@ class OutlineWidget extends ScrolledWindow
     }
 
     private void buildOutline() {
-        Metadata meta;
+        final Metadata meta;
+        final Manuscript manuscript;
+        final Alignment align;
         Chapter chapter;
-        String str;
         Series series;
         HBox box;
         Segment segment;
@@ -116,16 +118,23 @@ class OutlineWidget extends ScrolledWindow
         buf.append("</span>");
 
         label = createHeadingLabel(buf.toString());
+        align = new Alignment(Alignment.LEFT, Alignment.CENTER, 0.0f, 0.0f);
+        align.add(label);
+        align.setPadding(0, 0, 0, 2);
 
         box = new HBox(false, 0);
-        box.packStart(label, false, false, 3);
+        box.packStart(align, false, false, 3);
+
+        /*
+         * Document filename
+         */
 
         buf.setLength(0);
-        buf.append(folio.getManuscript().getBasename());
-        buf.append(".parchment");
-        label = createFilenameLabel(buf.toString());
-        box.packStart(label, true, true, 3);
+        manuscript = folio.getManuscript();
 
+        label = createManuscriptFilenameLabel(manuscript);
+
+        box.packStart(label, true, true, 0);
         top.packStart(box, false, false, 3);
 
         for (j = 0; j < folio.size(); j++) {
@@ -152,8 +161,7 @@ class OutlineWidget extends ScrolledWindow
                     box.packStart(button, false, false, 0);
 
                     chapter = folio.getChapter(j);
-                    str = chapter.getRelative();
-                    label = createFilenameLabel(str);
+                    label = createChapterFilenameLabel(chapter);
                     label.setAlignment(Alignment.LEFT, Alignment.CENTER);
                     box.packStart(label, true, true, 0);
 
@@ -222,17 +230,41 @@ class OutlineWidget extends ScrolledWindow
         return result;
     }
 
-    private Label createFilenameLabel(String str) {
+    private static Label createChapterFilenameLabel(final Chapter chapter) {
         final Label result;
+        final String str;
+
+        str = chapter.getRelative();
 
         /*
          * It would be better if this colour was taken from quill.ui.Format,
          * seeing as how we're using the same visual as used for <filename>
          * markup in EditorTextView.
          */
+
         result = new Label("<span color='darkgreen'><tt>" + markupEscapeText(str) + "</tt></span>");
         result.setUseMarkup(true);
 
+        result.setAlignment(Alignment.LEFT, Alignment.CENTER);
+
+        result.setEllipsize(EllipsizeMode.START);
+
+        return result;
+    }
+
+    private static Label createManuscriptFilenameLabel(final Manuscript manuscript) {
+        String str;
+        final String dir, file;
+        final Label result;
+
+        str = manuscript.getDirectory();
+        dir = str.replace(System.getenv("HOME"), "~");
+
+        file = manuscript.getBasename() + ".parchment";
+
+        result = new Label("<span color='darkgreen' size='x-small'><tt>" + markupEscapeText(dir)
+                + "</tt></span>\n<span color='darkgreen'><tt>" + markupEscapeText(file) + "</tt></span>");
+        result.setUseMarkup(true);
         result.setAlignment(Alignment.LEFT, Alignment.CENTER);
 
         result.setEllipsize(EllipsizeMode.START);
