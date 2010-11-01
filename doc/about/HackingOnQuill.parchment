@@ -15,7 +15,8 @@
     <font heading="Linux Libertine O C" size="5.6"/>
   </presentation>
   <metadata>
-    <document title="Hacking on Quill" lang="en_CA"/>
+    <document title="Hacking on Quill"/>
     <author name="Andrew Cowie"/>
+    <spelling lang="en_CA"/>
   </metadata>
 </manuscript>

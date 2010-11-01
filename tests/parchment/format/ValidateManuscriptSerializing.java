@@ -70,7 +70,7 @@ public class ValidateManuscriptSerializing extends IOTestCase
         style = new Stylesheet("parchment.render.ReportRenderEngine", "A4", "15.0", "20.0", "12.5",
                 "10.0", "Linux Libertine", "Liberation Sans", "Inconsolata", "Linux Libertine O C",
                 "3.2", "2.6", "3.0", "5.6");
-        meta = new Metadata("Untitled", "en_CA", "");
+        meta = new Metadata("Untitled", "", "en_CA");
 
         folio = new Folio(manuscript, chapter, series, style, meta);
 

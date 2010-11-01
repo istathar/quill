@@ -1052,7 +1052,7 @@ class PrimaryWindow extends Window
         final String lang;
 
         meta = folio.getMetadata();
-        lang = meta.getDocumentLanguage();
+        lang = meta.getSpellingLanguage();
 
         if (lang.equals("")) {
             throw new AssertionError("Document specified an empty language code!");

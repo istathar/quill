@@ -30,20 +30,20 @@ public class Metadata
 {
     private final String documentTitle;
 
-    private final String documentLang;
-
     private final String authorName;
 
-    public Metadata(final String documentTitle, final String documentLang, final String authorName) {
+    private final String spellingLang;
+
+    public Metadata(final String documentTitle, final String authorName, final String spellingLang) {
         this.documentTitle = documentTitle;
-        this.documentLang = documentLang;
         this.authorName = authorName;
+        this.spellingLang = spellingLang;
     }
 
     public Metadata() {
         this.documentTitle = "Untitled";
-        this.documentLang = "en_CA";
         this.authorName = "";
+        this.spellingLang = "en_CA";
     }
 
     public String getDocumentTitle() {
@@ -51,7 +51,7 @@ public class Metadata
     }
 
     public Metadata changeDocumentTitle(String value) {
-        return new Metadata(value, this.documentLang, this.authorName);
+        return new Metadata(value, this.authorName, this.spellingLang);
     }
 
     /**
@@ -59,12 +59,12 @@ public class Metadata
      * by an '_' which indicates the spelling dictionary to be loaded, ie
      * Australian English (en_AU) and Canadian French (fr_CA).
      */
-    public String getDocumentLanguage() {
-        return this.documentLang;
+    public String getSpellingLanguage() {
+        return this.spellingLang;
     }
 
-    public Metadata changeDocumentLanguage(String value) {
-        return new Metadata(this.documentTitle, value, this.authorName);
+    public Metadata changeSpellingLanguage(String value) {
+        return new Metadata(this.documentTitle, this.authorName, value);
     }
 
     public String getAuthorName() {
@@ -72,6 +72,6 @@ public class Metadata
     }
 
     public Metadata changeAuthorName(String value) {
-        return new Metadata(this.documentTitle, this.documentLang, value);
+        return new Metadata(this.documentTitle, value, this.spellingLang);
     }
 }

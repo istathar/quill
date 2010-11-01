@@ -13,7 +13,8 @@
     <font heading="Linux Libertine O C" size="5.6"/>
   </presentation>
   <metadata>
-    <document title="Poems from the front lines" lang="en_US"/>
+    <document title="Poems from the front lines"/>
     <author name=""/>
+    <spelling lang="en_US"/>
   </metadata>
 </manuscript>

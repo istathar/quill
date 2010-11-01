@@ -58,29 +58,29 @@ public class ValidateManuscriptLoading extends IOTestCase
      * better test?
      */
     public final void testManualLoadFile() throws Exception {
-        final Document document;
+        final Document parsed;
         Elements elements;
-        final Element manuscript, content, presentation;
-        final Element renderer, paper, margins;
+        final Element manuscript, content, presentation, metadata;
+        final Element renderer, paper, margins, document, author, spelling;
         Element chapter, font;
         Attribute attribute;
         String name, value;
         String[] expected, sides, widths, faces, desc, sizes;
         int i, num;
 
-        document = load("xml/Example.parchment");
+        parsed = load("xml/Example.parchment");
 
         /*
          * Check <manuscript> root element
          */
 
-        manuscript = document.getRootElement();
+        manuscript = parsed.getRootElement();
         name = manuscript.getLocalName();
         assertEquals("manuscript", name);
 
         elements = manuscript.getChildElements();
         num = elements.size();
-        assertEquals(2, num);
+        assertEquals(3, num);
 
         /*
          * Check <content> and <presentation> toplevels
@@ -93,6 +93,10 @@ public class ValidateManuscriptLoading extends IOTestCase
         presentation = elements.get(1);
         name = presentation.getLocalName();
         assertEquals("presentation", name);
+
+        metadata = elements.get(2);
+        name = metadata.getLocalName();
+        assertEquals("metadata", name);
 
         /*
          * Descend into <content>
@@ -120,6 +124,10 @@ public class ValidateManuscriptLoading extends IOTestCase
             value = attribute.getValue();
             assertEquals(expected[i], value);
         }
+
+        /*
+         * Descend into <presentation>
+         */
 
         elements = presentation.getChildElements();
         num = elements.size();
@@ -218,5 +226,61 @@ public class ValidateManuscriptLoading extends IOTestCase
             value = attribute.getValue();
             assertEquals(sizes[i], value);
         }
+
+        /*
+         * Descend into <metadata>
+         */
+
+        elements = metadata.getChildElements();
+        num = elements.size();
+        assertEquals(3, num);
+
+        /*
+         * Check <document> element
+         */
+
+        document = elements.get(0);
+        name = document.getLocalName();
+        assertEquals("document", name);
+
+        num = document.getAttributeCount();
+        assertEquals(1, num);
+        attribute = document.getAttribute(0);
+        name = attribute.getLocalName();
+        assertEquals("title", name);
+        value = attribute.getValue();
+        assertEquals("Reference Document", value);
+
+        /*
+         * Check <author> element
+         */
+
+        author = elements.get(1);
+        name = author.getLocalName();
+        assertEquals("author", name);
+
+        num = author.getAttributeCount();
+        assertEquals(1, num);
+        attribute = author.getAttribute(0);
+        name = attribute.getLocalName();
+        assertEquals("name", name);
+        value = attribute.getValue();
+        assertEquals("George Jones", value);
+
+        /*
+         * Check <spelling> element
+         */
+
+        spelling = elements.get(2);
+        name = spelling.getLocalName();
+        assertEquals("spelling", name);
+
+        num = author.getAttributeCount();
+        assertEquals(1, num);
+        attribute = spelling.getAttribute(0);
+        name = attribute.getLocalName();
+        assertEquals("lang", name);
+        value = attribute.getValue();
+        assertEquals("en_CA", value);
     }
 }
