@@ -273,7 +273,7 @@ public class Chapter
     /**
      * Get the (relative) filename of this Chapter on disk.
      */
-    String getRelative() {
+    public String getRelative() {
         return relative;
     }
 

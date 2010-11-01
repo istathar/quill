@@ -30,10 +30,12 @@ import org.gnome.gtk.Label;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ReliefStyle;
 import org.gnome.gtk.ScrolledWindow;
+import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.pango.EllipsizeMode;
 
+import parchment.format.Chapter;
 import parchment.format.Metadata;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
@@ -44,6 +46,8 @@ import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.TextChain;
+
+import static org.gnome.gtk.SizeGroupMode.HORIZONTAL;
 
 /**
  * A table of contents style interface to navigate the document. This could be
@@ -64,6 +68,8 @@ class OutlineWidget extends ScrolledWindow
 
     private Folio folio;
 
+    private SizeGroup group;
+
     public OutlineWidget() {
         super();
         final HBox spacer;
@@ -80,7 +86,11 @@ class OutlineWidget extends ScrolledWindow
 
     private void buildOutline() {
         Metadata meta;
+        Chapter chapter;
+        String str;
         Series series;
+        HBox sides;
+        VBox left, right;
         Segment segment;
         int i, j;
         Extract entire;
@@ -93,6 +103,8 @@ class OutlineWidget extends ScrolledWindow
             return;
         }
         meta = folio.getMetadata();
+
+        group = new SizeGroup(HORIZONTAL);
 
         buf = new StringBuilder();
 
@@ -112,6 +124,15 @@ class OutlineWidget extends ScrolledWindow
 
         for (j = 0; j < folio.size(); j++) {
             series = folio.getSeries(j);
+
+            left = new VBox(false, 0);
+            right = new VBox(false, 0);
+
+            chapter = folio.getChapter(j);
+            str = chapter.getRelative();
+            label = new Label(str);
+            label.setAlignment(Alignment.LEFT, Alignment.CENTER);
+            right.packStart(label, false, false, 0);
 
             for (i = 0; i < series.size(); i++) {
                 segment = series.getSegment(i);
@@ -133,14 +154,14 @@ class OutlineWidget extends ScrolledWindow
 
                 } else if (segment instanceof ImageSegment) {
                     Image image;
-                    HBox left;
+                    HBox spacer;
 
                     image = new Image(images.graphic);
                     image.setAlignment(Alignment.LEFT, Alignment.TOP);
                     image.setPadding(40, 3);
-                    left = new HBox(false, 0);
-                    left.packStart(image, false, false, 0);
-                    top.packStart(left, false, false, 0);
+                    spacer = new HBox(false, 0);
+                    spacer.packStart(image, false, false, 0);
+                    left.packStart(spacer, false, false, 0);
                     continue;
                 } else {
                     entire = segment.getEntire();
@@ -150,7 +171,7 @@ class OutlineWidget extends ScrolledWindow
                     } else {
                         lines = new CompressedLines(entire, false);
                     }
-                    top.packStart(lines, false, false, 0);
+                    left.packStart(lines, false, false, 0);
                     continue;
                 }
 
@@ -159,8 +180,13 @@ class OutlineWidget extends ScrolledWindow
                 label = createHeadingLabel(buf.toString());
                 button.add(label);
 
-                top.packStart(button, false, false, 0);
+                left.packStart(button, false, false, 0);
             }
+
+            sides = new HBox(false, 0);
+            sides.packStart(left, false, false, 0);
+            sides.packStart(right, false, false, 0);
+            top.packStart(sides, false, false, 0);
         }
 
         top.showAll();
@@ -184,7 +210,10 @@ class OutlineWidget extends ScrolledWindow
          * driven by the CompressedLines. With this, the headings are slightly
          * wider than that width, and nicely overhand the lines on both sides.
          */
+
         result.setMaxWidthChars(32);
+
+        group.add(result);
 
         return result;
     }
