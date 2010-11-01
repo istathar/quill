@@ -279,7 +279,7 @@ class PrimaryWindow extends Window
     }
 
     private void setupEditorSide() {
-        final Alignment align;
+        Alignment align;
 
         left = new Notebook();
         left.setShowTabs(false);
@@ -297,7 +297,11 @@ class PrimaryWindow extends Window
         left.insertPage(align, null, 1);
 
         metaditor = new MetadataEditorWidget(this);
-        left.insertPage(metaditor, null, 2);
+        align = new Alignment();
+        align.setAlignment(Alignment.LEFT, Alignment.TOP, 1.0f, 1.0f);
+        align.setPadding(0, 0, 3, 0);
+        align.add(metaditor);
+        left.insertPage(align, null, 2);
 
         pane.add1(left);
     }
