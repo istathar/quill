@@ -32,7 +32,9 @@ import org.gnome.gtk.ReliefStyle;
 import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
+import org.gnome.pango.EllipsizeMode;
 
+import parchment.format.Metadata;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
@@ -64,21 +66,25 @@ class OutlineWidget extends ScrolledWindow
 
     public OutlineWidget() {
         super();
+        final HBox spacer;
         scroll = this;
 
+        spacer = new HBox(false, 0);
         top = new VBox(false, 0);
-        scroll.addWithViewport(top);
+        spacer.packStart(top, false, false, 0);
+        scroll.addWithViewport(spacer);
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
 
         folio = null;
     }
 
     private void buildOutline() {
+        Metadata meta;
         Series series;
         Segment segment;
         int i, j;
         Extract entire;
-        StringBuilder str;
+        StringBuilder buf;
         Button button;
         Label label;
         DrawingArea lines;
@@ -86,6 +92,27 @@ class OutlineWidget extends ScrolledWindow
         if (folio == null) {
             return;
         }
+        meta = folio.getMetadata();
+
+        buf = new StringBuilder();
+
+        buf.append("<span size='xx-large'>");
+        buf.append("<span font='Liberation Serif 12'>");
+        buf.append('“');
+        buf.append("</span>");
+        buf.append(meta.getDocumentTitle());
+        buf.append("<span font='Liberation Serif 12'>");
+        buf.append('”');
+        buf.append("</span>");
+        buf.append("</span>");
+
+        label = new Label(buf.toString());
+        label.setUseMarkup(true);
+        label.setAlignment(Alignment.LEFT, Alignment.TOP);
+        label.setEllipsize(EllipsizeMode.END);
+        label.setMaxWidthChars(32);
+        top.packStart(label, false, false, 6);
+        buf.setLength(0);
 
         for (j = 0; j < folio.size(); j++) {
             series = folio.getSeries(j);
@@ -93,19 +120,21 @@ class OutlineWidget extends ScrolledWindow
             for (i = 0; i < series.size(); i++) {
                 segment = series.getSegment(i);
 
+                buf.setLength(0);
+
                 if (segment instanceof ComponentSegment) {
                     entire = segment.getEntire();
 
-                    str = new StringBuilder();
-                    str.append("<span size=\"xx-large\"> ");
-                    str.append(entire.getText());
-                    str.append("</span>");
+                    buf.append("<span size='x-large'> ");
+                    buf.append(entire.getText());
+                    buf.append("</span>");
                 } else if (segment instanceof HeadingSegment) {
                     entire = segment.getEntire();
 
-                    str = new StringBuilder();
-                    str.append("      ");
-                    str.append(entire.getText());
+                    buf = new StringBuilder();
+                    buf.append("      ");
+                    buf.append(entire.getText());
+
                 } else if (segment instanceof ImageSegment) {
                     Image image;
                     HBox left;
@@ -129,11 +158,20 @@ class OutlineWidget extends ScrolledWindow
                     continue;
                 }
 
-                button = new Button(str.toString());
+                button = new Button();
                 button.setRelief(ReliefStyle.NONE);
-                label = (Label) button.getChild();
+                label = new Label(buf.toString());
                 label.setUseMarkup(true);
                 label.setAlignment(Alignment.LEFT, Alignment.TOP);
+                label.setEllipsize(EllipsizeMode.END);
+                /*
+                 * Without this, the Label will ellipsize, but to the width
+                 * being driven by the CompressedLines. With this, the
+                 * headings are slightly wider than that width, and nicely
+                 * overhand the lines on both sides.
+                 */
+                label.setMaxWidthChars(32);
+                button.add(label);
 
                 top.packStart(button, false, false, 0);
             }
