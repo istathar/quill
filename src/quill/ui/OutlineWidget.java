@@ -106,12 +106,8 @@ class OutlineWidget extends ScrolledWindow
         buf.append("</span>");
         buf.append("</span>");
 
-        label = new Label(buf.toString());
-        label.setUseMarkup(true);
-        label.setAlignment(Alignment.LEFT, Alignment.TOP);
-        label.setEllipsize(EllipsizeMode.END);
-        label.setMaxWidthChars(32);
-        top.packStart(label, false, false, 6);
+        label = createHeadingLabel(buf.toString());
+        top.packStart(label, false, false, 3);
         buf.setLength(0);
 
         for (j = 0; j < folio.size(); j++) {
@@ -160,17 +156,7 @@ class OutlineWidget extends ScrolledWindow
 
                 button = new Button();
                 button.setRelief(ReliefStyle.NONE);
-                label = new Label(buf.toString());
-                label.setUseMarkup(true);
-                label.setAlignment(Alignment.LEFT, Alignment.TOP);
-                label.setEllipsize(EllipsizeMode.END);
-                /*
-                 * Without this, the Label will ellipsize, but to the width
-                 * being driven by the CompressedLines. With this, the
-                 * headings are slightly wider than that width, and nicely
-                 * overhand the lines on both sides.
-                 */
-                label.setMaxWidthChars(32);
+                label = createHeadingLabel(buf.toString());
                 button.add(label);
 
                 top.packStart(button, false, false, 0);
@@ -178,6 +164,29 @@ class OutlineWidget extends ScrolledWindow
         }
 
         top.showAll();
+    }
+
+    private Label createHeadingLabel(String str) {
+        final Label result;
+
+        result = new Label(str);
+        result.setUseMarkup(true);
+        result.setAlignment(Alignment.LEFT, Alignment.TOP);
+
+        /*
+         * Ellipsize the text...
+         */
+
+        result.setEllipsize(EllipsizeMode.END);
+
+        /*
+         * Without this, the Label will ellipsize, but to the width being
+         * driven by the CompressedLines. With this, the headings are slightly
+         * wider than that width, and nicely overhand the lines on both sides.
+         */
+        result.setMaxWidthChars(32);
+
+        return result;
     }
 
     /**
