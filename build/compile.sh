@@ -17,6 +17,7 @@ if [ ! -d  tmp/classes ] ; then
 	echo -e "MKDIR\ttmp/"
 	mkdir -p tmp/classes
 	mkdir -p tmp/unittests
+	mkdir -p tmp/i18n
 fi
 
 if [ ! -f tmp/stamp/build-core ] ; then
@@ -36,6 +37,7 @@ if [ -s tmp/stamp/list-core ] ; then
 		exit $?
 	fi
 	touch tmp/stamp/build-core
+	rm tmp/stamp/list-core
 fi
 
 # strictly speaking, not necessary to generate the .pot file, but this has to
@@ -44,11 +46,13 @@ fi
 if [ ! -f tmp/i18n/quill.pot ] ; then
 	touch -d "2001-01-01" tmp/i18n/quill.pot
 fi
-#find src -type f -name '*.java' -newer tmp/i18n/quill.pot > tmp/stamp/list-i18n
-find src -type f -name '*.java' > tmp/stamp/list-i18n
+find src -type f -name '*.java' -newer tmp/i18n/quill.pot > tmp/stamp/list-i18n
 if [ -s tmp/stamp/list-i18n ] ; then
+	rm tmp/stamp/list-i18n
 	echo -e "EXTRACT\ttmp/i18n/quill.pot"
-	xgettext -o tmp/i18n/quill.pot --omit-header --from-code=UTF-8 --keyword=_ --keyword=N_ `cat tmp/stamp/list-i18n`
+	find src -type f -name '*.java' > tmp/stamp/list-core
+	xgettext -o tmp/i18n/quill.pot --omit-header --from-code=UTF-8 --keyword=_ --keyword=N_ `cat tmp/stamp/list-core`
+	rm tmp/stamp/list-core
 fi
 
 #

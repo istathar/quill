@@ -30,14 +30,7 @@ all: .config dirs compile
 
 -include .config
 
-SOURCES_DIST=$(shell find src -name '*.java' | sort)
-TRANSLATIONS=$(shell find po/ -name '*.po' | sed -e 's/po\/\(.*\)\.po/share\/locale\/\1\/LC_MESSAGES\/quill\.mo/g')
-
-dirs: tmp/classes tmp/stamp tmp/i18n
-
-tmp/classes:
-	@/bin/echo -e "MKDIR\t$@"
-	mkdir $@
+dirs: tmp/stamp
 
 tmp/stamp:
 	@/bin/echo -e "MKDIR\t$@"
