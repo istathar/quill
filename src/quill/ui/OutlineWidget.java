@@ -30,18 +30,28 @@ import org.gnome.gtk.Label;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ReliefStyle;
 import org.gnome.gtk.ScrolledWindow;
+import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
+import org.gnome.pango.EllipsizeMode;
 
+import parchment.format.Chapter;
+import parchment.format.Manuscript;
+import parchment.format.Metadata;
+import quill.textbase.CharacterVisitor;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
+import quill.textbase.Markup;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.TextChain;
+
+import static org.gnome.glib.Glib.markupEscapeText;
+import static org.gnome.gtk.SizeGroupMode.HORIZONTAL;
 
 /**
  * A table of contents style interface to navigate the document. This could be
@@ -62,6 +72,16 @@ class OutlineWidget extends ScrolledWindow
 
     private Folio folio;
 
+    private SizeGroup group;
+
+    private Label wordsDocument;
+
+    private Label[] wordsChapter;
+
+    private int countDocument;
+
+    private int[] countChapter;
+
     public OutlineWidget() {
         super();
         scroll = this;
@@ -74,49 +94,137 @@ class OutlineWidget extends ScrolledWindow
     }
 
     private void buildOutline() {
+        final Metadata meta;
+        final Manuscript manuscript;
+        final Alignment align;
+        final int J;
+        Chapter chapter;
         Series series;
+        HBox box;
         Segment segment;
         int i, j;
         Extract entire;
-        StringBuilder str;
+        StringBuilder buf;
         Button button;
         Label label;
         DrawingArea lines;
+        Image image;
+        String str;
 
         if (folio == null) {
             return;
         }
+        meta = folio.getMetadata();
 
-        for (j = 0; j < folio.size(); j++) {
+        group = new SizeGroup(HORIZONTAL);
+
+        buf = new StringBuilder();
+
+        buf.append("<span size='xx-large'>");
+        buf.append("<span font='Liberation Serif 12'>");
+        buf.append('“');
+        buf.append("</span>");
+        buf.append(meta.getDocumentTitle());
+        buf.append("<span font='Liberation Serif 12'>");
+        buf.append('”');
+        buf.append("</span>");
+        buf.append("</span>");
+
+        label = createHeadingLabel(buf.toString());
+        align = new Alignment(Alignment.LEFT, Alignment.CENTER, 0.0f, 0.0f);
+        align.add(label);
+        align.setPadding(0, 0, 0, 2);
+
+        box = new HBox(false, 0);
+        box.packStart(align, false, false, 3);
+
+        /*
+         * Document filename
+         */
+
+        buf.setLength(0);
+        manuscript = folio.getManuscript();
+
+        label = createDocumentFilenameLabel(manuscript);
+
+        box.packStart(label, true, true, 0);
+
+        J = folio.size();
+
+        countDocument = 0;
+        countChapter = new int[J];
+        for (j = 0; j < J; j++) {
+            countChapter[j] = 0;
+        }
+
+        wordsChapter = new Label[J];
+
+        wordsDocument = new Label();
+        wordsDocument.setUseMarkup(true);
+        wordsDocument.setAlignment(Alignment.LEFT, Alignment.BOTTOM);
+        box.packEnd(wordsDocument, false, false, 0);
+
+        top.packStart(box, false, false, 3);
+
+        for (j = 0; j < J; j++) {
             series = folio.getSeries(j);
 
             for (i = 0; i < series.size(); i++) {
                 segment = series.getSegment(i);
+                entire = segment.getEntire();
+
+                buf.setLength(0);
+                box = new HBox(false, 0);
 
                 if (segment instanceof ComponentSegment) {
-                    entire = segment.getEntire();
+                    incrementWordCount(j, entire);
 
-                    str = new StringBuilder();
-                    str.append("<span size=\"xx-large\"> ");
-                    str.append(entire.getText());
-                    str.append("</span>");
+                    buf.append("<span size='x-large'> ");
+                    buf.append(entire.getText());
+                    buf.append("</span>");
+
+                    button = new Button();
+                    button.setRelief(ReliefStyle.NONE);
+                    label = createHeadingLabel(buf.toString());
+                    button.add(label);
+                    box.packStart(button, false, false, 0);
+
+                    chapter = folio.getChapter(j);
+                    label = createChapterFilenameLabel(chapter);
+                    label.setAlignment(Alignment.LEFT, Alignment.CENTER);
+                    box.packStart(label, true, true, 0);
+
+                    /*
+                     * We need to both create a Label so it can be packed and
+                     * store a reference to it so we can update it later.
+                     */
+
+                    label = new Label();
+                    label.setUseMarkup(true);
+                    wordsChapter[j] = label;
+                    box.packEnd(label, false, false, 0);
+
                 } else if (segment instanceof HeadingSegment) {
-                    entire = segment.getEntire();
+                    incrementWordCount(j, entire);
 
-                    str = new StringBuilder();
-                    str.append("      ");
-                    str.append(entire.getText());
+                    buf = new StringBuilder();
+                    buf.append("      ");
+                    buf.append(entire.getText());
+
+                    button = new Button();
+                    button.setRelief(ReliefStyle.NONE);
+                    label = createHeadingLabel(buf.toString());
+                    button.add(label);
+                    box.packStart(button, false, false, 0);
+
                 } else if (segment instanceof ImageSegment) {
-                    Image image;
-                    HBox left;
+                    incrementWordCount(j, entire);
 
                     image = new Image(images.graphic);
                     image.setAlignment(Alignment.LEFT, Alignment.TOP);
                     image.setPadding(40, 3);
-                    left = new HBox(false, 0);
-                    left.packStart(image, false, false, 0);
-                    top.packStart(left, false, false, 0);
-                    continue;
+
+                    box.packStart(image, false, false, 0);
                 } else {
                     entire = segment.getEntire();
 
@@ -124,22 +232,101 @@ class OutlineWidget extends ScrolledWindow
                         lines = new CompressedLines(entire, true);
                     } else {
                         lines = new CompressedLines(entire, false);
+                        incrementWordCount(j, entire);
                     }
-                    top.packStart(lines, false, false, 0);
-                    continue;
+                    box.packStart(lines, false, false, 0);
                 }
 
-                button = new Button(str.toString());
-                button.setRelief(ReliefStyle.NONE);
-                label = (Label) button.getChild();
-                label.setUseMarkup(true);
-                label.setAlignment(Alignment.LEFT, Alignment.TOP);
-
-                top.packStart(button, false, false, 0);
+                top.packStart(box, false, false, 0);
             }
         }
 
+        /*
+         * Now update the word count labels. We use constant width so that the
+         * (fairly common) case of a single chapter showing its word count
+         * next to the document word count looks good - otherwise they're
+         * different widths, and it's a bit jarring visually.
+         */
+
+        str = formatWordCount(countDocument);
+        wordsDocument.setLabel("<tt><b>" + str + "</b></tt>");
+
+        for (j = 0; j < J; j++) {
+            str = formatWordCount(countChapter[j]);
+            wordsChapter[j].setLabel("<tt>" + str + "</tt>");
+        }
+
         top.showAll();
+    }
+
+    private Label createHeadingLabel(String str) {
+        final Label result;
+
+        result = new Label(str);
+        result.setUseMarkup(true);
+        result.setAlignment(Alignment.LEFT, Alignment.TOP);
+        result.setSizeRequest(300, -1);
+
+        /*
+         * Ellipsize the text...
+         */
+
+        result.setEllipsize(EllipsizeMode.END);
+
+        /*
+         * Without this, the Label will ellipsize, but to the width being
+         * driven by the CompressedLines. With this, the headings are slightly
+         * wider than that width, and nicely overhand the lines on both sides.
+         */
+
+        result.setMaxWidthChars(32);
+
+        group.add(result);
+
+        return result;
+    }
+
+    private static Label createChapterFilenameLabel(final Chapter chapter) {
+        final Label result;
+        final String str;
+
+        str = chapter.getRelative();
+
+        /*
+         * It would be better if this colour was taken from quill.ui.Format,
+         * seeing as how we're using the same visual as used for <filename>
+         * markup in EditorTextView.
+         */
+
+        result = new Label("<span color='darkgreen'> <tt>" + markupEscapeText(str) + "</tt></span>");
+        result.setUseMarkup(true);
+
+        result.setAlignment(Alignment.LEFT, Alignment.CENTER);
+
+        result.setEllipsize(EllipsizeMode.START);
+
+        return result;
+    }
+
+    private static Label createDocumentFilenameLabel(final Manuscript manuscript) {
+        String str;
+        final String dir, file;
+        final Label result;
+
+        str = manuscript.getDirectory();
+        dir = str.replace(System.getenv("HOME"), "~");
+
+        file = manuscript.getBasename() + ".parchment";
+
+        result = new Label("<span color='darkgreen' size='x-small'><tt>" + markupEscapeText(dir)
+                + "</tt></span>" + "\n" + "<span color='darkgreen'> <tt><b>" + markupEscapeText(file)
+                + "</b></tt></span>");
+        result.setUseMarkup(true);
+        result.setAlignment(Alignment.LEFT, Alignment.BOTTOM);
+
+        result.setEllipsize(EllipsizeMode.START);
+
+        return result;
     }
 
     /**
@@ -179,6 +366,66 @@ class OutlineWidget extends ScrolledWindow
         }
 
         buildOutline();
+    }
+
+    private void incrementWordCount(int index, Extract entire) {
+        final WordCountingCharacterVisitor tourist;
+        final int num;
+
+        tourist = new WordCountingCharacterVisitor();
+        entire.visit(tourist);
+
+        num = tourist.getCount();
+        countDocument += num;
+        countChapter[index] += num;
+    }
+
+    private String formatWordCount(final int num) {
+        final String str;
+        final StringBuffer buf;
+        int i;
+
+        str = Integer.toString(num);
+        buf = new StringBuffer(str);
+
+        i = buf.length();
+        i -= 3;
+        while (i > 0) {
+            buf.insert(i, ',');
+            i -= 3;
+        }
+
+        return buf.toString();
+    }
+
+    private class WordCountingCharacterVisitor implements CharacterVisitor
+    {
+        private boolean word;
+
+        private int count;
+
+        private WordCountingCharacterVisitor() {
+            count = 0;
+            word = false;
+        }
+
+        public boolean visit(int character, Markup markup) {
+            if (Character.isWhitespace(character)) {
+                if (word) {
+                    word = false;
+                }
+            } else {
+                if (!word) {
+                    count++;
+                    word = true;
+                }
+            }
+            return false;
+        }
+
+        private int getCount() {
+            return count;
+        }
     }
 }
 
