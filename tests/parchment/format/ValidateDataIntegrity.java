@@ -95,7 +95,7 @@ public class ValidateDataIntegrity extends IOTestCase
 
         expected = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.3\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
                 "<text>",
                 "<bold>Hello </bold><type>GtkButton</type><bold> world</bold>",
                 "</text>",
@@ -193,7 +193,7 @@ public class ValidateDataIntegrity extends IOTestCase
 
         outbound = combine(new String[] {
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.3\">",
+                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
                 "<text>",
                 "Hello world. <italics>It is a lovely day.</italics>",
                 "</text>",
