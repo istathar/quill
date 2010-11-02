@@ -30,6 +30,7 @@ import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gdk.MouseButton;
 import org.gnome.gdk.Rectangle;
+import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.EventBox;
 import org.gnome.gtk.InputMethod;
@@ -1116,10 +1117,19 @@ abstract class EditorTextView extends TextView
 
     private String[] texts;
 
-    private MenuItem createMenuItem(final String label, final Class<?> type) {
+    private MenuItem createMenuItem(final String markup, final Class<?> type) {
         final MenuItem result;
+        final Label label;
 
-        result = new MenuItem(label, new MenuItem.Activate() {
+        label = new Label(markup);
+        label.setUseMarkup(true);
+        label.setUseUnderline(true);
+        label.setAlignment(Alignment.LEFT, Alignment.CENTER);
+
+        result = new MenuItem();
+        result.add(label);
+
+        result.connect(new MenuItem.Activate() {
             public void onActivate(MenuItem source) {
                 try {
                     handleInsertSegment(type);
@@ -1159,12 +1169,12 @@ abstract class EditorTextView extends TextView
         };
 
         texts = new String[] {
-                "Normal _paragraphs",
-                "_Code (preformatted source)",
-                "_Quote",
-                "Poe_m (preformatted quote)",
-                "_Attribution",
-                "Section _heading"
+                "<b>Text _paragraphs</b>\n<small>(normal wrapped text)</small>",
+                "<b>_Source code</b>\n<small>(formating preserved; monospaced)</small>",
+                "<b>Block _quote</b>\n<small>(normal wrapped text, but indented)</small>",
+                "<b>Poe_m</b>\n<small>(formating preserved)</small>",
+                "<b>_Attribution</b>\n<small>(smaller wrapped text, offset right)</small>",
+                "<b>Section _heading</b>\n<small>(bold text, single line)</small>"
         };
 
         for (i = 0; i < types.length; i++) {
