@@ -38,11 +38,13 @@ import org.gnome.pango.EllipsizeMode;
 import parchment.format.Chapter;
 import parchment.format.Manuscript;
 import parchment.format.Metadata;
+import quill.textbase.CharacterVisitor;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
+import quill.textbase.Markup;
 import quill.textbase.PreformatSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
@@ -72,6 +74,8 @@ class OutlineWidget extends ScrolledWindow
 
     private SizeGroup group;
 
+    private Label documentLength;
+
     public OutlineWidget() {
         super();
         scroll = this;
@@ -97,6 +101,7 @@ class OutlineWidget extends ScrolledWindow
         Button button;
         Label label;
         DrawingArea lines;
+        Image image;
 
         if (folio == null) {
             return;
@@ -135,6 +140,11 @@ class OutlineWidget extends ScrolledWindow
         label = createManuscriptFilenameLabel(manuscript);
 
         box.packStart(label, true, true, 0);
+
+        wordCount = 0;
+        documentLength = new Label();
+        box.packStart(documentLength, false, false, 0);
+
         top.packStart(box, false, false, 3);
 
         for (j = 0; j < folio.size(); j++) {
@@ -142,13 +152,13 @@ class OutlineWidget extends ScrolledWindow
 
             for (i = 0; i < series.size(); i++) {
                 segment = series.getSegment(i);
+                entire = segment.getEntire();
 
                 buf.setLength(0);
                 box = new HBox(false, 0);
 
                 if (segment instanceof ComponentSegment) {
-
-                    entire = segment.getEntire();
+                    incrementWordCount(entire);
 
                     buf.append("<span size='x-large'> ");
                     buf.append(entire.getText());
@@ -166,7 +176,7 @@ class OutlineWidget extends ScrolledWindow
                     box.packStart(label, true, true, 0);
 
                 } else if (segment instanceof HeadingSegment) {
-                    entire = segment.getEntire();
+                    incrementWordCount(entire);
 
                     buf = new StringBuilder();
                     buf.append("      ");
@@ -179,7 +189,7 @@ class OutlineWidget extends ScrolledWindow
                     box.packStart(button, false, false, 0);
 
                 } else if (segment instanceof ImageSegment) {
-                    Image image;
+                    incrementWordCount(entire);
 
                     image = new Image(images.graphic);
                     image.setAlignment(Alignment.LEFT, Alignment.TOP);
@@ -193,6 +203,7 @@ class OutlineWidget extends ScrolledWindow
                         lines = new CompressedLines(entire, true);
                     } else {
                         lines = new CompressedLines(entire, false);
+                        incrementWordCount(entire);
                     }
                     box.packStart(lines, false, false, 0);
                 }
@@ -201,6 +212,7 @@ class OutlineWidget extends ScrolledWindow
             }
         }
 
+        documentLength.setLabel(Integer.toString(wordCount));
         top.showAll();
     }
 
@@ -262,8 +274,9 @@ class OutlineWidget extends ScrolledWindow
 
         file = manuscript.getBasename() + ".parchment";
 
-        result = new Label("<span color='darkgreen' size='x-small'><tt>" + markupEscapeText(dir)
-                + "</tt></span>\n<span color='darkgreen'><tt>" + markupEscapeText(file) + "</tt></span>");
+        result = new Label("<span color='darkgreen'><tt>" + markupEscapeText(file)
+                + "</tt></span>\n<span color='darkgreen' size='x-small'><tt>" + markupEscapeText(dir)
+                + "</tt></span>");
         result.setUseMarkup(true);
         result.setAlignment(Alignment.LEFT, Alignment.CENTER);
 
@@ -309,6 +322,41 @@ class OutlineWidget extends ScrolledWindow
         }
 
         buildOutline();
+    }
+
+    private int wordCount;
+
+    private void incrementWordCount(Extract entire) {
+        final WordCountingCharacterVisitor tourist;
+
+        tourist = new WordCountingCharacterVisitor();
+        entire.visit(tourist);
+
+        wordCount += tourist.getCount();
+    }
+
+    void incrementWordCount(int words) {
+        wordCount += words;
+    }
+
+    private class WordCountingCharacterVisitor implements CharacterVisitor
+    {
+        int count;
+
+        private WordCountingCharacterVisitor() {
+            count = 0;
+        }
+
+        public boolean visit(int character, Markup markup) {
+            if ((character == ' ') || (character == '\n')) {
+                count++;
+            }
+            return false;
+        }
+
+        private int getCount() {
+            return count;
+        }
     }
 }
 
