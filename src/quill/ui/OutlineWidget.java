@@ -74,7 +74,13 @@ class OutlineWidget extends ScrolledWindow
 
     private SizeGroup group;
 
-    private Label documentLength;
+    private Label wordsDocument;
+
+    private Label[] wordsChapter;
+
+    private int countDocument;
+
+    private int[] countChapter;
 
     public OutlineWidget() {
         super();
@@ -91,6 +97,7 @@ class OutlineWidget extends ScrolledWindow
         final Metadata meta;
         final Manuscript manuscript;
         final Alignment align;
+        final int J;
         Chapter chapter;
         Series series;
         HBox box;
@@ -102,6 +109,7 @@ class OutlineWidget extends ScrolledWindow
         Label label;
         DrawingArea lines;
         Image image;
+        String str;
 
         if (folio == null) {
             return;
@@ -137,17 +145,28 @@ class OutlineWidget extends ScrolledWindow
         buf.setLength(0);
         manuscript = folio.getManuscript();
 
-        label = createManuscriptFilenameLabel(manuscript);
+        label = createDocumentFilenameLabel(manuscript);
 
         box.packStart(label, true, true, 0);
 
-        wordCount = 0;
-        documentLength = new Label();
-        box.packStart(documentLength, false, false, 0);
+        J = folio.size();
+
+        countDocument = 0;
+        countChapter = new int[J];
+        for (j = 0; j < J; j++) {
+            countChapter[j] = 0;
+        }
+
+        wordsChapter = new Label[J];
+
+        wordsDocument = new Label();
+        wordsDocument.setUseMarkup(true);
+        wordsDocument.setAlignment(Alignment.LEFT, Alignment.BOTTOM);
+        box.packEnd(wordsDocument, false, false, 0);
 
         top.packStart(box, false, false, 3);
 
-        for (j = 0; j < folio.size(); j++) {
+        for (j = 0; j < J; j++) {
             series = folio.getSeries(j);
 
             for (i = 0; i < series.size(); i++) {
@@ -158,7 +177,7 @@ class OutlineWidget extends ScrolledWindow
                 box = new HBox(false, 0);
 
                 if (segment instanceof ComponentSegment) {
-                    incrementWordCount(entire);
+                    incrementWordCount(j, entire);
 
                     buf.append("<span size='x-large'> ");
                     buf.append(entire.getText());
@@ -175,8 +194,18 @@ class OutlineWidget extends ScrolledWindow
                     label.setAlignment(Alignment.LEFT, Alignment.CENTER);
                     box.packStart(label, true, true, 0);
 
+                    /*
+                     * We need to both create a Label so it can be packed and
+                     * store a reference to it so we can update it later.
+                     */
+
+                    label = new Label();
+                    label.setUseMarkup(true);
+                    wordsChapter[j] = label;
+                    box.packEnd(label, false, false, 0);
+
                 } else if (segment instanceof HeadingSegment) {
-                    incrementWordCount(entire);
+                    incrementWordCount(j, entire);
 
                     buf = new StringBuilder();
                     buf.append("      ");
@@ -189,7 +218,7 @@ class OutlineWidget extends ScrolledWindow
                     box.packStart(button, false, false, 0);
 
                 } else if (segment instanceof ImageSegment) {
-                    incrementWordCount(entire);
+                    incrementWordCount(j, entire);
 
                     image = new Image(images.graphic);
                     image.setAlignment(Alignment.LEFT, Alignment.TOP);
@@ -203,7 +232,7 @@ class OutlineWidget extends ScrolledWindow
                         lines = new CompressedLines(entire, true);
                     } else {
                         lines = new CompressedLines(entire, false);
-                        incrementWordCount(entire);
+                        incrementWordCount(j, entire);
                     }
                     box.packStart(lines, false, false, 0);
                 }
@@ -212,7 +241,21 @@ class OutlineWidget extends ScrolledWindow
             }
         }
 
-        updateWordCountLabel();
+        /*
+         * Now update the word count labels. We use constant width so that the
+         * (fairly common) case of a single chapter showing its word count
+         * next to the document word count looks good - otherwise they're
+         * different widths, and it's a bit jarring visually.
+         */
+
+        str = formatWordCount(countDocument);
+        wordsDocument.setLabel("<tt><b>" + str + "</b></tt>");
+
+        for (j = 0; j < J; j++) {
+            str = formatWordCount(countChapter[j]);
+            wordsChapter[j].setLabel("<tt>" + str + "</tt>");
+        }
+
         top.showAll();
     }
 
@@ -254,7 +297,7 @@ class OutlineWidget extends ScrolledWindow
          * markup in EditorTextView.
          */
 
-        result = new Label("<span color='darkgreen'><tt>" + markupEscapeText(str) + "</tt></span>");
+        result = new Label("<span color='darkgreen'> <tt>" + markupEscapeText(str) + "</tt></span>");
         result.setUseMarkup(true);
 
         result.setAlignment(Alignment.LEFT, Alignment.CENTER);
@@ -264,7 +307,7 @@ class OutlineWidget extends ScrolledWindow
         return result;
     }
 
-    private static Label createManuscriptFilenameLabel(final Manuscript manuscript) {
+    private static Label createDocumentFilenameLabel(final Manuscript manuscript) {
         String str;
         final String dir, file;
         final Label result;
@@ -274,11 +317,11 @@ class OutlineWidget extends ScrolledWindow
 
         file = manuscript.getBasename() + ".parchment";
 
-        result = new Label("<span color='darkgreen'><tt>" + markupEscapeText(file)
-                + "</tt></span>\n<span color='darkgreen' size='x-small'><tt>" + markupEscapeText(dir)
-                + "</tt></span>");
+        result = new Label("<span color='darkgreen' size='x-small'><tt>" + markupEscapeText(dir)
+                + "</tt></span>" + "\n" + "<span color='darkgreen'> <tt><b>" + markupEscapeText(file)
+                + "</b></tt></span>");
         result.setUseMarkup(true);
-        result.setAlignment(Alignment.LEFT, Alignment.CENTER);
+        result.setAlignment(Alignment.LEFT, Alignment.BOTTOM);
 
         result.setEllipsize(EllipsizeMode.START);
 
@@ -324,23 +367,24 @@ class OutlineWidget extends ScrolledWindow
         buildOutline();
     }
 
-    private int wordCount;
-
-    private void incrementWordCount(Extract entire) {
+    private void incrementWordCount(int index, Extract entire) {
         final WordCountingCharacterVisitor tourist;
+        final int num;
 
         tourist = new WordCountingCharacterVisitor();
         entire.visit(tourist);
 
-        wordCount += tourist.getCount();
+        num = tourist.getCount();
+        countDocument += num;
+        countChapter[index] += num;
     }
 
-    private void updateWordCountLabel() {
-        String str;
+    private String formatWordCount(final int num) {
+        final String str;
         final StringBuffer buf;
         int i;
 
-        str = Integer.toString(wordCount);
+        str = Integer.toString(num);
         buf = new StringBuffer(str);
 
         i = buf.length();
@@ -350,8 +394,7 @@ class OutlineWidget extends ScrolledWindow
             i -= 3;
         }
 
-        str = buf.toString();
-        documentLength.setLabel(str);
+        return buf.toString();
     }
 
     private class WordCountingCharacterVisitor implements CharacterVisitor
