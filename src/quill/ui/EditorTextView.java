@@ -69,6 +69,7 @@ import quill.textbase.Special;
 import quill.textbase.TextChain;
 import quill.textbase.WordVisitor;
 
+import static org.freedesktop.bindings.Internationalization._;
 import static org.gnome.gtk.TextWindowType.TEXT;
 import static quill.ui.Format.spelling;
 import static quill.ui.Format.tagForMarkup;
@@ -1169,12 +1170,17 @@ abstract class EditorTextView extends TextView
         };
 
         texts = new String[] {
-                "<b>Text _paragraphs</b>\n<small>(normal wrapped text)</small>",
-                "<b>_Source code</b>\n<small>(formating preserved; monospaced)</small>",
-                "<b>Block _quote</b>\n<small>(normal wrapped text, but indented)</small>",
-                "<b>Poe_m</b>\n<small>(formating preserved)</small>",
-                "<b>_Attribution</b>\n<small>(smaller wrapped text, offset right)</small>",
-                "<b>Section _heading</b>\n<small>(bold text, single line)</small>"
+                "<b>" + _("Text _paragraphs") + "</b>\n<small>(" + _("normal wrapped text")
+                        + ")</small>",
+                "<b>" + _("_Source code") + "</b>\n<small>(" + _("formating preserved; monospaced")
+                        + ")</small>",
+                "<b>" + _("Block _quote") + "</b>\n<small>(" + _("normal wrapped text, but indented")
+                        + ")</small>",
+                "<b>" + _("Poe_m") + "</b>\n<small>(" + _("formating preserved") + ")</small>",
+                "<b>" + _("_Attribution") + "</b>\n<small>(" + _("smaller wrapped text, offset right")
+                        + ")</small>",
+                "<b>" + _("Section _heading") + "</b>\n<small>(" + _("bold text, single line")
+                        + ")</small>"
         };
 
         for (i = 0; i < types.length; i++) {
