@@ -212,7 +212,7 @@ class OutlineWidget extends ScrolledWindow
             }
         }
 
-        documentLength.setLabel(Integer.toString(wordCount));
+        updateWordCountLabel();
         top.showAll();
     }
 
@@ -335,21 +335,46 @@ class OutlineWidget extends ScrolledWindow
         wordCount += tourist.getCount();
     }
 
-    void incrementWordCount(int words) {
-        wordCount += words;
+    private void updateWordCountLabel() {
+        String str;
+        final StringBuffer buf;
+        int i;
+
+        str = Integer.toString(wordCount);
+        buf = new StringBuffer(str);
+
+        i = buf.length();
+        i -= 3;
+        while (i > 0) {
+            buf.insert(i, ',');
+            i -= 3;
+        }
+
+        str = buf.toString();
+        documentLength.setLabel(str);
     }
 
     private class WordCountingCharacterVisitor implements CharacterVisitor
     {
-        int count;
+        private boolean word;
+
+        private int count;
 
         private WordCountingCharacterVisitor() {
             count = 0;
+            word = false;
         }
 
         public boolean visit(int character, Markup markup) {
-            if ((character == ' ') || (character == '\n')) {
-                count++;
+            if (Character.isWhitespace(character)) {
+                if (word) {
+                    word = false;
+                }
+            } else {
+                if (!word) {
+                    count++;
+                    word = true;
+                }
             }
             return false;
         }
