@@ -265,7 +265,7 @@ class OutlineWidget extends ScrolledWindow
         result = new Label(str);
         result.setUseMarkup(true);
         result.setAlignment(Alignment.LEFT, Alignment.TOP);
-
+        result.setSizeRequest(300, -1);
         /*
          * Ellipsize the text...
          */
