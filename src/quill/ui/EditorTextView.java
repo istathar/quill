@@ -1114,13 +1114,16 @@ abstract class EditorTextView extends TextView
 
     private ContextMenu split;
 
-    private Class<?>[] types;
+    private InsertMenuTexts[] types;
 
-    private String[] texts;
-
-    private MenuItem createMenuItem(final String markup, final Class<?> type) {
+    private MenuItem createMenuItem(InsertMenuTexts details) {
+        final String markup;
+        final Class<?> type;
         final MenuItem result;
         final Label label;
+
+        type = details.type; // FIXME
+        markup = "<b>" + details.text + "</b>\n<small>(" + details.subtext + ")</small>";
 
         label = new Label(markup);
         label.setUseMarkup(true);
@@ -1150,6 +1153,21 @@ abstract class EditorTextView extends TextView
         }
     }
 
+    private static class InsertMenuTexts
+    {
+        final Class<?> type;
+
+        final String text;
+
+        final String subtext;
+
+        private InsertMenuTexts(Class<?> type, String text, String subtext) {
+            this.type = type;
+            this.text = text;
+            this.subtext = subtext;
+        }
+    }
+
     /*
      * Yes it would be "better" to write this such that the two arrays weren't
      * coupled but instead strongly typed objects with two+ fields.
@@ -1160,31 +1178,21 @@ abstract class EditorTextView extends TextView
 
         split = new InsertContextMenu(parent);
 
-        types = new Class<?>[] {
-                NormalSegment.class,
-                PreformatSegment.class,
-                QuoteSegment.class,
-                PoeticSegment.class,
-                AttributionSegment.class,
-                HeadingSegment.class
-        };
-
-        texts = new String[] {
-                "<b>" + _("Text _paragraphs") + "</b>\n<small>(" + _("normal wrapped text")
-                        + ")</small>",
-                "<b>" + _("_Source code") + "</b>\n<small>(" + _("formating preserved; monospaced")
-                        + ")</small>",
-                "<b>" + _("Block _quote") + "</b>\n<small>(" + _("normal wrapped text, but indented")
-                        + ")</small>",
-                "<b>" + _("Poe_m") + "</b>\n<small>(" + _("formating preserved") + ")</small>",
-                "<b>" + _("_Attribution") + "</b>\n<small>(" + _("smaller wrapped text, offset right")
-                        + ")</small>",
-                "<b>" + _("Section _heading") + "</b>\n<small>(" + _("bold text, single line")
-                        + ")</small>"
+        types = new InsertMenuTexts[] {
+                new InsertMenuTexts(NormalSegment.class, _("Text _paragraphs"), _("normal wrapped text")),
+                new InsertMenuTexts(PreformatSegment.class, _("_Program code"),
+                        _("formating preserved; monospaced")),
+                new InsertMenuTexts(QuoteSegment.class, _("Block _quote"),
+                        _("normal wrapped text, but indented")),
+                new InsertMenuTexts(PoeticSegment.class, _("Poe_m"), _("formating preserved")),
+                new InsertMenuTexts(AttributionSegment.class, _("_Attribution"),
+                        _("smaller wrapped text, offset right")),
+                new InsertMenuTexts(HeadingSegment.class, _("Section _heading"),
+                        _("bold text, single line"))
         };
 
         for (i = 0; i < types.length; i++) {
-            item = createMenuItem(texts[i], types[i]);
+            item = createMenuItem(types[i]);
             split.append(item);
         }
 
@@ -1211,7 +1219,7 @@ abstract class EditorTextView extends TextView
         children = split.getChildren();
 
         for (i = 0; i < types.length; i++) {
-            if (types[i].isInstance(segment)) {
+            if (types[i].type.isInstance(segment)) {
                 children[i].setSensitive(false);
             } else {
                 children[i].setSensitive(true);
@@ -1233,7 +1241,7 @@ abstract class EditorTextView extends TextView
                 next = series.getSegment(i);
 
                 for (i = 0; i < types.length; i++) {
-                    if (types[i].isInstance(next)) {
+                    if (types[i].type.isInstance(next)) {
                         children[i].setSensitive(false);
                         break;
                     }
