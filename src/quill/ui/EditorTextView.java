@@ -30,6 +30,7 @@ import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gdk.MouseButton;
 import org.gnome.gdk.Rectangle;
+import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.EventBox;
 import org.gnome.gtk.InputMethod;
@@ -48,6 +49,7 @@ import org.gnome.gtk.WrapMode;
 import org.gnome.pango.FontDescription;
 
 import quill.client.Quill;
+import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
@@ -56,6 +58,7 @@ import quill.textbase.HeadingSegment;
 import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
+import quill.textbase.PoeticSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
@@ -66,6 +69,7 @@ import quill.textbase.Special;
 import quill.textbase.TextChain;
 import quill.textbase.WordVisitor;
 
+import static org.freedesktop.bindings.Internationalization._;
 import static org.gnome.gtk.TextWindowType.TEXT;
 import static quill.ui.Format.spelling;
 import static quill.ui.Format.tagForMarkup;
@@ -108,7 +112,7 @@ abstract class EditorTextView extends TextView
         this.chain = new TextChain();
 
         setupTextView();
-        setupInsertMenu();
+        setupInsertMenuDetails();
         setupContextMenu();
 
         initializeSegment(segment);
@@ -1108,16 +1112,26 @@ abstract class EditorTextView extends TextView
         return box;
     }
 
-    private ContextMenu split;
+    private InsertMenuDetails[] insertDetails;
 
-    private Class<?>[] types;
-
-    private String[] texts;
-
-    private MenuItem createMenuItem(final String label, final Class<?> type) {
+    private MenuItem createMenuItem(InsertMenuDetails details) {
+        final String markup;
+        final Class<?> type;
         final MenuItem result;
+        final Label label;
 
-        result = new MenuItem(label, new MenuItem.Activate() {
+        type = details.type; // FIXME
+        markup = "<b>" + details.text + "</b>\n<small>(" + details.subtext + ")</small>";
+
+        label = new Label(markup);
+        label.setUseMarkup(true);
+        label.setUseUnderline(true);
+        label.setAlignment(Alignment.LEFT, Alignment.CENTER);
+
+        result = new MenuItem();
+        result.add(label);
+
+        result.connect(new MenuItem.Activate() {
             public void onActivate(MenuItem source) {
                 try {
                     handleInsertSegment(type);
@@ -1137,38 +1151,50 @@ abstract class EditorTextView extends TextView
         }
     }
 
+    private static class InsertMenuDetails
+    {
+        final Class<?> type;
+
+        final String text;
+
+        final String subtext;
+
+        private InsertMenuDetails(Class<?> type, String text, String subtext) {
+            this.type = type;
+            this.text = text;
+            this.subtext = subtext;
+        }
+    }
+
     /*
      * Yes it would be "better" to write this such that the two arrays weren't
      * coupled but instead strongly typed objects with two+ fields.
      */
-    private void setupInsertMenu() {
-        int i;
-        MenuItem item;
-
-        split = new InsertContextMenu(parent);
-
-        types = new Class<?>[] {
-                NormalSegment.class, PreformatSegment.class, QuoteSegment.class, HeadingSegment.class
+    private void setupInsertMenuDetails() {
+        insertDetails = new InsertMenuDetails[] {
+                new InsertMenuDetails(NormalSegment.class, _("Text _paragraphs"),
+                        _("normal wrapped text")),
+                new InsertMenuDetails(PreformatSegment.class, _("_Program code"),
+                        _("formating preserved; monospaced")),
+                new InsertMenuDetails(QuoteSegment.class, _("Block _quote"),
+                        _("normal wrapped text, but indented")),
+                new InsertMenuDetails(PoeticSegment.class, _("Poe_m"), _("formating preserved")),
+                new InsertMenuDetails(AttributionSegment.class, _("_Attribution"),
+                        _("smaller wrapped text, offset right")),
+                new InsertMenuDetails(HeadingSegment.class, _("Section _heading"),
+                        _("bold text, single line"))
         };
-
-        texts = new String[] {
-                "Normal _paragraphs", "Preformatted _code block", "Block _quote", "Section _heading"
-        };
-
-        for (i = 0; i < types.length; i++) {
-            item = createMenuItem(texts[i], types[i]);
-            split.append(item);
-        }
-
-        split.showAll();
     }
 
     /*
      * This is a bit hideous.
      */
     private void popupInsertMenu() {
-        final Widget[] children;
+        final ContextMenu split;
+        final int I;
+        MenuItem item;
         int i;
+        final Widget[] children;
         final int len, xr, yr, X, Y, R, xo, yo;
         final Segment next;
         final Series series;
@@ -1177,13 +1203,27 @@ abstract class EditorTextView extends TextView
         final org.gnome.gdk.Window underlying;
 
         /*
+         * Build the menu
+         */
+
+        split = new InsertContextMenu(parent);
+        I = insertDetails.length;
+
+        for (i = 0; i < I; i++) {
+            item = createMenuItem(insertDetails[i]);
+            split.append(item);
+        }
+
+        split.showAll();
+
+        /*
          * Turn off the type that the current Segment is
          */
 
         children = split.getChildren();
 
-        for (i = 0; i < types.length; i++) {
-            if (types[i].isInstance(segment)) {
+        for (i = 0; i < I; i++) {
+            if (insertDetails[i].type.isInstance(segment)) {
                 children[i].setSensitive(false);
             } else {
                 children[i].setSensitive(true);
@@ -1204,15 +1244,15 @@ abstract class EditorTextView extends TextView
                 i++;
                 next = series.getSegment(i);
 
-                for (i = 0; i < types.length; i++) {
-                    if (types[i].isInstance(next)) {
+                for (i = 0; i < insertDetails.length; i++) {
+                    if (insertDetails[i].type.isInstance(next)) {
                         children[i].setSensitive(false);
                         break;
                     }
                 }
             }
         } else if (segment instanceof ComponentSegment) {
-            for (i = 0; i < types.length; i++) {
+            for (i = 0; i < insertDetails.length; i++) {
                 children[i].setSensitive(false);
             }
         }
