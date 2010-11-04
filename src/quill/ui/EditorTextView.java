@@ -112,7 +112,7 @@ abstract class EditorTextView extends TextView
         this.chain = new TextChain();
 
         setupTextView();
-        setupInsertMenu();
+        setupInsertMenuDetails();
         setupContextMenu();
 
         initializeSegment(segment);
@@ -1112,11 +1112,9 @@ abstract class EditorTextView extends TextView
         return box;
     }
 
-    private ContextMenu split;
+    private InsertMenuDetails[] insertDetails;
 
-    private InsertMenuTexts[] types;
-
-    private MenuItem createMenuItem(InsertMenuTexts details) {
+    private MenuItem createMenuItem(InsertMenuDetails details) {
         final String markup;
         final Class<?> type;
         final MenuItem result;
@@ -1153,7 +1151,7 @@ abstract class EditorTextView extends TextView
         }
     }
 
-    private static class InsertMenuTexts
+    private static class InsertMenuDetails
     {
         final Class<?> type;
 
@@ -1161,7 +1159,7 @@ abstract class EditorTextView extends TextView
 
         final String subtext;
 
-        private InsertMenuTexts(Class<?> type, String text, String subtext) {
+        private InsertMenuDetails(Class<?> type, String text, String subtext) {
             this.type = type;
             this.text = text;
             this.subtext = subtext;
@@ -1172,39 +1170,31 @@ abstract class EditorTextView extends TextView
      * Yes it would be "better" to write this such that the two arrays weren't
      * coupled but instead strongly typed objects with two+ fields.
      */
-    private void setupInsertMenu() {
-        int i;
-        MenuItem item;
-
-        split = new InsertContextMenu(parent);
-
-        types = new InsertMenuTexts[] {
-                new InsertMenuTexts(NormalSegment.class, _("Text _paragraphs"), _("normal wrapped text")),
-                new InsertMenuTexts(PreformatSegment.class, _("_Program code"),
+    private void setupInsertMenuDetails() {
+        insertDetails = new InsertMenuDetails[] {
+                new InsertMenuDetails(NormalSegment.class, _("Text _paragraphs"),
+                        _("normal wrapped text")),
+                new InsertMenuDetails(PreformatSegment.class, _("_Program code"),
                         _("formating preserved; monospaced")),
-                new InsertMenuTexts(QuoteSegment.class, _("Block _quote"),
+                new InsertMenuDetails(QuoteSegment.class, _("Block _quote"),
                         _("normal wrapped text, but indented")),
-                new InsertMenuTexts(PoeticSegment.class, _("Poe_m"), _("formating preserved")),
-                new InsertMenuTexts(AttributionSegment.class, _("_Attribution"),
+                new InsertMenuDetails(PoeticSegment.class, _("Poe_m"), _("formating preserved")),
+                new InsertMenuDetails(AttributionSegment.class, _("_Attribution"),
                         _("smaller wrapped text, offset right")),
-                new InsertMenuTexts(HeadingSegment.class, _("Section _heading"),
+                new InsertMenuDetails(HeadingSegment.class, _("Section _heading"),
                         _("bold text, single line"))
         };
-
-        for (i = 0; i < types.length; i++) {
-            item = createMenuItem(types[i]);
-            split.append(item);
-        }
-
-        split.showAll();
     }
 
     /*
      * This is a bit hideous.
      */
     private void popupInsertMenu() {
-        final Widget[] children;
+        final ContextMenu split;
+        final int I;
+        MenuItem item;
         int i;
+        final Widget[] children;
         final int len, xr, yr, X, Y, R, xo, yo;
         final Segment next;
         final Series series;
@@ -1213,13 +1203,27 @@ abstract class EditorTextView extends TextView
         final org.gnome.gdk.Window underlying;
 
         /*
+         * Build the menu
+         */
+
+        split = new InsertContextMenu(parent);
+        I = insertDetails.length;
+
+        for (i = 0; i < I; i++) {
+            item = createMenuItem(insertDetails[i]);
+            split.append(item);
+        }
+
+        split.showAll();
+
+        /*
          * Turn off the type that the current Segment is
          */
 
         children = split.getChildren();
 
-        for (i = 0; i < types.length; i++) {
-            if (types[i].type.isInstance(segment)) {
+        for (i = 0; i < I; i++) {
+            if (insertDetails[i].type.isInstance(segment)) {
                 children[i].setSensitive(false);
             } else {
                 children[i].setSensitive(true);
@@ -1240,15 +1244,15 @@ abstract class EditorTextView extends TextView
                 i++;
                 next = series.getSegment(i);
 
-                for (i = 0; i < types.length; i++) {
-                    if (types[i].type.isInstance(next)) {
+                for (i = 0; i < insertDetails.length; i++) {
+                    if (insertDetails[i].type.isInstance(next)) {
                         children[i].setSensitive(false);
                         break;
                     }
                 }
             }
         } else if (segment instanceof ComponentSegment) {
-            for (i = 0; i < types.length; i++) {
+            for (i = 0; i < insertDetails.length; i++) {
                 children[i].setSensitive(false);
             }
         }
