@@ -298,6 +298,20 @@ public class UserInterface
             primary.emergencySave();
         }
     }
+
+    /**
+     * Our idea of where the user "is"; files will be opened and/or saved
+     * starting from this point.
+     */
+    private String curent;
+
+    public void setCurrentFolder(String directory) {
+        curent = directory;
+    }
+
+    String getCurrentFolder() {
+        return curent;
+    }
 }
 
 class images

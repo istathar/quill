@@ -28,6 +28,8 @@ import parchment.format.Manuscript;
 import quill.textbase.Folio;
 import quill.ui.UserInterface;
 
+import static org.gnome.glib.UserDirectory.DOCUMENTS;
+
 /**
  * Main execution entry point for the Quill what-you-see-is-what-you-need
  * editor of Quack XML documents, using the Parchment rendering engine to
@@ -75,6 +77,7 @@ public class Quill
     static void loadDocumentFile(String filename) throws Exception {
         Manuscript manuscript;
         Folio folio;
+        String directory;
 
         try {
             manuscript = new Manuscript(filename);
@@ -94,17 +97,24 @@ public class Quill
             folio = manuscript.loadDocument();
         }
 
+        directory = manuscript.getDirectory();
+
+        ui.setCurrentFolder(directory);
         ui.displayDocument(folio);
     }
 
     static void loadDocumentBlank() {
         final Manuscript manuscript;
         final Folio folio;
+        final String directory;
+
+        directory = Glib.getUserSpecialDir(DOCUMENTS);
 
         // sets active
         manuscript = new Manuscript();
-        folio = manuscript.createDocument();
+        folio = manuscript.createDocument(directory);
 
+        ui.setCurrentFolder(directory);
         ui.displayDocument(folio);
     }
 
