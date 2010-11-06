@@ -90,8 +90,8 @@ public class Quill
             manuscript.checkFilename();
             folio = manuscript.loadDocument();
         } catch (FileNotFoundException fnfe) {
-            manuscript = new Manuscript(filename);
-            folio = manuscript.createDocument();
+            directory = manuscript.getDirectory();
+            folio = manuscript.createDocument(directory);
         } catch (RecoveryFileExistsException rfee) {
             ui.warning(rfee);
             folio = manuscript.loadDocument();
