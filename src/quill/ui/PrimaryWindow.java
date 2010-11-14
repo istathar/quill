@@ -714,11 +714,15 @@ class PrimaryWindow extends Window
      * and who drives the process.
      */
     void requestFilename() throws SaveCancelledException {
+        final String directory;
         final FileChooserDialog dialog;
         String filename;
         ResponseType response;
 
         dialog = new FileChooserDialog("Save As...", window, SAVE);
+
+        directory = ui.getCurrentFolder();
+        dialog.setCurrentFolder(directory);
 
         while (true) {
             response = dialog.run();
@@ -854,6 +858,7 @@ class PrimaryWindow extends Window
      * Open a new chapter in the editor, replacing the current one.
      */
     void openDocument() {
+        final String directory;
         final Manuscript attempt;
         final FileChooserDialog dialog;
         final FileFilter filter;
@@ -863,6 +868,9 @@ class PrimaryWindow extends Window
         final Folio folio;
 
         dialog = new FileChooserDialog("Open file...", window, OPEN);
+
+        directory = ui.getCurrentFolder();
+        dialog.setCurrentFolder(directory);
 
         filter = new FileFilter();
         filter.setName("Quill and Parchment documents");

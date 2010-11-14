@@ -161,9 +161,18 @@ public class Manuscript
     }
 
     /**
-     * Create a new blank document with a single Component.
+     * Create a new blank document with a single Component in the current
+     * working directory. For use by test cases only.
      */
     public Folio createDocument() {
+        return this.createDocument(".");
+    }
+
+    /**
+     * Create a new blank document with a single Component in the specified
+     * directory. This is called when you start Quill without a filename.
+     */
+    public Folio createDocument(String directory) {
         final Series series1;
         final Folio folio;
         final Chapter chapter1;
@@ -178,7 +187,7 @@ public class Manuscript
         folio = new Folio(this, chapter1, series1, blank, none);
 
         try {
-            this.setFilename("Untitled.parchment");
+            this.setFilename(directory + "/" + "Untitled.parchment");
             chapter1.setFilename("Chapter1.xml");
         } catch (ImproperFilenameException ife) {
             throw new IllegalStateException();
