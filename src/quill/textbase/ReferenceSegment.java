@@ -19,17 +19,17 @@
 package quill.textbase;
 
 /**
- * The text of an endnote (or footnote?; not implemented).
+ * The text of an reference (bibliography) entry.
  * 
  * @author Andrew Cowie
  */
-public final class EndnoteSegment extends Segment
+public final class ReferenceSegment extends Segment
 {
-    public EndnoteSegment(Extract entire, String extra) {
+    public ReferenceSegment(Extract entire, String extra) {
         super(entire, extra, 0, 0, entire.getWidth());
     }
 
-    private EndnoteSegment(Extract entire, String extra, int offset, int removed, int inserted) {
+    private ReferenceSegment(Extract entire, String extra, int offset, int removed, int inserted) {
         super(entire, extra, offset, removed, inserted);
     }
 
@@ -38,6 +38,6 @@ public final class EndnoteSegment extends Segment
 
         extra = super.getImage();
 
-        return new EndnoteSegment(entire, extra, offset, removed, inserted);
+        return new ReferenceSegment(entire, extra, offset, removed, inserted);
     }
 }

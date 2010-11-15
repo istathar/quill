@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -16,28 +16,18 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.textbase;
+package quill.quack;
 
 /**
- * The text of an endnote (or footnote?; not implemented).
+ * Attributes which describe the (unique?) tag for an endnote or citation
+ * reference, for instance <code>name="[Lorem]"</code>.
  * 
  * @author Andrew Cowie
  */
-public final class EndnoteSegment extends Segment
+// cloned from SourceAttribute
+public class NameAttribute extends QuackAttribute implements Meta
 {
-    public EndnoteSegment(Extract entire, String extra) {
-        super(entire, extra, 0, 0, entire.getWidth());
-    }
-
-    private EndnoteSegment(Extract entire, String extra, int offset, int removed, int inserted) {
-        super(entire, extra, offset, removed, inserted);
-    }
-
-    public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
-        final String extra;
-
-        extra = super.getImage();
-
-        return new EndnoteSegment(entire, extra, offset, removed, inserted);
+    NameAttribute(String value) {
+        super("name", value);
     }
 }

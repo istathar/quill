@@ -87,6 +87,10 @@ public class QuackNodeFactory extends NodeFactory
             return new NoteElement();
         } else if (name.equals("cite")) {
             return new CiteElement();
+        } else if (name.equals("endnote")) {
+            return new EndnoteElement();
+        } else if (name.equals("reference")) {
+            return new ReferenceElement();
         } else {
             /*
              * This is actually fairly serious; once our code is working
@@ -104,6 +108,8 @@ public class QuackNodeFactory extends NodeFactory
          */
         if (name.equals("src")) {
             return new Nodes(new SourceAttribute(value));
+        } else if (name.equals("name")) {
+            return new Nodes(new NameAttribute(value));
         } else {
             return super.makeAttribute(name, URI, value, type);
         }

@@ -16,28 +16,11 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.textbase;
+package quill.quack;
 
-/**
- * The text of an endnote (or footnote?; not implemented).
- * 
- * @author Andrew Cowie
- */
-public final class EndnoteSegment extends Segment
+public class ReferenceElement extends BlockElement implements Block
 {
-    public EndnoteSegment(Extract entire, String extra) {
-        super(entire, extra, 0, 0, entire.getWidth());
-    }
-
-    private EndnoteSegment(Extract entire, String extra, int offset, int removed, int inserted) {
-        super(entire, extra, offset, removed, inserted);
-    }
-
-    public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
-        final String extra;
-
-        extra = super.getImage();
-
-        return new EndnoteSegment(entire, extra, offset, removed, inserted);
+    public ReferenceElement() {
+        super("reference");
     }
 }
