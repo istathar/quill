@@ -24,6 +24,7 @@ import nu.xom.Document;
 import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
+import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
@@ -235,6 +236,8 @@ public class QuackLoader
             segment = new ImageSegment(entire, attribute);
         } else if (block instanceof TitleElement) {
             segment = new ComponentSegment(entire);
+        } else if (block instanceof EndnoteElement) {
+            segment = new EndnoteSegment(entire);
         } else {
             throw new IllegalStateException("\n" + "What kind of Block is " + block);
         }
