@@ -153,4 +153,25 @@ in making it any bigger.
 to see the filename), there isn't any UI for inserting images
 and/or changing the source file yet.
 </text>
+<endnote name="1">
+From "A Victory For Democracy", an episode of the popular television
+series <italics>Yes Prime Minister</italics>. This passage taken
+from the book version <cite ref="[2]"/>, page 165.
+</endnote>
+<endnote name="2">
+Typesetting text (the fake latin verse) known as "Lorum Ipsum"
+created by an online generator program available at <cite ref="[3]"/>.
+</endnote>
+<reference name="[1]">
+Andrew Cowie, "Surviving Change" in <italics>Proceedings of the
+12th Australian Systems Administrators Conference</italics> (Brisbane:
+SAGE-AU, 2004), pages 23-40.
+</reference>
+<reference name="[2]">
+Antony Jay and Jonathan Lynn, <italics>The Complete Yes Prime
+Minister</italics> (London: BBC Books, 1989). ISBN 0563207736.
+</reference>
+<reference name="[3]">
+<filename>http://www.lipsum.com</filename>
+</reference>
 </chapter>

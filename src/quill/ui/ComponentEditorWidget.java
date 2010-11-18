@@ -19,42 +19,36 @@
 package quill.ui;
 
 import java.util.LinkedList;
+import java.util.List;
 
-import org.freedesktop.cairo.Context;
-import org.freedesktop.cairo.Surface;
 import org.gnome.gdk.Color;
-import org.gnome.gdk.EventExpose;
-import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Container;
 import org.gnome.gtk.PolicyType;
-import org.gnome.gtk.Scrollbar;
 import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.StateType;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Viewport;
 import org.gnome.gtk.Widget;
 
-import quill.textbase.AttributionSegment;
-import quill.textbase.ComponentSegment;
-import quill.textbase.HeadingSegment;
-import quill.textbase.ImageSegment;
-import quill.textbase.NormalSegment;
 import quill.textbase.Origin;
-import quill.textbase.PoeticSegment;
-import quill.textbase.PreformatSegment;
-import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 
 /**
- * Left hand side of a PrimaryWindow for editing a Component (Article or
- * Chapter).
+ * Code for editing a Series (of Segments), presenting them as a list of
+ * EditorTextViews. This is primarily about the editor for the main body of
+ * each chapter, but is also reused to power the notes and references editor.
+ * 
+ * <p>
+ * <i>The name "component" derives from DocBook's generic name for its
+ * articles and chapters, though it wasn't actually as strictly typed as
+ * that.</i>
  * 
  * @author Andrew Cowie
  */
-class ComponentEditorWidget extends ScrolledWindow
+abstract class ComponentEditorWidget extends ScrolledWindow
 {
     private ScrolledWindow scroll;
 
@@ -72,7 +66,7 @@ class ComponentEditorWidget extends ScrolledWindow
     /**
      * What is the top level UI holding this document?
      */
-    private PrimaryWindow primary;
+    private final PrimaryWindow primary;
 
     private Series series;
 
@@ -105,6 +99,14 @@ class ComponentEditorWidget extends ScrolledWindow
         port.modifyBackground(StateType.NORMAL, Color.WHITE);
 
         adj = scroll.getVAdjustment();
+    }
+
+    /**
+     * Get the VBox that the contents of this Widget are to be packed into;
+     * this is scrolled.
+     */
+    protected VBox getTop() {
+        return box;
     }
 
     private void hookupAdjustmentReactions() {}
@@ -171,8 +173,12 @@ class ComponentEditorWidget extends ScrolledWindow
             segment = series.getSegment(i);
 
             widget = createEditorForSegment(i, segment);
+            if (widget == null) {
+                continue;
+            }
 
             box.packStart(widget, false, false, 0);
+            editors.add(i, editor);
         }
 
         box.showAll();
@@ -217,105 +223,26 @@ class ComponentEditorWidget extends ScrolledWindow
         return editors.get(i);
     }
 
-    private Widget createEditorForSegment(int index, Segment segment) {
-        final Widget result;
-        final EditorTextView editor;
-        final HeadingBox heading;
-        final ImageDisplayBox image;
-        final Scrollbar bar;
-        final ScrolledWindow wide;
-
-        if (segment instanceof NormalSegment) {
-            editor = new NormalEditorTextView(this, segment);
-
-            result = editor;
-        } else if (segment instanceof QuoteSegment) {
-            editor = new QuoteEditorTextView(this, segment);
-
-            result = editor;
-        } else if (segment instanceof PoeticSegment) {
-            editor = new PoeticEditorTextView(this, segment);
-
-            result = editor;
-        } else if (segment instanceof AttributionSegment) {
-            editor = new AttributionEditorTextView(this, segment);
-
-            result = editor;
-        } else if (segment instanceof PreformatSegment) {
-            editor = new PreformatEditorTextView(this, segment);
-
-            wide = new ScrolledWindow();
-            wide.setPolicy(PolicyType.ALWAYS, PolicyType.NEVER);
-            wide.add(editor);
-
-            /*
-             * Having set up horizontal scrollbars for code blocks, we want to
-             * make them a bit less obtrusive in normal use.
-             */
-
-            bar = wide.getHScrollbar();
-            editor.connect(new Widget.FocusInEvent() {
-                public boolean onFocusInEvent(Widget source, EventFocus event) {
-                    bar.setSensitive(true);
-                    return false;
-                }
-            });
-            editor.connect(new Widget.FocusOutEvent() {
-                public boolean onFocusOutEvent(Widget source, EventFocus event) {
-                    bar.setValue(0);
-                    bar.setSensitive(false);
-                    return false;
-                }
-            });
-            bar.setSensitive(false);
-
-            bar.connect(new ExposeEvent() {
-                public boolean onExposeEvent(Widget source, EventExpose event) {
-                    final Context cr;
-                    final Surface surface;
-
-                    if (bar.getSensitive()) {
-                        return false;
-                    }
-
-                    cr = new Context(event);
-
-                    cr.setSource(Color.WHITE);
-                    cr.paint();
-
-                    surface = cr.getTarget();
-                    surface.flush();
-
-                    return true;
-                }
-            });
-
-            result = wide;
-        } else if (segment instanceof ImageSegment) {
-            image = new ImageDisplayBox(this, segment);
-
-            editor = image.getEditor();
-            result = image;
-        } else if (segment instanceof HeadingSegment) {
-            heading = new SectionHeadingBox(this, segment);
-
-            editor = heading.getEditor();
-            result = heading;
-        } else if (segment instanceof ComponentSegment) {
-            heading = new ChapterHeadingBox(this, segment);
-
-            editor = heading.getEditor();
-            result = heading;
-        } else {
-
-            throw new IllegalStateException("Unknown Segment type");
-        }
-
-        editors.add(index, editor);
-
-        return result;
+    protected List<EditorTextView> getEditors() {
+        return editors;
     }
 
+    /**
+     * Given a Segment, create the user interface for it. To be implemented by
+     * concrete subclasses.
+     * 
+     * @param index
+     *            The position within the series that this Segment is found.
+     * @param segment
+     */
+    protected Widget createEditorForSegment(int index, Segment segment) {
+        throw new AssertionError();
+    }
+
+    /**
+     * @deprecated
+     */
+    @SuppressWarnings("unused")
     private static boolean doesContainerHaveChild(Widget widget, Widget target) {
         final Widget[] children;
         Container parent;
