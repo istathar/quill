@@ -25,6 +25,8 @@ import org.freedesktop.cairo.PdfSurface;
 import org.freedesktop.cairo.Surface;
 import org.freedesktop.enchant.Dictionary;
 import org.freedesktop.enchant.Enchant;
+import org.freedesktop.icons.ActionIcon;
+import org.freedesktop.icons.PlaceIcon;
 import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
@@ -40,7 +42,6 @@ import org.gnome.gtk.ErrorMessageDialog;
 import org.gnome.gtk.FileChooserDialog;
 import org.gnome.gtk.FileFilter;
 import org.gnome.gtk.HPaned;
-import org.gnome.gtk.Icon;
 import org.gnome.gtk.IconSize;
 import org.gnome.gtk.Image;
 import org.gnome.gtk.InfoMessageDialog;
@@ -824,17 +825,17 @@ class PrimaryWindow extends Window
                 + "has been modified. Do you want to save it first?", true);
 
         discard = new Button();
-        discard.setImage(new Image(Icon.USER_TRASH, IconSize.BUTTON));
+        discard.setImage(new Image(PlaceIcon.USER_TRASH, IconSize.BUTTON));
         discard.setLabel("Discard changes");
         dialog.addButton(discard, ResponseType.CLOSE);
 
         cancel = new Button();
-        cancel.setImage(new Image(Icon.DOCUMENT_REVERT, IconSize.BUTTON));
+        cancel.setImage(new Image(ActionIcon.DOCUMENT_REVERT, IconSize.BUTTON));
         cancel.setLabel("Return to editor");
         dialog.addButton(cancel, ResponseType.CANCEL);
 
         ok = new Button();
-        ok.setImage(new Image(Icon.DOCUMENT_SAVE, IconSize.BUTTON));
+        ok.setImage(new Image(ActionIcon.DOCUMENT_SAVE, IconSize.BUTTON));
         ok.setLabel("Yes, save");
         dialog.addButton(ok, ResponseType.OK);
 
