@@ -36,12 +36,15 @@ import org.freedesktop.enchant.Enchant;
 import org.gnome.gdk.EventFocus;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
+import org.gnome.gdk.WindowTypeHint;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnString;
 import org.gnome.gtk.ListStore;
+import org.gnome.gtk.PolicyType;
+import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.SelectionMode;
 import org.gnome.gtk.Statusbar;
 import org.gnome.gtk.TreeIter;
@@ -210,15 +213,31 @@ class DictionarySelectionWindow extends Window
 
         hookupKeyboardSignals();
         hookupSelectionSignals();
-        window.showAll();
-        window.hide();
+
+        initialPresentation();
     }
 
     private void setupWindow() {
         window.setDecorated(false);
+        window.setTitle("Languages");
+        window.setTypeHint(WindowTypeHint.DIALOG);
+        window.setDefaultSize(-1, 400);
 
         top = new VBox(false, 0);
         window.add(top);
+    }
+
+    /*
+     * We aren't actually present()ing the window here; but we need to call
+     * realize() to cause the allocation cycle to run otherwise the
+     * LanguageSelctionButton ends up zero width. More importatnly, if we
+     * show() the window at this point then under Compiz we get a ghost window
+     * temporarily appearing on the screen.
+     */
+    private void initialPresentation() {
+        top.showAll();
+        window.realize();
+        window.hide();
     }
 
     int getWidestDisplay() {
@@ -236,7 +255,8 @@ class DictionarySelectionWindow extends Window
         displayColumn = new DataColumnString();
 
         store = new ListStore(new DataColumn[] {
-                tagColumn, displayColumn
+                tagColumn,
+                displayColumn
         });
         filtered = new TreeModelFilter(store, null);
         sorted = new TreeModelSort(filtered);
@@ -245,6 +265,7 @@ class DictionarySelectionWindow extends Window
     private void setupView() {
         final TreeViewColumn vertical;
         final CellRendererText renderer;
+        final ScrolledWindow scroll;
 
         view = new TreeView(sorted);
         view.setRulesHint(false);
@@ -261,7 +282,10 @@ class DictionarySelectionWindow extends Window
         renderer = new CellRendererText(vertical);
         renderer.setText(displayColumn);
 
-        top.packStart(view, false, false, 0);
+        scroll = new ScrolledWindow();
+        scroll.add(view);
+        scroll.setPolicy(PolicyType.NEVER, PolicyType.AUTOMATIC);
+        top.packStart(scroll, true, true, 0);
     }
 
     private void setupStatusbar() {

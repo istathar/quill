@@ -53,7 +53,9 @@ public class ValidateDocumentModified extends GraphicalTestCase
         editor = parent.testGetEditor(1);
 
         spans = new Span[] {
-                createSpan("Hello", null), createSpan(" ", null), createSpan("World", Common.BOLD)
+                createSpan("Hello", null),
+                createSpan(" ", null),
+                createSpan("World", Common.BOLD)
         };
 
         for (i = 0; i < spans.length; i++) {

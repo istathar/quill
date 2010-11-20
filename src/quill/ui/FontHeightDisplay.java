@@ -107,11 +107,15 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
         FontDescription[] fonts;
 
         texts = new String[] {
-                "x Serif, ", "Sans, ", "Mono"
+                "x Serif, ",
+                "Sans, ",
+                "Mono"
         };
 
         fonts = new FontDescription[] {
-                settings.getFontSerif(), settings.getFontSans(), settings.getFontMono()
+                settings.getFontSerif(),
+                settings.getFontSans(),
+                settings.getFontMono()
         };
 
         for (i = 0; i < texts.length; i++) {
