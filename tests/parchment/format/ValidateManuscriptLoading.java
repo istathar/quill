@@ -107,7 +107,8 @@ public class ValidateManuscriptLoading extends IOTestCase
         assertEquals(2, num);
 
         expected = new String[] {
-                "Introduction.xml", "Final Everywhere.xml"
+                "Introduction.xml",
+                "Final Everywhere.xml"
         };
 
         elements = content.getChildElements();
@@ -170,11 +171,17 @@ public class ValidateManuscriptLoading extends IOTestCase
          */
 
         sides = new String[] {
-                "top", "left", "right", "bottom"
+                "top",
+                "left",
+                "right",
+                "bottom"
         };
 
         widths = new String[] {
-                "15.0", "20.0", "12.5", "10.0"
+                "15.0",
+                "20.0",
+                "12.5",
+                "10.0"
         };
 
         margins = elements.get(2);
@@ -196,14 +203,23 @@ public class ValidateManuscriptLoading extends IOTestCase
          */
 
         faces = new String[] {
-                "serif", "sans", "mono", "heading"
+                "serif",
+                "sans",
+                "mono",
+                "heading"
         };
 
         desc = new String[] {
-                "Linux Libertine", "Liberation Sans", "Inconsolata", "Linux Libertine O C"
+                "Linux Libertine",
+                "Liberation Sans",
+                "Inconsolata",
+                "Linux Libertine O C"
         };
         sizes = new String[] {
-                "3.2", "2.6", "3.0", "5.6"
+                "3.2",
+                "2.6",
+                "3.0",
+                "5.6"
         };
 
         for (i = 0; i < 4; i++) {

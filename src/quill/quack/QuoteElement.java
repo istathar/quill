@@ -18,7 +18,6 @@
  */
 package quill.quack;
 
-
 /**
  * A verse or quote as a passage.
  * 
