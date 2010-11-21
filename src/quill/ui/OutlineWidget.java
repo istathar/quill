@@ -222,6 +222,8 @@ class OutlineWidget extends ScrolledWindow
                     button.add(label);
                     box.packStart(button, false, false, 0);
 
+                    button.connect(new PresentSegmentWhenClicked(series, segment));
+
                 } else if (segment instanceof ImageSegment) {
                     incrementWordCount(j, entire);
 

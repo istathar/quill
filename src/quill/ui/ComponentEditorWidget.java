@@ -32,6 +32,7 @@ import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.Scrollbar;
 import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.StateType;
+import org.gnome.gtk.Test;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Viewport;
 import org.gnome.gtk.Widget;
@@ -135,14 +136,45 @@ class ComponentEditorWidget extends ScrolledWindow
     void ensureVisible(Segment segment) {
         final EditorTextView editor;
         final Allocation alloc;
-        final int y;
+        int h, H;
+        int y;
 
         editor = lookup(segment);
 
         alloc = editor.getAllocation();
         y = alloc.getY();
 
-        adj.setValue(y);
+        if (y < 0) {
+            /*
+             * Yet again we bump into the TextView doesn't know it's own hight
+             * yet probem. Suprisingly, cycling the main loop appears to let
+             * the idle handler run?!? FIXME Perhaps it's time to expose
+             * mainIterationDo() in java-gnome for real, since we really
+             * shouldn't be using Test as a workaround.
+             */
+
+            Test.cycleMainLoop();
+            y = alloc.getY();
+
+            /*
+             * If we don't have a value, then we're screwed for real. Bail
+             * out.
+             */
+
+            if (y < 0) {
+                return;
+            }
+        }
+
+        h = (int) adj.getPageSize();
+        H = (int) adj.getUpper();
+
+        if (y + h > H) {
+            adj.setValue(H - h);
+        } else {
+            adj.setValue(y);
+        }
+
     }
 
     Series getSeries() {
