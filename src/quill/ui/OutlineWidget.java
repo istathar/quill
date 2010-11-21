@@ -108,7 +108,7 @@ class OutlineWidget extends ScrolledWindow
         int i, j;
         Extract entire;
         StringBuilder buf;
-        Button button;
+        PresentSegmentButton button;
         Label label;
         DrawingArea lines;
         Image image;
@@ -186,13 +186,13 @@ class OutlineWidget extends ScrolledWindow
                     buf.append(entire.getText());
                     buf.append("</span>");
 
-                    button = new Button();
+                    button = new PresentSegmentButton();
                     button.setRelief(ReliefStyle.NONE);
                     label = createHeadingLabel(buf.toString());
                     button.add(label);
                     box.packStart(button, false, false, 0);
 
-                    button.connect(new PresentSegmentWhenClicked(series, segment));
+                    button.setAddress(series, segment);
 
                     chapter = folio.getChapter(j);
                     label = createChapterFilenameLabel(chapter);
@@ -216,13 +216,13 @@ class OutlineWidget extends ScrolledWindow
                     buf.append("      ");
                     buf.append(entire.getText());
 
-                    button = new Button();
+                    button = new PresentSegmentButton();
                     button.setRelief(ReliefStyle.NONE);
                     label = createHeadingLabel(buf.toString());
                     button.add(label);
                     box.packStart(button, false, false, 0);
 
-                    button.connect(new PresentSegmentWhenClicked(series, segment));
+                    button.setAddress(series, segment);
 
                 } else if (segment instanceof ImageSegment) {
                     incrementWordCount(j, entire);
@@ -265,19 +265,24 @@ class OutlineWidget extends ScrolledWindow
         top.showAll();
     }
 
-    private class PresentSegmentWhenClicked implements Button.Clicked
+    private class PresentSegmentButton extends Button implements Button.Clicked
     {
-        private final Series series;
+        private Series series;
 
-        private final Segment segment;
+        private Segment segment;
 
-        private PresentSegmentWhenClicked(final Series series, final Segment segment) {
-            this.series = series;
-            this.segment = segment;
+        private PresentSegmentButton() {
+            super();
+            super.connect(this);
         }
 
         public void onClicked(Button source) {
             primary.ensureVisible(series, segment);
+        }
+
+        private void setAddress(final Series series, final Segment segment) {
+            this.series = series;
+            this.segment = segment;
         }
     }
 
