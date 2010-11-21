@@ -226,7 +226,6 @@ class OutlineWidget extends ScrolledWindow
 
                     box.packStart(image, false, false, 0);
                 } else {
-                    entire = segment.getEntire();
 
                     if (segment instanceof PreformatSegment) {
                         lines = new CompressedLines(entire, true);
@@ -439,7 +438,7 @@ class CompressedLines extends DrawingArea
 
     private static final int WIDTH = 200;
 
-    private static final int SPACING = 4;
+    private static final int SPACING = 3;
 
     CompressedLines(Extract entire, boolean program) {
         super();
@@ -501,6 +500,7 @@ class CompressedLines extends DrawingArea
 
                 cr.setLineWidth(1.0);
                 cr.setAntialias(Antialias.NONE);
+                cr.translate(0.5, 0.5);
 
                 cr.moveTo(40, 0);
                 width = 0;
