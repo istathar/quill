@@ -82,7 +82,9 @@ class OutlineWidget extends ScrolledWindow
 
     private int[] countChapter;
 
-    public OutlineWidget() {
+    private final PrimaryWindow primary;
+
+    public OutlineWidget(PrimaryWindow window) {
         super();
         scroll = this;
 
@@ -91,6 +93,7 @@ class OutlineWidget extends ScrolledWindow
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
 
         folio = null;
+        primary = window;
     }
 
     private void buildOutline() {
@@ -189,6 +192,8 @@ class OutlineWidget extends ScrolledWindow
                     button.add(label);
                     box.packStart(button, false, false, 0);
 
+                    button.connect(new PresentSegmentWhenClicked(series, segment));
+
                     chapter = folio.getChapter(j);
                     label = createChapterFilenameLabel(chapter);
                     label.setAlignment(Alignment.LEFT, Alignment.CENTER);
@@ -256,6 +261,22 @@ class OutlineWidget extends ScrolledWindow
         }
 
         top.showAll();
+    }
+
+    private class PresentSegmentWhenClicked implements Button.Clicked
+    {
+        private final Series series;
+
+        private final Segment segment;
+
+        private PresentSegmentWhenClicked(final Series series, final Segment segment) {
+            this.series = series;
+            this.segment = segment;
+        }
+
+        public void onClicked(Button source) {
+            primary.ensureVisible(series, segment);
+        }
     }
 
     private Label createHeadingLabel(String str) {

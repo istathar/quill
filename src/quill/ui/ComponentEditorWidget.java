@@ -132,6 +132,19 @@ class ComponentEditorWidget extends ScrolledWindow
         }
     }
 
+    void ensureVisible(Segment segment) {
+        final EditorTextView editor;
+        final Allocation alloc;
+        final int y;
+
+        editor = lookup(segment);
+
+        alloc = editor.getAllocation();
+        y = alloc.getY();
+
+        adj.setValue(y);
+    }
+
     Series getSeries() {
         return series;
     }

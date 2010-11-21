@@ -318,7 +318,7 @@ class PrimaryWindow extends Window
         help = new HelpWidget();
         right.add(help);
 
-        outline = new OutlineWidget();
+        outline = new OutlineWidget(this);
         right.add(outline);
 
         endnotes = new NotesEditorWidget(this);
@@ -1052,6 +1052,25 @@ class PrimaryWindow extends Window
         cursorSeries = folio.getSeries(i);
 
         editor.initializeSeries(cursorSeries);
+        preview.refreshDisplay();
+        updateTitle();
+    }
+
+    /**
+     * Ensure that the given "address" is presented in the
+     * ComponentEditorWidget with the appropriate Chapter showing.
+     */
+    void ensureVisible(Series series, Segment segment) {
+        final int I;
+        int i;
+
+        if (series != cursorSeries) {
+            cursorSeries = series;
+            editor.initializeSeries(cursorSeries);
+        }
+
+        editor.ensureVisible(segment);
+
         preview.refreshDisplay();
         updateTitle();
     }
