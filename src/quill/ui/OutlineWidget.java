@@ -133,7 +133,8 @@ class OutlineWidget extends ScrolledWindow
         buf.append("</span>");
         buf.append("</span>");
 
-        label = createHeadingLabel(buf.toString());
+        label = new HeadingLabel();
+        label.setLabel(buf.toString());
         align = new Alignment(Alignment.LEFT, Alignment.CENTER, 0.0f, 0.0f);
         align.add(label);
         align.setPadding(0, 0, 0, 2);
@@ -182,14 +183,7 @@ class OutlineWidget extends ScrolledWindow
                 if (segment instanceof ComponentSegment) {
                     incrementWordCount(j, entire);
 
-                    buf.append("<span size='x-large'> ");
-                    buf.append(entire.getText());
-                    buf.append("</span>");
-
-                    button = new PresentSegmentButton();
-                    button.setRelief(ReliefStyle.NONE);
-                    label = createHeadingLabel(buf.toString());
-                    button.add(label);
+                    button = new PresentSegmentButton(primary, group);
                     box.packStart(button, false, false, 0);
 
                     button.setAddress(series, segment);
@@ -212,14 +206,7 @@ class OutlineWidget extends ScrolledWindow
                 } else if (segment instanceof HeadingSegment) {
                     incrementWordCount(j, entire);
 
-                    buf = new StringBuilder();
-                    buf.append("      ");
-                    buf.append(entire.getText());
-
-                    button = new PresentSegmentButton();
-                    button.setRelief(ReliefStyle.NONE);
-                    label = createHeadingLabel(buf.toString());
-                    button.add(label);
+                    button = new PresentSegmentButton(primary, group);
                     box.packStart(button, false, false, 0);
 
                     button.setAddress(series, segment);
@@ -263,54 +250,6 @@ class OutlineWidget extends ScrolledWindow
         }
 
         top.showAll();
-    }
-
-    private class PresentSegmentButton extends Button implements Button.Clicked
-    {
-        private Series series;
-
-        private Segment segment;
-
-        private PresentSegmentButton() {
-            super();
-            super.connect(this);
-        }
-
-        public void onClicked(Button source) {
-            primary.ensureVisible(series, segment);
-        }
-
-        private void setAddress(final Series series, final Segment segment) {
-            this.series = series;
-            this.segment = segment;
-        }
-    }
-
-    private Label createHeadingLabel(String str) {
-        final Label result;
-
-        result = new Label(str);
-        result.setUseMarkup(true);
-        result.setAlignment(Alignment.LEFT, Alignment.TOP);
-        result.setSizeRequest(300, -1);
-
-        /*
-         * Ellipsize the text...
-         */
-
-        result.setEllipsize(EllipsizeMode.END);
-
-        /*
-         * Without this, the Label will ellipsize, but to the width being
-         * driven by the CompressedLines. With this, the headings are slightly
-         * wider than that width, and nicely overhand the lines on both sides.
-         */
-
-        result.setMaxWidthChars(32);
-
-        group.add(result);
-
-        return result;
     }
 
     private static Label createChapterFilenameLabel(final Chapter chapter) {
@@ -453,6 +392,95 @@ class OutlineWidget extends ScrolledWindow
         private int getCount() {
             return count;
         }
+    }
+}
+
+class PresentSegmentButton extends Button implements Button.Clicked
+{
+    private Series series;
+
+    private Segment segment;
+
+    private final PrimaryWindow primary;
+
+    private final Label label;
+
+    PresentSegmentButton(PrimaryWindow primary, SizeGroup group) {
+        super();
+        this.primary = primary;
+        super.setRelief(ReliefStyle.NONE);
+        super.connect(this);
+
+        label = new HeadingLabel();
+        super.add(label);
+        group.add(label);
+    }
+
+    public void onClicked(Button source) {
+        primary.ensureVisible(series, segment);
+    }
+
+    void setAddress(final Series series, final Segment segment) {
+        final StringBuilder buf;
+        final Extract entire;
+        final String str;
+
+        /*
+         * Update state if necessary
+         */
+
+        if (series == this.series) {
+            return;
+        }
+        this.series = series;
+        this.segment = segment;
+
+        /*
+         * Redo label.
+         */
+
+        entire = segment.getEntire();
+        str = entire.getText();
+
+        buf = new StringBuilder();
+
+        if (segment instanceof HeadingSegment) {
+            buf.append("      ");
+            buf.append(str);
+        } else if (segment instanceof ComponentSegment) {
+            buf.append("<span size='x-large'>  ");
+            buf.append(str);
+            buf.append("</span>");
+        } else {
+            throw new AssertionError();
+        }
+
+        label.setLabel(buf.toString());
+    }
+
+}
+
+class HeadingLabel extends Label
+{
+    HeadingLabel() {
+        super();
+        super.setUseMarkup(true);
+        super.setAlignment(Alignment.LEFT, Alignment.TOP);
+        super.setSizeRequest(300, -1);
+
+        /*
+         * Ellipsize the text...
+         */
+
+        super.setEllipsize(EllipsizeMode.END);
+
+        /*
+         * Without this, the Label will ellipsize, but to the width being
+         * driven by the CompressedLines. With this, the headings are slightly
+         * wider than that width, and nicely overhand the lines on both sides.
+         */
+
+        super.setMaxWidthChars(32);
     }
 }
 
