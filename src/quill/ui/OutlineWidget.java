@@ -18,6 +18,8 @@
  */
 package quill.ui;
 
+import java.util.ArrayList;
+
 import org.freedesktop.cairo.Antialias;
 import org.freedesktop.cairo.Context;
 import org.gnome.gdk.EventExpose;
@@ -38,6 +40,7 @@ import org.gnome.pango.EllipsizeMode;
 import parchment.format.Chapter;
 import parchment.format.Manuscript;
 import parchment.format.Metadata;
+import quill.client.ApplicationException;
 import quill.textbase.CharacterVisitor;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
@@ -82,7 +85,9 @@ class OutlineWidget extends ScrolledWindow
 
     private int[] countChapter;
 
-    public OutlineWidget() {
+    private final PrimaryWindow primary;
+
+    public OutlineWidget(PrimaryWindow window) {
         super();
         scroll = this;
 
@@ -91,6 +96,7 @@ class OutlineWidget extends ScrolledWindow
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
 
         folio = null;
+        primary = window;
     }
 
     private void buildOutline() {
@@ -105,7 +111,7 @@ class OutlineWidget extends ScrolledWindow
         int i, j;
         Extract entire;
         StringBuilder buf;
-        Button button;
+        PresentSegmentButton button;
         Label label;
         DrawingArea lines;
         Image image;
@@ -117,6 +123,7 @@ class OutlineWidget extends ScrolledWindow
         meta = folio.getMetadata();
 
         group = new SizeGroup(HORIZONTAL);
+        buttons = new ArrayList<PresentSegmentButton>();
 
         buf = new StringBuilder();
 
@@ -130,7 +137,8 @@ class OutlineWidget extends ScrolledWindow
         buf.append("</span>");
         buf.append("</span>");
 
-        label = createHeadingLabel(buf.toString());
+        label = new HeadingLabel();
+        label.setLabel(buf.toString());
         align = new Alignment(Alignment.LEFT, Alignment.CENTER, 0.0f, 0.0f);
         align.add(label);
         align.setPadding(0, 0, 0, 2);
@@ -179,15 +187,11 @@ class OutlineWidget extends ScrolledWindow
                 if (segment instanceof ComponentSegment) {
                     incrementWordCount(j, entire);
 
-                    buf.append("<span size='x-large'> ");
-                    buf.append(entire.getText());
-                    buf.append("</span>");
-
-                    button = new Button();
-                    button.setRelief(ReliefStyle.NONE);
-                    label = createHeadingLabel(buf.toString());
-                    button.add(label);
+                    button = new PresentSegmentButton(primary, group);
                     box.packStart(button, false, false, 0);
+
+                    button.setAddress(series, segment);
+                    buttons.add(button);
 
                     chapter = folio.getChapter(j);
                     label = createChapterFilenameLabel(chapter);
@@ -207,15 +211,11 @@ class OutlineWidget extends ScrolledWindow
                 } else if (segment instanceof HeadingSegment) {
                     incrementWordCount(j, entire);
 
-                    buf = new StringBuilder();
-                    buf.append("      ");
-                    buf.append(entire.getText());
-
-                    button = new Button();
-                    button.setRelief(ReliefStyle.NONE);
-                    label = createHeadingLabel(buf.toString());
-                    button.add(label);
+                    button = new PresentSegmentButton(primary, group);
                     box.packStart(button, false, false, 0);
+
+                    button.setAddress(series, segment);
+                    buttons.add(button);
 
                 } else if (segment instanceof ImageSegment) {
                     incrementWordCount(j, entire);
@@ -226,7 +226,6 @@ class OutlineWidget extends ScrolledWindow
 
                     box.packStart(image, false, false, 0);
                 } else {
-                    entire = segment.getEntire();
 
                     if (segment instanceof PreformatSegment) {
                         lines = new CompressedLines(entire, true);
@@ -257,33 +256,6 @@ class OutlineWidget extends ScrolledWindow
         }
 
         top.showAll();
-    }
-
-    private Label createHeadingLabel(String str) {
-        final Label result;
-
-        result = new Label(str);
-        result.setUseMarkup(true);
-        result.setAlignment(Alignment.LEFT, Alignment.TOP);
-        result.setSizeRequest(300, -1);
-
-        /*
-         * Ellipsize the text...
-         */
-
-        result.setEllipsize(EllipsizeMode.END);
-
-        /*
-         * Without this, the Label will ellipsize, but to the width being
-         * driven by the CompressedLines. With this, the headings are slightly
-         * wider than that width, and nicely overhand the lines on both sides.
-         */
-
-        result.setMaxWidthChars(32);
-
-        group.add(result);
-
-        return result;
     }
 
     private static Label createChapterFilenameLabel(final Chapter chapter) {
@@ -329,25 +301,94 @@ class OutlineWidget extends ScrolledWindow
         return result;
     }
 
+    private ArrayList<PresentSegmentButton> buttons;
+
     /**
      * Given a Folio, display it.
      */
-    /*
-     * FIXME Mockup! We actually need to evaluate the Series(s) against the
-     * ones being displayed, and rebuild if/as necessary, and presumably if
-     * we're actually showing.
-     */
-    /*
-     * At the moment this is horribly inefficient; we should have something
-     * more dynamic that merely updates the Labels rather than wholesale
-     * recreates everything.
-     */
-    void affect(Folio folio) {
-        if (this.folio == folio) {
+    void affect(Folio after) {
+        final Folio before;
+
+        if (this.folio == after) {
             return;
         }
+        before = this.folio;
+        this.folio = after;
 
-        this.folio = folio;
+        /*
+         * This is a bit tricky. We can only update the Buttons' Segments if
+         * there are the same number of Series and Segments therein. Otherwise
+         * we have to do a full rebuild.
+         */
+
+        try {
+            updateButtons(before);
+        } catch (StructureChangedException sce) {
+            rebuildOutline();
+        }
+    }
+
+    private void updateButtons(Folio before) throws StructureChangedException {
+        final int J;
+        int i, j, I, k;
+        final Folio after;
+        Series previous, next;
+        Segment segment;
+        PresentSegmentButton button;
+
+        after = this.folio;
+
+        /*
+         * First we run through everything to see if the structure has
+         * changed. If it has, we have to rebuild everything.
+         */
+
+        if (before == null) {
+            throw new StructureChangedException();
+        }
+        if (before.size() != after.size()) {
+            throw new StructureChangedException();
+        }
+
+        J = after.size();
+
+        for (j = 0; j < J; j++) {
+            previous = before.getSeries(j);
+            next = after.getSeries(j);
+
+            if (previous.size() != next.size()) {
+                throw new StructureChangedException();
+            }
+        }
+
+        /*
+         * Ok, so we have the same number of Buttons. Good. We can just update
+         * the references on them.
+         */
+
+        k = 0;
+
+        for (j = 0; j < J; j++) {
+            previous = before.getSeries(j);
+            next = after.getSeries(j);
+
+            segment = next.getSegment(0);
+            button = buttons.get(k);
+            button.setAddress(next, segment);
+            k++;
+
+            I = next.size();
+
+            for (i = 1; i < I; i++) {
+                segment = next.getSegment(i);
+
+                if (segment instanceof HeadingSegment) {
+                    button = buttons.get(k);
+                    button.setAddress(next, segment);
+                    k++;
+                }
+            }
+        }
     }
 
     /**
@@ -361,6 +402,10 @@ class OutlineWidget extends ScrolledWindow
      * reconstruct and repack.
      */
     void refreshDisplay() {
+        rebuildOutline();
+    }
+
+    private void rebuildOutline() {
         for (Widget child : top.getChildren()) {
             top.remove(child);
         }
@@ -427,6 +472,100 @@ class OutlineWidget extends ScrolledWindow
             return count;
         }
     }
+
+    @SuppressWarnings("serial")
+    private class StructureChangedException extends ApplicationException
+    {
+    }
+}
+
+class PresentSegmentButton extends Button implements Button.Clicked
+{
+    private Series series;
+
+    private Segment segment;
+
+    private final PrimaryWindow primary;
+
+    private final Label label;
+
+    PresentSegmentButton(PrimaryWindow primary, SizeGroup group) {
+        super();
+        this.primary = primary;
+        super.setRelief(ReliefStyle.NONE);
+        super.connect(this);
+
+        label = new HeadingLabel();
+        super.add(label);
+        group.add(label);
+    }
+
+    public void onClicked(Button source) {
+        primary.ensureVisible(series, segment);
+    }
+
+    void setAddress(final Series series, final Segment segment) {
+        final StringBuilder buf;
+        final Extract entire;
+        final String str;
+
+        /*
+         * Update state if necessary
+         */
+
+        if (series == this.series) {
+            return;
+        }
+        this.series = series;
+        this.segment = segment;
+
+        /*
+         * Redo label.
+         */
+
+        entire = segment.getEntire();
+        str = entire.getText();
+
+        buf = new StringBuilder();
+
+        if (segment instanceof HeadingSegment) {
+            buf.append("      ");
+            buf.append(str);
+        } else if (segment instanceof ComponentSegment) {
+            buf.append("<span size='x-large'>  ");
+            buf.append(str);
+            buf.append("</span>");
+        } else {
+            throw new AssertionError();
+        }
+
+        label.setLabel(buf.toString());
+    }
+
+}
+
+class HeadingLabel extends Label
+{
+    HeadingLabel() {
+        super();
+        super.setUseMarkup(true);
+        super.setAlignment(Alignment.LEFT, Alignment.TOP);
+        super.setSizeRequest(300, -1);
+
+        /*
+         * Ellipsize the text...
+         */
+
+        super.setEllipsize(EllipsizeMode.END);
+
+        /*
+         * Without this, the Label will ellipsize, but to the width being
+         * driven by the CompressedLines. With this, the headings are slightly
+         * wider than that width, and nicely overhand the lines on both sides.
+         */
+
+        super.setMaxWidthChars(32);
+    }
 }
 
 class CompressedLines extends DrawingArea
@@ -439,7 +578,7 @@ class CompressedLines extends DrawingArea
 
     private static final int WIDTH = 200;
 
-    private static final int SPACING = 4;
+    private static final int SPACING = 3;
 
     CompressedLines(Extract entire, boolean program) {
         super();
@@ -501,6 +640,7 @@ class CompressedLines extends DrawingArea
 
                 cr.setLineWidth(1.0);
                 cr.setAntialias(Antialias.NONE);
+                cr.translate(0.5, 0.5);
 
                 cr.moveTo(40, 0);
                 width = 0;
