@@ -132,6 +132,8 @@ public class QuackLoader
          * Series, and return it.
          */
 
+        ensureChapterHasTitle();
+
         return new Series(list);
     }
 
@@ -142,6 +144,30 @@ public class QuackLoader
         } else {
             throw new UnsupportedOperationException("Implement support for <article>?");
         }
+    }
+
+    /**
+     * Ensure that the first Segment in the Series is a ComponentSegment.
+     */
+    /*
+     * This is a bit of a hack, but this means that at run time inside the app
+     * we always have at least one Segment.
+     */
+    private void ensureChapterHasTitle() {
+        Segment first;
+        Extract blank;
+
+        if (list.size() > 0) {
+            first = list.get(0);
+            if (first instanceof ComponentSegment) {
+                return;
+            }
+        }
+
+        blank = Extract.create();
+        first = new ComponentSegment(blank);
+
+        list.add(0, first);
     }
 
     /*
