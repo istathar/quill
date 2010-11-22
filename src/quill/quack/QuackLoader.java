@@ -151,23 +151,45 @@ public class QuackLoader
      */
     /*
      * This is a bit of a hack, but this means that at run time inside the app
-     * we always have at least one Segment.
+     * we always have at least one Segment. And, just to make the user
+     * experience a touch better, if there wasn't a second Segment, then add a
+     * Normal one so that there is somewhere to type.
      */
     private void ensureChapterHasTitle() {
-        Segment first;
-        Extract blank;
+        final int num;
+        Segment first, second;
+        final Extract blank;
 
-        if (list.size() > 0) {
-            first = list.get(0);
-            if (first instanceof ComponentSegment) {
-                return;
-            }
+        num = list.size();
+
+        if (num == 0) {
+            blank = Extract.create();
+            first = new ComponentSegment(blank);
+            list.add(first);
+            second = new NormalSegment(blank);
+            list.add(second);
+            return;
         }
 
-        blank = Extract.create();
-        first = new ComponentSegment(blank);
+        first = list.get(0);
 
-        list.add(0, first);
+        if (first instanceof ComponentSegment) {
+            if (num > 1) {
+                /*
+                 * This is the usual case; there's a title and some body.
+                 * Excellent. We're done.
+                 */
+                return;
+            }
+
+            blank = Extract.create();
+            second = new NormalSegment(blank);
+            list.add(second);
+        } else {
+            blank = Extract.create();
+            first = new ComponentSegment(blank);
+            list.add(0, first);
+        }
     }
 
     /*
