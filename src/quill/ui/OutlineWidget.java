@@ -18,6 +18,8 @@
  */
 package quill.ui;
 
+import java.util.ArrayList;
+
 import org.freedesktop.cairo.Antialias;
 import org.freedesktop.cairo.Context;
 import org.gnome.gdk.EventExpose;
@@ -38,6 +40,7 @@ import org.gnome.pango.EllipsizeMode;
 import parchment.format.Chapter;
 import parchment.format.Manuscript;
 import parchment.format.Metadata;
+import quill.client.ApplicationException;
 import quill.textbase.CharacterVisitor;
 import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
@@ -120,6 +123,7 @@ class OutlineWidget extends ScrolledWindow
         meta = folio.getMetadata();
 
         group = new SizeGroup(HORIZONTAL);
+        buttons = new ArrayList<PresentSegmentButton>();
 
         buf = new StringBuilder();
 
@@ -187,6 +191,7 @@ class OutlineWidget extends ScrolledWindow
                     box.packStart(button, false, false, 0);
 
                     button.setAddress(series, segment);
+                    buttons.add(button);
 
                     chapter = folio.getChapter(j);
                     label = createChapterFilenameLabel(chapter);
@@ -210,6 +215,7 @@ class OutlineWidget extends ScrolledWindow
                     box.packStart(button, false, false, 0);
 
                     button.setAddress(series, segment);
+                    buttons.add(button);
 
                 } else if (segment instanceof ImageSegment) {
                     incrementWordCount(j, entire);
@@ -295,25 +301,94 @@ class OutlineWidget extends ScrolledWindow
         return result;
     }
 
+    private ArrayList<PresentSegmentButton> buttons;
+
     /**
      * Given a Folio, display it.
      */
-    /*
-     * FIXME Mockup! We actually need to evaluate the Series(s) against the
-     * ones being displayed, and rebuild if/as necessary, and presumably if
-     * we're actually showing.
-     */
-    /*
-     * At the moment this is horribly inefficient; we should have something
-     * more dynamic that merely updates the Labels rather than wholesale
-     * recreates everything.
-     */
-    void affect(Folio folio) {
-        if (this.folio == folio) {
+    void affect(Folio after) {
+        final Folio before;
+
+        if (this.folio == after) {
             return;
         }
+        before = this.folio;
+        this.folio = after;
 
-        this.folio = folio;
+        /*
+         * This is a bit tricky. We can only update the Buttons' Segments if
+         * there are the same number of Series and Segments therein. Otherwise
+         * we have to do a full rebuild.
+         */
+
+        try {
+            updateButtons(before);
+        } catch (StructureChangedException sce) {
+            rebuildOutline();
+        }
+    }
+
+    private void updateButtons(Folio before) throws StructureChangedException {
+        final int J;
+        int i, j, I, k;
+        final Folio after;
+        Series previous, next;
+        Segment segment;
+        PresentSegmentButton button;
+
+        after = this.folio;
+
+        /*
+         * First we run through everything to see if the structure has
+         * changed. If it has, we have to rebuild everything.
+         */
+
+        if (before == null) {
+            throw new StructureChangedException();
+        }
+        if (before.size() != after.size()) {
+            throw new StructureChangedException();
+        }
+
+        J = after.size();
+
+        for (j = 0; j < J; j++) {
+            previous = before.getSeries(j);
+            next = after.getSeries(j);
+
+            if (previous.size() != next.size()) {
+                throw new StructureChangedException();
+            }
+        }
+
+        /*
+         * Ok, so we have the same number of Buttons. Good. We can just update
+         * the references on them.
+         */
+
+        k = 0;
+
+        for (j = 0; j < J; j++) {
+            previous = before.getSeries(j);
+            next = after.getSeries(j);
+
+            segment = next.getSegment(0);
+            button = buttons.get(k);
+            button.setAddress(next, segment);
+            k++;
+
+            I = next.size();
+
+            for (i = 1; i < I; i++) {
+                segment = next.getSegment(i);
+
+                if (segment instanceof HeadingSegment) {
+                    button = buttons.get(k);
+                    button.setAddress(next, segment);
+                    k++;
+                }
+            }
+        }
     }
 
     /**
@@ -327,6 +402,10 @@ class OutlineWidget extends ScrolledWindow
      * reconstruct and repack.
      */
     void refreshDisplay() {
+        rebuildOutline();
+    }
+
+    private void rebuildOutline() {
         for (Widget child : top.getChildren()) {
             top.remove(child);
         }
@@ -392,6 +471,11 @@ class OutlineWidget extends ScrolledWindow
         private int getCount() {
             return count;
         }
+    }
+
+    @SuppressWarnings("serial")
+    private class StructureChangedException extends ApplicationException
+    {
     }
 }
 
