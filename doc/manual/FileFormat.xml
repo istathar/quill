@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://namespace.operationaldynamics.com/parchment/0.4">
+<title>
+Documents on disk
+</title>
+<text>
+The idea is...
+</text>
+<heading>
+About the Quack file format
+</heading>
+<text>
+you can fix the quack on disk if Quill breaks, but if you break
+the file on disk you'll break Quill.
+</text>
+<text>
+you can't expect Quill to figure it out 
+</text>
+<text>
+you can ... but {ironically?} you if you break the 
+</text>
+<text>
+<bold>Why did you create your own XML schema?</bold>
+</text>
+<text>
+You use a commonly available format if you wish to interoperate.
+But (at least at present) we're not worried about that; Quack
+format documents are for consumption by Quill and rendering by
+Parchment.
+</text>
+<text>
+Quack is not intended to be human <italics>writable</italics>.
+And it's not particularly meant for reading by other programs.
+But it is human <italics>mergeable</italics>.
+</text>
+<text>
+<bold>Why didn't you use...</bold>
+</text>
+<text>
+As mentioned, the driving imperative for Quack documents is that
+they be manageable with the collaboration tools we use to write
+open source software - specifically the modern 3rd generation
+distributed version control systems (DVCS) such as
+<application>Bazaar</application> (<command>bzr</command>),
+<application>Git</application> (<command>git</command>), or
+<application>Mercurial</application> (<command>hg</command>).
+</text>
+<heading>
+Commentary on other formats
+</heading>
+<text>
+With the above in mind, 
+</text>
+<text>
+<bold>Open Office </bold><literal>.odt</literal>
+</text>
+<text>
+This is the very definition of un-fun. Open Document Format was
+already disqualified on the grounds of it being contained in
+a single Zip compressed file and thus unsuitable for version
+control, but if you take some time.
+</text>
+<text/>
+<text>
+The give away was looking at what Writer writes out when you
+tell it to pretend it's an web page editor and ask it to save
+as HTML... <highlight>HERE</highlight>
+</text>
+<text>
+<bold>DocBook XML</bold>
+</text>
+<text>
+In all conscience DocBook is certainly a comprehensive schema.
+In fact, Quill started life as a DocBook editor, or at least
+something that would author documents in the very limited subset
+of DocBook we actually needed.
+</text>
+<text>
+The DocBook specification, however, is exceedingly large. It
+shows all the signs of design by committee and there is much
+cruft. You spend all your time hunting around trying to figure
+out which tags you're supposed to use, and then you scratch your
+head for hours trying to work out just how to go about using
+it properly.
+</text>
+<text>
+DocBook is exceedingly difficult to work in programmatically
+due to the arbitrary nesting it allows. And because of that nesting
+it is really difficult to handle merge conflicts between two
+versions of a document.
+</text>
+<text>
+Contrast an image in DocBook:
+</text>
+<code xml:space="preserve">
+&lt;mediaobject&gt;
+  &lt;alt&gt;The DocBook: TDG Duck&lt;/alt&gt;
+  &lt;imageobject&gt;
+    &lt;imagedata align="center" width="6in" format="PNG"
+        fileref="figures/duck-small.png"/&gt;
+  &lt;/imageobject&gt;
+  &lt;imageobject&gt;
+    &lt;imagedata align="center" width="6in" format="GIF"
+        fileref="figures/duck-small.gif"/&gt;
+  &lt;/imageobject&gt;
+  &lt;textobject&gt;
+    &lt;para&gt;The bird on the cover of &lt;citetitle&gt;DocBook: The Definitive
+Guide&lt;/citetitle&gt; is a wood duck. Often considered one of the most
+beautiful ducks in North America, the mail wood duck has a metallic
+purple and green head with white streaks extending from its bill
+around the eyes and down to its blue and green, gold-flecked
+wings. It has a white neck, chestnut-colored chest, a white or red
+bill, and yellow-orange legs and feet. Females have more brown, gray,
+and subdueed hues.&lt;/para&gt;
+  &lt;/textobject&gt;
+  &lt;caption&gt;
+    &lt;para&gt;A wood duck, from the cover of &lt;citetitle&gt;DocBook: The Definitive
+Guide&lt;/citetitle&gt;.&lt;/para&gt;
+  &lt;/caption&gt;
+&lt;/mediaobject&gt;
+</code>
+<text>
+with how we do it in Quack:
+</text>
+<code xml:space="preserve">
+&lt;image src="figures/duck-small.png"&gt;
+A wood duck, from the cover of &lt;italics&gt;DocBook: The Definitive Guide&lt;/italics&gt;.
+&lt;/image&gt;
+</code>
+<text>
+While it is fascinating and powerful that DocBook allows you
+to express alternative versions of a generic media (in this case
+the image in two formats, and a textual alternative to use in,
+say, text-only browsers and screen readers), the entire block
+is hideously overcomplicated for the task of putting an illustration
+with an optional caption into the flow of your article or chapter.
+</text>
+<text>
+The excessive nesting illustrates another point: if someone has
+to manually resolve a merge conflict, you want to make it as
+easy as possible. If all you have is huge amounts of whitespace
+padding a complex hierarchy of elements to illustrate their relationships,
+and yet all you have is the diff of a fragment of the document,
+how are you supposed to know which is which?
+</text>
+<text>
+And even after all that nesting, they still have
+<literal>&lt;para&gt;</literal> tags glued to the actual text,
+which is hopelessly in the way, and exceedingly ugly to have
+to look at. And worse, they treat whitespace as significant in
+normal text of their <literal>&lt;para&gt;</literal>s, which
+is why they're not given any indenting at all. The net result
+is not only ugly, but not even accomplishing the task of providing
+context.
+</text>
+<text>
+Quack takes the aesthetic approach used by HTML of discarding
+leading and trailing whitespace from block level elements, with
+the result that the document is <italics>much</italics> cleaner
+to read, and (if compelled to do so manually) adjust. By design
+the schema is so simple that there is no nesting used because
+none is necessary for comprehension.
+</text>
+<text>
+We are, however, quite concerned to ensure that people using
+Quill and Parchment never have their documents locked in and
+be unable to extract them in the future. To that end, it shouldn't
+be too hard to write a function to do a one-way export from Quack
+XML to DocBook XML - perhaps using XSLT, perhaps using a custom
+Serializer, and perhaps using Parchment.
+</text>
+<text>
+If you ever <italics>are</italics> working with DocBook, ensure
+you're working with version 5 of the spec. They've cleaned up
+a few things, and now their documents are composed with a root
+element identified with a <literal>xmlns</literal> namespace
+attribute, rather than <literal>DOCTYPE</literal> declarations.
+</text>
+</chapter>
