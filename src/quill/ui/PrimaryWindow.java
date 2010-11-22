@@ -52,6 +52,7 @@ import org.gnome.gtk.ResponseType;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
+import org.gnome.gtk.WindowPosition;
 
 import parchment.format.Manuscript;
 import parchment.format.Metadata;
@@ -264,11 +265,16 @@ class PrimaryWindow extends Window
         this.advanceTo(following);
     }
 
+    /*
+     * We probably shouldn't be forcing the position, but we want to start out
+     * with a balance and do our best by the user on first presentation.
+     */
     private void setupWindow() {
         ui = Quill.getUserInterface();
 
         window = this;
-        window.setMaximize(true);
+        window.setDefaultSize(1380, 950);
+        window.setPosition(WindowPosition.CENTER_ALWAYS);
         window.setTitle("Quill");
 
         top = new VBox(false, 0);
@@ -335,6 +341,7 @@ class PrimaryWindow extends Window
         right.setCurrentPage(4);
 
         window.present();
+        window.setPosition(WindowPosition.NONE);
     }
 
     private void hookupWindowManagement() {
@@ -501,11 +508,10 @@ class PrimaryWindow extends Window
             alloc = left.getAllocation();
             right.hide();
             window.setMaximize(false);
-            window.resize(alloc.getWidth(), 720);
+            window.resize(alloc.getWidth(), 950);
             showingRightSide = false;
         } else {
             right.show();
-            window.setMaximize(true);
             showingRightSide = true;
         }
     }
