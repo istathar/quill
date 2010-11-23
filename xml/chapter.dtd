@@ -21,7 +21,7 @@
 -->
 
 <!ELEMENT chapter (title?,(heading | text | code | quote | image | poem | credit)*,endnote*,reference*)>
-<!ATTLIST chapter xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/0.4">
+<!ATTLIST chapter xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/0.5">
 
 <!-- block level  -->
 
@@ -29,25 +29,25 @@
 
 <!ELEMENT heading (#PCDATA)>
 
-<!ELEMENT text (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
+<!ELEMENT text (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note  | publication | keyboard | proper)*>
 
 <!ELEMENT code (#PCDATA | bold | highlight | note)*>
 <!ATTLIST code xml:space CDATA #FIXED "preserve">
 
-<!ELEMENT quote (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
+<!ELEMENT quote (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note | publication | keyboard | proper)*>
 
-<!ELEMENT image (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
+<!ELEMENT image (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note | publication | keyboard | proper)*>
 <!ATTLIST image src CDATA #REQUIRED>
 
-<!ELEMENT poem (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
+<!ELEMENT poem (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note | publication | keyboard | proper)*>
 <!ATTLIST poem xml:space CDATA #FIXED "preserve">
 
-<!ELEMENT credit (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
+<!ELEMENT credit (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note | publication | keyboard | proper)*>
 
-<!ELEMENT endnote (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | cite)*>
+<!ELEMENT endnote (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | cite | publication | keyboard | proper)*>
 <!ATTLIST endnote name CDATA #REQUIRED>
 
-<!ELEMENT reference (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight)*>
+<!ELEMENT reference (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | publication | keyboard | proper)*>
 <!ATTLIST reference name CDATA #REQUIRED>
 
 <!-- inline spans -->
@@ -69,6 +69,12 @@
 <!ELEMENT command (#PCDATA)>
 
 <!ELEMENT highlight (#PCDATA)>
+
+<!ELEMENT publication (#PCDATA)>
+
+<!ELEMENT keyboard (#PCDATA)>
+
+<!ELEMENT proper (#PCDATA)>
 
 <!ELEMENT note EMPTY>
 <!ATTLIST note ref CDATA #REQUIRED>
