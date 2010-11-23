@@ -71,9 +71,9 @@ public class ValidateEndnoteConversion extends IOTestCase
         chapter.setFilename("Endnote.xml");
         series = chapter.loadDocument();
 
-        assertEquals(1, series.size());
+        assertEquals(2, series.size());
 
-        segment = series.getSegment(0);
+        segment = series.getSegment(1);
         assertTrue(segment instanceof QuoteSegment);
 
         entire = segment.getEntire();
@@ -133,13 +133,15 @@ public class ValidateEndnoteConversion extends IOTestCase
          */
 
         series = chapter.loadDocument();
-        assertEquals(3, series.size());
+        assertEquals(4, series.size());
 
         segment = series.getSegment(0);
-        assertTrue(segment instanceof NormalSegment);
+        assertTrue(segment instanceof ComponentSegment);
         segment = series.getSegment(1);
-        assertTrue(segment instanceof QuoteSegment);
+        assertTrue(segment instanceof NormalSegment);
         segment = series.getSegment(2);
+        assertTrue(segment instanceof QuoteSegment);
+        segment = series.getSegment(3);
         assertTrue(segment instanceof NormalSegment);
 
         /*
@@ -192,20 +194,22 @@ public class ValidateEndnoteConversion extends IOTestCase
          */
 
         series = chapter.loadDocument();
-        assertEquals(3, series.size());
+        assertEquals(4, series.size());
 
         segment = series.getSegment(0);
-        assertTrue(segment instanceof NormalSegment);
+        assertTrue(segment instanceof ComponentSegment);
         segment = series.getSegment(1);
-        assertTrue(segment instanceof QuoteSegment);
+        assertTrue(segment instanceof NormalSegment);
         segment = series.getSegment(2);
+        assertTrue(segment instanceof QuoteSegment);
+        segment = series.getSegment(3);
         assertTrue(segment instanceof NormalSegment);
 
         /*
          * Append a <note> to the end of the first NormalSegment
          */
 
-        segment = series.getSegment(0);
+        segment = series.getSegment(1);
         entire = segment.getEntire();
 
         span = Span.createMarker("[Einstein, 1905]", Special.NOTE);
@@ -234,7 +238,7 @@ public class ValidateEndnoteConversion extends IOTestCase
 
         entire = chain.extractAll();
         segment = segment.createSimilar(entire, 0, 0, entire.getWidth());
-        series = series.update(0, segment);
+        series = series.update(1, segment);
 
         converter = new QuackConverter();
 
