@@ -31,6 +31,7 @@ import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
+import org.gnome.gdk.Screen;
 import org.gnome.gdk.WindowState;
 import org.gnome.glib.Glib;
 import org.gnome.gtk.Alignment;
@@ -266,15 +267,41 @@ class PrimaryWindow extends Window
     }
 
     /*
-     * We probably shouldn't be forcing the position, but we want to start out
-     * with a balance and do our best by the user on first presentation.
      */
     private void setupWindow() {
+        final Screen screen;
+        final int availableWidth, availableHeight;
+        final int desiredWidth = 1380;
+        final int desiredHeight = 950;
+
         ui = Quill.getUserInterface();
 
         window = this;
-        window.setDefaultSize(1380, 950);
-        window.setPosition(WindowPosition.CENTER_ALWAYS);
+
+        /*
+         * Try and size the Window as best we can. If we're on a laptop
+         * (arbitrarily defined as 16:9 WSXGA or less), then we go for as much
+         * screen real estate as we can. If we're on a larger monitor, then we
+         * pick a good size.
+         * 
+         * We probably shouldn't be forcing any of this, but we want to start
+         * out with a balance and do our best by the user on first
+         * presentation; the usual approach of saving the user's last used
+         * window size isn't such a good idea if the user has gone and screwed
+         * it up.
+         */
+
+        screen = window.getScreen();
+        availableWidth = screen.getWidth();
+        availableHeight = screen.getHeight();
+
+        if ((availableWidth < desiredWidth) || (availableHeight < desiredHeight)) {
+            window.setMaximize(true);
+        } else {
+            window.setDefaultSize(desiredWidth, desiredHeight);
+            window.setPosition(WindowPosition.CENTER_ALWAYS);
+        }
+
         window.setTitle("Quill");
 
         top = new VBox(false, 0);
@@ -1067,9 +1094,6 @@ class PrimaryWindow extends Window
      * ComponentEditorWidget with the appropriate Chapter showing.
      */
     void ensureVisible(Series series, Segment segment) {
-        final int I;
-        int i;
-
         if (series != cursorSeries) {
             cursorSeries = series;
             editor.initializeSeries(cursorSeries);
