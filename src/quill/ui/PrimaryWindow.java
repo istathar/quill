@@ -892,7 +892,7 @@ class PrimaryWindow extends Window
      * Open a new chapter in the editor, replacing the current one.
      */
     void openDocument() {
-        final String directory;
+        String directory;
         final Manuscript attempt;
         final FileChooserDialog dialog;
         final FileFilter filter;
@@ -941,6 +941,10 @@ class PrimaryWindow extends Window
             error.hide();
             return;
         }
+
+        directory = manuscript.getDirectory();
+        ui.setCurrentFolder(directory);
+
         this.displayDocument(folio);
     }
 
