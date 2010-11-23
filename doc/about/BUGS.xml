@@ -54,6 +54,12 @@ I thought this used to work. But perhaps the
 <type>EditorTextView</type> is clearing the formatting? Or check
 <function>paste()</function> there.
 </text>
+<text>
+<bold>Spell checking</bold>
+</text>
+<text>
+Application markup should not be checked.
+</text>
 <heading>
 Internal
 </heading>

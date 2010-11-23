@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.client.ImproperFilenameException;
+import quill.textbase.ComponentSegment;
 import quill.textbase.NormalSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
@@ -44,13 +45,23 @@ public class ValidateBlockquoteConversion extends TestCase
         chapter.setFilename("Blockquote.xml");
         series = chapter.loadDocument();
 
-        assertEquals(3, series.size());
+        assertEquals(4, series.size());
+
+        /*
+         * Automatically added on load
+         */
 
         segment = series.getSegment(0);
-        assertTrue(segment instanceof NormalSegment);
+        assertTrue(segment instanceof ComponentSegment);
+
+        /*
+         * Actual blocks from file
+         */
         segment = series.getSegment(1);
-        assertTrue(segment instanceof QuoteSegment);
+        assertTrue(segment instanceof NormalSegment);
         segment = series.getSegment(2);
+        assertTrue(segment instanceof QuoteSegment);
+        segment = series.getSegment(3);
         assertTrue(segment instanceof NormalSegment);
     }
 }

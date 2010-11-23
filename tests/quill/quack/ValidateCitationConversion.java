@@ -28,6 +28,7 @@ import parchment.format.InvalidDocumentException;
 import parchment.format.Manuscript;
 import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
+import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
 import quill.textbase.MarkerSpan;
 import quill.textbase.NormalSegment;
@@ -72,9 +73,11 @@ public class ValidateCitationConversion extends IOTestCase
         chapter.setFilename("Citation.xml");
         series = chapter.loadDocument();
 
-        assertEquals(1, series.size());
+        assertEquals(2, series.size());
 
         segment = series.getSegment(0);
+        assertTrue(segment instanceof ComponentSegment);
+        segment = series.getSegment(1);
         assertTrue(segment instanceof NormalSegment);
 
         entire = segment.getEntire();

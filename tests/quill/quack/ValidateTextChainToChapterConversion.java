@@ -57,9 +57,14 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         chapter = new Chapter(manuscript);
         chapter.setFilename("HelloWorld.xml"); // real
         series = chapter.loadDocument();
-        assertEquals(1, series.size());
 
-        entire = series.getSegment(0).getEntire();
+        /*
+         * Loaded <text> block gives a NormalSegment, now plus an automatic
+         * empty ComponentSegment for the UI.
+         */
+        assertEquals(2, series.size());
+
+        entire = series.getSegment(1).getEntire();
         assertNotNull(entire);
         assertEquals("Hello world", entire.getText());
     }
@@ -196,9 +201,9 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         chapter = new Chapter(manuscript);
         chapter.setFilename("TemporaryFiles.xml");
         series = chapter.loadDocument();
-        assertEquals(1, series.size());
+        assertEquals(2, series.size());
 
-        entire = series.getSegment(0).getEntire();
+        entire = series.getSegment(1).getEntire();
 
         assertNotNull(entire);
         assertEquals("Accessing the /tmp directory directly is "

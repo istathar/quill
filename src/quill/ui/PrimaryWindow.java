@@ -31,6 +31,7 @@ import org.gnome.gdk.Event;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
+import org.gnome.gdk.Screen;
 import org.gnome.gdk.WindowState;
 import org.gnome.glib.Glib;
 import org.gnome.gtk.Alignment;
@@ -52,6 +53,7 @@ import org.gnome.gtk.ResponseType;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
+import org.gnome.gtk.WindowPosition;
 
 import parchment.format.Manuscript;
 import parchment.format.Metadata;
@@ -264,11 +266,42 @@ class PrimaryWindow extends Window
         this.advanceTo(following);
     }
 
+    /*
+     */
     private void setupWindow() {
+        final Screen screen;
+        final int availableWidth, availableHeight;
+        final int desiredWidth = 1380;
+        final int desiredHeight = 950;
+
         ui = Quill.getUserInterface();
 
         window = this;
-        window.setMaximize(true);
+
+        /*
+         * Try and size the Window as best we can. If we're on a laptop
+         * (arbitrarily defined as 16:9 WSXGA or less), then we go for as much
+         * screen real estate as we can. If we're on a larger monitor, then we
+         * pick a good size.
+         * 
+         * We probably shouldn't be forcing any of this, but we want to start
+         * out with a balance and do our best by the user on first
+         * presentation; the usual approach of saving the user's last used
+         * window size isn't such a good idea if the user has gone and screwed
+         * it up.
+         */
+
+        screen = window.getScreen();
+        availableWidth = screen.getWidth();
+        availableHeight = screen.getHeight();
+
+        if ((availableWidth < desiredWidth) || (availableHeight < desiredHeight)) {
+            window.setMaximize(true);
+        } else {
+            window.setDefaultSize(desiredWidth, desiredHeight);
+            window.setPosition(WindowPosition.CENTER_ALWAYS);
+        }
+
         window.setTitle("Quill");
 
         top = new VBox(false, 0);
@@ -335,6 +368,7 @@ class PrimaryWindow extends Window
         right.setCurrentPage(4);
 
         window.present();
+        window.setPosition(WindowPosition.NONE);
     }
 
     private void hookupWindowManagement() {
@@ -501,11 +535,10 @@ class PrimaryWindow extends Window
             alloc = left.getAllocation();
             right.hide();
             window.setMaximize(false);
-            window.resize(alloc.getWidth(), 720);
+            window.resize(alloc.getWidth(), 950);
             showingRightSide = false;
         } else {
             right.show();
-            window.setMaximize(true);
             showingRightSide = true;
         }
     }
@@ -859,7 +892,7 @@ class PrimaryWindow extends Window
      * Open a new chapter in the editor, replacing the current one.
      */
     void openDocument() {
-        final String directory;
+        String directory;
         final Manuscript attempt;
         final FileChooserDialog dialog;
         final FileFilter filter;
@@ -908,6 +941,10 @@ class PrimaryWindow extends Window
             error.hide();
             return;
         }
+
+        directory = manuscript.getDirectory();
+        ui.setCurrentFolder(directory);
+
         this.displayDocument(folio);
     }
 
@@ -1061,9 +1098,6 @@ class PrimaryWindow extends Window
      * ComponentEditorWidget with the appropriate Chapter showing.
      */
     void ensureVisible(Series series, Segment segment) {
-        final int I;
-        int i;
-
         if (series != cursorSeries) {
             cursorSeries = series;
             editor.initializeSeries(cursorSeries);
