@@ -94,12 +94,12 @@ public class ValidateChangePropagation extends GraphicalTestCase
         chapter.saveDocument(series, out);
 
         expected = combine(new String[] {
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
-                "<title>",
-                "h",
-                "</title>",
-                "</chapter>"
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
+            "<title>",
+            "h",
+            "</title>",
+            "</chapter>"
         });
         assertEquals(expected, out.toString());
     }
@@ -142,13 +142,13 @@ public class ValidateChangePropagation extends GraphicalTestCase
         chapter.saveDocument(series, out);
 
         expected = combine(new String[] {
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
-                "<text>",
-                "This is a test of the emergency broadcast",
-                "system",
-                "</text>",
-                "</chapter>"
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
+            "<text>",
+            "This is a test of the emergency broadcast",
+            "system",
+            "</text>",
+            "</chapter>"
         });
         assertEquals(expected, out.toString());
 
@@ -189,12 +189,12 @@ public class ValidateChangePropagation extends GraphicalTestCase
         chapter.saveDocument(series, out);
 
         expected = combine(new String[] {
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
-                "<text>",
-                "This is an emergency broadcast system",
-                "</text>",
-                "</chapter>"
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
+            "<text>",
+            "This is an emergency broadcast system",
+            "</text>",
+            "</chapter>"
         });
         assertEquals(expected, out.toString());
     }
@@ -240,13 +240,13 @@ public class ValidateChangePropagation extends GraphicalTestCase
         chapter.saveDocument(series, out);
 
         expected = combine(new String[] {
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
-                "<text>",
-                "This is a test of the <italics>emergency</italics>",
-                "broadcast system",
-                "</text>",
-                "</chapter>",
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
+            "<text>",
+            "This is a test of the <italics>emergency</italics>",
+            "broadcast system",
+            "</text>",
+            "</chapter>",
         });
         assertEquals(expected, out.toString());
 
@@ -274,14 +274,14 @@ public class ValidateChangePropagation extends GraphicalTestCase
         chapter.saveDocument(series, out);
 
         expected = combine(new String[] {
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
-                "<text>",
-                "This is a test of the",
-                "a<italics>emergency</italics> broadcast",
-                "system",
-                "</text>",
-                "</chapter>"
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
+            "<text>",
+            "This is a test of the",
+            "a<italics>emergency</italics> broadcast",
+            "system",
+            "</text>",
+            "</chapter>"
         });
         assertEquals(expected, out.toString());
 
@@ -304,14 +304,14 @@ public class ValidateChangePropagation extends GraphicalTestCase
         chapter.saveDocument(series, out);
 
         expected = combine(new String[] {
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
-                "<para>",
-                "This is a test of the",
-                "a<emphasis>emergencya</emphasis> broadcast",
-                "system",
-                "</para>",
-                "</chapter>"
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<chapter version=\"5.0\" xmlns=\"http://docbook.org/ns/docbook\">",
+            "<para>",
+            "This is a test of the",
+            "a<emphasis>emergencya</emphasis> broadcast",
+            "system",
+            "</para>",
+            "</chapter>"
         });
         assertEquals(expected, out.toString());
 

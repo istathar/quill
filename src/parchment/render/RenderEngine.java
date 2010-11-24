@@ -953,8 +953,8 @@ public abstract class RenderEngine
                 };
             } else if (m == Common.FILENAME) {
                 return new Attribute[] {
-                        new FontDescriptionAttribute(monoFace.desc),
-                        new StyleAttribute(Style.ITALIC),
+                    new FontDescriptionAttribute(monoFace.desc),
+                    new StyleAttribute(Style.ITALIC),
                 };
             } else if (m == Common.TYPE) {
                 return new Attribute[] {
@@ -974,9 +974,9 @@ public abstract class RenderEngine
                 };
             } else if (m == Common.COMMAND) {
                 return new Attribute[] {
-                        new FontDescriptionAttribute(monoFace.desc),
-                        new WeightAttribute(Weight.SEMIBOLD),
-                        new ForegroundColorAttribute(0.1, 0.1, 0.1),
+                    new FontDescriptionAttribute(monoFace.desc),
+                    new WeightAttribute(Weight.SEMIBOLD),
+                    new ForegroundColorAttribute(0.1, 0.1, 0.1),
                 };
             } else if (m == Common.HIGHLIGHT) {
                 return new Attribute[] {
@@ -991,8 +991,8 @@ public abstract class RenderEngine
         } else if (m instanceof Special) {
             if (m == Special.NOTE) {
                 return new Attribute[] {
-                        new SizeAttribute(4.0),
-                        new RiseAttribute(4.5),
+                    new SizeAttribute(4.0),
+                    new RiseAttribute(4.5),
                 };
             } else if (m == Special.CITE) {
                 return empty;
@@ -1070,9 +1070,9 @@ public abstract class RenderEngine
         left = layoutAreaFooterRight(cr, pageNumber);
 
         return new Area[] {
-                right,
-                center,
-                left
+            right,
+            center,
+            left
         };
     }
 
@@ -1179,9 +1179,9 @@ public abstract class RenderEngine
         left = layoutAreaHeaderRight(cr, pageNumber);
 
         return new Area[] {
-                right,
-                center,
-                left
+            right,
+            center,
+            left
         };
     }
 

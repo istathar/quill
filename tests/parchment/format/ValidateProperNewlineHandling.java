@@ -64,11 +64,11 @@ public class ValidateProperNewlineHandling extends ParchmentTestCase
         entire = segment.getEntire();
 
         spans = new Span[] {
-                createSpan("Hello\n", null),
-                createSpan("\n", null),
-                createSpan("World", Common.BOLD),
-                createSpan("\n", null),
-                createSpan("\n", null)
+            createSpan("Hello\n", null),
+            createSpan("\n", null),
+            createSpan("World", Common.BOLD),
+            createSpan("\n", null),
+            createSpan("\n", null)
         };
 
         chain = new TextChain();
@@ -90,18 +90,18 @@ public class ValidateProperNewlineHandling extends ParchmentTestCase
         chapter.saveDocument(series, out);
 
         blob = combine(new String[] {
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
-                "<text>",
-                "Hello",
-                "</text>",
-                "<text/>",
-                "<text>",
-                "<bold>World</bold>",
-                "</text>",
-                "<text/>",
-                "<text/>",
-                "</chapter>"
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
+            "<text>",
+            "Hello",
+            "</text>",
+            "<text/>",
+            "<text>",
+            "<bold>World</bold>",
+            "</text>",
+            "<text/>",
+            "<text/>",
+            "</chapter>"
         });
         assertEquals(blob, out.toString());
     }

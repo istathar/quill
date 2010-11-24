@@ -176,9 +176,9 @@ public class ValidateSpellingOperations extends GraphicalTestCase
          */
 
         spans = new Span[] {
-                createSpan("Use ", null),
-                createSpan("dsmthng()", Common.FUNCTION),
-                createSpan(" speek.", null),
+            createSpan("Use ", null),
+            createSpan("dsmthng()", Common.FUNCTION),
+            createSpan(" speek.", null),
         };
 
         parent = primary.testGetEditor();

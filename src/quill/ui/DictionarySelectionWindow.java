@@ -255,8 +255,8 @@ class DictionarySelectionWindow extends Window
         displayColumn = new DataColumnString();
 
         store = new ListStore(new DataColumn[] {
-                tagColumn,
-                displayColumn
+            tagColumn,
+            displayColumn
         });
         filtered = new TreeModelFilter(store, null);
         sorted = new TreeModelSort(filtered);
