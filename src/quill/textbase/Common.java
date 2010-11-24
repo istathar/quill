@@ -44,9 +44,15 @@ public class Common extends Markup
 
     public static final Common FUNCTION = new Common("FUNCTION", false);
 
-    public static final Common APPLICATION = new Common("APPLICATION", true);
+    public static final Common APPLICATION = new Common("APPLICATION", false);
 
     public static final Common COMMAND = new Common("COMMAND", false);
 
     public static final Common HIGHLIGHT = new Common("HIGHLIGHT", false);
+
+    public static final Common PUBLICATION = new Common("PUBLICATION", true);
+
+    public static final Common KEYBOARD = new Common("KEYBOARD", false);
+
+    public static final Common PROPER = new Common("PROPER", true);
 }

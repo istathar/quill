@@ -81,12 +81,6 @@ to the document. Perhaps this is just "Ignore"?
 This will likely make more sense when we have a proper notion
 of document and can store a word list there.
 </text>
-<text>
-<bold>Markup improvements</bold>
-</text>
-<text>
-Keystroke needs an accelerator.
-</text>
 <heading>
 Copyright
 </heading>

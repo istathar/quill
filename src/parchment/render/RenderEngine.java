@@ -42,6 +42,8 @@ import org.gnome.pango.RiseAttribute;
 import org.gnome.pango.SizeAttribute;
 import org.gnome.pango.Style;
 import org.gnome.pango.StyleAttribute;
+import org.gnome.pango.Variant;
+import org.gnome.pango.VariantAttribute;
 import org.gnome.pango.Weight;
 import org.gnome.pango.WeightAttribute;
 import org.gnome.pango.WrapMode;
@@ -982,6 +984,16 @@ public abstract class RenderEngine
                 return new Attribute[] {
                     new BackgroundColorAttribute(1.0, 1.0, 0.0),
                 };
+            } else if (m == Common.PUBLICATION) {
+                return new Attribute[] {
+                    new StyleAttribute(Style.ITALIC),
+                };
+            } else if (m == Common.KEYBOARD) {
+                return new Attribute[] {
+                    new WeightAttribute(Weight.BOLD),
+                };
+            } else if (m == Common.PROPER) {
+                return createSmallCaps();
             }
 
         } else if (m instanceof Preformat) {
@@ -1000,6 +1012,29 @@ public abstract class RenderEngine
         }
 
         throw new IllegalArgumentException("\n" + "Translation of " + m + " not yet implemented");
+    }
+
+    /**
+     * Generate a set of Attributes representing a "small caps" face.
+     */
+    /*
+     * Woarkaround the bug that Variant.SMALL_CAPS doesn't actually work; and
+     * meanwhile, "Linux Libertine O C" is a small caps font.
+     */
+    private Attribute[] createSmallCaps() {
+        final FontDescription desc;
+        final double size;
+
+        size = serifFace.desc.getSize();
+
+        desc = new FontDescription();
+        desc.setFamily("Linux Libertine O C");
+
+        return new Attribute[] {
+            new FontDescriptionAttribute(desc),
+            new SizeAttribute(size),
+            new VariantAttribute(Variant.SMALL_CAPS)
+        };
     }
 
     /*

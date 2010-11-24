@@ -12,12 +12,12 @@ Formatting
 </heading>
 <text>
 Different semantic markup can be applied. The various formats
-can be applied by typing <literal>Ctrl+Shift+&lt;Key&gt;</literal>.
+can be applied by typing <keyboard>Ctrl+Shift+&lt;Key&gt;</keyboard>.
 
 </text>
 <text>
 You can never get away from legacy, so bold and italics are
-<literal>Ctrl+B</literal> and <literal>Ctrl+I</literal> respectively.
+<keyboard>Ctrl+B</keyboard> and <keyboard>Ctrl+I</keyboard> respectively.
 It's not like we were going to use those combinations for something
 else, and as much as consistency is important, we're not trying
 to make people's lives difficult.
@@ -41,11 +41,11 @@ wanted ship names in italics can just use
 or...
 </text>
 <text>
-<literal>Ctrl+Shift+P</literal> Publication (book title, ship
+<keyboard>Ctrl+Shift+P</keyboard> Publication (book title, ship
 name: italics)
 </text>
 <text>
-<literal>Crtl+Shift+N</literal> Proper Name (term or abbreviation:
+<keyboard>Crtl+Shift+N</keyboard> Proper Name (term or abbreviation:
 small caps)
 </text>
 </chapter>

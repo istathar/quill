@@ -75,6 +75,12 @@ public class QuackNodeFactory extends NodeFactory
             return new CommandElement();
         } else if (name.equals("highlight")) {
             return new HighlightElement();
+        } else if (name.equals("publication")) {
+            return new PublicationElement();
+        } else if (name.equals("keyboard")) {
+            return new KeyboardElement();
+        } else if (name.equals("proper")) {
+            return new ProperElement();
         } else if (name.equals("application")) {
             return new ApplicationElement();
         } else if (name.equals("userinput")) {

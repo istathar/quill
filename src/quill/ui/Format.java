@@ -19,6 +19,7 @@
 package quill.ui;
 
 import org.gnome.gtk.TextTag;
+import org.gnome.pango.FontDescription;
 import org.gnome.pango.Style;
 import org.gnome.pango.Underline;
 import org.gnome.pango.Weight;
@@ -56,6 +57,12 @@ class Format
 
     static final TextTag highlight;
 
+    static final TextTag publication;
+
+    static final TextTag keyboard;
+
+    static final TextTag proper;
+
     static final TextTag hidden;
 
     static final TextTag userinput;
@@ -63,6 +70,9 @@ class Format
     static final TextTag spelling;
 
     static {
+        FontDescription desc;
+        double size;
+
         filename = new TextTag();
         filename.setFontDescription(fonts.mono);
         filename.setForeground("darkgreen");
@@ -106,6 +116,25 @@ class Format
 
         spelling = new TextTag();
         spelling.setUnderline(Underline.ERROR);
+
+        publication = new TextTag();
+        publication.setStyle(Style.ITALIC);
+
+        keyboard = new TextTag();
+        keyboard.setFontDescription(fonts.mono);
+        keyboard.setWeight(Weight.BOLD);
+
+        proper = new TextTag();
+
+        /*
+         * This is a hack; clearly we need something better to display.
+         */
+        desc = new FontDescription("Linux Libertine O C");
+
+        proper.setFontDescription(desc);
+        proper.setWeight(Weight.BOLD);
+        size = fonts.serif.getSize();
+        proper.setSize(size);
     }
 
     /**
@@ -151,6 +180,12 @@ class Format
                 return command;
             } else if (m == Common.HIGHLIGHT) {
                 return highlight;
+            } else if (m == Common.PUBLICATION) {
+                return publication;
+            } else if (m == Common.KEYBOARD) {
+                return keyboard;
+            } else if (m == Common.PROPER) {
+                return proper;
             } else if (m == Common.LITERAL) {
                 return code;
             }

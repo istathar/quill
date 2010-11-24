@@ -21,8 +21,8 @@ to GTK </bold><type>Label</type><bold>?</bold>
 </text>
 <text>
 If you put the text <literal>&lt;!--</literal> into a section
-heading, then <bold>F3</bold> Outline, the application crashes
-with an error from <type>Label</type>'s
+heading, then <keyboard>F3</keyboard> Outline, the application
+crashes with an error from <type>Label</type>'s
 <literal>setUseMarkup()</literal>.
 </text>
 <text>
@@ -31,9 +31,9 @@ with an error from <type>Label</type>'s
 </text>
 <text>
 If you select text in one editor, then you click in another,
-moving the focus, the TextView which looses focus sets the selected
-region the semi-tone "I'm inactive but still have a selection"
-colour.
+moving the focus, the <type>TextView</type> which looses focus
+sets the selected region the semi-tone "I'm inactive but still
+have a selection" colour.
 </text>
 <text>
 It should probably be cleared so the behaviour is consistent
@@ -44,7 +44,7 @@ with there only being one <type>TextView</type>.
 </text>
 <text>
 For some reason, if you set a format (say
-<filename>filename</filename> with <bold>Ctrl+Shift+F</bold>)
+<filename>filename</filename> with <keyboard>Ctrl+Shift+F</keyboard>)
 and then you paste some text, that format is not picked up and
 instead it seems to be given <literal>null</literal> formatting.
 </text>
@@ -53,12 +53,6 @@ I thought this used to work. But perhaps the
 <literal>TextView.NotifyCursorPosition </literal>handler in
 <type>EditorTextView</type> is clearing the formatting? Or check
 <function>paste()</function> there.
-</text>
-<text>
-<bold>Spell checking</bold>
-</text>
-<text>
-Application markup should not be checked.
 </text>
 <heading>
 Internal
