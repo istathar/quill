@@ -56,9 +56,9 @@ public class ValidateDataIntegrity extends IOTestCase
         assertTrue(segment instanceof NormalSegment);
 
         spans = new Span[] {
-                createSpan("Hello ", Common.BOLD),
-                createSpan("GtkButton", Common.TYPE),
-                createSpan(" world", Common.BOLD)
+            createSpan("Hello ", Common.BOLD),
+            createSpan("GtkButton", Common.TYPE),
+            createSpan(" world", Common.BOLD)
         };
 
         chain = new TextChain();
@@ -94,12 +94,12 @@ public class ValidateDataIntegrity extends IOTestCase
         chapter.saveDocument(series, out);
 
         expected = combine(new String[] {
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
-                "<text>",
-                "<bold>Hello </bold><type>GtkButton</type><bold> world</bold>",
-                "</text>",
-                "</chapter>"
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
+            "<text>",
+            "<bold>Hello </bold><type>GtkButton</type><bold> world</bold>",
+            "</text>",
+            "</chapter>"
         });
 
         assertEquals(expected, out.toString());
@@ -120,11 +120,11 @@ public class ValidateDataIntegrity extends IOTestCase
         final Extract entire;
 
         expected = new Span[] {
-                createSpan("Hello ", Common.BOLD),
-                createSpan("GtkButton", Common.TYPE),
-                createSpan(" world", Common.BOLD),
-                createSpan(" ", Common.BOLD), // the \n
-                createSpan("printf()", Common.LITERAL)
+            createSpan("Hello ", Common.BOLD),
+            createSpan("GtkButton", Common.TYPE),
+            createSpan(" world", Common.BOLD),
+            createSpan(" ", Common.BOLD), // the \n
+            createSpan("printf()", Common.LITERAL)
         };
 
         manuscript = new Manuscript();
@@ -161,11 +161,11 @@ public class ValidateDataIntegrity extends IOTestCase
         final String outbound;
 
         inbound = new Span[] {
-                createSpan("Hello world. ", null),
-                createSpan("It is a lovely day.", Common.ITALICS),
-                createSpan("\n", null),
-                createSpan("And so is this day.", Common.ITALICS),
-                createSpan(" Goodbye.", null),
+            createSpan("Hello world. ", null),
+            createSpan("It is a lovely day.", Common.ITALICS),
+            createSpan("\n", null),
+            createSpan("And so is this day.", Common.ITALICS),
+            createSpan(" Goodbye.", null),
         };
 
         manuscript = new Manuscript();
@@ -192,15 +192,15 @@ public class ValidateDataIntegrity extends IOTestCase
         chapter.saveDocument(series, out);
 
         outbound = combine(new String[] {
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
-                "<text>",
-                "Hello world. <italics>It is a lovely day.</italics>",
-                "</text>",
-                "<text>",
-                "<italics>And so is this day.</italics> Goodbye.",
-                "</text>",
-                "</chapter>"
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
+            "<text>",
+            "Hello world. <italics>It is a lovely day.</italics>",
+            "</text>",
+            "<text>",
+            "<italics>And so is this day.</italics> Goodbye.",
+            "</text>",
+            "</chapter>"
         });
 
         assertEquals(outbound, out.toString());

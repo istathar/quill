@@ -82,15 +82,15 @@ public class ValidatePreformattedConversion extends IOTestCase
         series = series.update(0, segment);
 
         spans = new Span[] {
-                createSpan("public class Hello {", null),
-                createSpan("\n", null),
-                createSpan("    public static void main(String[] args) {", null),
-                createSpan("\n", null),
-                createSpan("        System.out.println(\"Hello World\");", null),
-                createSpan("\n", null),
-                createSpan("    }", null),
-                createSpan("\n", null),
-                createSpan("}", null)
+            createSpan("public class Hello {", null),
+            createSpan("\n", null),
+            createSpan("    public static void main(String[] args) {", null),
+            createSpan("\n", null),
+            createSpan("        System.out.println(\"Hello World\");", null),
+            createSpan("\n", null),
+            createSpan("    }", null),
+            createSpan("\n", null),
+            createSpan("}", null)
         };
 
         chain = new TextChain();
@@ -103,9 +103,9 @@ public class ValidatePreformattedConversion extends IOTestCase
         series = series.update(1, segment);
 
         spans = new Span[] {
-                createSpan("There really isn't anything like saying ", null),
-                createSpan("Hello World", Common.ITALICS),
-                createSpan(" to a nice friendly programmer.", null),
+            createSpan("There really isn't anything like saying ", null),
+            createSpan("Hello World", Common.ITALICS),
+            createSpan(" to a nice friendly programmer.", null),
         };
 
         chain = new TextChain();
@@ -133,24 +133,24 @@ public class ValidatePreformattedConversion extends IOTestCase
         converter.writeChapter(out);
 
         blob = combine(new String[] {
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
-                "<text>",
-                "Consider the following simple and yet profound expression of",
-                "quality program code:",
-                "</text>",
-                "<code xml:space=\"preserve\">",
-                "public class Hello {",
-                "    public static void main(String[] args) {",
-                "        System.out.println(\"Hello World\");",
-                "    }",
-                "}",
-                "</code>",
-                "<text>",
-                "There really isn't anything like saying <italics>Hello World</italics>",
-                "to a nice friendly programmer.",
-                "</text>",
-                "</chapter>"
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
+            "<text>",
+            "Consider the following simple and yet profound expression of",
+            "quality program code:",
+            "</text>",
+            "<code xml:space=\"preserve\">",
+            "public class Hello {",
+            "    public static void main(String[] args) {",
+            "        System.out.println(\"Hello World\");",
+            "    }",
+            "}",
+            "</code>",
+            "<text>",
+            "There really isn't anything like saying <italics>Hello World</italics>",
+            "to a nice friendly programmer.",
+            "</text>",
+            "</chapter>"
         });
 
         /*

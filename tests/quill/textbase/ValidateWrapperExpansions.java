@@ -30,11 +30,11 @@ public class ValidateWrapperExpansions extends TestCase
         blank = Extract.create();
 
         segments = new Segment[] {
-                new ComponentSegment(blank),
-                new HeadingSegment(blank),
-                new NormalSegment(blank),
-                new PreformatSegment(blank),
-                new NormalSegment(blank),
+            new ComponentSegment(blank),
+            new HeadingSegment(blank),
+            new NormalSegment(blank),
+            new PreformatSegment(blank),
+            new NormalSegment(blank),
         };
     }
 

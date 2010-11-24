@@ -616,9 +616,9 @@ class RendererPicker extends VBox
         label = new Label(_("Renderer") + ":");
 
         model = new ListStore(new DataColumn[] {
-                nameColumn = new DataColumnString(),
-                defaultColumn = new DataColumnPixbuf(),
-                classColumn = new DataColumnString()
+            nameColumn = new DataColumnString(),
+            defaultColumn = new DataColumnPixbuf(),
+            classColumn = new DataColumnString()
         });
 
         combo = new ComboBox(model);

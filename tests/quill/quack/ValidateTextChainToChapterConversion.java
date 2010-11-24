@@ -103,15 +103,15 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         converter.writeChapter(out);
 
         blob = combine(new String[] {
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
-                "<text>",
-                "Hello",
-                "</text>",
-                "<text>",
-                "World",
-                "</text>",
-                "</chapter>"
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
+            "<text>",
+            "Hello",
+            "</text>",
+            "<text>",
+            "World",
+            "</text>",
+            "</chapter>"
         });
         assertEquals(blob, out.toString());
     }
@@ -130,20 +130,20 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
          */
 
         spans = new Span[] {
-                createSpan("Accessing the ", null),
-                createSpan("/tmp", Common.FILENAME),
-                createSpan(" directory directly is fine, but you are often better off using ", null),
-                createSpan("File", Common.TYPE),
-                createSpan('\'', null),
-                createSpan('s', null),
-                createSpan(' ', null),
-                createSpan("createTemp", Common.FUNCTION),
-                createSpan('F', Common.FUNCTION),
-                createSpan('i', Common.FUNCTION),
-                createSpan('l', Common.FUNCTION),
-                createSpan('e', Common.FUNCTION),
-                createSpan("()", Common.FUNCTION),
-                createSpan(" function.", null),
+            createSpan("Accessing the ", null),
+            createSpan("/tmp", Common.FILENAME),
+            createSpan(" directory directly is fine, but you are often better off using ", null),
+            createSpan("File", Common.TYPE),
+            createSpan('\'', null),
+            createSpan('s', null),
+            createSpan(' ', null),
+            createSpan("createTemp", Common.FUNCTION),
+            createSpan('F', Common.FUNCTION),
+            createSpan('i', Common.FUNCTION),
+            createSpan('l', Common.FUNCTION),
+            createSpan('e', Common.FUNCTION),
+            createSpan("()", Common.FUNCTION),
+            createSpan(" function.", null),
         };
 
         chain = new TextChain();
@@ -171,14 +171,14 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         converter.writeChapter(out);
 
         blob = combine(new String[] {
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
-                "<text>",
-                "Accessing the " + "<filename>/tmp</filename>" + " directory directly is",
-                "fine, but you are often better off using " + "<type>" + "File" + "</type>'s",
-                "<function>" + "createTempFile()" + "</function> function.",
-                "</text>",
-                "</chapter>"
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
+            "<text>",
+            "Accessing the " + "<filename>/tmp</filename>" + " directory directly is",
+            "fine, but you are often better off using " + "<type>" + "File" + "</type>'s",
+            "<function>" + "createTempFile()" + "</function> function.",
+            "</text>",
+            "</chapter>"
         });
 
         /*
@@ -244,12 +244,12 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         converter.writeChapter(out);
 
         blob = combine(new String[] {
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-                "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
-                "<text>",
-                ":𝑛:",
-                "</text>",
-                "</chapter>"
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
+            "<text>",
+            ":𝑛:",
+            "</text>",
+            "</chapter>"
         });
         assertEquals(blob, out.toString());
     }

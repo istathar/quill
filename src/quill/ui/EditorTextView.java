@@ -1172,17 +1172,16 @@ abstract class EditorTextView extends TextView
      */
     private void setupInsertMenuDetails() {
         insertDetails = new InsertMenuDetails[] {
-                new InsertMenuDetails(NormalSegment.class, _("Text _paragraphs"),
-                        _("normal wrapped text")),
-                new InsertMenuDetails(PreformatSegment.class, _("_Program code"),
-                        _("formating preserved; monospaced")),
-                new InsertMenuDetails(QuoteSegment.class, _("Block _quote"),
-                        _("normal wrapped text, but indented")),
-                new InsertMenuDetails(PoeticSegment.class, _("Poe_m"), _("formating preserved")),
-                new InsertMenuDetails(AttributionSegment.class, _("_Attribution"),
-                        _("smaller wrapped text, offset right")),
-                new InsertMenuDetails(HeadingSegment.class, _("Section _heading"),
-                        _("bold text, single line"))
+            new InsertMenuDetails(NormalSegment.class, _("Text _paragraphs"), _("normal wrapped text")),
+            new InsertMenuDetails(PreformatSegment.class, _("_Program code"),
+                    _("formating preserved; monospaced")),
+            new InsertMenuDetails(QuoteSegment.class, _("Block _quote"),
+                    _("normal wrapped text, but indented")),
+            new InsertMenuDetails(PoeticSegment.class, _("Poe_m"), _("formating preserved")),
+            new InsertMenuDetails(AttributionSegment.class, _("_Attribution"),
+                    _("smaller wrapped text, offset right")),
+            new InsertMenuDetails(HeadingSegment.class, _("Section _heading"),
+                    _("bold text, single line"))
         };
     }
 
