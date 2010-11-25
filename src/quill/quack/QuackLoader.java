@@ -346,8 +346,8 @@ public class QuackLoader
                 markup = Common.PUBLICATION;
             } else if (span instanceof KeyboardElement) {
                 markup = Common.KEYBOARD;
-            } else if (span instanceof ProperElement) {
-                markup = Common.PROPER;
+            } else if (span instanceof AcronymElement) {
+                markup = Common.ACRONYM;
             } else if (span instanceof ApplicationElement) {
                 markup = Common.APPLICATION;
             } else if (span instanceof ItalicsElement) {

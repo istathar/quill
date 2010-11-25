@@ -54,5 +54,5 @@ public class Common extends Markup
 
     public static final Common KEYBOARD = new Common("KEYBOARD", false);
 
-    public static final Common PROPER = new Common("PROPER", true);
+    public static final Common ACRONYM = new Common("PROPER", false);
 }

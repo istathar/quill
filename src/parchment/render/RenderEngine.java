@@ -992,7 +992,7 @@ public abstract class RenderEngine
                 return new Attribute[] {
                     new WeightAttribute(Weight.BOLD),
                 };
-            } else if (m == Common.PROPER) {
+            } else if (m == Common.ACRONYM) {
                 return createSmallCaps();
             }
 

@@ -184,7 +184,7 @@ class Format
                 return publication;
             } else if (m == Common.KEYBOARD) {
                 return keyboard;
-            } else if (m == Common.PROPER) {
+            } else if (m == Common.ACRONYM) {
                 return proper;
             } else if (m == Common.LITERAL) {
                 return code;

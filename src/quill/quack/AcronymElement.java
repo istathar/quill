@@ -22,10 +22,12 @@ package quill.quack;
  * Proper names (terms, acronyms) as markup
  * 
  * @author Andrew Cowie
+ * @see <a href="http://www.lyberty.com/encyc/articles/abbr.html">abbreviation
+ *      vs. acronym vs. initialism</a>
  */
-public class ProperElement extends InlineElement implements Inline
+public class AcronymElement extends InlineElement implements Inline
 {
-    public ProperElement() {
+    public AcronymElement() {
         super("proper");
     }
 }

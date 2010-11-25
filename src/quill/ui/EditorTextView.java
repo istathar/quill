@@ -394,7 +394,7 @@ abstract class EditorTextView extends TextView
                         toggleMarkup(Common.FUNCTION);
                         return true;
                     } else if (key == Keyval.N) {
-                        toggleMarkup(Common.PROPER);
+                        toggleMarkup(Common.ACRONYM);
                         return true;
                     } else if (key == Keyval.O) {
                         toggleMarkup(Common.COMMAND);

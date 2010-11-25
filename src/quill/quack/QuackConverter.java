@@ -205,8 +205,8 @@ public class QuackConverter
             inline = new PublicationElement();
         } else if (format == Common.KEYBOARD) {
             inline = new KeyboardElement();
-        } else if (format == Common.PROPER) {
-            inline = new ProperElement();
+        } else if (format == Common.ACRONYM) {
+            inline = new AcronymElement();
         } else if (format == Preformat.USERINPUT) {
             // boom?
         } else if (format == Special.NOTE) {
