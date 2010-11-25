@@ -127,13 +127,11 @@ class Format
         acronym = new TextTag();
 
         /*
-         * This is a hack; clearly we need something better to display.
+         * This is a bit of a hack; clearly we need to visually indicate small
+         * caps, and of course shrinking the normal serif font isn't entirely
+         * the best because lower case letters are hard to tell.
          */
-        desc = new FontDescription("Linux Libertine O");
-
-        acronym.setFontDescription(desc);
-        acronym.setWeight(Weight.BOLD);
-        size = fonts.serif.getSize();
+        size = fonts.serif.getSize() * 0.9;
         acronym.setSize(size);
     }
 

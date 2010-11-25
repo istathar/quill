@@ -42,8 +42,6 @@ import org.gnome.pango.RiseAttribute;
 import org.gnome.pango.SizeAttribute;
 import org.gnome.pango.Style;
 import org.gnome.pango.StyleAttribute;
-import org.gnome.pango.Variant;
-import org.gnome.pango.VariantAttribute;
 import org.gnome.pango.Weight;
 import org.gnome.pango.WeightAttribute;
 import org.gnome.pango.WrapMode;
@@ -119,6 +117,13 @@ public abstract class RenderEngine
     Typeface monoFace;
 
     Typeface headingFace;
+
+    /**
+     * Woarkaround the bug that Variant.SMALL_CAPS doesn't actually work; and
+     * meanwhile, "Linux Libertine O" has small caps font in the Private Use
+     * area. See {@link LibertineTypography#toSmallCase(int)}.
+     */
+    private Typeface smallFace;
 
     /**
      * This chapter's content, as prepared into Areas.
@@ -309,13 +314,25 @@ public abstract class RenderEngine
     }
 
     protected void specifyFonts(final Context cr) {
-        serifFace = new Typeface(cr, settings.getFontSerif(), 0.2);
+        FontDescription desc;
+        final double size;
 
-        sansFace = new Typeface(cr, settings.getFontSans(), 0.0);
+        desc = settings.getFontSerif();
+        size = desc.getSize();
+        serifFace = new Typeface(cr, desc, 0.2);
 
-        monoFace = new Typeface(cr, settings.getFontMono(), 0.0);
+        desc = settings.getFontSans();
+        sansFace = new Typeface(cr, desc, 0.0);
 
-        headingFace = new Typeface(cr, settings.getFontHeading(), 0.0);
+        desc = settings.getFontMono();
+        monoFace = new Typeface(cr, desc, 0.0);
+
+        desc = settings.getFontHeading();
+        headingFace = new Typeface(cr, desc, 0.0);
+
+        desc = new FontDescription("Linux Libertine O");
+        desc.setSize(size);
+        smallFace = new Typeface(cr, desc, 0.0);
 
         cr.setSource(0.0, 0.0, 0.0);
     }
@@ -560,10 +577,31 @@ public abstract class RenderEngine
      * characters actually added, since some cases insert Unicode control
      * sequences.
      */
-    private int translateAndAppend(final StringBuilder buf, final int ch, final boolean code) {
-        int num, i;
+    private int translateAndAppend(final StringBuilder buf, final int ch, final Markup format,
+            final boolean preformatted) {
+        int num, i, tr;
+        boolean code, small;
 
+        code = false;
+        small = false;
         num = 0;
+
+        /*
+         * If it's preformatted, then automatically assume code conditions.
+         * Otherwise, setup switches based on Markup type.
+         */
+
+        if (preformatted) {
+            code = true;
+        } else if ((format == Common.LITERAL) || (format == Common.FILENAME)) {
+            code = true;
+        } else if (format == Common.ACRONYM) {
+            small = true;
+        }
+
+        /*
+         * Perform translations.
+         */
 
         if (code) {
             /*
@@ -583,6 +621,11 @@ public abstract class RenderEngine
              */
 
             buf.appendCodePoint(ch);
+            num++;
+        } else if (small) {
+            tr = LibertineTypography.toSmallCase(ch);
+
+            buf.appendCodePoint(tr);
             num++;
         } else if (ch == '"') {
             /*
@@ -700,22 +743,13 @@ public abstract class RenderEngine
             private int offset = 0;
 
             public boolean visit(Span span) {
-                Markup format;
+                final Markup format;
                 final int len;
                 int width, j;
-                boolean code;
                 String str;
 
                 format = span.getMarkup();
                 width = 0;
-
-                if (preformatted) {
-                    code = true;
-                } else if ((format == Common.LITERAL) || (format == Common.FILENAME)) {
-                    code = true;
-                } else {
-                    code = false;
-                }
 
                 /*
                  * FIXME Use Span characters, not String!!!! Fixing this will
@@ -727,10 +761,10 @@ public abstract class RenderEngine
                 len = str.length();
 
                 for (j = 0; j < len; j++) {
-                    width += translateAndAppend(buf, str.charAt(j), code);
+                    width += translateAndAppend(buf, str.charAt(j), format, preformatted);
                 }
 
-                for (Attribute attr : attributesForMarkup(span.getMarkup())) {
+                for (Attribute attr : attributesForMarkup(format)) {
                     attr.setIndices(offset, width);
                     list.insert(attr);
                 }
@@ -993,7 +1027,16 @@ public abstract class RenderEngine
                     new WeightAttribute(Weight.BOLD),
                 };
             } else if (m == Common.ACRONYM) {
-                return createSmallCaps();
+                /*
+                 * Originally we called createSmallCaps() to map, but now we
+                 * are mapping acronym upper case characters and numerals
+                 * directly to the Linux Libertine font's Private Use area
+                 * block. Absolutely need to make sure that we have that font
+                 * at play.
+                 */
+                return new Attribute[] {
+                    new FontDescriptionAttribute(smallFace.desc),
+                };
             }
 
         } else if (m instanceof Preformat) {
@@ -1012,29 +1055,6 @@ public abstract class RenderEngine
         }
 
         throw new IllegalArgumentException("\n" + "Translation of " + m + " not yet implemented");
-    }
-
-    /**
-     * Generate a set of Attributes representing a "small caps" face.
-     */
-    /*
-     * Woarkaround the bug that Variant.SMALL_CAPS doesn't actually work; and
-     * meanwhile, "Linux Libertine O C" is a small caps font.
-     */
-    private Attribute[] createSmallCaps() {
-        final FontDescription desc;
-        final double size;
-
-        size = serifFace.desc.getSize();
-
-        desc = new FontDescription();
-        desc.setFamily("Linux Libertine O C");
-
-        return new Attribute[] {
-            new FontDescriptionAttribute(desc),
-            new SizeAttribute(size),
-            new VariantAttribute(Variant.SMALL_CAPS)
-        };
     }
 
     /*

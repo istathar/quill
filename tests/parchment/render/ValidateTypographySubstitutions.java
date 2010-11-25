@@ -21,6 +21,7 @@ package parchment.render;
 import quill.ui.GraphicalTestCase;
 
 import static parchment.render.LibertineTypography.toSmallCaps;
+import static parchment.render.LibertineTypography.toSmallCase;
 import static parchment.render.LibertineTypography.toSmallNumbers;
 
 /**
@@ -36,14 +37,27 @@ public class ValidateTypographySubstitutions extends GraphicalTestCase
      * confirm assumptions.
      */
     public final void testLibertineSmallCaps() {
-        assertEquals(0xe053, toSmallCaps('C'));
+        assertEquals(0xe053, toSmallCaps('c'));
 
-        assertEquals(0xe05e, toSmallCaps('N'));
-        assertEquals('\ue05e', toSmallCaps('N'));
-        assertEquals('', toSmallCaps('N'));
+        assertEquals(0xe05e, toSmallCaps('n'));
+        assertEquals('\ue05e', toSmallCaps('n'));
+        assertEquals('', toSmallCaps('n'));
+    }
 
+    public final void testLibertineSmallNumbers() {
         assertEquals(0xe027, toSmallNumbers('7'));
         assertEquals('', toSmallNumbers('7'));
+    }
+
+    public final void testLibertineSmallCase() {
+        assertEquals(0xe053, toSmallCase('C'));
+
+        assertEquals(0xe05e, toSmallCase('N'));
+        assertEquals('\ue05e', toSmallCase('N'));
+        assertEquals('', toSmallCase('N'));
+
+        assertEquals(0xe027, toSmallCase('7'));
+        assertEquals('', toSmallCase('7'));
     }
 
     private static void diagnose(int expected, int actual) {

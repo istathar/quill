@@ -25,6 +25,7 @@ package parchment.render;
  * are actually in the normal font, up in the Private Use area.
  * 
  * @author Andrew Cowie
+ * @see quill.quack.AcronymElement
  */
 class LibertineTypography
 {
@@ -34,6 +35,8 @@ class LibertineTypography
      * Take an <b>upper</b> case Latin character and translate it to the small
      * caps equivalent. Note that this is different than the usual mapping
      * done by the "Linux Libertine O C" font where 'A' -> 'A' and 'a' -> ''.
+     * 
+     * This implements our display algorithm for acronyms.
      */
     /*
      * Linux Libertine puts small caps variants for the main Latin characters
@@ -42,9 +45,23 @@ class LibertineTypography
      * changing fonts b) this is just a workaround, but best of all, c) who
      * ever heard of an acronym with accents?
      */
-    static int toSmallCaps(int ch) {
+    static int toSmallCase(int ch) {
         if ((ch >= 'A') && (ch <= 'Z')) {
             return '\ue051' + (ch - 'A');
+        } else if ((ch >= '0') && (ch <= '9')) {
+            return '\ue020' + (ch - '0');
+        } else {
+            return ch;
+        }
+    }
+
+    /**
+     * Translate a normal lower case letter and make it small caps. This maps
+     * 'a' -> '' and leaves 'A' -> 'A'.
+     */
+    static int toSmallCaps(int ch) {
+        if ((ch >= 'a') && (ch <= 'z')) {
+            return '\ue051' + (ch - 'a');
         } else {
             return ch;
         }
