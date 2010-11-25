@@ -51,7 +51,7 @@ class Format
 
     static final TextTag code;
 
-    static final TextTag application;
+    static final TextTag name;
 
     static final TextTag command;
 
@@ -61,7 +61,7 @@ class Format
 
     static final TextTag keyboard;
 
-    static final TextTag proper;
+    static final TextTag acronym;
 
     static final TextTag hidden;
 
@@ -89,10 +89,10 @@ class Format
         code = new TextTag();
         code.setFontDescription(fonts.mono);
 
-        application = new TextTag();
-        application.setFontDescription(fonts.sans);
-        application.setWeight(Weight.BOLD);
-        application.setForeground("#444444");
+        name = new TextTag();
+        name.setFontDescription(fonts.sans);
+        name.setWeight(Weight.BOLD);
+        name.setForeground("#444444");
 
         command = new TextTag();
         command.setFontDescription(fonts.mono);
@@ -124,17 +124,17 @@ class Format
         keyboard.setFontDescription(fonts.mono);
         keyboard.setWeight(Weight.BOLD);
 
-        proper = new TextTag();
+        acronym = new TextTag();
 
         /*
          * This is a hack; clearly we need something better to display.
          */
-        desc = new FontDescription("Linux Libertine O C");
+        desc = new FontDescription("Linux Libertine O");
 
-        proper.setFontDescription(desc);
-        proper.setWeight(Weight.BOLD);
+        acronym.setFontDescription(desc);
+        acronym.setWeight(Weight.BOLD);
         size = fonts.serif.getSize();
-        proper.setSize(size);
+        acronym.setSize(size);
     }
 
     /**
@@ -174,8 +174,8 @@ class Format
                 return classname;
             } else if (m == Common.FUNCTION) {
                 return function;
-            } else if (m == Common.APPLICATION) {
-                return application;
+            } else if (m == Common.NAME) {
+                return name;
             } else if (m == Common.COMMAND) {
                 return command;
             } else if (m == Common.HIGHLIGHT) {
@@ -185,7 +185,7 @@ class Format
             } else if (m == Common.KEYBOARD) {
                 return keyboard;
             } else if (m == Common.ACRONYM) {
-                return proper;
+                return acronym;
             } else if (m == Common.LITERAL) {
                 return code;
             }

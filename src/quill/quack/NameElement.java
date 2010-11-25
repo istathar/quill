@@ -19,13 +19,13 @@
 package quill.quack;
 
 /**
- * The name of a software project.
+ * The proper name of, for example, a software project.
  * 
  * @author Andrew Cowie
  */
-public class ApplicationElement extends InlineElement implements Inline
+public class NameElement extends InlineElement implements Inline
 {
-    public ApplicationElement() {
-        super("application");
+    public NameElement() {
+        super("name");
     }
 }

@@ -28,6 +28,6 @@ package quill.quack;
 public class AcronymElement extends InlineElement implements Inline
 {
     public AcronymElement() {
-        super("proper");
+        super("acronym");
     }
 }

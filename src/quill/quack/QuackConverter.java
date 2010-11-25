@@ -195,8 +195,8 @@ public class QuackConverter
             inline = new BoldElement();
         } else if (format == Common.LITERAL) {
             inline = new LiteralElement();
-        } else if (format == Common.APPLICATION) {
-            inline = new ApplicationElement();
+        } else if (format == Common.NAME) {
+            inline = new NameElement();
         } else if (format == Common.COMMAND) {
             inline = new CommandElement();
         } else if (format == Common.HIGHLIGHT) {

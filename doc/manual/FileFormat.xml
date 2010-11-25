@@ -40,10 +40,9 @@ But it is human <italics>mergeable</italics>.
 As mentioned, the driving imperative for Quack documents is that
 they be manageable with the collaboration tools we use to write
 open source software - specifically the modern 3rd generation
-distributed version control systems (DVCS) such as
-<application>Bazaar</application> (<command>bzr</command>),
-<application>Git</application> (<command>git</command>), or
-<application>Mercurial</application> (<command>hg</command>).
+distributed version control systems (DVCS) such as <name>Bazaar</name>
+(<command>bzr</command>), <name>Git</name> (<command>git</command>),
+or <name>Mercurial</name> (<command>hg</command>).
 </text>
 <heading>
 Commentary on other formats

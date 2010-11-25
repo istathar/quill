@@ -81,8 +81,8 @@ public class QuackNodeFactory extends NodeFactory
             return new KeyboardElement();
         } else if (name.equals("acronym")) {
             return new AcronymElement();
-        } else if (name.equals("application")) {
-            return new ApplicationElement();
+        } else if (name.equals("name")) {
+            return new NameElement();
         } else if (name.equals("userinput")) {
             throw new UnsupportedOperationException("Implement a UserInputElement class");
         } else if (name.equals("italics")) {

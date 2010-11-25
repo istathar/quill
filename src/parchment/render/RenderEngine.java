@@ -970,7 +970,7 @@ public abstract class RenderEngine
                 return new Attribute[] {
                     new FontDescriptionAttribute(monoFace.desc),
                 };
-            } else if (m == Common.APPLICATION) {
+            } else if (m == Common.NAME) {
                 return new Attribute[] {
                     new WeightAttribute(Weight.BOLD),
                 };
