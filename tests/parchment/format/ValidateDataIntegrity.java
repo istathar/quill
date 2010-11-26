@@ -29,6 +29,7 @@ import quill.textbase.Common;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.NormalSegment;
+import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
@@ -134,7 +135,7 @@ public class ValidateDataIntegrity extends IOTestCase
         chapter.setFilename("ContinuousMarkup.xml"); // real
 
         series = chapter.loadDocument();
-        segment = series.getSegment(0);
+        segment = series.getSegment(1);
         entire = segment.getEntire();
         assertNotNull(entire);
 
@@ -174,7 +175,7 @@ public class ValidateDataIntegrity extends IOTestCase
         chapter = new Chapter(manuscript);
         chapter.setFilename("TwoBlocksMarkup.xml");
         series = chapter.loadDocument();
-        segment = series.getSegment(0);
+        segment = series.getSegment(1);
         entire = segment.getEntire();
         assertNotNull(entire);
 
@@ -200,6 +201,75 @@ public class ValidateDataIntegrity extends IOTestCase
             "<text>",
             "<italics>And so is this day.</italics> Goodbye.",
             "</text>",
+            "</chapter>"
+        });
+
+        assertEquals(outbound, out.toString());
+    }
+
+    /*
+     * There is a space character between the two Spans with Markup, but the
+     * bug is that on loading? serializing? that ' ' is being lost.
+     */
+    public final void testWhitespaceBetweenConsequitiveMarkup() throws ImproperFilenameException,
+            ValidityException, ParsingException, IOException {
+        final Manuscript manuscript;
+        final Chapter chapter;
+        final Span[] inbound;
+        final Series series;
+        final Segment segment;
+        final Extract entire;
+        final ByteArrayOutputStream out;
+        final String outbound;
+
+        inbound = new Span[] {
+            createSpan("Out of the picture, really, we'll need ", null),
+            createSpan("HMS", Common.ACRONYM),
+            createSpan(" ", null),
+            createSpan("Renown", Common.PUBLICATION),
+            createSpan(" as it was 28th January 1802.", null),
+        };
+
+        manuscript = new Manuscript();
+        manuscript.setFilename("tests/quill/quack/ValidateDataIntegrity.parchment"); // junk
+
+        chapter = new Chapter(manuscript);
+        chapter.setFilename("WhitespaceBetweenConsequtiveMarkup.xml");
+        series = chapter.loadDocument();
+        segment = series.getSegment(1);
+        assertTrue(segment instanceof QuoteSegment);
+
+        entire = segment.getEntire();
+        assertNotNull(entire);
+
+        /*
+         * Check what was read.
+         */
+
+        entire.visit(new SpanVisitor() {
+            private int i = 0;
+
+            public boolean visit(Span span) {
+                assertEquals(inbound[i], span);
+                i++;
+                return false;
+            }
+        });
+
+        /*
+         * Check as written out.
+         */
+
+        out = new ByteArrayOutputStream();
+        chapter.saveDocument(series, out);
+
+        outbound = combine(new String[] {
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
+            "<quote>",
+            "Out of the picture, really, we'll need <acronym>HMS</acronym>",
+            "<publication>Renown</publication> as it was 28th January 1802.",
+            "</quote>",
             "</chapter>"
         });
 

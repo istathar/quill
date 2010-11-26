@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
+<quote>
+Out of the picture, really, we'll need <acronym>HMS</acronym>
+<publication>Renown</publication> as it was 28th January 1802.
+</quote>
+</chapter>
+<!--
+The whitespace between HMS and Renown is going missing.
+-->

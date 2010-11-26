@@ -384,7 +384,8 @@ public class QuackLoader
         len = text.length();
 
         /*
-         * These two cases are common for structure tags
+         * This case, and the first in the next block, are common for
+         * structure tags
          */
 
         if (len == 0) {
@@ -392,10 +393,14 @@ public class QuackLoader
             return; // empty
         }
 
-        if (len == 1) {
-            if (text.charAt(0) == '\n') {
-                space = false;
-                return; // empty
+        /*
+         * Check for valid file format: no bare newlines. This is probably
+         * expensive, but we have tests that expect this.
+         */
+
+        if ((!preserve) && (len > 1)) {
+            if (text.contains("\n\n")) {
+                throw new IllegalStateException("Can't have bare newlines in normal Blocks");
             }
         }
 
@@ -408,11 +413,29 @@ public class QuackLoader
         if (start) {
             start = false;
             space = false;
-            text = text.substring(1);
-            len--;
+
+            ch = text.charAt(0);
+            if (ch == '\n') {
+                if (len == 1) {
+                    return; // ignore it
+                }
+                text = text.substring(1);
+                len--;
+            }
         } else if (space) {
             chain.append(pending);
             pending = null;
+        }
+
+        /*
+         * If not preformatted text, turn any interior newlines into spaces,
+         * then add.
+         */
+
+        if (preserve) {
+            str = text;
+        } else {
+            str = text.replace('\n', ' ');
         }
 
         /*
@@ -424,31 +447,20 @@ public class QuackLoader
 
         ch = text.charAt(len - 1);
         if (ch == '\n') {
-            trim = text.substring(0, len - 1);
-            len--;
+            trim = str.substring(0, len - 1);
             space = true;
             pending = Span.createSpan(' ', markup);
+
+            if (len == 1) {
+                return; // captured in pending
+            }
+            len--;
         } else {
-            trim = text;
+            trim = str;
             space = false;
         }
 
-        /*
-         * If not preformatted text, turn any interior newlines into spaces,
-         * then add.
-         */
-
-        if (preserve) {
-            str = trim;
-        } else {
-            str = trim.replace('\n', ' ');
-        }
-
-        if (str.equals("")) {
-            throw new IllegalStateException("Can't have bare newlines in an otherwise empty element");
-        }
-
-        chain.append(createSpan(str, markup));
+        chain.append(createSpan(trim, markup));
     }
 
     private void processMarker(String str) {
