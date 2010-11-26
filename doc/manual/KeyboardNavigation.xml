@@ -13,7 +13,6 @@ Formatting
 <text>
 Different semantic markup can be applied. The various formats
 can be applied by typing <keyboard>Ctrl+Shift+&lt;Key&gt;</keyboard>.
-
 </text>
 <text>
 You can never get away from legacy, so bold and italics are
@@ -36,16 +35,5 @@ to do something different. Remember that the point is to ensure
 consistent display of different classes of text; the person who
 wanted ship names in italics can just use
 <literal>&lt;publication&gt;</literal> to get herself italics.
-</text>
-<text>
-or...
-</text>
-<text>
-<keyboard>Ctrl+Shift+P</keyboard> Publication (book title, ship
-name: italics)
-</text>
-<text>
-<keyboard>Crtl+Shift+N</keyboard> Proper Name (term or abbreviation:
-small caps)
 </text>
 </chapter>

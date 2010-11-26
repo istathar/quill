@@ -375,7 +375,7 @@ abstract class EditorTextView extends TextView
                         clearFormat();
                         return true;
                     } else if (key == Keyval.A) {
-                        toggleMarkup(Common.NAME);
+                        toggleMarkup(Common.ACRONYM);
                         return true;
                     } else if (key == Keyval.L) {
                         toggleMarkup(Common.LITERAL);
@@ -394,7 +394,7 @@ abstract class EditorTextView extends TextView
                         toggleMarkup(Common.FUNCTION);
                         return true;
                     } else if (key == Keyval.N) {
-                        toggleMarkup(Common.ACRONYM);
+                        toggleMarkup(Common.NAME);
                         return true;
                     } else if (key == Keyval.O) {
                         toggleMarkup(Common.COMMAND);
