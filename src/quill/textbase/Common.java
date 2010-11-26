@@ -44,7 +44,7 @@ public class Common extends Markup
 
     public static final Common FUNCTION = new Common("FUNCTION", false);
 
-    public static final Common NAME = new Common("APPLICATION", false);
+    public static final Common PROJECT = new Common("PROJECT", false);
 
     public static final Common COMMAND = new Common("COMMAND", false);
 

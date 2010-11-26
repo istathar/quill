@@ -348,8 +348,8 @@ public class QuackLoader
                 markup = Common.KEYBOARD;
             } else if (span instanceof AcronymElement) {
                 markup = Common.ACRONYM;
-            } else if (span instanceof NameElement) {
-                markup = Common.NAME;
+            } else if (span instanceof ProjectElement) {
+                markup = Common.PROJECT;
             } else if (span instanceof ItalicsElement) {
                 markup = Common.ITALICS;
             } else if (span instanceof BoldElement) {

@@ -393,13 +393,14 @@ abstract class EditorTextView extends TextView
                         // function or _m_ethod
                         toggleMarkup(Common.FUNCTION);
                         return true;
-                    } else if (key == Keyval.N) {
-                        toggleMarkup(Common.NAME);
+                    } else if (key == Keyval.P) {
+                        toggleMarkup(Common.PROJECT);
                         return true;
                     } else if (key == Keyval.O) {
                         toggleMarkup(Common.COMMAND);
                         return true;
-                    } else if (key == Keyval.P) {
+                    } else if (key == Keyval.N) {
+                        // _name of work
                         toggleMarkup(Common.PUBLICATION);
                         return true;
                     } else if (key == Keyval.T) {

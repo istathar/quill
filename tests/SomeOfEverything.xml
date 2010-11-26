@@ -22,7 +22,7 @@ back and forth between normal prose and blocks of code.
 </text>
 <text>
 For example, the simplest program you could write with the excellent
-<name>java-gnome</name> user interface library is this:
+<project>java-gnome</project> user interface library is this:
 </text>
 <code xml:space="preserve">
 import org.gnome.gtk.Gtk;

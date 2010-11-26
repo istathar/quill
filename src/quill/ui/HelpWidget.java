@@ -203,9 +203,9 @@ class HelpWidget extends ScrolledWindow
                 _("The name of a _method or function call.")
             },
             new String[] {
-                "Ctrl+Shift+N",
-                _("Application or Project"),
-                _("The proper _name of a program, application suite, or project.")
+                "Ctrl+Shift+P",
+                _("Project"),
+                _("The proper name of a program, application suite, or _project.")
             },
             new String[] {
                 "Ctrl+Shift+O",
@@ -223,9 +223,9 @@ class HelpWidget extends ScrolledWindow
                 _("Mark an inline work-in-progress comment.")
             },
             new String[] {
-                "Ctrl+Shift+P",
+                "Ctrl+Shift+N",
                 _("Publication"),
-                _("The name of a book, journal, or other publication.")
+                _("The _name of a book, journal, or other publication.")
             },
             new String[] {
                 "Ctrl+Shift+A",

@@ -1004,8 +1004,9 @@ public abstract class RenderEngine
                 return new Attribute[] {
                     new FontDescriptionAttribute(monoFace.desc),
                 };
-            } else if (m == Common.NAME) {
+            } else if (m == Common.PROJECT) {
                 return new Attribute[] {
+                    new FontDescriptionAttribute(sansFace.desc),
                     new WeightAttribute(Weight.BOLD),
                 };
             } else if (m == Common.COMMAND) {

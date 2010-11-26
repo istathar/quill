@@ -40,9 +40,10 @@ But it is human <italics>mergeable</italics>.
 As mentioned, the driving imperative for Quack documents is that
 they be manageable with the collaboration tools we use to write
 open source software - specifically the modern 3rd generation
-distributed version control systems (DVCS) such as <name>Bazaar</name>
-(<command>bzr</command>), <name>Git</name> (<command>git</command>),
-or <name>Mercurial</name> (<command>hg</command>).
+distributed version control systems (DVCS) such as
+<project>Bazaar</project> (<command>bzr</command>),
+<project>Git</project> (<command>git</command>), or
+<project>Mercurial</project> (<command>hg</command>).
 </text>
 <heading>
 Commentary on other formats
@@ -123,7 +124,7 @@ with how we do it in Quack:
 </text>
 <code xml:space="preserve">
 &lt;image src="figures/duck-small.png"&gt;
-A wood duck, from the cover of &lt;italics&gt;DocBook: The Definitive Guide&lt;/italics&gt;.
+A wood duck, from the cover of &lt;publication&gt;DocBook: The Definitive Guide&lt;/publication&gt;.
 &lt;/image&gt;
 </code>
 <text>

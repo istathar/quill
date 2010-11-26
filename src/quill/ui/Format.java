@@ -51,7 +51,7 @@ class Format
 
     static final TextTag code;
 
-    static final TextTag name;
+    static final TextTag project;
 
     static final TextTag command;
 
@@ -89,10 +89,10 @@ class Format
         code = new TextTag();
         code.setFontDescription(fonts.mono);
 
-        name = new TextTag();
-        name.setFontDescription(fonts.sans);
-        name.setWeight(Weight.BOLD);
-        name.setForeground("#444444");
+        project = new TextTag();
+        project.setFontDescription(fonts.sans);
+        project.setWeight(Weight.BOLD);
+        project.setForeground("#444444");
 
         command = new TextTag();
         command.setFontDescription(fonts.mono);
@@ -172,8 +172,8 @@ class Format
                 return classname;
             } else if (m == Common.FUNCTION) {
                 return function;
-            } else if (m == Common.NAME) {
-                return name;
+            } else if (m == Common.PROJECT) {
+                return project;
             } else if (m == Common.COMMAND) {
                 return command;
             } else if (m == Common.HIGHLIGHT) {

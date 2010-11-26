@@ -16,8 +16,9 @@ The on-disk format needs to be completed, and finalized as
 <text>
 Once the format is finalized, we need to register a MIME type
 with GNOME via a <literal>.desktop</literal> file so that documents
-are launched when opened by the <name>Nautilus</name> file browser
-or with <command>gnome-open</command> from the command line.
+are launched when opened by the <project>Nautilus</project> file
+browser or with <command>gnome-open</command> from the command
+line.
 </text>
 <text>
 This will probably also require single instance code via [org.gnome.notify]
@@ -35,13 +36,13 @@ Saving
 <bold>Line wrapping of XML output</bold>
 </text>
 <text>
-The line-breaking algorithm in <name>Xom</name> is rather poor:
-it takes the maximum line length specified, subtracts 10, and
-then looks for a possible line break after that point. This makes
-for erratic justification, trailing space characters, and other
-artifacts. This is due to <name>Xom</name>'s <type>Serializer</type>
-handles its output one character at a time and has no look ahead
-/ read back capability.
+The line-breaking algorithm in <project>Xom</project> is rather
+poor: it takes the maximum line length specified, subtracts 10,
+and then looks for a possible line break after that point. This
+makes for erratic justification, trailing space characters, and
+other artifacts. This is due to <project>Xom</project>'s
+<type>Serializer</type> handles its output one character at a
+time and has no look ahead / read back capability.
 </text>
 <text>
 It may be better for us to write the output file to a
@@ -51,8 +52,8 @@ to <literal>'\n' </literal>replacements.
 </text>
 <text>
 For what it's worth, though, it's getting closer to the point
-where <italics>not</italics> using <name>Xom</name> and just
-doing the really minimal XML work ourselves would be feasible.
+where <italics>not</italics> using <project>Xom</project> and
+just doing the really minimal XML work ourselves would be feasible.
 Not really that interested going down the not-invented-here road,
 but...
 </text>
