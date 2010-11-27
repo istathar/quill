@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
+<quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
 <title>
 An Example Chapter
 </title>
@@ -152,4 +152,4 @@ in making it any bigger.
 to see the filename), there isn't any UI for inserting images
 and/or changing the source file yet.
 </text>
-</chapter>
+</quack>

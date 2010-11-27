@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -21,14 +21,14 @@ package quill.quack;
 import nu.xom.Elements;
 
 /**
- * A chapter in a book.
+ * The root element of a Quack format document.
  * 
  * @author Andrew Cowie
  */
-public class ChapterElement extends QuackElement implements Component
+public class RootElement extends QuackElement implements Root
 {
-    public ChapterElement() {
-        super("chapter");
+    public RootElement() {
+        super("quack");
     }
 
     /**

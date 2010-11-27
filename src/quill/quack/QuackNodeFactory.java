@@ -130,10 +130,8 @@ public class QuackNodeFactory extends NodeFactory
      */
 
     public Element makeRootElement(String name, String namespace) {
-        if (name.equals("chapter")) {
-            return new ChapterElement();
-        } else if (name.equals("article")) {
-            throw new UnsupportedOperationException("Implement ArticleElement?");
+        if (name.equals("quack")) {
+            return new RootElement();
         } else {
             throw new IllegalStateException("Invalid document");
         }

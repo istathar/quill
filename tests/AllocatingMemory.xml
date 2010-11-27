@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
+<quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
 <title>
 Allocating Memory
 </title>
@@ -152,4 +152,4 @@ the zone resides in platform-specific files, usually in
 <filename>mm/init.c</filename> within the <filename>arch</filename>
 tree. We'll revisit these topics in Chapter 15.
 </text>
-</chapter>
+</quack>

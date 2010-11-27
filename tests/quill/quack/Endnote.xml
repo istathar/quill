@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
+<quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
 <quote>
 In the beginning...<note ref="42"/>
 </quote>
-</chapter>
+</quack>

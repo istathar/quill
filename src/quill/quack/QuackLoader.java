@@ -110,11 +110,11 @@ public class QuackLoader
      * processor state here.
      */
     public Series process(Document doc) {
-        final Component chapter;
+        final Root chapter;
         int j;
         Block[] blocks;
 
-        chapter = (Component) doc.getRootElement();
+        chapter = (Root) doc.getRootElement();
         processComponent(chapter);
 
         /*
@@ -137,8 +137,8 @@ public class QuackLoader
         return new Series(list);
     }
 
-    private void processComponent(Component component) {
-        if (component instanceof ChapterElement) {
+    private void processComponent(Root component) {
+        if (component instanceof RootElement) {
             start = true;
             preserve = false;
         } else {

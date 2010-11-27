@@ -55,7 +55,7 @@ import quill.textbase.Special;
  */
 public class QuackConverter
 {
-    private Component component;
+    private Root component;
 
     private final StringBuilder buf;
 
@@ -76,7 +76,7 @@ public class QuackConverter
 
     public QuackConverter() {
         buf = new StringBuilder();
-        component = new ChapterElement();
+        component = new RootElement();
     }
 
     /**
@@ -284,9 +284,9 @@ public class QuackConverter
      * to the converter, and write it to the given stream.
      */
     public void writeChapter(OutputStream out) throws IOException {
-        final ChapterElement chapter;
+        final RootElement chapter;
 
-        chapter = (ChapterElement) component;
+        chapter = (RootElement) component;
         chapter.toXML(out);
     }
 

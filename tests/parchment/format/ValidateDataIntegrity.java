@@ -96,11 +96,11 @@ public class ValidateDataIntegrity extends IOTestCase
 
         expected = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
+            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
             "<text>",
             "<bold>Hello </bold><type>GtkButton</type><bold> world</bold>",
             "</text>",
-            "</chapter>"
+            "</quack>"
         });
 
         assertEquals(expected, out.toString());
@@ -194,14 +194,14 @@ public class ValidateDataIntegrity extends IOTestCase
 
         outbound = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
+            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
             "<text>",
             "Hello world. <italics>It is a lovely day.</italics>",
             "</text>",
             "<text>",
             "<italics>And so is this day.</italics> Goodbye.",
             "</text>",
-            "</chapter>"
+            "</quack>"
         });
 
         assertEquals(outbound, out.toString());
@@ -265,12 +265,12 @@ public class ValidateDataIntegrity extends IOTestCase
 
         outbound = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
+            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
             "<quote>",
             "Out of the picture, really, we'll need <acronym>HMS</acronym>",
             "<publication>Renown</publication> as it was 28th January 1802.",
             "</quote>",
-            "</chapter>"
+            "</quack>"
         });
 
         assertEquals(outbound, out.toString());

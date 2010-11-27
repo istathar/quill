@@ -21,7 +21,7 @@ package quill.quack;
 /**
  * Components are the chapter-like elements. They contain a series of Blocks.
  */
-public interface Component extends Tag
+public interface Root extends Tag
 {
     public void add(Block block);
 
