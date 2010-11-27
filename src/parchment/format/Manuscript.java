@@ -36,7 +36,7 @@ import quill.textbase.Folio;
 import quill.textbase.Series;
 
 /**
- * A document on disk in a .parchment file contining a <manuscript> root
+ * A document on disk in a .parchment file contining a &lt;manuscript&gt; root
  * element.
  * 
  * This class is an intermediary, not an encapsulation of the data itself,

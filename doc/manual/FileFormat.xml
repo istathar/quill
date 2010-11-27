@@ -25,8 +25,8 @@ you can ... but {ironically?} you if you break the
 <text>
 You use a commonly available format if you wish to interoperate.
 But (at least at present) we're not worried about that; Quack
-format documents are for consumption by Quill and rendering by
-Parchment.
+format documents are for consumption by <project>Quill</project>
+and rendering by <project>Parchment</project>.
 </text>
 <text>
 Quack is not intended to be human <italics>writable</italics>.
@@ -40,8 +40,8 @@ But it is human <italics>mergeable</italics>.
 As mentioned, the driving imperative for Quack documents is that
 they be manageable with the collaboration tools we use to write
 open source software - specifically the modern 3rd generation
-distributed version control systems (DVCS) such as
-<project>Bazaar</project> (<command>bzr</command>),
+distributed version control systems (<acronym>DVCS</acronym>)
+such as <project>Bazaar</project> (<command>bzr</command>),
 <project>Git</project> (<command>git</command>), or
 <project>Mercurial</project> (<command>hg</command>).
 </text>
@@ -64,7 +64,7 @@ control, but if you take some time.
 <text>
 The give away was looking at what Writer writes out when you
 tell it to pretend it's an web page editor and ask it to save
-as HTML... <highlight>HERE</highlight>
+as <acronym>HTML</acronym>... <highlight>HERE</highlight>
 </text>
 <text>
 <bold>DocBook XML</bold>
@@ -154,20 +154,21 @@ is not only ugly, but not even accomplishing the task of providing
 context.
 </text>
 <text>
-Quack takes the aesthetic approach used by HTML of discarding
-leading and trailing whitespace from block level elements, with
-the result that the document is <italics>much</italics> cleaner
-to read, and (if compelled to do so manually) adjust. By design
-the schema is so simple that there is no nesting used because
-none is necessary for comprehension.
+Quack takes the aesthetic approach used by <acronym>HTML</acronym>
+of discarding leading and trailing whitespace from block level
+elements, with the result that the document is <italics>much</italics>
+cleaner to read, and (if compelled to do so manually) adjust.
+By design the schema is so simple that there is no nesting used
+because none is necessary for comprehension.
 </text>
 <text>
 We are, however, quite concerned to ensure that people using
-Quill and Parchment never have their documents locked in and
-be unable to extract them in the future. To that end, it shouldn't
-be too hard to write a function to do a one-way export from Quack
-XML to DocBook XML - perhaps using XSLT, perhaps using a custom
-Serializer, and perhaps using Parchment.
+<project>Quill and Parchment</project> never have their documents
+locked in and be unable to extract them in the future. To that
+end, it shouldn't be too hard to write a function to do a one-way
+export from Quack <acronym>XML</acronym> to DocBook
+<acronym>XML</acronym> - perhaps using <acronym>XSLT</acronym>,
+perhaps using a custom Serializer, and perhaps using Parchment.
 </text>
 <text>
 If you ever <italics>are</italics> working with DocBook, ensure
