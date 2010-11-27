@@ -110,18 +110,18 @@ public class QuackLoader
      * processor state here.
      */
     public Series process(Document doc) {
-        final Root chapter;
+        final Root quack;
         int j;
         Block[] blocks;
 
-        chapter = (Root) doc.getRootElement();
-        processComponent(chapter);
+        quack = (Root) doc.getRootElement();
+        processComponent(quack);
 
         /*
          * Now iterate over the Blocks.
          */
 
-        blocks = chapter.getBlocks();
+        blocks = quack.getBlocks();
 
         for (j = 0; j < blocks.length; j++) {
             processBlock(blocks[j]);
@@ -137,12 +137,12 @@ public class QuackLoader
         return new Series(list);
     }
 
-    private void processComponent(Root component) {
-        if (component instanceof RootElement) {
+    private void processComponent(Root quack) {
+        if (quack instanceof RootElement) {
             start = true;
             preserve = false;
         } else {
-            throw new UnsupportedOperationException("Implement support for <article>?");
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -243,11 +243,11 @@ public class QuackLoader
             preserve = false;
 
             processData(block);
-        } else if (block instanceof TitleElement) {
+        } else if (block instanceof ChapterElement) {
             preserve = false;
             if (segment != null) {
                 throw new IllegalStateException("\n"
-                        + "The <title> must be the first block in a Quack <chapter>");
+                        + "A <chapter> must be the first block in a Quack file.");
             }
         } else {
             throw new IllegalStateException("\n" + "What kind of Block is " + block);
@@ -281,7 +281,7 @@ public class QuackLoader
             segment = new HeadingSegment(entire);
         } else if (block instanceof ImageElement) {
             segment = new ImageSegment(entire, attribute);
-        } else if (block instanceof TitleElement) {
+        } else if (block instanceof ChapterElement) {
             segment = new ComponentSegment(entire);
         } else {
             throw new IllegalStateException("\n" + "What kind of Block is " + block);

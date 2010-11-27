@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
-<title>
+<chapter>
 Documents on disk
-</title>
+</chapter>
 <text>
 The idea is...
 </text>

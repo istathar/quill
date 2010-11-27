@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
-<title>
+<chapter>
 Chapter 1
-</title>
+</chapter>
 <text>
 This is not a real document. This is a series
 of unrelated fragments that are assembled

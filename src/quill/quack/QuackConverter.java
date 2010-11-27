@@ -89,7 +89,7 @@ public class QuackConverter
         this.segment = segment;
 
         if (segment instanceof ComponentSegment) {
-            block = new TitleElement();
+            block = new ChapterElement();
         } else if (segment instanceof HeadingSegment) {
             block = new HeadingElement();
         } else if (segment instanceof PreformatSegment) {

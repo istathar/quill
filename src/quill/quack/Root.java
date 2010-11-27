@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -19,7 +19,8 @@
 package quill.quack;
 
 /**
- * Components are the chapter-like elements. They contain a series of Blocks.
+ * The top level of a Quack format XML. One way or another it will be a
+ * "component", a chapter-like elements. They contain a series of Blocks.
  */
 public interface Root extends Tag
 {

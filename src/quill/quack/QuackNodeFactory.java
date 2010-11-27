@@ -66,8 +66,8 @@ public class QuackNodeFactory extends NodeFactory
             return new PoemElement();
         } else if (name == "credit") {
             return new CreditElement();
-        } else if (name == "title") {
-            return new TitleElement();
+        } else if (name == "chapter") {
+            return new ChapterElement();
         } else if (name == "heading") {
             return new HeadingElement();
         } else if (name == "image") {

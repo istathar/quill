@@ -96,9 +96,9 @@ public class ValidateChangePropagation extends GraphicalTestCase
         expected = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
-            "<title>",
+            "<chapter>",
             "h",
-            "</title>",
+            "</chapter>",
             "</quack>"
         });
         assertEquals(expected, out.toString());

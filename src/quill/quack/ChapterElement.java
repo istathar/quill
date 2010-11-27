@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -18,14 +18,16 @@
  */
 package quill.quack;
 
-public class TitleElement extends BlockElement implements Block
+/**
+ * The title of a chapter. It is peers with {@link PartElement}.
+ * 
+ * Contrast to {@link HeadingElement} which is for a section heading.
+ * 
+ * @author Andrew Cowie
+ */
+public class ChapterElement extends BlockElement implements Block
 {
-    public TitleElement() {
-        super("title");
-    }
-
-    public TitleElement(String title) {
-        super("title");
-        super.add(title);
+    public ChapterElement() {
+        super("chapter");
     }
 }

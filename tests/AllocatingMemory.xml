@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
-<title>
+<chapter>
 Allocating Memory
-</title>
+</chapter>
 <text>
 Thus far, we have used <function>kmalloc</function> and
 <function>kfree</function> for the allocation and freeing of
