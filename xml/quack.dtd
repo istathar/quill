@@ -29,25 +29,52 @@
 
 <!ELEMENT heading (#PCDATA)>
 
-<!ELEMENT text (#PCDATA | italics | bold | name | type | function | literal | filename | project | command | highlight | note  | publication | keyboard | acronym)*>
+<!ELEMENT text (#PCDATA 
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| note | cite
+		| keyboard | acronym)*>
 
 <!ELEMENT code (#PCDATA | bold | highlight | note)*>
 <!ATTLIST code xml:space CDATA #FIXED "preserve">
 
-<!ELEMENT quote (#PCDATA | italics | bold | name | type | function | literal | filename | project | command | highlight | note | publication | keyboard | acronym)*>
+<!ELEMENT quote (#PCDATA
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| note | cite
+		| keyboard | acronym)*>
 
-<!ELEMENT image (#PCDATA | italics | bold | name | type | function | literal | filename | project | command | highlight | note | publication | keyboard | acronym)*>
+<!ELEMENT image (#PCDATA
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| note | cite
+		| keyboard | acronym)*>
 <!ATTLIST image src CDATA #REQUIRED>
 
-<!ELEMENT poem (#PCDATA | italics | bold | name | type | function | literal | filename | project | command | highlight | note | publication | keyboard | acronym)*>
+<!ELEMENT poem (#PCDATA
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| note | cite
+		| keyboard | acronym)*>
 <!ATTLIST poem xml:space CDATA #FIXED "preserve">
 
-<!ELEMENT credit (#PCDATA | italics | bold | name | type | function | literal | filename | project | command | highlight | note | publication | keyboard | acronym)*>
+<!ELEMENT credit (#PCDATA
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| note | cite
+		| keyboard | acronym)*>
 
-<!ELEMENT endnote (#PCDATA | italics | bold | name | type | function | literal | filename | project | command | highlight | cite | publication | keyboard | acronym)*>
+<!ELEMENT endnote (#PCDATA
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| cite
+		| keyboard | acronym)*>
 <!ATTLIST endnote name CDATA #REQUIRED>
 
-<!ELEMENT reference (#PCDATA | italics | bold | name | type | function | literal | filename | project | command | highlight | publication | keyboard | acronym)*>
+<!ELEMENT reference (#PCDATA
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| keyboard | acronym)*>
 <!ATTLIST reference name CDATA #REQUIRED>
 
 <!-- inline spans -->
@@ -72,7 +99,7 @@
 
 <!ELEMENT highlight (#PCDATA)>
 
-<!ELEMENT publication (#PCDATA)>
+<!ELEMENT title (#PCDATA)>
 
 <!ELEMENT keyboard (#PCDATA)>
 

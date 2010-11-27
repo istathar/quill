@@ -226,7 +226,7 @@ public class ValidateDataIntegrity extends IOTestCase
             createSpan("Out of the picture, really, we'll need ", null),
             createSpan("HMS", Common.ACRONYM),
             createSpan(" ", null),
-            createSpan("Renown", Common.PUBLICATION),
+            createSpan("Renown", Common.TITLE),
             createSpan(" as it was 28th January 1802.", null),
         };
 
@@ -268,7 +268,7 @@ public class ValidateDataIntegrity extends IOTestCase
             "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
             "<quote>",
             "Out of the picture, really, we'll need <acronym>HMS</acronym>",
-            "<publication>Renown</publication> as it was 28th January 1802.",
+            "<title>Renown</title> as it was 28th January 1802.",
             "</quote>",
             "</quack>"
         });

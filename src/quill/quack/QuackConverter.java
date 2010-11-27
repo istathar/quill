@@ -201,8 +201,8 @@ public class QuackConverter
             inline = new CommandElement();
         } else if (format == Common.HIGHLIGHT) {
             inline = new HighlightElement();
-        } else if (format == Common.PUBLICATION) {
-            inline = new PublicationElement();
+        } else if (format == Common.TITLE) {
+            inline = new TitleElement();
         } else if (format == Common.KEYBOARD) {
             inline = new KeyboardElement();
         } else if (format == Common.ACRONYM) {

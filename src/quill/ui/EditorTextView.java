@@ -377,6 +377,9 @@ abstract class EditorTextView extends TextView
                     } else if (key == Keyval.A) {
                         toggleMarkup(Common.ACRONYM);
                         return true;
+                    } else if (key == Keyval.C) {
+                        toggleMarkup(Common.TYPE);
+                        return true;
                     } else if (key == Keyval.L) {
                         toggleMarkup(Common.LITERAL);
                         return true;
@@ -399,12 +402,8 @@ abstract class EditorTextView extends TextView
                     } else if (key == Keyval.O) {
                         toggleMarkup(Common.COMMAND);
                         return true;
-                    } else if (key == Keyval.N) {
-                        // _name of work
-                        toggleMarkup(Common.PUBLICATION);
-                        return true;
                     } else if (key == Keyval.T) {
-                        toggleMarkup(Common.TYPE);
+                        toggleMarkup(Common.TITLE);
                         return true;
                     } else if (key == Keyval.U) {
                         /*

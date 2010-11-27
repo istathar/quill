@@ -84,8 +84,8 @@ public class QuackNodeFactory extends NodeFactory
             return new CommandElement();
         } else if (name == "highlight") {
             return new HighlightElement();
-        } else if (name == "publication") {
-            return new PublicationElement();
+        } else if (name == "title") {
+            return new TitleElement();
         } else if (name == "keyboard") {
             return new KeyboardElement();
         } else if (name == "acronym") {

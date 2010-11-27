@@ -193,9 +193,9 @@ class HelpWidget extends ScrolledWindow
                 _("A path on the _filesystem.")
             },
             new String[] {
-                "Ctrl+Shift+T",
+                "Ctrl+Shift+C",
                 _("Class or Type"),
-                _("The name of an object-oriented class or similar _type.")
+                _("The name of an object-oriented _class or similar type.")
             },
             new String[] {
                 "Ctrl+Shift+M",
@@ -223,9 +223,9 @@ class HelpWidget extends ScrolledWindow
                 _("Mark an inline work-in-progress comment.")
             },
             new String[] {
-                "Ctrl+Shift+N",
+                "Ctrl+Shift+T",
                 _("Publication"),
-                _("The _name of a book, journal, or other publication.")
+                _("The _title of a book, journal, or other publication.")
             },
             new String[] {
                 "Ctrl+Shift+A",

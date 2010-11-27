@@ -23,9 +23,9 @@ package quill.quack;
  * 
  * @author Andrew Cowie
  */
-public class PublicationElement extends InlineElement implements Inline
+public class TitleElement extends InlineElement implements Inline
 {
-    public PublicationElement() {
-        super("publication");
+    public TitleElement() {
+        super("title");
     }
 }

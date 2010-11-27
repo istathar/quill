@@ -1019,7 +1019,7 @@ public abstract class RenderEngine
                 return new Attribute[] {
                     new BackgroundColorAttribute(1.0, 1.0, 0.0),
                 };
-            } else if (m == Common.PUBLICATION) {
+            } else if (m == Common.TITLE) {
                 return new Attribute[] {
                     new StyleAttribute(Style.ITALIC),
                 };

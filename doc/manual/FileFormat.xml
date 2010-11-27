@@ -124,7 +124,7 @@ with how we do it in Quack:
 </text>
 <code xml:space="preserve">
 &lt;image src="figures/duck-small.png"&gt;
-A wood duck, from the cover of &lt;publication&gt;DocBook: The Definitive Guide&lt;/publication&gt;.
+A wood duck, from the cover of &lt;title&gt;DocBook: The Definitive Guide&lt;/title&gt;.
 &lt;/image&gt;
 </code>
 <text>

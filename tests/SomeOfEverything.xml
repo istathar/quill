@@ -89,7 +89,7 @@ anchor at the end.
 <text>
 <highlight>TODO</highlight> when you click on the footnote, you
 should to actually be taken to where you can edit the note text.
-We haven't written the UI for that yet.
+We haven't written the <acronym>UI</acronym> for that yet.
 </text>
 <heading>
 Illuminating the past
@@ -116,14 +116,15 @@ text. Of course, we don't have Latin installed as a dictionary,
 so we just see a lot of misspelled words. Note that the first
 two words have varying inline markup (italics to normal and back);
 this tests that when loading from disk and serializing out again
-that the XML library does not insert a space at markup change
-boundaries.
+that the <acronym>XML</acronym> library does not insert a space
+at markup change boundaries.
 </text>
 <text>
 That passage also shows the other kind of reference, an in-line
-citation. They are presented in the editor with the same UI for
-footnotes providing some indication that they are special, but
-when rendered they appear inline as normal text.
+citation. They are presented in the editor with the same
+<acronym>UI</acronym> for footnotes providing some indication
+that they are special, but when rendered they appear inline as
+normal text.
 </text>
 <text>
 And in keeping with the feel of ancient civilization,
@@ -149,7 +150,7 @@ in making it any bigger.
 <text>
 <highlight>TODO</highlight> while loading and saving files with
 <type>ImageSegment</type>s clearly works (hover over the image
-to see the filename), there isn't any UI for inserting images
-and/or changing the source file yet.
+to see the filename), there isn't any <acronym>UI</acronym> for
+inserting images and/or changing the source file yet.
 </text>
 </quack>

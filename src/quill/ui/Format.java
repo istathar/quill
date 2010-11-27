@@ -57,7 +57,7 @@ class Format
 
     static final TextTag highlight;
 
-    static final TextTag publication;
+    static final TextTag title;
 
     static final TextTag keyboard;
 
@@ -117,8 +117,8 @@ class Format
         spelling = new TextTag();
         spelling.setUnderline(Underline.ERROR);
 
-        publication = new TextTag();
-        publication.setStyle(Style.ITALIC);
+        title = new TextTag();
+        title.setStyle(Style.ITALIC);
 
         keyboard = new TextTag();
         keyboard.setFontDescription(fonts.mono);
@@ -178,8 +178,8 @@ class Format
                 return command;
             } else if (m == Common.HIGHLIGHT) {
                 return highlight;
-            } else if (m == Common.PUBLICATION) {
-                return publication;
+            } else if (m == Common.TITLE) {
+                return title;
             } else if (m == Common.KEYBOARD) {
                 return keyboard;
             } else if (m == Common.ACRONYM) {

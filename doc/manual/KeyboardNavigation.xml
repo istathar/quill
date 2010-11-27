@@ -34,6 +34,7 @@ you are desperate you can always hack your <type>RenderEngine</type>
 to do something different. Remember that the point is to ensure
 consistent display of different classes of text; the person who
 wanted ship names in italics can just use
-<literal>&lt;publication&gt;</literal> to get herself italics.
+<literal>&lt;title&gt;</literal> to get herself a distinguished
+markup that conveniently defaults to italics.
 </text>
 </quack>

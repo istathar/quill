@@ -50,7 +50,7 @@ public class Common extends Markup
 
     public static final Common HIGHLIGHT = new Common("HIGHLIGHT", false);
 
-    public static final Common PUBLICATION = new Common("PUBLICATION", true);
+    public static final Common TITLE = new Common("TITLE", true);
 
     public static final Common KEYBOARD = new Common("KEYBOARD", false);
 
