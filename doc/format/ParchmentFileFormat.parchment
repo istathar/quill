@@ -4,6 +4,7 @@
     <chapter src="Background.xml"/>
     <chapter src="Chapters.xml"/>
     <chapter src="Documents.xml"/>
+    <chapter src="Notes.xml"/>
   </content>
   <presentation>
     <renderer class="parchment.render.ReportRenderEngine"/>

@@ -3,7 +3,6 @@
   <content>
     <chapter src="Introduction.xml"/>
     <chapter src="KeyboardNavigation.xml"/>
-    <chapter src="FileFormat.xml"/>
   </content>
   <presentation>
     <renderer class="parchment.render.ReportRenderEngine"/>

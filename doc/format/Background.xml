@@ -14,4 +14,43 @@ Criteria
 Thus we have the following criteria:
 </text>
 <text/>
+<text/>
+<text/>
+<text>
+you can fix the quack on disk if Quill breaks, but if you break
+the file on disk you'll break Quill.
+</text>
+<text>
+you can't expect Quill to figure it out 
+</text>
+<text>
+you can ... but {ironically?} you if you break the 
+</text>
+<text>
+<bold>Why did you create your own XML schema?</bold>
+</text>
+<text>
+You use a commonly available format if you wish to interoperate.
+But (at least at present) we're not worried about that; Quack
+format documents are for consumption by <project>Quill</project>
+and rendering by <project>Parchment</project>.
+</text>
+<text>
+Quack is not intended to be human <italics>writable</italics>.
+And it's not particularly meant for reading by other programs.
+But it is human <italics>mergeable</italics>.
+</text>
+<text>
+<bold>Why didn't you use...</bold>
+</text>
+<text>
+As mentioned, the driving imperative for Quack documents is that
+they be manageable with the collaboration tools we use to write
+open source software - specifically the modern 3rd generation
+distributed version control systems (<acronym>DVCS</acronym>)
+such as <project>Bazaar</project> (<command>bzr</command>),
+<project>Git</project> (<command>git</command>), or
+<project>Mercurial</project> (<command>hg</command>).
+</text>
+<text/>
 </quack>

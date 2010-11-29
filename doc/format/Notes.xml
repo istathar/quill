@@ -1,64 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
 <chapter>
-Documents on disk
+Notes on other formats
 </chapter>
 <text>
-The idea is...
+So that's the Parchment file format. For reference and comparison,
+here are some observations and opinions about other word processors
+and their file formats for "text documents".
 </text>
 <heading>
-About the Quack file format
+Open Office
 </heading>
 <text>
-you can fix the quack on disk if Quill breaks, but if you break
-the file on disk you'll break Quill.
-</text>
-<text>
-you can't expect Quill to figure it out 
-</text>
-<text>
-you can ... but {ironically?} you if you break the 
-</text>
-<text>
-<bold>Why did you create your own XML schema?</bold>
-</text>
-<text>
-You use a commonly available format if you wish to interoperate.
-But (at least at present) we're not worried about that; Quack
-format documents are for consumption by <project>Quill</project>
-and rendering by <project>Parchment</project>.
-</text>
-<text>
-Quack is not intended to be human <italics>writable</italics>.
-And it's not particularly meant for reading by other programs.
-But it is human <italics>mergeable</italics>.
-</text>
-<text>
-<bold>Why didn't you use...</bold>
-</text>
-<text>
-As mentioned, the driving imperative for Quack documents is that
-they be manageable with the collaboration tools we use to write
-open source software - specifically the modern 3rd generation
-distributed version control systems (<acronym>DVCS</acronym>)
-such as <project>Bazaar</project> (<command>bzr</command>),
-<project>Git</project> (<command>git</command>), or
-<project>Mercurial</project> (<command>hg</command>).
-</text>
-<heading>
-Commentary on other formats
-</heading>
-<text>
-With the above in mind, 
-</text>
-<text>
-<bold>Open Office </bold><literal>.odt</literal>
+<bold>Open Document Format</bold>, <filename>.odt</filename>
 </text>
 <text>
 This is the very definition of un-fun. Open Document Format was
 already disqualified on the grounds of it being contained in
 a single Zip compressed file and thus unsuitable for version
-control, but if you take some time.
+control.
+</text>
+<text/>
+<text>
+Still, <project>Open Office</project> is a fairly major player.
+We happily use if for our business correspondence and it outputs
+very serviceable <acronym>PDF</acronym> documents. Which raises
+a good concluding point; it has long been Unix philosophy that
+you endeavour to use the best tools you can for the job. OOo
+is a fantastic full feature office suite, and it being so leaves
+us the room to allow us to write <project>Quill and Parchment</project>
+to such that it specializes in what it's good at, without having
+to be all things to all people.
+</text>
+<text>
+If you've written a fairly substantial article, report, or essay
+in <project>Open Office</project>, you might be interested to
+take some time to open it up and have a look at
+<acronym>ODF.</acronym>
+</text>
+<text>
+Which raised the possibility that one could, hypothetically,
+unzip the document, commit the resultant directory tree to
+<acronym>VCS</acronym>, and then re-zip the tree back into a
+<filename>.odt</filename> before editing it again. Hm. Maybe
+not.
+</text>
+<text>
+No, much as the zipping the document's files together into a
+single archive makes it easy to send that document as a single
+file to someone, it is diametrically opposed to what we need
+to be able to use a <acronym>VCS</acronym> to version our documents
+and to merge with others we are collaborating with.
 </text>
 <text/>
 <text>
@@ -66,14 +58,17 @@ The give away was looking at what Writer writes out when you
 tell it to pretend it's an web page editor and ask it to save
 as <acronym>HTML</acronym>... <highlight>HERE</highlight>
 </text>
+<heading>
+DocBook
+</heading>
 <text>
-<bold>DocBook XML</bold>
+<bold>DocBook XML</bold>, <filename>.xml</filename>
 </text>
 <text>
 In all conscience DocBook is certainly a comprehensive schema.
-In fact, Quill started life as a DocBook editor, or at least
-something that would author documents in the very limited subset
-of DocBook we actually needed.
+In fact, <project>Quill</project> started life as a DocBook editor,
+or at least something that would author documents in the very
+limited subset of DocBook we actually needed.
 </text>
 <text>
 The DocBook specification, however, is exceedingly large. It
