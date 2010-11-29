@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
+<chapter>
+Background
+</chapter>
+<text>
+Writing is already hard enough. It's really not to be borne that
+the tools we have to write with make it harder.
+</text>
+<heading>
+Criteria
+</heading>
+<text>
+Thus we have the following criteria:
+</text>
+<text/>
+</quack>
