@@ -86,7 +86,7 @@ public class Stylesheet
         this.marginRight = "12.5";
         this.marginBottom = "10.0";
 
-        this.fontSerif = "Linux Libertine";
+        this.fontSerif = "Linux Libertine O";
         this.fontSans = "Liberation Sans";
         this.fontMono = "Inconsolata";
         this.fontHeading = "Linux Libertine O C";

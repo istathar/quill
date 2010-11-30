@@ -52,7 +52,7 @@ public class ValidateStylesheetToRenderSettingsConversion extends GraphicalTestC
         assertEquals("20.0", style.getMarginLeft());
         assertEquals("12.5", style.getMarginRight());
         assertEquals("10.0", style.getMarginBottom());
-        assertEquals("Linux Libertine", style.getFontSerif());
+        assertEquals("Linux Libertine O", style.getFontSerif());
         assertEquals("Liberation Sans", style.getFontSans());
         assertEquals("Inconsolata", style.getFontMono());
         assertEquals("Linux Libertine O C", style.getFontHeading());
@@ -77,7 +77,7 @@ public class ValidateStylesheetToRenderSettingsConversion extends GraphicalTestC
         assertEquals(35.43, settings.getMarginRight(), 0.01);
         assertEquals(28.35, settings.getMarginBottom(), 0.01);
 
-        assertEquals("Linux Libertine", settings.getFontSerif().getFamily());
+        assertEquals("Linux Libertine O", settings.getFontSerif().getFamily());
         assertEquals(convertMilimetresToPoints(3.2), settings.getFontSerif().getSize(), 0.01);
         assertEquals(Style.NORMAL, settings.getFontSerif().getStyle());
         assertEquals(Weight.NORMAL, settings.getFontSerif().getWeight());

@@ -45,7 +45,7 @@ Here is the <literal>.parchment</literal> file for this document:
     &lt;renderer class="parchment.render.ReportRenderEngine"/&gt;
     &lt;paper size="A4"/&gt;
     &lt;margins top="15.0" left="20.0" right="12.5" bottom="10.0"/&gt;
-    &lt;font serif="Linux Libertine" size="3.2"/&gt;
+    &lt;font serif="Linux Libertine O" size="3.2"/&gt;
     &lt;font sans="Liberation Sans" size="2.6"/&gt;
     &lt;font mono="Inconsolata" size="3.0"/&gt;
     &lt;font heading="Linux Libertine O C" size="5.6"/&gt;
