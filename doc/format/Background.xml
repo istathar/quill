@@ -87,28 +87,30 @@ documents. It's excellent at all these things.
 </text>
 <text>
 But <acronym>ODF</acronym> is unbelievably complex. The specification
-comes in at over 6,000 pages. Trying to write something that
-is able to parse and output compliant documents would be a huge
-undertaking. And the bigger problem is that even if we tried
-to use say a subset of <acronym>ODF</acronym>, people would instantly
-(and quite reasonably) expect that Quill and Parchment would
-be able to open their documents, and that they'd be able to open
-their documents with <project>Open Office</project>. That's not
-really the point here (we do need to be able to escape from Parchment
-format documents, and it's not beyond the pale that someone could
-write an exporter, but that's another issue).
+comes in at 1,216 pages. Trying to write something that is able
+to parse and output compliant documents would be a huge undertaking.
+And the bigger problem is that even if we tried to use say a
+subset of <acronym>ODF</acronym>, people would instantly (and
+quite reasonably) expect that Quill and Parchment would be able
+to open their documents, and that they'd be able to open their
+documents with <project>Open Office</project>'s
+<project>Writer</project> That's not really the point here (we
+do need to be able to escape from Parchment format documents,
+and it's not beyond the pale that someone could write an exporter,
+but that's another issue).
 </text>
 <text>
 In any event, the one-big-binary-blob nature of Open Document
 Format doesn't meet our criteria above, and so that was that.
 </text>
 <text>
-That doesn't mean that we expect Quill and Parchment to "beat"
-Open Office. Nothing of the sort. We set out to write a tool
-that would help us author the kinds of documents that we want
-to create. If it does a good job at that we'll be content; and
-for anything that doesn't fit the (admittedly quite tight) mold
-of <project>Quill</project> we'll just use OOo!
+That doesn't mean that we expect <project>Quill and Parchment</project>
+to "beat" <project>Writer</project>. Nothing of the sort. We
+set out to write a tool that would help us author the kinds of
+documents that we want to create. If it does a good job at that
+we'll be content; and for anything that doesn't fit the (admittedly
+quite restrictive) mold of <project>Quill</project>, just use
+<project>Writer</project>!
 </text>
 <text>
 Which raises a good concluding point; it has long been Unix philosophy

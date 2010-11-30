@@ -45,8 +45,8 @@ back to spaces). To begin a new paragraph we start another
 <literal>&lt;text&gt;</literal> block.
 </text>
 <text>
-Pure XML takes a somewhat puritanical approach; you often see
-text like this:
+Pure <acronym>XML</acronym> takes a somewhat puritanical approach;
+you often see text like this:
 </text>
 <code xml:space="preserve">
 &lt;para&gt;This is some text
