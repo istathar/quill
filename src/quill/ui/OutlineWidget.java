@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import org.freedesktop.cairo.Antialias;
 import org.freedesktop.cairo.Context;
 import org.gnome.gdk.EventExpose;
+import org.gnome.glib.Glib;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.DrawingArea;
@@ -507,7 +508,7 @@ class PresentSegmentButton extends Button implements Button.Clicked
     void setAddress(final Series series, final Segment segment) {
         final StringBuilder buf;
         final Extract entire;
-        final String str;
+        final String str, escaped;
 
         /*
          * Update state if necessary
@@ -525,15 +526,16 @@ class PresentSegmentButton extends Button implements Button.Clicked
 
         entire = segment.getEntire();
         str = entire.getText();
+        escaped = Glib.markupEscapeText(str);
 
         buf = new StringBuilder();
 
         if (segment instanceof HeadingSegment) {
             buf.append("      ");
-            buf.append(str);
+            buf.append(escaped);
         } else if (segment instanceof ComponentSegment) {
             buf.append("<span size='x-large'>  ");
-            buf.append(str);
+            buf.append(escaped);
             buf.append("</span>");
         } else {
             throw new AssertionError();
