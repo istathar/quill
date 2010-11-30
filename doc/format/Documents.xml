@@ -31,7 +31,7 @@ files with the text body), presentation (what renderer to use
 and how to configure it), and metadata. And that's it.
 </text>
 <text>
-Here is the <filename>.parchment</filename> file for this document:
+Here is the <literal>.parchment</literal> file for this document:
 </text>
 <code xml:space="preserve">
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
@@ -58,31 +58,37 @@ Here is the <filename>.parchment</filename> file for this document:
 &lt;/manuscript&gt;
 </code>
 <text>
-Pretty simple!
+Pretty simple! That's in
+<filename>ParchmentFileFormat.parchment</filename>. The user
+can call their documents anything they want, of course.
+<project>Quill</project> is set up so that when it generates
+a <acronym>PDF</acronym> it will use the document's base name
+for where it will write; <filename>ParchmentFileFormat.pdf</filename>
+in this case.
 </text>
 <heading>
 Content
 </heading>
 <text>
-This section is simply a list of the components which make up
-the document. Contains only <literal>&lt;chapter&gt;</literal>
-elements, one file per element.
+The <literal>&lt;content&gt;</literal> section is simply a list
+of the components which make up the document. Contains only
+<literal>&lt;chapter&gt;</literal> elements, one file per element.
 </text>
 <text>
-Don't get excited if your component isn't a chapter; "articles"
-are documents with one chapter while things like part separators
-and front and back matter are also in Quack format files.
+Don't get excited if your component isn't a chapter. An "article"
+is a document with one chapter. Things like part separators and
+front and back matter are also contained in Quack format files.
 </text>
 <heading>
 Presentation
 </heading>
 <text>
-This section specifies the minimal amount of information that
-defines how the document is to be rendered to paper. By design,
-most of the details of how the output will look is in the code
-of the <type>RenderEngine</type>s. The document itself needs
-to know which one is to be used to print it, and to what size
-of paper.
+The <literal>&lt;presentation&gt;</literal> section specifies
+the minimal amount of information that defines how the document
+is to be rendered to paper. By design, most of the details of
+how the output will look is in the code of the
+<type>RenderEngine</type>s. The document itself needs to know
+which one is to be used to print it, and to what size of paper.
 </text>
 <text>
 There are only two valid paper sizes, <literal>Letter</literal>
@@ -94,38 +100,40 @@ sizes simultaneously; text flow and pagination depends on available
 area and that depends on paper size.
 </text>
 <text>
-Margins are expressed in milimetres, 
+Margins are expressed in milimetres.
 </text>
 <text>
 Font sizes are also in milimetres. This is different than the
 usual "points" in part to make it clear that "a 12 point font"
 is not 12 points high; it ends up being however high the graphics
 subsystem chooses; typically people are used to seeing things
-fixed at 96 dpi but that has nothing to do with a 1200 dpi printer
-or even the ~130 dpi that modern monitors are achieving.
+fixed at 96 <acronym>dpi</acronym> but that has nothing to do
+with a 1200 <acronym>dpi</acronym> printer or even the ~130
+<acronym>dpi</acronym> that modern monitors are achieving.
 </text>
 <heading>
 Metadata
 </heading>
 <text>
-This section was added when we tackled spell checking and the
-need for a document to indicate what dictionary it was checked
-against. The <literal>&lt;spelling&gt;</literal> element specifies
-an <project>Enchant</project> dictionary.
+Finally is <literal>&lt;metadata&gt;</literal>. This section
+was added when we tackled spell checking and the need for a Quill
+to know what dictionary to load. The
+<literal>&lt;spelling&gt;</literal> element specifies an
+<project>Enchant</project> dictionary "language tag".
 </text>
 <text>
 Not long after that we added support for rendering headers and
 footers and realized we needed somewhere for the author and title
-of the work as a whole. Note that there are not multiple
-<literal>&lt;author&gt;</literal> elements; this is just for
-use in a header or footer, so if there are two of you it's
-<literal>"Kermit and Fozzie"</literal> and if more, well, that's
-up to you, but <literal>"Kermit, et al"</literal> would do pretty
-well.
+of the work as a whole. Note that there are <italics>not</italics>
+multiple <literal>&lt;author&gt;</literal> elements; this is
+just for use in a header or footer, so if there are two of you
+it's <literal>"Kermit and Fozzie"</literal> and if more, well,
+that's up to you, but <literal>"Kermit, et al"</literal> would
+do pretty well.
 </text>
 <text>
 Document title is available for headers or footers, and also
 shows up in the Outline when you're editing with
-<command>quill</command>.
+<project>Quill</project>.
 </text>
 </quack>
