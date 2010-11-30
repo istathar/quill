@@ -13,7 +13,15 @@ Criteria
 <text>
 Thus we have the following criteria:
 </text>
-<text/>
+<text>
+<bold>Simplicity</bold>
+</text>
+<text>
+<bold>Text based</bold>
+</text>
+<text>
+In a text file, less that 80 characters wide, 
+</text>
 <text/>
 <text/>
 <text>
@@ -53,4 +61,61 @@ such as <project>Bazaar</project> (<command>bzr</command>),
 <project>Mercurial</project> (<command>hg</command>).
 </text>
 <text/>
+<text/>
+<heading>
+Why didn't you use...
+</heading>
+<text>
+Programmers create new formats and schemas all the time, but
+the instant you mention that the application is a "word processor"
+they freak out and insist that you make your program interoperable
+with <project>Open Office</project>'s Open Document Format. Which
+is "lovely" - in that everyone has the application which opens
+said documents - and "standardized" - people seem to think that
+since it exists, is widely adopted, and not to mention in a huge
+fight with Microsoft's "Office XML" (which even <project>Microsoft
+Office</project> doesn't support) that everything else has to
+support it too.
+</text>
+<text>
+<project>Open Office</project> is of course a major player. It
+always will be. At Operational Dynamics we happily use it for
+our business correspondence and it outputs very serviceable
+<acronym>PDF</acronym> documents. It also serves the tremendously
+important role of allowing us to open Microsoft Office format
+documents. It's excellent at all these things.
+</text>
+<text>
+But <acronym>ODF</acronym> is unbelievably complex. The specification
+comes in at over 6,000 pages. Trying to write something that
+is able to parse and output compliant documents would be a huge
+undertaking. And the bigger problem is that even if we tried
+to use say a subset of <acronym>ODF</acronym>, people would instantly
+(and quite reasonably) expect that Quill and Parchment would
+be able to open their documents, and that they'd be able to open
+their documents with <project>Open Office</project>. That's not
+really the point here (we do need to be able to escape from Parchment
+format documents, and it's not beyond the pale that someone could
+write an exporter, but that's another issue).
+</text>
+<text>
+In any event, the one-big-binary-blob nature of Open Document
+Format doesn't meet our criteria above, and so that was that.
+</text>
+<text>
+That doesn't mean that we expect Quill and Parchment to "beat"
+Open Office. Nothing of the sort. We set out to write a tool
+that would help us author the kinds of documents that we want
+to create. If it does a good job at that we'll be content; and
+for anything that doesn't fit the (admittedly quite tight) mold
+of <project>Quill</project> we'll just use OOo!
+</text>
+<text>
+Which raises a good concluding point; it has long been Unix philosophy
+that you endeavour to use the best individual tools you can for
+the job. OOo is an impressive full feature office suite, and
+it being so leaves us the room allowing us to write <project>Quill
+and Parchment</project> as a specialized writing tool, without
+having to make it all things to all people.
+</text>
 </quack>

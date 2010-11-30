@@ -4,5 +4,191 @@
 Chapters
 </chapter>
 <text/>
+<text>
+The inlines serve two purposes: they differentiate text that
+is to be formatted differently when rendered, and they differentiate
+text that is not to be spell checked (vice text that is), which
+is why there is some overlap in output; after all, there's only
+a few permutations of face {serif, sans serif, monospaced, and
+small caps}, style {normal, italics}, and weight {normal, bold}
+to work with.
+</text>
 <text/>
+<text>
+Discussion of how a given block type or inline markup is to be
+rendered is largely predicated on the reference
+<type>RenderEngine</type>s that ship by default with <project>Quill
+and Parchment</project>. The user (or the user's organization)
+is of course welcome to do anything they want, but the Quack
+format is largely there to support these processing expectations.
+</text>
+<heading>
+Blocks
+</heading>
+<text>
+With the exception of preformatted code blocks, block level elements
+are wrapped at 70 characters.
+</text>
+<text>
+<bold>Normal text blocks</bold>, <literal>&lt;text&gt;</literal>
+</text>
+<text>
+Normal prose intended to flow onto subsequent lines being word
+wrapped at page margin. 
+</text>
+<text>
+On-disk, text is likewise word wrapped so that lines are
+<literal>&lt;=</literal> 70 characters wide. Bare newlines
+(<literal>'\n'</literal>) are not permitted (newlines arising
+in-stream due to word wrapping when the file was wrote are converted
+back to spaces). To begin a new paragraph we start another
+<literal>&lt;text&gt;</literal> block.
+</text>
+<text>
+Pure XML takes a somewhat puritanical approach; you often see
+text like this:
+</text>
+<code xml:space="preserve">
+&lt;para&gt;This is some text
+wrapped onto the
+next line&lt;/para&gt;
+&lt;para&gt;And this is
+the next
+paragraph.&lt;/para&gt;
+</code>
+<text>
+which looks pretty stupid in long text runs because the tags
+get in the way. We instead take the same approach as used by
+<literal>HTML</literal> whereby leading and trailing newlines
+are trimmed. So we have:
+</text>
+<code xml:space="preserve">
+&lt;text&gt;
+This is some text
+wrapped onto the
+next line.
+&lt;/text&gt;
+&lt;text&gt;
+And this is the
+next paragraph.
+&lt;/text&gt;
+</code>
+<text>
+which looks a lot better and is <italics>much</italics> easier
+to deal with when merging.
+</text>
+<text>
+<bold>Preformatted blocks</bold>, <literal>&lt;code&gt;</literal>
+</text>
+<text>
+The major use of of Quill and Parchment is technical writing,
+so after normal prose the most common block type is preformatted
+computer program source code.
+</text>
+<text>
+These blocks are <italics>not</italics> wrapped. Whitespace (newlines,
+spaces, and tabs) is preserved.
+</text>
+<text>
+The code we use for reading and writing <acronym>XML</acronym>,
+an excellent library called <project>Xom</project>, is rigorously
+standards compliant and properly escapes <literal>'&lt;'</literal>,
+<literal>'&gt;'</literal>, <literal>'&amp;'</literal> and friends
+as entities.
+</text>
+<text>
+<bold>Quote blocks</bold>, <literal>&lt;quote&gt;</literal> and
+<literal>&lt;poem&gt;</literal>
+</text>
+<text>
+There are two block types for quotations: blockquotes and poems.
+</text>
+<text>
+Blockquote are expected to be presented indented from the margin
+on both sides. They <italics>are</italics> word wrapped. If the
+<type>RenderEngine</type> is double spacing normal text the text
+in a quote would not be double spaced.
+</text>
+<text>
+<bold>Poetry blocks</bold>, <literal>&lt;poem&gt;</literal>
+</text>
+<text>
+Poems are passages which are <italics>not</italics> word wrapped.
+You wouldn't really expect poems to be offset indented like blockquotes
+- these are ultimately just normal text blocks that happen to
+preserve whitespace - but presentation is ultimately up to the
+<type>RenderEngine</type> being used.
+</text>
+<heading>
+Inlines
+</heading>
+<text>
+These are the markup that occur within Blocks.
+</text>
+<text>
+<bold>Italics</bold>, <literal>&lt;italics&gt;</literal>
+</text>
+<text>
+Gently emphasized text to be rendered in italics. Note that we're
+off to a good start here; we don't mean emphasis in the way that
+<acronym>HTML</acronym>; if you want italics you use italics;
+if you want bolded text then you say bold. Done. It's
+<italics>not</italics> up to the <type>RenderEngine</type> to
+decide about such things; italic text is a semantic all of its
+own. If the author wants italics they get italics. And so that's
+what's in Quack.
+</text>
+<text>
+<bold>Bold</bold>, <literal>&lt;bold&gt;</literal>
+</text>
+<text>
+Strongly emphasized text to be rendered in a bold font.
+</text>
+<text>
+<bold>Code Literals</bold>, &lt;literal&gt;
+</text>
+<text>
+Used for short literal code fragments from source code. Rendered
+in a monospaced font, the same as used for preformatted code
+blocks (indeed, when configuring the stylesheet the
+<literal>mono</literal> font's size is chosen in order that these
+literals look good inline with normal text).
+</text>
+<text>
+<bold>Class and Method</bold>, <literal>&lt;type&gt;</literal>
+and <literal>&lt;function&gt;</literal>
+</text>
+<text>
+These are specialist markups for writing about program code.
+C programmers write about functions; Java programmers talk about
+their classes a lot, and just as frequently mention methods by
+name.
+</text>
+<text>
+O'Reilly presents function names in italics like
+<italics>printf</italics>. Other publishers present them in a
+monospaced font, as <function>printf</function>. Personally,
+I always add <literal>'('</literal> and <literal>')'</literal>
+to my function and method names to add a visual cue, as in
+<type>Object</type>'s <function>equals()</function> which every
+Java object has. But that's up to the author; how it's presented
+is up to the renderer.
+</text>
+<text>
+Not spell checked.
+</text>
+<text>
+...
+</text>
+<text>
+<bold>Publication Titles</bold>, <literal>&lt;title&gt;</literal>
+</text>
+<text>
+Book titles, and by extension, magazine titles, movie titles,
+etc. In general this is expected to be in italics, so this could
+have been achieved with the <literal>&lt;italics&gt;</literal>
+inline, except that some institutions require titles to be in
+in small caps, hence an independent markup type so the
+<type>RenderEngine</type> can do the right thing.
+</text>
 </quack>

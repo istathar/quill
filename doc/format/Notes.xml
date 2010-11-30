@@ -9,10 +9,14 @@ here are some observations and opinions about other word processors
 and their file formats for "text documents".
 </text>
 <heading>
-Open Office
+Open Document Format
 </heading>
 <text>
-<bold>Open Document Format</bold>, <filename>.odt</filename>
+But on the topic of on-disk file formats, here are our comments
+on <acronym>ODF</acronym> for text documents.
+</text>
+<text>
+<bold>Open Office</bold>, <filename>.odt</filename>
 </text>
 <text>
 This is the very definition of un-fun. Open Document Format was
@@ -21,17 +25,7 @@ a single Zip compressed file and thus unsuitable for version
 control.
 </text>
 <text/>
-<text>
-Still, <project>Open Office</project> is a fairly major player.
-We happily use if for our business correspondence and it outputs
-very serviceable <acronym>PDF</acronym> documents. Which raises
-a good concluding point; it has long been Unix philosophy that
-you endeavour to use the best tools you can for the job. OOo
-is a fantastic full feature office suite, and it being so leaves
-us the room to allow us to write <project>Quill and Parchment</project>
-to such that it specializes in what it's good at, without having
-to be all things to all people.
-</text>
+<text/>
 <text>
 If you've written a fairly substantial article, report, or essay
 in <project>Open Office</project>, you might be interested to
@@ -163,7 +157,8 @@ locked in and be unable to extract them in the future. To that
 end, it shouldn't be too hard to write a function to do a one-way
 export from Quack <acronym>XML</acronym> to DocBook
 <acronym>XML</acronym> - perhaps using <acronym>XSLT</acronym>,
-perhaps using a custom Serializer, and perhaps using Parchment.
+perhaps using a custom <type>Serializer</type>, and perhaps using
+Parchment.
 </text>
 <text>
 If you ever <italics>are</italics> working with DocBook, ensure
