@@ -3,16 +3,71 @@
 <chapter>
 Chapters
 </chapter>
+<text>
+The central insight underling the Quack schema and the Parchment
+engine which renders it for display or printing is that ultimately,
+<italics>there is no structure in a document</italics>. When
+you read a book, you see prose, then a section's heading, then
+more prose, then an image, then a new chapter ... as they are
+printed they are just a series of lines of lines of text.
+</text>
+<text>
+Structure that we impose in our documents - sections, chapters,
+parts, documents - are constructs that we have become accustomed
+to in outlines and in tables of content. People would consider
+that a paragraph of text is "in" a section which is "in" a chapter,
+but from a rendering standpoint, these are just a stream of lines
+of normal text, then a line of heading, then further lines of
+normal text.
+</text>
+<text>
+So the Quack schema is just that. At the top level is a linear
+series of "blocks", each of which is in a consistent format:
+normal prose, program code, a block quotation, section headings.
+</text>
+<text>
+Blocks contain text and the second level of elements, termed
+"inlines", specifying a specific markup to be applied to a span
+of text.
+</text>
+<text/>
+<heading>
+Components
+</heading>
+<text>
+Chapters are Content-Type <literal>text/xml</literal>,
+<literal>UTF-8</literal> encoded, with file extension
+<literal>.xml</literal>.
+</text>
+<text>
+The minimal document in the Quack schema is:
+</text>
+<code xml:space="preserve">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5"/&gt;
+</code>
+<text>
+If that was in <filename>First.xml</filename> it could be a part
+of a Parchment document, and <project>Quill</project> would load
+it as an empty chapter. 
+</text>
+<text>
+Real chapters start with a block giving the chapter title, followed
+by one or more content blocks with the body of the chapter. The
+schema is as follows:
+</text>
+<text/>
+<code xml:space="preserve">
+&lt;chapter&gt;?,
+&lt;text&gt;,&lt;code&gt;,&lt;
+</code>
 <text/>
 <text>
-The inlines serve two purposes: they differentiate text that
-is to be formatted differently when rendered, and they differentiate
-text that is not to be spell checked (vice text that is), which
-is why there is some overlap in output; after all, there's only
-a few permutations of face {serif, sans serif, monospaced, and
-small caps}, style {normal, italics}, and weight {normal, bold}
-to work with.
+: an optional chapter title, a series of normal content blocks,
+then notes and references if there are any.
 </text>
+<text/>
+<text/>
 <text/>
 <text>
 Discussion of how a given block type or inline markup is to be
@@ -97,8 +152,7 @@ standards compliant and properly escapes <literal>'&lt;'</literal>,
 as entities.
 </text>
 <text>
-<bold>Quote blocks</bold>, <literal>&lt;quote&gt;</literal> and
-<literal>&lt;poem&gt;</literal>
+<bold>Quote blocks</bold>, <literal>&lt;quote&gt;</literal>
 </text>
 <text>
 There are two block types for quotations: blockquotes and poems.
@@ -124,6 +178,15 @@ Inlines
 </heading>
 <text>
 These are the markup that occur within Blocks.
+</text>
+<text>
+The inlines serve two purposes: they differentiate text that
+is to be formatted differently when rendered, and they differentiate
+text that is not to be spell checked (vice text that is), which
+is why there is some overlap in output; after all, there's only
+a few permutations of face {serif, sans serif, monospaced, and
+small caps}, style {normal, italics}, and weight {normal, bold}
+to work with.
 </text>
 <text>
 <bold>Italics</bold>, <literal>&lt;italics&gt;</literal>
@@ -178,7 +241,65 @@ is up to the renderer.
 Not spell checked.
 </text>
 <text>
-...
+<bold>Filenames</bold>, <literal>&lt;filename&gt;</literal>
+</text>
+<text>
+A file or path to a file on disk. Typically rendered in the monospaced
+font, but in italics. Can also be used for <acronym>URL</acronym>s.
+</text>
+<text>
+<bold>Projects and their Commands</bold>,
+<literal>&lt;project&gt;</literal> and
+<literal>&lt;command&gt;</literal>
+</text>
+<text>
+The project markup is for the proper name of an application suite.
+Not everyone will want or need this; but in our consulting work
+we find it helpful to draw attention to the fact that a term
+the reader might not be familiar with were the names of (in those
+cases, open source) software projects. The reference implementation
+renders project markup in the sans font, bolded, but with the
+colour dropped out to reduce the emphasis.
+</text>
+<text>
+Command markup is necessary because we often talk about the command
+being run as distinct from the project it belongs to, ie,
+<command>bzr</command> on the command-line and
+<project>Bazaar</project> the project. And while the reference
+<type>RenderEngine</type> renders commands in the monospaced
+font the same as with literals, other stylesheets have these
+command names rendered in italics.
+</text>
+<text>
+<bold>Acronyms</bold>, <literal>&lt;acronym&gt;</literal>
+</text>
+<text>
+We follow the convention used in publications like <title>The
+Economist</title>, where initialisms, abbreviations, and acronyms
+are presented in a small capitals font, and this markup gives
+the user access to that. Note that in our renderer we manually
+map capital letters to their small caps equivalent for presentation
+purposes; the user is still expected to write their abbreviation
+in capital letters. This means that on-disk the file contains:
+</text>
+<code xml:space="preserve">
+The American space agency, &lt;acronym&gt;NASA&lt;/acronym&gt;, reports that
+they have run out of paperclips.
+</code>
+<text>
+and not:
+</text>
+<code xml:space="preserve">
+The American space agency, &lt;acronym&gt;nasa&lt;/acronym&gt;, reports that
+they have run out of paperclips.
+</code>
+<text>
+which looks odd, and would be wrong if the markup were stripped
+and the resultant <literal>text/plain</literal> was viewed.
+</text>
+<text>
+As with any typographic effect, if the user wants their abbreviation
+in normal capitals they can simply choose not to apply this markup.
 </text>
 <text>
 <bold>Publication Titles</bold>, <literal>&lt;title&gt;</literal>
@@ -190,5 +311,9 @@ have been achieved with the <literal>&lt;italics&gt;</literal>
 inline, except that some institutions require titles to be in
 in small caps, hence an independent markup type so the
 <type>RenderEngine</type> can do the right thing.
+</text>
+<text>
+Mostly this markup will show up when you're writing notes and
+references, but it can be used everywhere, of course.
 </text>
 </quack>
