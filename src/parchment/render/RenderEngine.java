@@ -1008,6 +1008,7 @@ public abstract class RenderEngine
                 return new Attribute[] {
                     new FontDescriptionAttribute(sansFace.desc),
                     new WeightAttribute(Weight.BOLD),
+                    new ForegroundColorAttribute(0.3, 0.3, 0.3),
                 };
             } else if (m == Common.COMMAND) {
                 return new Attribute[] {
