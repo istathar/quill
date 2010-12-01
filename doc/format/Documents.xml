@@ -4,13 +4,11 @@
 Documents
 </chapter>
 <text>
-Since Quack is just a single chapter, then we need something
-to express what a book or other work is.
-</text>
-<text>
-It doesn't need much. A book is, after all, just a series of
-chapters. So, we need is a single file which is "the work" which
-lists the component files that make it up.
+Since the Quack schema describes a single chapter, we need something
+to express what a book or other work is. It doesn't need much.
+A book is, after all, just a series of chapters. So, we need
+is a single file which is "the work" which lists the component
+files that make it up.
 </text>
 <text>
 <project>Quill and Parchment</project> is about separation of
@@ -20,7 +18,7 @@ are a few configurable knobs though, and their settings need
 to go somewhere. The document container is the place.
 </text>
 <text>
-Finally, there a <italics>very few</italics> global properties
+Finally, there are a <italics>very few</italics> global properties
 that go with a document. Frankly this isn't much more than what
 language dictionary to use to spell check the document, but again,
 it has to go somewhere.

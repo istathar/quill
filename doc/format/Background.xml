@@ -14,54 +14,84 @@ Criteria
 Thus we have the following criteria:
 </text>
 <text>
-<bold>Simplicity</bold>
+<bold>1. Text based</bold>
 </text>
 <text>
-<bold>Text based</bold>
-</text>
-<text>
-In a text file, less that 80 characters wide, 
-</text>
-<text/>
-<text/>
-<text>
-you can fix the quack on disk if Quill breaks, but if you break
-the file on disk you'll break Quill.
-</text>
-<text>
-you can't expect Quill to figure it out 
-</text>
-<text>
-you can ... but {ironically?} you if you break the 
-</text>
-<text>
-<bold>Why did you create your own XML schema?</bold>
-</text>
-<text>
-You use a commonly available format if you wish to interoperate.
-But (at least at present) we're not worried about that; Quack
-format documents are for consumption by <project>Quill</project>
-and rendering by <project>Parchment</project>.
-</text>
-<text>
-Quack is not intended to be human <italics>writable</italics>.
-And it's not particularly meant for reading by other programs.
-But it is human <italics>mergeable</italics>.
-</text>
-<text>
-<bold>Why didn't you use...</bold>
-</text>
-<text>
-As mentioned, the driving imperative for Quack documents is that
-they be manageable with the collaboration tools we use to write
-open source software - specifically the modern 3rd generation
-distributed version control systems (<acronym>DVCS</acronym>)
-such as <project>Bazaar</project> (<command>bzr</command>),
-<project>Git</project> (<command>git</command>), or
+The driving imperative for Quack documents is that they be manageable
+with the collaboration tools we use to write open source software
+- specifically the modern 3rd generation distributed version
+control systems (<acronym>DVCS</acronym>) such as the most excellent
+<project>Bazaar</project> (<command>bzr</command>) or its friends
+<project>Git</project> (<command>git</command>) or
 <project>Mercurial</project> (<command>hg</command>).
 </text>
-<text/>
-<text/>
+<text>
+This is both so that we can use these existing tools to manage
+the history of our documents and to give us robustness against
+things going wrong, but more importantly so that these tools
+can be used to enable to multiple authors to collaborate on the
+same document. We do it for source code; it's high time we were
+able to use the same tools for our written work too.
+</text>
+<text>
+So the format <bold>must</bold> be "text based"; in text files,
+with lines wrapped such that they are less that 80 characters
+wide. This is necessary so that when files are compared or merged
+the diffs are sensible and fit in a standard width terminal screens.
+</text>
+<text>
+2<bold>. Valid documents only</bold>
+</text>
+<text>
+There is nothing in particular that requires <literal>XML</literal>
+be used, but its main attraction is that we can requiring that
+documents be valid per a <acronym>DTD</acronym>. This helps keep
+the complexity that the application has to deal with under control.
+Why do people write apps that accept invalid input? Astounding,
+really, but then they output invalid <acronym>XML</acronym> too.
+Go figure.
+</text>
+<text>
+3<bold>. Simple schema</bold>
+</text>
+<text>
+Having chosen <acronym>XML</acronym>, however, there is a new
+imperative: simplicity. Hierarchical structure is something that
+humans tend to understand very quickly, but it is fiendishly
+difficult to work with programatically.
+</text>
+<text>
+Keeping the schema ridiculously straight forward means that the
+program that manipulates these documents and focuses on user
+experience rather can be written by mere mortals.
+</text>
+<text>
+The simplicity requirement also means that you can fix your chapter
+files on disk if the <project>Quill</project> application breaks,
+but if you break the file on disk you'll break
+<project>Quill</project>. Tough cookies.
+</text>
+<text>
+Note that the simplicity criteria does not mean that the on-disk
+files are intended to be human <italics>writable</italics>. Just
+because it's human readable doesn't mean that you're supposed
+to have it open in <command>vi</command>. And it's not particularly
+meant for reading by other programs. But the format does have
+to be human <italics>mergeable</italics>; if two people are collaborating,
+combine their branches, and get a merge conflict, they
+<bold>have</bold> to be able to resolve it.
+</text>
+<text>
+4<bold>. One file per chapter</bold>
+</text>
+<text>
+This is somewhat arbitrary, but nevertheless it is common practice
+when writing book length works to have each chapter in its own
+file. And this makes sense; if one author does work on the chapter
+about Spain while the editor makes revisions to the chapter about
+Antigua, those changes should be independent and show up as different
+files being changed.
+</text>
 <heading>
 Why didn't you use...
 </heading>
@@ -89,15 +119,16 @@ documents. It's excellent at all these things.
 But <acronym>ODF</acronym> is unbelievably complex. The specification
 comes in at 1,216 pages. Trying to write something that is able
 to parse and output compliant documents would be a huge undertaking.
-And the bigger problem is that even if we tried to use say a
-subset of <acronym>ODF</acronym>, people would instantly (and
-quite reasonably) expect that Quill and Parchment would be able
-to open their documents, and that they'd be able to open their
-documents with <project>Open Office</project>'s
-<project>Writer</project> That's not really the point here (we
-do need to be able to escape from Parchment format documents,
-and it's not beyond the pale that someone could write an exporter,
-but that's another issue).
+And the bigger problem is that even if we tried to use even just
+a subset of <acronym>ODF</acronym>, people would instantly (and
+quite reasonably) expect that <project>Quill</project> would
+be able to open their <project>Writer</project> documents, and
+that they'd be able to open their <project>Quill</project> documents
+with <project>Writer</project> That's not really the point here;
+while we do need to be able to escape from the Parchment format
+so that users are assured they're not locked in that's a very
+different issue from being able to round-trip import documents
+from other systems.
 </text>
 <text>
 In any event, the one-big-binary-blob nature of Open Document
