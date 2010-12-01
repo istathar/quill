@@ -15,9 +15,7 @@ Open Document Format
 But on the topic of on-disk file formats, here are our comments
 on <acronym>ODF</acronym> for text documents.
 </text>
-<text>
-<bold>Open Office</bold>, <filename>.odt</filename>
-</text>
+<text/>
 <text>
 This is the very definition of un-fun. Open Document Format was
 already disqualified on the grounds of it being contained in
@@ -53,11 +51,8 @@ tell it to pretend it's an web page editor and ask it to save
 as <acronym>HTML</acronym>... <highlight>HERE</highlight>
 </text>
 <heading>
-DocBook
+DocBook XML
 </heading>
-<text>
-<bold>DocBook XML</bold>, <filename>.xml</filename>
-</text>
 <text>
 In all conscience DocBook is certainly a comprehensive schema.
 In fact, <project>Quill</project> started life as a DocBook editor,
@@ -166,5 +161,25 @@ you're working with version 5 of the spec. They've cleaned up
 a few things, and now their documents are composed with a root
 element identified with a <literal>xmlns</literal> namespace
 attribute, rather than <literal>DOCTYPE</literal> declarations.
+</text>
+<heading>
+Microformats in XHTML
+</heading>
+<text>
+We also investigated ways to make .
+</text>
+<text>
+This had a lot of appeal, notably because it would make the question
+of "how do you escape lock-in" dead easy. But in the end we swerved
+away from the idea. Ultimately we knew that if people found out
+that their documents were <acronym>HTML</acronym>, they would
+expect to be able to make arbitrary changes to those files on
+disk, changes which would be valid <acronym>HTML</acronym> perhaps,
+but not fit into the restrictive schema that our poor little
+program would ever be capable of handling. People would also
+instantly expect Quill to be able to use those files as web pages,
+which is a problem: there's a big difference between the content
+and metadata of a text document on disk, and that document as
+marked up for presentation online.
 </text>
 </quack>
