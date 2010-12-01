@@ -30,17 +30,14 @@ Blocks contain text and the second level of elements, termed
 "inlines", specifying a specific markup to be applied to a span
 of text.
 </text>
-<text/>
 <heading>
 Components
 </heading>
 <text>
-Chapters are Content-Type <literal>text/xml</literal>,
-<literal>UTF-8</literal> encoded, with file extension
-<literal>.xml</literal>.
-</text>
-<text>
-The minimal document in the Quack schema is:
+Chapters in the Quack schema are content-type
+<literal>text/xml</literal>, <literal>UTF-8</literal> encoded,
+with file extension <literal>.xml</literal>. The minimal document
+is:
 </text>
 <code xml:space="preserve">
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
@@ -53,21 +50,43 @@ it as an empty chapter.
 </text>
 <text>
 Real chapters start with a block giving the chapter title, followed
-by one or more content blocks with the body of the chapter. The
-schema is as follows:
+by one or more content blocks with the body of the chapter. A
+slightly more complete example is as follows:
 </text>
-<text/>
 <code xml:space="preserve">
-&lt;chapter&gt;?,
-&lt;text&gt;,&lt;code&gt;,&lt;
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5"&gt;
+&lt;chapter&gt;
+Origins
+&lt;/chapter&gt;
+&lt;text&gt;
+In the beginning, God created the integers. Then God said,
+&lt;/text&gt;
+&lt;quote&gt;
+"Let there be light"
+&lt;/quote&gt;
+&lt;text&gt;
+and in response to all the splendour around him, Man said,
+&lt;/text&gt;
+&lt;code xml:space="preserve"&gt;
+printf("Hello World\n");
+&lt;/code&gt;
+&lt;text&gt;
+It all pretty much went to hell at that point. The End.
+&lt;/text&gt;
+&lt;/quack&gt;
 </code>
-<text/>
 <text>
-: an optional chapter title, a series of normal content blocks,
-then notes and references if there are any.
+Here we see a chapter title followed by a series of normal content
+blocks.
 </text>
-<text/>
-<text/>
+<text>
+The full schema is given in the <acronym>DTD</acronym>, but is
+summarized as follows: an optional chapter title block, a series
+of {normal, code, quote, image, citation, poem, and image} blocks,
+then endnotes (if there are any), then references (if there are
+any).
+</text>
 <text/>
 <text>
 Discussion of how a given block type or inline markup is to be
