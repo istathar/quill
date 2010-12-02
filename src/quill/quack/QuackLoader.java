@@ -24,6 +24,7 @@ import nu.xom.Document;
 import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
+import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
@@ -32,6 +33,7 @@ import quill.textbase.NormalSegment;
 import quill.textbase.PoeticSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
+import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
@@ -241,7 +243,6 @@ public class QuackLoader
             preserve = false;
         } else if (block instanceof ImageElement) {
             preserve = false;
-
             processData(block);
         } else if (block instanceof ChapterElement) {
             preserve = false;
@@ -249,6 +250,12 @@ public class QuackLoader
                 throw new IllegalStateException("\n"
                         + "A <chapter> must be the first block in a Quack file.");
             }
+        } else if (block instanceof EndnoteElement) {
+            preserve = false;
+            processData(block);
+        } else if (block instanceof ReferenceElement) {
+            preserve = false;
+            processData(block);
         } else {
             throw new IllegalStateException("\n" + "What kind of Block is " + block);
         }
@@ -283,6 +290,10 @@ public class QuackLoader
             segment = new ImageSegment(entire, attribute);
         } else if (block instanceof ChapterElement) {
             segment = new ComponentSegment(entire);
+        } else if (block instanceof EndnoteElement) {
+            segment = new EndnoteSegment(entire, attribute);
+        } else if (block instanceof ReferenceElement) {
+            segment = new ReferenceSegment(entire, attribute);
         } else {
             throw new IllegalStateException("\n" + "What kind of Block is " + block);
         }
@@ -314,6 +325,9 @@ public class QuackLoader
         final String str;
 
         if (meta instanceof SourceAttribute) {
+            str = meta.getValue();
+            attribute = str;
+        } else if (meta instanceof NameAttribute) {
             str = meta.getValue();
             attribute = str;
         } else {

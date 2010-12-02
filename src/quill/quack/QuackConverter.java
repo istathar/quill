@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
+import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
@@ -38,6 +39,7 @@ import quill.textbase.PoeticSegment;
 import quill.textbase.Preformat;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
+import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
 import quill.textbase.Span;
 import quill.textbase.SpanVisitor;
@@ -106,6 +108,14 @@ public class QuackConverter
             block = new ImageElement();
             value = segment.getImage();
             block.add(new SourceAttribute(value));
+        } else if (segment instanceof EndnoteSegment) {
+            block = new EndnoteElement();
+            value = segment.getImage();
+            block.add(new NameAttribute(value));
+        } else if (segment instanceof ReferenceSegment) {
+            block = new ReferenceElement();
+            value = segment.getImage();
+            block.add(new NameAttribute(value));
         } else {
             throw new IllegalStateException("Unhandled segment type " + segment);
         }
@@ -296,6 +306,7 @@ public class QuackConverter
      * <code>&lt;article&gt;</code>s.
      * 
      * @deprecated
+     * @param out
      */
     public void writeArticle(OutputStream out) throws IOException {
         throw new UnsupportedOperationException("Not yet implemented");
