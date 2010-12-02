@@ -210,7 +210,7 @@ public class ValidateManuscriptLoading extends IOTestCase
         };
 
         desc = new String[] {
-            "Linux Libertine",
+            "Linux Libertine O",
             "Liberation Sans",
             "Inconsolata",
             "Linux Libertine O C"
