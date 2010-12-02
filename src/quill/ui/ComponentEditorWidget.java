@@ -28,6 +28,7 @@ import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Container;
+import org.gnome.gtk.HSeparator;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.Scrollbar;
 import org.gnome.gtk.ScrolledWindow;
@@ -39,6 +40,7 @@ import org.gnome.gtk.Widget;
 
 import quill.textbase.AttributionSegment;
 import quill.textbase.ComponentSegment;
+import quill.textbase.EndnoteSegment;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.NormalSegment;
@@ -46,6 +48,7 @@ import quill.textbase.Origin;
 import quill.textbase.PoeticSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
+import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 
@@ -351,6 +354,12 @@ class ComponentEditorWidget extends ScrolledWindow
 
             editor = heading.getEditor();
             result = heading;
+        } else if (segment instanceof EndnoteSegment) {
+            editor = null;
+            result = new HSeparator();
+        } else if (segment instanceof ReferenceSegment) {
+            editor = null;
+            result = new HSeparator();
         } else {
 
             throw new IllegalStateException("Unknown Segment type");

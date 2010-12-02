@@ -54,6 +54,7 @@ import quill.client.ApplicationException;
 import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
+import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.HeadingSegment;
@@ -65,6 +66,7 @@ import quill.textbase.PoeticSegment;
 import quill.textbase.Preformat;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
+import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
@@ -396,6 +398,12 @@ public abstract class RenderEngine
                     }
                     appendSegmentBreak(cr);
                     appendCaptionParagraph(cr, entire);
+                } else if (segment instanceof EndnoteSegment) {
+                    appendSegmentBreak(cr);
+                    appendListParagraph(cr, "", entire);
+                } else if (segment instanceof ReferenceSegment) {
+                    appendSegmentBreak(cr);
+                    appendListParagraph(cr, "", entire);
                 }
             }
 
@@ -567,6 +575,52 @@ public abstract class RenderEngine
 
         list = layoutAreaText(cr, entire, monoFace, true, false, 0.0, 1, false);
         accumulate(list);
+    }
+
+    protected void appendListParagraph(final Context cr, final String label, final Extract entire) {
+        final Area area;
+        final Area[] list;
+        final double savedLeft;
+
+        /*
+         * Label
+         */
+
+        area = layoutAreaBullet(cr, "1.");
+        accumulate(area);
+
+        /*
+         * Body
+         */
+
+        savedLeft = leftMargin;
+        leftMargin += 35.0;
+
+        list = layoutAreaText(cr, entire, serifFace, false, false, 0.0, 1, false);
+        accumulate(list);
+
+        leftMargin = savedLeft;
+    }
+
+    private Area layoutAreaBullet(final Context cr, String label) {
+        final Layout layout;
+        final LayoutLine line;
+        final Area area;
+
+        layout = new Layout(cr);
+        layout.setFontDescription(serifFace.desc);
+        layout.setText(label);
+
+        line = layout.getLineReadonly(0);
+
+        /*
+         * Passing height 0 means that no vertical space will be consumed by
+         * this Area; the ascent is stil needed to position the Cairo point
+         * before drawing the LayoutLine.
+         */
+        area = new TextArea(null, leftMargin, 0.0, serifFace.lineAscent, line, false);
+
+        return area;
     }
 
     // character
