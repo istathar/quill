@@ -586,15 +586,17 @@ public abstract class RenderEngine
          * Label
          */
 
-        area = layoutAreaBullet(cr, "1.");
+        area = layoutAreaBullet(cr, "1", sansFace);
         accumulate(area);
 
         /*
-         * Body
+         * Body. 25 points is enough for most labels, up to [999], and
+         * meanwhile is a bit less than the block quote indentation. This
+         * should probably be settable by subclasses.
          */
 
         savedLeft = leftMargin;
-        leftMargin += 35.0;
+        leftMargin += 25.0;
 
         list = layoutAreaText(cr, entire, serifFace, false, false, 0.0, 1, false);
         accumulate(list);
@@ -602,13 +604,13 @@ public abstract class RenderEngine
         leftMargin = savedLeft;
     }
 
-    private Area layoutAreaBullet(final Context cr, String label) {
+    private Area layoutAreaBullet(final Context cr, final String label, final Typeface face) {
         final Layout layout;
         final LayoutLine line;
         final Area area;
 
         layout = new Layout(cr);
-        layout.setFontDescription(serifFace.desc);
+        layout.setFontDescription(face.desc);
         layout.setText(label);
 
         line = layout.getLineReadonly(0);
