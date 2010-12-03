@@ -478,6 +478,9 @@ class ComponentEditorWidget extends ScrolledWindow
         for (i = 0; i < replacement.size(); i++) {
             segment = replacement.getSegment(i);
             editor = editors.get(i);
+            if (editor == null) {
+                continue;
+            }
             editor.advanceTo(segment);
         }
     }

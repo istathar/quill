@@ -3,6 +3,13 @@
 <chapter>
 Coming back for seconds
 </chapter>
+<text>
+While the editor you see is only presenting the series of blocks
+making up one chapter, a book is many such chapters, and this
+is what <project>Quill</project> supports. This is the second
+chapter in the example document, where various other things that
+need to be exercised were dumped.
+</text>
 <heading>
 Business this week
 </heading>
@@ -15,20 +22,20 @@ Leaders
 </heading>
 <quote>
 The <acronym>G20</acronym> has a legitimacy lacking in other
-economic clubs, such as the rich country only <acronym>G7</acronym>.
-Unfortunately history suggests that big-picture debates on the
-future of the international monetary system rarely yield results.
-France should take note. The <acronym>G20</acronym> will remain
-worth having only if it sticks to the art of the
+economic clubs, such as the rich country only <acronym>G7</acronym>
+... Unfortunately history suggests that big-picture debates on
+the future of the international monetary system rarely yield
+results. France should take note. The <acronym>G20</acronym>
+will remain worth having only if it sticks to the art of the
 possible.<note ref="1"/>
 </quote>
 <credit>
 - from <title>The Economist</title>
 </credit>
 <endnote name="1">
-Editorial about the <acronym>G20</acronym> and its challenges
+From an editorial about the <acronym>G20</acronym> and its challenges
 in the lead up to the Seoul summit. "Finally, a talking-shop
-worth having" in <title>The Economist</title> (6 Nov 2010), page
-17.
+worth having" in <title>The Economist</title> (6 Nov 2010), pages
+16-17.
 </endnote>
 </quack>
