@@ -126,7 +126,7 @@ be able to open their <project>Writer</project> documents, and
 that they'd be able to open their <project>Quill</project> documents
 with <project>Writer</project> That's not really the point here;
 while we do need to be able to escape from the Parchment format
-so that users are assured they're not locked in that's a very
+so that users are assured they're not locked-in, that's a very
 different issue from being able to round-trip import documents
 from other systems.
 </text>
