@@ -347,12 +347,24 @@ public abstract class RenderEngine
         TextChain chain;
         Extract[] paras;
         String filename;
+        ArrayList<Segment> endnotes;
+        final ArrayList<Segment> references;
+        String label;
 
         areas = new ArrayList<Area>(64);
+
+        references = new ArrayList<Segment>(4);
+        endnotes = new ArrayList<Segment>(4);
 
         for (i = 0; i < folio.size(); i++) {
             series = folio.getSeries(i);
             folioIndex = i;
+
+            if (i > 0) {
+                appendPageBreak(cr);
+            }
+
+            endnotes.clear();
 
             for (j = 0; j < series.size(); j++) {
                 seriesIndex = j;
@@ -399,15 +411,29 @@ public abstract class RenderEngine
                     appendSegmentBreak(cr);
                     appendCaptionParagraph(cr, entire);
                 } else if (segment instanceof EndnoteSegment) {
-                    appendSegmentBreak(cr);
-                    appendListParagraph(cr, segment.getImage(), entire);
+                    endnotes.add(segment);
                 } else if (segment instanceof ReferenceSegment) {
-                    appendSegmentBreak(cr);
-                    appendListParagraph(cr, segment.getImage(), entire);
+                    references.add(segment);
                 }
             }
 
-            appendPageBreak(cr);
+            for (j = 0; j < endnotes.size(); j++) {
+                appendSegmentBreak(cr);
+
+                segment = endnotes.get(j);
+                label = segment.getImage();
+                entire = segment.getEntire();
+                appendListParagraph(cr, label, entire);
+            }
+        }
+
+        for (i = 0; i < references.size(); i++) {
+            appendSegmentBreak(cr);
+
+            segment = references.get(i);
+            label = segment.getImage();
+            entire = segment.getEntire();
+            appendListParagraph(cr, label, entire);
         }
     }
 
