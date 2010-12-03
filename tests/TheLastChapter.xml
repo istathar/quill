@@ -3,24 +3,6 @@
 <chapter>
 References
 </chapter>
-<heading>
-Notes to Text
-</heading>
-<text>
-<bold>Chapter 1</bold>
-</text>
-<endnote name="1">
-From "A Victory For Democracy", an episode of the popular television
-series <title>Yes Prime Minister</title>. This passage taken
-from the book version <cite ref="[2]"/>, page 165.
-</endnote>
-<endnote name="2">
-Typesetting text (the fake latin verse) known as "Lorum Ipsum"
-created by an online generator program available at <cite ref="[3]"/>.
-</endnote>
-<heading>
-Publications
-</heading>
 <reference name="[1]">
 Andrew Cowie, "Surviving Change" in <title>Proceedings of the
 12th Australian Systems Administrators Conference</title> (Brisbane:
@@ -28,7 +10,7 @@ SAGE-AU, 2004), pages 23-40.
 </reference>
 <reference name="[2]">
 Antony Jay and Jonathan Lynn, <title>The Complete Yes Prime Minister</title>
-(London: BBC Books, 1989). ISBN 0563207736.
+(London: BBC Books, 1989); ISBN 0563207736.
 </reference>
 <reference name="[3]">
 <filename>http://www.lipsum.com</filename>

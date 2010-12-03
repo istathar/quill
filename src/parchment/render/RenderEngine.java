@@ -74,6 +74,7 @@ import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
 import quill.textbase.TextChain;
 
+import static org.freedesktop.bindings.Internationalization._;
 import static org.freedesktop.cairo.HintMetrics.OFF;
 import static org.freedesktop.cairo.HintStyle.NONE;
 import static quill.textbase.Span.createSpan;
@@ -341,22 +342,26 @@ public abstract class RenderEngine
 
     void processSegmentsIntoAreas(final Context cr) {
         int i, j, k;
+        int I, J;
         Series series;
         Segment segment;
         Extract entire;
         TextChain chain;
         Extract[] paras;
         String filename;
-        ArrayList<Segment> endnotes;
+        ArrayList<Segment>[] endnotes;
         final ArrayList<Segment> references;
-        String label;
+        StringBuilder buf;
+        String which, label;
+        boolean heading;
 
+        I = folio.size();
         areas = new ArrayList<Area>(64);
 
         references = new ArrayList<Segment>(4);
-        endnotes = new ArrayList<Segment>(4);
+        endnotes = new ArrayList[I];
 
-        for (i = 0; i < folio.size(); i++) {
+        for (i = 0; i < I; i++) {
             series = folio.getSeries(i);
             folioIndex = i;
 
@@ -364,9 +369,10 @@ public abstract class RenderEngine
                 appendPageBreak(cr);
             }
 
-            endnotes.clear();
+            endnotes[i] = new ArrayList<Segment>(4);
 
-            for (j = 0; j < series.size(); j++) {
+            J = series.size();
+            for (j = 0; j < J; j++) {
                 seriesIndex = j;
                 currentOffset = 0;
 
@@ -411,29 +417,79 @@ public abstract class RenderEngine
                     appendSegmentBreak(cr);
                     appendCaptionParagraph(cr, entire);
                 } else if (segment instanceof EndnoteSegment) {
-                    endnotes.add(segment);
+                    endnotes[i].add(segment);
                 } else if (segment instanceof ReferenceSegment) {
                     references.add(segment);
                 }
             }
 
-            for (j = 0; j < endnotes.size(); j++) {
+            appendSegmentBreak(cr);
+        }
+
+        /*
+         * Now build the notes and references. This is somewhat hardcoded, but
+         * choose "intelligent defaults" as Robert Collins says.
+         */
+        heading = false;
+
+        for (i = 0; i < I; i++) {
+            J = endnotes[i].size();
+
+            if (J == 0) {
+                continue;
+            }
+
+            if (!heading) {
+                appendHeading(cr, _("Notes"));
+                heading = true;
+            }
+
+            /*
+             * If there's a chapter title, then put up a bit of bold text with
+             * that title. If there isn't a title we keep on rendering notes;
+             * the assumption would thus seem to be that they've done
+             * continuous numbering (or, maybe, the RenderEngine is doing
+             * notes at chapter end not document end). Only bother if there's
+             * > 1 chapter, though.
+             */
+
+            series = folio.getSeries(i);
+
+            if ((I > 1) && (series.size() > 0)) {
+                segment = series.getSegment(0);
+                if (segment instanceof ComponentSegment) {
+                    entire = segment.getEntire();
+                    which = entire.getText();
+                    appendSegmentBreak(cr);
+                    appendNormalParagraph(cr, which, Common.BOLD);
+                }
+            }
+
+            for (j = 0; j < J; j++) {
                 appendSegmentBreak(cr);
 
-                segment = endnotes.get(j);
+                segment = endnotes[i].get(j);
                 label = segment.getImage();
                 entire = segment.getEntire();
                 appendListParagraph(cr, label, entire);
             }
         }
-
-        for (i = 0; i < references.size(); i++) {
+        if (heading) {
             appendSegmentBreak(cr);
+        }
 
-            segment = references.get(i);
-            label = segment.getImage();
-            entire = segment.getEntire();
-            appendListParagraph(cr, label, entire);
+        J = references.size();
+        if (J > 0) {
+            appendHeading(cr, _("Publications"));
+
+            for (j = 0; j < J; j++) {
+                appendSegmentBreak(cr);
+
+                segment = references.get(j);
+                label = segment.getImage();
+                entire = segment.getEntire();
+                appendListParagraph(cr, label, entire);
+            }
         }
     }
 
@@ -482,6 +538,16 @@ public abstract class RenderEngine
         accumulate(area);
     }
 
+    private void appendHeading(Context cr, String text) {
+        final Span span;
+        final Extract entire;
+
+        span = Span.createSpan(text, null);
+        entire = Extract.create(span);
+
+        appendHeading(cr, entire);
+    }
+
     protected void appendHeading(Context cr, Extract entire) {
         final Area[] list;
 
@@ -514,6 +580,16 @@ public abstract class RenderEngine
 
     private void accumulate(Area area) {
         areas.add(area);
+    }
+
+    protected void appendNormalParagraph(final Context cr, final String text, final Markup markup) {
+        final Span span;
+        final Extract extract;
+
+        span = Span.createSpan(text, markup);
+        extract = Extract.create(span);
+
+        appendNormalParagraph(cr, extract);
     }
 
     protected void appendNormalParagraph(Context cr, Extract extract) {

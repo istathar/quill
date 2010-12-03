@@ -2,6 +2,7 @@
 <manuscript xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
   <content>
     <chapter src="SomeOfEverything.xml"/>
+    <chapter src="NotToBeOutdone.xml"/>
     <chapter src="TheLastChapter.xml"/>
   </content>
   <presentation>

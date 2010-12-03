@@ -80,7 +80,7 @@ make up their own lines generally do not last long.
 <quote>
 <italics>The Foreign Office solution:</italics> The PM must realize
 that as far as Foreign Affairs are concerned his job is to confine
-himself to the hospitality and ceremonial role.<note ref="42"/>
+himself to the hospitality and ceremonial role.<note ref="1"/>
 </quote>
 <text>
 Here we see a <type>BlockquoteSegment</type>, along with a footnote
@@ -95,20 +95,20 @@ We haven't written the <acronym>UI</acronym> for that yet.
 Illuminating the past
 </heading>
 <text>
-<italics>Lor</italics>em ip<italics>sum</italics> dolor sit amet,
-consectetuer adipiscing elit. Proin adipiscing locus est. Curabitur
-vel odio - morbi ipsum sem, viverra eget, tristique tincidunt
-- mollis vestibulum, nulla. Suspendisse blandit. Fuse bibendum
-neque at est. Mauris eget turpis. Sed erat. Class aptent taciti
-sociosqu ad litora torquent per conubia nostra, per inceptos
-himenaeos. Phasellus in diam. Donec felis. Pellentesque libero
-libero, interdum et, accumsan quis, interdum quis, odio. Vestibulum
-nec lacus. Etiam id lacus. Curabitur ornare, felis sit amet auctor
-iaculis, metus eros feugiat nisl, sed adipiscing nisl urna nec
-odio. Nam magna. Pellentesque sed ante non massa pulvinar dapibus.
-Suspendisse at sapien. Sed lobortis, nisi non tempor consequat,
-nisl ante lobortis dolor, ut hendrerit tortor "quam id augue."
-per <cite ref="[Lorem]"/>.
+<italics>Lor</italics>em ip<italics>sum</italics><note ref="2"/>
+dolor sit amet, consectetuer adipiscing elit. Proin adipiscing
+locus est. Curabitur vel odio - morbi ipsum sem, viverra eget,
+tristique tincidunt - mollis vestibulum, nulla. Suspendisse blandit.
+Fuse bibendum neque at est. Mauris eget turpis. Sed erat. Class
+aptent taciti sociosqu ad litora torquent per conubia nostra,
+per inceptos himenaeos. Phasellus in diam. Donec felis. Pellentesque
+libero libero, interdum et, accumsan quis, interdum quis, odio.
+Vestibulum nec lacus. Etiam id lacus. Curabitur ornare, felis
+sit amet auctor iaculis, metus eros feugiat nisl, sed adipiscing
+nisl urna nec odio. Nam magna. Pellentesque sed ante non massa
+pulvinar dapibus. Suspendisse at sapien. Sed lobortis, nisi non
+tempor consequat, nisl ante lobortis dolor, ut hendrerit tortor
+"quam id augue." per <cite ref="[Lorem]"/>.
 </text>
 <text>
 Which is the sort of thing you write when you want to have filler
@@ -153,4 +153,13 @@ in making it any bigger.
 to see the filename), there isn't any <acronym>UI</acronym> for
 inserting images and/or changing the source file yet.
 </text>
+<endnote name="1">
+From "A Victory For Democracy", an episode of the popular television
+series <title>Yes Prime Minister</title>. This passage taken
+from the book version <cite ref="[2]"/>, page 165.
+</endnote>
+<endnote name="2">
+Typesetting text (the fake latin verse) known as "Lorum Ipsum"
+created by an online generator program available at <cite ref="[3]"/>.
+</endnote>
 </quack>
