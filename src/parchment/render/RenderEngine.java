@@ -400,10 +400,10 @@ public abstract class RenderEngine
                     appendCaptionParagraph(cr, entire);
                 } else if (segment instanceof EndnoteSegment) {
                     appendSegmentBreak(cr);
-                    appendListParagraph(cr, "", entire);
+                    appendListParagraph(cr, segment.getImage(), entire);
                 } else if (segment instanceof ReferenceSegment) {
                     appendSegmentBreak(cr);
-                    appendListParagraph(cr, "", entire);
+                    appendListParagraph(cr, segment.getImage(), entire);
                 }
             }
 
@@ -586,7 +586,7 @@ public abstract class RenderEngine
          * Label
          */
 
-        area = layoutAreaBullet(cr, "1", sansFace);
+        area = layoutAreaBullet(cr, label, serifFace);
         accumulate(area);
 
         /*

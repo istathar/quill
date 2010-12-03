@@ -3,6 +3,12 @@
 <chapter>
 References
 </chapter>
+<heading>
+Notes to Text
+</heading>
+<text>
+<bold>Chapter 1</bold>
+</text>
 <endnote name="1">
 From "A Victory For Democracy", an episode of the popular television
 series <title>Yes Prime Minister</title>. This passage taken
@@ -12,6 +18,9 @@ from the book version <cite ref="[2]"/>, page 165.
 Typesetting text (the fake latin verse) known as "Lorum Ipsum"
 created by an online generator program available at <cite ref="[3]"/>.
 </endnote>
+<heading>
+Publications
+</heading>
 <reference name="[1]">
 Andrew Cowie, "Surviving Change" in <title>Proceedings of the
 12th Australian Systems Administrators Conference</title> (Brisbane:
