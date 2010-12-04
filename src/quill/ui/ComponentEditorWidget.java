@@ -28,7 +28,6 @@ import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Container;
-import org.gnome.gtk.HSeparator;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.Scrollbar;
 import org.gnome.gtk.ScrolledWindow;
@@ -272,6 +271,7 @@ class ComponentEditorWidget extends ScrolledWindow
         final ImageDisplayBox image;
         final Scrollbar bar;
         final ScrolledWindow wide;
+        final ReferenceListitemBox listitem;
 
         if (segment instanceof NormalSegment) {
             editor = new NormalEditorTextView(this, segment);
@@ -354,12 +354,22 @@ class ComponentEditorWidget extends ScrolledWindow
 
             editor = heading.getEditor();
             result = heading;
-        } else if (segment instanceof EndnoteSegment) {
-            editor = null;
-            result = new HSeparator();
+        }
+        /*
+         * TODO this is for testing ONLY, so we can at least see the note
+         * texts somewhere and edit them. Soon we will move this out of the
+         * main chapter body editor UI.
+         */
+        else if (segment instanceof EndnoteSegment) {
+            listitem = new ReferenceListitemBox(this, segment);
+
+            editor = listitem.getEditor();
+            result = listitem;
         } else if (segment instanceof ReferenceSegment) {
-            editor = null;
-            result = new HSeparator();
+            listitem = new ReferenceListitemBox(this, segment);
+
+            editor = listitem.getEditor();
+            result = listitem;
         } else {
 
             throw new IllegalStateException("Unknown Segment type");
