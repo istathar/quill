@@ -40,19 +40,22 @@ wide. This is necessary so that when files are compared or merged
 the diffs are sensible and fit in a standard width terminal screens.
 </text>
 <text>
-2<bold>. Valid documents only</bold>
+<bold>2. Valid documents only</bold>
 </text>
 <text>
-There is nothing in particular that requires <literal>XML</literal>
-be used, but its main attraction is that we can requiring that
-documents be valid per a <acronym>DTD</acronym>. This helps keep
-the complexity that the application has to deal with under control.
-Why do people write apps that accept invalid input? Astounding,
+There is nothing in particular that requires <acronym>XML</acronym>
+be used, but we are working in marked up, somewhat hierarchical
+text; <acronym>SGML</acronym> was always about that.
+<acronym>XML</acronym>'s main attraction, of course, is that
+one can specify a schema and require that documents be valid
+per that schema's <acronym>DTD</acronym>. This helps keep the
+complexity that the application has to deal with under control.
+Why do people write apps that accept invalid input? Astounding
 really, but then they output invalid <acronym>XML</acronym> too.
 Go figure.
 </text>
 <text>
-3<bold>. Simple schema</bold>
+<bold>3. Simple schema</bold>
 </text>
 <text>
 Having chosen <acronym>XML</acronym>, however, there is a new
@@ -82,7 +85,28 @@ combine their branches, and get a merge conflict, they
 <bold>have</bold> to be able to resolve it.
 </text>
 <text>
-4<bold>. One file per chapter</bold>
+<bold>4. Suitable for technical writing</bold>
+</text>
+<text>
+The format needs to support sufficient different markups so as
+to be able to do the sorts of technical reports, software documentation,
+conference papers, and journal articles the authors of whom are
+Quill's target audience. This is both an exclusive and inclusive
+statement; the markup format does not need to be particularly
+flexible or extensible; such things are nice but grossly add
+complexity. It does, however, have to support sufficient variety
+that it is possible to express the range of syntax that occurs
+in such documents.
+</text>
+<text>
+Ultimately, each of the semantic block types and inline markups
+are about driving a specific output formatting. So while the
+names of the inlines refer to various purposes, there is no real
+requirement to have a unique markup for ever possible different
+use.
+</text>
+<text>
+<bold>5. One file per chapter</bold>
 </text>
 <text>
 This is somewhat arbitrary, but nevertheless it is common practice
