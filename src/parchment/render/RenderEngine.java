@@ -54,6 +54,7 @@ import quill.client.ApplicationException;
 import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
+import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.HeadingSegment;
@@ -65,6 +66,7 @@ import quill.textbase.PoeticSegment;
 import quill.textbase.Preformat;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
+import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
@@ -72,6 +74,7 @@ import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
 import quill.textbase.TextChain;
 
+import static org.freedesktop.bindings.Internationalization._;
 import static org.freedesktop.cairo.HintMetrics.OFF;
 import static org.freedesktop.cairo.HintStyle.NONE;
 import static quill.textbase.Span.createSpan;
@@ -339,20 +342,37 @@ public abstract class RenderEngine
 
     void processSegmentsIntoAreas(final Context cr) {
         int i, j, k;
+        int I, J;
         Series series;
         Segment segment;
         Extract entire;
         TextChain chain;
         Extract[] paras;
         String filename;
+        ArrayList<Segment>[] endnotes;
+        final ArrayList<Segment> references;
+        StringBuilder buf;
+        String which, label;
+        boolean heading;
 
+        I = folio.size();
         areas = new ArrayList<Area>(64);
 
-        for (i = 0; i < folio.size(); i++) {
+        references = new ArrayList<Segment>(4);
+        endnotes = new ArrayList[I];
+
+        for (i = 0; i < I; i++) {
             series = folio.getSeries(i);
             folioIndex = i;
 
-            for (j = 0; j < series.size(); j++) {
+            if (i > 0) {
+                appendPageBreak(cr);
+            }
+
+            endnotes[i] = new ArrayList<Segment>(4);
+
+            J = series.size();
+            for (j = 0; j < J; j++) {
                 seriesIndex = j;
                 currentOffset = 0;
 
@@ -396,10 +416,80 @@ public abstract class RenderEngine
                     }
                     appendSegmentBreak(cr);
                     appendCaptionParagraph(cr, entire);
+                } else if (segment instanceof EndnoteSegment) {
+                    endnotes[i].add(segment);
+                } else if (segment instanceof ReferenceSegment) {
+                    references.add(segment);
                 }
             }
 
-            appendPageBreak(cr);
+            appendSegmentBreak(cr);
+        }
+
+        /*
+         * Now build the notes and references. This is somewhat hardcoded, but
+         * choose "intelligent defaults" as Robert Collins says.
+         */
+        heading = false;
+
+        for (i = 0; i < I; i++) {
+            J = endnotes[i].size();
+
+            if (J == 0) {
+                continue;
+            }
+
+            if (!heading) {
+                appendHeading(cr, _("Notes"));
+                heading = true;
+            }
+
+            /*
+             * If there's a chapter title, then put up a bit of bold text with
+             * that title. If there isn't a title we keep on rendering notes;
+             * the assumption would thus seem to be that they've done
+             * continuous numbering (or, maybe, the RenderEngine is doing
+             * notes at chapter end not document end). Only bother if there's
+             * > 1 chapter, though.
+             */
+
+            series = folio.getSeries(i);
+
+            if ((I > 1) && (series.size() > 0)) {
+                segment = series.getSegment(0);
+                if (segment instanceof ComponentSegment) {
+                    entire = segment.getEntire();
+                    which = entire.getText();
+                    appendSegmentBreak(cr);
+                    appendNormalParagraph(cr, which, Common.BOLD);
+                }
+            }
+
+            for (j = 0; j < J; j++) {
+                appendSegmentBreak(cr);
+
+                segment = endnotes[i].get(j);
+                label = segment.getImage();
+                entire = segment.getEntire();
+                appendListParagraph(cr, label, entire);
+            }
+        }
+        if (heading) {
+            appendSegmentBreak(cr);
+        }
+
+        J = references.size();
+        if (J > 0) {
+            appendHeading(cr, _("Publications"));
+
+            for (j = 0; j < J; j++) {
+                appendSegmentBreak(cr);
+
+                segment = references.get(j);
+                label = segment.getImage();
+                entire = segment.getEntire();
+                appendListParagraph(cr, label, entire);
+            }
         }
     }
 
@@ -448,6 +538,16 @@ public abstract class RenderEngine
         accumulate(area);
     }
 
+    private void appendHeading(Context cr, String text) {
+        final Span span;
+        final Extract entire;
+
+        span = Span.createSpan(text, null);
+        entire = Extract.create(span);
+
+        appendHeading(cr, entire);
+    }
+
     protected void appendHeading(Context cr, Extract entire) {
         final Area[] list;
 
@@ -480,6 +580,16 @@ public abstract class RenderEngine
 
     private void accumulate(Area area) {
         areas.add(area);
+    }
+
+    protected void appendNormalParagraph(final Context cr, final String text, final Markup markup) {
+        final Span span;
+        final Extract extract;
+
+        span = Span.createSpan(text, markup);
+        extract = Extract.create(span);
+
+        appendNormalParagraph(cr, extract);
     }
 
     protected void appendNormalParagraph(Context cr, Extract extract) {
@@ -567,6 +677,54 @@ public abstract class RenderEngine
 
         list = layoutAreaText(cr, entire, monoFace, true, false, 0.0, 1, false);
         accumulate(list);
+    }
+
+    protected void appendListParagraph(final Context cr, final String label, final Extract entire) {
+        final Area area;
+        final Area[] list;
+        final double savedLeft;
+
+        /*
+         * Label
+         */
+
+        area = layoutAreaBullet(cr, label, serifFace);
+        accumulate(area);
+
+        /*
+         * Body. 25 points is enough for most labels, up to [999], and
+         * meanwhile is a bit less than the block quote indentation. This
+         * should probably be settable by subclasses.
+         */
+
+        savedLeft = leftMargin;
+        leftMargin += 25.0;
+
+        list = layoutAreaText(cr, entire, serifFace, false, false, 0.0, 1, false);
+        accumulate(list);
+
+        leftMargin = savedLeft;
+    }
+
+    private Area layoutAreaBullet(final Context cr, final String label, final Typeface face) {
+        final Layout layout;
+        final LayoutLine line;
+        final Area area;
+
+        layout = new Layout(cr);
+        layout.setFontDescription(face.desc);
+        layout.setText(label);
+
+        line = layout.getLineReadonly(0);
+
+        /*
+         * Passing height 0 means that no vertical space will be consumed by
+         * this Area; the ascent is stil needed to position the Cairo point
+         * before drawing the LayoutLine.
+         */
+        area = new TextArea(null, leftMargin, 0.0, serifFace.lineAscent, line, false);
+
+        return area;
     }
 
     // character
