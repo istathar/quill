@@ -43,6 +43,7 @@ import quill.textbase.DivisionSegment;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
+import quill.textbase.ListitemSegment;
 import quill.textbase.NormalSegment;
 import quill.textbase.Origin;
 import quill.textbase.PoeticSegment;
@@ -272,7 +273,7 @@ class ComponentEditorWidget extends ScrolledWindow
         final ImageDisplayBox image;
         final Scrollbar bar;
         final ScrolledWindow wide;
-        final ReferenceListitemBox listitem;
+        final ListitemBox listitem;
 
         if (segment instanceof NormalSegment) {
             editor = new NormalEditorTextView(this, segment);
@@ -286,6 +287,11 @@ class ComponentEditorWidget extends ScrolledWindow
             editor = new PoeticEditorTextView(this, segment);
 
             result = editor;
+        } else if (segment instanceof ListitemSegment) {
+            listitem = new NormalListitemBox(this, segment);
+
+            editor = listitem.getEditor();
+            result = listitem;
         } else if (segment instanceof AttributionSegment) {
             editor = new AttributionEditorTextView(this, segment);
 

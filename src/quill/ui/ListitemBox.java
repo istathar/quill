@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -18,23 +18,39 @@
  */
 package quill.ui;
 
-import quill.textbase.Segment;
+import org.gnome.gtk.HBox;
+import org.gnome.gtk.Widget;
 
 /**
- * We define notes as being only a single paragraph, so we subclass in order
- * to disallow <b><code>Enter</code></b>.
+ * An Editor wrapper that has a label and a body. For list items, and notes
+ * &amp; references.
  * 
  * @author Andrew Cowie
  */
-class ListitemEditorTextView extends EditorTextView
+abstract class ListitemBox extends HBox
 {
-    ListitemEditorTextView(ComponentEditorWidget parent, Segment segment) {
-        super(parent, segment);
+    private final HBox box;
 
-        view.modifyFont(fonts.serif);
+    private Widget label;
+
+    private EditorTextView body;
+
+    ListitemBox() {
+        super(false, 0);
+        box = this;
     }
 
-    protected boolean isEnterAllowed() {
-        return false;
+    void setupLabel(final Widget widget) {
+        label = widget;
+        box.packStart(label, false, false, 0);
+    }
+
+    void setupBody(final EditorTextView editor) {
+        body = editor;
+        box.packStart(body, true, true, 0);
+    }
+
+    EditorTextView getEditor() {
+        return body;
     }
 }

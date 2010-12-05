@@ -24,17 +24,17 @@ import org.gnome.gtk.Widget;
 
 import quill.textbase.Segment;
 
-class ReferenceListitemBox extends ListitemBox
+class NormalListitemBox extends ListitemBox
 {
-    ReferenceListitemBox(final ComponentEditorWidget parent, final Segment segment) {
+    NormalListitemBox(final ComponentEditorWidget parent, final Segment segment) {
         super();
         final Widget widget;
         final EditorTextView editor;
 
         widget = createLabel(segment);
-        editor = new ReferenceEditorTextView(parent, segment);
-
         super.setupLabel(widget);
+
+        editor = new NormalEditorTextView(parent, segment);
         super.setupBody(editor);
     }
 
