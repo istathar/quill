@@ -60,6 +60,7 @@ import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
+import quill.textbase.ListitemSegment;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.Origin;
@@ -405,6 +406,17 @@ public abstract class RenderEngine
                         appendParagraphBreak(cr);
                         appendNormalParagraph(cr, paras[k]);
                     }
+                } else if (segment instanceof ListitemSegment) {
+                    label = segment.getImage();
+
+                    chain = new TextChain(entire);
+                    paras = chain.extractParagraphs();
+                    for (k = 0; k < paras.length; k++) {
+                        appendParagraphBreak(cr);
+                        appendListParagraph(cr, label, paras[k]);
+
+                        label = "";
+                    }
                 } else if (segment instanceof PoeticSegment) {
                     appendSegmentBreak(cr);
                     appendNormalParagraph(cr, entire);
@@ -434,6 +446,7 @@ public abstract class RenderEngine
          * Now build the notes and references. This is somewhat hardcoded, but
          * choose "intelligent defaults" as Robert Collins says.
          */
+
         heading = false;
 
         for (i = 0; i < I; i++) {
@@ -700,7 +713,7 @@ public abstract class RenderEngine
         accumulate(list);
     }
 
-    protected void appendListParagraph(final Context cr, final String label, final Extract entire) {
+    protected void appendListParagraph(final Context cr, final String label, final Extract extract) {
         final Area area;
         final Area[] list;
         final double savedLeft;
@@ -721,7 +734,7 @@ public abstract class RenderEngine
         savedLeft = leftMargin;
         leftMargin += 25.0;
 
-        list = layoutAreaText(cr, entire, serifFace, false, false, 0.0, 1, false);
+        list = layoutAreaText(cr, extract, serifFace, false, false, 0.0, 1, false);
         accumulate(list);
 
         leftMargin = savedLeft;
