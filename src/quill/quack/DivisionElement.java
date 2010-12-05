@@ -16,15 +16,18 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.textbase;
+package quill.quack;
 
-public abstract class ComponentSegment extends Segment
+/**
+ * The title of a part. It is peers with {@link ChapterElement}. This is for
+ * the title page of a work, and for the title pages of the divisions of a
+ * book.
+ * 
+ * @author Andrew Cowie
+ */
+public class DivisionElement extends BlockElement implements Block
 {
-    protected ComponentSegment(Extract entire) {
-        super(entire);
-    }
-
-    protected ComponentSegment(Extract entire, int offset, int removed, int inserted) {
-        super(entire, offset, removed, inserted);
+    public DivisionElement() {
+        super("division");
     }
 }

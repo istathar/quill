@@ -16,15 +16,16 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.textbase;
+package quill.ui;
 
-public abstract class ComponentSegment extends Segment
+import quill.textbase.Segment;
+
+class PartHeadingBox extends HeadingBox
 {
-    protected ComponentSegment(Extract entire) {
-        super(entire);
-    }
+    public PartHeadingBox(final ComponentEditorWidget parent, final Segment segment) {
+        super();
 
-    protected ComponentSegment(Extract entire, int offset, int removed, int inserted) {
-        super(entire, offset, removed, inserted);
+        super.setupBox(parent, segment, "Part");
+        super.setupLine();
     }
 }

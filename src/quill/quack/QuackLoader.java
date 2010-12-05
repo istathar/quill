@@ -22,8 +22,10 @@ import java.util.ArrayList;
 
 import nu.xom.Document;
 import quill.textbase.AttributionSegment;
+import quill.textbase.ChapterSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
+import quill.textbase.DivisionSegment;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
@@ -166,7 +168,7 @@ public class QuackLoader
 
         if (num == 0) {
             blank = Extract.create();
-            first = new ComponentSegment(blank);
+            first = new ChapterSegment(blank);
             list.add(first);
             second = new NormalSegment(blank);
             list.add(second);
@@ -189,7 +191,7 @@ public class QuackLoader
             list.add(second);
         } else {
             blank = Extract.create();
-            first = new ComponentSegment(blank);
+            first = new ChapterSegment(blank);
             list.add(0, first);
         }
     }
@@ -244,7 +246,7 @@ public class QuackLoader
         } else if (block instanceof ImageElement) {
             preserve = false;
             processData(block);
-        } else if (block instanceof ChapterElement) {
+        } else if ((block instanceof ChapterElement) || (block instanceof DivisionElement)) {
             preserve = false;
             if (segment != null) {
                 throw new IllegalStateException("\n"
@@ -289,7 +291,9 @@ public class QuackLoader
         } else if (block instanceof ImageElement) {
             segment = new ImageSegment(entire, attribute);
         } else if (block instanceof ChapterElement) {
-            segment = new ComponentSegment(entire);
+            segment = new ChapterSegment(entire);
+        } else if (block instanceof DivisionElement) {
+            segment = new DivisionSegment(entire);
         } else if (block instanceof EndnoteElement) {
             segment = new EndnoteSegment(entire, attribute);
         } else if (block instanceof ReferenceElement) {

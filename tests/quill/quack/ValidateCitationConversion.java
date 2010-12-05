@@ -28,7 +28,7 @@ import parchment.format.InvalidDocumentException;
 import parchment.format.Manuscript;
 import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
-import quill.textbase.ComponentSegment;
+import quill.textbase.ChapterSegment;
 import quill.textbase.Extract;
 import quill.textbase.MarkerSpan;
 import quill.textbase.NormalSegment;
@@ -76,7 +76,7 @@ public class ValidateCitationConversion extends IOTestCase
         assertEquals(2, series.size());
 
         segment = series.getSegment(0);
-        assertTrue(segment instanceof ComponentSegment);
+        assertTrue(segment instanceof ChapterSegment);
         segment = series.getSegment(1);
         assertTrue(segment instanceof NormalSegment);
 

@@ -27,7 +27,8 @@ import java.io.OutputStream;
 
 import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
-import quill.textbase.ComponentSegment;
+import quill.textbase.ChapterSegment;
+import quill.textbase.DivisionSegment;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
@@ -90,8 +91,10 @@ public class QuackConverter
 
         this.segment = segment;
 
-        if (segment instanceof ComponentSegment) {
+        if (segment instanceof ChapterSegment) {
             block = new ChapterElement();
+        } else if (segment instanceof DivisionSegment) {
+            block = new DivisionElement();
         } else if (segment instanceof HeadingSegment) {
             block = new HeadingElement();
         } else if (segment instanceof PreformatSegment) {

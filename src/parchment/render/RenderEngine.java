@@ -52,8 +52,9 @@ import parchment.format.Stylesheet;
 import parchment.format.UnsupportedValueException;
 import quill.client.ApplicationException;
 import quill.textbase.AttributionSegment;
+import quill.textbase.ChapterSegment;
 import quill.textbase.Common;
-import quill.textbase.ComponentSegment;
+import quill.textbase.DivisionSegment;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
@@ -351,7 +352,6 @@ public abstract class RenderEngine
         String filename;
         ArrayList<Segment>[] endnotes;
         final ArrayList<Segment> references;
-        StringBuilder buf;
         String which, label;
         boolean heading;
 
@@ -379,8 +379,12 @@ public abstract class RenderEngine
                 segment = series.getSegment(j);
                 entire = segment.getEntire();
 
-                if (segment instanceof ComponentSegment) {
-                    appendTitle(cr, entire);
+                if (segment instanceof ChapterSegment) {
+                    appendTitle(cr, entire, 2.0, false);
+                } else if (segment instanceof DivisionSegment) {
+                    appendWhitespace(cr, 100.0);
+                    appendTitle(cr, entire, 3.0, true);
+                    appendWhitespace(cr, 20.0);
                 } else if (segment instanceof HeadingSegment) {
                     appendSegmentBreak(cr);
                     appendHeading(cr, entire);
@@ -457,7 +461,7 @@ public abstract class RenderEngine
 
             if ((I > 1) && (series.size() > 0)) {
                 segment = series.getSegment(0);
-                if (segment instanceof ComponentSegment) {
+                if (segment instanceof ChapterSegment) {
                     entire = segment.getEntire();
                     which = entire.getText();
                     appendSegmentBreak(cr);
@@ -538,6 +542,22 @@ public abstract class RenderEngine
         accumulate(area);
     }
 
+    /**
+     * @param cr
+     */
+    /*
+     * We use an ImageArea rather than a BlankArea so that it doesn't get
+     * absorbed by the flow logic.
+     */
+    protected void appendWhitespace(final Context cr, final double request) {
+        final Origin origin;
+        final Area area;
+
+        origin = new Origin(folioIndex, seriesIndex, currentOffset);
+        area = new ImageArea(origin, 0.0, request, null, 1.0);
+        accumulate(area);
+    }
+
     private void appendHeading(Context cr, String text) {
         final Span span;
         final Extract entire;
@@ -555,7 +575,8 @@ public abstract class RenderEngine
         accumulate(list);
     }
 
-    protected void appendTitle(Context cr, Extract entire) {
+    protected void appendTitle(final Context cr, final Extract entire, final double multiplier,
+            final boolean centered) {
         final FontDescription desc;
         final Typeface face;
         final Area[] list;
@@ -563,10 +584,10 @@ public abstract class RenderEngine
 
         desc = headingFace.desc.copy();
         size = desc.getSize();
-        desc.setSize(size * 2);
+        desc.setSize(size * multiplier);
         face = new Typeface(cr, desc, 0.0);
 
-        list = layoutAreaText(cr, entire, face, false, false, 0.0, 1, false);
+        list = layoutAreaText(cr, entire, face, false, centered, 0.0, 1, false);
         accumulate(list);
     }
 

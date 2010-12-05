@@ -38,7 +38,8 @@ import org.gnome.gtk.Viewport;
 import org.gnome.gtk.Widget;
 
 import quill.textbase.AttributionSegment;
-import quill.textbase.ComponentSegment;
+import quill.textbase.ChapterSegment;
+import quill.textbase.DivisionSegment;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
@@ -349,8 +350,13 @@ class ComponentEditorWidget extends ScrolledWindow
 
             editor = heading.getEditor();
             result = heading;
-        } else if (segment instanceof ComponentSegment) {
+        } else if (segment instanceof ChapterSegment) {
             heading = new ChapterHeadingBox(this, segment);
+
+            editor = heading.getEditor();
+            result = heading;
+        } else if (segment instanceof DivisionSegment) {
+            heading = new PartHeadingBox(this, segment);
 
             editor = heading.getEditor();
             result = heading;

@@ -19,7 +19,7 @@
 package quill.quack;
 
 /**
- * The title of a chapter. It is peers with {@link PartElement}.
+ * The title of a chapter. It is peers with {@link DivisionElement}.
  * 
  * Contrast to {@link HeadingElement} which is for a section heading.
  * 

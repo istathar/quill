@@ -106,6 +106,8 @@ public class QuackNodeFactory extends NodeFactory
             return new EndnoteElement();
         } else if (name.equals("reference")) {
             return new ReferenceElement();
+        } else if (name == "division") {
+            return new DivisionElement();
         } else {
             /*
              * This is actually fairly serious; once our code is working

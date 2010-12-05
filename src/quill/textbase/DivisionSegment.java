@@ -18,13 +18,17 @@
  */
 package quill.textbase;
 
-public abstract class ComponentSegment extends Segment
+public final class DivisionSegment extends ComponentSegment
 {
-    protected ComponentSegment(Extract entire) {
+    public DivisionSegment(Extract entire) {
         super(entire);
     }
 
-    protected ComponentSegment(Extract entire, int offset, int removed, int inserted) {
+    public DivisionSegment(Extract entire, int offset, int removed, int inserted) {
         super(entire, offset, removed, inserted);
+    }
+
+    public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
+        return new DivisionSegment(entire, offset, removed, inserted);
     }
 }
