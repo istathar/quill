@@ -22,7 +22,7 @@ import quill.textbase.Segment;
 
 class SectionHeadingBox extends HeadingBox
 {
-    public SectionHeadingBox(final ComponentEditorWidget parent, final Segment segment) {
+    SectionHeadingBox(final ComponentEditorWidget parent, final Segment segment) {
         super();
 
         super.setupLine();
