@@ -64,6 +64,8 @@ public class QuackNodeFactory extends NodeFactory
             return new QuoteElement();
         } else if (name == "poem") {
             return new PoemElement();
+        } else if (name == "list") {
+            return new ListElement();
         } else if (name == "credit") {
             return new CreditElement();
         } else if (name == "chapter") {
@@ -127,6 +129,8 @@ public class QuackNodeFactory extends NodeFactory
             return new Nodes(new SourceAttribute(value));
         } else if (name.equals("name")) {
             return new Nodes(new NameAttribute(value));
+        } else if (name.equals("label")) {
+            return new Nodes(new LabelAttribute(value));
         } else {
             return super.makeAttribute(name, URI, value, type);
         }

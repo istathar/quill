@@ -21,6 +21,7 @@ package quill.client;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -83,13 +84,13 @@ public abstract class IOTestCase extends TestCase
 
     protected static String loadFileIntoString(String filename) {
         final StringBuilder str;
-        final FileInputStream in;
+        final FileReader in;
         int b;
 
         str = new StringBuilder(1024);
 
         try {
-            in = new FileInputStream(filename);
+            in = new FileReader(filename);
             while ((b = in.read()) != -1) {
                 str.append((char) b);
             }

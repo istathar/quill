@@ -30,6 +30,7 @@ import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
+import quill.textbase.ListitemSegment;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.PoeticSegment;
@@ -206,6 +207,7 @@ public class QuackLoader
 
         start = true;
         chain = new TextChain();
+        attribute = null;
 
         if (block instanceof TextElement) {
             preserve = false;
@@ -231,6 +233,19 @@ public class QuackLoader
             }
         } else if (block instanceof PoemElement) {
             preserve = true;
+        } else if (block instanceof ListElement) {
+            preserve = false;
+            processData(block);
+            if ((attribute == null) && (segment instanceof ListitemSegment)) {
+                entire = segment.getEntire();
+                chain.setTree(entire);
+                chain.append(Span.createSpan('\n', null));
+
+                i = list.size() - 1;
+                list.remove(i);
+
+                attribute = segment.getImage();
+            }
         } else if (block instanceof CreditElement) {
             preserve = false;
             if (segment instanceof AttributionSegment) {
@@ -284,6 +299,8 @@ public class QuackLoader
             segment = new QuoteSegment(entire);
         } else if (block instanceof PoemElement) {
             segment = new PoeticSegment(entire);
+        } else if (block instanceof ListElement) {
+            segment = new ListitemSegment(entire, attribute);
         } else if (block instanceof CreditElement) {
             segment = new AttributionSegment(entire);
         } else if (block instanceof HeadingElement) {
@@ -332,6 +349,9 @@ public class QuackLoader
             str = meta.getValue();
             attribute = str;
         } else if (meta instanceof NameAttribute) {
+            str = meta.getValue();
+            attribute = str;
+        } else if (meta instanceof LabelAttribute) {
             str = meta.getValue();
             attribute = str;
         } else {

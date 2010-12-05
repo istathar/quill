@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -19,14 +19,13 @@
 package quill.quack;
 
 /**
- * A verse or quote as a passage. These wrap; a {@link PoemElement} is a quote
- * which preserves whitespace.
+ * A paragraph in an ordered or unordered list.
  * 
  * @author Andrew Cowie
  */
-public class QuoteElement extends BlockElement implements Block
+public class ListElement extends BlockElement implements Block
 {
-    public QuoteElement() {
-        super("quote");
+    public ListElement() {
+        super("list");
     }
 }

@@ -20,12 +20,12 @@ package quill.textbase;
 
 public class ImageSegment extends Segment
 {
-    public ImageSegment(Extract entire, String extra) {
-        super(entire, extra, 0, 0, entire.getWidth());
+    public ImageSegment(Extract entire, String source) {
+        super(entire, source, 0, 0, entire.getWidth());
     }
 
-    public ImageSegment(Extract entire, String extra, int offset, int removed, int inserted) {
-        super(entire, extra, offset, removed, inserted);
+    public ImageSegment(Extract entire, String source, int offset, int removed, int inserted) {
+        super(entire, source, offset, removed, inserted);
     }
 
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
