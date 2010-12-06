@@ -96,7 +96,7 @@ public class ValidateDataIntegrity extends IOTestCase
 
         expected = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
+            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/5.0\">",
             "<text>",
             "<bold>Hello </bold><type>GtkButton</type><bold> world</bold>",
             "</text>",
@@ -194,7 +194,7 @@ public class ValidateDataIntegrity extends IOTestCase
 
         outbound = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
+            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/5.0\">",
             "<text>",
             "Hello world. <italics>It is a lovely day.</italics>",
             "</text>",
@@ -265,7 +265,7 @@ public class ValidateDataIntegrity extends IOTestCase
 
         outbound = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
+            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/5.0\">",
             "<quote>",
             "Out of the picture, really, we'll need <acronym>HMS</acronym>",
             "<title>Renown</title> as it was 28th January 1802.",

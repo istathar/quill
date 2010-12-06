@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
+<quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0">
 <chapter>
 Chapters
 </chapter>
@@ -41,7 +41,7 @@ is:
 </text>
 <code xml:space="preserve">
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5"/&gt;
+&lt;quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0"/&gt;
 </code>
 <text>
 If that was in <filename>First.xml</filename> it could be a part
@@ -55,7 +55,7 @@ slightly more complete example is as follows:
 </text>
 <code xml:space="preserve">
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5"&gt;
+&lt;quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0"&gt;
 &lt;chapter&gt;
 Origins
 &lt;/chapter&gt;

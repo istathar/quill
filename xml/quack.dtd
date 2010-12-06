@@ -24,7 +24,7 @@
 		 (heading | text | code | quote | list | list | image | poem | credit)*,
 		 (endnote*),
 		 (reference*))>
-<!ATTLIST quack xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/0.5">
+<!ATTLIST quack xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/5.0">
 
 <!-- block level  -->
 

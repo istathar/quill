@@ -134,7 +134,7 @@ public class ValidatePreformattedConversion extends IOTestCase
 
         blob = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
+            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/5.0\">",
             "<text>",
             "Consider the following simple and yet profound expression of",
             "quality program code:",
