@@ -22,12 +22,16 @@ import java.util.ArrayList;
 
 import nu.xom.Document;
 import quill.textbase.AttributionSegment;
+import quill.textbase.ChapterSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
+import quill.textbase.DivisionSegment;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
+import quill.textbase.LeaderSegment;
+import quill.textbase.ListitemSegment;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.PoeticSegment;
@@ -166,7 +170,7 @@ public class QuackLoader
 
         if (num == 0) {
             blank = Extract.create();
-            first = new ComponentSegment(blank);
+            first = new ChapterSegment(blank);
             list.add(first);
             second = new NormalSegment(blank);
             list.add(second);
@@ -189,7 +193,7 @@ public class QuackLoader
             list.add(second);
         } else {
             blank = Extract.create();
-            first = new ComponentSegment(blank);
+            first = new ChapterSegment(blank);
             list.add(0, first);
         }
     }
@@ -204,6 +208,7 @@ public class QuackLoader
 
         start = true;
         chain = new TextChain();
+        attribute = null;
 
         if (block instanceof TextElement) {
             preserve = false;
@@ -229,6 +234,19 @@ public class QuackLoader
             }
         } else if (block instanceof PoemElement) {
             preserve = true;
+        } else if (block instanceof ListElement) {
+            preserve = false;
+            processData(block);
+            if ((attribute == null) && (segment instanceof ListitemSegment)) {
+                entire = segment.getEntire();
+                chain.setTree(entire);
+                chain.append(Span.createSpan('\n', null));
+
+                i = list.size() - 1;
+                list.remove(i);
+
+                attribute = segment.getImage();
+            }
         } else if (block instanceof CreditElement) {
             preserve = false;
             if (segment instanceof AttributionSegment) {
@@ -241,10 +259,12 @@ public class QuackLoader
             }
         } else if (block instanceof HeadingElement) {
             preserve = false;
+        } else if (block instanceof LeaderElement) {
+            preserve = false;
         } else if (block instanceof ImageElement) {
             preserve = false;
             processData(block);
-        } else if (block instanceof ChapterElement) {
+        } else if ((block instanceof ChapterElement) || (block instanceof DivisionElement)) {
             preserve = false;
             if (segment != null) {
                 throw new IllegalStateException("\n"
@@ -282,6 +302,8 @@ public class QuackLoader
             segment = new QuoteSegment(entire);
         } else if (block instanceof PoemElement) {
             segment = new PoeticSegment(entire);
+        } else if (block instanceof ListElement) {
+            segment = new ListitemSegment(entire, attribute);
         } else if (block instanceof CreditElement) {
             segment = new AttributionSegment(entire);
         } else if (block instanceof HeadingElement) {
@@ -289,11 +311,15 @@ public class QuackLoader
         } else if (block instanceof ImageElement) {
             segment = new ImageSegment(entire, attribute);
         } else if (block instanceof ChapterElement) {
-            segment = new ComponentSegment(entire);
+            segment = new ChapterSegment(entire);
+        } else if (block instanceof DivisionElement) {
+            segment = new DivisionSegment(entire);
         } else if (block instanceof EndnoteElement) {
             segment = new EndnoteSegment(entire, attribute);
         } else if (block instanceof ReferenceElement) {
             segment = new ReferenceSegment(entire, attribute);
+        } else if (block instanceof LeaderElement) {
+            segment = new LeaderSegment(entire);
         } else {
             throw new IllegalStateException("\n" + "What kind of Block is " + block);
         }
@@ -328,6 +354,9 @@ public class QuackLoader
             str = meta.getValue();
             attribute = str;
         } else if (meta instanceof NameAttribute) {
+            str = meta.getValue();
+            attribute = str;
+        } else if (meta instanceof LabelAttribute) {
             str = meta.getValue();
             attribute = str;
         } else {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
+<quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0">
 <chapter>
 Documents
 </chapter>
@@ -33,7 +33,7 @@ Here is the <literal>.parchment</literal> file for this document:
 </text>
 <code xml:space="preserve">
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;manuscript xmlns="http://namespace.operationaldynamics.com/parchment/0.5"&gt;
+&lt;manuscript xmlns="http://namespace.operationaldynamics.com/parchment/5.0"&gt;
   &lt;content&gt;
     &lt;chapter src="Background.xml"/&gt;
     &lt;chapter src="Chapters.xml"/&gt;

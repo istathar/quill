@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
+<quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0">
 <chapter>
 Coming back for seconds
 </chapter>
@@ -32,6 +32,15 @@ possible.<note ref="1"/>
 <credit>
 - from <title>The Economist</title>
 </credit>
+<text>
+And now for our list:
+</text>
+<list label="•">
+This is the first item.
+</list>
+<list label="•">
+Not to be outdone, this is the second item.
+</list>
 <endnote name="1">
 From an editorial about the <acronym>G20</acronym> and its challenges
 in the lead up to the Seoul summit. "Finally, a talking-shop

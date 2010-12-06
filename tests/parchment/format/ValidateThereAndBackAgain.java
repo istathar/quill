@@ -36,8 +36,8 @@ import quill.textbase.Series;
  */
 public class ValidateThereAndBackAgain extends IOTestCase
 {
-    public void testRoundTrip() throws IOException, ValidityException, ParsingException,
-            ImproperFilenameException {
+    private static void roundTripChapter(final String from) throws IOException, ValidityException,
+            ParsingException, ImproperFilenameException {
         final Manuscript manuscript;
         final File source, target;
         final Chapter chapter;
@@ -45,13 +45,13 @@ public class ValidateThereAndBackAgain extends IOTestCase
         final String msg;
         final String sum1, sum2;
 
-        source = new File("tests/SomeOfEverything.xml");
+        source = new File(from);
         assertTrue(source.exists());
 
         manuscript = new Manuscript();
-        manuscript.setFilename("tests/NonExistent.parchment"); // junk
+        manuscript.setFilename("NonExistent.parchment"); // junk
         chapter = new Chapter(manuscript);
-        chapter.setFilename("SomeOfEverything.xml");
+        chapter.setFilename(from);
         series = chapter.loadDocument();
 
         ensureDirectory("tmp/unittests/parchment/format/");
@@ -73,6 +73,26 @@ public class ValidateThereAndBackAgain extends IOTestCase
                 + target + "\nresulted in different output; hashes\n" + sum1 + " and\n" + sum2;
 
         assertTrue(msg, sum1.equals(sum2));
+    }
+
+    public void testRoundTripChapter1() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
+        roundTripChapter("tests/SomeOfEverything.xml");
+    }
+
+    public void testRoundTripChapter2() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
+        roundTripChapter("tests/NotToBeOutdone.xml");
+    }
+
+    public void testRoundTripPart() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
+        roundTripChapter("tests/TheEnd.xml");
+    }
+
+    public void testRoundTripChapter3() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
+        roundTripChapter("tests/LastChapter.xml");
     }
 
     public static void main(String[] args) throws IOException, ValidityException, ParsingException,

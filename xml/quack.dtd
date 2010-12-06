@@ -20,14 +20,21 @@
 
 -->
 
-<!ELEMENT quack (chapter?,(heading | text | code | quote | image | poem | credit)*,endnote*,reference*)>
-<!ATTLIST quack xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/0.5">
+<!ELEMENT quack ((division | chapter)?,
+		 (heading | leader | text | code | quote | list | image | poem | credit)*,
+		 (endnote*),
+		 (reference*))>
+<!ATTLIST quack xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/5.0">
 
 <!-- block level  -->
+
+<!ELEMENT division (#PCDATA)>
 
 <!ELEMENT chapter (#PCDATA)>
 
 <!ELEMENT heading (#PCDATA)>
+
+<!ELEMENT leader (#PCDATA)>
 
 <!ELEMENT text (#PCDATA 
 		| italics | bold | name | type | function | literal
@@ -35,7 +42,11 @@
 		| note | cite
 		| keyboard | acronym)*>
 
-<!ELEMENT code (#PCDATA | bold | highlight | note)*>
+<!ELEMENT code (#PCDATA
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| note | cite
+		| keyboard | acronym)*>
 <!ATTLIST code xml:space CDATA #FIXED "preserve">
 
 <!ELEMENT quote (#PCDATA
@@ -43,6 +54,13 @@
 		| filename | project | command | highlight | title
 		| note | cite
 		| keyboard | acronym)*>
+
+<!ELEMENT list (#PCDATA
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| note | cite
+		| keyboard | acronym)*>
+<!ATTLIST list label CDATA #IMPLIED>
 
 <!ELEMENT image (#PCDATA
 		| italics | bold | name | type | function | literal

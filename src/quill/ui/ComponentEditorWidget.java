@@ -38,10 +38,13 @@ import org.gnome.gtk.Viewport;
 import org.gnome.gtk.Widget;
 
 import quill.textbase.AttributionSegment;
-import quill.textbase.ComponentSegment;
+import quill.textbase.ChapterSegment;
+import quill.textbase.DivisionSegment;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
+import quill.textbase.LeaderSegment;
+import quill.textbase.ListitemSegment;
 import quill.textbase.NormalSegment;
 import quill.textbase.Origin;
 import quill.textbase.PoeticSegment;
@@ -271,7 +274,7 @@ class ComponentEditorWidget extends ScrolledWindow
         final ImageDisplayBox image;
         final Scrollbar bar;
         final ScrolledWindow wide;
-        final ReferenceListitemBox listitem;
+        final ListitemBox listitem;
 
         if (segment instanceof NormalSegment) {
             editor = new NormalEditorTextView(this, segment);
@@ -285,6 +288,11 @@ class ComponentEditorWidget extends ScrolledWindow
             editor = new PoeticEditorTextView(this, segment);
 
             result = editor;
+        } else if (segment instanceof ListitemSegment) {
+            listitem = new NormalListitemBox(this, segment);
+
+            editor = listitem.getEditor();
+            result = listitem;
         } else if (segment instanceof AttributionSegment) {
             editor = new AttributionEditorTextView(this, segment);
 
@@ -349,8 +357,17 @@ class ComponentEditorWidget extends ScrolledWindow
 
             editor = heading.getEditor();
             result = heading;
-        } else if (segment instanceof ComponentSegment) {
+        } else if (segment instanceof LeaderSegment) {
+            editor = new LeaderEditorTextView(this, segment);
+
+            result = editor;
+        } else if (segment instanceof ChapterSegment) {
             heading = new ChapterHeadingBox(this, segment);
+
+            editor = heading.getEditor();
+            result = heading;
+        } else if (segment instanceof DivisionSegment) {
+            heading = new PartHeadingBox(this, segment);
 
             editor = heading.getEditor();
             result = heading;

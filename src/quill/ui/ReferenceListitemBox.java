@@ -19,28 +19,28 @@
 package quill.ui;
 
 import org.gnome.gtk.Alignment;
-import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
+import org.gnome.gtk.Widget;
 
 import quill.textbase.Segment;
 
-class ReferenceListitemBox extends HBox
+class ReferenceListitemBox extends ListitemBox
 {
-    private final HBox box;
-
-    private Label label;
-
-    private ListitemEditorTextView body;
-
     ReferenceListitemBox(final ComponentEditorWidget parent, final Segment segment) {
-        super(false, 0);
-        box = this;
-        setupLabel(segment);
-        setupBody(parent, segment);
+        super();
+        final Widget widget;
+        final EditorTextView editor;
+
+        widget = createLabel(segment);
+        editor = new ReferenceEditorTextView(parent, segment);
+
+        super.setupLabel(widget);
+        super.setupBody(editor);
     }
 
-    private void setupLabel(final Segment segment) {
+    private Widget createLabel(final Segment segment) {
         final String text;
+        final Label label; // field?
         final Alignment align;
 
         text = segment.getImage();
@@ -53,15 +53,6 @@ class ReferenceListitemBox extends HBox
         align.setPadding(3, 0, 0, 1);
         align.add(label);
 
-        box.packStart(align, false, false, 0);
-    }
-
-    private void setupBody(final ComponentEditorWidget parent, final Segment segment) {
-        body = new ListitemEditorTextView(parent, segment);
-        box.packStart(body, true, true, 0);
-    }
-
-    EditorTextView getEditor() {
-        return body;
+        return align;
     }
 }

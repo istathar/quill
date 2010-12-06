@@ -54,10 +54,6 @@ class CaptionEditorTextView extends EditorTextView
         return false;
     }
 
-    protected boolean isSpellChecked() {
-        return false;
-    }
-
     protected boolean isEnterAllowed() {
         return false;
     }

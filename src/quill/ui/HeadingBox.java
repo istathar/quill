@@ -25,7 +25,7 @@ import org.gnome.gtk.VBox;
 
 import quill.textbase.Segment;
 
-class HeadingBox extends VBox
+abstract class HeadingBox extends VBox
 {
     private VBox top;
 
@@ -33,12 +33,12 @@ class HeadingBox extends VBox
 
     private Label label;
 
-    public HeadingBox() {
+    HeadingBox() {
         super(false, 0);
         top = this;
     }
 
-    protected void setupBox(final ComponentEditorWidget parent, final Segment segment, final String text) {
+    void setupBox(final ComponentEditorWidget parent, final Segment segment, final String text) {
         final HBox box;
 
         box = new HBox(false, 0);
@@ -55,7 +55,7 @@ class HeadingBox extends VBox
         top.packStart(box, false, false, 0);
     }
 
-    protected void setupLine() {
+    void setupLine() {
         final HSeparator sep;
 
         sep = new HSeparator();

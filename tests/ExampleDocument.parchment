@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<manuscript xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
+<manuscript xmlns="http://namespace.operationaldynamics.com/parchment/5.0">
   <content>
     <chapter src="SomeOfEverything.xml"/>
     <chapter src="NotToBeOutdone.xml"/>
-    <chapter src="TheLastChapter.xml"/>
+    <chapter src="TheEnd.xml"/>
+    <chapter src="LastChapter.xml"/>
   </content>
   <presentation>
     <renderer class="parchment.render.ReportRenderEngine"/>

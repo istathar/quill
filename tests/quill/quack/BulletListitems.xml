@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0">
+<list label="•">
+This is the first item.
+</list>
+<list label="•">
+Not to be outdone, this is the second item.
+</list>
+<list>
+This is a second paragraph in the second item, testing continuation.
+</list>
+<list label="•">
+Now on to the third item, testing restarting a new Segment.
+</list>
+</quack>

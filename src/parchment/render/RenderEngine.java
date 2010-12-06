@@ -52,13 +52,16 @@ import parchment.format.Stylesheet;
 import parchment.format.UnsupportedValueException;
 import quill.client.ApplicationException;
 import quill.textbase.AttributionSegment;
+import quill.textbase.ChapterSegment;
 import quill.textbase.Common;
-import quill.textbase.ComponentSegment;
+import quill.textbase.DivisionSegment;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
+import quill.textbase.LeaderSegment;
+import quill.textbase.ListitemSegment;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.Origin;
@@ -351,7 +354,6 @@ public abstract class RenderEngine
         String filename;
         ArrayList<Segment>[] endnotes;
         final ArrayList<Segment> references;
-        StringBuilder buf;
         String which, label;
         boolean heading;
 
@@ -379,8 +381,12 @@ public abstract class RenderEngine
                 segment = series.getSegment(j);
                 entire = segment.getEntire();
 
-                if (segment instanceof ComponentSegment) {
-                    appendTitle(cr, entire);
+                if (segment instanceof ChapterSegment) {
+                    appendTitle(cr, entire, 2.0, false);
+                } else if (segment instanceof DivisionSegment) {
+                    appendWhitespace(cr, 100.0);
+                    appendTitle(cr, entire, 3.0, true);
+                    appendWhitespace(cr, 20.0);
                 } else if (segment instanceof HeadingSegment) {
                     appendSegmentBreak(cr);
                     appendHeading(cr, entire);
@@ -401,6 +407,17 @@ public abstract class RenderEngine
                         appendParagraphBreak(cr);
                         appendNormalParagraph(cr, paras[k]);
                     }
+                } else if (segment instanceof ListitemSegment) {
+                    label = segment.getImage();
+
+                    chain = new TextChain(entire);
+                    paras = chain.extractParagraphs();
+                    for (k = 0; k < paras.length; k++) {
+                        appendParagraphBreak(cr);
+                        appendListParagraph(cr, label, paras[k]);
+
+                        label = "";
+                    }
                 } else if (segment instanceof PoeticSegment) {
                     appendSegmentBreak(cr);
                     appendNormalParagraph(cr, entire);
@@ -420,6 +437,9 @@ public abstract class RenderEngine
                     endnotes[i].add(segment);
                 } else if (segment instanceof ReferenceSegment) {
                     references.add(segment);
+                } else if (segment instanceof LeaderSegment) {
+                    appendSegmentBreak(cr);
+                    appendLeader(cr, entire);
                 }
             }
 
@@ -430,6 +450,7 @@ public abstract class RenderEngine
          * Now build the notes and references. This is somewhat hardcoded, but
          * choose "intelligent defaults" as Robert Collins says.
          */
+
         heading = false;
 
         for (i = 0; i < I; i++) {
@@ -457,7 +478,7 @@ public abstract class RenderEngine
 
             if ((I > 1) && (series.size() > 0)) {
                 segment = series.getSegment(0);
-                if (segment instanceof ComponentSegment) {
+                if (segment instanceof ChapterSegment) {
                     entire = segment.getEntire();
                     which = entire.getText();
                     appendSegmentBreak(cr);
@@ -471,7 +492,7 @@ public abstract class RenderEngine
                 segment = endnotes[i].get(j);
                 label = segment.getImage();
                 entire = segment.getEntire();
-                appendListParagraph(cr, label, entire);
+                appendReferenceParagraph(cr, label, entire);
             }
         }
         if (heading) {
@@ -488,7 +509,7 @@ public abstract class RenderEngine
                 segment = references.get(j);
                 label = segment.getImage();
                 entire = segment.getEntire();
-                appendListParagraph(cr, label, entire);
+                appendReferenceParagraph(cr, label, entire);
             }
         }
     }
@@ -538,6 +559,22 @@ public abstract class RenderEngine
         accumulate(area);
     }
 
+    /**
+     * @param cr
+     */
+    /*
+     * We use an ImageArea rather than a BlankArea so that it doesn't get
+     * absorbed by the flow logic.
+     */
+    protected void appendWhitespace(final Context cr, final double request) {
+        final Origin origin;
+        final Area area;
+
+        origin = new Origin(folioIndex, seriesIndex, currentOffset);
+        area = new ImageArea(origin, 0.0, request, null, 1.0);
+        accumulate(area);
+    }
+
     private void appendHeading(Context cr, String text) {
         final Span span;
         final Extract entire;
@@ -555,18 +592,35 @@ public abstract class RenderEngine
         accumulate(list);
     }
 
-    protected void appendTitle(Context cr, Extract entire) {
+    protected void appendTitle(final Context cr, final Extract entire, final double multiplier,
+            final boolean centered) {
         final FontDescription desc;
+        final double size;
         final Typeface face;
         final Area[] list;
-        final double size;
 
         desc = headingFace.desc.copy();
         size = desc.getSize();
-        desc.setSize(size * 2);
+        desc.setSize(size * multiplier);
         face = new Typeface(cr, desc, 0.0);
 
-        list = layoutAreaText(cr, entire, face, false, false, 0.0, 1, false);
+        list = layoutAreaText(cr, entire, face, false, centered, 0.0, 1, false);
+        accumulate(list);
+    }
+
+    protected void appendLeader(Context cr, Extract entire) {
+        final FontDescription desc;
+        final double size;
+        final Typeface face;
+        final Area[] list;
+
+        desc = serifFace.desc.copy();
+        desc.setWeight(Weight.BOLD);
+        size = desc.getSize();
+        desc.setSize(size * 1.2);
+        face = new Typeface(cr, desc, 0.0);
+
+        list = layoutAreaText(cr, entire, face, false, true, 0.0, 1, false);
         accumulate(list);
     }
 
@@ -679,7 +733,7 @@ public abstract class RenderEngine
         accumulate(list);
     }
 
-    protected void appendListParagraph(final Context cr, final String label, final Extract entire) {
+    protected void appendListParagraph(final Context cr, final String label, final Extract extract) {
         final Area area;
         final Area[] list;
         final double savedLeft;
@@ -688,25 +742,51 @@ public abstract class RenderEngine
          * Label
          */
 
-        area = layoutAreaBullet(cr, label, serifFace);
+        area = layoutAreaBullet(cr, label, serifFace, 9.0);
         accumulate(area);
 
         /*
-         * Body. 25 points is enough for most labels, up to [999], and
-         * meanwhile is a bit less than the block quote indentation. This
+         * Body. There's an interplay between bullet intent, body intent, and
+         * still being a bit less than the block quote indentation. This
          * should probably be settable by subclasses.
          */
 
         savedLeft = leftMargin;
-        leftMargin += 25.0;
+        leftMargin += 31.0;
 
-        list = layoutAreaText(cr, entire, serifFace, false, false, 0.0, 1, false);
+        list = layoutAreaText(cr, extract, serifFace, false, false, 0.0, 1, false);
         accumulate(list);
 
         leftMargin = savedLeft;
     }
 
-    private Area layoutAreaBullet(final Context cr, final String label, final Typeface face) {
+    protected void appendReferenceParagraph(final Context cr, final String label, final Extract extract) {
+        final Area area;
+        final Area[] list;
+        final double savedLeft;
+
+        /*
+         * Label
+         */
+
+        area = layoutAreaBullet(cr, label, serifFace, 0.0);
+        accumulate(area);
+
+        /*
+         * Body. 25 points is suitable for [99] and (barely) enough for [999].
+         */
+
+        savedLeft = leftMargin;
+        leftMargin += 25.0;
+
+        list = layoutAreaText(cr, extract, serifFace, false, false, 0.0, 1, false);
+        accumulate(list);
+
+        leftMargin = savedLeft;
+    }
+
+    private Area layoutAreaBullet(final Context cr, final String label, final Typeface face,
+            final double position) {
         final Layout layout;
         final LayoutLine line;
         final Area area;
@@ -722,7 +802,7 @@ public abstract class RenderEngine
          * this Area; the ascent is stil needed to position the Cairo point
          * before drawing the LayoutLine.
          */
-        area = new TextArea(null, leftMargin, 0.0, serifFace.lineAscent, line, false);
+        area = new TextArea(null, leftMargin + position, 0.0, serifFace.lineAscent, line, false);
 
         return area;
     }
@@ -1206,7 +1286,7 @@ public abstract class RenderEngine
         } else if (m instanceof Special) {
             if (m == Special.NOTE) {
                 return new Attribute[] {
-                    new SizeAttribute(4.0),
+                    new SizeAttribute(4.5),
                     new RiseAttribute(4.5),
                 };
             } else if (m == Special.CITE) {

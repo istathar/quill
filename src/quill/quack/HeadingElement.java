@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -22,10 +22,5 @@ public class HeadingElement extends BlockElement implements Block
 {
     public HeadingElement() {
         super("heading");
-    }
-
-    public HeadingElement(String title) {
-        super("heading");
-        super.add(title);
     }
 }

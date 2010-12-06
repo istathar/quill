@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
+<quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0">
 <chapter>
 Chapters
 </chapter>
@@ -9,7 +9,8 @@ engine which renders it for display or printing is that ultimately,
 <italics>there is no structure in a document</italics>. When
 you read a book, you see prose, then a section's heading, then
 more prose, then an image, then a new chapter ... as they are
-printed they are just a series of lines of lines of text.
+printed they are just a series of blocks of similarly formatted
+paragraphs of text. One paragraph then another.
 </text>
 <text>
 Structure that we impose in our documents - sections, chapters,
@@ -30,6 +31,50 @@ Blocks contain text and the second level of elements, termed
 "inlines", specifying a specific markup to be applied to a span
 of text.
 </text>
+<text>
+<bold>Schema</bold>
+</text>
+<text>
+The full schema is given in the <acronym>DTD</acronym>, but is
+summarized as follows: an optional (but almost certainly present)
+component title block <literal>&lt;division&gt;</literal> or
+<literal>&lt;chapter&gt;</literal>, a series of
+<literal>&lt;normal&gt;</literal>, <literal>&lt;code&gt;</literal>,
+<literal>&lt;quote&gt;</literal>, <literal>&lt;list&gt;</literal>,
+<literal>&lt;citation&gt;</literal>, <literal>&lt;poem&gt;</literal>,
+and <literal>&lt;image&gt;</literal> blocks, then a series of
+<literal>&lt;endnotes&gt;</literal> (if there are any), then
+a series of <literal>&lt;reference&gt;</literal>s (if there are
+any). By convention <literal>&lt;reference&gt;</literal> blocks
+will be shuffled to the end of the last component in the document
+when saving.
+</text>
+<text>
+The blocks can contain the following inlines:
+<literal>&lt;italics&gt;</literal>, <literal>&lt;bold&gt;</literal>,
+<literal>&lt;filename&gt;</literal>, <literal>&lt;type&gt;</literal>,
+<literal>&lt;function&gt;</literal>,
+<literal>&lt;literal&gt;</literal>, <literal>&lt;project&gt;</literal>,
+<literal>&lt;command&gt;</literal>,
+<literal>&lt;highlight&gt;</literal>, <literal>&lt;title&gt;</literal>,
+<literal>&lt;acronym&gt;</literal>, or
+<literal>&lt;keyboard&gt;</literal>. What these all mean is described
+below. <literal>:)</literal> There are also some special inlines
+which are empty elements: <literal>&lt;note&gt;</literal> and
+<literal>&lt;cite&gt;</literal> for note anchors and citations
+respectively.
+</text>
+<text>
+<bold>Rendering</bold>
+</text>
+<text>
+Discussion of how a given block type or inline markup is to be
+rendered is largely predicated on the reference
+<type>RenderEngine</type>s that ship by default with <project>Quill
+and Parchment</project>. The user (or the user's organization)
+is of course welcome to do anything they want, but the Quack
+format is largely there to support these processing expectations.
+</text>
 <heading>
 Components
 </heading>
@@ -41,12 +86,20 @@ is:
 </text>
 <code xml:space="preserve">
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5"/&gt;
+&lt;quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0"/&gt;
 </code>
 <text>
 If that was in <filename>First.xml</filename> it could be a part
 of a Parchment document, and <project>Quill</project> would load
-it as an empty chapter. 
+it as an empty chapter.
+</text>
+<text>
+Component files generally begin with one of two special block
+types indicating the title for a component and, implicitly, what
+kinds of component a given file is.
+</text>
+<text>
+<bold>Chapter title blocks</bold>, <literal>&lt;chapter&gt;</literal>
 </text>
 <text>
 Real chapters start with a block giving the chapter title, followed
@@ -55,7 +108,7 @@ slightly more complete example is as follows:
 </text>
 <code xml:space="preserve">
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5"&gt;
+&lt;quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0"&gt;
 &lt;chapter&gt;
 Origins
 &lt;/chapter&gt;
@@ -81,20 +134,37 @@ Here we see a chapter title followed by a series of normal content
 blocks.
 </text>
 <text>
-The full schema is given in the <acronym>DTD</acronym>, but is
-summarized as follows: an optional chapter title block, a series
-of {normal, code, quote, image, citation, poem, and image} blocks,
-then endnotes (if there are any), then references (if there are
-any).
+The <literal>&lt;chapter&gt;</literal> blocks are rendered in
+the heading font at twice their size, and start on a new page.
 </text>
-<text/>
 <text>
-Discussion of how a given block type or inline markup is to be
-rendered is largely predicated on the reference
-<type>RenderEngine</type>s that ship by default with <project>Quill
-and Parchment</project>. The user (or the user's organization)
-is of course welcome to do anything they want, but the Quack
-format is largely there to support these processing expectations.
+<bold>Part title blocks</bold>, <literal>&lt;division&gt;</literal>
+</text>
+<text>
+There is sometimes a requirement to divide books into groups
+of chapters; these are often labelled "parts" and are formally
+known as the divisions of a book. While the Parchment File Format
+simply provides for a series of chapters, a short Quack Schema
+file which begins with a <literal>&lt;division&gt;</literal>
+block can be used to indicate a part title page... or indeed
+can be the title page for the work as a whole:
+</text>
+<code xml:space="preserve">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0"&gt;
+&lt;division&gt;
+The Tao of Joda
+&lt;/division&gt;
+&lt;text&gt;
+As told to Lake Groundcrawler.
+&lt;/text&gt;
+&lt;/quack&gt;
+</code>
+<text>
+The reference implementation renders
+<literal>&lt;division&gt;</literal> blocks in the heading font
+at three times the size of normal headings and pushes them down
+the page somewhat.
 </text>
 <heading>
 Blocks
@@ -133,7 +203,7 @@ paragraph.&lt;/para&gt;
 <text>
 which looks pretty stupid in long text runs because the tags
 get in the way. We instead take the same approach as used by
-<literal>HTML</literal> whereby leading and trailing newlines
+<acronym>HTML</acronym> whereby leading and trailing newlines
 are trimmed. So we have:
 </text>
 <code xml:space="preserve">
@@ -192,6 +262,100 @@ You wouldn't really expect poems to be offset indented like blockquotes
 preserve whitespace - but presentation is ultimately up to the
 <type>RenderEngine</type> being used.
 </text>
+<text>
+<bold>Attribution blocks</bold>, <literal>&lt;credit&gt;</literal>
+</text>
+<text>
+These are specialist blocks that are for giving attribution to
+a passage, be it a block quote or poetic in nature. Though you'd
+often expect only one wrapped blurb of text, a new paragraph
+triggered by <literal>'\n'</literal> in the editor would result
+in a subsequent <literal>&lt;credit&gt;</literal> block, as is
+the case with <literal>&lt;text&gt;</literal> and
+<literal>&lt;quote&gt;</literal> blocks. Attribution blocks are
+rendered offset to the far right of the page in a somewhat smaller
+font.
+</text>
+<text>
+<bold>Image blocks</bold>, <literal>&lt;image&gt;</literal>
+</text>
+<text>
+Places an image in the document. The source file of the image
+is specified in the <literal>src</literal> attribute:
+</text>
+<code xml:space="preserve">
+&lt;image src="OldMap.jpg"/&gt;
+</code>
+<text>
+Images can have single paragraph "captions", which are the bodies
+of the <literal>&lt;image&gt;</literal> block:
+</text>
+<code xml:space="preserve">
+&lt;image src="OldMap.jpg"&gt;
+A map of the ancient world.
+&lt;/image&gt;
+</code>
+<text>
+Note that there are no inline images in the Quack schema. In
+virtually everything we've studied in the document classes we
+care about, the illustrations, figures, and photos stand on their
+own. Incidentally, this design decision meant we could completely
+ignore problems about specifying the word flow around embedded
+images. An image is just another block in the flow of a chapter.
+</text>
+<text>
+Images are scaled down so that they exactly fit between left
+and right margins, or rendered at their natural resolution if
+smaller than the available width. So you can either a) throw
+a high-resolution photo at <project>Parchment</project> and it
+will make the most use of it, or b) specify the size in the source
+file, thereby maintaining control of scaling in the external
+tool you used to create your graphics in the first place.
+</text>
+<text>
+<bold>List blocks</bold>, <literal>&lt;list&gt;</literal>
+</text>
+<text>
+Sometimes one needs to present information in lists, be they
+unordered ("bullet lists") or ordered. We were going to leave
+this for a later version, but implementing the rendering for
+notes and references gave us the tools for rendering lists. So
+we have added the <literal>&lt;list&gt;</literal> block type.
+</text>
+<text>
+Each <literal>'\n'</literal> separated paragraph is its own
+<literal>&lt;list&gt;</literal> block as with
+<literal>&lt;text&gt;</literal>, <literal>&lt;quote&gt;</literal>,
+etc blocks. Thus a single list item may be spread across multiple
+<literal>&lt;list&gt;</literal> blocks. The start of a "new"
+list item is indicated by the presence of a <literal>label</literal>
+attribute with the text of the bullet or ordinal to be rendered:
+</text>
+<code xml:space="preserve">
+&lt;list label="1."&gt;
+This is the first item's
+first paragraph.
+&lt;/list&gt;
+&lt;list&gt;
+This is the first item's
+second paragraph.
+&lt;/list&gt;
+&lt;list label="2."&gt;
+This is the second item.
+&lt;/list&gt;
+</code>
+<text>
+Clearly the "type" of list is up to what the author puts in the
+labels; there is no differentiation in the Quack schema between
+ordered and unordered list items. While it would be unusual,
+there is no schema requirement for the first list item to have
+a label, giving a level of indent between normal and quote.
+</text>
+<text>
+Internally, <project>Quill</project> treats lists specially;
+they are one <type>ListitemSegment</type> per bullet; the only
+case where <type>Segment</type>s of the same type run consecutively.
+</text>
 <heading>
 Inlines
 </heading>
@@ -227,7 +391,7 @@ what's in Quack.
 Strongly emphasized text to be rendered in a bold font.
 </text>
 <text>
-<bold>Code Literals</bold>, &lt;literal&gt;
+<bold>Code Literals</bold>, <literal>&lt;literal&gt;</literal>
 </text>
 <text>
 Used for short literal code fragments from source code. Rendered

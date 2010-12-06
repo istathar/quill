@@ -30,7 +30,7 @@ public class ValidateWrapperExpansions extends TestCase
         blank = Extract.create();
 
         segments = new Segment[] {
-            new ComponentSegment(blank),
+            new ChapterSegment(blank),
             new HeadingSegment(blank),
             new NormalSegment(blank),
             new PreformatSegment(blank),
@@ -99,7 +99,7 @@ public class ValidateWrapperExpansions extends TestCase
         before = new Series(segments);
 
         assertEquals(5, before.size());
-        assertTrue(before.getSegment(0) instanceof ComponentSegment);
+        assertTrue(before.getSegment(0) instanceof ChapterSegment);
 
         after = before.insert(0, new PreformatSegment(blank));
 
@@ -225,17 +225,17 @@ public class ValidateWrapperExpansions extends TestCase
         before = new Series(segments);
 
         assertEquals(5, before.size());
-        assertTrue(before.getSegment(0) instanceof ComponentSegment);
+        assertTrue(before.getSegment(0) instanceof ChapterSegment);
         assertTrue(before.getSegment(1) instanceof HeadingSegment);
         assertSame(before.getSegment(1), segments[1]);
 
-        after = before.splice(0, new ComponentSegment(blank), new QuoteSegment(blank),
-                new ComponentSegment(blank));
+        after = before.splice(0, new ChapterSegment(blank), new QuoteSegment(blank),
+                new ChapterSegment(blank));
 
         assertEquals(7, after.size());
-        assertTrue(after.getSegment(0) instanceof ComponentSegment);
+        assertTrue(after.getSegment(0) instanceof ChapterSegment);
         assertTrue(after.getSegment(1) instanceof QuoteSegment);
-        assertTrue(after.getSegment(2) instanceof ComponentSegment);
+        assertTrue(after.getSegment(2) instanceof ChapterSegment);
         assertSame(after.getSegment(3), segments[1]);
         assertSame(after.getSegment(4), segments[2]);
         assertSame(after.getSegment(5), segments[3]);

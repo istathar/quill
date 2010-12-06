@@ -35,7 +35,7 @@ import quill.client.ImproperFilenameException;
 import quill.quack.QuackConverter;
 import quill.quack.QuackLoader;
 import quill.quack.QuackNodeFactory;
-import quill.textbase.ComponentSegment;
+import quill.textbase.ChapterSegment;
 import quill.textbase.Extract;
 import quill.textbase.NormalSegment;
 import quill.textbase.Segment;
@@ -80,7 +80,7 @@ public class Chapter
         final Series result;
 
         entire = Extract.create();
-        heading = new ComponentSegment(entire);
+        heading = new ChapterSegment(entire);
 
         entire = Extract.create();
         para = new NormalSegment(entire);

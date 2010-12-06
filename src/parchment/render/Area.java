@@ -124,6 +124,10 @@ final class ImageArea extends Area
     void draw(final Context cr, final double y) {
         final Matrix matrix;
 
+        if (pixbuf == null) {
+            return;
+        }
+
         /*
          * This is a bit unusual; you'd think you would just moveTo(), or,
          * just as conventionally, use the x,y co-ordinates of setSource().
