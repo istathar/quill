@@ -193,9 +193,9 @@ class HelpWidget extends ScrolledWindow
                 _("A path on the _filesystem.")
             },
             new String[] {
-                "Ctrl+Shift+T",
+                "Ctrl+Shift+C",
                 _("Class or Type"),
-                _("The name of an object-oriented class or similar _type.")
+                _("The name of an object-oriented _class or similar type.")
             },
             new String[] {
                 "Ctrl+Shift+M",
@@ -203,9 +203,9 @@ class HelpWidget extends ScrolledWindow
                 _("The name of a _method or function call.")
             },
             new String[] {
-                "Ctrl+Shift+A",
-                _("Application"),
-                _("The proper name of a program, _application suite, or project.")
+                "Ctrl+Shift+P",
+                _("Project"),
+                _("The proper name of a program, application suite, or _project.")
             },
             new String[] {
                 "Ctrl+Shift+O",
@@ -221,6 +221,21 @@ class HelpWidget extends ScrolledWindow
                 "Ctrl+Shift+H",
                 _("Highlight"),
                 _("Mark an inline work-in-progress comment.")
+            },
+            new String[] {
+                "Ctrl+Shift+T",
+                _("Publication"),
+                _("The _title of a book, journal, or other publication.")
+            },
+            new String[] {
+                "Ctrl+Shift+A",
+                _("Acronym"),
+                _("An abbreviation, acronym, or initialism. It's expceted that you'll use all capitals.")
+            },
+            new String[] {
+                "Ctrl+Shift+K",
+                _("Keystroke"),
+                _("Keys pressed by the user, or differentiating user input in a preformatted block.")
             },
         };
 

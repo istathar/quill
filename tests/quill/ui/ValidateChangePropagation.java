@@ -95,11 +95,11 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
-            "<title>",
+            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
+            "<chapter>",
             "h",
-            "</title>",
-            "</chapter>"
+            "</chapter>",
+            "</quack>"
         });
         assertEquals(expected, out.toString());
     }
@@ -143,12 +143,12 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
+            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
             "<text>",
             "This is a test of the emergency broadcast",
             "system",
             "</text>",
-            "</chapter>"
+            "</quack>"
         });
         assertEquals(expected, out.toString());
 
@@ -190,11 +190,11 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
+            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
             "<text>",
             "This is an emergency broadcast system",
             "</text>",
-            "</chapter>"
+            "</quack>"
         });
         assertEquals(expected, out.toString());
     }
@@ -241,12 +241,12 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
+            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
             "<text>",
             "This is a test of the <italics>emergency</italics>",
             "broadcast system",
             "</text>",
-            "</chapter>",
+            "</quack>",
         });
         assertEquals(expected, out.toString());
 
@@ -275,13 +275,13 @@ public class ValidateChangePropagation extends GraphicalTestCase
 
         expected = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
+            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
             "<text>",
             "This is a test of the",
             "a<italics>emergency</italics> broadcast",
             "system",
             "</text>",
-            "</chapter>"
+            "</quack>"
         });
         assertEquals(expected, out.toString());
 
@@ -311,7 +311,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
             "a<emphasis>emergencya</emphasis> broadcast",
             "system",
             "</para>",
-            "</chapter>"
+            "</quack>"
         });
         assertEquals(expected, out.toString());
 

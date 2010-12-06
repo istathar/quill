@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manuscript xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
+  <content>
+    <chapter src="Background.xml"/>
+    <chapter src="Chapters.xml"/>
+    <chapter src="Documents.xml"/>
+    <chapter src="Notes.xml"/>
+  </content>
+  <presentation>
+    <renderer class="parchment.render.ReportRenderEngine"/>
+    <paper size="A4"/>
+    <margins top="15.0" left="20.0" right="12.5" bottom="10.0"/>
+    <font serif="Linux Libertine O" size="3.2"/>
+    <font sans="Liberation Sans" size="2.6"/>
+    <font mono="Inconsolata" size="3.0"/>
+    <font heading="Linux Libertine O C" size="5.6"/>
+  </presentation>
+  <metadata>
+    <document title="The Parchment File Format"/>
+    <author name="Andrew Cowie"/>
+    <spelling lang="en_CA"/>
+  </metadata>
+</manuscript>

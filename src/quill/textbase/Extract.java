@@ -52,6 +52,9 @@ public abstract class Extract
         return Node.createNode(span);
     }
 
+    /**
+     * Create an empty Extract.
+     */
     public static Extract create() {
         return Node.createNode();
     }

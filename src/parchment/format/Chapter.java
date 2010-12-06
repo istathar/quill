@@ -44,7 +44,8 @@ import quill.textbase.Series;
 import static java.lang.String.format;
 
 /**
- * A chapter on disk in an .xml file containing a <chapter> root element.
+ * A chapter on disk in an .xml file containing a &lt;chapter&gt; root
+ * element.
  * 
  * This class is an intermediary, not an encapsulating container, which is why
  * save takes a Series as argument to be persisted.

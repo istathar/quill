@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
+<chapter>
+References
+</chapter>
+<reference name="[1]">
+Andrew Cowie, "Surviving Change" in <title>Proceedings of the
+12th Australian Systems Administrators Conference</title> (Brisbane:
+SAGE-AU, 2004), pages 23-40.
+</reference>
+<reference name="[2]">
+Antony Jay and Jonathan Lynn, <title>The Complete Yes Prime Minister</title>
+(London: BBC Books, 1989); ISBN 0563207736.
+</reference>
+<reference name="[3]">
+<filename>http://www.lipsum.com</filename>
+</reference>
+</quack>

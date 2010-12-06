@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://namespace.operationaldynamics.com/parchment/0.4">
+<quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
 <text>
 Hello world. <italics>It is a lovely day.</italics>
 </text>
 <text>
 <italics>And so is this day.</italics> Goodbye.
 </text>
-</chapter>
+</quack>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://namespace.operationaldynamics.com/parchment/0.2">
-<title>
+<quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
+<chapter>
 Chapter 1
-</title>
+</chapter>
 <text>
 This is not a real document. This is a series
 of unrelated fragments that are assembled
@@ -16,7 +16,7 @@ Getting started
 </heading>
 <text>
 This is a simple
-<application>java-gnome</application> program
+<project>java-gnome</project> program
 with 𝑛-way permutations.
 </text>
 <text>
@@ -180,10 +180,13 @@ malesuada, erat arcu pulvinar tortor, vitae
 rhoncus justo est ut ipsum. Sed sagittis
 mi sit amet mauris.
 </text>
+<text>
+And at the end of it all, press <keyboard>F1</keyboard> for help.
+</text>
 <endnote name="1">
 From "A Victory For Democracy", an episode of the
-popular television series <italics>Yes Prime
-Minister</italics>. This passage taken from the
+popular television series <title>Yes Prime
+Minister</title>. This passage taken from the
 book version <cite ref="[2]"/>, page 165.
 </endnote>
 <endnote name="2">
@@ -193,19 +196,19 @@ program available at <cite ref="[3]"/>.
 </endnote>
 <reference name="[1]">
 Andrew Cowie, "Surviving Change" in
-<italics>Proceedings of the 12th Australian
-Systems Administrators Conference</italics>
+<title>Proceedings of the 12th Australian
+Systems Administrators Conference</title>
 (Brisbane: SAGE-AU, 2004), pages 23-40.
 </reference>
 <reference name="[2]">
-Antony Jay and Jonathan Lynn, <italics>The
-Complete Yes Prime Minister</italics> (London:
+Antony Jay and Jonathan Lynn, <title>The
+Complete Yes Prime Minister</title> (London:
 BBC Books, 1989). ISBN 0563207736.
 </reference>
 <reference name="[3]">
 <filename>http://www.lipsum.com</filename>
 </reference>
-</chapter>
+</quack>
 <!--
 
   Example.xml

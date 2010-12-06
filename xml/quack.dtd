@@ -1,6 +1,6 @@
 <!--
 
-  chapter.dtd
+  quack.dtd
 
   Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
 
@@ -20,34 +20,61 @@
 
 -->
 
-<!ELEMENT chapter (title?,(heading | text | code | quote | image | poem | credit)*,endnote*,reference*)>
-<!ATTLIST chapter xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/0.4">
+<!ELEMENT quack (chapter?,(heading | text | code | quote | image | poem | credit)*,endnote*,reference*)>
+<!ATTLIST quack xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/0.5">
 
 <!-- block level  -->
 
-<!ELEMENT title (#PCDATA)>
+<!ELEMENT chapter (#PCDATA)>
 
 <!ELEMENT heading (#PCDATA)>
 
-<!ELEMENT text (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
+<!ELEMENT text (#PCDATA 
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| note | cite
+		| keyboard | acronym)*>
 
 <!ELEMENT code (#PCDATA | bold | highlight | note)*>
 <!ATTLIST code xml:space CDATA #FIXED "preserve">
 
-<!ELEMENT quote (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
+<!ELEMENT quote (#PCDATA
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| note | cite
+		| keyboard | acronym)*>
 
-<!ELEMENT image (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
+<!ELEMENT image (#PCDATA
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| note | cite
+		| keyboard | acronym)*>
 <!ATTLIST image src CDATA #REQUIRED>
 
-<!ELEMENT poem (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
+<!ELEMENT poem (#PCDATA
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| note | cite
+		| keyboard | acronym)*>
 <!ATTLIST poem xml:space CDATA #FIXED "preserve">
 
-<!ELEMENT credit (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | note)*>
+<!ELEMENT credit (#PCDATA
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| note | cite
+		| keyboard | acronym)*>
 
-<!ELEMENT endnote (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight | cite)*>
+<!ELEMENT endnote (#PCDATA
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| cite
+		| keyboard | acronym)*>
 <!ATTLIST endnote name CDATA #REQUIRED>
 
-<!ELEMENT reference (#PCDATA | italics | bold | application | type | function | literal | filename | command | highlight)*>
+<!ELEMENT reference (#PCDATA
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| keyboard | acronym)*>
 <!ATTLIST reference name CDATA #REQUIRED>
 
 <!-- inline spans -->
@@ -56,7 +83,7 @@
 
 <!ELEMENT bold (#PCDATA)>
 
-<!ELEMENT application (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
 
 <!ELEMENT type (#PCDATA)>
 
@@ -66,9 +93,17 @@
 
 <!ELEMENT filename (#PCDATA)>
 
+<!ELEMENT project (#PCDATA)>
+
 <!ELEMENT command (#PCDATA)>
 
 <!ELEMENT highlight (#PCDATA)>
+
+<!ELEMENT title (#PCDATA)>
+
+<!ELEMENT keyboard (#PCDATA)>
+
+<!ELEMENT acronym (#PCDATA)>
 
 <!ELEMENT note EMPTY>
 <!ATTLIST note ref CDATA #REQUIRED>

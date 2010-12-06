@@ -39,6 +39,7 @@ import org.gnome.gtk.Widget;
 
 import quill.textbase.AttributionSegment;
 import quill.textbase.ComponentSegment;
+import quill.textbase.EndnoteSegment;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.NormalSegment;
@@ -46,6 +47,7 @@ import quill.textbase.Origin;
 import quill.textbase.PoeticSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
+import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 
@@ -269,6 +271,7 @@ class ComponentEditorWidget extends ScrolledWindow
         final ImageDisplayBox image;
         final Scrollbar bar;
         final ScrolledWindow wide;
+        final ReferenceListitemBox listitem;
 
         if (segment instanceof NormalSegment) {
             editor = new NormalEditorTextView(this, segment);
@@ -351,6 +354,22 @@ class ComponentEditorWidget extends ScrolledWindow
 
             editor = heading.getEditor();
             result = heading;
+        }
+        /*
+         * TODO this is for testing ONLY, so we can at least see the note
+         * texts somewhere and edit them. Soon we will move this out of the
+         * main chapter body editor UI.
+         */
+        else if (segment instanceof EndnoteSegment) {
+            listitem = new ReferenceListitemBox(this, segment);
+
+            editor = listitem.getEditor();
+            result = listitem;
+        } else if (segment instanceof ReferenceSegment) {
+            listitem = new ReferenceListitemBox(this, segment);
+
+            editor = listitem.getEditor();
+            result = listitem;
         } else {
 
             throw new IllegalStateException("Unknown Segment type");
@@ -469,6 +488,9 @@ class ComponentEditorWidget extends ScrolledWindow
         for (i = 0; i < replacement.size(); i++) {
             segment = replacement.getSegment(i);
             editor = editors.get(i);
+            if (editor == null) {
+                continue;
+            }
             editor.advanceTo(segment);
         }
     }

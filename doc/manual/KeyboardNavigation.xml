@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://namespace.operationaldynamics.com/parchment/0.4">
-<title>
+<quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
+<chapter>
 Keyboard shortcuts
-</title>
+</chapter>
 <text>
 Actually, they're not really shortcuts. They're the way you use
 Quill!
@@ -12,12 +12,11 @@ Formatting
 </heading>
 <text>
 Different semantic markup can be applied. The various formats
-can be applied by typing <literal>Ctrl+Shift+&lt;Key&gt;</literal>.
-
+can be applied by typing <keyboard>Ctrl+Shift+&lt;Key&gt;</keyboard>.
 </text>
 <text>
 You can never get away from legacy, so bold and italics are
-<literal>Ctrl+B</literal> and <literal>Ctrl+I</literal> respectively.
+<keyboard>Ctrl+B</keyboard> and <keyboard>Ctrl+I</keyboard> respectively.
 It's not like we were going to use those combinations for something
 else, and as much as consistency is important, we're not trying
 to make people's lives difficult.
@@ -35,17 +34,7 @@ you are desperate you can always hack your <type>RenderEngine</type>
 to do something different. Remember that the point is to ensure
 consistent display of different classes of text; the person who
 wanted ship names in italics can just use
-<literal>&lt;publication&gt;</literal> to get herself italics.
+<literal>&lt;title&gt;</literal> to get herself a distinguished
+markup that conveniently defaults to italics.
 </text>
-<text>
-or...
-</text>
-<text>
-<literal>Ctrl+Shift+P</literal> Publication (book title, ship
-name: italics)
-</text>
-<text>
-<literal>Crtl+Shift+N</literal> Proper Name (term or abbreviation:
-small caps)
-</text>
-</chapter>
+</quack>

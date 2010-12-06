@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -18,14 +18,9 @@
  */
 package quill.quack;
 
-/**
- * The name of a software project.
- * 
- * @author Andrew Cowie
- */
-public class ApplicationElement extends InlineElement implements Inline
+public class ReferenceElement extends BlockElement implements Block
 {
-    public ApplicationElement() {
-        super("application");
+    public ReferenceElement() {
+        super("reference");
     }
 }

@@ -1,79 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://namespace.operationaldynamics.com/parchment/0.4">
-<title>
-Documents on disk
-</title>
+<quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
+<chapter>
+Notes on Other Formats
+</chapter>
 <text>
-The idea is...
+So that's the Parchment file format. For reference and comparison,
+here are some observations and opinions about other word processors
+and their file formats for "text documents".
 </text>
 <heading>
-About the Quack file format
+Open Document Format
 </heading>
 <text>
-you can fix the quack on disk if Quill breaks, but if you break
-the file on disk you'll break Quill.
+But on the topic of on-disk file formats, here are our comments
+on <acronym>ODF</acronym> for text documents.
 </text>
-<text>
-you can't expect Quill to figure it out 
-</text>
-<text>
-you can ... but {ironically?} you if you break the 
-</text>
-<text>
-<bold>Why did you create your own XML schema?</bold>
-</text>
-<text>
-You use a commonly available format if you wish to interoperate.
-But (at least at present) we're not worried about that; Quack
-format documents are for consumption by Quill and rendering by
-Parchment.
-</text>
-<text>
-Quack is not intended to be human <italics>writable</italics>.
-And it's not particularly meant for reading by other programs.
-But it is human <italics>mergeable</italics>.
-</text>
-<text>
-<bold>Why didn't you use...</bold>
-</text>
-<text>
-As mentioned, the driving imperative for Quack documents is that
-they be manageable with the collaboration tools we use to write
-open source software - specifically the modern 3rd generation
-distributed version control systems (DVCS) such as
-<application>Bazaar</application> (<command>bzr</command>),
-<application>Git</application> (<command>git</command>), or
-<application>Mercurial</application> (<command>hg</command>).
-</text>
-<heading>
-Commentary on other formats
-</heading>
-<text>
-With the above in mind, 
-</text>
-<text>
-<bold>Open Office </bold><literal>.odt</literal>
-</text>
+<text/>
 <text>
 This is the very definition of un-fun. Open Document Format was
 already disqualified on the grounds of it being contained in
 a single Zip compressed file and thus unsuitable for version
-control, but if you take some time.
+control.
+</text>
+<text/>
+<text/>
+<text>
+If you've written a fairly substantial article, report, or essay
+in <project>Open Office</project>, you might be interested to
+take some time to open it up and have a look at
+<acronym>ODF.</acronym>
+</text>
+<text>
+Which raised the possibility that one could, hypothetically,
+unzip the document, commit the resultant directory tree to
+<acronym>VCS</acronym>, and then re-zip the tree back into a
+<filename>.odt</filename> before editing it again. Hm. Maybe
+not.
+</text>
+<text>
+No, much as the zipping the document's files together into a
+single archive makes it easy to send that document as a single
+file to someone, it is diametrically opposed to what we need
+to be able to use a <acronym>VCS</acronym> to version our documents
+and to merge with others we are collaborating with.
 </text>
 <text/>
 <text>
 The give away was looking at what Writer writes out when you
 tell it to pretend it's an web page editor and ask it to save
-as HTML... <highlight>HERE</highlight>
+as <acronym>HTML</acronym>... <highlight>HERE</highlight>
 </text>
-<text>
-<bold>DocBook XML</bold>
-</text>
+<heading>
+DocBook XML
+</heading>
 <text>
 In all conscience DocBook is certainly a comprehensive schema.
-In fact, Quill started life as a DocBook editor, or at least
-something that would author documents in the very limited subset
-of DocBook we actually needed.
+In fact, <project>Quill</project> started life as a DocBook editor,
+or at least something that would author documents in the very
+limited subset of DocBook we actually needed.
 </text>
 <text>
 The DocBook specification, however, is exceedingly large. It
@@ -124,7 +108,7 @@ with how we do it in Quack:
 </text>
 <code xml:space="preserve">
 &lt;image src="figures/duck-small.png"&gt;
-A wood duck, from the cover of &lt;italics&gt;DocBook: The Definitive Guide&lt;/italics&gt;.
+A wood duck, from the cover of &lt;title&gt;DocBook: The Definitive Guide&lt;/title&gt;.
 &lt;/image&gt;
 </code>
 <text>
@@ -154,20 +138,22 @@ is not only ugly, but not even accomplishing the task of providing
 context.
 </text>
 <text>
-Quack takes the aesthetic approach used by HTML of discarding
-leading and trailing whitespace from block level elements, with
-the result that the document is <italics>much</italics> cleaner
-to read, and (if compelled to do so manually) adjust. By design
-the schema is so simple that there is no nesting used because
-none is necessary for comprehension.
+Quack takes the aesthetic approach used by <acronym>HTML</acronym>
+of discarding leading and trailing whitespace from block level
+elements, with the result that the document is <italics>much</italics>
+cleaner to read, and (if compelled to do so manually) adjust.
+By design the schema is so simple that there is no nesting used
+because none is necessary for comprehension.
 </text>
 <text>
 We are, however, quite concerned to ensure that people using
-Quill and Parchment never have their documents locked in and
-be unable to extract them in the future. To that end, it shouldn't
-be too hard to write a function to do a one-way export from Quack
-XML to DocBook XML - perhaps using XSLT, perhaps using a custom
-Serializer, and perhaps using Parchment.
+<project>Quill and Parchment</project> never have their documents
+locked in and be unable to extract them in the future. To that
+end, it shouldn't be too hard to write a function to do a one-way
+export from Quack <acronym>XML</acronym> to DocBook
+<acronym>XML</acronym> - perhaps using <acronym>XSLT</acronym>,
+perhaps using a custom <type>Serializer</type>, and perhaps using
+a Parchment <type>RenderEngine</type> implementation.
 </text>
 <text>
 If you ever <italics>are</italics> working with DocBook, ensure
@@ -176,4 +162,24 @@ a few things, and now their documents are composed with a root
 element identified with a <literal>xmlns</literal> namespace
 attribute, rather than <literal>DOCTYPE</literal> declarations.
 </text>
-</chapter>
+<heading>
+Microformats in XHTML
+</heading>
+<text>
+We also investigated ways to make .
+</text>
+<text>
+This had a lot of appeal, notably because it would make the question
+of "how do you escape lock-in" dead easy. But in the end we swerved
+away from the idea. Ultimately we knew that if people found out
+that their documents were <acronym>HTML</acronym>, they would
+expect to be able to make arbitrary changes to those files on
+disk, changes which would be valid <acronym>HTML</acronym> perhaps,
+but not fit into the restrictive schema that our poor little
+program would ever be capable of handling. People would also
+instantly expect Quill to be able to use those files as web pages,
+which is a problem: there's a big difference between the content
+and metadata of a text document on disk, and that document as
+marked up for presentation online.
+</text>
+</quack>

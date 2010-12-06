@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
+import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
@@ -38,6 +39,7 @@ import quill.textbase.PoeticSegment;
 import quill.textbase.Preformat;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
+import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
 import quill.textbase.Span;
 import quill.textbase.SpanVisitor;
@@ -55,7 +57,7 @@ import quill.textbase.Special;
  */
 public class QuackConverter
 {
-    private Component component;
+    private Root component;
 
     private final StringBuilder buf;
 
@@ -76,7 +78,7 @@ public class QuackConverter
 
     public QuackConverter() {
         buf = new StringBuilder();
-        component = new ChapterElement();
+        component = new RootElement();
     }
 
     /**
@@ -89,7 +91,7 @@ public class QuackConverter
         this.segment = segment;
 
         if (segment instanceof ComponentSegment) {
-            block = new TitleElement();
+            block = new ChapterElement();
         } else if (segment instanceof HeadingSegment) {
             block = new HeadingElement();
         } else if (segment instanceof PreformatSegment) {
@@ -106,6 +108,14 @@ public class QuackConverter
             block = new ImageElement();
             value = segment.getImage();
             block.add(new SourceAttribute(value));
+        } else if (segment instanceof EndnoteSegment) {
+            block = new EndnoteElement();
+            value = segment.getImage();
+            block.add(new NameAttribute(value));
+        } else if (segment instanceof ReferenceSegment) {
+            block = new ReferenceElement();
+            value = segment.getImage();
+            block.add(new NameAttribute(value));
         } else {
             throw new IllegalStateException("Unhandled segment type " + segment);
         }
@@ -195,12 +205,18 @@ public class QuackConverter
             inline = new BoldElement();
         } else if (format == Common.LITERAL) {
             inline = new LiteralElement();
-        } else if (format == Common.APPLICATION) {
-            inline = new ApplicationElement();
+        } else if (format == Common.PROJECT) {
+            inline = new ProjectElement();
         } else if (format == Common.COMMAND) {
             inline = new CommandElement();
         } else if (format == Common.HIGHLIGHT) {
             inline = new HighlightElement();
+        } else if (format == Common.TITLE) {
+            inline = new TitleElement();
+        } else if (format == Common.KEYBOARD) {
+            inline = new KeyboardElement();
+        } else if (format == Common.ACRONYM) {
+            inline = new AcronymElement();
         } else if (format == Preformat.USERINPUT) {
             // boom?
         } else if (format == Special.NOTE) {
@@ -278,9 +294,9 @@ public class QuackConverter
      * to the converter, and write it to the given stream.
      */
     public void writeChapter(OutputStream out) throws IOException {
-        final ChapterElement chapter;
+        final RootElement chapter;
 
-        chapter = (ChapterElement) component;
+        chapter = (RootElement) component;
         chapter.toXML(out);
     }
 
@@ -290,6 +306,7 @@ public class QuackConverter
      * <code>&lt;article&gt;</code>s.
      * 
      * @deprecated
+     * @param out
      */
     public void writeArticle(OutputStream out) throws IOException {
         throw new UnsupportedOperationException("Not yet implemented");

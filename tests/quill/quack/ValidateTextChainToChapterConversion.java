@@ -104,14 +104,14 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
 
         blob = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
+            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
             "<text>",
             "Hello",
             "</text>",
             "<text>",
             "World",
             "</text>",
-            "</chapter>"
+            "</quack>"
         });
         assertEquals(blob, out.toString());
     }
@@ -172,13 +172,13 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
 
         blob = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
+            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
             "<text>",
             "Accessing the " + "<filename>/tmp</filename>" + " directory directly is",
             "fine, but you are often better off using " + "<type>" + "File" + "</type>'s",
             "<function>" + "createTempFile()" + "</function> function.",
             "</text>",
-            "</chapter>"
+            "</quack>"
         });
 
         /*
@@ -245,11 +245,11 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
 
         blob = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "<chapter xmlns=\"http://namespace.operationaldynamics.com/parchment/0.4\">",
+            "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/0.5\">",
             "<text>",
             ":𝑛:",
             "</text>",
-            "</chapter>"
+            "</quack>"
         });
         assertEquals(blob, out.toString());
     }

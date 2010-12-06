@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -27,14 +27,14 @@ import nu.xom.Element;
 import nu.xom.Serializer;
 
 /**
- * Internal root class for all DocBook tags.
+ * Internal base class for all Quack format tags.
  * 
  * @author Andrew Cowie
  */
 abstract class QuackElement extends Element
 {
     QuackElement(String name) {
-        super(name, "http://namespace.operationaldynamics.com/parchment/0.4");
+        super(name, "http://namespace.operationaldynamics.com/parchment/0.5");
     }
 
     void add(Tag tag) {

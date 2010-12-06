@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://namespace.operationaldynamics.com/parchment/0.4">
-<title>
+<quack xmlns="http://namespace.operationaldynamics.com/parchment/0.5">
+<chapter>
 As you are leaving
-</title>
+</chapter>
 <poem xml:space="preserve">
 If you are able
 save for them a place
@@ -37,4 +37,4 @@ Major Michael Davis O'Donnell,
 <credit>
 Dak To, Vietnam
 </credit>
-</chapter>
+</quack>

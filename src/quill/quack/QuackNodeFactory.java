@@ -46,47 +46,66 @@ public class QuackNodeFactory extends NodeFactory
      * and whether to convert line endings. So we set those two things, and
      * then return.
      */
-    public Element startMakingElement(String name, String namespace) {
-        if (name.equals("text")) {
+    /*
+     * We intern the element name for two reasons. A tinsy speed improvement
+     * over equals(), of course, but also because we do end up making a fair
+     * number of of these, and better to use the same object.
+     */
+    public Element startMakingElement(String local, String namespace) {
+        final String name;
+
+        name = local.intern();
+
+        if (name == "text") {
             return new TextElement();
-        } else if (name.equals("code")) {
+        } else if (name == "code") {
             return new CodeElement();
-        } else if (name.equals("quote")) {
+        } else if (name == "quote") {
             return new QuoteElement();
-        } else if (name.equals("poem")) {
+        } else if (name == "poem") {
             return new PoemElement();
-        } else if (name.equals("credit")) {
+        } else if (name == "credit") {
             return new CreditElement();
-        } else if (name.equals("title")) {
-            return new TitleElement();
-        } else if (name.equals("heading")) {
+        } else if (name == "chapter") {
+            return new ChapterElement();
+        } else if (name == "heading") {
             return new HeadingElement();
-        } else if (name.equals("image")) {
+        } else if (name == "image") {
             return new ImageElement();
-        } else if (name.equals("function")) {
+        } else if (name == "function") {
             return new FunctionElement();
-        } else if (name.equals("filename")) {
+        } else if (name == "filename") {
             return new FilenameElement();
-        } else if (name.equals("type")) {
+        } else if (name == "type") {
             return new TypeElement();
-        } else if (name.equals("literal")) {
+        } else if (name == "literal") {
             return new LiteralElement();
-        } else if (name.equals("command")) {
+        } else if (name == "command") {
             return new CommandElement();
-        } else if (name.equals("highlight")) {
+        } else if (name == "highlight") {
             return new HighlightElement();
-        } else if (name.equals("application")) {
-            return new ApplicationElement();
-        } else if (name.equals("userinput")) {
+        } else if (name == "title") {
+            return new TitleElement();
+        } else if (name == "keyboard") {
+            return new KeyboardElement();
+        } else if (name == "acronym") {
+            return new AcronymElement();
+        } else if (name == "project") {
+            return new ProjectElement();
+        } else if (name == "userinput") {
             throw new UnsupportedOperationException("Implement a UserInputElement class");
-        } else if (name.equals("italics")) {
+        } else if (name == "italics") {
             return new ItalicsElement();
-        } else if (name.equals("bold")) {
+        } else if (name == "bold") {
             return new BoldElement();
-        } else if (name.equals("note")) {
+        } else if (name == "note") {
             return new NoteElement();
-        } else if (name.equals("cite")) {
+        } else if (name == "cite") {
             return new CiteElement();
+        } else if (name.equals("endnote")) {
+            return new EndnoteElement();
+        } else if (name.equals("reference")) {
+            return new ReferenceElement();
         } else {
             /*
              * This is actually fairly serious; once our code is working
@@ -104,6 +123,8 @@ public class QuackNodeFactory extends NodeFactory
          */
         if (name.equals("src")) {
             return new Nodes(new SourceAttribute(value));
+        } else if (name.equals("name")) {
+            return new Nodes(new NameAttribute(value));
         } else {
             return super.makeAttribute(name, URI, value, type);
         }
@@ -115,10 +136,8 @@ public class QuackNodeFactory extends NodeFactory
      */
 
     public Element makeRootElement(String name, String namespace) {
-        if (name.equals("chapter")) {
-            return new ChapterElement();
-        } else if (name.equals("article")) {
-            throw new UnsupportedOperationException("Implement ArticleElement?");
+        if (name.equals("quack")) {
+            return new RootElement();
         } else {
             throw new IllegalStateException("Invalid document");
         }

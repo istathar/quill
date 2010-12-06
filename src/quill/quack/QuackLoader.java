@@ -24,6 +24,7 @@ import nu.xom.Document;
 import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
+import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
@@ -32,6 +33,7 @@ import quill.textbase.NormalSegment;
 import quill.textbase.PoeticSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
+import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
@@ -110,18 +112,18 @@ public class QuackLoader
      * processor state here.
      */
     public Series process(Document doc) {
-        final Component chapter;
+        final Root quack;
         int j;
         Block[] blocks;
 
-        chapter = (Component) doc.getRootElement();
-        processComponent(chapter);
+        quack = (Root) doc.getRootElement();
+        processComponent(quack);
 
         /*
          * Now iterate over the Blocks.
          */
 
-        blocks = chapter.getBlocks();
+        blocks = quack.getBlocks();
 
         for (j = 0; j < blocks.length; j++) {
             processBlock(blocks[j]);
@@ -137,12 +139,12 @@ public class QuackLoader
         return new Series(list);
     }
 
-    private void processComponent(Component component) {
-        if (component instanceof ChapterElement) {
+    private void processComponent(Root quack) {
+        if (quack instanceof RootElement) {
             start = true;
             preserve = false;
         } else {
-            throw new UnsupportedOperationException("Implement support for <article>?");
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -241,14 +243,19 @@ public class QuackLoader
             preserve = false;
         } else if (block instanceof ImageElement) {
             preserve = false;
-
             processData(block);
-        } else if (block instanceof TitleElement) {
+        } else if (block instanceof ChapterElement) {
             preserve = false;
             if (segment != null) {
                 throw new IllegalStateException("\n"
-                        + "The <title> must be the first block in a Quack <chapter>");
+                        + "A <chapter> must be the first block in a Quack file.");
             }
+        } else if (block instanceof EndnoteElement) {
+            preserve = false;
+            processData(block);
+        } else if (block instanceof ReferenceElement) {
+            preserve = false;
+            processData(block);
         } else {
             throw new IllegalStateException("\n" + "What kind of Block is " + block);
         }
@@ -281,8 +288,12 @@ public class QuackLoader
             segment = new HeadingSegment(entire);
         } else if (block instanceof ImageElement) {
             segment = new ImageSegment(entire, attribute);
-        } else if (block instanceof TitleElement) {
+        } else if (block instanceof ChapterElement) {
             segment = new ComponentSegment(entire);
+        } else if (block instanceof EndnoteElement) {
+            segment = new EndnoteSegment(entire, attribute);
+        } else if (block instanceof ReferenceElement) {
+            segment = new ReferenceSegment(entire, attribute);
         } else {
             throw new IllegalStateException("\n" + "What kind of Block is " + block);
         }
@@ -316,6 +327,9 @@ public class QuackLoader
         if (meta instanceof SourceAttribute) {
             str = meta.getValue();
             attribute = str;
+        } else if (meta instanceof NameAttribute) {
+            str = meta.getValue();
+            attribute = str;
         } else {
             throw new IllegalStateException("Unknown Meta type");
         }
@@ -342,8 +356,14 @@ public class QuackLoader
                 markup = Common.COMMAND;
             } else if (span instanceof HighlightElement) {
                 markup = Common.HIGHLIGHT;
-            } else if (span instanceof ApplicationElement) {
-                markup = Common.APPLICATION;
+            } else if (span instanceof TitleElement) {
+                markup = Common.TITLE;
+            } else if (span instanceof KeyboardElement) {
+                markup = Common.KEYBOARD;
+            } else if (span instanceof AcronymElement) {
+                markup = Common.ACRONYM;
+            } else if (span instanceof ProjectElement) {
+                markup = Common.PROJECT;
             } else if (span instanceof ItalicsElement) {
                 markup = Common.ITALICS;
             } else if (span instanceof BoldElement) {
@@ -378,7 +398,8 @@ public class QuackLoader
         len = text.length();
 
         /*
-         * These two cases are common for structure tags
+         * This case, and the first in the next block, are common for
+         * structure tags
          */
 
         if (len == 0) {
@@ -386,10 +407,14 @@ public class QuackLoader
             return; // empty
         }
 
-        if (len == 1) {
-            if (text.charAt(0) == '\n') {
-                space = false;
-                return; // empty
+        /*
+         * Check for valid file format: no bare newlines. This is probably
+         * expensive, but we have tests that expect this.
+         */
+
+        if ((!preserve) && (len > 1)) {
+            if (text.contains("\n\n")) {
+                throw new IllegalStateException("Can't have bare newlines in normal Blocks");
             }
         }
 
@@ -402,11 +427,29 @@ public class QuackLoader
         if (start) {
             start = false;
             space = false;
-            text = text.substring(1);
-            len--;
+
+            ch = text.charAt(0);
+            if (ch == '\n') {
+                if (len == 1) {
+                    return; // ignore it
+                }
+                text = text.substring(1);
+                len--;
+            }
         } else if (space) {
             chain.append(pending);
             pending = null;
+        }
+
+        /*
+         * If not preformatted text, turn any interior newlines into spaces,
+         * then add.
+         */
+
+        if (preserve) {
+            str = text;
+        } else {
+            str = text.replace('\n', ' ');
         }
 
         /*
@@ -418,31 +461,20 @@ public class QuackLoader
 
         ch = text.charAt(len - 1);
         if (ch == '\n') {
-            trim = text.substring(0, len - 1);
-            len--;
+            trim = str.substring(0, len - 1);
             space = true;
             pending = Span.createSpan(' ', markup);
+
+            if (len == 1) {
+                return; // captured in pending
+            }
+            len--;
         } else {
-            trim = text;
+            trim = str;
             space = false;
         }
 
-        /*
-         * If not preformatted text, turn any interior newlines into spaces,
-         * then add.
-         */
-
-        if (preserve) {
-            str = trim;
-        } else {
-            str = trim.replace('\n', ' ');
-        }
-
-        if (str.equals("")) {
-            throw new IllegalStateException("Can't have bare newlines in an otherwise empty element");
-        }
-
-        chain.append(createSpan(str, markup));
+        chain.append(createSpan(trim, markup));
     }
 
     private void processMarker(String str) {

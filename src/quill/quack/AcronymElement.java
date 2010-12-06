@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2009 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -19,11 +19,15 @@
 package quill.quack;
 
 /**
- * Components are the chapter-like elements. They contain a series of Blocks.
+ * Proper names (terms, acronyms) as markup
+ * 
+ * @author Andrew Cowie
+ * @see <a href="http://www.lyberty.com/encyc/articles/abbr.html">abbreviation
+ *      vs. acronym vs. initialism</a>
  */
-public interface Component extends Tag
+public class AcronymElement extends InlineElement implements Inline
 {
-    public void add(Block block);
-
-    public Block[] getBlocks();
+    public AcronymElement() {
+        super("acronym");
+    }
 }

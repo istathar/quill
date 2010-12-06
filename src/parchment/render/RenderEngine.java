@@ -54,6 +54,7 @@ import quill.client.ApplicationException;
 import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
 import quill.textbase.ComponentSegment;
+import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.HeadingSegment;
@@ -65,6 +66,7 @@ import quill.textbase.PoeticSegment;
 import quill.textbase.Preformat;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
+import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
@@ -72,6 +74,7 @@ import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
 import quill.textbase.TextChain;
 
+import static org.freedesktop.bindings.Internationalization._;
 import static org.freedesktop.cairo.HintMetrics.OFF;
 import static org.freedesktop.cairo.HintStyle.NONE;
 import static quill.textbase.Span.createSpan;
@@ -117,6 +120,13 @@ public abstract class RenderEngine
     Typeface monoFace;
 
     Typeface headingFace;
+
+    /**
+     * Woarkaround the bug that Variant.SMALL_CAPS doesn't actually work; and
+     * meanwhile, "Linux Libertine O" has small caps font in the Private Use
+     * area. See {@link LibertineTypography#toSmallCase(int)}.
+     */
+    private Typeface smallFace;
 
     /**
      * This chapter's content, as prepared into Areas.
@@ -307,33 +317,62 @@ public abstract class RenderEngine
     }
 
     protected void specifyFonts(final Context cr) {
-        serifFace = new Typeface(cr, settings.getFontSerif(), 0.2);
+        FontDescription desc;
+        final double size;
 
-        sansFace = new Typeface(cr, settings.getFontSans(), 0.0);
+        desc = settings.getFontSerif();
+        size = desc.getSize();
+        serifFace = new Typeface(cr, desc, 0.2);
 
-        monoFace = new Typeface(cr, settings.getFontMono(), 0.0);
+        desc = settings.getFontSans();
+        sansFace = new Typeface(cr, desc, 0.0);
 
-        headingFace = new Typeface(cr, settings.getFontHeading(), 0.0);
+        desc = settings.getFontMono();
+        monoFace = new Typeface(cr, desc, 0.0);
+
+        desc = settings.getFontHeading();
+        headingFace = new Typeface(cr, desc, 0.0);
+
+        desc = new FontDescription("Linux Libertine O");
+        desc.setSize(size);
+        smallFace = new Typeface(cr, desc, 0.0);
 
         cr.setSource(0.0, 0.0, 0.0);
     }
 
     void processSegmentsIntoAreas(final Context cr) {
         int i, j, k;
+        int I, J;
         Series series;
         Segment segment;
         Extract entire;
         TextChain chain;
         Extract[] paras;
         String filename;
+        ArrayList<Segment>[] endnotes;
+        final ArrayList<Segment> references;
+        StringBuilder buf;
+        String which, label;
+        boolean heading;
 
+        I = folio.size();
         areas = new ArrayList<Area>(64);
 
-        for (i = 0; i < folio.size(); i++) {
+        references = new ArrayList<Segment>(4);
+        endnotes = new ArrayList[I];
+
+        for (i = 0; i < I; i++) {
             series = folio.getSeries(i);
             folioIndex = i;
 
-            for (j = 0; j < series.size(); j++) {
+            if (i > 0) {
+                appendPageBreak(cr);
+            }
+
+            endnotes[i] = new ArrayList<Segment>(4);
+
+            J = series.size();
+            for (j = 0; j < J; j++) {
                 seriesIndex = j;
                 currentOffset = 0;
 
@@ -377,10 +416,80 @@ public abstract class RenderEngine
                     }
                     appendSegmentBreak(cr);
                     appendCaptionParagraph(cr, entire);
+                } else if (segment instanceof EndnoteSegment) {
+                    endnotes[i].add(segment);
+                } else if (segment instanceof ReferenceSegment) {
+                    references.add(segment);
                 }
             }
 
-            appendPageBreak(cr);
+            appendSegmentBreak(cr);
+        }
+
+        /*
+         * Now build the notes and references. This is somewhat hardcoded, but
+         * choose "intelligent defaults" as Robert Collins says.
+         */
+        heading = false;
+
+        for (i = 0; i < I; i++) {
+            J = endnotes[i].size();
+
+            if (J == 0) {
+                continue;
+            }
+
+            if (!heading) {
+                appendHeading(cr, _("Notes"));
+                heading = true;
+            }
+
+            /*
+             * If there's a chapter title, then put up a bit of bold text with
+             * that title. If there isn't a title we keep on rendering notes;
+             * the assumption would thus seem to be that they've done
+             * continuous numbering (or, maybe, the RenderEngine is doing
+             * notes at chapter end not document end). Only bother if there's
+             * > 1 chapter, though.
+             */
+
+            series = folio.getSeries(i);
+
+            if ((I > 1) && (series.size() > 0)) {
+                segment = series.getSegment(0);
+                if (segment instanceof ComponentSegment) {
+                    entire = segment.getEntire();
+                    which = entire.getText();
+                    appendSegmentBreak(cr);
+                    appendNormalParagraph(cr, which, Common.BOLD);
+                }
+            }
+
+            for (j = 0; j < J; j++) {
+                appendSegmentBreak(cr);
+
+                segment = endnotes[i].get(j);
+                label = segment.getImage();
+                entire = segment.getEntire();
+                appendListParagraph(cr, label, entire);
+            }
+        }
+        if (heading) {
+            appendSegmentBreak(cr);
+        }
+
+        J = references.size();
+        if (J > 0) {
+            appendHeading(cr, _("Publications"));
+
+            for (j = 0; j < J; j++) {
+                appendSegmentBreak(cr);
+
+                segment = references.get(j);
+                label = segment.getImage();
+                entire = segment.getEntire();
+                appendListParagraph(cr, label, entire);
+            }
         }
     }
 
@@ -429,6 +538,16 @@ public abstract class RenderEngine
         accumulate(area);
     }
 
+    private void appendHeading(Context cr, String text) {
+        final Span span;
+        final Extract entire;
+
+        span = Span.createSpan(text, null);
+        entire = Extract.create(span);
+
+        appendHeading(cr, entire);
+    }
+
     protected void appendHeading(Context cr, Extract entire) {
         final Area[] list;
 
@@ -461,6 +580,16 @@ public abstract class RenderEngine
 
     private void accumulate(Area area) {
         areas.add(area);
+    }
+
+    protected void appendNormalParagraph(final Context cr, final String text, final Markup markup) {
+        final Span span;
+        final Extract extract;
+
+        span = Span.createSpan(text, markup);
+        extract = Extract.create(span);
+
+        appendNormalParagraph(cr, extract);
     }
 
     protected void appendNormalParagraph(Context cr, Extract extract) {
@@ -550,6 +679,54 @@ public abstract class RenderEngine
         accumulate(list);
     }
 
+    protected void appendListParagraph(final Context cr, final String label, final Extract entire) {
+        final Area area;
+        final Area[] list;
+        final double savedLeft;
+
+        /*
+         * Label
+         */
+
+        area = layoutAreaBullet(cr, label, serifFace);
+        accumulate(area);
+
+        /*
+         * Body. 25 points is enough for most labels, up to [999], and
+         * meanwhile is a bit less than the block quote indentation. This
+         * should probably be settable by subclasses.
+         */
+
+        savedLeft = leftMargin;
+        leftMargin += 25.0;
+
+        list = layoutAreaText(cr, entire, serifFace, false, false, 0.0, 1, false);
+        accumulate(list);
+
+        leftMargin = savedLeft;
+    }
+
+    private Area layoutAreaBullet(final Context cr, final String label, final Typeface face) {
+        final Layout layout;
+        final LayoutLine line;
+        final Area area;
+
+        layout = new Layout(cr);
+        layout.setFontDescription(face.desc);
+        layout.setText(label);
+
+        line = layout.getLineReadonly(0);
+
+        /*
+         * Passing height 0 means that no vertical space will be consumed by
+         * this Area; the ascent is stil needed to position the Cairo point
+         * before drawing the LayoutLine.
+         */
+        area = new TextArea(null, leftMargin, 0.0, serifFace.lineAscent, line, false);
+
+        return area;
+    }
+
     // character
     private int previous;
 
@@ -558,10 +735,31 @@ public abstract class RenderEngine
      * characters actually added, since some cases insert Unicode control
      * sequences.
      */
-    private int translateAndAppend(final StringBuilder buf, final int ch, final boolean code) {
-        int num, i;
+    private int translateAndAppend(final StringBuilder buf, final int ch, final Markup format,
+            final boolean preformatted) {
+        int num, i, tr;
+        boolean code, small;
 
+        code = false;
+        small = false;
         num = 0;
+
+        /*
+         * If it's preformatted, then automatically assume code conditions.
+         * Otherwise, setup switches based on Markup type.
+         */
+
+        if (preformatted) {
+            code = true;
+        } else if ((format == Common.LITERAL) || (format == Common.FILENAME)) {
+            code = true;
+        } else if (format == Common.ACRONYM) {
+            small = true;
+        }
+
+        /*
+         * Perform translations.
+         */
 
         if (code) {
             /*
@@ -581,6 +779,11 @@ public abstract class RenderEngine
              */
 
             buf.appendCodePoint(ch);
+            num++;
+        } else if (small) {
+            tr = LibertineTypography.toSmallCase(ch);
+
+            buf.appendCodePoint(tr);
             num++;
         } else if (ch == '"') {
             /*
@@ -698,22 +901,13 @@ public abstract class RenderEngine
             private int offset = 0;
 
             public boolean visit(Span span) {
-                Markup format;
+                final Markup format;
                 final int len;
                 int width, j;
-                boolean code;
                 String str;
 
                 format = span.getMarkup();
                 width = 0;
-
-                if (preformatted) {
-                    code = true;
-                } else if ((format == Common.LITERAL) || (format == Common.FILENAME)) {
-                    code = true;
-                } else {
-                    code = false;
-                }
 
                 /*
                  * FIXME Use Span characters, not String!!!! Fixing this will
@@ -725,10 +919,10 @@ public abstract class RenderEngine
                 len = str.length();
 
                 for (j = 0; j < len; j++) {
-                    width += translateAndAppend(buf, str.charAt(j), code);
+                    width += translateAndAppend(buf, str.charAt(j), format, preformatted);
                 }
 
-                for (Attribute attr : attributesForMarkup(span.getMarkup())) {
+                for (Attribute attr : attributesForMarkup(format)) {
                     attr.setIndices(offset, width);
                     list.insert(attr);
                 }
@@ -968,9 +1162,11 @@ public abstract class RenderEngine
                 return new Attribute[] {
                     new FontDescriptionAttribute(monoFace.desc),
                 };
-            } else if (m == Common.APPLICATION) {
+            } else if (m == Common.PROJECT) {
                 return new Attribute[] {
+                    new FontDescriptionAttribute(sansFace.desc),
                     new WeightAttribute(Weight.BOLD),
+                    new ForegroundColorAttribute(0.3, 0.3, 0.3),
                 };
             } else if (m == Common.COMMAND) {
                 return new Attribute[] {
@@ -981,6 +1177,25 @@ public abstract class RenderEngine
             } else if (m == Common.HIGHLIGHT) {
                 return new Attribute[] {
                     new BackgroundColorAttribute(1.0, 1.0, 0.0),
+                };
+            } else if (m == Common.TITLE) {
+                return new Attribute[] {
+                    new StyleAttribute(Style.ITALIC),
+                };
+            } else if (m == Common.KEYBOARD) {
+                return new Attribute[] {
+                    new WeightAttribute(Weight.BOLD),
+                };
+            } else if (m == Common.ACRONYM) {
+                /*
+                 * Originally we called createSmallCaps() to map, but now we
+                 * are mapping acronym upper case characters and numerals
+                 * directly to the Linux Libertine font's Private Use area
+                 * block. Absolutely need to make sure that we have that font
+                 * at play.
+                 */
+                return new Attribute[] {
+                    new FontDescriptionAttribute(smallFace.desc),
                 };
             }
 

@@ -21,7 +21,7 @@
 -->
 
 <!ELEMENT manuscript (content, presentation, metadata)>
-<!ATTLIST manuscript xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/0.4">
+<!ATTLIST manuscript xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/0.5">
 
 <!-- document source -->
 
