@@ -135,7 +135,7 @@ blocks.
 </text>
 <text>
 The <literal>&lt;chapter&gt;</literal> blocks are rendered in
-the heading font at twice their size.
+the heading font at twice their size, and start on a new page.
 </text>
 <text>
 <bold>Part title blocks</bold>, <literal>&lt;division&gt;</literal>
@@ -263,6 +263,56 @@ preserve whitespace - but presentation is ultimately up to the
 <type>RenderEngine</type> being used.
 </text>
 <text>
+<bold>Attribution blocks</bold>, <literal>&lt;credit&gt;</literal>
+</text>
+<text>
+These are specialist blocks that are for giving attribution to
+a passage, be it a block quote or poetic in nature. Though you'd
+often expect only one wrapped blurb of text, a new paragraph
+triggered by <literal>'\n'</literal> in the editor would result
+in a subsequent <literal>&lt;credit&gt;</literal> block, as is
+the case with <literal>&lt;text&gt;</literal> and
+<literal>&lt;quote&gt;</literal> blocks. Attribution blocks are
+rendered offset to the far right of the page in a somewhat smaller
+font.
+</text>
+<text>
+<bold>Image blocks</bold>, <literal>&lt;image&gt;</literal>
+</text>
+<text>
+Places an image in the document. The source file of the image
+is specified in the <literal>src</literal> attribute:
+</text>
+<code xml:space="preserve">
+&lt;image src="OldMap.jpg"/&gt;
+</code>
+<text>
+Images can have single paragraph "captions", which are the bodies
+of the <literal>&lt;image&gt;</literal> block:
+</text>
+<code xml:space="preserve">
+&lt;image src="OldMap.jpg"&gt;
+A map of the ancient world.
+&lt;/image&gt;
+</code>
+<text>
+Note that there are no inline images in the Quack schema. In
+virtually everything we've studied in the document classes we
+care about, the illustrations, figures, and photos stand on their
+own. Incidentally, this design decision meant we could completely
+ignore problems about specifying the word flow around embedded
+images. An image is just another block in the flow of a chapter.
+</text>
+<text>
+Images are scaled down so that they exactly fit between left
+and right margins, or rendered at their natural resolution if
+smaller than the available width. So you can either a) throw
+a high-resolution photo at <project>Parchment</project> and it
+will make the most use of it, or b) specify the size in the source
+file, thereby maintaining control of scaling in the external
+tool you used to create your graphics in the first place.
+</text>
+<text>
 <bold>List blocks</bold>, <literal>&lt;list&gt;</literal>
 </text>
 <text>
@@ -275,8 +325,8 @@ we have added the <literal>&lt;list&gt;</literal> block type.
 <text>
 Each <literal>'\n'</literal> separated paragraph is its own
 <literal>&lt;list&gt;</literal> block as with
-<literal>&lt;text&gt;</literal> and <literal>&lt;quote&gt;</literal>
-blocks. Thus a single list item may be spread across multiple
+<literal>&lt;text&gt;</literal>, <literal>&lt;quote&gt;</literal>,
+etc blocks. Thus a single list item may be spread across multiple
 <literal>&lt;list&gt;</literal> blocks. The start of a "new"
 list item is indicated by the presence of a <literal>label</literal>
 attribute with the text of the bullet or ordinal to be rendered:
