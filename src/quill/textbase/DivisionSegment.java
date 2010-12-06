@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -16,16 +16,19 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.ui;
+package quill.textbase;
 
-import quill.textbase.Segment;
-
-class SectionHeadingBox extends HeadingBox
+public final class DivisionSegment extends ComponentSegment
 {
-    SectionHeadingBox(final ComponentEditorWidget parent, final Segment segment) {
-        super();
+    public DivisionSegment(Extract entire) {
+        super(entire);
+    }
 
-        super.setupLine();
-        super.setupBox(parent, segment, "Section");
+    public DivisionSegment(Extract entire, int offset, int removed, int inserted) {
+        super(entire, offset, removed, inserted);
+    }
+
+    public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
+        return new DivisionSegment(entire, offset, removed, inserted);
     }
 }

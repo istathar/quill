@@ -20,10 +20,15 @@
 
 -->
 
-<!ELEMENT quack (chapter?,(heading | text | code | quote | image | poem | credit)*,endnote*,reference*)>
+<!ELEMENT quack ((division | chapter)?,
+		 (heading | text | code | quote | list | list | image | poem | credit)*,
+		 (endnote*),
+		 (reference*))>
 <!ATTLIST quack xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/0.5">
 
 <!-- block level  -->
+
+<!ELEMENT division (#PCDATA)>
 
 <!ELEMENT chapter (#PCDATA)>
 
@@ -43,6 +48,13 @@
 		| filename | project | command | highlight | title
 		| note | cite
 		| keyboard | acronym)*>
+
+<!ELEMENT list (#PCDATA
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| note | cite
+		| keyboard | acronym)*>
+<!ATTLIST list label CDATA #IMPLIED>
 
 <!ELEMENT image (#PCDATA
 		| italics | bold | name | type | function | literal

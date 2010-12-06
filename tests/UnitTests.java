@@ -30,6 +30,7 @@ import parchment.render.ValidateStylesheetToRenderSettingsConversion;
 import parchment.render.ValidateTypographySubstitutions;
 import quill.quack.ValidateCitationConversion;
 import quill.quack.ValidateEndnoteConversion;
+import quill.quack.ValidateListitemConversion;
 import quill.quack.ValidatePreformattedConversion;
 import quill.quack.ValidateTextChainToChapterConversion;
 import quill.textbase.ValidateExtracts;
@@ -84,6 +85,7 @@ public class UnitTests
         suite.addTestSuite(ValidateDataIntegrity.class);
         suite.addTestSuite(ValidateBlockquoteConversion.class);
         suite.addTestSuite(ValidateEndnoteConversion.class);
+        suite.addTestSuite(ValidateListitemConversion.class);
         suite.addTestSuite(ValidateCitationConversion.class);
         suite.addTestSuite(ValidateProperNewlineHandling.class);
         suite.addTestSuite(ValidateWrapperExpansions.class);

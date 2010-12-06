@@ -16,16 +16,19 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.ui;
+package quill.textbase;
 
-import quill.textbase.Segment;
-
-class SectionHeadingBox extends HeadingBox
+public final class ChapterSegment extends ComponentSegment
 {
-    SectionHeadingBox(final ComponentEditorWidget parent, final Segment segment) {
-        super();
+    public ChapterSegment(Extract entire) {
+        super(entire);
+    }
 
-        super.setupLine();
-        super.setupBox(parent, segment, "Section");
+    public ChapterSegment(Extract entire, int offset, int removed, int inserted) {
+        super(entire, offset, removed, inserted);
+    }
+
+    public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
+        return new ChapterSegment(entire, offset, removed, inserted);
     }
 }

@@ -32,7 +32,7 @@ import parchment.format.Manuscript;
 import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
 import quill.textbase.Common;
-import quill.textbase.ComponentSegment;
+import quill.textbase.ChapterSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.NormalSegment;
@@ -96,7 +96,7 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
 
         entire = Extract.create();
         converter = new QuackConverter();
-        converter.append(new ComponentSegment(entire));
+        converter.append(new ChapterSegment(entire));
         converter.append(segment);
 
         out = new ByteArrayOutputStream();
@@ -158,7 +158,7 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         converter = new QuackConverter();
         entire = Extract.create();
 
-        segment = new ComponentSegment(entire);
+        segment = new ChapterSegment(entire);
         converter.append(segment);
         segment = new HeadingSegment(entire);
         converter.append(segment);
@@ -233,7 +233,7 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         converter = new QuackConverter();
         entire = Extract.create();
 
-        segment = new ComponentSegment(entire);
+        segment = new ChapterSegment(entire);
         converter.append(segment);
 
         entire = chain.extractAll();

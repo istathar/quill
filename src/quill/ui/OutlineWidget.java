@@ -42,8 +42,10 @@ import parchment.format.Chapter;
 import parchment.format.Manuscript;
 import parchment.format.Metadata;
 import quill.client.ApplicationException;
+import quill.textbase.ChapterSegment;
 import quill.textbase.CharacterVisitor;
 import quill.textbase.ComponentSegment;
+import quill.textbase.DivisionSegment;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.HeadingSegment;
@@ -533,8 +535,12 @@ class PresentSegmentButton extends Button implements Button.Clicked
         if (segment instanceof HeadingSegment) {
             buf.append("      ");
             buf.append(escaped);
-        } else if (segment instanceof ComponentSegment) {
+        } else if (segment instanceof ChapterSegment) {
             buf.append("<span size='x-large'>  ");
+            buf.append(escaped);
+            buf.append("</span>");
+        } else if (segment instanceof DivisionSegment) {
+            buf.append("<span size='xx-large'>  ");
             buf.append(escaped);
             buf.append("</span>");
         } else {
@@ -543,7 +549,6 @@ class PresentSegmentButton extends Button implements Button.Clicked
 
         label.setLabel(buf.toString());
     }
-
 }
 
 class HeadingLabel extends Label

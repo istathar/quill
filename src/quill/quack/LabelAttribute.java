@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -16,25 +16,18 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.ui;
-
-import quill.textbase.Segment;
+package quill.quack;
 
 /**
- * We define notes as being only a single paragraph, so we subclass in order
- * to disallow <b><code>Enter</code></b>.
+ * Attributes which contain the label for a list item [ie its bullet character
+ * or ordinal number], or the ordinal number of a chapter.
  * 
  * @author Andrew Cowie
  */
-class ListitemEditorTextView extends EditorTextView
+// cloned from NameAttribute
+public class LabelAttribute extends QuackAttribute implements Meta
 {
-    ListitemEditorTextView(ComponentEditorWidget parent, Segment segment) {
-        super(parent, segment);
-
-        view.modifyFont(fonts.serif);
-    }
-
-    protected boolean isEnterAllowed() {
-        return false;
+    LabelAttribute(String value) {
+        super("label", value);
     }
 }

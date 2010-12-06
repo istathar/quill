@@ -3,7 +3,8 @@
   <content>
     <chapter src="SomeOfEverything.xml"/>
     <chapter src="NotToBeOutdone.xml"/>
-    <chapter src="TheLastChapter.xml"/>
+    <chapter src="TheEnd.xml"/>
+    <chapter src="LastChapter.xml"/>
   </content>
   <presentation>
     <renderer class="parchment.render.ReportRenderEngine"/>

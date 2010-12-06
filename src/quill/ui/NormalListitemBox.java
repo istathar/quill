@@ -19,39 +19,41 @@
 package quill.ui;
 
 import org.gnome.gtk.Alignment;
-import org.gnome.gtk.Label;
+import org.gnome.gtk.Entry;
 import org.gnome.gtk.Widget;
 
 import quill.textbase.Segment;
 
-class ReferenceListitemBox extends ListitemBox
+class NormalListitemBox extends ListitemBox
 {
-    ReferenceListitemBox(final ComponentEditorWidget parent, final Segment segment) {
+    NormalListitemBox(final ComponentEditorWidget parent, final Segment segment) {
         super();
         final Widget widget;
         final EditorTextView editor;
 
         widget = createLabel(segment);
-        editor = new ReferenceEditorTextView(parent, segment);
-
         super.setupLabel(widget);
+
+        editor = new NormalEditorTextView(parent, segment);
         super.setupBody(editor);
     }
 
     private Widget createLabel(final Segment segment) {
         final String text;
-        final Label label; // field?
+        final Entry entry; // field?
         final Alignment align;
 
         text = segment.getImage();
 
-        label = new Label();
-        label.setLabel(text);
-        label.setWidthChars(3);
+        entry = new Entry();
+        entry.setText(text);
+        entry.setWidthChars(3);
+        entry.setHasFrame(false);
+        entry.setAlignment(Alignment.RIGHT);
 
         align = new Alignment(Alignment.LEFT, Alignment.TOP, 0, 0);
-        align.setPadding(3, 0, 0, 1);
-        align.add(label);
+        align.setPadding(5, 0, 0, 0);
+        align.add(entry);
 
         return align;
     }

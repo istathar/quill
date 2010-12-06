@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -16,16 +16,18 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.ui;
+package quill.quack;
 
-import quill.textbase.Segment;
-
-class SectionHeadingBox extends HeadingBox
+/**
+ * The title of a part. It is peers with {@link ChapterElement}. This is for
+ * the title page of a work, and for the title pages of the divisions of a
+ * book.
+ * 
+ * @author Andrew Cowie
+ */
+public class DivisionElement extends BlockElement implements Block
 {
-    SectionHeadingBox(final ComponentEditorWidget parent, final Segment segment) {
-        super();
-
-        super.setupLine();
-        super.setupBox(parent, segment, "Section");
+    public DivisionElement() {
+        super("division");
     }
 }

@@ -20,12 +20,21 @@ package quill.ui;
 
 import quill.textbase.Segment;
 
-class SectionHeadingBox extends HeadingBox
+/**
+ * We define notes as being only a single paragraph, so we subclass in order
+ * to disallow <b><code>Enter</code></b>.
+ * 
+ * @author Andrew Cowie
+ */
+class ReferenceEditorTextView extends EditorTextView
 {
-    SectionHeadingBox(final ComponentEditorWidget parent, final Segment segment) {
-        super();
+    ReferenceEditorTextView(ComponentEditorWidget parent, Segment segment) {
+        super(parent, segment);
 
-        super.setupLine();
-        super.setupBox(parent, segment, "Section");
+        view.modifyFont(fonts.serif);
+    }
+
+    protected boolean isEnterAllowed() {
+        return false;
     }
 }

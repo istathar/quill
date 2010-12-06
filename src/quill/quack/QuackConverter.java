@@ -26,12 +26,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import quill.textbase.AttributionSegment;
+import quill.textbase.ChapterSegment;
 import quill.textbase.Common;
-import quill.textbase.ComponentSegment;
+import quill.textbase.DivisionSegment;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
+import quill.textbase.ListitemSegment;
 import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
@@ -90,8 +92,10 @@ public class QuackConverter
 
         this.segment = segment;
 
-        if (segment instanceof ComponentSegment) {
+        if (segment instanceof ChapterSegment) {
             block = new ChapterElement();
+        } else if (segment instanceof DivisionSegment) {
+            block = new DivisionElement();
         } else if (segment instanceof HeadingSegment) {
             block = new HeadingElement();
         } else if (segment instanceof PreformatSegment) {
@@ -102,6 +106,12 @@ public class QuackConverter
             block = new TextElement();
         } else if (segment instanceof PoeticSegment) {
             block = new PoemElement();
+        } else if (segment instanceof ListitemSegment) {
+            block = new ListElement();
+            value = segment.getImage();
+            if ((value != null) && (value.length() != 0)) {
+                block.add(new LabelAttribute(value));
+            }
         } else if (segment instanceof AttributionSegment) {
             block = new CreditElement();
         } else if (segment instanceof ImageSegment) {
@@ -167,7 +177,7 @@ public class QuackConverter
         });
 
         /*
-         * Finally, we need to deal with the fact that TextStacks (like the
+         * Finally, we need to deal with the fact that TextChains (like the
          * TextBuffers they back) do not end with a paragraph separator, so we
          * need to act to close out the last block.
          */
@@ -270,6 +280,8 @@ public class QuackConverter
             } else if (segment instanceof PoeticSegment) {
                 buf.append('\n');
                 return;
+            } else if (segment instanceof ListitemSegment) {
+                block = new ListElement();
             } else if (segment instanceof AttributionSegment) {
                 block = new CreditElement();
             } else {

@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -16,16 +16,25 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.ui;
+package quill.textbase;
 
-import quill.textbase.Segment;
-
-class SectionHeadingBox extends HeadingBox
+/**
+ * An item in an ordered or unordered list. It can be multiple paragraphs, but
+ * only one bullet or ordinal number per ListitemSegment.
+ * 
+ * @author Andrew Cowie
+ */
+public class ListitemSegment extends Segment
 {
-    SectionHeadingBox(final ComponentEditorWidget parent, final Segment segment) {
-        super();
+    public ListitemSegment(Extract entire, String label) {
+        super(entire, label, 0, 0, entire.getWidth());
+    }
 
-        super.setupLine();
-        super.setupBox(parent, segment, "Section");
+    public ListitemSegment(Extract entire, String label, int offset, int removed, int inserted) {
+        super(entire, label, offset, removed, inserted);
+    }
+
+    public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
+        return new ListitemSegment(entire, super.getImage(), offset, removed, inserted);
     }
 }
