@@ -31,6 +31,50 @@ Blocks contain text and the second level of elements, termed
 "inlines", specifying a specific markup to be applied to a span
 of text.
 </text>
+<text>
+<bold>Schema</bold>
+</text>
+<text>
+The full schema is given in the <acronym>DTD</acronym>, but is
+summarized as follows: an optional (but almost certainly present)
+component title block <literal>&lt;division&gt;</literal> or
+<literal>&lt;chapter&gt;</literal>, a series of
+<literal>&lt;normal&gt;</literal>, <literal>&lt;code&gt;</literal>,
+<literal>&lt;quote&gt;</literal>, <literal>&lt;list&gt;</literal>,
+<literal>&lt;citation&gt;</literal>, <literal>&lt;poem&gt;</literal>,
+and <literal>&lt;image&gt;</literal> blocks, then a series of
+<literal>&lt;endnotes&gt;</literal> (if there are any), then
+a series of <literal>&lt;reference&gt;</literal>s (if there are
+any). By convention <literal>&lt;reference&gt;</literal> blocks
+will be shuffled to the end of the last component in the document
+when saving.
+</text>
+<text>
+The blocks can contain the following inlines:
+<literal>&lt;italics&gt;</literal>, <literal>&lt;bold&gt;</literal>,
+<literal>&lt;filename&gt;</literal>, <literal>&lt;type&gt;</literal>,
+<literal>&lt;function&gt;</literal>,
+<literal>&lt;literal&gt;</literal>, <literal>&lt;project&gt;</literal>,
+<literal>&lt;command&gt;</literal>,
+<literal>&lt;highlight&gt;</literal>, <literal>&lt;title&gt;</literal>,
+<literal>&lt;acronym&gt;</literal>, or
+<literal>&lt;keyboard&gt;</literal>. What these all mean is described
+below. <literal>:)</literal> There are also some special inlines
+which are empty elements: <literal>&lt;note&gt;</literal> and
+<literal>&lt;cite&gt;</literal> for note anchors and citations
+respectively.
+</text>
+<text>
+<bold>Rendering</bold>
+</text>
+<text>
+Discussion of how a given block type or inline markup is to be
+rendered is largely predicated on the reference
+<type>RenderEngine</type>s that ship by default with <project>Quill
+and Parchment</project>. The user (or the user's organization)
+is of course welcome to do anything they want, but the Quack
+format is largely there to support these processing expectations.
+</text>
 <heading>
 Components
 </heading>
@@ -47,7 +91,15 @@ is:
 <text>
 If that was in <filename>First.xml</filename> it could be a part
 of a Parchment document, and <project>Quill</project> would load
-it as an empty chapter. 
+it as an empty chapter.
+</text>
+<text>
+Component files generally begin with one of two special block
+types indicating the title for a component and, implicitly, what
+kinds of component a given file is.
+</text>
+<text>
+<bold>Chapter title blocks</bold>, <literal>&lt;chapter&gt;</literal>
 </text>
 <text>
 Real chapters start with a block giving the chapter title, followed
@@ -83,31 +135,36 @@ blocks.
 </text>
 <text>
 The <literal>&lt;chapter&gt;</literal> blocks are rendered in
-a font twice the size of the heading font.
+the heading font at twice their size.
 </text>
 <text>
-The full schema is given in the <acronym>DTD</acronym>, but is
-summarized as follows: an optional (but almost certainly present)
-component title block <literal>division</literal> or
-<literal>chapter</literal>, a series of <literal>normal</literal>,
-<literal>code</literal>, <literal>quote</literal>,
-<literal>list</literal>, <literal>citation</literal>,
-<literal>poem</literal>, and <literal>image</literal> blocks,
-then a series of <literal>endnotes</literal> (if there are any),
-then a series of <literal>references</literal> (if there are
-any). By convention <literal>references</literal> will be shuffled
-to the end of the last component in the document.
+<bold>Part title blocks</bold>, <literal>&lt;division&gt;</literal>
 </text>
 <text>
-<bold>Rendering</bold>
+There is sometimes a requirement to divide books into groups
+of chapters; these are often labelled "parts" and are formally
+known as the divisions of a book. While the Parchment File Format
+simply provides for a series of chapters, a short Quack Schema
+file which begins with a <literal>&lt;division&gt;</literal>
+block can be used to indicate a part title page... or indeed
+can be the title page for the work as a whole:
 </text>
+<code xml:space="preserve">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0"&gt;
+&lt;division&gt;
+The Tao of Joda
+&lt;/division&gt;
+&lt;text&gt;
+As told to Lake Groundcrawler.
+&lt;/text&gt;
+&lt;/quack&gt;
+</code>
 <text>
-Discussion of how a given block type or inline markup is to be
-rendered is largely predicated on the reference
-<type>RenderEngine</type>s that ship by default with <project>Quill
-and Parchment</project>. The user (or the user's organization)
-is of course welcome to do anything they want, but the Quack
-format is largely there to support these processing expectations.
+The reference implementation renders
+<literal>&lt;division&gt;</literal> blocks in the heading font
+at three times the size of normal headings and pushes them down
+the page somewhat.
 </text>
 <heading>
 Blocks
