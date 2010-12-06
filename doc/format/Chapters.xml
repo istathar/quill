@@ -133,7 +133,7 @@ paragraph.&lt;/para&gt;
 <text>
 which looks pretty stupid in long text runs because the tags
 get in the way. We instead take the same approach as used by
-<literal>HTML</literal> whereby leading and trailing newlines
+<acronym>HTML</acronym> whereby leading and trailing newlines
 are trimmed. So we have:
 </text>
 <code xml:space="preserve">
@@ -227,7 +227,7 @@ what's in Quack.
 Strongly emphasized text to be rendered in a bold font.
 </text>
 <text>
-<bold>Code Literals</bold>, &lt;literal&gt;
+<bold>Code Literals</bold>, <literal>&lt;literal&gt;</literal>
 </text>
 <text>
 Used for short literal code fragments from source code. Rendered
