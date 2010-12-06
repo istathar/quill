@@ -43,6 +43,7 @@ import quill.textbase.DivisionSegment;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
+import quill.textbase.LeaderSegment;
 import quill.textbase.ListitemSegment;
 import quill.textbase.NormalSegment;
 import quill.textbase.Origin;
@@ -356,6 +357,10 @@ class ComponentEditorWidget extends ScrolledWindow
 
             editor = heading.getEditor();
             result = heading;
+        } else if (segment instanceof LeaderSegment) {
+            editor = new LeaderEditorTextView(this, segment);
+
+            result = editor;
         } else if (segment instanceof ChapterSegment) {
             heading = new ChapterHeadingBox(this, segment);
 

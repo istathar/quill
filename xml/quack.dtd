@@ -21,7 +21,7 @@
 -->
 
 <!ELEMENT quack ((division | chapter)?,
-		 (heading | text | code | quote | list | list | image | poem | credit)*,
+		 (heading | leader | text | code | quote | list | image | poem | credit)*,
 		 (endnote*),
 		 (reference*))>
 <!ATTLIST quack xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/5.0">
@@ -34,13 +34,19 @@
 
 <!ELEMENT heading (#PCDATA)>
 
+<!ELEMENT leader (#PCDATA)>
+
 <!ELEMENT text (#PCDATA 
 		| italics | bold | name | type | function | literal
 		| filename | project | command | highlight | title
 		| note | cite
 		| keyboard | acronym)*>
 
-<!ELEMENT code (#PCDATA | bold | highlight | note)*>
+<!ELEMENT code (#PCDATA
+		| italics | bold | name | type | function | literal
+		| filename | project | command | highlight | title
+		| note | cite
+		| keyboard | acronym)*>
 <!ATTLIST code xml:space CDATA #FIXED "preserve">
 
 <!ELEMENT quote (#PCDATA

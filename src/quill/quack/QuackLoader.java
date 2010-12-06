@@ -30,6 +30,7 @@ import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
+import quill.textbase.LeaderSegment;
 import quill.textbase.ListitemSegment;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
@@ -258,6 +259,8 @@ public class QuackLoader
             }
         } else if (block instanceof HeadingElement) {
             preserve = false;
+        } else if (block instanceof LeaderElement) {
+            preserve = false;
         } else if (block instanceof ImageElement) {
             preserve = false;
             processData(block);
@@ -315,6 +318,8 @@ public class QuackLoader
             segment = new EndnoteSegment(entire, attribute);
         } else if (block instanceof ReferenceElement) {
             segment = new ReferenceSegment(entire, attribute);
+        } else if (block instanceof LeaderElement) {
+            segment = new LeaderSegment(entire);
         } else {
             throw new IllegalStateException("\n" + "What kind of Block is " + block);
         }

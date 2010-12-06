@@ -60,6 +60,7 @@ import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
+import quill.textbase.LeaderSegment;
 import quill.textbase.ListitemSegment;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
@@ -436,6 +437,9 @@ public abstract class RenderEngine
                     endnotes[i].add(segment);
                 } else if (segment instanceof ReferenceSegment) {
                     references.add(segment);
+                } else if (segment instanceof LeaderSegment) {
+                    appendSegmentBreak(cr);
+                    appendLeader(cr, entire);
                 }
             }
 
@@ -591,9 +595,9 @@ public abstract class RenderEngine
     protected void appendTitle(final Context cr, final Extract entire, final double multiplier,
             final boolean centered) {
         final FontDescription desc;
+        final double size;
         final Typeface face;
         final Area[] list;
-        final double size;
 
         desc = headingFace.desc.copy();
         size = desc.getSize();
@@ -601,6 +605,22 @@ public abstract class RenderEngine
         face = new Typeface(cr, desc, 0.0);
 
         list = layoutAreaText(cr, entire, face, false, centered, 0.0, 1, false);
+        accumulate(list);
+    }
+
+    protected void appendLeader(Context cr, Extract entire) {
+        final FontDescription desc;
+        final double size;
+        final Typeface face;
+        final Area[] list;
+
+        desc = serifFace.desc.copy();
+        desc.setWeight(Weight.BOLD);
+        size = desc.getSize();
+        desc.setSize(size * 1.2);
+        face = new Typeface(cr, desc, 0.0);
+
+        list = layoutAreaText(cr, entire, face, false, true, 0.0, 1, false);
         accumulate(list);
     }
 

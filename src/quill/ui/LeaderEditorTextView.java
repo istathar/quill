@@ -20,7 +20,7 @@ package quill.ui;
 
 import org.gnome.gtk.Justification;
 import org.gnome.pango.FontDescription;
-import org.gnome.pango.Style;
+import org.gnome.pango.Weight;
 
 import quill.textbase.Segment;
 
@@ -30,16 +30,17 @@ import quill.textbase.Segment;
  * 
  * @author Andrew Cowie
  */
-class CaptionEditorTextView extends EditorTextView
+// cloned from CaptionEditorTextView
+class LeaderEditorTextView extends EditorTextView
 {
     private static FontDescription desc;
 
     static {
-        desc = fonts.serif.copy();
-        desc.setStyle(Style.ITALIC);
+        desc = fonts.sans.copy();
+        desc.setWeight(Weight.BOLD);
     }
 
-    CaptionEditorTextView(ComponentEditorWidget parent, Segment segment) {
+    LeaderEditorTextView(ComponentEditorWidget parent, Segment segment) {
         super(parent, segment);
 
         view.modifyFont(desc);

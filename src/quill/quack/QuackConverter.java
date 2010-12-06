@@ -33,6 +33,7 @@ import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
+import quill.textbase.LeaderSegment;
 import quill.textbase.ListitemSegment;
 import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
@@ -126,6 +127,8 @@ public class QuackConverter
             block = new ReferenceElement();
             value = segment.getImage();
             block.add(new NameAttribute(value));
+        } else if (segment instanceof LeaderSegment) {
+            block = new LeaderElement();
         } else {
             throw new IllegalStateException("Unhandled segment type " + segment);
         }

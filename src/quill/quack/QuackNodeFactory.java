@@ -110,6 +110,8 @@ public class QuackNodeFactory extends NodeFactory
             return new ReferenceElement();
         } else if (name == "division") {
             return new DivisionElement();
+        } else if (name == "leader") {
+            return new LeaderElement();
         } else {
             /*
              * This is actually fairly serious; once our code is working
