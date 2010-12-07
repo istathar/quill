@@ -18,7 +18,7 @@
  */
 package quill.textbase;
 
-public final class HeadingSegment extends ComponentSegment
+public final class HeadingSegment extends Segment
 {
     public HeadingSegment(Extract entire) {
         super(entire, null, 0, 0, entire.getWidth());
