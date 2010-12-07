@@ -22,12 +22,15 @@ import java.util.LinkedList;
 
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Surface;
+import org.freedesktop.icons.EmblemIcon;
 import org.gnome.gdk.Color;
 import org.gnome.gdk.EventExpose;
 import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Container;
+import org.gnome.gtk.IconSize;
+import org.gnome.gtk.Image;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.Scrollbar;
 import org.gnome.gtk.ScrolledWindow;
@@ -53,6 +56,7 @@ import quill.textbase.QuoteSegment;
 import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
+import quill.textbase.SpecialSegment;
 
 /**
  * Left hand side of a PrimaryWindow for editing a Component (Article or
@@ -387,6 +391,11 @@ class ComponentEditorWidget extends ScrolledWindow
 
             editor = listitem.getEditor();
             result = listitem;
+        } else if (segment instanceof SpecialSegment) {
+            // TODO placeholder; improve!
+            editor = null;
+            result = new Image(EmblemIcon.EMBLEM_PACKAGE, IconSize.DIALOG);
+            result.setTooltipText(segment.getImage());
         } else {
 
             throw new IllegalStateException("Unknown Segment type");

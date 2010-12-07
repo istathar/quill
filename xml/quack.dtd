@@ -21,7 +21,7 @@
 -->
 
 <!ELEMENT quack ((division | chapter)?,
-		 (heading | leader | text | code | quote | list | image | poem | credit)*,
+		 (heading | leader | text | code | quote | list | image | poem | credit | special)*,
 		 (endnote*),
 		 (reference*))>
 <!ATTLIST quack xmlns CDATA #FIXED "http://namespace.operationaldynamics.com/parchment/5.0">
@@ -94,6 +94,9 @@
 		| filename | project | command | highlight | title
 		| keyboard | acronym)*>
 <!ATTLIST reference name CDATA #REQUIRED>
+
+<!ELEMENT special EMPTY>
+<!ATTLIST special type CDATA #REQUIRED>
 
 <!-- inline spans -->
 

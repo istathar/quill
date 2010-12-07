@@ -3,6 +3,14 @@
 <chapter>
 References
 </chapter>
+<heading>
+Notes to text
+</heading>
+<special type="endnotes"/>
+<heading>
+References
+</heading>
+<special type="references"/>
 <reference name="[1]">
 Andrew Cowie, "Surviving Change" in <title>Proceedings of the
 12th Australian Systems Administrators Conference</title> (Brisbane:

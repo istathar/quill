@@ -112,6 +112,8 @@ public class QuackNodeFactory extends NodeFactory
             return new DivisionElement();
         } else if (name == "leader") {
             return new LeaderElement();
+        } else if (name == "special") {
+            return new SpecialElement();
         } else {
             /*
              * This is actually fairly serious; once our code is working
@@ -133,6 +135,8 @@ public class QuackNodeFactory extends NodeFactory
             return new Nodes(new NameAttribute(value));
         } else if (name.equals("label")) {
             return new Nodes(new LabelAttribute(value));
+        } else if (name.equals("type")) {
+            return new Nodes(new TypeAttribute(value));
         } else {
             return super.makeAttribute(name, URI, value, type);
         }
