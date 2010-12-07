@@ -26,7 +26,7 @@ if [ -s tmp/stamp/list-tests ] ; then
 		-sourcepath src:tests \
 		`cat tmp/stamp/list-tests`
 	if [ $? -ne 0 ] ; then
-		exit $?
+		exit 1
 	fi
 	touch tmp/stamp/build-tests
 	rm tmp/stamp/list-tests
