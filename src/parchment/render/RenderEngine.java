@@ -75,9 +75,9 @@ import quill.textbase.Series;
 import quill.textbase.Span;
 import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
+import quill.textbase.SpecialSegment;
 import quill.textbase.TextChain;
 
-import static org.freedesktop.bindings.Internationalization._;
 import static org.freedesktop.cairo.HintMetrics.OFF;
 import static org.freedesktop.cairo.HintStyle.NONE;
 import static quill.textbase.Span.createSpan;
@@ -354,14 +354,36 @@ public abstract class RenderEngine
         String filename;
         ArrayList<Segment>[] endnotes;
         final ArrayList<Segment> references;
-        String which, label;
-        boolean heading;
+        String label, type;
 
         I = folio.size();
         areas = new ArrayList<Area>(64);
 
         references = new ArrayList<Segment>(4);
+
         endnotes = new ArrayList[I];
+
+        /*
+         * Accumulate ReferenceSegments so they can later be output when a
+         * SpecialSegment is encountered.
+         */
+
+        for (i = 0; i < I; i++) {
+            series = folio.getSeries(i);
+
+            J = series.size();
+            for (j = 0; j < J; j++) {
+                segment = series.getSegment(j);
+
+                if (segment instanceof ReferenceSegment) {
+                    references.add(segment);
+                }
+            }
+        }
+
+        /*
+         * Now process document
+         */
 
         for (i = 0; i < I; i++) {
             series = folio.getSeries(i);
@@ -436,33 +458,45 @@ public abstract class RenderEngine
                 } else if (segment instanceof EndnoteSegment) {
                     endnotes[i].add(segment);
                 } else if (segment instanceof ReferenceSegment) {
-                    references.add(segment);
+                    // already accumulated
                 } else if (segment instanceof LeaderSegment) {
                     appendSegmentBreak(cr);
                     appendLeader(cr, entire);
+                } else if (segment instanceof SpecialSegment) {
+                    type = segment.getImage();
+
+                    if (type.equals("endnotes")) {
+                        processSpecialEndnotes(cr, endnotes);
+                    } else if (type.equals("references")) {
+                        processSpecialReferences(cr, references);
+                    }
                 }
             }
 
             appendSegmentBreak(cr);
         }
+    }
+
+    void processSpecialEndnotes(final Context cr, ArrayList<Segment>[] endnotes) {
+        int i, j;
+        int I, J;
+        Series series;
+        Extract entire;
+        Segment segment;
+        String which, label;
+
+        I = endnotes.length;
 
         /*
          * Now build the notes and references. This is somewhat hardcoded, but
          * choose "intelligent defaults" as Robert Collins says.
          */
 
-        heading = false;
-
         for (i = 0; i < I; i++) {
             J = endnotes[i].size();
 
             if (J == 0) {
                 continue;
-            }
-
-            if (!heading) {
-                appendHeading(cr, _("Notes"));
-                heading = true;
             }
 
             /*
@@ -495,14 +529,17 @@ public abstract class RenderEngine
                 appendReferenceParagraph(cr, label, entire);
             }
         }
-        if (heading) {
-            appendSegmentBreak(cr);
-        }
+    }
+
+    void processSpecialReferences(final Context cr, final ArrayList<Segment> references) {
+        int j;
+        final int J;
+        Segment segment;
+        Extract entire;
+        String label;
 
         J = references.size();
         if (J > 0) {
-            appendHeading(cr, _("Publications"));
-
             for (j = 0; j < J; j++) {
                 appendSegmentBreak(cr);
 
@@ -573,16 +610,6 @@ public abstract class RenderEngine
         origin = new Origin(folioIndex, seriesIndex, currentOffset);
         area = new ImageArea(origin, 0.0, request, null, 1.0);
         accumulate(area);
-    }
-
-    private void appendHeading(Context cr, String text) {
-        final Span span;
-        final Extract entire;
-
-        span = Span.createSpan(text, null);
-        entire = Extract.create(span);
-
-        appendHeading(cr, entire);
     }
 
     protected void appendHeading(Context cr, Extract entire) {
