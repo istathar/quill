@@ -139,6 +139,11 @@ The <literal>&lt;chapter&gt;</literal> blocks are rendered in
 the heading font at twice their size, and start on a new page.
 </text>
 <text>
+Chapter titles are single line only (their text content will
+wrap, but you can't include a newline and nor can you have more
+than one <literal>&lt;chapter&gt;</literal> element per file).
+</text>
+<text>
 <bold>Part title blocks</bold>, <literal>&lt;division&gt;</literal>
 </text>
 <text>
@@ -165,7 +170,7 @@ As told to Lake Groundcrawler.
 The reference implementation renders
 <literal>&lt;division&gt;</literal> blocks in the heading font
 at three times the size of normal headings and pushes them down
-the page somewhat.
+the page somewhat. Part titles are also single line only.
 </text>
 <heading>
 Blocks
@@ -358,6 +363,73 @@ they are one <type>ListitemSegment</type> per bullet; the only
 case where <type>Segment</type>s of the same type run consecutively.
 </text>
 <text>
+<bold>Section blocks</bold>, <literal>&lt;heading&gt;</literal>
+</text>
+<text>
+As discussed elsewhere, parts, chapters, and sections are
+<bold>not</bold> elements which enclose their subordinate structure.
+Headings are just further blocks in the flow of paragraphs.
+</text>
+<text>
+Headings are single line only (strictly, a single wrapped paragraph,
+but you get the idea).
+</text>
+<text>
+Section headings are rendered in the heading font. Ideally this
+is something at the very least larger and hopefully visually
+distinct from the serif font used for normal text. New documents
+provide a default configuration which has the heading font at
+5.6mm tall as compared to 3.2mm high for the serif font, and
+in a small caps variant, creating an effect somewhat reminiscent
+of museum caps.
+</text>
+<text>
+The <project>Quill</project> user interface treats headings specially;
+they provide points you can easily navigate to via the outline
+pane.
+</text>
+<text>
+Note that there is no "subheading" block type. This is because
+a) we didn't need the granularity in navigation, b) the idea
+of depth in an outline leads to the need to constantly promote
+and demote sections, increasing complexity for little gain; and
+c) if you want to create such an effect (as appears in this document)
+just use emboldened text. 
+</text>
+<text>
+<bold>Division, Chapter, and Section labels</bold>
+</text>
+<text>
+Section headings along with chapter titles and part tiles can
+have an optional <literal>label</literal> attribute; this allows
+you to create a numbered outline if necessary:
+</text>
+<code xml:space="preserve">
+&lt;chapter label="1"&gt;
+Origins
+&lt;/chapter&gt;
+</code>
+<text>
+and
+</text>
+<code xml:space="preserve">
+&lt;heading label="1.1"&gt;
+Start here
+&lt;/heading&gt;
+&lt;text&gt;
+At the commencement of it all, ...
+&lt;/text&gt;
+</code>
+<text>
+We weren't in a rush to add these; some people use outline numbering
+compulsively but it's surprising how well you can do without
+them. Nevertheless adding <literal>label</literal> future-proofs
+us against the requirement of numbering chapter and section headings
+(some of our internal reference documents indeed use such numbering)
+and these labels will also in due course serve us when we cook
+up a table of contents. Speaking of which...
+</text>
+<text>
 <bold>Special blocks</bold>, <literal>&lt;special&gt;</literal>
 </text>
 <text>
@@ -367,7 +439,7 @@ and the generated list of collected references are to be rendered.
 <literal>&lt;special&gt;</literal> is empty, with a single attribute
 <literal>type</literal> indicating which it is. Valid values
 are "endnotes", "references", and "contents" (for future use
-as the insertion point when we have tables of contents).
+as the insertion point when we have generated tables of contents).
 </text>
 <text>
 This block type allows you to control the heading and any necessary
@@ -391,6 +463,34 @@ References
 </code>
 <text>
 to get the desired effect.
+</text>
+<text>
+<bold>Meta text headline blocks</bold>,
+<literal>&lt;leader&gt;</literal>
+</text>
+<text>
+Did we say finally? No, there's one last one. &lt;leader&gt;
+is a specialist heading which is used to title meta text in front-matter
+and back-matter. For example:
+</text>
+<code xml:space="preserve">
+&lt;leader&gt;
+Abstract
+&lt;/leader&gt;
+&lt;text&gt;
+This document outlines the Parchment File Format, a
+markup language for text documents innovative only
+for its radical simplicity and blantent disregard of
+conventional wisdom.
+&lt;/text&gt;
+</code>
+<text>
+is the abstract for this document. Here the headline "Abstract"
+is rendered as a centred, bolded, and slightly larger piece of
+text by the reference implementation, giving you a nice title
+over the following text block. These headlines are single line
+only, do not have labels, do not appear in the
+<project>Quill</project> editor's outline function as headings.
 </text>
 <heading>
 Inlines
