@@ -42,6 +42,7 @@ import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
 import quill.textbase.Special;
+import quill.textbase.SpecialSegment;
 import quill.textbase.TextChain;
 
 import static quill.textbase.Span.createSpan;
@@ -276,6 +277,9 @@ public class QuackLoader
         } else if (block instanceof ReferenceElement) {
             preserve = false;
             processData(block);
+        } else if (block instanceof SpecialElement) {
+            preserve = false;
+            processData(block);
         } else {
             throw new IllegalStateException("\n" + "What kind of Block is " + block);
         }
@@ -320,6 +324,8 @@ public class QuackLoader
             segment = new ReferenceSegment(entire, attribute);
         } else if (block instanceof LeaderElement) {
             segment = new LeaderSegment(entire);
+        } else if (block instanceof SpecialElement) {
+            segment = new SpecialSegment(attribute);
         } else {
             throw new IllegalStateException("\n" + "What kind of Block is " + block);
         }
@@ -357,6 +363,9 @@ public class QuackLoader
             str = meta.getValue();
             attribute = str;
         } else if (meta instanceof LabelAttribute) {
+            str = meta.getValue();
+            attribute = str;
+        } else if (meta instanceof TypeAttribute) {
             str = meta.getValue();
             attribute = str;
         } else {
