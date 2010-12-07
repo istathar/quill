@@ -29,10 +29,13 @@
 <!-- block level  -->
 
 <!ELEMENT division (#PCDATA)>
+<!ATTLIST division label CDATA #IMPLIED>
 
 <!ELEMENT chapter (#PCDATA)>
+<!ATTLIST chapter label CDATA #IMPLIED>
 
 <!ELEMENT heading (#PCDATA)>
+<!ATTLIST heading label CDATA #IMPLIED>
 
 <!ELEMENT leader (#PCDATA)>
 

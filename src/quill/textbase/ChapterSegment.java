@@ -21,14 +21,18 @@ package quill.textbase;
 public final class ChapterSegment extends ComponentSegment
 {
     public ChapterSegment(Extract entire) {
-        super(entire);
+        super(entire, null, 0, 0, entire.getWidth());
     }
 
-    public ChapterSegment(Extract entire, int offset, int removed, int inserted) {
-        super(entire, offset, removed, inserted);
+    public ChapterSegment(Extract entire, String label) {
+        super(entire, label, 0, 0, entire.getWidth());
+    }
+
+    private ChapterSegment(Extract entire, String label, int offset, int removed, int inserted) {
+        super(entire, label, offset, removed, inserted);
     }
 
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
-        return new ChapterSegment(entire, offset, removed, inserted);
+        return new ChapterSegment(entire, super.getImage(), offset, removed, inserted);
     }
 }
