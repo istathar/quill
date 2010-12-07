@@ -96,10 +96,22 @@ public class QuackConverter
 
         if (segment instanceof ChapterSegment) {
             block = new ChapterElement();
+            value = segment.getImage();
+            if ((value != null) && (value.length() != 0)) {
+                block.add(new LabelAttribute(value));
+            }
         } else if (segment instanceof DivisionSegment) {
             block = new DivisionElement();
+            value = segment.getImage();
+            if ((value != null) && (value.length() != 0)) {
+                block.add(new LabelAttribute(value));
+            }
         } else if (segment instanceof HeadingSegment) {
             block = new HeadingElement();
+            value = segment.getImage();
+            if ((value != null) && (value.length() != 0)) {
+                block.add(new LabelAttribute(value));
+            }
         } else if (segment instanceof PreformatSegment) {
             block = new CodeElement();
         } else if (segment instanceof QuoteSegment) {

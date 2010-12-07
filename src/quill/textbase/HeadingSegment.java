@@ -18,17 +18,21 @@
  */
 package quill.textbase;
 
-public final class HeadingSegment extends Segment
+public final class HeadingSegment extends ComponentSegment
 {
     public HeadingSegment(Extract entire) {
-        super(entire);
+        super(entire, null, 0, 0, entire.getWidth());
     }
 
-    public HeadingSegment(Extract entire, int offset, int removed, int inserted) {
-        super(entire, offset, removed, inserted);
+    public HeadingSegment(Extract entire, String label) {
+        super(entire, label, 0, 0, entire.getWidth());
+    }
+
+    private HeadingSegment(Extract entire, String label, int offset, int removed, int inserted) {
+        super(entire, label, offset, removed, inserted);
     }
 
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
-        return new HeadingSegment(entire, offset, removed, inserted);
+        return new HeadingSegment(entire, super.getImage(), offset, removed, inserted);
     }
 }

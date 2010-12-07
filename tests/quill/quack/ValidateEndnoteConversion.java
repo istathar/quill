@@ -116,7 +116,6 @@ public class ValidateEndnoteConversion extends IOTestCase
         final Chapter chapter;
         final Series series;
         Segment segment;
-        final Extract blank;
         final QuackConverter converter;
         final ByteArrayOutputStream out;
         final String original, result;
