@@ -44,6 +44,17 @@ Not to be outdone, this is the second item.
 <text>
 And that's it. No more list for you.
 </text>
+<text>
+...
+</text>
+<heading label="2.71">
+To Be Continued
+</heading>
+<text>
+This section's label is wider than the default allowance, so
+the heading body text should be pushed to the right accordingly.
+Euler would understand.
+</text>
 <endnote name="1">
 From an editorial about the <acronym>G20</acronym> and its challenges
 in the lead up to the Seoul summit. "Finally, a talking-shop

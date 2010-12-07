@@ -619,23 +619,50 @@ public abstract class RenderEngine
     }
 
     protected void appendHeading(Context cr, String label, Extract entire) {
-        final TextChain chain;
-        final Span span;
+        final Area area;
         final Area[] list;
-        final Extract extract;
+        double width;
 
         if ((label != null) && (label.length() > 0)) {
-            chain = new TextChain(entire);
+            area = layoutAreaLabel(cr, label, headingFace);
+            accumulate(area);
 
-            span = Span.createSpan(label + "  ", null);
-            chain.insert(0, span);
+            width = area.getWidth();
 
-            extract = chain.extractAll();
+            if (width + 6.0 < 31.0) {
+                width = 31.0;
+            } else {
+                width += 6.0;
+            }
         } else {
-            extract = entire;
+            width = 0.0;
         }
-        list = layoutAreaText(cr, extract, headingFace, false, false, 0.0, 1, false);
+
+        list = layoutAreaText(cr, entire, headingFace, false, false, width, 1, false);
         accumulate(list);
+    }
+
+    /**
+     * Create an Area for the label attribute of a Chapter or Heading. Not to
+     * be confused with the labels of bullet lists; see
+     * {@link #layoutAreaBullet(Context, String, Typeface, double)}. This
+     * exists largely so that the returned Area can be queried for its width.
+     */
+    protected Area layoutAreaLabel(final Context cr, final String label, final Typeface face) {
+        final Layout layout;
+        final LayoutLine line;
+        final Origin origin;
+        final Area result;
+
+        layout = new Layout(cr);
+        layout.setFontDescription(face.desc);
+        layout.setText(label);
+
+        line = layout.getLineReadonly(0);
+
+        origin = new Origin(folioIndex, seriesIndex, 0);
+        result = new TextArea(origin, leftMargin, 0.0, face.lineAscent, line, false);
+        return result;
     }
 
     protected void appendTitle(final Context cr, final String label, final Extract entire,
@@ -643,10 +670,9 @@ public abstract class RenderEngine
         final FontDescription desc;
         final double size;
         final Typeface face;
-        final TextChain chain;
-        final Span span;
-        final Extract extract;
+        final Area area;
         final Area[] list;
+        double width;
 
         desc = headingFace.desc.copy();
         size = desc.getSize();
@@ -654,17 +680,27 @@ public abstract class RenderEngine
         face = new Typeface(cr, desc, 0.0);
 
         if ((label != null) && (label.length() > 0)) {
-            chain = new TextChain(entire);
+            area = layoutAreaLabel(cr, label, face);
+            accumulate(area);
 
-            span = Span.createSpan(label + " ", null);
-            chain.insert(0, span);
+            width = area.getWidth();
 
-            extract = chain.extractAll();
+            /*
+             * TODO This 31 is the same as appendHeading() and
+             * appendListParagraph(). In fact, excepting the multiplier this
+             * is the same code as appendHeading(). Refactor.
+             */
+
+            if (width + 6.0 < 31.0) {
+                width = 31.0;
+            } else {
+                width += 6.0 * multiplier;
+            }
         } else {
-            extract = entire;
+            width = 0.0;
         }
 
-        list = layoutAreaText(cr, extract, face, false, centered, 0.0, 1, false);
+        list = layoutAreaText(cr, entire, face, false, centered, width, 1, false);
         accumulate(list);
     }
 
