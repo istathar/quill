@@ -404,14 +404,20 @@ public abstract class RenderEngine
                 entire = segment.getEntire();
 
                 if (segment instanceof ChapterSegment) {
-                    appendTitle(cr, entire, 2.0, false);
+                    label = segment.getImage();
+                    appendTitle(cr, label, entire, 2.0, false);
                 } else if (segment instanceof DivisionSegment) {
                     appendWhitespace(cr, 100.0);
-                    appendTitle(cr, entire, 3.0, true);
+
+                    label = segment.getImage();
+                    appendTitle(cr, label, entire, 3.0, true);
+
                     appendWhitespace(cr, 20.0);
                 } else if (segment instanceof HeadingSegment) {
                     appendSegmentBreak(cr);
-                    appendHeading(cr, entire);
+
+                    label = segment.getImage();
+                    appendHeading(cr, label, entire);
                 } else if (segment instanceof PreformatSegment) {
                     appendSegmentBreak(cr);
                     appendProgramCode(cr, entire);
@@ -612,18 +618,34 @@ public abstract class RenderEngine
         accumulate(area);
     }
 
-    protected void appendHeading(Context cr, Extract entire) {
+    protected void appendHeading(Context cr, String label, Extract entire) {
+        final TextChain chain;
+        final Span span;
         final Area[] list;
+        final Extract extract;
 
-        list = layoutAreaText(cr, entire, headingFace, false, false, 0.0, 1, false);
+        if ((label != null) && (label.length() > 0)) {
+            chain = new TextChain(entire);
+
+            span = Span.createSpan(label + "  ", null);
+            chain.insert(0, span);
+
+            extract = chain.extractAll();
+        } else {
+            extract = entire;
+        }
+        list = layoutAreaText(cr, extract, headingFace, false, false, 0.0, 1, false);
         accumulate(list);
     }
 
-    protected void appendTitle(final Context cr, final Extract entire, final double multiplier,
-            final boolean centered) {
+    protected void appendTitle(final Context cr, final String label, final Extract entire,
+            final double multiplier, final boolean centered) {
         final FontDescription desc;
         final double size;
         final Typeface face;
+        final TextChain chain;
+        final Span span;
+        final Extract extract;
         final Area[] list;
 
         desc = headingFace.desc.copy();
@@ -631,7 +653,18 @@ public abstract class RenderEngine
         desc.setSize(size * multiplier);
         face = new Typeface(cr, desc, 0.0);
 
-        list = layoutAreaText(cr, entire, face, false, centered, 0.0, 1, false);
+        if ((label != null) && (label.length() > 0)) {
+            chain = new TextChain(entire);
+
+            span = Span.createSpan(label + " ", null);
+            chain.insert(0, span);
+
+            extract = chain.extractAll();
+        } else {
+            extract = entire;
+        }
+
+        list = layoutAreaText(cr, extract, face, false, centered, 0.0, 1, false);
         accumulate(list);
     }
 

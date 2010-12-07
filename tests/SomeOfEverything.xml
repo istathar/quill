@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0">
-<chapter label="1">
+<chapter>
 An Example Chapter
 </chapter>
 <text>
