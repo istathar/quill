@@ -47,6 +47,7 @@ import quill.textbase.Segment;
 import quill.textbase.Span;
 import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
+import quill.textbase.SpecialSegment;
 
 /**
  * Build a DocBook XOM tree equivalent to the data in our textbase, ready for
@@ -129,19 +130,39 @@ public class QuackConverter
             block.add(new NameAttribute(value));
         } else if (segment instanceof LeaderSegment) {
             block = new LeaderElement();
+        } else if (segment instanceof SpecialSegment) {
+            block = new SpecialElement();
+            value = segment.getImage();
+            block.add(new TypeAttribute(value));
         } else {
             throw new IllegalStateException("Unhandled segment type " + segment);
         }
         inline = null;
 
-        entire = segment.getEntire();
-        if ((entire == null) || (entire.getWidth() == 0)) {
-            // FIXME is it ever null now?
+        /*
+         * Special case for empty blocks.
+         */
+
+        if (block instanceof Empty) {
+            component.add(block);
             return;
         }
 
-        component.add(block);
-        append(entire);
+        /*
+         * If there is no content then we jettison the block (this turns our
+         * to be our temporary workaround for not being able to delete empty
+         * Segments with the UI, but it's a good idea anyway). Otherwise it's
+         * normal; add it to root element and set append its content
+         */
+
+        entire = segment.getEntire();
+        if (entire.getWidth() == 0) {
+            // block with no content; skip it!
+            return;
+        } else {
+            component.add(block);
+            append(entire);
+        }
     }
 
     private void append(final Extract entire) {

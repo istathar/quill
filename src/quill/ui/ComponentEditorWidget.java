@@ -53,6 +53,7 @@ import quill.textbase.QuoteSegment;
 import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
+import quill.textbase.SpecialSegment;
 
 /**
  * Left hand side of a PrimaryWindow for editing a Component (Article or
@@ -387,6 +388,10 @@ class ComponentEditorWidget extends ScrolledWindow
 
             editor = listitem.getEditor();
             result = listitem;
+        } else if (segment instanceof SpecialSegment) {
+            // TODO placeholder; improve!
+            editor = null;
+            result = new SpecialHeadingBox(this, segment);
         } else {
 
             throw new IllegalStateException("Unknown Segment type");

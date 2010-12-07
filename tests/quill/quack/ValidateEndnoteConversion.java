@@ -38,6 +38,7 @@ import quill.textbase.Series;
 import quill.textbase.Span;
 import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
+import quill.textbase.SpecialSegment;
 import quill.textbase.StringSpan;
 import quill.textbase.TextChain;
 
@@ -248,6 +249,45 @@ public class ValidateEndnoteConversion extends IOTestCase
 
         out = new ByteArrayOutputStream();
         converter.writeChapter(out);
+
+        result = out.toString();
+        assertEquals(expected, result);
+    }
+
+    public final void testSpecials() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
+        final Manuscript manuscript;
+        final Chapter chapter;
+        Series series;
+        Segment segment;
+        final ByteArrayOutputStream out;
+        final String expected, result;
+
+        expected = loadFileIntoString("tests/quill/quack/Specials.xml");
+
+        manuscript = new Manuscript();
+        manuscript.setFilename("tests/quill/quack/ValidateEndnoteConversion.parchment");
+        chapter = new Chapter(manuscript);
+        chapter.setFilename("Specials.xml");
+
+        /*
+         * Check the state is what we think it is
+         */
+
+        series = chapter.loadDocument();
+        assertEquals(2, series.size());
+
+        segment = series.getSegment(0);
+        assertTrue(segment instanceof ChapterSegment);
+        segment = series.getSegment(1);
+        assertTrue(segment instanceof SpecialSegment);
+
+        /*
+         * Now, write out, and test. We shouldn't lose anything
+         */
+
+        out = new ByteArrayOutputStream();
+        chapter.saveDocument(series, out);
 
         result = out.toString();
         assertEquals(expected, result);
