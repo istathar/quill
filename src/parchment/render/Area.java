@@ -22,6 +22,7 @@ import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Matrix;
 import org.gnome.gdk.Pixbuf;
 import org.gnome.pango.LayoutLine;
+import org.gnome.pango.Rectangle;
 
 import quill.textbase.Origin;
 
@@ -35,6 +36,9 @@ abstract class Area
 {
     protected final Origin origin;
 
+    /**
+     * The horizontal position of this Area, relative to the page edge.
+     */
     protected final double x;
 
     protected final double height;
@@ -50,6 +54,14 @@ abstract class Area
      */
     double getHeight() {
         return height;
+    }
+
+    /**
+     * Get the width of this Area. This is <i>very</i> preliminary and used
+     * only for laying out labels at present.
+     */
+    double getWidth() {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     /**
@@ -101,6 +113,16 @@ final class TextArea extends Area
         if (error) {
             cr.setSource(0.0, 0.0, 0.0);
         }
+    }
+
+    double getWidth() {
+        final Rectangle rect;
+        final double width;
+
+        rect = line.getExtentsLogical();
+        width = rect.getWidth();
+
+        return width;
     }
 }
 

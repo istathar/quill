@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -20,15 +20,15 @@ package quill.textbase;
 
 public final class DivisionSegment extends ComponentSegment
 {
-    public DivisionSegment(Extract entire) {
-        super(entire);
+    public DivisionSegment(Extract entire, String label) {
+        super(entire, label, 0, 0, entire.getWidth());
     }
 
-    public DivisionSegment(Extract entire, int offset, int removed, int inserted) {
-        super(entire, offset, removed, inserted);
+    private DivisionSegment(Extract entire, String label, int offset, int removed, int inserted) {
+        super(entire, label, offset, removed, inserted);
     }
 
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
-        return new DivisionSegment(entire, offset, removed, inserted);
+        return new DivisionSegment(entire, super.getImage(), offset, removed, inserted);
     }
 }

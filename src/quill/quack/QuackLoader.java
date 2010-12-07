@@ -260,6 +260,7 @@ public class QuackLoader
             }
         } else if (block instanceof HeadingElement) {
             preserve = false;
+            processData(block);
         } else if (block instanceof LeaderElement) {
             preserve = false;
         } else if (block instanceof ImageElement) {
@@ -271,6 +272,7 @@ public class QuackLoader
                 throw new IllegalStateException("\n"
                         + "A <chapter> must be the first block in a Quack file.");
             }
+            processData(block);
         } else if (block instanceof EndnoteElement) {
             preserve = false;
             processData(block);
@@ -311,13 +313,13 @@ public class QuackLoader
         } else if (block instanceof CreditElement) {
             segment = new AttributionSegment(entire);
         } else if (block instanceof HeadingElement) {
-            segment = new HeadingSegment(entire);
+            segment = new HeadingSegment(entire, attribute);
         } else if (block instanceof ImageElement) {
             segment = new ImageSegment(entire, attribute);
         } else if (block instanceof ChapterElement) {
-            segment = new ChapterSegment(entire);
+            segment = new ChapterSegment(entire, attribute);
         } else if (block instanceof DivisionElement) {
-            segment = new DivisionSegment(entire);
+            segment = new DivisionSegment(entire, attribute);
         } else if (block instanceof EndnoteElement) {
             segment = new EndnoteSegment(entire, attribute);
         } else if (block instanceof ReferenceElement) {
