@@ -31,10 +31,9 @@ if [ -s tmp/stamp/list-core ] ; then
 	${JAVAC} \
 		-classpath ${GNOME_JARS}:${XOM_JARS}:tmp/classes \
 		-d tmp/classes \
-		-sourcepath src \
 		`cat tmp/stamp/list-core`
 	if [ $? -ne 0 ] ; then
-		exit $?
+		exit 1
 	fi
 	touch tmp/stamp/build-core
 	rm tmp/stamp/list-core
