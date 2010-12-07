@@ -23,7 +23,6 @@ if [ -s tmp/stamp/list-tests ] ; then
 	${JAVAC} \
 		-classpath ${GNOME_JARS}:${XOM_JARS}:${JUNIT_JARS}:tmp/classes:tmp/unittests \
 		-d tmp/unittests \
-		-sourcepath src:tests \
 		`cat tmp/stamp/list-tests`
 	if [ $? -ne 0 ] ; then
 		exit 1
