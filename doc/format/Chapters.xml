@@ -42,7 +42,8 @@ component title block <literal>&lt;division&gt;</literal> or
 <literal>&lt;normal&gt;</literal>, <literal>&lt;code&gt;</literal>,
 <literal>&lt;quote&gt;</literal>, <literal>&lt;list&gt;</literal>,
 <literal>&lt;citation&gt;</literal>, <literal>&lt;poem&gt;</literal>,
-and <literal>&lt;image&gt;</literal> blocks, then a series of
+<literal>&lt;image&gt;</literal>, and
+<literal>&lt;special&gt;</literal> blocks, then a series of
 <literal>&lt;endnotes&gt;</literal> (if there are any), then
 a series of <literal>&lt;reference&gt;</literal>s (if there are
 any). By convention <literal>&lt;reference&gt;</literal> blocks
@@ -355,6 +356,41 @@ a label, giving a level of indent between normal and quote.
 Internally, <project>Quill</project> treats lists specially;
 they are one <type>ListitemSegment</type> per bullet; the only
 case where <type>Segment</type>s of the same type run consecutively.
+</text>
+<text>
+<bold>Special blocks</bold>, <literal>&lt;special&gt;</literal>
+</text>
+<text>
+Finally there is a special block type for special cases. These
+mark the insertion point where generated list of collected endnotes
+and the generated list of collected references are to be rendered.
+<literal>&lt;special&gt;</literal> is empty, with a single attribute
+<literal>type</literal> indicating which it is. Valid values
+are "endnotes", "references", and "contents" (for future use
+as the insertion point when we have tables of contents).
+</text>
+<text>
+This block type allows you to control the heading and any necessary
+preamble preceding the generated list. At the end of the last
+chapter of our documents we generally put:
+</text>
+<code xml:space="preserve">
+&lt;heading&gt;
+Notes to text
+&lt;/heading&gt;
+&lt;special type="endnotes"/&gt;
+&lt;heading&gt;
+</code>
+<text>
+followed quickly by:
+</text>
+<code xml:space="preserve">
+References
+&lt;/heading&gt;
+&lt;special type="references"/&gt;
+</code>
+<text>
+to get the desired effect.
 </text>
 <heading>
 Inlines
