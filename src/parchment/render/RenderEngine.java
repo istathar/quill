@@ -1181,6 +1181,9 @@ public abstract class RenderEngine
                 if ((k == 0) && (indent > 0.0)) {
                     x += indent;
                 }
+                if (x < leftMargin) {
+                    x = leftMargin;
+                }
             }
 
             origin = new Origin(folioIndex, seriesIndex, currentOffset);
