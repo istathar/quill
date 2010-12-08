@@ -624,7 +624,7 @@ public abstract class RenderEngine
         double width;
 
         if ((label != null) && (label.length() > 0)) {
-            area = layoutAreaLabel(cr, label, headingFace);
+            area = layoutAreaLabel(cr, label, headingFace, false);
             accumulate(area);
 
             width = area.getWidth();
@@ -647,12 +647,21 @@ public abstract class RenderEngine
      * be confused with the labels of bullet lists; see
      * {@link #layoutAreaBullet(Context, String, Typeface, double)}. This
      * exists largely so that the returned Area can be queried for its width.
+     * 
+     * @param take
+     *            Use <code>true</code> to cause this label to take its
+     *            height, <code>false</code> to have this label be transient
+     *            (on the assumption that the Area that it belongs to will
+     *            take the necessary height).
      */
-    protected Area layoutAreaLabel(final Context cr, final String label, final Typeface face) {
+    protected Area layoutAreaLabel(final Context cr, final String label, final Typeface face,
+            boolean take) {
         final Layout layout;
         final LayoutLine line;
         final Origin origin;
         final Area result;
+        final Rectangle rect;
+        final double height;
 
         layout = new Layout(cr);
         layout.setFontDescription(face.desc);
@@ -660,8 +669,16 @@ public abstract class RenderEngine
 
         line = layout.getLineReadonly(0);
 
+        if (take) {
+            rect = line.getExtentsLogical();
+            height = rect.getHeight();
+        } else {
+            height = 0.0;
+        }
+
         origin = new Origin(folioIndex, seriesIndex, 0);
-        result = new TextArea(origin, leftMargin, 0.0, face.lineAscent, line, false);
+        result = new TextArea(origin, leftMargin, height, face.lineAscent, line, false);
+
         return result;
     }
 
@@ -670,8 +687,10 @@ public abstract class RenderEngine
         final FontDescription desc;
         final double size;
         final Typeface face;
+        final Span span;
+        final Extract extract;
         final Area area;
-        final Area[] list;
+        Area[] list;
         double width;
 
         desc = headingFace.desc.copy();
@@ -679,25 +698,36 @@ public abstract class RenderEngine
         desc.setSize(size * multiplier);
         face = new Typeface(cr, desc, 0.0);
 
-        if ((label != null) && (label.length() > 0)) {
-            area = layoutAreaLabel(cr, label, face);
-            accumulate(area);
-
-            width = area.getWidth();
-
-            /*
-             * TODO This 31 is the same as appendHeading() and
-             * appendListParagraph(). In fact, excepting the multiplier this
-             * is the same code as appendHeading(). Refactor.
-             */
-
-            if (width + 6.0 < 31.0) {
-                width = 31.0;
-            } else {
-                width += 6.0 * multiplier;
+        if (centered) {
+            if ((label != null) && (label.length() > 0)) {
+                span = Span.createSpan(label, null);
+                extract = Extract.create(span);
+                list = layoutAreaText(cr, extract, face, false, true, 0.0, 1, false);
+                accumulate(list);
             }
-        } else {
+
             width = 0.0;
+        } else {
+            if ((label != null) && (label.length() > 0)) {
+                area = layoutAreaLabel(cr, label, face, false);
+                accumulate(area);
+
+                width = area.getWidth();
+
+                /*
+                 * TODO This 31 is the same as appendHeading() and
+                 * appendListParagraph(). In fact, excepting the multiplier
+                 * this is the same code as appendHeading(). Refactor.
+                 */
+
+                if (width + 6.0 < 31.0) {
+                    width = 31.0;
+                } else {
+                    width += 6.0 * multiplier;
+                }
+            } else {
+                width = 0.0;
+            }
         }
 
         list = layoutAreaText(cr, entire, face, false, centered, width, 1, false);
@@ -1150,6 +1180,9 @@ public abstract class RenderEngine
                 x = pageWidth / 2 - rect.getWidth() / 2;
                 if ((k == 0) && (indent > 0.0)) {
                     x += indent;
+                }
+                if (x < leftMargin) {
+                    x = leftMargin;
                 }
             }
 
