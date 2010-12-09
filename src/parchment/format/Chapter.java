@@ -26,15 +26,16 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import parchment.quack.QuackConverter;
+import parchment.quack.QuackLoader;
+import parchment.quack.QuackNodeFactory;
+
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.NodeFactory;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.client.ImproperFilenameException;
-import quill.quack.QuackConverter;
-import quill.quack.QuackLoader;
-import quill.quack.QuackNodeFactory;
 import quill.textbase.ChapterSegment;
 import quill.textbase.Extract;
 import quill.textbase.NormalSegment;
