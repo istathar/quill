@@ -21,12 +21,11 @@ package parchment.quack;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import parchment.manuscript.Chapter;
-import parchment.manuscript.Manuscript;
-import parchment.manuscript.ParchmentTestCase;
-
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import parchment.manuscript.Chapter;
+import parchment.manuscript.Manuscript;
+import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
 import quill.textbase.Common;
 import quill.textbase.Extract;
@@ -39,7 +38,7 @@ import quill.textbase.TextChain;
 
 import static quill.textbase.Span.createSpan;
 
-public class ValidateProperNewlineHandling extends ParchmentTestCase
+public class ValidateProperNewlineHandling extends IOTestCase
 {
     public final void testWriteChainWithTrainingBlankLine() throws IOException {
         final TextChain chain;
