@@ -915,6 +915,7 @@ public abstract class RenderEngine
             final double position) {
         final Layout layout;
         final LayoutLine line;
+        final Origin origin;
         final Area area;
 
         layout = new Layout(cr);
@@ -923,12 +924,15 @@ public abstract class RenderEngine
 
         line = layout.getLineReadonly(0);
 
+        origin = new Origin(folioIndex, seriesIndex, 0);
+
         /*
          * Passing height 0 means that no vertical space will be consumed by
          * this Area; the ascent is stil needed to position the Cairo point
          * before drawing the LayoutLine.
          */
-        area = new TextArea(null, leftMargin + position, 0.0, serifFace.lineAscent, line, false);
+
+        area = new TextArea(origin, leftMargin + position, 0.0, serifFace.lineAscent, line, false);
 
         return area;
     }
