@@ -25,8 +25,6 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import parchment.manuscript.Chapter;
 import parchment.manuscript.Manuscript;
-import parchment.quack.QuackConverter;
-import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
 import quill.textbase.ChapterSegment;
 import quill.textbase.Extract;
@@ -43,7 +41,7 @@ import quill.textbase.SpecialSegment;
 import quill.textbase.StringSpan;
 import quill.textbase.TextChain;
 
-public class ValidateEndnoteConversion extends IOTestCase
+public class ValidateEndnoteConversion extends QuackTestCase
 {
     public final void testMarkerSpan() {
         Span span;
@@ -56,22 +54,11 @@ public class ValidateEndnoteConversion extends IOTestCase
 
     public final void testInlineNote() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
-        final Manuscript manuscript;
-        final Chapter chapter;
         final Series series;
         Segment segment;
-        final Extract entire, blank;
-        final QuackConverter converter;
-        final ByteArrayOutputStream out;
-        final String original, result;
+        final Extract entire;
 
-        original = loadFileIntoString("tests/parchment/quack/Endnote.xml");
-
-        manuscript = new Manuscript();
-        manuscript.setFilename("tests/parchment/quack/ValidateEndnoteConversion.parchment");
-        chapter = new Chapter(manuscript);
-        chapter.setFilename("Endnote.xml");
-        series = chapter.loadDocument();
+        series = loadDocument("tests/parchment/quack/Endnote.xml");
 
         assertEquals(2, series.size());
 
@@ -99,41 +86,20 @@ public class ValidateEndnoteConversion extends IOTestCase
             }
         });
 
-        converter = new QuackConverter();
-        blank = Extract.create();
-        converter.append(new ChapterSegment(blank));
-        converter.append(segment);
-
-        out = new ByteArrayOutputStream();
-        converter.writeChapter(out);
-
-        result = out.toString();
-        assertEquals(original, result);
+        compareDocument(series);
     }
 
     public final void testManyNotes() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
-        final Manuscript manuscript;
-        final Chapter chapter;
         final Series series;
         Segment segment;
-        final QuackConverter converter;
-        final ByteArrayOutputStream out;
-        final String original, result;
-        int i;
 
-        original = loadFileIntoString("tests/parchment/quack/Manynotes.xml");
-
-        manuscript = new Manuscript();
-        manuscript.setFilename("tests/parchment/quack/ValidateEndnoteConversion.parchment");
-        chapter = new Chapter(manuscript);
-        chapter.setFilename("Manynotes.xml");
+        series = loadDocument("tests/parchment/quack/Manynotes.xml");
 
         /*
          * Check the state is what we think it is
          */
 
-        series = chapter.loadDocument();
         assertEquals(4, series.size());
 
         segment = series.getSegment(0);
@@ -149,17 +115,7 @@ public class ValidateEndnoteConversion extends IOTestCase
          * Now, write out, and test.
          */
 
-        converter = new QuackConverter();
-
-        for (i = 0; i < series.size(); i++) {
-            converter.append(series.getSegment(i));
-        }
-
-        out = new ByteArrayOutputStream();
-        converter.writeChapter(out);
-
-        result = out.toString();
-        assertEquals(original, result);
+        compareDocument(series);
     }
 
     /*
@@ -256,25 +212,15 @@ public class ValidateEndnoteConversion extends IOTestCase
 
     public final void testSpecials() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
-        final Manuscript manuscript;
-        final Chapter chapter;
         Series series;
         Segment segment;
-        final ByteArrayOutputStream out;
-        final String expected, result;
 
-        expected = loadFileIntoString("tests/parchment/quack/Specials.xml");
-
-        manuscript = new Manuscript();
-        manuscript.setFilename("tests/parchment/quack/ValidateEndnoteConversion.parchment");
-        chapter = new Chapter(manuscript);
-        chapter.setFilename("Specials.xml");
+        series = loadDocument("tests/parchment/quack/Specials.xml");
 
         /*
          * Check the state is what we think it is
          */
 
-        series = chapter.loadDocument();
         assertEquals(2, series.size());
 
         segment = series.getSegment(0);
@@ -286,10 +232,6 @@ public class ValidateEndnoteConversion extends IOTestCase
          * Now, write out, and test. We shouldn't lose anything
          */
 
-        out = new ByteArrayOutputStream();
-        chapter.saveDocument(series, out);
-
-        result = out.toString();
-        assertEquals(expected, result);
+        compareDocument(series);
     }
 }

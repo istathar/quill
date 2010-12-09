@@ -24,62 +24,46 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.client.ImproperFilenameException;
 import quill.textbase.ComponentSegment;
-import quill.textbase.ListitemSegment;
+import quill.textbase.ImageSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 
-public class ValidateListitemConversion extends QuackTestCase
+public class ValidateImageConversion extends QuackTestCase
 {
-    public final void testElementToSegmentBullets() throws IOException, ValidityException,
-            ParsingException, ImproperFilenameException {
+    public final void testImageWithCaption() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
         final Series series;
         Segment segment;
 
-        series = loadDocument("tests/parchment/quack/BulletListitems.xml");
+        series = loadDocument("tests/parchment/quack/ImageWithCaption.xml");
 
-        assertEquals(1 + 3, series.size());
+        assertEquals(1 + 1, series.size());
 
         segment = series.getSegment(0);
         assertTrue(segment instanceof ComponentSegment);
 
         segment = series.getSegment(1);
-        assertTrue(segment instanceof ListitemSegment);
-        assertEquals("\u2022", segment.getExtra());
-
-        segment = series.getSegment(2);
-        assertTrue(segment instanceof ListitemSegment);
-        assertEquals("\u2022", segment.getExtra());
-
-        segment = series.getSegment(3);
-        assertTrue(segment instanceof ListitemSegment);
-        assertEquals("\u2022", segment.getExtra());
+        assertTrue(segment instanceof ImageSegment);
+        assertEquals("NonExistent.svg", segment.getExtra());
 
         compareDocument(series);
     }
 
-    public final void testElementToSegmentOrdinals() throws IOException, ValidityException,
-            ParsingException, ImproperFilenameException {
+    public final void testImageWithoutCaption() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
         final Series series;
         Segment segment;
 
-        series = loadDocument("tests/parchment/quack/OrdinalListitems.xml");
+        series = loadDocument("tests/parchment/quack/ImageWithoutCaption.xml");
 
-        assertEquals(1 + 3, series.size());
+        assertEquals(1 + 1, series.size());
 
         segment = series.getSegment(0);
         assertTrue(segment instanceof ComponentSegment);
 
         segment = series.getSegment(1);
-        assertTrue(segment instanceof ListitemSegment);
-        assertEquals("1", segment.getExtra());
-
-        segment = series.getSegment(2);
-        assertTrue(segment instanceof ListitemSegment);
-        assertEquals("2", segment.getExtra());
-
-        segment = series.getSegment(3);
-        assertTrue(segment instanceof ListitemSegment);
-        assertEquals("3", segment.getExtra());
+        assertTrue(segment instanceof ImageSegment);
+        assertEquals("OfNoFixedAddress.svg", segment.getExtra());
 
         compareDocument(series);
     }

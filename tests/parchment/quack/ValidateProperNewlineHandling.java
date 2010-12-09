@@ -21,12 +21,10 @@ package parchment.quack;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import parchment.manuscript.Chapter;
-import parchment.manuscript.Manuscript;
-import parchment.manuscript.ParchmentTestCase;
-
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import parchment.manuscript.Chapter;
+import parchment.manuscript.Manuscript;
 import quill.client.ImproperFilenameException;
 import quill.textbase.Common;
 import quill.textbase.Extract;
@@ -39,7 +37,7 @@ import quill.textbase.TextChain;
 
 import static quill.textbase.Span.createSpan;
 
-public class ValidateProperNewlineHandling extends ParchmentTestCase
+public class ValidateProperNewlineHandling extends QuackTestCase
 {
     public final void testWriteChainWithTrainingBlankLine() throws IOException {
         final TextChain chain;
@@ -136,22 +134,9 @@ public class ValidateProperNewlineHandling extends ParchmentTestCase
      */
     public final void testBugOverlyLongInline() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
-        final Manuscript manuscript;
-        final Chapter chapter;
         final Series series;
-        final ByteArrayOutputStream out;
-        final String expected;
 
-        manuscript = new Manuscript();
-        manuscript.setFilename("tests/parchment/quack/ValudateProperNewlineHandling.parchment"); // junk
-        chapter = new Chapter(manuscript);
-        chapter.setFilename("ReallyLongInlineLeadingBlock.xml");
-        series = chapter.loadDocument();
-
-        out = new ByteArrayOutputStream();
-        chapter.saveDocument(series, out);
-
-        expected = loadFileIntoString("tests/parchment/quack/ReallyLongInlineLeadingBlock.xml");
-        assertEquals(expected, out.toString());
+        series = loadDocument("tests/parchment/quack/ReallyLongInlineLeadingBlock.xml");
+        compareDocument(series);
     }
 }

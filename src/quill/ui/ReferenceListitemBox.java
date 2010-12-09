@@ -43,7 +43,7 @@ class ReferenceListitemBox extends ListitemBox
         final Label label; // field?
         final Alignment align;
 
-        text = segment.getImage();
+        text = segment.getExtra();
 
         label = new Label();
         label.setLabel(text);

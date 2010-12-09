@@ -18,7 +18,7 @@
  */
 package parchment.quack;
 
-public class ImageElement extends BlockElement implements Block
+public class ImageElement extends BlockElement implements Block, Optional
 {
     public ImageElement() {
         super("image");

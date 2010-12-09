@@ -96,19 +96,19 @@ public class QuackConverter
 
         if (segment instanceof ChapterSegment) {
             block = new ChapterElement();
-            value = segment.getImage();
+            value = segment.getExtra();
             if ((value != null) && (value.length() != 0)) {
                 block.add(new LabelAttribute(value));
             }
         } else if (segment instanceof DivisionSegment) {
             block = new DivisionElement();
-            value = segment.getImage();
+            value = segment.getExtra();
             if ((value != null) && (value.length() != 0)) {
                 block.add(new LabelAttribute(value));
             }
         } else if (segment instanceof HeadingSegment) {
             block = new HeadingElement();
-            value = segment.getImage();
+            value = segment.getExtra();
             if ((value != null) && (value.length() != 0)) {
                 block.add(new LabelAttribute(value));
             }
@@ -122,7 +122,7 @@ public class QuackConverter
             block = new PoemElement();
         } else if (segment instanceof ListitemSegment) {
             block = new ListElement();
-            value = segment.getImage();
+            value = segment.getExtra();
             if ((value != null) && (value.length() != 0)) {
                 block.add(new LabelAttribute(value));
             }
@@ -130,21 +130,21 @@ public class QuackConverter
             block = new CreditElement();
         } else if (segment instanceof ImageSegment) {
             block = new ImageElement();
-            value = segment.getImage();
+            value = segment.getExtra();
             block.add(new SourceAttribute(value));
         } else if (segment instanceof EndnoteSegment) {
             block = new EndnoteElement();
-            value = segment.getImage();
+            value = segment.getExtra();
             block.add(new NameAttribute(value));
         } else if (segment instanceof ReferenceSegment) {
             block = new ReferenceElement();
-            value = segment.getImage();
+            value = segment.getExtra();
             block.add(new NameAttribute(value));
         } else if (segment instanceof LeaderSegment) {
             block = new LeaderElement();
         } else if (segment instanceof SpecialSegment) {
             block = new SpecialElement();
-            value = segment.getImage();
+            value = segment.getExtra();
             block.add(new TypeAttribute(value));
         } else {
             throw new IllegalStateException("Unhandled segment type " + segment);
@@ -168,12 +168,11 @@ public class QuackConverter
          */
 
         entire = segment.getEntire();
-        if (entire.getWidth() == 0) {
-            // block with no content; skip it!
-            return;
-        } else {
+        if ((entire.getWidth() > 0) || (block instanceof Optional)) {
             component.add(block);
             append(entire);
+        } else {
+            // segment with no content; skip it!
         }
     }
 

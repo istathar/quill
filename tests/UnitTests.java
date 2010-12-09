@@ -27,6 +27,7 @@ import parchment.quack.ValidateBlockquoteConversion;
 import parchment.quack.ValidateCitationConversion;
 import parchment.quack.ValidateDataIntegrity;
 import parchment.quack.ValidateEndnoteConversion;
+import parchment.quack.ValidateImageConversion;
 import parchment.quack.ValidateListitemConversion;
 import parchment.quack.ValidatePreformattedConversion;
 import parchment.quack.ValidateProperNewlineHandling;
@@ -87,6 +88,7 @@ public class UnitTests
         suite.addTestSuite(ValidateEndnoteConversion.class);
         suite.addTestSuite(ValidateListitemConversion.class);
         suite.addTestSuite(ValidateCitationConversion.class);
+        suite.addTestSuite(ValidateImageConversion.class);
         suite.addTestSuite(ValidateProperNewlineHandling.class);
         suite.addTestSuite(ValidateWrapperExpansions.class);
         suite.addTestSuite(ValidateThereAndBackAgain.class);

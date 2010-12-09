@@ -16,25 +16,15 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package quill.textbase;
+package parchment.quack;
 
 /**
- * An item in an ordered or unordered list. It can be multiple paragraphs, but
- * only one bullet or ordinal number per ListitemSegment.
+ * Marker interface for block elements whose content is optional; they can be
+ * empty or normal elements; the orignal reason for this existing was
+ * {@link ImageElement}.
  * 
  * @author Andrew Cowie
  */
-public class ListitemSegment extends Segment
+public interface Optional extends Tag
 {
-    public ListitemSegment(Extract entire, String label) {
-        super(entire, label, 0, 0, entire.getWidth());
-    }
-
-    public ListitemSegment(Extract entire, String label, int offset, int removed, int inserted) {
-        super(entire, label, offset, removed, inserted);
-    }
-
-    public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
-        return new ListitemSegment(entire, super.getExtra(), offset, removed, inserted);
-    }
 }
