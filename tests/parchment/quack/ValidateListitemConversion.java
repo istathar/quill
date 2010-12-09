@@ -58,15 +58,15 @@ public class ValidateListitemConversion extends IOTestCase
 
         segment = series.getSegment(1);
         assertTrue(segment instanceof ListitemSegment);
-        assertEquals("\u2022", segment.getImage());
+        assertEquals("\u2022", segment.getExtra());
 
         segment = series.getSegment(2);
         assertTrue(segment instanceof ListitemSegment);
-        assertEquals("\u2022", segment.getImage());
+        assertEquals("\u2022", segment.getExtra());
 
         segment = series.getSegment(3);
         assertTrue(segment instanceof ListitemSegment);
-        assertEquals("\u2022", segment.getImage());
+        assertEquals("\u2022", segment.getExtra());
 
         out = new ByteArrayOutputStream();
         chapter.saveDocument(series, out);
@@ -99,15 +99,15 @@ public class ValidateListitemConversion extends IOTestCase
 
         segment = series.getSegment(1);
         assertTrue(segment instanceof ListitemSegment);
-        assertEquals("1", segment.getImage());
+        assertEquals("1", segment.getExtra());
 
         segment = series.getSegment(2);
         assertTrue(segment instanceof ListitemSegment);
-        assertEquals("2", segment.getImage());
+        assertEquals("2", segment.getExtra());
 
         segment = series.getSegment(3);
         assertTrue(segment instanceof ListitemSegment);
-        assertEquals("3", segment.getImage());
+        assertEquals("3", segment.getExtra());
 
         out = new ByteArrayOutputStream();
         chapter.saveDocument(series, out);

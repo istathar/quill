@@ -29,6 +29,6 @@ public final class DivisionSegment extends ComponentSegment
     }
 
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
-        return new DivisionSegment(entire, super.getImage(), offset, removed, inserted);
+        return new DivisionSegment(entire, super.getExtra(), offset, removed, inserted);
     }
 }

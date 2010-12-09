@@ -33,6 +33,6 @@ public final class ChapterSegment extends ComponentSegment
     }
 
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
-        return new ChapterSegment(entire, super.getImage(), offset, removed, inserted);
+        return new ChapterSegment(entire, super.getExtra(), offset, removed, inserted);
     }
 }

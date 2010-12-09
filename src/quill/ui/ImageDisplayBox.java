@@ -58,7 +58,7 @@ public class ImageDisplayBox extends VBox
          * location, work out an actual pathname to the file.
          */
 
-        source = segment.getImage();
+        source = segment.getExtra();
 
         primary = parent.getPrimary();
         folio = primary.getDocument();

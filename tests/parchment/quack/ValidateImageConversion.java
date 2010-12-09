@@ -44,7 +44,7 @@ public class ValidateImageConversion extends QuackTestCase
 
         segment = series.getSegment(1);
         assertTrue(segment instanceof ImageSegment);
-        assertEquals("NonExistent.svg", segment.getImage());
+        assertEquals("NonExistent.svg", segment.getExtra());
 
         compareDocument(series);
     }
@@ -63,7 +63,7 @@ public class ValidateImageConversion extends QuackTestCase
 
         segment = series.getSegment(1);
         assertTrue(segment instanceof ImageSegment);
-        assertEquals("OfNoFixedAddress.svg", segment.getImage());
+        assertEquals("OfNoFixedAddress.svg", segment.getExtra());
 
         compareDocument(series);
     }

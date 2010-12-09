@@ -246,7 +246,7 @@ public class QuackLoader
                 i = list.size() - 1;
                 list.remove(i);
 
-                attribute = segment.getImage();
+                attribute = segment.getExtra();
             }
         } else if (block instanceof CreditElement) {
             preserve = false;
