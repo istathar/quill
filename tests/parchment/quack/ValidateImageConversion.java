@@ -44,7 +44,26 @@ public class ValidateImageConversion extends QuackTestCase
 
         segment = series.getSegment(1);
         assertTrue(segment instanceof ImageSegment);
-        assertEquals("nonexistent.svg", segment.getImage());
+        assertEquals("NonExistent.svg", segment.getImage());
+
+        compareDocument(series);
+    }
+
+    public final void testImageWithoutCaption() throws IOException, ValidityException, ParsingException,
+            ImproperFilenameException {
+        final Series series;
+        Segment segment;
+
+        series = loadDocument("tests/parchment/quack/ImageWithoutCaption.xml");
+
+        assertEquals(1 + 1, series.size());
+
+        segment = series.getSegment(0);
+        assertTrue(segment instanceof ComponentSegment);
+
+        segment = series.getSegment(1);
+        assertTrue(segment instanceof ImageSegment);
+        assertEquals("OfNoFixedAddress.svg", segment.getImage());
 
         compareDocument(series);
     }

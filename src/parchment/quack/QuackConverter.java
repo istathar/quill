@@ -168,12 +168,11 @@ public class QuackConverter
          */
 
         entire = segment.getEntire();
-        if (entire.getWidth() == 0) {
-            // block with no content; skip it!
-            return;
-        } else {
+        if ((entire.getWidth() > 0) || (block instanceof Optional)) {
             component.add(block);
             append(entire);
+        } else {
+            // segment with no content; skip it!
         }
     }
 
