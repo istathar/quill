@@ -20,10 +20,10 @@ package quill.textbase;
 
 import java.util.List;
 
-import parchment.format.Chapter;
-import parchment.format.Manuscript;
-import parchment.format.Metadata;
-import parchment.format.Stylesheet;
+import parchment.manuscript.Chapter;
+import parchment.manuscript.Manuscript;
+import parchment.manuscript.Metadata;
+import parchment.manuscript.Stylesheet;
 
 /**
  * A sequence of Series making up a document.

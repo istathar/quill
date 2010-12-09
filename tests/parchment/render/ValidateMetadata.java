@@ -18,7 +18,7 @@
  */
 package parchment.render;
 
-import parchment.format.Metadata;
+import parchment.manuscript.Metadata;
 import quill.ui.GraphicalTestCase;
 
 /**

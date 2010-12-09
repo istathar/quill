@@ -38,7 +38,7 @@ public abstract class Segment
 {
     protected Segment(Extract entire) {
         this.entire = entire;
-        this.image = "";
+        this.extra = "";
         this.offset = 0;
         this.removed = 0;
         this.inserted = entire.getWidth();
@@ -46,7 +46,7 @@ public abstract class Segment
 
     protected Segment(Extract entire, int offset, int removed, int inserted) {
         this.entire = entire;
-        this.image = "";
+        this.extra = "";
         this.offset = offset;
         this.removed = removed;
         this.inserted = inserted;
@@ -54,7 +54,7 @@ public abstract class Segment
 
     protected Segment(Extract entire, String extra, int offset, int removed, int inserted) {
         this.entire = entire;
-        this.image = extra;
+        this.extra = extra;
         this.offset = offset;
         this.removed = removed;
         this.inserted = inserted;
@@ -108,16 +108,19 @@ public abstract class Segment
     /**
      * A single item of metadata, originally the filename for an ImageSegment.
      */
-    private final String image;
+    private final String extra;
 
-    /*
-     * TODO rename this to getMeta() or such.
+    /**
+     * Get the additional data (ie, the value of the Block's Attribute). This
+     * is extra's src, endnot's name, heading's label, etc.
      */
     /*
-     * This is called by RenderEngine...
+     * FUTURE This will need to grow if we ever have more than one attribute
+     * per block [ie hyperlinks will cause us to need getLink() as well], but
+     * right now this covers the general metadata case.
      */
-    public String getImage() {
-        return image;
+    public String getExtra() {
+        return extra;
     }
 
     /**

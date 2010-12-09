@@ -25,7 +25,7 @@ package parchment.render;
  * are actually in the normal font, up in the Private Use area.
  * 
  * @author Andrew Cowie
- * @see quill.quack.AcronymElement
+ * @see parchment.quack.AcronymElement
  */
 class LibertineTypography
 {

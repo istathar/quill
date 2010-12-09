@@ -20,7 +20,7 @@ package quill.ui;
 
 import java.io.IOException;
 
-import parchment.format.Manuscript;
+import parchment.manuscript.Manuscript;
 import quill.client.ImproperFilenameException;
 import quill.textbase.Common;
 import quill.textbase.Folio;

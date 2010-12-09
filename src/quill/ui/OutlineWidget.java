@@ -38,9 +38,9 @@ import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 import org.gnome.pango.EllipsizeMode;
 
-import parchment.format.Chapter;
-import parchment.format.Manuscript;
-import parchment.format.Metadata;
+import parchment.manuscript.Chapter;
+import parchment.manuscript.Manuscript;
+import parchment.manuscript.Metadata;
 import quill.client.ApplicationException;
 import quill.textbase.ChapterSegment;
 import quill.textbase.CharacterVisitor;

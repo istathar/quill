@@ -46,10 +46,10 @@ import org.gnome.pango.Weight;
 import org.gnome.pango.WeightAttribute;
 import org.gnome.pango.WrapMode;
 
-import parchment.format.Manuscript;
-import parchment.format.RendererNotFoundException;
-import parchment.format.Stylesheet;
-import parchment.format.UnsupportedValueException;
+import parchment.manuscript.Manuscript;
+import parchment.manuscript.RendererNotFoundException;
+import parchment.manuscript.Stylesheet;
+import parchment.manuscript.UnsupportedValueException;
 import quill.client.ApplicationException;
 import quill.textbase.AttributionSegment;
 import quill.textbase.ChapterSegment;
@@ -404,19 +404,19 @@ public abstract class RenderEngine
                 entire = segment.getEntire();
 
                 if (segment instanceof ChapterSegment) {
-                    label = segment.getImage();
+                    label = segment.getExtra();
                     appendTitle(cr, label, entire, 2.0, false);
                 } else if (segment instanceof DivisionSegment) {
                     appendWhitespace(cr, 100.0);
 
-                    label = segment.getImage();
+                    label = segment.getExtra();
                     appendTitle(cr, label, entire, 3.0, true);
 
                     appendWhitespace(cr, 20.0);
                 } else if (segment instanceof HeadingSegment) {
                     appendSegmentBreak(cr);
 
-                    label = segment.getImage();
+                    label = segment.getExtra();
                     appendHeading(cr, label, entire);
                 } else if (segment instanceof PreformatSegment) {
                     appendSegmentBreak(cr);
@@ -436,7 +436,7 @@ public abstract class RenderEngine
                         appendNormalParagraph(cr, paras[k]);
                     }
                 } else if (segment instanceof ListitemSegment) {
-                    label = segment.getImage();
+                    label = segment.getExtra();
 
                     chain = new TextChain(entire);
                     paras = chain.extractParagraphs();
@@ -453,7 +453,7 @@ public abstract class RenderEngine
                     appendSegmentBreak(cr);
                     appendAttributionParagraph(cr, entire);
                 } else if (segment instanceof ImageSegment) {
-                    filename = segment.getImage();
+                    filename = segment.getExtra();
                     appendSegmentBreak(cr);
                     appendExternalGraphic(cr, filename);
                     if (entire == null) {
@@ -469,7 +469,7 @@ public abstract class RenderEngine
                     appendSegmentBreak(cr);
                     appendLeader(cr, entire);
                 } else if (segment instanceof SpecialSegment) {
-                    type = segment.getImage();
+                    type = segment.getExtra();
 
                     if (type.equals("endnotes")) {
                         processSpecialEndnotes(cr, endnotes);
@@ -530,7 +530,7 @@ public abstract class RenderEngine
                 appendSegmentBreak(cr);
 
                 segment = endnotes[i].get(j);
-                label = segment.getImage();
+                label = segment.getExtra();
                 entire = segment.getEntire();
                 appendReferenceParagraph(cr, label, entire);
             }
@@ -550,7 +550,7 @@ public abstract class RenderEngine
                 appendSegmentBreak(cr);
 
                 segment = references.get(j);
-                label = segment.getImage();
+                label = segment.getExtra();
                 entire = segment.getEntire();
                 appendReferenceParagraph(cr, label, entire);
             }

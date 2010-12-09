@@ -36,7 +36,7 @@ public final class EndnoteSegment extends Segment
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
         final String extra;
 
-        extra = super.getImage();
+        extra = super.getExtra();
 
         return new EndnoteSegment(entire, extra, offset, removed, inserted);
     }

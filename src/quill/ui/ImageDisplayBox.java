@@ -28,7 +28,7 @@ import org.gnome.gtk.Label;
 import org.gnome.gtk.Stock;
 import org.gnome.gtk.VBox;
 
-import parchment.format.Manuscript;
+import parchment.manuscript.Manuscript;
 import quill.textbase.Folio;
 import quill.textbase.Segment;
 
@@ -58,7 +58,7 @@ public class ImageDisplayBox extends VBox
          * location, work out an actual pathname to the file.
          */
 
-        source = segment.getImage();
+        source = segment.getExtra();
 
         primary = parent.getPrimary();
         folio = primary.getDocument();
