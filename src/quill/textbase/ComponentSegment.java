@@ -20,11 +20,7 @@ package quill.textbase;
 
 public abstract class ComponentSegment extends Segment
 {
-    protected ComponentSegment(Extract entire) {
-        super(entire);
-    }
-
-    protected ComponentSegment(Extract entire, int offset, int removed, int inserted) {
-        super(entire, offset, removed, inserted);
+    protected ComponentSegment(Extract entire, String label, int offset, int removed, int inserted) {
+        super(entire, label, offset, removed, inserted);
     }
 }

@@ -21,8 +21,8 @@ package parchment.render;
 import org.gnome.gtk.PaperSize;
 import org.gnome.pango.FontDescription;
 
-import parchment.format.Stylesheet;
-import parchment.format.UnsupportedValueException;
+import parchment.manuscript.Stylesheet;
+import parchment.manuscript.UnsupportedValueException;
 
 /**
  * Convert all the values from loaded from a Stylesheet into strong types for

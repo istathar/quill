@@ -29,8 +29,8 @@ import org.gnome.gtk.Gtk;
 import org.gnome.gtk.PaperSize;
 import org.gnome.gtk.Unit;
 
-import parchment.format.Manuscript;
-import parchment.format.Stylesheet;
+import parchment.manuscript.Manuscript;
+import parchment.manuscript.Stylesheet;
 import parchment.render.RenderEngine;
 import quill.textbase.Folio;
 import quill.ui.UserInterface;

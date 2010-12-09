@@ -21,7 +21,7 @@ package parchment.render;
 import org.freedesktop.cairo.Context;
 import org.gnome.pango.Layout;
 
-import parchment.format.Metadata;
+import parchment.manuscript.Metadata;
 import quill.textbase.Folio;
 
 /**
