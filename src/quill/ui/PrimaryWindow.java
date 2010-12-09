@@ -55,9 +55,9 @@ import org.gnome.gtk.Widget;
 import org.gnome.gtk.Window;
 import org.gnome.gtk.WindowPosition;
 
-import parchment.format.Manuscript;
-import parchment.format.Metadata;
-import parchment.format.Stylesheet;
+import parchment.manuscript.Manuscript;
+import parchment.manuscript.Metadata;
+import parchment.manuscript.Stylesheet;
 import parchment.render.RenderEngine;
 import quill.client.ApplicationException;
 import quill.client.ImproperFilenameException;

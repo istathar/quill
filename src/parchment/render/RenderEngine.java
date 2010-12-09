@@ -46,10 +46,10 @@ import org.gnome.pango.Weight;
 import org.gnome.pango.WeightAttribute;
 import org.gnome.pango.WrapMode;
 
-import parchment.format.Manuscript;
-import parchment.format.RendererNotFoundException;
-import parchment.format.Stylesheet;
-import parchment.format.UnsupportedValueException;
+import parchment.manuscript.Manuscript;
+import parchment.manuscript.RendererNotFoundException;
+import parchment.manuscript.Stylesheet;
+import parchment.manuscript.UnsupportedValueException;
 import quill.client.ApplicationException;
 import quill.textbase.AttributionSegment;
 import quill.textbase.ChapterSegment;

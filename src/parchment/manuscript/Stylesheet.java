@@ -16,7 +16,7 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package parchment.format;
+package parchment.manuscript;
 
 /**
  * Configuration for a RenderEngine. This information is persisted as the

@@ -19,10 +19,10 @@
 package quill.ui;
 
 import junit.framework.TestCase;
-import parchment.format.Chapter;
-import parchment.format.Manuscript;
-import parchment.format.Metadata;
-import parchment.format.Stylesheet;
+import parchment.manuscript.Chapter;
+import parchment.manuscript.Manuscript;
+import parchment.manuscript.Metadata;
+import parchment.manuscript.Stylesheet;
 import quill.textbase.Folio;
 import quill.textbase.Series;
 

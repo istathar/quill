@@ -19,10 +19,10 @@
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import parchment.format.ValidateFileNaming;
-import parchment.format.ValidateManuscriptLoading;
-import parchment.format.ValidateManuscriptSerializing;
-import parchment.format.ValidateThereAndBackAgain;
+import parchment.manuscript.ValidateFileNaming;
+import parchment.manuscript.ValidateManuscriptLoading;
+import parchment.manuscript.ValidateManuscriptSerializing;
+import parchment.manuscript.ValidateThereAndBackAgain;
 import parchment.quack.ValidateBlockquoteConversion;
 import parchment.quack.ValidateCitationConversion;
 import parchment.quack.ValidateDataIntegrity;

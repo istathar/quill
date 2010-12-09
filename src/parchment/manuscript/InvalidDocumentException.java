@@ -16,30 +16,21 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package parchment.format;
+package parchment.manuscript;
 
-import quill.client.IOTestCase;
+import quill.client.ApplicationException;
 
-public abstract class ParchmentTestCase extends IOTestCase
+/**
+ * The file being loaded is invalid XML. This is pretty serious; it means we
+ * can't load a file the user [or test] expects us to.
+ * 
+ * @author Andrew Cowie
+ */
+@SuppressWarnings("serial")
+public class InvalidDocumentException extends ApplicationException
 {
-    /**
-     * Create a dummy document comprising a Manuscript containing 1 Chapter of
-     * 1 Series with 1 HeadingSegment and 1 NormalSegment. No file associated
-     * with it.
-     */
-    protected static Manuscript createDocument() {
-        final Manuscript result;
-
-        result = new Manuscript();
-
-        return result;
+    public InvalidDocumentException(String message) {
+        super(message);
     }
 
-    protected static Chapter createChapter(Manuscript manuscript) {
-        final Chapter result;
-
-        result = new Chapter(manuscript);
-
-        return result;
-    }
 }

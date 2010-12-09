@@ -16,7 +16,7 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package parchment.format;
+package parchment.manuscript;
 
 import java.io.IOException;
 import java.io.OutputStream;

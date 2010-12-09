@@ -16,21 +16,22 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package parchment.format;
+package parchment.manuscript;
 
 import quill.client.ApplicationException;
 
 /**
- * The file being loaded is invalid XML. This is pretty serious; it means we
- * can't load a file the user [or test] expects us to.
+ * Something in the loaded data is invalid.
+ * 
+ * This was originally written to support illegal paper sizes.
  * 
  * @author Andrew Cowie
  */
 @SuppressWarnings("serial")
-public class InvalidDocumentException extends ApplicationException
+public class UnsupportedValueException extends ApplicationException
 {
-    public InvalidDocumentException(String message) {
-        super(message);
+    public UnsupportedValueException(String value) {
+        super(value);
     }
 
 }

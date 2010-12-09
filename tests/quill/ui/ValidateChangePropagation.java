@@ -31,8 +31,8 @@ import org.gnome.gtk.Test;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 
-import parchment.format.Chapter;
-import parchment.format.Manuscript;
+import parchment.manuscript.Chapter;
+import parchment.manuscript.Manuscript;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.Segment;

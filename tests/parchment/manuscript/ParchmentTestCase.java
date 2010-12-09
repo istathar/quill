@@ -16,22 +16,32 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package parchment.format;
+package parchment.manuscript;
 
-import quill.client.ApplicationException;
+import parchment.manuscript.Chapter;
+import parchment.manuscript.Manuscript;
+import quill.client.IOTestCase;
 
-/**
- * Something in the loaded data is invalid.
- * 
- * This was originally written to support illegal paper sizes.
- * 
- * @author Andrew Cowie
- */
-@SuppressWarnings("serial")
-public class UnsupportedValueException extends ApplicationException
+public abstract class ParchmentTestCase extends IOTestCase
 {
-    public UnsupportedValueException(String value) {
-        super(value);
+    /**
+     * Create a dummy document comprising a Manuscript containing 1 Chapter of
+     * 1 Series with 1 HeadingSegment and 1 NormalSegment. No file associated
+     * with it.
+     */
+    protected static Manuscript createDocument() {
+        final Manuscript result;
+
+        result = new Manuscript();
+
+        return result;
     }
 
+    protected static Chapter createChapter(Manuscript manuscript) {
+        final Chapter result;
+
+        result = new Chapter(manuscript);
+
+        return result;
+    }
 }

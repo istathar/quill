@@ -27,7 +27,7 @@ import org.gnome.gtk.SizeGroupMode;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
-import parchment.format.Metadata;
+import parchment.manuscript.Metadata;
 import quill.textbase.Folio;
 
 import static org.freedesktop.bindings.Internationalization._;

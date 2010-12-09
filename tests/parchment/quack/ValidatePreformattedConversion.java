@@ -21,7 +21,7 @@ package parchment.quack;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import parchment.format.Manuscript;
+import parchment.manuscript.Manuscript;
 import parchment.quack.QuackConverter;
 import quill.client.IOTestCase;
 import quill.textbase.Common;

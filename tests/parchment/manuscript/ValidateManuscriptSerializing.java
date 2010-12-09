@@ -16,7 +16,7 @@
  * see http://www.gnu.org/licenses/. The authors of this program may be
  * contacted through http://research.operationaldynamics.com/projects/quill/.
  */
-package parchment.format;
+package parchment.manuscript;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,12 +54,12 @@ public class ValidateManuscriptSerializing extends IOTestCase
         Metadata meta;
         ManuscriptConverter converter;
 
-        dir = new File("tmp/unittests/parchment/format/");
+        dir = new File("tmp/unittests/parchment/manuscript/");
 
         if (!dir.exists() && (!dir.isDirectory())) {
             dir.mkdirs();
         }
-        filename = "tmp/unittests/parchment/format/ValidateManuscriptSerializing.parchment";
+        filename = "tmp/unittests/parchment/manuscript/ValidateManuscriptSerializing.parchment";
         out = new FileOutputStream(filename);
 
         manuscript = new Manuscript();
@@ -80,7 +80,7 @@ public class ValidateManuscriptSerializing extends IOTestCase
         out.close();
 
         exercise = loadFileIntoString(filename);
-        reference = loadFileIntoString("tests/parchment/format/ValidateManuscriptSerializing.parchment");
+        reference = loadFileIntoString("tests/parchment/manuscript/ValidateManuscriptSerializing.parchment");
 
         assertEquals(reference, exercise);
     }

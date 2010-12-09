@@ -21,9 +21,9 @@ package parchment.quack;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import parchment.format.Chapter;
-import parchment.format.Manuscript;
-import parchment.format.ParchmentTestCase;
+import parchment.manuscript.Chapter;
+import parchment.manuscript.Manuscript;
+import parchment.manuscript.ParchmentTestCase;
 
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;

@@ -23,9 +23,9 @@ import java.io.IOException;
 
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import parchment.format.Chapter;
-import parchment.format.InvalidDocumentException;
-import parchment.format.Manuscript;
+import parchment.manuscript.Chapter;
+import parchment.manuscript.InvalidDocumentException;
+import parchment.manuscript.Manuscript;
 import parchment.quack.QuackConverter;
 import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
