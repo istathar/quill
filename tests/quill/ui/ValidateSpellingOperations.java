@@ -28,7 +28,7 @@ import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextTag;
 
-import parchment.format.Manuscript;
+import parchment.manuscript.Manuscript;
 import quill.textbase.Common;
 import quill.textbase.Extract;
 import quill.textbase.Folio;

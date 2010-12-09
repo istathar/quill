@@ -24,7 +24,7 @@ import org.freedesktop.bindings.Internationalization;
 import org.gnome.glib.Glib;
 import org.gnome.gtk.Gtk;
 
-import parchment.format.Manuscript;
+import parchment.manuscript.Manuscript;
 import quill.textbase.Folio;
 import quill.ui.UserInterface;
 

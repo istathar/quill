@@ -29,7 +29,7 @@ import org.gnome.gtk.Scrollbar;
 import org.gnome.gtk.VScrollbar;
 import org.gnome.gtk.Widget;
 
-import parchment.format.Stylesheet;
+import parchment.manuscript.Stylesheet;
 import parchment.render.RenderEngine;
 import quill.client.ApplicationException;
 import quill.textbase.Folio;
