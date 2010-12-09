@@ -18,38 +18,24 @@
  */
 package parchment.quack;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import parchment.manuscript.Chapter;
-import parchment.manuscript.Manuscript;
-import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
 import quill.textbase.ComponentSegment;
 import quill.textbase.ListitemSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 
-public class ValidateListitemConversion extends IOTestCase
+public class ValidateListitemConversion extends QuackTestCase
 {
     public final void testElementToSegmentBullets() throws IOException, ValidityException,
             ParsingException, ImproperFilenameException {
-        final Manuscript manuscript;
-        final Chapter chapter;
         final Series series;
         Segment segment;
-        final ByteArrayOutputStream out;
-        final String original, result;
 
-        original = loadFileIntoString("tests/parchment/quack/BulletListitems.xml");
-
-        manuscript = new Manuscript();
-        manuscript.setFilename("tests/parchment/quack/ValidateListitemConversion.parchment"); // junk
-        chapter = new Chapter(manuscript);
-        chapter.setFilename("BulletListitems.xml");
-        series = chapter.loadDocument();
+        series = loadDocument("tests/parchment/quack/BulletListitems.xml");
 
         assertEquals(1 + 3, series.size());
 
@@ -68,29 +54,15 @@ public class ValidateListitemConversion extends IOTestCase
         assertTrue(segment instanceof ListitemSegment);
         assertEquals("\u2022", segment.getExtra());
 
-        out = new ByteArrayOutputStream();
-        chapter.saveDocument(series, out);
-
-        result = out.toString();
-        assertEquals(original, result);
+        compareDocument(series);
     }
 
     public final void testElementToSegmentOrdinals() throws IOException, ValidityException,
             ParsingException, ImproperFilenameException {
-        final Manuscript manuscript;
-        final Chapter chapter;
         final Series series;
         Segment segment;
-        final ByteArrayOutputStream out;
-        final String original, result;
 
-        original = loadFileIntoString("tests/parchment/quack/OrdinalListitems.xml");
-
-        manuscript = new Manuscript();
-        manuscript.setFilename("tests/parchment/quack/ValidateListitemConversion.parchment"); // junk
-        chapter = new Chapter(manuscript);
-        chapter.setFilename("OrdinalListitems.xml");
-        series = chapter.loadDocument();
+        series = loadDocument("tests/parchment/quack/OrdinalListitems.xml");
 
         assertEquals(1 + 3, series.size());
 
@@ -109,10 +81,6 @@ public class ValidateListitemConversion extends IOTestCase
         assertTrue(segment instanceof ListitemSegment);
         assertEquals("3", segment.getExtra());
 
-        out = new ByteArrayOutputStream();
-        chapter.saveDocument(series, out);
-
-        result = out.toString();
-        assertEquals(original, result);
+        compareDocument(series);
     }
 }

@@ -18,16 +18,11 @@
  */
 package parchment.quack;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
-import parchment.manuscript.Chapter;
 import parchment.manuscript.InvalidDocumentException;
-import parchment.manuscript.Manuscript;
-import parchment.quack.QuackConverter;
-import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
 import quill.textbase.ChapterSegment;
 import quill.textbase.Extract;
@@ -40,7 +35,7 @@ import quill.textbase.SpanVisitor;
 import quill.textbase.Special;
 import quill.textbase.StringSpan;
 
-public class ValidateCitationConversion extends IOTestCase
+public class ValidateCitationConversion extends QuackTestCase
 {
     public final void testMarkerSpan() {
         Span span;
@@ -53,26 +48,11 @@ public class ValidateCitationConversion extends IOTestCase
 
     public final void testInlineCite() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException, InvalidDocumentException {
-        final String FILE;
-        final Manuscript manuscript;
-        final Chapter chapter;
         final Series series;
         Segment segment;
         final Extract entire;
-        final QuackConverter converter;
-        int i;
-        final ByteArrayOutputStream out;
-        final String original, result;
 
-        FILE = "tests/parchment/quack/Citation.xml";
-
-        original = loadFileIntoString(FILE);
-
-        manuscript = new Manuscript();
-        manuscript.setFilename("tests/parchment/quack/ValidateCitationConversion.parchment"); // junk
-        chapter = new Chapter(manuscript);
-        chapter.setFilename("Citation.xml");
-        series = chapter.loadDocument();
+        series = loadDocument("tests/parchment/quack/Citation.xml");
 
         assertEquals(2, series.size());
 
@@ -102,16 +82,6 @@ public class ValidateCitationConversion extends IOTestCase
             }
         });
 
-        converter = new QuackConverter();
-
-        for (i = 0; i < series.size(); i++) {
-            converter.append(series.getSegment(i));
-        }
-
-        out = new ByteArrayOutputStream();
-        converter.writeChapter(out);
-
-        result = out.toString();
-        assertEquals(original, result);
+        compareDocument(series);
     }
 }
