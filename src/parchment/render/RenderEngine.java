@@ -407,7 +407,16 @@ public abstract class RenderEngine
                     label = segment.getImage();
                     appendTitle(cr, label, entire, 2.0, false);
                 } else if (segment instanceof DivisionSegment) {
-                    appendWhitespace(cr, 100.0);
+                    /*
+                     * For first page title pages we start at the top of the
+                     * page; otherwise it looks a bit silly, especaially if
+                     * there's more content such as an abstract on the page.
+                     * This will need to be controllable in subclasses,
+                     * obviously.
+                     */
+                    if (i > 0) {
+                        appendWhitespace(cr, 100.0);
+                    }
 
                     label = segment.getImage();
                     appendTitle(cr, label, entire, 3.0, true);
