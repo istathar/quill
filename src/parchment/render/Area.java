@@ -32,6 +32,7 @@ import quill.textbase.Origin;
  * 
  * @author Andrew Cowie
  */
+// immutable
 abstract class Area
 {
     protected final Origin origin;

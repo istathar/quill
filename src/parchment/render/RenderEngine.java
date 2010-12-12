@@ -407,7 +407,16 @@ public abstract class RenderEngine
                     label = segment.getExtra();
                     appendTitle(cr, label, entire, 2.0, false);
                 } else if (segment instanceof DivisionSegment) {
-                    appendWhitespace(cr, 100.0);
+                    /*
+                     * For first page title pages we start at the top of the
+                     * page; otherwise it looks a bit silly, especaially if
+                     * there's more content such as an abstract on the page.
+                     * This will need to be controllable in subclasses,
+                     * obviously.
+                     */
+                    if (i > 0) {
+                        appendWhitespace(cr, 100.0);
+                    }
 
                     label = segment.getExtra();
                     appendTitle(cr, label, entire, 3.0, true);
@@ -624,7 +633,7 @@ public abstract class RenderEngine
         double width;
 
         if ((label != null) && (label.length() > 0)) {
-            area = layoutAreaLabel(cr, label, headingFace);
+            area = layoutAreaLabel(cr, label, headingFace, false);
             accumulate(area);
 
             width = area.getWidth();
@@ -647,12 +656,21 @@ public abstract class RenderEngine
      * be confused with the labels of bullet lists; see
      * {@link #layoutAreaBullet(Context, String, Typeface, double)}. This
      * exists largely so that the returned Area can be queried for its width.
+     * 
+     * @param take
+     *            Use <code>true</code> to cause this label to take its
+     *            height, <code>false</code> to have this label be transient
+     *            (on the assumption that the Area that it belongs to will
+     *            take the necessary height).
      */
-    protected Area layoutAreaLabel(final Context cr, final String label, final Typeface face) {
+    protected Area layoutAreaLabel(final Context cr, final String label, final Typeface face,
+            boolean take) {
         final Layout layout;
         final LayoutLine line;
         final Origin origin;
         final Area result;
+        final Rectangle rect;
+        final double height;
 
         layout = new Layout(cr);
         layout.setFontDescription(face.desc);
@@ -660,8 +678,16 @@ public abstract class RenderEngine
 
         line = layout.getLineReadonly(0);
 
+        if (take) {
+            rect = line.getExtentsLogical();
+            height = rect.getHeight();
+        } else {
+            height = 0.0;
+        }
+
         origin = new Origin(folioIndex, seriesIndex, 0);
-        result = new TextArea(origin, leftMargin, 0.0, face.lineAscent, line, false);
+        result = new TextArea(origin, leftMargin, height, face.lineAscent, line, false);
+
         return result;
     }
 
@@ -670,8 +696,10 @@ public abstract class RenderEngine
         final FontDescription desc;
         final double size;
         final Typeface face;
+        final Span span;
+        final Extract extract;
         final Area area;
-        final Area[] list;
+        Area[] list;
         double width;
 
         desc = headingFace.desc.copy();
@@ -679,25 +707,36 @@ public abstract class RenderEngine
         desc.setSize(size * multiplier);
         face = new Typeface(cr, desc, 0.0);
 
-        if ((label != null) && (label.length() > 0)) {
-            area = layoutAreaLabel(cr, label, face);
-            accumulate(area);
-
-            width = area.getWidth();
-
-            /*
-             * TODO This 31 is the same as appendHeading() and
-             * appendListParagraph(). In fact, excepting the multiplier this
-             * is the same code as appendHeading(). Refactor.
-             */
-
-            if (width + 6.0 < 31.0) {
-                width = 31.0;
-            } else {
-                width += 6.0 * multiplier;
+        if (centered) {
+            if ((label != null) && (label.length() > 0)) {
+                span = Span.createSpan(label, null);
+                extract = Extract.create(span);
+                list = layoutAreaText(cr, extract, face, false, true, 0.0, 1, false);
+                accumulate(list);
             }
-        } else {
+
             width = 0.0;
+        } else {
+            if ((label != null) && (label.length() > 0)) {
+                area = layoutAreaLabel(cr, label, face, false);
+                accumulate(area);
+
+                width = area.getWidth();
+
+                /*
+                 * TODO This 31 is the same as appendHeading() and
+                 * appendListParagraph(). In fact, excepting the multiplier
+                 * this is the same code as appendHeading(). Refactor.
+                 */
+
+                if (width + 6.0 < 31.0) {
+                    width = 31.0;
+                } else {
+                    width += 6.0 * multiplier;
+                }
+            } else {
+                width = 0.0;
+            }
         }
 
         list = layoutAreaText(cr, entire, face, false, centered, width, 1, false);
@@ -885,6 +924,7 @@ public abstract class RenderEngine
             final double position) {
         final Layout layout;
         final LayoutLine line;
+        final Origin origin;
         final Area area;
 
         layout = new Layout(cr);
@@ -893,12 +933,15 @@ public abstract class RenderEngine
 
         line = layout.getLineReadonly(0);
 
+        origin = new Origin(folioIndex, seriesIndex, 0);
+
         /*
          * Passing height 0 means that no vertical space will be consumed by
          * this Area; the ascent is stil needed to position the Cairo point
          * before drawing the LayoutLine.
          */
-        area = new TextArea(null, leftMargin + position, 0.0, serifFace.lineAscent, line, false);
+
+        area = new TextArea(origin, leftMargin + position, 0.0, serifFace.lineAscent, line, false);
 
         return area;
     }
@@ -1150,6 +1193,9 @@ public abstract class RenderEngine
                 x = pageWidth / 2 - rect.getWidth() / 2;
                 if ((k == 0) && (indent > 0.0)) {
                     x += indent;
+                }
+                if (x < leftMargin) {
+                    x = leftMargin;
                 }
             }
 
@@ -1673,6 +1719,7 @@ public abstract class RenderEngine
         final Pixbuf pixbuf;
         final TextChain chain;
         final Extract extract;
+        final double dpi;
         final Area image;
 
         manuscript = folio.getManuscript();
@@ -1691,7 +1738,32 @@ public abstract class RenderEngine
             return;
         }
 
-        image = layoutAreaImage(cr, pixbuf);
+        /*
+         * FIXME This is a monster, horrible hack: we have to have some notion
+         * of what the assumed resolution of the source image is. There is, at
+         * present, no way to find this out.
+         * 
+         * So we use the following heuristic: if the file is an SVG, then use
+         * Inkscape's default of 1 px @ 90 dpi (which flows from the SVG
+         * specification which in turn references the CSS specification).
+         * 
+         * Otherwise, we rather arbitrarily go for the old Macintosh
+         * definition (which even less firmly became the web standard) of 1 px
+         * 
+         * @ 72 dpi.
+         * 
+         * This is of course completely meaningless for digital photos, but we
+         * kinda assume that a decent photo will be wider than available page
+         * width and so will get down scaled to margins and that's that.
+         */
+
+        if (filename.endsWith(".svg")) {
+            dpi = 90.0;
+        } else {
+            dpi = 72.0;
+        }
+
+        image = layoutAreaImage(cr, pixbuf, dpi);
         accumulate(image);
     }
 
@@ -1737,26 +1809,29 @@ public abstract class RenderEngine
      * 
      * @param cr
      */
-    protected final Area layoutAreaImage(final Context cr, final Pixbuf pixbuf) {
+    protected final Area layoutAreaImage(final Context cr, final Pixbuf pixbuf, final double dpi) {
         final double width, height;
-        final double available, scaleFactor, request;
+        final double conversionFactor, available, scaleFactor, request;
         final double leftCorner;
         final Origin origin;
         final Area area;
 
-        width = pixbuf.getWidth();
-        height = pixbuf.getHeight();
+        conversionFactor = 72.0 / dpi;
+
+        width = pixbuf.getWidth() * conversionFactor;
+        height = pixbuf.getHeight() * conversionFactor;
 
         available = pageWidth - rightMargin - leftMargin;
 
         if (width > available) {
             scaleFactor = available / width;
             leftCorner = leftMargin;
+            request = height * scaleFactor;
         } else {
-            scaleFactor = 1.0;
+            scaleFactor = conversionFactor; // was 1.0
             leftCorner = pageWidth / 2 - width / 2;
+            request = height;
         }
-        request = height * scaleFactor;
 
         origin = new Origin(folioIndex, seriesIndex, 0);
         area = new ImageArea(origin, leftCorner, request, pixbuf, scaleFactor);

@@ -32,22 +32,28 @@ possible.<note ref="1"/>
 <credit>
 - from <title>The Economist</title>
 </credit>
+<heading label="2.3">
+The virtues of Incompleteness
+</heading>
 <text>
-And now for our list:
+There are several things to take aboard reading this chapter.
 </text>
 <list label="•">
-This is the first item.
+The user interface is far from complete; terribly sorry about
+that, but the we've been working on other areas of the project,
+and so now what the underlying file format supports has far outstripped
+the capabilities of the <project>Quill</project> editor.
 </list>
 <list label="•">
-Not to be outdone, this is the second item.
+The Parchment File Format is, or should be, stable now, and
+<project>Parchment</project> <bold>will</bold> properly render
+everything in it. So now we have a clear goal to work toward,
+and we will be building better editor support in the coming months.
 </list>
 <text>
 And that's it. No more list for you.
 </text>
-<text>
-...
-</text>
-<heading label="2.71">
+<heading label="2.718">
 To Be Continued
 </heading>
 <text>

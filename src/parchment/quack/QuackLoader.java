@@ -269,8 +269,8 @@ public class QuackLoader
         } else if ((block instanceof ChapterElement) || (block instanceof DivisionElement)) {
             preserve = false;
             if (segment != null) {
-                throw new IllegalStateException("\n"
-                        + "A <chapter> must be the first block in a Quack file.");
+                throw new IllegalStateException("\n" + "A " + block.toString()
+                        + " must be the first block in a Quack file.");
             }
             processData(block);
         } else if (block instanceof EndnoteElement) {
