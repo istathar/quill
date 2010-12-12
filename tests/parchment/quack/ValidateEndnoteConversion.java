@@ -27,6 +27,7 @@ import parchment.manuscript.Chapter;
 import parchment.manuscript.Manuscript;
 import quill.client.ImproperFilenameException;
 import quill.textbase.ChapterSegment;
+import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
@@ -230,6 +231,79 @@ public class ValidateEndnoteConversion extends QuackTestCase
 
         /*
          * Now, write out, and test. We shouldn't lose anything
+         */
+
+        compareDocument(series);
+    }
+
+    /*
+     * Bug is misplacement of whitespace when wrapping <cite> elements.
+     */
+    public final void testCitationInEndnoteWrapping() throws IOException, ValidityException,
+            ParsingException, ImproperFilenameException {
+        Series series;
+        Segment segment;
+        Extract entire;
+        Span span;
+
+        series = loadDocument("tests/parchment/quack/EndnoteWrappingBug.xml");
+
+        assertEquals(2, series.size());
+
+        segment = series.getSegment(0);
+        assertTrue(segment instanceof ChapterSegment);
+        segment = series.getSegment(1);
+        assertTrue(segment instanceof EndnoteSegment);
+
+        /*
+         * This is pretty specific, but was debugging whether the problem was
+         * in the Loader or...
+         */
+
+        entire = segment.getEntire();
+
+        entire.visit(new SpanVisitor() {
+            private int i;
+
+            public boolean visit(Span span) {
+                String str;
+                Markup markup;
+
+                str = span.getText();
+                markup = span.getMarkup();
+
+                switch (i) {
+                case 0:
+                    assertEquals("Enriched personal lives. See colophon to ", str);
+                    break;
+                case 1:
+                    assertTrue(span instanceof MarkerSpan);
+                    assertTrue(markup == Special.CITE);
+                    assertEquals("[12]", span.getText());
+                    break;
+                case 2:
+                    assertEquals(" and ", str);
+                    break;
+                case 3:
+                    assertTrue(span instanceof MarkerSpan);
+                    assertTrue(markup == Special.CITE);
+                    assertEquals("[18]", span.getText());
+                    break;
+                case 4:
+                    assertEquals(".", str);
+                    break;
+                default:
+                    fail();
+                }
+
+                i++;
+                return false;
+            }
+        });
+
+        /*
+         * Now, write out, and test. We shouldn't change anything, but we were
+         * getting spaces moved around.
          */
 
         compareDocument(series);
