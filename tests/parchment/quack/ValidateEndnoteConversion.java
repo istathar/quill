@@ -27,6 +27,7 @@ import parchment.manuscript.Chapter;
 import parchment.manuscript.Manuscript;
 import quill.client.ImproperFilenameException;
 import quill.textbase.ChapterSegment;
+import quill.textbase.CharacterSpan;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.MarkerSpan;
@@ -237,7 +238,8 @@ public class ValidateEndnoteConversion extends QuackTestCase
     }
 
     /*
-     * Bug is misplacement of whitespace when wrapping <cite> elements.
+     * Bug encountered due to misplacement of captured newlines when wrapping
+     * text followed by a <cite> element.
      */
     public final void testCitationInEndnoteWrapping() throws IOException, ValidityException,
             ParsingException, ImproperFilenameException {
@@ -282,14 +284,18 @@ public class ValidateEndnoteConversion extends QuackTestCase
                     assertEquals("[12]", span.getText());
                     break;
                 case 2:
-                    assertEquals(" and ", str);
+                    assertEquals(" and", str);
                     break;
                 case 3:
+                    assertTrue(span instanceof CharacterSpan);
+                    assertEquals(" ", str);
+                    break;
+                case 4:
                     assertTrue(span instanceof MarkerSpan);
                     assertTrue(markup == Special.CITE);
                     assertEquals("[18]", span.getText());
                     break;
-                case 4:
+                case 5:
                     assertEquals(".", str);
                     break;
                 default:
