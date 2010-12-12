@@ -1719,6 +1719,7 @@ public abstract class RenderEngine
         final Pixbuf pixbuf;
         final TextChain chain;
         final Extract extract;
+        final double dpi;
         final Area image;
 
         manuscript = folio.getManuscript();
@@ -1737,7 +1738,32 @@ public abstract class RenderEngine
             return;
         }
 
-        image = layoutAreaImage(cr, pixbuf);
+        /*
+         * FIXME This is a monster, horrible hack: we have to have some notion
+         * of what the assumed resolution of the source image is. There is, at
+         * present, no way to find this out.
+         * 
+         * So we use the following heuristic: if the file is an SVG, then use
+         * Inkscape's default of 1 px @ 90 dpi (which flows from the SVG
+         * specification which in turn references the CSS specification).
+         * 
+         * Otherwise, we rather arbitrarily go for the old Macintosh
+         * definition (which even less firmly became the web standard) of 1 px
+         * 
+         * @ 72 dpi.
+         * 
+         * This is of course completely meaningless for digital photos, but we
+         * kinda assume that a decent photo will be wider than available page
+         * width and so will get down scaled to margins and that's that.
+         */
+
+        if (filename.endsWith(".svg")) {
+            dpi = 90.0;
+        } else {
+            dpi = 72.0;
+        }
+
+        image = layoutAreaImage(cr, pixbuf, dpi);
         accumulate(image);
     }
 
@@ -1783,26 +1809,29 @@ public abstract class RenderEngine
      * 
      * @param cr
      */
-    protected final Area layoutAreaImage(final Context cr, final Pixbuf pixbuf) {
+    protected final Area layoutAreaImage(final Context cr, final Pixbuf pixbuf, final double dpi) {
         final double width, height;
-        final double available, scaleFactor, request;
+        final double conversionFactor, available, scaleFactor, request;
         final double leftCorner;
         final Origin origin;
         final Area area;
 
-        width = pixbuf.getWidth();
-        height = pixbuf.getHeight();
+        conversionFactor = 72.0 / dpi;
+
+        width = pixbuf.getWidth() * conversionFactor;
+        height = pixbuf.getHeight() * conversionFactor;
 
         available = pageWidth - rightMargin - leftMargin;
 
         if (width > available) {
             scaleFactor = available / width;
             leftCorner = leftMargin;
+            request = height * scaleFactor;
         } else {
-            scaleFactor = 1.0;
+            scaleFactor = conversionFactor; // was 1.0
             leftCorner = pageWidth / 2 - width / 2;
+            request = height;
         }
-        request = height * scaleFactor;
 
         origin = new Origin(folioIndex, seriesIndex, 0);
         area = new ImageArea(origin, leftCorner, request, pixbuf, scaleFactor);
