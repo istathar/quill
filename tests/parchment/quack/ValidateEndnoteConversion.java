@@ -246,7 +246,6 @@ public class ValidateEndnoteConversion extends QuackTestCase
         Series series;
         Segment segment;
         Extract entire;
-        Span span;
 
         series = loadDocument("tests/parchment/quack/EndnoteWrappingBug.xml");
 
@@ -310,6 +309,67 @@ public class ValidateEndnoteConversion extends QuackTestCase
         /*
          * Now, write out, and test. We shouldn't change anything, but we were
          * getting spaces moved around.
+         */
+
+        compareDocument(series);
+    }
+
+    /*
+     * Bug encountered is insertion of spurious whitespace at wrap boundary
+     * inserted between </italics> and <cite> element.
+     */
+    public final void testNoteInQuotationWrapping() throws IOException, ValidityException,
+            ParsingException, ImproperFilenameException {
+        Series series;
+        Segment segment;
+        Extract entire;
+
+        series = loadDocument("tests/parchment/quack/QuoteWithNoteWrappingBug.xml");
+
+        assertEquals(2, series.size());
+
+        segment = series.getSegment(0);
+        assertTrue(segment instanceof ChapterSegment);
+        segment = series.getSegment(1);
+        assertTrue(segment instanceof QuoteSegment);
+
+        entire = segment.getEntire();
+
+        /*
+         * Should be what we expect, otherwise the problem is in the Loader.
+         */
+
+        entire.visit(new SpanVisitor() {
+            private int i;
+
+            public boolean visit(Span span) {
+                String str;
+                Markup markup;
+
+                str = span.getText();
+                markup = span.getMarkup();
+
+                switch (i) {
+                case 0:
+                    assertEquals("\"A plan is simply a common basis for change\"", str);
+                    break;
+                case 1:
+                    assertTrue(span instanceof MarkerSpan);
+                    assertTrue(markup == Special.NOTE);
+                    assertEquals("14", span.getText());
+                    break;
+                default:
+                    fail();
+                }
+
+                i++;
+                return false;
+            }
+        });
+
+        /*
+         * Now, write out, and test. Nothing should have changed, and if it
+         * has the problem is in the Converter.
          */
 
         compareDocument(series);
