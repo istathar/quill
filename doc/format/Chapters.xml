@@ -394,7 +394,45 @@ a) we didn't need the granularity in navigation, b) the idea
 of depth in an outline leads to the need to constantly promote
 and demote sections, increasing complexity for little gain; and
 c) if you want to create such an effect (as appears in this document)
-just use emboldened text. 
+just use emboldened text.
+</text>
+<text>
+<bold>Endnotes and Reference blocks</bold>,
+<literal>&lt;endnote&gt;</literal> and
+<literal>&lt;reference&gt;</literal>
+</text>
+<text>
+The body of each endnotes is stored in an
+<literal>&lt;endnote&gt;</literal> block at the end of whichever
+chapter it appears. Endnotes have a label stored in the
+<literal>name</literal> attribute which corresponds to the label
+used on the note anchor in the text. 
+</text>
+<code xml:space="preserve">
+&lt;endnote name="3"&gt;
+For further details about what the words
+really mean, consult the Oxford English
+Dictionary.
+&lt;/endnote&gt;
+</code>
+<text>
+References are similarly block level elements:
+</text>
+<code xml:space="preserve">
+&lt;reference name="[Einstein]"&gt;
+"On the Electrodynamics of Moving Bodies", in
+&lt;title&gt;Annalen der Physik&lt;/title&gt; (17, pages
+891-921,26 Sep 1905)
+&lt;/reference&gt;
+</code>
+<text>
+Our convention is that references are collected and are saved
+at the end of the last chapter of a document.
+</text>
+<text>
+Endnote and reference blocks are <italics>not</italics> rendered
+where they are encountered; they are collected and output when
+a <literal>&lt;special&gt;</literal> block is used. See below.
 </text>
 <text>
 <bold>Division, Chapter, and Section labels</bold>
@@ -425,9 +463,9 @@ We weren't in a rush to add these; some people use outline numbering
 compulsively but it's surprising how well you can do without
 them. Nevertheless adding <literal>label</literal> future-proofs
 us against the requirement of numbering chapter and section headings
-(some of our internal reference documents indeed use such numbering)
-and these labels will also in due course serve us when we cook
-up a table of contents. Speaking of which...
+(some of our internal documents indeed use such numbering) and
+these labels will also in due course serve us when we cook up
+a table of contents. Speaking of which...
 </text>
 <text>
 <bold>Special blocks</bold>, <literal>&lt;special&gt;</literal>
@@ -438,8 +476,9 @@ mark the insertion point where generated list of collected endnotes
 and the generated list of collected references are to be rendered.
 <literal>&lt;special&gt;</literal> is empty, with a single attribute
 <literal>type</literal> indicating which it is. Valid values
-are "endnotes", "references", and "contents" (for future use
-as the insertion point when we have generated tables of contents).
+are "<literal>endnotes</literal>", "<literal>references</literal>",
+and "<literal>contents</literal>" (for future use as the insertion
+point when we have generated tables of contents).
 </text>
 <text>
 This block type allows you to control the heading and any necessary
@@ -634,5 +673,95 @@ in small caps, hence an independent markup type so the
 <text>
 Mostly this markup will show up when you're writing notes and
 references, but it can be used everywhere, of course.
+</text>
+<text>
+<bold>Notes</bold>, <literal>&lt;note&gt;</literal>
+</text>
+<text>
+Finally we have two special inlines to indicate the position
+of an endnote anchor or citation anchor. Both elements are empty
+but have a <literal>ref</literal> attribute which specifies the
+text of the anchor.
+</text>
+<text>
+The text of a note's <literal>ref</literal> attribute is rendered
+in a smaller font and raised off the baseline. Notes appear in
+text as follows:
+</text>
+<code xml:space="preserve">
+Without a doubt, that is true.&lt;note ref="42"/&gt;
+</code>
+<text>
+would indicate the 42nd endnote of a given chapter.
+</text>
+<text>
+The Quack Schema does not enforce any particular numbering scheme,
+and nor does it enforce whether you have to restart numbering
+each chapter (though that convention, and clearly advisable on
+a work of any significant length). Obviously there should only
+be one <literal>&lt;note&gt;</literal> marker per
+<literal>&lt;endnote&gt;</literal>.
+</text>
+<text>
+As discussed above, it is convention to put the
+<literal>&lt;endnote&gt;</literal> element for a given
+<literal>&lt;note&gt;</literal> marker at the bottom of the
+<literal>.xml</literal> file the note appears in.
+</text>
+<text>
+<bold>Citations</bold>, <literal>&lt;cite&gt;</literal>
+</text>
+<text>
+Unlike note anchors, the text of a citation's <literal>ref</literal>
+attribute will by default be rendered as normal text in the serif
+font. Citations can appear anywhere in the main chapter body
+or (more usually) in <literal>&lt;endnote&gt;</literal>s. For
+people using numerical references such a citation might appear
+as follows:
+</text>
+<code xml:space="preserve">
+Wisdom about boolean logic taken from Joda's
+trestise on the philosophy of film critics;
+see &lt;cite ref="[13]"/&gt;, page 351.
+</code>
+<text>
+while people using named references might see this:
+</text>
+<code xml:space="preserve">
+It is an important and popular fact that things are
+not always what they seem was written in an important
+and popular novel &lt;cite ref="[Adams]"/&gt;.
+</code>
+<text>
+or perhaps,
+</text>
+<code xml:space="preserve">
+In the paper &lt;title&gt;On the electrodynamics of moving
+bodies&lt;/title&gt; &lt;cite ref="(Einstein, 1905)/&gt; it was
+pointed out that things are not always what they seem.
+</code>
+<text>
+or any other variation, really. The text of the reference is
+up to the author.
+</text>
+<text>
+There is nothing in the Quack Schema that enforces any special
+requirement to have the reference label correspond to the name
+of an <literal>&lt;reference&gt;</literal> at the end of the
+document - while obviously the work would be incomplete without
+it, it's not an <italics>a priori</italics> validation requirement.
+Ensuring the <literal>&lt;cite&gt;</literal>'s <literal>ref</literal>
+value aligns with a <literal>&lt;reference&gt;</literal>'s
+<literal>name</literal> value is up to the editor; as far as
+<project>Parchment</project> is concerned they're all just text
+to be rendered.
+</text>
+<text>
+That said, the whole reason references are inline anchors is
+so that <project>Quill</project> can present a user interface
+which jumps the user to the reference text in a similar manner
+to endnotes. Unlike notes, though, there is no logical limitation
+on the number of times a reference anchor can appear with a given
+label.
 </text>
 </quack>
