@@ -3,4 +3,64 @@
 <division>
 The Parchment File Format
 </division>
+<text/>
+<text/>
+<leader>
+Abstract
+</leader>
+<quote>
+<italics>The on-disk file format used by the</italics>
+<project>Quill</project><italics> what-you-see-is-what-you-need
+document editor and presented by the</italics>
+<project>Parchment</project><italics> what-you-get-is-what-you-want
+rendering engine is a little unconventional: it's text based,
+so you can use version control. The schema is extraordinarily
+simplistic, meaning that it can be worked with programatically.
+More importantly, it can be fixed by humans when it breaks. And
+finally, the format is actually designed to support technical
+writing and technical writers.</italics>
+</quote>
+<quote>
+<italics>Not to worry; this is not the dawn of the millennium;
+the program will probably crash and eat your data. All is as
+it should be.</italics>
+</quote>
+<quote>
+<italics>But if you're interested in the design decisions that
+led to the Parchment File Format being what it is, then you will
+find here some background along with our documentation of the
+"Manuscript Schema" (found in the </italics>
+<literal>.parchment</literal><italics> files), and the "Quack
+Schema" (the chapters in </italics><literal>.xml</literal><italics>
+files that make up those manuscripts).</italics>
+</quote>
+<quote/>
+<text/>
+<text/>
+<text/>
+<text>
+Copyright © 2010 Operational Dynamics Consulting, Pty Ltd.
+</text>
+<text>
+This document describes the file format used for storing chapters
+created by the <project>Quill and Parchment</project> suite of
+programs along with the metadata files used to describe documents
+as a whole.
+</text>
+<text>
+As such, this file forms an integral part of the source code
+of the program it accompanies, and is made available to you by
+its authors under the terms of the <title>GNU General Public
+Licence version 2</title>. See the <filename>LICENCE</filename>
+file for the terms governing usage, copying and redistribution.
+</text>
+<text>
+Although you have the freedom to use the information in this
+document in accordance with this licence, the schema it describes
+is controlled by the <acronym>XML</acronym> Standards Team at
+Operational Dynamics. Changes will only be made after public
+consultation and in correlation with support in the <project>Quill
+and Parchment</project> application for such new schema versions
+to ensure forward and backwards compatibility.
+</text>
 </quack>
