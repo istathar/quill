@@ -394,7 +394,45 @@ a) we didn't need the granularity in navigation, b) the idea
 of depth in an outline leads to the need to constantly promote
 and demote sections, increasing complexity for little gain; and
 c) if you want to create such an effect (as appears in this document)
-just use emboldened text. 
+just use emboldened text.
+</text>
+<text>
+<bold>Endnotes and Reference blocks</bold>,
+<literal>&lt;endnote&gt;</literal> and
+<literal>&lt;reference&gt;</literal>
+</text>
+<text>
+The body of each endnotes is stored in an
+<literal>&lt;endnote&gt;</literal> block at the end of whichever
+chapter it appears. Endnotes have a label stored in the
+<literal>name</literal> attribute which corresponds to the label
+used on the note anchor in the text. 
+</text>
+<code xml:space="preserve">
+&lt;endnote name="3"&gt;
+For further details about what the words
+really mean, consult the Oxford English
+Dictionary.
+&lt;/endnote&gt;
+</code>
+<text>
+References are similarly block level elements:
+</text>
+<code xml:space="preserve">
+&lt;reference name="[Einstein]"&gt;
+"On the Electrodynamics of Moving Bodies", in
+&lt;title&gt;Annalen der Physik&lt;/title&gt; (17, pages
+891-921,26 Sep 1905)
+&lt;/reference&gt;
+</code>
+<text>
+Our convention is that references are collected and are saved
+at the end of the last chapter of a document.
+</text>
+<text>
+Endnote and reference blocks are <italics>not</italics> rendered
+where they are encountered; they are collected and output when
+a <literal>&lt;special&gt;</literal> block is used. See below.
 </text>
 <text>
 <bold>Division, Chapter, and Section labels</bold>
@@ -438,8 +476,9 @@ mark the insertion point where generated list of collected endnotes
 and the generated list of collected references are to be rendered.
 <literal>&lt;special&gt;</literal> is empty, with a single attribute
 <literal>type</literal> indicating which it is. Valid values
-are "endnotes", "references", and "contents" (for future use
-as the insertion point when we have generated tables of contents).
+are "<literal>endnotes</literal>", "<literal>references</literal>",
+and "<literal>contents</literal>" (for future use as the insertion
+point when we have generated tables of contents).
 </text>
 <text>
 This block type allows you to control the heading and any necessary
@@ -705,7 +744,6 @@ pointed out that things are not always what they seem.
 or any other variation, really. The text of the reference is
 up to the author.
 </text>
-<text/>
 <text>
 There is nothing in the Quack Schema that enforces any special
 requirement to have the reference label correspond to the name
