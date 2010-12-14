@@ -108,7 +108,7 @@ public class ValidateThereAndBackAgain extends IOTestCase
         manuscript = new Manuscript();
         manuscript.setFilename("tests/ExampleDocument.parchment");
         chapter = new Chapter(manuscript);
-        chapter.setFilename("tests/SomeOfEverything.xml");
+        chapter.setFilename("SomeOfEverything.xml");
         series = chapter.loadDocument();
 
         for (i = 1; i <= 70; i++) {

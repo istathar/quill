@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -18,10 +18,11 @@
  */
 package parchment.quack;
 
-public class CodeElement extends BlockElement implements Block, Preserve
+/**
+ * Marker interface for [block] elements that preserve whitespace.
+ * 
+ * @author Andrew Cowie
+ */
+public interface Preserve extends Tag
 {
-    public CodeElement() {
-        super("code");
-        super.setPreserveWhitespace();
-    }
 }

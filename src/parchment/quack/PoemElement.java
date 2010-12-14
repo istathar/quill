@@ -23,7 +23,7 @@ package parchment.quack;
  * 
  * @author Andrew Cowie
  */
-public class PoemElement extends BlockElement implements Block
+public class PoemElement extends BlockElement implements Block, Preserve
 {
     public PoemElement() {
         super("poem");
