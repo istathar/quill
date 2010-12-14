@@ -465,7 +465,7 @@ public abstract class RenderEngine
                     filename = segment.getImage();
                     appendSegmentBreak(cr);
                     appendExternalGraphic(cr, filename);
-                    if (entire == null) {
+                    if (entire.getWidth() == 0) {
                         continue;
                     }
                     appendSegmentBreak(cr);
@@ -1087,7 +1087,7 @@ public abstract class RenderEngine
         Origin origin;
         Area area;
 
-        if (extract == null) {
+        if ((extract == null) || (extract.getWidth() == 0)) {
             return new Area[] {};
         }
 
@@ -1744,13 +1744,12 @@ public abstract class RenderEngine
          * present, no way to find this out.
          * 
          * So we use the following heuristic: if the file is an SVG, then use
-         * Inkscape's default of 1 px @ 90 dpi (which flows from the SVG
+         * Inkscape's default of 90 pixels per inch (which flows from the SVG
          * specification which in turn references the CSS specification).
          * 
          * Otherwise, we rather arbitrarily go for the old Macintosh
-         * definition (which even less firmly became the web standard) of 1 px
-         * 
-         * @ 72 dpi.
+         * definition (which even less firmly became the web standard) of 72
+         * pixels per inch.
          * 
          * This is of course completely meaningless for digital photos, but we
          * kinda assume that a decent photo will be wider than available page
