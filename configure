@@ -518,7 +518,7 @@ if ($os eq "gentoo") {
 	check_prereq(@xom_jars,
 			"Jaxen XPath engine",
 			"dev-java/jaxen",
-			"/usr/share/jaxen/lib/jaxen.jar");
+			"/usr/share/jaxen-1.1/lib/jaxen.jar");
 
 	check_prereq(@junit_jars,
 			"JUnit test framework",
