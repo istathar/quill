@@ -30,33 +30,6 @@ instance?).
 Should individual chapters be launchable, or just the document?
 </text>
 <heading>
-Saving
-</heading>
-<text>
-<bold>Line wrapping of XML output</bold>
-</text>
-<text>
-The line-breaking algorithm in <project>Xom</project> is rather poor:
-it takes the maximum line length specified, subtracts 10, and then
-looks for a possible line break after that point. This makes for
-erratic justification, trailing space characters, and other artifacts.
-This is due to <project>Xom</project>'s <type>Serializer</type>
-handles its output one character at a time and has no look ahead /
-read back capability.
-</text>
-<text>
-It may be better for us to write the output file to a
-<type>StringWriter</type> or <type>ByteArrayOutputStream</type> and
-then do the breaks manually by doing <literal>' '</literal> to
-<literal>'\n' </literal>replacements.
-</text>
-<text>
-For what it's worth, though, it's getting closer to the point where
-<italics>not</italics> using <project>Xom</project> and just doing the
-really minimal XML work ourselves would be feasible. Not really that
-interested going down the not-invented-here road, but...
-</text>
-<heading>
 User interface
 </heading>
 <text>

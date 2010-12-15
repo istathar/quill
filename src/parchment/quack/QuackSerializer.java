@@ -34,14 +34,28 @@ import nu.xom.Text;
 /**
  * Render a document as valid Quack XML. Modelled directly on the Xom
  * Serializer class, but after several iterations we finally just implemented
- * our own, so as to get better wrapping behaviour.
+ * our own, so as to get more accurate wrapping behaviour:
+ * 
+ * <ul>
+ * <li>Documents are wrapped at 70 characters width;
+ * <li>Whitespace is <b>not</b> inserted between consequtive inlines if a wrap
+ * boundary appears between them - the wrap occurs at whereever the candiate
+ * ' ' was;
+ * <li>Whitespace is <b>not</b> inserted between an inline and a text if a
+ * wrap boundary occurs there.
+ * <li>A start tags with an attribute whose width takes it over the edge is
+ * not broken in two; the previous candidate space is used. Only if the inline
+ * begins the line and is, with attribute, wider than 70 will it overflow.
+ * </ul>
+ * 
+ * In other words, the wrapping is correct, with the exception that for our
+ * own stylistic and aesthetic reasons we don't allow wrapping within tags.
  * 
  * @author Andrew Cowie
  */
 /*
- * We would have set this to 78 which is our habit for text files, but a)
- * XOM's line wrapping is a bit weak, and b) this gives us room for a \t in an
- * 80 column wide terminal.
+ * We would have set this to 78 which is our habit for text files, but this
+ * gives us room for a \t in an 80 column wide terminal.
  */
 class QuackSerializer
 {

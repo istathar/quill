@@ -625,4 +625,47 @@ right thing.
 Mostly this markup will show up when you're writing notes and
 references, but it can be used everywhere, of course.
 </text>
+<heading>
+Serializing
+</heading>
+<text>
+When chapters are serialized out to <acronym>XML</acronym>, the
+content is formatted as follows:
+</text>
+<list label="•">
+Quack files are word wrapped at 70 characters width when possible.
+Tags are not indented.
+</list>
+<list label="•">
+Start and end tags of block level elements are on their own lines. The
+extra newlines thus inserted are stripped from beginning and end of
+each block when reloading the document.
+</list>
+<list label="•">
+No wrapping is applied to the content of blocks which preserve
+formatting (<literal>&lt;code&gt;</literal> and
+<literal>&lt;poem&gt;</literal>). The content of these blocks
+<italics>is</italics> escaped - we don't write
+<literal>CDATA</literal> sections.
+</list>
+<list label="•">
+Element start tags which contain spaces (ie <literal>&lt;cite
+ref="[Alexander The Great, -323]"/&gt;</literal>) are
+<italics>not</italics> broken in two for wrapping. Either a space is
+on the line as an eligible break location before the
+<literal>'&lt;'</literal>, or the line will be allowed to overflow.
+</list>
+<list label="•">
+Newlines are never inserted between consecutive inlines, and likewise
+newlines are never inserted at the boundary between an an inline tag
+and a non-space character (you wouldn't expect to need to be explicit
+about this, but some <acronym>XML</acronym> libraries will incorrectly
+allow breaks to be inserted).
+</list>
+<text>
+Provided with <project>Quill and Parchment</project> is a simple front
+end, <command>format</command>, which normalizes a document by loading
+it and then saving it out again. This can be useful if you've had to
+manually change one of the chapter files after a merge.
+</text>
 </quack>
