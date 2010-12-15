@@ -6,30 +6,29 @@ Chapters
 <text>
 The central insight underling the Quack schema and the Parchment
 engine which renders it for display or printing is that ultimately,
-<italics>there is no structure in a document</italics>. When
-you read a book, you see prose, then a section's heading, then
-more prose, then an image, then a new chapter ... as they are
-printed they are just a series of blocks of similarly formatted
-paragraphs of text. One paragraph then another.
+<italics>there is no structure in a document</italics>. When you read
+a book, you see prose, then a section's heading, then more prose, then
+an image, then a new chapter ... as they are printed they are just a
+series of blocks of similarly formatted paragraphs of text. One
+paragraph then another.
 </text>
 <text>
-Structure that we impose in our documents - sections, chapters,
-parts, documents - are constructs that we have become accustomed
-to in outlines and in tables of content. People would consider
-that a paragraph of text is "in" a section which is "in" a chapter,
-but from a rendering standpoint, these are just a stream of lines
-of normal text, then a line of heading, then further lines of
-normal text.
+Structure that we impose in our documents - sections, chapters, parts,
+documents - are constructs that we have become accustomed to in
+outlines and in tables of content. People would consider that a
+paragraph of text is "in" a section which is "in" a chapter, but from
+a rendering standpoint, these are just a stream of lines of normal
+text, then a line of heading, then further lines of normal text.
 </text>
 <text>
-So the Quack schema is just that. At the top level is a linear
-series of "blocks", each of which is in a consistent format:
-normal prose, program code, a block quotation, section headings.
+So the Quack schema is just that. At the top level is a linear series
+of "blocks", each of which is in a consistent format: normal prose,
+program code, a block quotation, section headings.
 </text>
 <text>
 Blocks contain text and the second level of elements, termed
-"inlines", specifying a specific markup to be applied to a span
-of text.
+"inlines", specifying a specific markup to be applied to a span of
+text.
 </text>
 <text>
 <bold>Schema</bold>
@@ -44,24 +43,24 @@ component title block <literal>&lt;division&gt;</literal> or
 <literal>&lt;citation&gt;</literal>, <literal>&lt;poem&gt;</literal>,
 <literal>&lt;image&gt;</literal>, and
 <literal>&lt;special&gt;</literal> blocks, then a series of
-<literal>&lt;endnotes&gt;</literal> (if there are any), then
-a series of <literal>&lt;reference&gt;</literal>s (if there are
-any). By convention <literal>&lt;reference&gt;</literal> blocks
-will be shuffled to the end of the last component in the document
-when saving.
+<literal>&lt;endnotes&gt;</literal> (if there are any), then a series
+of <literal>&lt;reference&gt;</literal>s (if there are any). By
+convention <literal>&lt;reference&gt;</literal> blocks will be
+shuffled to the end of the last component in the document when saving.
 </text>
 <text>
 The blocks can contain the following inlines:
 <literal>&lt;italics&gt;</literal>, <literal>&lt;bold&gt;</literal>,
 <literal>&lt;filename&gt;</literal>, <literal>&lt;type&gt;</literal>,
 <literal>&lt;function&gt;</literal>,
-<literal>&lt;literal&gt;</literal>, <literal>&lt;project&gt;</literal>,
+<literal>&lt;literal&gt;</literal>,
+<literal>&lt;project&gt;</literal>,
 <literal>&lt;command&gt;</literal>,
-<literal>&lt;highlight&gt;</literal>, <literal>&lt;title&gt;</literal>,
-<literal>&lt;acronym&gt;</literal>, or
-<literal>&lt;keyboard&gt;</literal>. What these all mean is described
-below. <literal>:)</literal> There are also some special inlines
-which are empty elements: <literal>&lt;note&gt;</literal> and
+<literal>&lt;highlight&gt;</literal>,
+<literal>&lt;title&gt;</literal>, <literal>&lt;acronym&gt;</literal>,
+or <literal>&lt;keyboard&gt;</literal>. What these all mean is
+described below. <literal>:)</literal> There are also some special
+inlines which are empty elements: <literal>&lt;note&gt;</literal> and
 <literal>&lt;cite&gt;</literal> for note anchors and citations
 respectively.
 </text>
@@ -72,40 +71,39 @@ respectively.
 Discussion of how a given block type or inline markup is to be
 rendered is largely predicated on the reference
 <type>RenderEngine</type>s that ship by default with <project>Quill
-and Parchment</project>. The user (or the user's organization)
-is of course welcome to do anything they want, but the Quack
-format is largely there to support these processing expectations.
+and Parchment</project>. The user (or the user's organization) is of
+course welcome to do anything they want, but the Quack format is
+largely there to support these processing expectations.
 </text>
 <heading>
 Components
 </heading>
 <text>
 Chapters in the Quack schema are content-type
-<literal>text/xml</literal>, <literal>UTF-8</literal> encoded,
-with file extension <literal>.xml</literal>. The minimal document
-is:
+<literal>text/xml</literal>, <literal>UTF-8</literal> encoded, with
+file extension <literal>.xml</literal>. The minimal document is:
 </text>
 <code xml:space="preserve">
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0"/&gt;
 </code>
 <text>
-If that was in <filename>First.xml</filename> it could be a part
-of a Parchment document, and <project>Quill</project> would load
-it as an empty chapter.
+If that was in <filename>First.xml</filename> it could be a part of a
+Parchment document, and <project>Quill</project> would load it as an
+empty chapter.
 </text>
 <text>
-Component files generally begin with one of two special block
-types indicating the title for a component and, implicitly, what
-kinds of component a given file is.
+Component files generally begin with one of two special block types
+indicating the title for a component and, implicitly, what kinds of
+component a given file is.
 </text>
 <text>
 <bold>Chapter title blocks</bold>, <literal>&lt;chapter&gt;</literal>
 </text>
 <text>
-Real chapters start with a block giving the chapter title, followed
-by one or more content blocks with the body of the chapter. A
-slightly more complete example is as follows:
+Real chapters start with a block giving the chapter title, followed by
+one or more content blocks with the body of the chapter. A slightly
+more complete example is as follows:
 </text>
 <code xml:space="preserve">
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
@@ -135,25 +133,25 @@ Here we see a chapter title followed by a series of normal content
 blocks.
 </text>
 <text>
-The <literal>&lt;chapter&gt;</literal> blocks are rendered in
-the heading font at twice their size, and start on a new page.
+The <literal>&lt;chapter&gt;</literal> blocks are rendered in the
+heading font at twice their size, and start on a new page.
 </text>
 <text>
-Chapter titles are single line only (their text content will
-wrap, but you can't include a newline and nor can you have more
-than one <literal>&lt;chapter&gt;</literal> element per file).
+Chapter titles are single line only (their text content will wrap, but
+you can't include a newline and nor can you have more than one
+<literal>&lt;chapter&gt;</literal> element per file).
 </text>
 <text>
 <bold>Part title blocks</bold>, <literal>&lt;division&gt;</literal>
 </text>
 <text>
-There is sometimes a requirement to divide books into groups
-of chapters; these are often labelled "parts" and are formally
-known as the divisions of a book. While the Parchment File Format
-simply provides for a series of chapters, a short Quack Schema
-file which begins with a <literal>&lt;division&gt;</literal>
-block can be used to indicate a part title page... or indeed
-can be the title page for the work as a whole:
+There is sometimes a requirement to divide books into groups of
+chapters; these are often labelled "parts" and are formally known as
+the divisions of a book. While the Parchment File Format simply
+provides for a series of chapters, a short Quack Schema file which
+begins with a <literal>&lt;division&gt;</literal> block can be used to
+indicate a part title page... or indeed can be the title page for the
+work as a whole:
 </text>
 <code xml:space="preserve">
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
@@ -168,9 +166,9 @@ As told to Lake Groundcrawler.
 </code>
 <text>
 The reference implementation renders
-<literal>&lt;division&gt;</literal> blocks in the heading font
-at three times the size of normal headings and pushes them down
-the page somewhat. Part titles are also single line only.
+<literal>&lt;division&gt;</literal> blocks in the heading font at
+three times the size of normal headings and pushes them down the page
+somewhat. Part titles are also single line only.
 </text>
 <heading>
 Blocks
@@ -183,8 +181,8 @@ are wrapped at 70 characters.
 <bold>Normal text blocks</bold>, <literal>&lt;text&gt;</literal>
 </text>
 <text>
-Normal prose intended to flow onto subsequent lines being word
-wrapped at page margin. 
+Normal prose intended to flow onto subsequent lines being word wrapped
+at page margin. 
 </text>
 <text>
 On-disk, text is likewise word wrapped so that lines are
@@ -195,8 +193,8 @@ back to spaces). To begin a new paragraph we start another
 <literal>&lt;text&gt;</literal> block.
 </text>
 <text>
-Pure <acronym>XML</acronym> takes a somewhat puritanical approach;
-you often see text like this:
+Pure <acronym>XML</acronym> takes a somewhat puritanical approach; you
+often see text like this:
 </text>
 <code xml:space="preserve">
 &lt;para&gt;This is some text
@@ -207,10 +205,10 @@ the next
 paragraph.&lt;/para&gt;
 </code>
 <text>
-which looks pretty stupid in long text runs because the tags
-get in the way. We instead take the same approach as used by
-<acronym>HTML</acronym> whereby leading and trailing newlines
-are trimmed. So we have:
+which looks pretty stupid in long text runs because the tags get in
+the way. We instead take the same approach as used by
+<acronym>HTML</acronym> whereby leading and trailing newlines are
+trimmed. So we have:
 </text>
 <code xml:space="preserve">
 &lt;text&gt;
@@ -224,27 +222,27 @@ next paragraph.
 &lt;/text&gt;
 </code>
 <text>
-which looks a lot better and is <italics>much</italics> easier
-to deal with when merging.
+which looks a lot better and is <italics>much</italics> easier to deal
+with when merging.
 </text>
 <text>
 <bold>Preformatted blocks</bold>, <literal>&lt;code&gt;</literal>
 </text>
 <text>
-The major use of of Quill and Parchment is technical writing,
-so after normal prose the most common block type is preformatted
-computer program source code.
+The major use of of Quill and Parchment is technical writing, so after
+normal prose the most common block type is preformatted computer
+program source code.
 </text>
 <text>
 These blocks are <italics>not</italics> wrapped. Whitespace (newlines,
 spaces, and tabs) is preserved.
 </text>
 <text>
-The code we use for reading and writing <acronym>XML</acronym>,
-an excellent library called <project>Xom</project>, is rigorously
+The code we use for reading and writing <acronym>XML</acronym>, an
+excellent library called <project>Xom</project>, is rigorously
 standards compliant and properly escapes <literal>'&lt;'</literal>,
-<literal>'&gt;'</literal>, <literal>'&amp;'</literal> and friends
-as entities.
+<literal>'&gt;'</literal>, <literal>'&amp;'</literal> and friends as
+entities.
 </text>
 <text>
 <bold>Quote blocks</bold>, <literal>&lt;quote&gt;</literal>
@@ -253,48 +251,47 @@ as entities.
 There are two block types for quotations: blockquotes and poems.
 </text>
 <text>
-Blockquote are expected to be presented indented from the margin
-on both sides. They <italics>are</italics> word wrapped. If the
-<type>RenderEngine</type> is double spacing normal text the text
-in a quote would not be double spaced.
+Blockquote are expected to be presented indented from the margin on
+both sides. They <italics>are</italics> word wrapped. If the
+<type>RenderEngine</type> is double spacing normal text the text in a
+quote would not be double spaced.
 </text>
 <text>
 <bold>Poetry blocks</bold>, <literal>&lt;poem&gt;</literal>
 </text>
 <text>
-Poems are passages which are <italics>not</italics> word wrapped.
-You wouldn't really expect poems to be offset indented like blockquotes
-- these are ultimately just normal text blocks that happen to
-preserve whitespace - but presentation is ultimately up to the
+Poems are passages which are <italics>not</italics> word wrapped. You
+wouldn't really expect poems to be offset indented like blockquotes -
+these are ultimately just normal text blocks that happen to preserve
+whitespace - but presentation is ultimately up to the
 <type>RenderEngine</type> being used.
 </text>
 <text>
 <bold>Attribution blocks</bold>, <literal>&lt;credit&gt;</literal>
 </text>
 <text>
-These are specialist blocks that are for giving attribution to
-a passage, be it a block quote or poetic in nature. Though you'd
-often expect only one wrapped blurb of text, a new paragraph
-triggered by <literal>'\n'</literal> in the editor would result
-in a subsequent <literal>&lt;credit&gt;</literal> block, as is
-the case with <literal>&lt;text&gt;</literal> and
-<literal>&lt;quote&gt;</literal> blocks. Attribution blocks are
-rendered offset to the far right of the page in a somewhat smaller
-font.
+These are specialist blocks that are for giving attribution to a
+passage, be it a block quote or poetic in nature. Though you'd often
+expect only one wrapped blurb of text, a new paragraph triggered by
+<literal>'\n'</literal> in the editor would result in a subsequent
+<literal>&lt;credit&gt;</literal> block, as is the case with
+<literal>&lt;text&gt;</literal> and <literal>&lt;quote&gt;</literal>
+blocks. Attribution blocks are rendered offset to the far right of the
+page in a somewhat smaller font.
 </text>
 <text>
 <bold>Image blocks</bold>, <literal>&lt;image&gt;</literal>
 </text>
 <text>
-Places an image in the document. The source file of the image
-is specified in the <literal>src</literal> attribute:
+Places an image in the document. The source file of the image is
+specified in the <literal>src</literal> attribute:
 </text>
 <code xml:space="preserve">
 &lt;image src="OldMap.jpg"/&gt;
 </code>
 <text>
-Images can have single paragraph "captions", which are the bodies
-of the <literal>&lt;image&gt;</literal> block:
+Images can have single paragraph "captions", which are the bodies of
+the <literal>&lt;image&gt;</literal> block:
 </text>
 <code xml:space="preserve">
 &lt;image src="OldMap.jpg"&gt;
@@ -302,40 +299,40 @@ A map of the ancient world.
 &lt;/image&gt;
 </code>
 <text>
-Note that there are no inline images in the Quack schema. In
-virtually everything we've studied in the document classes we
-care about, the illustrations, figures, and photos stand on their
-own. Incidentally, this design decision meant we could completely
-ignore problems about specifying the word flow around embedded
-images. An image is just another block in the flow of a chapter.
+Note that there are no inline images in the Quack schema. In virtually
+everything we've studied in the document classes we care about, the
+illustrations, figures, and photos stand on their own. Incidentally,
+this design decision meant we could completely ignore problems about
+specifying the word flow around embedded images. An image is just
+another block in the flow of a chapter.
 </text>
 <text>
-Images are scaled down so that they exactly fit between left
-and right margins, or rendered at their natural resolution if
-smaller than the available width. So you can either a) throw
-a high-resolution photo at <project>Parchment</project> and it
-will make the most use of it, or b) specify the size in the source
-file, thereby maintaining control of scaling in the external
-tool you used to create your graphics in the first place.
+Images are scaled down so that they exactly fit between left and right
+margins, or rendered at their natural resolution if smaller than the
+available width. So you can either a) throw a high-resolution photo at
+<project>Parchment</project> and it will make the most use of it, or
+b) specify the size in the source file, thereby maintaining control of
+scaling in the external tool you used to create your graphics in the
+first place.
 </text>
 <text>
 <bold>List blocks</bold>, <literal>&lt;list&gt;</literal>
 </text>
 <text>
-Sometimes one needs to present information in lists, be they
-unordered ("bullet lists") or ordered. We were going to leave
-this for a later version, but implementing the rendering for
-notes and references gave us the tools for rendering lists. So
-we have added the <literal>&lt;list&gt;</literal> block type.
+Sometimes one needs to present information in lists, be they unordered
+("bullet lists") or ordered. We were going to leave this for a later
+version, but implementing the rendering for notes and references gave
+us the tools for rendering lists. So we have added the
+<literal>&lt;list&gt;</literal> block type.
 </text>
 <text>
 Each <literal>'\n'</literal> separated paragraph is its own
 <literal>&lt;list&gt;</literal> block as with
-<literal>&lt;text&gt;</literal>, <literal>&lt;quote&gt;</literal>,
-etc blocks. Thus a single list item may be spread across multiple
-<literal>&lt;list&gt;</literal> blocks. The start of a "new"
-list item is indicated by the presence of a <literal>label</literal>
-attribute with the text of the bullet or ordinal to be rendered:
+<literal>&lt;text&gt;</literal>, <literal>&lt;quote&gt;</literal>, etc
+blocks. Thus a single list item may be spread across multiple
+<literal>&lt;list&gt;</literal> blocks. The start of a "new" list item
+is indicated by the presence of a <literal>label</literal> attribute
+with the text of the bullet or ordinal to be rendered:
 </text>
 <code xml:space="preserve">
 &lt;list label="1."&gt;
@@ -353,14 +350,14 @@ This is the second item.
 <text>
 Clearly the "type" of list is up to what the author puts in the
 labels; there is no differentiation in the Quack schema between
-ordered and unordered list items. While it would be unusual,
-there is no schema requirement for the first list item to have
-a label, giving a level of indent between normal and quote.
+ordered and unordered list items. While it would be unusual, there is
+no schema requirement for the first list item to have a label, giving
+a level of indent between normal and quote.
 </text>
 <text>
-Internally, <project>Quill</project> treats lists specially;
-they are one <type>ListitemSegment</type> per bullet; the only
-case where <type>Segment</type>s of the same type run consecutively.
+Internally, <project>Quill</project> treats lists specially; they are
+one <type>ListitemSegment</type> per bullet; the only case where
+<type>Segment</type>s of the same type run consecutively.
 </text>
 <text>
 <bold>Section blocks</bold>, <literal>&lt;heading&gt;</literal>
@@ -375,34 +372,31 @@ Headings are single line only (strictly, a single wrapped paragraph,
 but you get the idea).
 </text>
 <text>
-Section headings are rendered in the heading font. Ideally this
-is something at the very least larger and hopefully visually
-distinct from the serif font used for normal text. New documents
-provide a default configuration which has the heading font at
-5.6mm tall as compared to 3.2mm high for the serif font, and
-in a small caps variant, creating an effect somewhat reminiscent
-of museum caps.
+Section headings are rendered in the heading font. Ideally this is
+something at the very least larger and hopefully visually distinct
+from the serif font used for normal text. New documents provide a
+default configuration which has the heading font at 5.6mm tall as
+compared to 3.2mm high for the serif font, and in a small caps
+variant, creating an effect somewhat reminiscent of museum caps.
 </text>
 <text>
 The <project>Quill</project> user interface treats headings specially;
-they provide points you can easily navigate to via the outline
-pane.
+they provide points you can easily navigate to via the outline pane.
 </text>
 <text>
-Note that there is no "subheading" block type. This is because
-a) we didn't need the granularity in navigation, b) the idea
-of depth in an outline leads to the need to constantly promote
-and demote sections, increasing complexity for little gain; and
-c) if you want to create such an effect (as appears in this document)
-just use emboldened text. 
+Note that there is no "subheading" block type. This is because a) we
+didn't need the granularity in navigation, b) the idea of depth in an
+outline leads to the need to constantly promote and demote sections,
+increasing complexity for little gain; and c) if you want to create
+such an effect (as appears in this document) just use emboldened text. 
 </text>
 <text>
 <bold>Division, Chapter, and Section labels</bold>
 </text>
 <text>
-Section headings along with chapter titles and part tiles can
-have an optional <literal>label</literal> attribute; this allows
-you to create a numbered outline if necessary:
+Section headings along with chapter titles and part tiles can have an
+optional <literal>label</literal> attribute; this allows you to create
+a numbered outline if necessary:
 </text>
 <code xml:space="preserve">
 &lt;chapter label="1"&gt;
@@ -422,29 +416,29 @@ At the commencement of it all, ...
 </code>
 <text>
 We weren't in a rush to add these; some people use outline numbering
-compulsively but it's surprising how well you can do without
-them. Nevertheless adding <literal>label</literal> future-proofs
-us against the requirement of numbering chapter and section headings
-(some of our internal reference documents indeed use such numbering)
-and these labels will also in due course serve us when we cook
-up a table of contents. Speaking of which...
+compulsively but it's surprising how well you can do without them.
+Nevertheless adding <literal>label</literal> future-proofs us against
+the requirement of numbering chapter and section headings (some of our
+internal reference documents indeed use such numbering) and these
+labels will also in due course serve us when we cook up a table of
+contents. Speaking of which...
 </text>
 <text>
 <bold>Special blocks</bold>, <literal>&lt;special&gt;</literal>
 </text>
 <text>
-Finally there is a special block type for special cases. These
-mark the insertion point where generated list of collected endnotes
-and the generated list of collected references are to be rendered.
+Finally there is a special block type for special cases. These mark
+the insertion point where generated list of collected endnotes and the
+generated list of collected references are to be rendered.
 <literal>&lt;special&gt;</literal> is empty, with a single attribute
-<literal>type</literal> indicating which it is. Valid values
-are "endnotes", "references", and "contents" (for future use
-as the insertion point when we have generated tables of contents).
+<literal>type</literal> indicating which it is. Valid values are
+"endnotes", "references", and "contents" (for future use as the
+insertion point when we have generated tables of contents).
 </text>
 <text>
 This block type allows you to control the heading and any necessary
-preamble preceding the generated list. At the end of the last
-chapter of our documents we generally put:
+preamble preceding the generated list. At the end of the last chapter
+of our documents we generally put:
 </text>
 <code xml:space="preserve">
 &lt;heading&gt;
@@ -469,8 +463,8 @@ to get the desired effect.
 <literal>&lt;leader&gt;</literal>
 </text>
 <text>
-Did we say finally? No, there's one last one. &lt;leader&gt;
-is a specialist heading which is used to title meta text in front-matter
+Did we say finally? No, there's one last one. &lt;leader&gt; is a
+specialist heading which is used to title meta text in front-matter
 and back-matter. For example:
 </text>
 <code xml:space="preserve">
@@ -485,12 +479,12 @@ conventional wisdom.
 &lt;/text&gt;
 </code>
 <text>
-is the abstract for this document. Here the headline "Abstract"
-is rendered as a centred, bolded, and slightly larger piece of
-text by the reference implementation, giving you a nice title
-over the following text block. These headlines are single line
-only, do not have labels, do not appear in the
-<project>Quill</project> editor's outline function as headings.
+is the abstract for this document. Here the headline "Abstract" is
+rendered as a centred, bolded, and slightly larger piece of text by
+the reference implementation, giving you a nice title over the
+following text block. These headlines are single line only, do not
+have labels, do not appear in the <project>Quill</project> editor's
+outline function as headings.
 </text>
 <heading>
 Inlines
@@ -499,26 +493,24 @@ Inlines
 These are the markup that occur within Blocks.
 </text>
 <text>
-The inlines serve two purposes: they differentiate text that
-is to be formatted differently when rendered, and they differentiate
-text that is not to be spell checked (vice text that is), which
-is why there is some overlap in output; after all, there's only
-a few permutations of face {serif, sans serif, monospaced, and
-small caps}, style {normal, italics}, and weight {normal, bold}
-to work with.
+The inlines serve two purposes: they differentiate text that is to be
+formatted differently when rendered, and they differentiate text that
+is not to be spell checked (vice text that is), which is why there is
+some overlap in output; after all, there's only a few permutations of
+face {serif, sans serif, monospaced, and small caps}, style {normal,
+italics}, and weight {normal, bold} to work with.
 </text>
 <text>
 <bold>Italics</bold>, <literal>&lt;italics&gt;</literal>
 </text>
 <text>
-Gently emphasized text to be rendered in italics. Note that we're
-off to a good start here; we don't mean emphasis in the way that
-<acronym>HTML</acronym>; if you want italics you use italics;
-if you want bolded text then you say bold. Done. It's
-<italics>not</italics> up to the <type>RenderEngine</type> to
-decide about such things; italic text is a semantic all of its
-own. If the author wants italics they get italics. And so that's
-what's in Quack.
+Gently emphasized text to be rendered in italics. Note that we're off
+to a good start here; we don't mean emphasis in the way that
+<acronym>HTML</acronym>; if you want italics you use italics; if you
+want bolded text then you say bold. Done. It's <italics>not</italics>
+up to the <type>RenderEngine</type> to decide about such things;
+italic text is a semantic all of its own. If the author wants italics
+they get italics. And so that's what's in Quack.
 </text>
 <text>
 <bold>Bold</bold>, <literal>&lt;bold&gt;</literal>
@@ -530,31 +522,29 @@ Strongly emphasized text to be rendered in a bold font.
 <bold>Code Literals</bold>, <literal>&lt;literal&gt;</literal>
 </text>
 <text>
-Used for short literal code fragments from source code. Rendered
-in a monospaced font, the same as used for preformatted code
-blocks (indeed, when configuring the stylesheet the
-<literal>mono</literal> font's size is chosen in order that these
-literals look good inline with normal text).
+Used for short literal code fragments from source code. Rendered in a
+monospaced font, the same as used for preformatted code blocks
+(indeed, when configuring the stylesheet the <literal>mono</literal>
+font's size is chosen in order that these literals look good inline
+with normal text).
 </text>
 <text>
-<bold>Class and Method</bold>, <literal>&lt;type&gt;</literal>
-and <literal>&lt;function&gt;</literal>
+<bold>Class and Method</bold>, <literal>&lt;type&gt;</literal> and
+<literal>&lt;function&gt;</literal>
 </text>
 <text>
-These are specialist markups for writing about program code.
-C programmers write about functions; Java programmers talk about
-their classes a lot, and just as frequently mention methods by
-name.
+These are specialist markups for writing about program code. C
+programmers write about functions; Java programmers talk about their
+classes a lot, and just as frequently mention methods by name.
 </text>
 <text>
 O'Reilly presents function names in italics like
 <italics>printf</italics>. Other publishers present them in a
-monospaced font, as <function>printf</function>. Personally,
-I always add <literal>'('</literal> and <literal>')'</literal>
-to my function and method names to add a visual cue, as in
-<type>Object</type>'s <function>equals()</function> which every
-Java object has. But that's up to the author; how it's presented
-is up to the renderer.
+monospaced font, as <function>printf</function>. Personally, I always
+add <literal>'('</literal> and <literal>')'</literal> to my function
+and method names to add a visual cue, as in <type>Object</type>'s
+<function>equals()</function> which every Java object has. But that's
+up to the author; how it's presented is up to the renderer.
 </text>
 <text>
 Not spell checked.
@@ -572,34 +562,34 @@ font, but in italics. Can also be used for <acronym>URL</acronym>s.
 <literal>&lt;command&gt;</literal>
 </text>
 <text>
-The project markup is for the proper name of an application suite.
-Not everyone will want or need this; but in our consulting work
-we find it helpful to draw attention to the fact that a term
-the reader might not be familiar with were the names of (in those
-cases, open source) software projects. The reference implementation
-renders project markup in the sans font, bolded, but with the
-colour dropped out to reduce the emphasis.
+The project markup is for the proper name of an application suite. Not
+everyone will want or need this; but in our consulting work we find it
+helpful to draw attention to the fact that a term the reader might not
+be familiar with were the names of (in those cases, open source)
+software projects. The reference implementation renders project markup
+in the sans font, bolded, but with the colour dropped out to reduce
+the emphasis.
 </text>
 <text>
 Command markup is necessary because we often talk about the command
 being run as distinct from the project it belongs to, ie,
 <command>bzr</command> on the command-line and
 <project>Bazaar</project> the project. And while the reference
-<type>RenderEngine</type> renders commands in the monospaced
-font the same as with literals, other stylesheets have these
-command names rendered in italics.
+<type>RenderEngine</type> renders commands in the monospaced font the
+same as with literals, other stylesheets have these command names
+rendered in italics.
 </text>
 <text>
 <bold>Acronyms</bold>, <literal>&lt;acronym&gt;</literal>
 </text>
 <text>
 We follow the convention used in publications like <title>The
-Economist</title>, where initialisms, abbreviations, and acronyms
-are presented in a small capitals font, and this markup gives
-the user access to that. Note that in our renderer we manually
-map capital letters to their small caps equivalent for presentation
-purposes; the user is still expected to write their abbreviation
-in capital letters. This means that on-disk the file contains:
+Economist</title>, where initialisms, abbreviations, and acronyms are
+presented in a small capitals font, and this markup gives the user
+access to that. Note that in our renderer we manually map capital
+letters to their small caps equivalent for presentation purposes; the
+user is still expected to write their abbreviation in capital letters.
+This means that on-disk the file contains:
 </text>
 <code xml:space="preserve">
 The American space agency, &lt;acronym&gt;NASA&lt;/acronym&gt;, reports that
@@ -613,8 +603,8 @@ The American space agency, &lt;acronym&gt;nasa&lt;/acronym&gt;, reports that
 they have run out of paperclips.
 </code>
 <text>
-which looks odd, and would be wrong if the markup were stripped
-and the resultant <literal>text/plain</literal> was viewed.
+which looks odd, and would be wrong if the markup were stripped and
+the resultant <literal>text/plain</literal> was viewed.
 </text>
 <text>
 As with any typographic effect, if the user wants their abbreviation
@@ -624,12 +614,12 @@ in normal capitals they can simply choose not to apply this markup.
 <bold>Publication Titles</bold>, <literal>&lt;title&gt;</literal>
 </text>
 <text>
-Book titles, and by extension, magazine titles, movie titles,
-etc. In general this is expected to be in italics, so this could
-have been achieved with the <literal>&lt;italics&gt;</literal>
-inline, except that some institutions require titles to be in
-in small caps, hence an independent markup type so the
-<type>RenderEngine</type> can do the right thing.
+Book titles, and by extension, magazine titles, movie titles, etc. In
+general this is expected to be in italics, so this could have been
+achieved with the <literal>&lt;italics&gt;</literal> inline, except
+that some institutions require titles to be in in small caps, hence an
+independent markup type so the <type>RenderEngine</type> can do the
+right thing.
 </text>
 <text>
 Mostly this markup will show up when you're writing notes and

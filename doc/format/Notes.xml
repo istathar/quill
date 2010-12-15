@@ -12,66 +12,62 @@ and their file formats for "text documents".
 Open Document Format
 </heading>
 <text>
-But on the topic of on-disk file formats, here are our comments
-on <acronym>ODF</acronym> for text documents.
+But on the topic of on-disk file formats, here are our comments on
+<acronym>ODF</acronym> for text documents.
 </text>
 <text/>
 <text>
 This is the very definition of un-fun. Open Document Format was
-already disqualified on the grounds of it being contained in
-a single Zip compressed file and thus unsuitable for version
-control.
+already disqualified on the grounds of it being contained in a single
+Zip compressed file and thus unsuitable for version control.
 </text>
 <text/>
 <text/>
 <text>
-If you've written a fairly substantial article, report, or essay
-in <project>Open Office</project>, you might be interested to
-take some time to open it up and have a look at
-<acronym>ODF.</acronym>
+If you've written a fairly substantial article, report, or essay in
+<project>Open Office</project>, you might be interested to take some
+time to open it up and have a look at <acronym>ODF.</acronym>
 </text>
 <text>
-Which raised the possibility that one could, hypothetically,
-unzip the document, commit the resultant directory tree to
+Which raised the possibility that one could, hypothetically, unzip the
+document, commit the resultant directory tree to
 <acronym>VCS</acronym>, and then re-zip the tree back into a
-<filename>.odt</filename> before editing it again. Hm. Maybe
-not.
+<filename>.odt</filename> before editing it again. Hm. Maybe not.
 </text>
 <text>
-No, much as the zipping the document's files together into a
-single archive makes it easy to send that document as a single
-file to someone, it is diametrically opposed to what we need
-to be able to use a <acronym>VCS</acronym> to version our documents
-and to merge with others we are collaborating with.
+No, much as the zipping the document's files together into a single
+archive makes it easy to send that document as a single file to
+someone, it is diametrically opposed to what we need to be able to use
+a <acronym>VCS</acronym> to version our documents and to merge with
+others we are collaborating with.
 </text>
 <text/>
 <text>
-The give away was looking at what Writer writes out when you
-tell it to pretend it's an web page editor and ask it to save
-as <acronym>HTML</acronym>... <highlight>HERE</highlight>
+The give away was looking at what Writer writes out when you tell it
+to pretend it's an web page editor and ask it to save as
+<acronym>HTML</acronym>... <highlight>HERE</highlight>
 </text>
 <heading>
 DocBook XML
 </heading>
 <text>
-In all conscience DocBook is certainly a comprehensive schema.
-In fact, <project>Quill</project> started life as a DocBook editor,
-or at least something that would author documents in the very
-limited subset of DocBook we actually needed.
+In all conscience DocBook is certainly a comprehensive schema. In
+fact, <project>Quill</project> started life as a DocBook editor, or at
+least something that would author documents in the very limited subset
+of DocBook we actually needed.
 </text>
 <text>
-The DocBook specification, however, is exceedingly large. It
-shows all the signs of design by committee and there is much
-cruft. You spend all your time hunting around trying to figure
-out which tags you're supposed to use, and then you scratch your
-head for hours trying to work out just how to go about using
-it properly.
+The DocBook specification, however, is exceedingly large. It shows all
+the signs of design by committee and there is much cruft. You spend
+all your time hunting around trying to figure out which tags you're
+supposed to use, and then you scratch your head for hours trying to
+work out just how to go about using it properly.
 </text>
 <text>
-DocBook is exceedingly difficult to work in programmatically
-due to the arbitrary nesting it allows. And because of that nesting
-it is really difficult to handle merge conflicts between two
-versions of a document.
+DocBook is exceedingly difficult to work in programmatically due to
+the arbitrary nesting it allows. And because of that nesting it is
+really difficult to handle merge conflicts between two versions of a
+document.
 </text>
 <text>
 Contrast an image in DocBook:
@@ -112,55 +108,54 @@ A wood duck, from the cover of &lt;title&gt;DocBook: The Definitive Guide&lt;/ti
 &lt;/image&gt;
 </code>
 <text>
-While it is fascinating and powerful that DocBook allows you
-to express alternative versions of a generic media (in this case
-the image in two formats, and a textual alternative to use in,
-say, text-only browsers and screen readers), the entire block
-is hideously overcomplicated for the task of putting an illustration
-with an optional caption into the flow of your article or chapter.
+While it is fascinating and powerful that DocBook allows you to
+express alternative versions of a generic media (in this case the
+image in two formats, and a textual alternative to use in, say,
+text-only browsers and screen readers), the entire block is hideously
+overcomplicated for the task of putting an illustration with an
+optional caption into the flow of your article or chapter.
 </text>
 <text>
-The excessive nesting illustrates another point: if someone has
-to manually resolve a merge conflict, you want to make it as
-easy as possible. If all you have is huge amounts of whitespace
-padding a complex hierarchy of elements to illustrate their relationships,
-and yet all you have is the diff of a fragment of the document,
-how are you supposed to know which is which?
+The excessive nesting illustrates another point: if someone has to
+manually resolve a merge conflict, you want to make it as easy as
+possible. If all you have is huge amounts of whitespace padding a
+complex hierarchy of elements to illustrate their relationships, and
+yet all you have is the diff of a fragment of the document, how are
+you supposed to know which is which?
 </text>
 <text>
 And even after all that nesting, they still have
-<literal>&lt;para&gt;</literal> tags glued to the actual text,
-which is hopelessly in the way, and exceedingly ugly to have
-to look at. And worse, they treat whitespace as significant in
-normal text of their <literal>&lt;para&gt;</literal>s, which
-is why they're not given any indenting at all. The net result
-is not only ugly, but not even accomplishing the task of providing
-context.
+<literal>&lt;para&gt;</literal> tags glued to the actual text, which
+is hopelessly in the way, and exceedingly ugly to have to look at. And
+worse, they treat whitespace as significant in normal text of their
+<literal>&lt;para&gt;</literal>s, which is why they're not given any
+indenting at all. The net result is not only ugly, but not even
+accomplishing the task of providing context.
 </text>
 <text>
-Quack takes the aesthetic approach used by <acronym>HTML</acronym>
-of discarding leading and trailing whitespace from block level
-elements, with the result that the document is <italics>much</italics>
-cleaner to read, and (if compelled to do so manually) adjust.
-By design the schema is so simple that there is no nesting used
-because none is necessary for comprehension.
+Quack takes the aesthetic approach used by <acronym>HTML</acronym> of
+discarding leading and trailing whitespace from block level elements,
+with the result that the document is <italics>much</italics> cleaner
+to read, and (if compelled to do so manually) adjust. By design the
+schema is so simple that there is no nesting used because none is
+necessary for comprehension.
 </text>
 <text>
 We are, however, quite concerned to ensure that people using
 <project>Quill and Parchment</project> never have their documents
-locked in and be unable to extract them in the future. To that
-end, it shouldn't be too hard to write a function to do a one-way
-export from Quack <acronym>XML</acronym> to DocBook
-<acronym>XML</acronym> - perhaps using <acronym>XSLT</acronym>,
-perhaps using a custom <type>Serializer</type>, and perhaps using
-a Parchment <type>RenderEngine</type> implementation.
+locked in and be unable to extract them in the future. To that end, it
+shouldn't be too hard to write a function to do a one-way export from
+Quack <acronym>XML</acronym> to DocBook <acronym>XML</acronym> -
+perhaps using <acronym>XSLT</acronym>, perhaps using a custom
+<type>Serializer</type>, and perhaps using a Parchment
+<type>RenderEngine</type> implementation.
 </text>
 <text>
-If you ever <italics>are</italics> working with DocBook, ensure
-you're working with version 5 of the spec. They've cleaned up
-a few things, and now their documents are composed with a root
-element identified with a <literal>xmlns</literal> namespace
-attribute, rather than <literal>DOCTYPE</literal> declarations.
+If you ever <italics>are</italics> working with DocBook, ensure you're
+working with version 5 of the spec. They've cleaned up a few things,
+and now their documents are composed with a root element identified
+with a <literal>xmlns</literal> namespace attribute, rather than
+<literal>DOCTYPE</literal> declarations.
 </text>
 <heading>
 Microformats in XHTML
@@ -171,15 +166,14 @@ We also investigated ways to make .
 <text>
 This had a lot of appeal, notably because it would make the question
 of "how do you escape lock-in" dead easy. But in the end we swerved
-away from the idea. Ultimately we knew that if people found out
-that their documents were <acronym>HTML</acronym>, they would
-expect to be able to make arbitrary changes to those files on
-disk, changes which would be valid <acronym>HTML</acronym> perhaps,
-but not fit into the restrictive schema that our poor little
-program would ever be capable of handling. People would also
-instantly expect Quill to be able to use those files as web pages,
-which is a problem: there's a big difference between the content
-and metadata of a text document on disk, and that document as
-marked up for presentation online.
+away from the idea. Ultimately we knew that if people found out that
+their documents were <acronym>HTML</acronym>, they would expect to be
+able to make arbitrary changes to those files on disk, changes which
+would be valid <acronym>HTML</acronym> perhaps, but not fit into the
+restrictive schema that our poor little program would ever be capable
+of handling. People would also instantly expect Quill to be able to
+use those files as web pages, which is a problem: there's a big
+difference between the content and metadata of a text document on
+disk, and that document as marked up for presentation online.
 </text>
 </quack>
