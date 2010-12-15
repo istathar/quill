@@ -18,13 +18,8 @@
  */
 package parchment.quack;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import nu.xom.Attribute;
-import nu.xom.Document;
 import nu.xom.Element;
-import nu.xom.Serializer;
 
 /**
  * Internal base class for all Quack format tags.
@@ -76,21 +71,6 @@ abstract class QuackElement extends Element
      */
     void setPreserveWhitespace() {
         super.addAttribute(new Attribute("xml:space", "http://www.w3.org/XML/1998/namespace", "preserve"));
-    }
-
-    /**
-     * Serialize this document to XML.
-     */
-    // move this to QuillConverter?
-    public void toXML(OutputStream out) throws IOException {
-        final Document doc;
-        final Serializer s;
-
-        doc = new Document(this);
-
-        s = new QuackSerializer(out, this);
-        s.write(doc);
-        s.flush();
     }
 
     public String toString() {
