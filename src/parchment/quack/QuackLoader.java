@@ -478,6 +478,7 @@ public class QuackLoader
             }
         } else if (space) {
             chain.append(pending);
+            space = false;
             pending = null;
         }
 
@@ -518,6 +519,12 @@ public class QuackLoader
     }
 
     private void processMarker(String str) {
+        if (space) {
+            chain.append(pending);
+            space = false;
+            pending = null;
+        }
+
         chain.append(Span.createMarker(str, markup));
     }
 }

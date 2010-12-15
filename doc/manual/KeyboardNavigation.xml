@@ -4,37 +4,35 @@
 Keyboard shortcuts
 </chapter>
 <text>
-Actually, they're not really shortcuts. They're the way you use
-Quill!
+Actually, they're not really shortcuts. They're the way you use Quill!
 </text>
 <heading>
 Formatting
 </heading>
 <text>
-Different semantic markup can be applied. The various formats
-can be applied by typing <keyboard>Ctrl+Shift+&lt;Key&gt;</keyboard>.
+Different semantic markup can be applied. The various formats can be
+applied by typing <keyboard>Ctrl+Shift+&lt;Key&gt;</keyboard>.
 </text>
 <text>
 You can never get away from legacy, so bold and italics are
-<keyboard>Ctrl+B</keyboard> and <keyboard>Ctrl+I</keyboard> respectively.
-It's not like we were going to use those combinations for something
-else, and as much as consistency is important, we're not trying
-to make people's lives difficult.
+<keyboard>Ctrl+B</keyboard> and <keyboard>Ctrl+I</keyboard>
+respectively. It's not like we were going to use those combinations
+for something else, and as much as consistency is important, we're not
+trying to make people's lives difficult.
 </text>
 <text>
 Ultimately the point is to ensure consistent display of the resultant
-markup. You don't need an <type>Inline</type> for bloody every
-last thing under the sun. People will doubtless rant on about
-how they're favourite thing isn't available. [Last week it was
-someone complaining that there wasn't a strong semantic for ship
-names, and that as a result she couldn't say "USS
-<italics>Enterprise</italics>" consistently. Yeah. Sorry about
-that. Really] But you have a fair range to choose from and if
-you are desperate you can always hack your <type>RenderEngine</type>
-to do something different. Remember that the point is to ensure
-consistent display of different classes of text; the person who
-wanted ship names in italics can just use
-<literal>&lt;title&gt;</literal> to get herself a distinguished
-markup that conveniently defaults to italics.
+markup. You don't need an <type>Inline</type> for bloody every last
+thing under the sun. People will doubtless rant on about how they're
+favourite thing isn't available. [Last week it was someone complaining
+that there wasn't a strong semantic for ship names, and that as a
+result she couldn't say "USS <italics>Enterprise</italics>"
+consistently. Yeah. Sorry about that. Really] But you have a fair
+range to choose from and if you are desperate you can always hack your
+<type>RenderEngine</type> to do something different. Remember that the
+point is to ensure consistent display of different classes of text;
+the person who wanted ship names in italics can just use
+<literal>&lt;title&gt;</literal> to get herself a distinguished markup
+that conveniently defaults to italics.
 </text>
 </quack>

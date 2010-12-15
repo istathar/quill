@@ -25,6 +25,7 @@ package parchment.quack;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import nu.xom.Document;
 import quill.textbase.AttributionSegment;
 import quill.textbase.ChapterSegment;
 import quill.textbase.Common;
@@ -342,9 +343,14 @@ public class QuackConverter
      */
     public void writeChapter(OutputStream out) throws IOException {
         final RootElement chapter;
+        final Document doc;
+        final QuackSerializer s;
 
         chapter = (RootElement) component;
-        chapter.toXML(out);
+        doc = new Document(chapter);
+
+        s = new QuackSerializer(out);
+        s.write(doc);
     }
 
     /**

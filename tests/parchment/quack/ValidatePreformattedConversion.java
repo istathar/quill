@@ -22,7 +22,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import parchment.manuscript.Manuscript;
-import parchment.quack.QuackConverter;
 import quill.client.IOTestCase;
 import quill.textbase.Common;
 import quill.textbase.Extract;
@@ -137,8 +136,8 @@ public class ValidatePreformattedConversion extends IOTestCase
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/5.0\">",
             "<text>",
-            "Consider the following simple and yet profound expression of",
-            "quality program code:",
+            "Consider the following simple and yet profound expression of quality",
+            "program code:",
             "</text>",
             "<code xml:space=\"preserve\">",
             "public class Hello {",

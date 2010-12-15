@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0">
-<text>
-A long time ago in a galaxy far far away...<cite ref="[Lucas 1977]"/>
-</text>
+<endnote name="4">
+Enriched personal lives. See colophon to <cite ref="[12]"/> and
+<cite ref="[18]"/>.
+</endnote>
 </quack>

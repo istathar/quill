@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0">
-<text>
-A long time ago in a galaxy far far away...<cite ref="[Lucas 1977]"/>
-</text>
+<quote>
+<italics>"A plan is simply a common basis for
+change"</italics><note ref="14"/>
+</quote>
 </quack>

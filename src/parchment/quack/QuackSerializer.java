@@ -18,86 +18,359 @@
  */
 package parchment.quack;
 
-import java.io.IOException;
+import java.io.BufferedWriter;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
+import nu.xom.Attribute;
+import nu.xom.Document;
 import nu.xom.Element;
-import nu.xom.Serializer;
+import nu.xom.Node;
 import nu.xom.Text;
 
 /**
- * Render a document as valid Quack XML.
+ * Render a document as valid Quack XML. Modelled directly on the Xom
+ * Serializer class, but after several iterations we finally just implemented
+ * our own, so as to get more accurate wrapping behaviour:
+ * 
+ * <ul>
+ * <li>Documents are wrapped at 70 characters width;
+ * <li>Whitespace is <b>not</b> inserted between consequtive inlines if a wrap
+ * boundary appears between them - the wrap occurs at whereever the candiate
+ * ' ' was;
+ * <li>Whitespace is <b>not</b> inserted between an inline and a text if a
+ * wrap boundary occurs there.
+ * <li>A start tags with an attribute whose width takes it over the edge is
+ * not broken in two; the previous candidate space is used. Only if the inline
+ * begins the line and is, with attribute, wider than 70 will it overflow.
+ * </ul>
+ * 
+ * In other words, the wrapping is correct, with the exception that for our
+ * own stylistic and aesthetic reasons we don't allow wrapping within tags.
  * 
  * @author Andrew Cowie
  */
 /*
- * We would have set this to 78 which is our habit for text files, but a)
- * XOM's line wrapping is a bit weak, and b) this gives us room for a \t in an
- * 80 column wide terminal.
+ * We would have set this to 78 which is our habit for text files, but this
+ * gives us room for a \t in an 80 column wide terminal.
  */
-class QuackSerializer extends Serializer
+class QuackSerializer
 {
-    private final QuackElement root;
+    private Element root;
 
-    private String swollowed;
+    private final PrintWriter out;
 
-    QuackSerializer(OutputStream out, QuackElement root) {
-        super(out);
-        super.setLineSeparator("\n");
-        super.setMaxLength(70);
-        this.root = root;
-        this.swollowed = "";
+    /**
+     * Are we in a Block which preserves whitespace?
+     */
+    private boolean preserving;
+
+    /**
+     * Accumulator.
+     */
+    private ArrayList<String> list;
+
+    QuackSerializer(OutputStream actual) {
+        OutputStreamWriter writer;
+        BufferedWriter buffer;
+
+        try {
+            writer = new OutputStreamWriter(actual, "UTF-8");
+            buffer = new BufferedWriter(writer);
+            out = new PrintWriter(buffer);
+
+            list = new ArrayList<String>(128);
+        } catch (UnsupportedEncodingException uee) {
+            // not possible unless your VM is non compliant
+            throw new AssertionError();
+        }
     }
 
-    protected void writeStartTag(Element e) throws IOException {
-        final String nested;
-        final int col;
-        final int first;
-        final int max;
-        final int len;
+    /**
+     * Accumulate the given text. Characters must be legal in XML (ie,
+     * ampersands escaped).
+     */
+    private void accumulate(String str) {
+        list.add(str);
+    }
 
-        /*
-         * We don't want inline tags pushing us past our word wrap margin if
-         * we can help it. This isn't easy, because we need to know the width
-         * of the inline up to the first available whitespace. So at the
-         * moment we just wholesale convert the thing into XML and see if it's
-         * going to exceed our available width. That's pretty ugly. We could
-         * maybe look at the children nodes to be more intelligent about
-         * figuring out whether we need to call the Element's toXML().
-         */
+    /**
+     * Accumulate the text represented by this StringBuilder.
+     * 
+     * @param buf
+     */
+    private void accumulate(StringBuilder buf) {
+        final String str;
 
-        if (e instanceof Inline) {
-            nested = e.toXML();
+        str = buf.toString();
+        list.add(str);
+    }
 
-            col = super.getColumnNumber();
-            first = firstBreakPoint(nested);
-            len = swollowed.length();
-            max = super.getMaxLength();
+    /**
+     * When we know that we have safely reached the end of a block, we can
+     * write the accumulated buffer. This WILL result in a newline being
+     * emmitted and the accumulation buffer being cleared.
+     */
+    private void writeAccumulated() {
+        final int I;
+        // width since space
+        int p;
+        // current column
+        int x;
+        int i, width;
+        String str;
+        int last;
 
-            if (col + first + len > max) {
-                if (col > 0) {
-                    breakLine();
-                }
-                if (swollowed != "") {
-                    if ((len == 1) && (swollowed.equals(" "))) {
-                        swollowed = "";
-                    } else {
-                        swollowed = swollowed.substring(1, len);
-                    }
-                }
-            }
-        }
-        if (swollowed != "") {
-            writeEscaped(swollowed);
-            swollowed = "";
-        }
+        I = list.size();
 
-        super.writeStartTag(e);
-
-        if (e instanceof Inline) {
+        if (I == 0) {
             return;
         }
-        breakLine();
+
+        x = 0;
+        p = 0;
+        last = -1;
+
+        for (i = 0; i < I; i++) {
+            str = list.get(i);
+
+            /*
+             * Bare newlines are the signal of a block start or block end
+             * element.
+             */
+            if (str == "\n") {
+                p = 0;
+                x = 0;
+                last = -1;
+                continue;
+            }
+            if (str == " ") {
+                p = 0;
+                x++;
+                last = i;
+                continue;
+            }
+
+            width = str.length();
+            p += width;
+
+            if ((x + width > 70) && (last > 0)) {
+                list.set(last, "\n");
+                last = -1;
+                x = p;
+            } else {
+                x += width;
+            }
+        }
+
+        for (i = 0; i < I; i++) {
+            str = list.get(i);
+            out.print(str);
+        }
+
+        list.clear();
+    }
+
+    void write(Document doc) {
+        final StringBuilder buf;
+        final int I;
+        int i, j, J;
+        Element e;
+        Node node;
+
+        accumulate("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        accumulate("\n");
+
+        root = doc.getRootElement();
+
+        buf = new StringBuilder(128);
+        buf.append('<');
+        buf.append(root.getLocalName());
+        buf.append(' ');
+        buf.append("xmlns=");
+        buf.append('\"');
+        buf.append(root.getNamespaceURI());
+        buf.append('\"');
+        buf.append('>');
+
+        accumulate(buf);
+        accumulate("\n");
+
+        /*
+         * Children of Root are Blocks
+         */
+
+        I = root.getChildCount();
+        for (i = 0; i < I; i++) {
+            node = root.getChild(i);
+
+            if (node instanceof Element) {
+                e = (Element) node;
+                J = e.getChildCount();
+
+                if (J == 0) {
+                    writeStartTag(e, true);
+                } else {
+                    writeStartTag(e, false);
+                    for (j = 0; j < J; j++) {
+                        node = e.getChild(j);
+                        writeInline(node);
+                    }
+                    writeEndTag(e);
+                }
+            } else {
+                throw new AssertionError("Unknown Node type in Root element");
+            }
+
+            writeAccumulated();
+        }
+
+        writeEndTag(root);
+        writeAccumulated();
+
+        out.flush();
+    }
+
+    private void writeInline(Node node) {
+        final Element e;
+        int j, J;
+
+        if (node instanceof Text) {
+            writeText(node);
+        } else if (node instanceof Inline) {
+            e = (Element) node;
+            J = e.getChildCount();
+
+            if (J == 0) {
+                writeStartTag(e, true);
+            } else {
+                writeStartTag(e, false);
+                for (j = 0; j < J; j++) {
+                    node = e.getChild(j);
+                    writeText(node);
+                }
+                writeEndTag(e);
+            }
+
+        } else {
+            throw new AssertionError("Unknown Node type in Block level element");
+        }
+    }
+
+    /**
+     * Output the opening tag of an XML element, or the entire tag if it is an
+     * empty element.
+     */
+    /*
+     * When writing attributes, the "qualified" name includes the prefix,
+     * which does us for xml:space.
+     */
+    private void writeStartTag(Element e, boolean empty) {
+        StringBuilder buf;
+        final int K;
+        int k;
+        Attribute a;
+
+        buf = new StringBuilder();
+
+        buf.append('<');
+        buf.append(e.getLocalName());
+
+        K = e.getAttributeCount();
+        for (k = 0; k < K; k++) {
+            a = e.getAttribute(k);
+
+            buf.append(' ');
+            buf.append(a.getQualifiedName());
+            buf.append('=');
+            buf.append('\"');
+            buf.append(a.getValue());
+            buf.append('\"');
+        }
+        if (empty) {
+            buf.append('/');
+        }
+        buf.append('>');
+
+        accumulate(buf);
+
+        if (e instanceof Preserve) {
+            preserving = true;
+        }
+        if (e instanceof Block) {
+            accumulate("\n");
+        }
+    }
+
+    private void writeEndTag(Element e) {
+        final StringBuilder buf;
+
+        buf = new StringBuilder();
+
+        if (e instanceof Block) {
+            /*
+             * After writing a bunch of spans, take the cursor back to the
+             * beginning of the line before writing the end tag.
+             */
+            accumulate("\n");
+        }
+
+        buf.append('<');
+        buf.append('/');
+        buf.append(e.getLocalName());
+        buf.append('>');
+
+        accumulate(buf);
+
+        if (e instanceof Block) {
+            accumulate("\n");
+            preserving = false;
+        } else if (e instanceof Root) {
+            accumulate("\n");
+        }
+    }
+
+    /*
+     * Using Text's toXML() is expensive, though not nearly as expensive as
+     * Serializer's writeEscaped(). Sicne this is the only way we can get to
+     * the character sequence, this code can only be optimized out if we stop
+     * using Xom entirely.
+     */
+
+    private void writeText(Node node) {
+        final Text text;
+        final String str;
+        String sub;
+        int i, p;
+
+        text = (Text) node;
+        str = text.toXML();
+
+        if (preserving) {
+            list.add(str);
+        } else {
+            i = str.indexOf(' ');
+            p = 0;
+            while (i != -1) {
+                if (i > p) {
+                    sub = str.substring(p, i);
+
+                    accumulate(sub);
+                }
+                accumulate(" ");
+
+                i++;
+                p = i;
+                i = str.indexOf(' ', i);
+            }
+            if (p != str.length()) {
+                sub = str.substring(p);
+                accumulate(sub);
+            }
+        }
     }
 
     /**
@@ -123,109 +396,5 @@ class QuackSerializer extends Serializer
         } else {
             return i;
         }
-    }
-
-    protected void writeEndTag(Element e) throws IOException {
-        if (swollowed != null) {
-            writeEscaped(swollowed);
-            swollowed = "";
-        }
-
-        if (e instanceof Block) {
-            /*
-             * After writing a bunch of spans, take the cursor back to the
-             * beginning of the line before writing the end tag.
-             */
-            breakLine();
-        }
-
-        super.writeEndTag(e);
-
-        if (e instanceof Inline) {
-            return;
-        }
-        if (e == root) {
-            /*
-             * Serializer does a line break between each piece of a Document.
-             * So on the very last of our tags, we don't need to do a newline.
-             */
-            return;
-        }
-        breakLine();
-    }
-
-    /*
-     * TODO The swollowed logic is duplicated from writeStartTag() and should
-     * be extracted into a function.
-     */
-    protected void writeEmptyElementTag(Element e) throws IOException {
-        final String nested;
-        final int col;
-        final int first;
-        final int max;
-        final int len;
-
-        if (e instanceof Inline) {
-            nested = e.toXML();
-
-            col = super.getColumnNumber();
-            first = firstBreakPoint(nested);
-            len = swollowed.length();
-            max = super.getMaxLength();
-
-            if (col + first + len > max) {
-                if (col > 0) {
-                    breakLine();
-                }
-                if (swollowed != "") {
-                    if (swollowed == " ") {
-                        swollowed = "";
-                    } else {
-                        swollowed = swollowed.substring(1, len);
-                    }
-
-                }
-            }
-        }
-        if (swollowed != "") {
-            writeEscaped(swollowed);
-            swollowed = "";
-        }
-
-        super.writeEmptyElementTag(e);
-
-        if (e instanceof Block) {
-            breakLine();
-        }
-    }
-
-    /*
-     * Override XOM's text writing method so that we can be more intelligent
-     * about [not] writing trailing whitespace.
-     */
-    protected void write(Text text) throws IOException {
-        String str;
-        int len, i;
-
-        if (swollowed != "") {
-            writeEscaped(swollowed);
-            swollowed = "";
-        }
-
-        str = text.getValue();
-        len = str.length();
-
-        i = str.lastIndexOf(' ');
-
-        if (i != -1) {
-            if (i == len - 1) {
-                swollowed = " ";
-                str = str.substring(0, len - 1);
-            } else {
-                swollowed = str.substring(i, len);
-                str = str.substring(0, i);
-            }
-        }
-        writeEscaped(str);
     }
 }

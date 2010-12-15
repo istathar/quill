@@ -29,11 +29,10 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import parchment.manuscript.Chapter;
 import parchment.manuscript.Manuscript;
-import parchment.quack.QuackConverter;
 import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
-import quill.textbase.Common;
 import quill.textbase.ChapterSegment;
+import quill.textbase.Common;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.NormalSegment;
@@ -175,8 +174,8 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<quack xmlns=\"http://namespace.operationaldynamics.com/parchment/5.0\">",
             "<text>",
-            "Accessing the " + "<filename>/tmp</filename>" + " directory directly is",
-            "fine, but you are often better off using " + "<type>" + "File" + "</type>'s",
+            "Accessing the " + "<filename>/tmp</filename>" + " directory directly is fine,",
+            "but you are often better off using " + "<type>" + "File" + "</type>'s",
             "<function>" + "createTempFile()" + "</function> function.",
             "</text>",
             "</quack>"
