@@ -21,9 +21,6 @@ package parchment.manuscript;
 import java.io.File;
 import java.io.IOException;
 
-import parchment.manuscript.Chapter;
-import parchment.manuscript.Manuscript;
-
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.client.IOTestCase;
@@ -57,8 +54,8 @@ public class ValidateThereAndBackAgain extends IOTestCase
         chapter.setFilename(from);
         series = chapter.loadDocument();
 
-        ensureDirectory("tmp/unittests/parchment/format/");
-        manuscript.setFilename("tmp/unittests/parchment/format/ValidateThereAndBackAgain.parchment"); // junk
+        ensureDirectory("tmp/unittests/parchment/manuscript/");
+        manuscript.setFilename("tmp/unittests/parchment/manuscript/ValidateThereAndBackAgain.parchment"); // junk
         chapter.setFilename("testRoundTrip.xml");
         target = new File(chapter.getFilename());
 

@@ -5,10 +5,10 @@ An Example Chapter
 </chapter>
 <text>
 This is not a real document. This is a series of unrelated fragments
-that are assembled here to exercise the different features of
-Quill and Parchment that are implemented so far. So if it looks
-like nonsense, that's because it is. <literal>:)</literal> But
-it includes a little bit of everything.
+that are assembled here to exercise the different features of Quill
+and Parchment that are implemented so far. So if it looks like
+nonsense, that's because it is. <literal>:)</literal> But it includes
+a little bit of everything.
 </text>
 <heading>
 Techincal writing
@@ -16,9 +16,9 @@ Techincal writing
 <text>
 This application was originally designed for about writing reports,
 technical documentation, and someday books about software development,
-systems administration, and other computer engineering topics.
-One of the characteristics of such work is constantly switching
-back and forth between normal prose and blocks of code.
+systems administration, and other computer engineering topics. One of
+the characteristics of such work is constantly switching back and
+forth between normal prose and blocks of code.
 </text>
 <text>
 For example, the simplest program you could write with the excellent
@@ -37,45 +37,44 @@ public class Example
 </code>
 <text>
 If you were to place this code in <filename>Example.java</filename>
-and compile it with <command>javac</command>, you'd then face
-the real question: whether you know how to <italics>run</italics>
-the program...
+and compile it with <command>javac</command>, you'd then face the real
+question: whether you know how to <italics>run</italics> the
+program...
 </text>
 <text>
-This program has the drawback of <italics>not</italics> doing
-very much and even worse, <bold>not</bold> telling you that that's
-not what it's doing. This program needs a little love. Like a
-button! That's the <type>Button</type> class, as you'd expect,
-and to put text on the button we use the
-<function>setLabel()</function> method. In general you'll probably
-call it in code like <literal>button.setLabel("Hello World");</literal>
-which isn't terribly original but is very important as a starting
-point.
+This program has the drawback of <italics>not</italics> doing very
+much and even worse, <bold>not</bold> telling you that that's not what
+it's doing. This program needs a little love. Like a button! That's
+the <type>Button</type> class, as you'd expect, and to put text on the
+button we use the <function>setLabel()</function> method. In general
+you'll probably call it in code like <literal>button.setLabel("Hello
+World");</literal> which isn't terribly original but is very important
+as a starting point.
 </text>
 <text>
-More importantly, though, these passages shows us putting program
-code in a <type>PreformatSegment</type>, as well as a number
-of inlines in the text.
+More importantly, though, these passages shows us putting program code
+in a <type>PreformatSegment</type>, as well as a number of inlines in
+the text.
 </text>
 <heading>
 Quotes
 </heading>
 <text>
 Regardless of the kind of writing you do, there are often quotations
-from other works. One of my favourite television programs is
-the British comedy, <italics>Yes Prime Minister</italics>, aired
-by BBC. The authors later wrote a book, but rather than just
-being a screenplay, it's done up as if it were historical research,
-with "excerpts" from cabinet meetings, private diaries, newspaper
-articles and so on:
+from other works. One of my favourite television programs is the
+British comedy, <italics>Yes Prime Minister</italics>, aired by BBC.
+The authors later wrote a book, but rather than just being a
+screenplay, it's done up as if it were historical research, with
+"excerpts" from cabinet meetings, private diaries, newspaper articles
+and so on:
 </text>
 <quote>
 <italics>The potential problem with the PM:</italics> Like all
-inhabitants of 10 Downing Street, he wants to take his place
-on the world stage. But people on stages are called actors. All
-they are required to do is look plausible, stay sober, and say
-the lines they are given in the right order. Those who try to
-make up their own lines generally do not last long.
+inhabitants of 10 Downing Street, he wants to take his place on the
+world stage. But people on stages are called actors. All they are
+required to do is look plausible, stay sober, and say the lines they
+are given in the right order. Those who try to make up their own lines
+generally do not last long.
 </quote>
 <quote>
 <italics>The Foreign Office solution:</italics> The PM must realize
@@ -87,44 +86,42 @@ Here we see a <type>BlockquoteSegment</type>, along with a footnote
 anchor at the end.
 </text>
 <text>
-<highlight>TODO</highlight> when you click on the footnote, you
-should to actually be taken to where you can edit the note text.
-We haven't written the <acronym>UI</acronym> for that yet.
+<highlight>TODO</highlight> when you click on the footnote, you should
+to actually be taken to where you can edit the note text. We haven't
+written the <acronym>UI</acronym> for that yet.
 </text>
 <heading>
 Illuminating the past
 </heading>
 <text>
-<italics>Lor</italics>em ip<italics>sum</italics><note ref="2"/>
-dolor sit amet, consectetuer adipiscing elit. Proin adipiscing
-locus est. Curabitur vel odio - morbi ipsum sem, viverra eget,
-tristique tincidunt - mollis vestibulum, nulla. Suspendisse blandit.
-Fuse bibendum neque at est. Mauris eget turpis. Sed erat. Class
-aptent taciti sociosqu ad litora torquent per conubia nostra,
-per inceptos himenaeos. Phasellus in diam. Donec felis. Pellentesque
-libero libero, interdum et, accumsan quis, interdum quis, odio.
-Vestibulum nec lacus. Etiam id lacus. Curabitur ornare, felis
-sit amet auctor iaculis, metus eros feugiat nisl, sed adipiscing
-nisl urna nec odio. Nam magna. Pellentesque sed ante non massa
-pulvinar dapibus. Suspendisse at sapien. Sed lobortis, nisi non
-tempor consequat, nisl ante lobortis dolor, ut hendrerit tortor
-"quam id augue." per <cite ref="[Lorem]"/>.
+<italics>Lor</italics>em ip<italics>sum</italics><note ref="2"/> dolor
+sit amet, consectetuer adipiscing elit. Proin adipiscing locus est.
+Curabitur vel odio - morbi ipsum sem, viverra eget, tristique
+tincidunt - mollis vestibulum, nulla. Suspendisse blandit. Fuse
+bibendum neque at est. Mauris eget turpis. Sed erat. Class aptent
+taciti sociosqu ad litora torquent per conubia nostra, per inceptos
+himenaeos. Phasellus in diam. Donec felis. Pellentesque libero libero,
+interdum et, accumsan quis, interdum quis, odio. Vestibulum nec lacus.
+Etiam id lacus. Curabitur ornare, felis sit amet auctor iaculis, metus
+eros feugiat nisl, sed adipiscing nisl urna nec odio. Nam magna.
+Pellentesque sed ante non massa pulvinar dapibus. Suspendisse at
+sapien. Sed lobortis, nisi non tempor consequat, nisl ante lobortis
+dolor, ut hendrerit tortor "quam id augue." per <cite ref="[Lorem]"/>.
 </text>
 <text>
 Which is the sort of thing you write when you want to have filler
-text. Of course, we don't have Latin installed as a dictionary,
-so we just see a lot of misspelled words. Note that the first
-two words have varying inline markup (italics to normal and back);
-this tests that when loading from disk and serializing out again
-that the <acronym>XML</acronym> library does not insert a space
-at markup change boundaries.
+text. Of course, we don't have Latin installed as a dictionary, so we
+just see a lot of misspelled words. Note that the first two words have
+varying inline markup (italics to normal and back); this tests that
+when loading from disk and serializing out again that the
+<acronym>XML</acronym> library does not insert a space at markup
+change boundaries.
 </text>
 <text>
 That passage also shows the other kind of reference, an in-line
 citation. They are presented in the editor with the same
-<acronym>UI</acronym> for footnotes providing some indication
-that they are special, but when rendered they appear inline as
-normal text.
+<acronym>UI</acronym> for footnotes providing some indication that
+they are special, but when rendered they appear inline as normal text.
 </text>
 <text>
 And in keeping with the feel of ancient civilization,
@@ -133,33 +130,33 @@ And in keeping with the feel of ancient civilization,
 An old map.
 </image>
 <text>
-A image caption isn't always necessary, but it's a nice touch.
-If you don't write a caption it won't take up space when you
-render. Also evident here is our emphasis on
-<italics>writing</italics>. When you put an image in your document,
-we just show a small placeholder thumbnail instead of taking
-up a huge amount of vertical space in the editor canvas.
+A image caption isn't always necessary, but it's a nice touch. If you
+don't write a caption it won't take up space when you render. Also
+evident here is our emphasis on <italics>writing</italics>. When you
+put an image in your document, we just show a small placeholder
+thumbnail instead of taking up a huge amount of vertical space in the
+editor canvas.
 </text>
 <text>
 Images are rendered at their native resolution if they fit, otherwise
-they are scaled down to fit within the left and right margins.
-Which is exactly what you'd want - photos are typically way too
-big, but if you have a smaller illustration there's no point
-in making it any bigger.
+they are scaled down to fit within the left and right margins. Which
+is exactly what you'd want - photos are typically way too big, but if
+you have a smaller illustration there's no point in making it any
+bigger.
 </text>
 <text>
 <highlight>TODO</highlight> while loading and saving files with
-<type>ImageSegment</type>s clearly works (hover over the image
-to see the filename), there isn't any <acronym>UI</acronym> for
-inserting images and/or changing the source file yet.
+<type>ImageSegment</type>s clearly works (hover over the image to see
+the filename), there isn't any <acronym>UI</acronym> for inserting
+images and/or changing the source file yet.
 </text>
 <endnote name="1">
 From "A Victory For Democracy", an episode of the popular television
-series <title>Yes Prime Minister</title>. This passage taken
-from the book version <cite ref="[2]"/>, page 165.
+series <title>Yes Prime Minister</title>. This passage taken from the
+book version <cite ref="[2]"/>, page 165.
 </endnote>
 <endnote name="2">
-Typesetting text (the fake latin verse) known as "Lorum Ipsum"
-created by an online generator program available at <cite ref="[3]"/>.
+Typesetting text (the fake latin verse) known as "Lorum Ipsum" created
+by an online generator program available at <cite ref="[3]"/>.
 </endnote>
 </quack>
