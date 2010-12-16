@@ -36,7 +36,7 @@ public final class ReferenceSegment extends Segment
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
         final String extra;
 
-        extra = super.getImage();
+        extra = super.getExtra();
 
         return new ReferenceSegment(entire, extra, offset, removed, inserted);
     }

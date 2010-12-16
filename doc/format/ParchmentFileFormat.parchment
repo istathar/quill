@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manuscript xmlns="http://namespace.operationaldynamics.com/parchment/5.0">
   <content>
+    <chapter src="CoverPage.xml"/>
     <chapter src="Background.xml"/>
     <chapter src="Chapters.xml"/>
     <chapter src="Documents.xml"/>

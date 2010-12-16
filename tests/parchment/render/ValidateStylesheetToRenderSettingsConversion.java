@@ -22,9 +22,9 @@ import org.gnome.gtk.PaperSize;
 import org.gnome.pango.Style;
 import org.gnome.pango.Weight;
 
-import parchment.format.RendererNotFoundException;
-import parchment.format.Stylesheet;
-import parchment.format.UnsupportedValueException;
+import parchment.manuscript.RendererNotFoundException;
+import parchment.manuscript.Stylesheet;
+import parchment.manuscript.UnsupportedValueException;
 import quill.ui.GraphicalTestCase;
 
 import static parchment.render.RenderSettings.convertMilimetresToPoints;

@@ -43,7 +43,7 @@ class NormalListitemBox extends ListitemBox
         final Entry entry; // field?
         final Alignment align;
 
-        text = segment.getImage();
+        text = segment.getExtra();
 
         entry = new Entry();
         entry.setText(text);

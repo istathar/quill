@@ -5,29 +5,28 @@ Coming back for seconds
 </chapter>
 <text>
 While the editor you see is only presenting the series of blocks
-making up one chapter, a book is many such chapters, and this
-is what <project>Quill</project> supports. This is the second
-chapter in the example document, where various other things that
-need to be exercised were dumped.
+making up one chapter, a book is many such chapters, and this is what
+<project>Quill</project> supports. This is the second chapter in the
+example document, where various other things that need to be exercised
+were dumped.
 </text>
 <heading label="2.1">
 Business this week
 </heading>
 <text>
-The American space agency, <acronym>NASA</acronym>, reports that
-they have run out of paperclips.
+The American space agency, <acronym>NASA</acronym>, reports that they
+have run out of paperclips.
 </text>
 <heading label="2.2">
 Leaders
 </heading>
 <text>
-The <acronym>G20</acronym> has a legitimacy lacking in other
-economic clubs, such as the rich country only <acronym>G7</acronym>
-... Unfortunately history suggests that big-picture debates on
-the future of the international monetary system rarely yield
-results. France should take note. The <acronym>G20</acronym>
-will remain worth having only if it sticks to the art of the
-possible.<note ref="1"/>
+The <acronym>G20</acronym> has a legitimacy lacking in other economic
+clubs, such as the rich country only <acronym>G7</acronym> ...
+Unfortunately history suggests that big-picture debates on the future
+of the international monetary system rarely yield results. France
+should take note. The <acronym>G20</acronym> will remain worth having
+only if it sticks to the art of the possible.<note ref="1"/>
 </text>
 <credit>
 - from <title>The Economist</title>
@@ -39,16 +38,16 @@ The virtues of Incompleteness
 There are several things to take aboard reading this chapter.
 </text>
 <list label="•">
-The user interface is far from complete; terribly sorry about
-that, but the we've been working on other areas of the project,
-and so now what the underlying file format supports has far outstripped
-the capabilities of the <project>Quill</project> editor.
+The user interface is far from complete; terribly sorry about that,
+but the we've been working on other areas of the project, and so now
+what the underlying file format supports has far outstripped the
+capabilities of the <project>Quill</project> editor.
 </list>
 <list label="•">
 The Parchment File Format is, or should be, stable now, and
 <project>Parchment</project> <bold>will</bold> properly render
-everything in it. So now we have a clear goal to work toward,
-and we will be building better editor support in the coming months.
+everything in it. So now we have a clear goal to work toward, and we
+will be building better editor support in the coming months.
 </list>
 <text>
 And that's it. No more list for you.
@@ -57,14 +56,13 @@ And that's it. No more list for you.
 To Be Continued
 </heading>
 <text>
-This section's label is wider than the default allowance, so
-the heading body text should be pushed to the right accordingly.
-Euler would understand.
+This section's label is wider than the default allowance, so the
+heading body text should be pushed to the right accordingly. Euler
+would understand.
 </text>
 <endnote name="1">
 From an editorial about the <acronym>G20</acronym> and its challenges
-in the lead up to the Seoul summit. "Finally, a talking-shop
-worth having" in <title>The Economist</title> (6 Nov 2010), pages
-16-17.
+in the lead up to the Seoul summit. "Finally, a talking-shop worth
+having" in <title>The Economist</title> (6 Nov 2010), pages 16-17.
 </endnote>
 </quack>

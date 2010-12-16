@@ -14,48 +14,20 @@ The on-disk format needs to be completed, and finalized as
 <bold>Launching documents from Nautilus</bold>
 </text>
 <text>
-Once the format is finalized, we need to register a MIME type
-with GNOME via a <literal>.desktop</literal> file so that documents
-are launched when opened by the <project>Nautilus</project> file
-browser or with <command>gnome-open</command> from the command
-line.
+Once the format is finalized, we need to register a MIME type with
+GNOME via a <literal>.desktop</literal> file so that documents are
+launched when opened by the <project>Nautilus</project> file browser
+or with <command>gnome-open</command> from the command line.
 </text>
 <text>
-This will probably also require single instance code via [org.gnome.notify]
-<type>Notify</type>. We'll need to have a mechanism to differentiate
-between development and normal use (start new instance &amp;
-terminate existing vs just load into existing instance?).
+This will probably also require single instance code via
+[org.gnome.notify] <type>Notify</type>. We'll need to have a mechanism
+to differentiate between development and normal use (start new
+instance &amp; terminate existing vs just load into existing
+instance?).
 </text>
 <text>
 Should individual chapters be launchable, or just the document?
-</text>
-<heading>
-Saving
-</heading>
-<text>
-<bold>Line wrapping of XML output</bold>
-</text>
-<text>
-The line-breaking algorithm in <project>Xom</project> is rather
-poor: it takes the maximum line length specified, subtracts 10,
-and then looks for a possible line break after that point. This
-makes for erratic justification, trailing space characters, and
-other artifacts. This is due to <project>Xom</project>'s
-<type>Serializer</type> handles its output one character at a
-time and has no look ahead / read back capability.
-</text>
-<text>
-It may be better for us to write the output file to a
-<type>StringWriter</type> or <type>ByteArrayOutputStream</type>
-and then do the breaks manually by doing <literal>' '</literal>
-to <literal>'\n' </literal>replacements.
-</text>
-<text>
-For what it's worth, though, it's getting closer to the point
-where <italics>not</italics> using <project>Xom</project> and
-just doing the really minimal XML work ourselves would be feasible.
-Not really that interested going down the not-invented-here road,
-but...
 </text>
 <heading>
 User interface
@@ -66,20 +38,20 @@ User interface
 <text>
 While loading, display, rendering, and saving of documents with
 <literal>&lt;note&gt;</literal> and <literal>&lt;cite&gt;</literal>
-tags is implemented, there's no user interface for adding or
-creating these markers yet, nor editing the reference bodies.
+tags is implemented, there's no user interface for adding or creating
+these markers yet, nor editing the reference bodies.
 </text>
 <text>
 <bold>Document word lists</bold>
 </text>
 <text>
-While we have enabled adding words to the user's custom dictionary
-via "Add" in the suggestions menu, it may make sense to add words
-to the document. Perhaps this is just "Ignore"?
+While we have enabled adding words to the user's custom dictionary via
+"Add" in the suggestions menu, it may make sense to add words to the
+document. Perhaps this is just "Ignore"?
 </text>
 <text>
-This will likely make more sense when we have a proper notion
-of document and can store a word list there.
+This will likely make more sense when we have a proper notion of
+document and can store a word list there.
 </text>
 <heading>
 Copyright
@@ -88,10 +60,10 @@ Copyright
 Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
 </quote>
 <quote>
-As project documentation, this file forms an integral part of
-the source code of the program it accompanies, and thus is made
-available to you by its authors under the terms of the "GNU General
-Public Licence version 2". See the <filename>LICENCE</filename>
-file for the terms governing usage, copying and redistribution.
+As project documentation, this file forms an integral part of the
+source code of the program it accompanies, and thus is made available
+to you by its authors under the terms of the "GNU General Public
+Licence version 2". See the <filename>LICENCE</filename> file for the
+terms governing usage, copying and redistribution.
 </quote>
 </quack>

@@ -4,8 +4,11 @@
 Background
 </chapter>
 <text>
-Writing is already hard enough. It's really not to be borne that
-the tools we have to write with make it harder.
+Writing is already hard enough. It's really not to be borne that the
+tools we have to write with make it harder.
+</text>
+<text>
+<highlight>MORE</highlight>
 </text>
 <heading>
 Criteria
@@ -18,41 +21,40 @@ Thus we have the following criteria:
 </text>
 <text>
 The driving imperative for Quack documents is that they be manageable
-with the collaboration tools we use to write open source software
-- specifically the modern 3rd generation distributed version
-control systems (<acronym>DVCS</acronym>) such as the most excellent
+with the collaboration tools we use to write open source software -
+specifically the modern 3rd generation distributed version control
+systems (<acronym>DVCS</acronym>) such as the most excellent
 <project>Bazaar</project> (<command>bzr</command>) or its friends
 <project>Git</project> (<command>git</command>) or
 <project>Mercurial</project> (<command>hg</command>).
 </text>
 <text>
-This is both so that we can use these existing tools to manage
-the history of our documents and to give us robustness against
-things going wrong, but more importantly so that these tools
-can be used to enable to multiple authors to collaborate on the
-same document. We do it for source code; it's high time we were
-able to use the same tools for our written work too.
+This is both so that we can use these existing tools to manage the
+history of our documents and to give us robustness against things
+going wrong, but more importantly so that these tools can be used to
+enable to multiple authors to collaborate on the same document. We do
+it for source code; it's high time we were able to use the same tools
+for our written work too.
 </text>
 <text>
-So the format <bold>must</bold> be "text based"; in text files,
-with lines wrapped such that they are less that 80 characters
-wide. This is necessary so that when files are compared or merged
-the diffs are sensible and fit in a standard width terminal screens.
+So the format <bold>must</bold> be "text based"; in text files, with
+lines wrapped such that they are less that 80 characters wide. This is
+necessary so that when files are compared or merged the diffs are
+sensible and fit in a standard width terminal screens.
 </text>
 <text>
 <bold>2. Valid documents only</bold>
 </text>
 <text>
-There is nothing in particular that requires <acronym>XML</acronym>
-be used, but we are working in marked up, somewhat hierarchical
-text; <acronym>SGML</acronym> was always about that.
-<acronym>XML</acronym>'s main attraction, of course, is that
-one can specify a schema and require that documents be valid
-per that schema's <acronym>DTD</acronym>. This helps keep the
-complexity that the application has to deal with under control.
-Why do people write apps that accept invalid input? Astounding
-really, but then they output invalid <acronym>XML</acronym> too.
-Go figure.
+There is nothing in particular that requires <acronym>XML</acronym> be
+used, but we are working in marked up, somewhat hierarchical text;
+<acronym>SGML</acronym> was always about that.
+<acronym>XML</acronym>'s main attraction, of course, is that one can
+specify a schema and require that documents be valid per that schema's
+<acronym>DTD</acronym>. This helps keep the complexity that the
+application has to deal with under control. Why do people write apps
+that accept invalid input? Astounding really, but then they output
+invalid <acronym>XML</acronym> too. Go figure.
 </text>
 <text>
 <bold>3. Simple schema</bold>
@@ -60,8 +62,8 @@ Go figure.
 <text>
 Having chosen <acronym>XML</acronym>, however, there is a new
 imperative: simplicity. Hierarchical structure is something that
-humans tend to understand very quickly, but it is fiendishly
-difficult to work with programatically.
+humans tend to understand very quickly, but it is fiendishly difficult
+to work with programatically.
 </text>
 <text>
 Keeping the schema ridiculously straight forward means that the
@@ -70,109 +72,106 @@ experience rather can be written by mere mortals.
 </text>
 <text>
 The simplicity requirement also means that you can fix your chapter
-files on disk if the <project>Quill</project> application breaks,
-but if you break the file on disk you'll break
-<project>Quill</project>. Tough cookies.
+files on disk if the <project>Quill</project> application breaks, but
+if you break the file on disk you'll break <project>Quill</project>.
+Tough cookies.
 </text>
 <text>
-Note that the simplicity criteria does not mean that the on-disk
-files are intended to be human <italics>writable</italics>. Just
-because it's human readable doesn't mean that you're supposed
-to have it open in <command>vi</command>. And it's not particularly
-meant for reading by other programs. But the format does have
-to be human <italics>mergeable</italics>; if two people are collaborating,
-combine their branches, and get a merge conflict, they
-<bold>have</bold> to be able to resolve it.
+Note that the simplicity criteria does not mean that the on-disk files
+are intended to be human <italics>writable</italics>. Just because
+it's human readable doesn't mean that you're supposed to have it open
+in <command>vi</command>. And it's not particularly meant for reading
+by other programs. But the format does have to be human
+<italics>mergeable</italics>; if two people are collaborating, combine
+their branches, and get a merge conflict, they <bold>have</bold> to be
+able to resolve it.
 </text>
 <text>
 <bold>4. Suitable for technical writing</bold>
 </text>
 <text>
-The format needs to support sufficient different markups so as
-to be able to do the sorts of technical reports, software documentation,
+The format needs to support sufficient different markups so as to be
+able to do the sorts of technical reports, software documentation,
 conference papers, and journal articles the authors of whom are
 Quill's target audience. This is both an exclusive and inclusive
-statement; the markup format does not need to be particularly
-flexible or extensible; such things are nice but grossly add
-complexity. It does, however, have to support sufficient variety
-that it is possible to express the range of syntax that occurs
-in such documents.
+statement; the markup format does not need to be particularly flexible
+or extensible; such things are nice but grossly add complexity. It
+does, however, have to support sufficient variety that it is possible
+to express the range of syntax that occurs in such documents.
 </text>
 <text>
-Ultimately, each of the semantic block types and inline markups
-are about driving a specific output formatting. So while the
-names of the inlines refer to various purposes, there is no real
-requirement to have a unique markup for ever possible different
-use.
+Ultimately, each of the semantic block types and inline markups are
+about driving a specific output formatting. So while the names of the
+inlines refer to various purposes, there is no real requirement to
+have a unique markup for ever possible different use.
 </text>
 <text>
 <bold>5. One file per chapter</bold>
 </text>
 <text>
 This is somewhat arbitrary, but nevertheless it is common practice
-when writing book length works to have each chapter in its own
-file. And this makes sense; if one author does work on the chapter
-about Spain while the editor makes revisions to the chapter about
-Antigua, those changes should be independent and show up as different
-files being changed.
+when writing book length works to have each chapter in its own file.
+And this makes sense; if one author does work on the chapter about
+Spain while the editor makes revisions to the chapter about Antigua,
+those changes should be independent and show up as different files
+being changed.
 </text>
 <heading>
 Why didn't you use...
 </heading>
 <text>
-Programmers create new formats and schemas all the time, but
-the instant you mention that the application is a "word processor"
-they freak out and insist that you make your program interoperable
-with <project>Open Office</project>'s Open Document Format. Which
-is "lovely" - in that everyone has the application which opens
-said documents - and "standardized" - people seem to think that
-since it exists, is widely adopted, and not to mention in a huge
-fight with Microsoft's "Office XML" (which even <project>Microsoft
-Office</project> doesn't support) that everything else has to
-support it too.
+Programmers create new formats and schemas all the time, but the
+instant you mention that the application is a "word processor" they
+freak out and insist that you make your program interoperable with
+<project>Open Office</project>'s Open Document Format. Which is
+"lovely" - in that everyone has the application which opens said
+documents - and "standardized" - people seem to think that since it
+exists, is widely adopted, and not to mention in a huge fight with
+Microsoft's "Office XML" (which even <project>Microsoft
+Office</project> doesn't support) that everything else has to support
+it too.
 </text>
 <text>
-<project>Open Office</project> is of course a major player. It
-always will be. At Operational Dynamics we happily use it for
-our business correspondence and it outputs very serviceable
-<acronym>PDF</acronym> documents. It also serves the tremendously
-important role of allowing us to open Microsoft Office format
-documents. It's excellent at all these things.
+<project>Open Office</project> is of course a major player. It always
+will be. At Operational Dynamics we happily use it for our business
+correspondence and it outputs very serviceable <acronym>PDF</acronym>
+documents. It also serves the tremendously important role of allowing
+us to open Microsoft Office format documents. It's excellent at all
+these things.
 </text>
 <text>
 But <acronym>ODF</acronym> is unbelievably complex. The specification
-comes in at 1,216 pages. Trying to write something that is able
-to parse and output compliant documents would be a huge undertaking.
-And the bigger problem is that even if we tried to use even just
-a subset of <acronym>ODF</acronym>, people would instantly (and
-quite reasonably) expect that <project>Quill</project> would
-be able to open their <project>Writer</project> documents, and
-that they'd be able to open their <project>Quill</project> documents
-with <project>Writer</project> That's not really the point here;
-while we do need to be able to escape from the Parchment format
-so that users are assured they're not locked-in, that's a very
-different issue from being able to round-trip import documents
-from other systems.
+comes in at 1,216 pages. Trying to write something that is able to
+parse and output compliant documents would be a huge undertaking. And
+the bigger problem is that even if we tried to use even just a subset
+of <acronym>ODF</acronym>, people would instantly (and quite
+reasonably) expect that <project>Quill</project> would be able to open
+their <project>Writer</project> documents, and that they'd be able to
+open their <project>Quill</project> documents with
+<project>Writer</project> That's not really the point here; while we
+do need to be able to escape from the Parchment format so that users
+are assured they're not locked-in, that's a very different issue from
+being able to round-trip import documents from other systems.
 </text>
 <text>
-In any event, the one-big-binary-blob nature of Open Document
-Format doesn't meet our criteria above, and so that was that.
+In any event, the one-big-binary-blob nature of Open Document Format
+doesn't meet our criteria above, and so that was that.
 </text>
 <text>
-That doesn't mean that we expect <project>Quill and Parchment</project>
-to "beat" <project>Writer</project>. Nothing of the sort. We
-set out to write a tool that would help us author the kinds of
-documents that we want to create. If it does a good job at that
-we'll be content; and for anything that doesn't fit the (admittedly
-quite restrictive) mold of <project>Quill</project>, just use
-<project>Writer</project>!
+That doesn't mean that we expect <project>Quill and
+Parchment</project> to "beat" <project>Writer</project>. Nothing of
+the sort. We set out to write a tool that would help us author the
+kinds of documents that we want to create. If it does a good job at
+that we'll be content; and for anything that doesn't fit the
+(admittedly quite restrictive) mold of <project>Quill</project>, just
+use <project>Writer</project>!
 </text>
 <text>
 Which raises a good concluding point; it has long been Unix philosophy
-that you endeavour to use the best individual tools you can for
-the job. OOo is an impressive full feature office suite, and
-it being so leaves us the room allowing us to write <project>Quill
-and Parchment</project> as a specialized writing tool, without
-having to make it all things to all people.
+that you endeavour to use the best individual tools you can for the
+job. OOo is an impressive full feature office suite, and it being so
+leaves us the room allowing us to write <project>Quill and
+Parchment</project> as a specialized writing tool, without having to
+make it all things to all people.
 </text>
 </quack>

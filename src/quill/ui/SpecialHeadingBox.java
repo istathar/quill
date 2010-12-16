@@ -50,7 +50,7 @@ class SpecialHeadingBox extends HBox
         final Label label, spacer;
         final String type, text;
 
-        type = segment.getImage();
+        type = segment.getExtra();
 
         if (type.equals("endnotes")) {
             text = _("Endnotes");

@@ -43,7 +43,7 @@ import org.gnome.gtk.TreeIter;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
-import parchment.format.Stylesheet;
+import parchment.manuscript.Stylesheet;
 import parchment.render.RenderEngine;
 import quill.client.ApplicationException;
 import quill.textbase.Folio;

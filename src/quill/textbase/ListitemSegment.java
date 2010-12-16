@@ -35,6 +35,6 @@ public class ListitemSegment extends Segment
     }
 
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
-        return new ListitemSegment(entire, super.getImage(), offset, removed, inserted);
+        return new ListitemSegment(entire, super.getExtra(), offset, removed, inserted);
     }
 }
