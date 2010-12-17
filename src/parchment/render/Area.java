@@ -76,6 +76,25 @@ abstract class Area
      * Draw this Area onto Context cr at top corner position y.
      */
     abstract void draw(Context cr, double y);
+
+    /**
+     * Create a CompositeArea which can be drawn as a single Area from the
+     * supplied Areas.
+     */
+    static Area composite(Area[] areas) {
+        int i;
+        double height;
+        Area area;
+
+        height = 0;
+
+        for (i = 0; i < areas.length; i++) {
+            area = areas[i];
+            height += area.height;
+        }
+
+        return new CompositeArea(height, areas);
+    }
 }
 
 final class TextArea extends Area
@@ -197,5 +216,37 @@ final class PageBreakArea extends Area
 
     void draw(Context cr, double y) {
     // nothing :)
+    }
+}
+
+/**
+ * Special purpose Area for combining other Areas to force them aggregate
+ * their heights before flowing. Create these with
+ * {@link Area#composite(Area[])}.
+ * 
+ * @author Andrew Cowie
+ */
+final class CompositeArea extends Area
+{
+    private Area[] children;
+
+    CompositeArea(final double height, Area[] areas) {
+        super(areas[0].origin, 0.0, height);
+        children = areas;
+    }
+
+    void draw(Context cr, double y) {
+        int i;
+        Area area;
+        double d;
+
+        d = y;
+
+        for (i = 0; i < children.length; i++) {
+            area = children[i];
+
+            area.draw(cr, d);
+            d += area.height;
+        }
     }
 }

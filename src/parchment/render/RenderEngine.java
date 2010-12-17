@@ -896,16 +896,16 @@ public abstract class RenderEngine
     }
 
     protected void appendReferenceParagraph(final Context cr, final String label, final Extract extract) {
-        final Area area;
-        final Area[] list;
+        final Area area, group;
+        final Area[] list, areas;
         final double savedLeft;
+        int i;
 
         /*
          * Label
          */
 
         area = layoutAreaBullet(cr, label, serifFace, 0.0);
-        accumulate(area);
 
         /*
          * Body. 25 points is suitable for [99] and (barely) enough for [999].
@@ -915,6 +915,15 @@ public abstract class RenderEngine
         leftMargin += 25.0;
 
         list = layoutAreaText(cr, extract, serifFace, false, false, 0.0, 1, false);
+
+        areas = new Area[2];
+        areas[0] = area;
+        areas[1] = list[0];
+
+        list[0] = null;
+
+        group = Area.composite(areas);
+        accumulate(group);
         accumulate(list);
 
         leftMargin = savedLeft;
@@ -1320,6 +1329,11 @@ public abstract class RenderEngine
 
             while (i < I) {
                 area = areas.get(i);
+
+                if (area == null) {
+                    i++;
+                    continue;
+                }
 
                 if (area instanceof PageBreakArea) {
                     i++;
