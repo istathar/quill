@@ -18,13 +18,14 @@
  */
 package parchment.render;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.FontOptions;
+import org.freedesktop.cairo.Pattern;
 import org.freedesktop.cairo.Surface;
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.PaperSize;
@@ -1729,6 +1730,8 @@ public abstract class RenderEngine
         final TextChain chain;
         final Extract extract;
         final double dpi;
+        final Pattern pattern;
+        final Surface implicit;
         final Area image, blank, group;
         final double request, savedLeft, savedRight;
         final FontDescription desc;
@@ -1738,18 +1741,6 @@ public abstract class RenderEngine
         manuscript = folio.getManuscript();
         parent = manuscript.getDirectory();
         filename = parent + "/" + source;
-
-        try {
-            pixbuf = new Pixbuf(filename);
-        } catch (FileNotFoundException e) {
-            chain = new TextChain();
-            chain.append(createSpan("image" + "\n", null));
-            chain.append(createSpan(filename, Common.FILENAME));
-            chain.append(createSpan("\n" + "not found", null));
-            extract = chain.extractAll();
-            appendErrorParagraph(cr, extract);
-            return;
-        }
 
         /*
          * FIXME This is a monster, horrible hack: we have to have some notion
@@ -1775,7 +1766,18 @@ public abstract class RenderEngine
             dpi = 72.0;
         }
 
-        image = layoutAreaImage(cr, pixbuf, dpi);
+        try {
+            image = layoutAreaImage(cr, filename, dpi);
+
+        } catch (IOException e) {
+            chain = new TextChain();
+            chain.append(createSpan("image" + "\n", null));
+            chain.append(createSpan(filename, Common.FILENAME));
+            chain.append(createSpan("\n" + "not loaded", null));
+            extract = chain.extractAll();
+            appendErrorParagraph(cr, extract);
+            return;
+        }
 
         if (entire.getWidth() == 0) {
             accumulate(image);
@@ -1835,8 +1837,9 @@ public abstract class RenderEngine
      * 
      * @param cr
      */
-    protected final Area layoutAreaImage(final Context cr, final Pixbuf pixbuf, final double dpi) {
-        final double width, height;
+    protected final Area layoutAreaImage(final Context cr, final String filename, final double dpi)
+            throws IOException {
+        final double fileWidth, fileHeight, width, height;
         final double conversionFactor, available, scaleFactor, request;
         final double leftCorner;
         final Origin origin;
@@ -1844,8 +1847,10 @@ public abstract class RenderEngine
 
         conversionFactor = 72.0 / dpi;
 
-        width = pixbuf.getWidth() * conversionFactor;
-        height = pixbuf.getHeight() * conversionFactor;
+        fileWidth = Pixbuf.getFileInfoWidth(filename);
+        fileHeight = Pixbuf.getFileInfoHeight(filename);
+        width = fileWidth * conversionFactor;
+        height = fileHeight * conversionFactor;
 
         available = pageWidth - rightMargin - leftMargin;
 
@@ -1860,7 +1865,7 @@ public abstract class RenderEngine
         }
 
         origin = new Origin(folioIndex, seriesIndex, 0);
-        area = new ImageArea(origin, leftCorner, request, pixbuf, scaleFactor);
+        area = new ImageArea(origin, leftCorner, request, filename, scaleFactor);
         return area;
     }
 
