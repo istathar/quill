@@ -31,6 +31,7 @@ import org.freedesktop.cairo.Surface;
 import org.gnome.gdk.Pixbuf;
 import org.gnome.pango.LayoutLine;
 import org.gnome.pango.Rectangle;
+import org.gnome.rsvg.Handle;
 
 import quill.textbase.Origin;
 
@@ -198,6 +199,7 @@ final class ImageArea extends Area
 
     void draw(final Context cr, final double y) {
         final Matrix matrix;
+        final Handle graphic;
         final byte[] data;
         final Pixbuf pixbuf;
         final Pattern pattern;
@@ -225,19 +227,22 @@ final class ImageArea extends Area
 
             cr.transform(matrix);
 
-            if (filename.endsWith(".jpg")) {
+            if (filename.endsWith(".svg")) {
+                graphic = new Handle(filename);
+                cr.showHandle(graphic);
+            } else if (filename.endsWith(".jpg")) {
                 data = readFileIntoArray(filename);
                 pixbuf = new Pixbuf(data);
                 cr.setSource(pixbuf, 0, 0);
                 pattern = cr.getSource();
                 implicit = pattern.getSurface();
                 implicit.setMimeData(MimeType.JPEG, data);
+                cr.paint();
             } else {
                 pixbuf = new Pixbuf(filename);
                 cr.setSource(pixbuf, 0, 0);
+                cr.paint();
             }
-
-            cr.paint();
 
             /*
              * Reset the source [colour] to black text.
