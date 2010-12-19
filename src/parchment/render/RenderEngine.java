@@ -464,12 +464,7 @@ public abstract class RenderEngine
                 } else if (segment instanceof ImageSegment) {
                     filename = segment.getExtra();
                     appendSegmentBreak(cr);
-                    appendExternalGraphic(cr, filename);
-                    if (entire.getWidth() == 0) {
-                        continue;
-                    }
-                    appendSegmentBreak(cr);
-                    appendCaptionParagraph(cr, entire);
+                    appendExternalGraphic(cr, filename, entire);
                 } else if (segment instanceof EndnoteSegment) {
                     endnotes[i].add(segment);
                 } else if (segment instanceof ReferenceSegment) {
@@ -1727,14 +1722,18 @@ public abstract class RenderEngine
         return null;
     }
 
-    protected void appendExternalGraphic(final Context cr, final String source) {
+    protected void appendExternalGraphic(final Context cr, final String source, final Extract entire) {
         final Manuscript manuscript;
         final String parent, filename;
         final Pixbuf pixbuf;
         final TextChain chain;
         final Extract extract;
         final double dpi;
-        final Area image;
+        final Area image, blank, group;
+        final double request, savedLeft, savedRight;
+        final FontDescription desc;
+        final Typeface face;
+        final Area[] list, areas;
 
         manuscript = folio.getManuscript();
         parent = manuscript.getDirectory();
@@ -1777,7 +1776,48 @@ public abstract class RenderEngine
         }
 
         image = layoutAreaImage(cr, pixbuf, dpi);
-        accumulate(image);
+
+        if (entire.getWidth() == 0) {
+            accumulate(image);
+            return;
+        }
+
+        /*
+         * Add a blank line between image and caption. This should be
+         * abstracted from somewhere else.
+         */
+
+        request = serifFace.lineHeight * 0.7;
+        blank = new BlankArea(null, request);
+
+        savedLeft = leftMargin;
+        savedRight = rightMargin;
+
+        /*
+         * Render the caption text. The indent values are the same as
+         * appendQuoteParagraph(); these values should be sourced from
+         * somewhere else (a getter?) too.
+         */
+
+        leftMargin += 45.0;
+        rightMargin += 45.0;
+
+        desc = serifFace.desc.copy();
+        desc.setStyle(Style.ITALIC);
+        face = new Typeface(cr, desc, 0.0);
+
+        list = layoutAreaText(cr, entire, face, false, true, 0.0, 1, false);
+
+        areas = new Area[2 + list.length];
+        areas[0] = image;
+        areas[1] = blank;
+        System.arraycopy(list, 0, areas, 2, list.length);
+
+        group = Area.composite(areas);
+        accumulate(group);
+
+        leftMargin = savedLeft;
+        rightMargin = savedRight;
     }
 
     /**
@@ -1788,33 +1828,6 @@ public abstract class RenderEngine
 
         list = layoutAreaText(cr, extract, sansFace, false, true, 0.0, 1, true);
         accumulate(list);
-    }
-
-    /*
-     * Indentation copied from drawQuoteParagraph(). And face setting copied
-     * from drawHeading(). Both of these should probably be abstracted.
-     */
-    protected void appendCaptionParagraph(Context cr, Extract extract) {
-        final double savedLeft, savedRight;
-        final FontDescription desc;
-        final Typeface face;
-        final Area[] list;
-
-        savedLeft = leftMargin;
-        savedRight = rightMargin;
-
-        leftMargin += 45.0;
-        rightMargin += 45.0;
-
-        desc = serifFace.desc.copy();
-        desc.setStyle(Style.ITALIC);
-        face = new Typeface(cr, desc, 0.0);
-
-        list = layoutAreaText(cr, extract, face, false, true, 0.0, 1, false);
-        accumulate(list);
-
-        leftMargin = savedLeft;
-        rightMargin = savedRight;
     }
 
     /**
