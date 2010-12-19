@@ -18,11 +18,20 @@
  */
 package parchment.render;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Matrix;
+import org.freedesktop.cairo.MimeType;
+import org.freedesktop.cairo.Pattern;
+import org.freedesktop.cairo.Surface;
 import org.gnome.gdk.Pixbuf;
 import org.gnome.pango.LayoutLine;
 import org.gnome.pango.Rectangle;
+import org.gnome.rsvg.Handle;
 
 import quill.textbase.Origin;
 
@@ -76,6 +85,25 @@ abstract class Area
      * Draw this Area onto Context cr at top corner position y.
      */
     abstract void draw(Context cr, double y);
+
+    /**
+     * Create a CompositeArea which can be drawn as a single Area from the
+     * supplied Areas.
+     */
+    static Area composite(Area[] areas) {
+        int i;
+        double height;
+        Area area;
+
+        height = 0;
+
+        for (i = 0; i < areas.length; i++) {
+            area = areas[i];
+            height += area.height;
+        }
+
+        return new CompositeArea(height, areas);
+    }
 }
 
 final class TextArea extends Area
@@ -129,7 +157,7 @@ final class TextArea extends Area
 
 final class ImageArea extends Area
 {
-    private final Pixbuf pixbuf;
+    private final String filename;
 
     private final double scale;
 
@@ -137,44 +165,99 @@ final class ImageArea extends Area
      * @param x
      *            offset from left margin.
      */
-    ImageArea(final Origin origin, final double x, final double height, final Pixbuf pixbuf,
+    ImageArea(final Origin origin, final double x, final double height, final String filename,
             final double scale) {
         super(origin, x, height);
-        this.pixbuf = pixbuf;
+        this.filename = filename;
         this.scale = scale;
+    }
+
+    /*
+     * Modelled on java-gnome ValdiateCairoInternals.readFileIntoArray()
+     */
+    private static byte[] readFileIntoArray(String filename) throws IOException {
+        final File source;
+        final int length;
+        final FileInputStream fis;
+        final byte[] data;
+        int actual;
+
+        source = new File(filename);
+        length = (int) source.length();
+
+        data = new byte[length];
+
+        fis = new FileInputStream(source);
+
+        actual = 0;
+        while (actual != length) {
+            actual += fis.read(data, actual, length - actual);
+        }
+
+        return data;
     }
 
     void draw(final Context cr, final double y) {
         final Matrix matrix;
+        final Handle graphic;
+        final byte[] data;
+        final Pixbuf pixbuf;
+        final Pattern pattern;
+        final Surface implicit;
 
-        if (pixbuf == null) {
+        if (filename == null) {
             return;
         }
 
-        /*
-         * This is a bit unusual; you'd think you would just moveTo(), or,
-         * just as conventionally, use the x,y co-ordinates of setSource().
-         * But it works out just as cleanly to do a translattion to (x,y) and
-         * then to just assume the source is (0,0).
-         */
+        try {
+            cr.save();
 
-        cr.save();
-        matrix = new Matrix();
+            /*
+             * This is a bit unusual; you'd think you would just moveTo(), or,
+             * just as conventionally, use the x,y co-ordinates of
+             * setSource(). But it works out just as cleanly to do a
+             * translattion to (x,y) and then to just assume the source is
+             * (0,0).
+             */
 
-        matrix.translate(x, y);
-        matrix.scale(scale, scale);
+            matrix = new Matrix();
 
-        cr.transform(matrix);
-        cr.setSource(pixbuf, 0, 0);
-        cr.paint();
+            matrix.translate(x, y);
+            matrix.scale(scale, scale);
 
-        cr.restore();
+            cr.transform(matrix);
 
-        /*
-         * Reset the source [colour] to black text.
-         */
+            if (filename.endsWith(".svg")) {
+                graphic = new Handle(filename);
+                cr.showHandle(graphic);
+            } else if (filename.endsWith(".jpg")) {
+                data = readFileIntoArray(filename);
+                pixbuf = new Pixbuf(data);
+                cr.setSource(pixbuf, 0, 0);
+                pattern = cr.getSource();
+                implicit = pattern.getSurface();
+                implicit.setMimeData(MimeType.JPEG, data);
+                cr.paint();
+            } else {
+                pixbuf = new Pixbuf(filename);
+                cr.setSource(pixbuf, 0, 0);
+                cr.paint();
+            }
 
-        cr.setSource(0.0, 0.0, 0.0);
+            /*
+             * Reset the source [colour] to black text.
+             */
+
+            cr.setSource(0.0, 0.0, 0.0);
+
+        } catch (FileNotFoundException fnfe) {
+            // should be impossible, we just tested for it
+            throw new AssertionError();
+        } catch (IOException ioe) {
+            // bad news, but swollow
+        } finally {
+            cr.restore();
+        }
     }
 }
 
@@ -197,5 +280,37 @@ final class PageBreakArea extends Area
 
     void draw(Context cr, double y) {
     // nothing :)
+    }
+}
+
+/**
+ * Special purpose Area for combining other Areas to force them aggregate
+ * their heights before flowing. Create these with
+ * {@link Area#composite(Area[])}.
+ * 
+ * @author Andrew Cowie
+ */
+final class CompositeArea extends Area
+{
+    private Area[] children;
+
+    CompositeArea(final double height, Area[] areas) {
+        super(areas[0].origin, 0.0, height);
+        children = areas;
+    }
+
+    void draw(Context cr, double y) {
+        int i;
+        Area area;
+        double d;
+
+        d = y;
+
+        for (i = 0; i < children.length; i++) {
+            area = children[i];
+
+            area.draw(cr, d);
+            d += area.height;
+        }
     }
 }

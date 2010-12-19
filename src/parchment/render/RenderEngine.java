@@ -18,13 +18,14 @@
  */
 package parchment.render;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.FontOptions;
+import org.freedesktop.cairo.Pattern;
 import org.freedesktop.cairo.Surface;
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.PaperSize;
@@ -464,12 +465,7 @@ public abstract class RenderEngine
                 } else if (segment instanceof ImageSegment) {
                     filename = segment.getExtra();
                     appendSegmentBreak(cr);
-                    appendExternalGraphic(cr, filename);
-                    if (entire == null) {
-                        continue;
-                    }
-                    appendSegmentBreak(cr);
-                    appendCaptionParagraph(cr, entire);
+                    appendExternalGraphic(cr, filename, entire);
                 } else if (segment instanceof EndnoteSegment) {
                     endnotes[i].add(segment);
                 } else if (segment instanceof ReferenceSegment) {
@@ -896,16 +892,16 @@ public abstract class RenderEngine
     }
 
     protected void appendReferenceParagraph(final Context cr, final String label, final Extract extract) {
-        final Area area;
-        final Area[] list;
+        final Area area, group;
+        final Area[] list, areas;
         final double savedLeft;
+        int i;
 
         /*
          * Label
          */
 
         area = layoutAreaBullet(cr, label, serifFace, 0.0);
-        accumulate(area);
 
         /*
          * Body. 25 points is suitable for [99] and (barely) enough for [999].
@@ -915,6 +911,15 @@ public abstract class RenderEngine
         leftMargin += 25.0;
 
         list = layoutAreaText(cr, extract, serifFace, false, false, 0.0, 1, false);
+
+        areas = new Area[2];
+        areas[0] = area;
+        areas[1] = list[0];
+
+        list[0] = null;
+
+        group = Area.composite(areas);
+        accumulate(group);
         accumulate(list);
 
         leftMargin = savedLeft;
@@ -1087,7 +1092,7 @@ public abstract class RenderEngine
         Origin origin;
         Area area;
 
-        if (extract == null) {
+        if ((extract == null) || (extract.getWidth() == 0)) {
             return new Area[] {};
         }
 
@@ -1320,6 +1325,11 @@ public abstract class RenderEngine
 
             while (i < I) {
                 area = areas.get(i);
+
+                if (area == null) {
+                    i++;
+                    continue;
+                }
 
                 if (area instanceof PageBreakArea) {
                     i++;
@@ -1713,30 +1723,24 @@ public abstract class RenderEngine
         return null;
     }
 
-    protected void appendExternalGraphic(final Context cr, final String source) {
+    protected void appendExternalGraphic(final Context cr, final String source, final Extract entire) {
         final Manuscript manuscript;
         final String parent, filename;
         final Pixbuf pixbuf;
         final TextChain chain;
         final Extract extract;
         final double dpi;
-        final Area image;
+        final Pattern pattern;
+        final Surface implicit;
+        final Area image, blank, group;
+        final double request, savedLeft, savedRight;
+        final FontDescription desc;
+        final Typeface face;
+        final Area[] list, areas;
 
         manuscript = folio.getManuscript();
         parent = manuscript.getDirectory();
         filename = parent + "/" + source;
-
-        try {
-            pixbuf = new Pixbuf(filename);
-        } catch (FileNotFoundException e) {
-            chain = new TextChain();
-            chain.append(createSpan("image" + "\n", null));
-            chain.append(createSpan(filename, Common.FILENAME));
-            chain.append(createSpan("\n" + "not found", null));
-            extract = chain.extractAll();
-            appendErrorParagraph(cr, extract);
-            return;
-        }
 
         /*
          * FIXME This is a monster, horrible hack: we have to have some notion
@@ -1744,13 +1748,12 @@ public abstract class RenderEngine
          * present, no way to find this out.
          * 
          * So we use the following heuristic: if the file is an SVG, then use
-         * Inkscape's default of 1 px @ 90 dpi (which flows from the SVG
+         * Inkscape's default of 90 pixels per inch (which flows from the SVG
          * specification which in turn references the CSS specification).
          * 
          * Otherwise, we rather arbitrarily go for the old Macintosh
-         * definition (which even less firmly became the web standard) of 1 px
-         * 
-         * @ 72 dpi.
+         * definition (which even less firmly became the web standard) of 72
+         * pixels per inch.
          * 
          * This is of course completely meaningless for digital photos, but we
          * kinda assume that a decent photo will be wider than available page
@@ -1763,8 +1766,60 @@ public abstract class RenderEngine
             dpi = 72.0;
         }
 
-        image = layoutAreaImage(cr, pixbuf, dpi);
-        accumulate(image);
+        try {
+            image = layoutAreaImage(cr, filename, dpi);
+
+        } catch (IOException e) {
+            chain = new TextChain();
+            chain.append(createSpan("image" + "\n", null));
+            chain.append(createSpan(filename, Common.FILENAME));
+            chain.append(createSpan("\n" + "not loaded", null));
+            extract = chain.extractAll();
+            appendErrorParagraph(cr, extract);
+            return;
+        }
+
+        if (entire.getWidth() == 0) {
+            accumulate(image);
+            return;
+        }
+
+        /*
+         * Add a blank line between image and caption. This should be
+         * abstracted from somewhere else.
+         */
+
+        request = serifFace.lineHeight * 0.7;
+        blank = new BlankArea(null, request);
+
+        savedLeft = leftMargin;
+        savedRight = rightMargin;
+
+        /*
+         * Render the caption text. The indent values are the same as
+         * appendQuoteParagraph(); these values should be sourced from
+         * somewhere else (a getter?) too.
+         */
+
+        leftMargin += 45.0;
+        rightMargin += 45.0;
+
+        desc = serifFace.desc.copy();
+        desc.setStyle(Style.ITALIC);
+        face = new Typeface(cr, desc, 0.0);
+
+        list = layoutAreaText(cr, entire, face, false, true, 0.0, 1, false);
+
+        areas = new Area[2 + list.length];
+        areas[0] = image;
+        areas[1] = blank;
+        System.arraycopy(list, 0, areas, 2, list.length);
+
+        group = Area.composite(areas);
+        accumulate(group);
+
+        leftMargin = savedLeft;
+        rightMargin = savedRight;
     }
 
     /**
@@ -1777,40 +1832,14 @@ public abstract class RenderEngine
         accumulate(list);
     }
 
-    /*
-     * Indentation copied from drawQuoteParagraph(). And face setting copied
-     * from drawHeading(). Both of these should probably be abstracted.
-     */
-    protected void appendCaptionParagraph(Context cr, Extract extract) {
-        final double savedLeft, savedRight;
-        final FontDescription desc;
-        final Typeface face;
-        final Area[] list;
-
-        savedLeft = leftMargin;
-        savedRight = rightMargin;
-
-        leftMargin += 45.0;
-        rightMargin += 45.0;
-
-        desc = serifFace.desc.copy();
-        desc.setStyle(Style.ITALIC);
-        face = new Typeface(cr, desc, 0.0);
-
-        list = layoutAreaText(cr, extract, face, false, true, 0.0, 1, false);
-        accumulate(list);
-
-        leftMargin = savedLeft;
-        rightMargin = savedRight;
-    }
-
     /**
      * If the image is wider than the margins it will be scaled down.
      * 
      * @param cr
      */
-    protected final Area layoutAreaImage(final Context cr, final Pixbuf pixbuf, final double dpi) {
-        final double width, height;
+    protected final Area layoutAreaImage(final Context cr, final String filename, final double dpi)
+            throws IOException {
+        final double fileWidth, fileHeight, width, height;
         final double conversionFactor, available, scaleFactor, request;
         final double leftCorner;
         final Origin origin;
@@ -1818,8 +1847,10 @@ public abstract class RenderEngine
 
         conversionFactor = 72.0 / dpi;
 
-        width = pixbuf.getWidth() * conversionFactor;
-        height = pixbuf.getHeight() * conversionFactor;
+        fileWidth = Pixbuf.getFileInfoWidth(filename);
+        fileHeight = Pixbuf.getFileInfoHeight(filename);
+        width = fileWidth * conversionFactor;
+        height = fileHeight * conversionFactor;
 
         available = pageWidth - rightMargin - leftMargin;
 
@@ -1834,7 +1865,7 @@ public abstract class RenderEngine
         }
 
         origin = new Origin(folioIndex, seriesIndex, 0);
-        area = new ImageArea(origin, leftCorner, request, pixbuf, scaleFactor);
+        area = new ImageArea(origin, leftCorner, request, filename, scaleFactor);
         return area;
     }
 
