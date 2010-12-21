@@ -10,7 +10,7 @@ Dependencies
 
 You will need the following prerequisites:
 
- - java-gnome	>= 4.0.17-rc2 ('mainline' from bzr is always best)
+ - java-gnome	>= 4.0.18 ('mainline' from bzr is always best)
  - xom		>= 1.2.1  (note Ubuntu and Gentoo 1.1 packages not sufficent)
 
 Build
