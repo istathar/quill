@@ -67,6 +67,7 @@ import quill.textbase.Origin;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 
+import static org.gnome.gdk.ModifierType.mask;
 import static org.gnome.gtk.FileChooserAction.OPEN;
 import static org.gnome.gtk.FileChooserAction.SAVE;
 
@@ -389,10 +390,16 @@ class PrimaryWindow extends Window
         window.connect(new Widget.KeyPressEvent() {
             public boolean onKeyPressEvent(Widget source, EventKey event) {
                 final Keyval key;
-                final ModifierType mod;
+                final ModifierType raw, mod;
 
                 key = event.getKeyval();
-                mod = event.getState();
+
+                raw = event.getState();
+                if (raw.contains(ModifierType.NUM_MASK)) {
+                    mod = mask(raw, ModifierType.NUM_MASK);
+                } else {
+                    mod = raw;
+                }
 
                 if (mod == ModifierType.NONE) {
                     if (key == Keyval.F1) {

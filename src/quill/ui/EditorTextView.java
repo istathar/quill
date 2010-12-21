@@ -70,6 +70,7 @@ import quill.textbase.TextChain;
 import quill.textbase.WordVisitor;
 
 import static org.freedesktop.bindings.Internationalization._;
+import static org.gnome.gdk.ModifierType.mask;
 import static org.gnome.gtk.TextWindowType.TEXT;
 import static quill.ui.Format.spelling;
 import static quill.ui.Format.tagForMarkup;
@@ -172,7 +173,7 @@ abstract class EditorTextView extends TextView
         view.connect(new Widget.KeyPressEvent() {
             public boolean onKeyPressEvent(Widget source, EventKey event) {
                 final Keyval key;
-                final ModifierType mod;
+                final ModifierType raw, mod;
 
                 /*
                  * This is magic, actually. Both normal keystrokes and
@@ -254,7 +255,12 @@ abstract class EditorTextView extends TextView
                  * Now on to processing special keystrokes.
                  */
 
-                mod = event.getState();
+                raw = event.getState();
+                if (raw.contains(ModifierType.NUM_MASK)) {
+                    mod = mask(raw, ModifierType.NUM_MASK);
+                } else {
+                    mod = raw;
+                }
 
                 if (mod == ModifierType.NONE) {
                     /*
