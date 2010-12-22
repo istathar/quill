@@ -1,6 +1,7 @@
 tmp
 .config
 tests/*.pdf
+doc/*/*.pdf
 ./quill
 ./quill-*
 .norescue
