@@ -19,6 +19,7 @@
 package quill.ui;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -99,15 +100,24 @@ class SpellChecker
 
     /**
      * Add the given word to the document's private word list. If there is no
-     * such list, create it.
+     * such list, create it, putting a comment (sic) at the beginning.
      * 
      * Enchant is extraordinarily annoying in that it appends "\nword" instead
      * of doing "word\n" which means there is never a newline at end of file.
+     * 
+     * We therefore read in the entire list, remove the trailing newline, let
+     * Enchant add the word, then append a newline.
+     */
+    /*
+     * This must be staggeringly expensive, so TODO any better ideas? We want
+     * a newline terminated file, and no bloody blanks.
      */
     void addToDocument(final String word) {
-        File target;
+        File target, tmp;
+        FileInputStream fis;
         FileOutputStream fos;
         byte[] b;
+        int len, i;
 
         if (list == null) {
             try {
@@ -117,7 +127,7 @@ class SpellChecker
                 }
                 target.createNewFile();
 
-                fos = new FileOutputStream(target);
+                fos = new FileOutputStream(target, false);
                 b = "# Enchant word list".getBytes("UTF-8");
                 fos.write(b);
                 fos.close();
@@ -129,8 +139,45 @@ class SpellChecker
             } catch (FileNotFoundException fnfe) {
                 throw new AssertionError("Can't open document word list");
             }
+        } else {
+            target = new File(filename);
+            tmp = new File(filename + ".tmp");
+
+            try {
+                len = (int) target.length() - 1;
+                b = new byte[1024];
+
+                fis = new FileInputStream(target);
+                fos = new FileOutputStream(tmp, false);
+
+                while (len > 0) {
+                    i = fis.read(b, 0, len);
+                    fos.write(b, 0, i);
+                    len -= i;
+                }
+                fis.close();
+                fos.close();
+                tmp.renameTo(target);
+            } catch (IOException ioe) {
+                throw new AssertionError("Failed to prepare word list");
+            } finally {
+                tmp.delete();
+            }
         }
+
         list.add(word);
+
+        if (true) {
+            try {
+                target = new File(filename);
+
+                fos = new FileOutputStream(target, true);
+                fos.write('\n');
+                fos.close();
+            } catch (IOException ioe) {
+                throw new AssertionError("Failed to tidy word list");
+            }
+        }
     }
 
     boolean isSystemValid() {
