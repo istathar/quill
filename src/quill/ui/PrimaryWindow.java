@@ -18,13 +18,12 @@
  */
 package quill.ui;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.PdfSurface;
 import org.freedesktop.cairo.Surface;
-import org.freedesktop.enchant.Dictionary;
-import org.freedesktop.enchant.Enchant;
 import org.freedesktop.icons.ActionIcon;
 import org.freedesktop.icons.PlaceIcon;
 import org.gnome.gdk.Event;
@@ -128,7 +127,7 @@ class PrimaryWindow extends Window
      */
     private Folio folio;
 
-    private Dictionary dict;
+    private SpellChecker dict;
 
     PrimaryWindow() {
         super();
@@ -377,6 +376,7 @@ class PrimaryWindow extends Window
             public boolean onDeleteEvent(Widget source, Event event) {
                 try {
                     saveIfModified();
+                    removeDictionaryIfEmpty();
                     ui.shutdown();
                     return false;
                 } catch (SaveCancelledException sce) {
@@ -1127,14 +1127,23 @@ class PrimaryWindow extends Window
             throw new AssertionError("Document specified an empty language code!");
         }
 
-        if (Enchant.existsDictionary(lang)) {
-            dict = Enchant.requestDictionary(lang);
-        } else {
-            dict = null;
+        dict = new SpellChecker(manuscript, lang);
+    }
+
+    private void removeDictionaryIfEmpty() {
+        String filename;
+        File target;
+
+        filename = dict.getDocumentFilename();
+        target = new File(filename);
+        if (target.exists()) {
+            if (target.length() == 0) {
+                target.delete();
+            }
         }
     }
 
-    Dictionary getDictionary() {
+    SpellChecker getDictionary() {
         return dict;
     }
 }

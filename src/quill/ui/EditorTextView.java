@@ -20,7 +20,6 @@ package quill.ui;
 
 import java.lang.reflect.Constructor;
 
-import org.freedesktop.enchant.Dictionary;
 import org.gnome.gdk.Color;
 import org.gnome.gdk.Cursor;
 import org.gnome.gdk.EventButton;
@@ -103,7 +102,7 @@ abstract class EditorTextView extends TextView
 
     private final ComponentEditorWidget parent;
 
-    private Dictionary dict;
+    private SpellChecker dict;
 
     EditorTextView(ComponentEditorWidget parent, Segment segment) {
         super();

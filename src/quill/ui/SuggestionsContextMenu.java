@@ -18,8 +18,9 @@
  */
 package quill.ui;
 
-import org.freedesktop.enchant.Dictionary;
 import org.gnome.gtk.Alignment;
+import org.gnome.gtk.IconSize;
+import org.gnome.gtk.Image;
 import org.gnome.gtk.ImageMenuItem;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.MenuItem;
@@ -37,7 +38,7 @@ import static org.freedesktop.bindings.Internationalization._;
  */
 class SuggestionsContextMenu extends ContextMenu
 {
-    private final Dictionary dict;
+    private final SpellChecker dict;
 
     private MenuItem.Activate picked;
 
@@ -116,17 +117,34 @@ class SuggestionsContextMenu extends ContextMenu
         if (!dict.check(word)) {
             item = new SeparatorMenuItem();
             menu.append(item);
-            item = new ImageMenuItem(Stock.ADD);
+
+            item = new ImageMenuItem(new Image(Stock.ADD, IconSize.MENU), _("Add to document word list"));
             menu.append(item);
 
             item.connect(new MenuItem.Activate() {
                 public void onActivate(MenuItem source) {
                     menu.hide();
-                    dict.add(word);
+                    dict.addToDocument(word);
 
                     handler.onWordSelected(word, false);
                 }
             });
+
+            item = new MenuItem(_("Add to personal dictionary"));
+            menu.append(item);
+
+            item.connect(new MenuItem.Activate() {
+                public void onActivate(MenuItem source) {
+                    menu.hide();
+                    dict.addToSystem(word);
+
+                    handler.onWordSelected(word, false);
+                }
+            });
+
+            if (!dict.isSystemValid()) {
+                item.setSensitive(false);
+            }
         }
 
         menu.showAll();
