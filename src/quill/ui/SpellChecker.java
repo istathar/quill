@@ -19,6 +19,8 @@
 package quill.ui;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.freedesktop.enchant.Dictionary;
@@ -42,7 +44,7 @@ class SpellChecker
 {
     private final Dictionary dict;
 
-    private final Dictionary list;
+    private Dictionary list;
 
     /**
      * The path of the document word list.
@@ -50,8 +52,6 @@ class SpellChecker
     private final String filename;
 
     SpellChecker(final Manuscript manuscript, final String lang) {
-        File target;
-
         if (Enchant.existsDictionary(lang)) {
             dict = Enchant.requestDictionary(lang);
         } else {
@@ -61,13 +61,9 @@ class SpellChecker
         filename = manuscript.getDirectory() + "/" + manuscript.getBasename() + ".dic";
 
         try {
-            target = new File(filename);
-            if (!target.exists()) {
-                target.createNewFile();
-            }
             list = Enchant.requestPersonalWordList(filename);
-        } catch (IOException ioe) {
-            throw new AssertionError("Can't open document word list " + filename);
+        } catch (FileNotFoundException ioe) {
+            list = null;
         }
     }
 
@@ -102,14 +98,39 @@ class SpellChecker
     }
 
     /**
-     * Add the given word to the document's private word list.
+     * Add the given word to the document's private word list. If there is no
+     * such list, create it.
+     * 
+     * Enchant is extraordinarily annoying in that it appends "\nword" instead
+     * of doing "word\n" which means there is never a newline at end of file.
      */
     void addToDocument(final String word) {
-        if (list != null) {
-            list.add(word);
-        } else {
-            throw new AssertionError();
+        File target;
+        FileOutputStream fos;
+        byte[] b;
+
+        if (list == null) {
+            try {
+                target = new File(filename);
+                if (target.exists()) {
+                    throw new AssertionError("Why is there already a document word list?");
+                }
+                target.createNewFile();
+
+                fos = new FileOutputStream(target);
+                b = "# Enchant word list".getBytes("UTF-8");
+                fos.write(b);
+                fos.close();
+            } catch (IOException ioe) {
+                throw new AssertionError("Can't create document word list");
+            }
+            try {
+                list = Enchant.requestPersonalWordList(filename);
+            } catch (FileNotFoundException fnfe) {
+                throw new AssertionError("Can't open document word list");
+            }
         }
+        list.add(word);
     }
 
     boolean isSystemValid() {
