@@ -15,7 +15,7 @@ document editor and presented by the</italics>
 <project>Parchment</project><italics> what-you-get-is-what-you-want
 rendering engine is a little unconventional: it's text based, so you
 can use version control. The schema is extraordinarily simplistic,
-meaning that it can be worked with programatically. More importantly,
+meaning that it can be worked with programmatically. More importantly,
 it can be fixed by humans when it breaks. And finally, the format is
 actually designed to support technical writing and technical
 writers.</italics>

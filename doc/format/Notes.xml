@@ -21,18 +21,11 @@ This is the very definition of un-fun. Open Document Format was
 already disqualified on the grounds of it being contained in a single
 Zip compressed file and thus unsuitable for version control.
 </text>
-<text/>
-<text/>
-<text>
-If you've written a fairly substantial article, report, or essay in
-<project>Open Office</project>, you might be interested to take some
-time to open it up and have a look at <acronym>ODF.</acronym>
-</text>
 <text>
 Which raised the possibility that one could, hypothetically, unzip the
 document, commit the resultant directory tree to
 <acronym>VCS</acronym>, and then re-zip the tree back into a
-<filename>.odt</filename> before editing it again. Hm. Maybe not.
+<filename>.odt</filename> before editing it again. Hm. Maybe not. 
 </text>
 <text>
 No, much as the zipping the document's files together into a single
@@ -40,6 +33,14 @@ archive makes it easy to send that document as a single file to
 someone, it is diametrically opposed to what we need to be able to use
 a <acronym>VCS</acronym> to version our documents and to merge with
 others we are collaborating with.
+</text>
+<text>
+But for argument's sake, you might be interested to take some time to
+open it up and have a closer look at <acronym>ODF. </acronym>Grab
+something fairly substantial you've written with <project>Open
+Office</project> - an article, report, or essay. Unzip the file (just
+because it says <literal>.odt</literal> doesn't mean its not a zip
+compressed archive) and have a look at all the pieces.
 </text>
 <text/>
 <text>

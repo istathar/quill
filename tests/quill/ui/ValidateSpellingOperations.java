@@ -23,7 +23,6 @@ import java.io.IOException;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 
-import org.freedesktop.enchant.Dictionary;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextTag;
@@ -153,7 +152,7 @@ public class ValidateSpellingOperations extends GraphicalTestCase
         final UserInterface ui;
         final PrimaryWindow primary;
         final ComponentEditorWidget parent;
-        final Dictionary dict;
+        final SpellChecker dict;
         final Span[] spans;
         final Extract entire;
         Span span;

@@ -20,7 +20,6 @@ package quill.ui;
 
 import java.lang.reflect.Constructor;
 
-import org.freedesktop.enchant.Dictionary;
 import org.gnome.gdk.Color;
 import org.gnome.gdk.Cursor;
 import org.gnome.gdk.EventButton;
@@ -103,7 +102,7 @@ abstract class EditorTextView extends TextView
 
     private final ComponentEditorWidget parent;
 
-    private Dictionary dict;
+    private SpellChecker dict;
 
     EditorTextView(ComponentEditorWidget parent, Segment segment) {
         super();
@@ -1898,10 +1897,12 @@ abstract class EditorTextView extends TextView
 
                 propagateTextualChange(offset, wide, span.getWidth());
             } else {
-                // the word has been added, so we need to unmark it.
-                start = buffer.getIter(offset);
-                finish = buffer.getIter(offset + wide);
-                buffer.removeTag(spelling, start, finish);
+                /*
+                 * The word has been added, so we need to unmark it. But not
+                 * only that, we need to unmark it everywhere in the currently
+                 * displayed chapter. So, force a recheck.
+                 */
+                parent.forceRecheck();
             }
         }
     }
