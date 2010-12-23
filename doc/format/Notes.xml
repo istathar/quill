@@ -66,12 +66,7 @@ work out just how to go about using it properly.
 </text>
 <text>
 DocBook is exceedingly difficult to work in programmatically due to
-the arbitrary nesting it allows. And because of that nesting it is
-really difficult to handle merge conflicts between two versions of a
-document.
-</text>
-<text>
-Contrast an image in DocBook:
+the arbitrary nesting it allows. Contrast an image in DocBook:
 </text>
 <code xml:space="preserve">
 &lt;mediaobject&gt;
@@ -152,17 +147,19 @@ perhaps using <acronym>XSLT</acronym>, perhaps using a custom
 <type>RenderEngine</type> implementation.
 </text>
 <text>
-If you ever <italics>are</italics> working with DocBook, ensure you're
-working with version 5 of the spec. They've cleaned up a few things,
-and now their documents are composed with a root element identified
-with a <literal>xmlns</literal> namespace attribute, rather than
-<literal>DOCTYPE</literal> declarations.
+Incidentally, if you ever <italics>are</italics> working with DocBook,
+ensure you're working with version 5 of the spec. They've cleaned up a
+few things, and now their documents are composed with a root element
+identified with a <literal>xmlns</literal> namespace attribute, rather
+than <literal>DOCTYPE</literal> declarations.
 </text>
 <heading>
 Microformats in XHTML
 </heading>
 <text>
-We also investigated ways to make .
+We also investigated the possibilities of the "microformats" trend,
+which is a technique of embedding content in <acronym>XHTML</acronym>
+markup.
 </text>
 <text>
 This had a lot of appeal, notably because it would make the question
