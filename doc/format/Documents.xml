@@ -97,10 +97,10 @@ flow and pagination depends on available area and that depends on
 paper size.
 </text>
 <text>
-Margins are expressed in milimetres.
+Margins are expressed in millimetres.
 </text>
 <text>
-Font sizes are also in milimetres. This is different than the usual
+Font sizes are also in millimetres. This is different than the usual
 "points" in part to make it clear that "a 12 point font" is not 12
 points high; it ends up being however high the graphics subsystem
 chooses; typically people are used to seeing things fixed at 96

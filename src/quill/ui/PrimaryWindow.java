@@ -23,8 +23,6 @@ import java.io.IOException;
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.PdfSurface;
 import org.freedesktop.cairo.Surface;
-import org.freedesktop.enchant.Dictionary;
-import org.freedesktop.enchant.Enchant;
 import org.freedesktop.icons.ActionIcon;
 import org.freedesktop.icons.PlaceIcon;
 import org.gnome.gdk.Event;
@@ -128,7 +126,7 @@ class PrimaryWindow extends Window
      */
     private Folio folio;
 
-    private Dictionary dict;
+    private SpellChecker dict;
 
     PrimaryWindow() {
         super();
@@ -813,6 +811,7 @@ class PrimaryWindow extends Window
 
         try {
             manuscript.saveDocument(folio);
+            dict.saveDocumentList();
             last = stack.getCurrent();
         } catch (IllegalStateException ise) {
             dialog = new ErrorMessageDialog(window, "Save failed",
@@ -1127,14 +1126,10 @@ class PrimaryWindow extends Window
             throw new AssertionError("Document specified an empty language code!");
         }
 
-        if (Enchant.existsDictionary(lang)) {
-            dict = Enchant.requestDictionary(lang);
-        } else {
-            dict = null;
-        }
+        dict = new SpellChecker(manuscript, lang);
     }
 
-    Dictionary getDictionary() {
+    SpellChecker getDictionary() {
         return dict;
     }
 }
