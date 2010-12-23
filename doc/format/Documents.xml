@@ -63,7 +63,7 @@ Pretty simple! That's in
 their documents anything they want, of course.
 <command>quill</command> and <command>render</command> are set up so
 that when they generate a <acronym>PDF</acronym> they will use the
-document's base name for where it will write;
+document's basename for where it will write;
 <filename>ParchmentFileFormat.pdf</filename> in this case.
 </text>
 <heading>

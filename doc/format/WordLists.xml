@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0">
+<chapter>
+Spelling
+</chapter>
+<heading>
+Document word lists
+</heading>
+<text>
+When writing, especially when writing technical documentation, we
+frequently use words and terms that are unknown to the dictionary of
+our chosen language. We can "Add" such words so that they are ignored
+by the spell checker, but adding them to the user's personal
+dictionary on the local system is pointless: as soon as they share the
+document with anyone else, the words will be marked misspelled again.
+</text>
+<text>
+Thus when marking a word as not a mistake, we add that word to a
+document word list. The format is one word per line, as follows:
+</text>
+<code xml:space="preserve">
+# Document word list
+blockquote
+endnote
+inlines
+NormalSegment
+stylesheet
+</code>
+<text>
+and so on. The file is optional, but if it has been created it is
+sorted alphabetically, and placed in a file with the same basename as
+the manuscript and with a <literal>.dic</literal> extension; again in
+the example of this document, the word list is
+<filename>ParchmentFileFormat.dic</filename> and should be added to
+version control.
+</text>
+</quack>
