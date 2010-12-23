@@ -18,12 +18,15 @@
  */
 package quill.ui;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.TreeSet;
 
+import org.freedesktop.bindings.Environment;
 import org.freedesktop.enchant.Dictionary;
 import org.freedesktop.enchant.Enchant;
 
@@ -52,6 +55,10 @@ class SpellChecker
      */
     private final String filename;
 
+    private File target;
+
+    private File tmp;
+
     SpellChecker(final Manuscript manuscript, final String lang) {
         if (Enchant.existsDictionary(lang)) {
             dict = Enchant.requestDictionary(lang);
@@ -61,10 +68,71 @@ class SpellChecker
 
         filename = manuscript.getDirectory() + "/" + manuscript.getBasename() + ".dic";
 
+        target = new File(filename);
+        createTemporaryList();
+    }
+
+    protected void finalize() {
+        tmp.delete();
+    }
+
+    private static int counter;
+
+    static {
+        counter = 0;
+    }
+
+    private void createTemporaryList() {
+        final int pid;
+        FileReader reader;
+        FileWriter writer;
+        BufferedReader in;
+        BufferedWriter out;
+        String line;
+
+        pid = Environment.getProcessID();
+        counter++;
+
+        tmp = new File("/tmp/quill-" + pid + "-" + counter + ".tmp");
+        tmp.deleteOnExit();
+
+        if (!target.exists()) {
+            return;
+        }
+
         try {
-            list = Enchant.requestPersonalWordList(filename);
-        } catch (FileNotFoundException ioe) {
-            list = null;
+            reader = new FileReader(target);
+            in = new BufferedReader(reader);
+
+            writer = new FileWriter(tmp, false);
+            out = new BufferedWriter(writer);
+
+            /*
+             * Discard cosmetic comment.
+             */
+
+            line = in.readLine();
+
+            /*
+             * If we're here at all, it's because there was at least one. Note
+             * that readLine() trims, and, we output a leading (not trailing)
+             * \n to observe Enchant's conventions. We strip it later.
+             */
+
+            line = in.readLine();
+            while (line != null) {
+                out.write('\n');
+                out.write(line);
+
+                line = in.readLine();
+            }
+
+            in.close();
+            out.close();
+
+            list = Enchant.requestPersonalWordList(tmp.getAbsolutePath());
+        } catch (IOException ioe) {
+            throw new AssertionError("Failed to prepare word list");
         }
     }
 
@@ -104,83 +172,23 @@ class SpellChecker
     /**
      * Add the given word to the document's private word list. If there is no
      * such list, create it, putting a comment (sic) at the beginning.
-     * 
-     * Enchant is extraordinarily annoying in that it appends "\nword" instead
-     * of doing "word\n" which means there is never a newline at end of file.
-     * 
-     * We therefore read in the entire list, remove the trailing newline, let
-     * Enchant add the word, then append a newline.
      */
     /*
      * This must be staggeringly expensive, so TODO any better ideas? We want
      * a newline terminated file, and no bloody blanks.
      */
     void addToDocument(final String word) {
-        File target, tmp;
-        FileInputStream fis;
-        FileOutputStream fos;
-        byte[] b;
-        int len, i;
 
         if (list == null) {
             try {
-                target = new File(filename);
-                if (target.exists()) {
-                    throw new AssertionError("Why is there already a document word list?");
-                }
-                target.createNewFile();
-
-                fos = new FileOutputStream(target, false);
-                b = "# Document word list".getBytes("UTF-8");
-                fos.write(b);
-                fos.close();
-            } catch (IOException ioe) {
-                throw new AssertionError("Can't create document word list");
-            }
-            try {
-                list = Enchant.requestPersonalWordList(filename);
-            } catch (FileNotFoundException fnfe) {
+                tmp.createNewFile();
+                list = Enchant.requestPersonalWordList(tmp.getAbsolutePath());
+            } catch (IOException fnfe) {
                 throw new AssertionError("Can't open document word list");
-            }
-        } else {
-            target = new File(filename);
-            tmp = new File(filename + ".tmp");
-
-            try {
-                len = (int) target.length() - 1;
-                b = new byte[1024];
-
-                fis = new FileInputStream(target);
-                fos = new FileOutputStream(tmp, false);
-
-                while (len > 0) {
-                    i = fis.read(b, 0, len);
-                    fos.write(b, 0, i);
-                    len -= i;
-                }
-                fis.close();
-                fos.close();
-                tmp.renameTo(target);
-            } catch (IOException ioe) {
-                throw new AssertionError("Failed to prepare word list");
-            } finally {
-                tmp.delete();
             }
         }
 
         list.add(word);
-
-        if (true) {
-            try {
-                target = new File(filename);
-
-                fos = new FileOutputStream(target, true);
-                fos.write('\n');
-                fos.close();
-            } catch (IOException ioe) {
-                throw new AssertionError("Failed to tidy word list");
-            }
-        }
     }
 
     boolean isSystemValid() {
@@ -189,6 +197,60 @@ class SpellChecker
 
     boolean isDocumentValid() {
         return (list != null);
+    }
+
+    /**
+     * Enchant is extraordinarily annoying in that it appends "\nword" instead
+     * of doing "word\n" which means there is never a newline at end of file.
+     * It also doesn't bother to sort the list.
+     */
+    /*
+     * We therefore read in the entire list, remove the leading newline, sort,
+     * then append a newline.
+     */
+    void saveDocumentList() {
+        FileReader reader;
+        BufferedReader in;
+        FileWriter writer;
+        BufferedWriter out;
+        String line;
+        final TreeSet<String> sorted;
+
+        try {
+            sorted = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+
+            reader = new FileReader(tmp);
+            in = new BufferedReader(reader);
+
+            /*
+             * Annoying Enchant writes a blank line first, and we play along
+             * when creating the temp file for symmetry. Skip it.
+             */
+
+            line = in.readLine();
+
+            line = in.readLine();
+            while (line != null) {
+                sorted.add(line);
+                line = in.readLine();
+            }
+
+            in.close();
+
+            writer = new FileWriter(target, false);
+            out = new BufferedWriter(writer);
+
+            out.write("# Document word list\n");
+
+            for (String word : sorted) {
+                out.write(word);
+                out.write('\n');
+            }
+
+            out.close();
+        } catch (IOException ioe) {
+            throw new AssertionError("Can't save document word list");
+        }
     }
 
     /**

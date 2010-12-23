@@ -811,6 +811,7 @@ class PrimaryWindow extends Window
 
         try {
             manuscript.saveDocument(folio);
+            dict.saveDocumentList();
             last = stack.getCurrent();
         } catch (IllegalStateException ise) {
             dialog = new ErrorMessageDialog(window, "Save failed",
