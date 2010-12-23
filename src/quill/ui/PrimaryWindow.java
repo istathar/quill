@@ -18,7 +18,6 @@
  */
 package quill.ui;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.freedesktop.cairo.Context;
@@ -376,7 +375,6 @@ class PrimaryWindow extends Window
             public boolean onDeleteEvent(Widget source, Event event) {
                 try {
                     saveIfModified();
-                    removeDictionaryIfEmpty();
                     ui.shutdown();
                     return false;
                 } catch (SaveCancelledException sce) {
@@ -1128,19 +1126,6 @@ class PrimaryWindow extends Window
         }
 
         dict = new SpellChecker(manuscript, lang);
-    }
-
-    private void removeDictionaryIfEmpty() {
-        String filename;
-        File target;
-
-        filename = dict.getDocumentFilename();
-        target = new File(filename);
-        if (target.exists()) {
-            if (target.length() == 0) {
-                target.delete();
-            }
-        }
     }
 
     SpellChecker getDictionary() {

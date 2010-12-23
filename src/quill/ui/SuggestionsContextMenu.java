@@ -19,8 +19,6 @@
 package quill.ui;
 
 import org.gnome.gtk.Alignment;
-import org.gnome.gtk.IconSize;
-import org.gnome.gtk.Image;
 import org.gnome.gtk.ImageMenuItem;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.MenuItem;
@@ -118,7 +116,8 @@ class SuggestionsContextMenu extends ContextMenu
             item = new SeparatorMenuItem();
             menu.append(item);
 
-            item = new ImageMenuItem(new Image(Stock.ADD, IconSize.MENU), _("Add to document word list"));
+            item = new ImageMenuItem(Stock.ADD);
+            item.setTooltipText(_("Add the word to the document ignore list"));
             menu.append(item);
 
             item.connect(new MenuItem.Activate() {
@@ -129,22 +128,6 @@ class SuggestionsContextMenu extends ContextMenu
                     handler.onWordSelected(word, false);
                 }
             });
-
-            item = new MenuItem(_("Add to personal dictionary"));
-            menu.append(item);
-
-            item.connect(new MenuItem.Activate() {
-                public void onActivate(MenuItem source) {
-                    menu.hide();
-                    dict.addToSystem(word);
-
-                    handler.onWordSelected(word, false);
-                }
-            });
-
-            if (!dict.isSystemValid()) {
-                item.setSensitive(false);
-            }
         }
 
         menu.showAll();

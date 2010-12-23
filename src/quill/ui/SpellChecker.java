@@ -90,7 +90,10 @@ class SpellChecker
 
     /**
      * Add the given word to the user's word list that goes along with the
-     * system dictionary
+     * system dictionary. Turns out we're not using this because we don't want
+     * people adding words to their local system only personal word lists.
+     * 
+     * @deprecated
      */
     void addToSystem(final String word) {
         if (dict != null) {
@@ -234,12 +237,5 @@ class SpellChecker
         }
 
         return result;
-    }
-
-    /**
-     * Get the name of the document's personal word list.
-     */
-    String getDocumentFilename() {
-        return filename;
     }
 }
