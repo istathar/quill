@@ -216,6 +216,9 @@ class SpellChecker
         String line;
         final TreeSet<String> sorted;
 
+        if (!tmp.exists()) {
+            return;
+        }
         try {
             sorted = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
 
