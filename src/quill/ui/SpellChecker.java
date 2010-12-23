@@ -128,7 +128,7 @@ class SpellChecker
                 target.createNewFile();
 
                 fos = new FileOutputStream(target, false);
-                b = "# Enchant word list".getBytes("UTF-8");
+                b = "# Document word list".getBytes("UTF-8");
                 fos.write(b);
                 fos.close();
             } catch (IOException ioe) {
