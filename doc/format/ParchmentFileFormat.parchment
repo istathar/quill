@@ -5,6 +5,7 @@
     <chapter src="Background.xml"/>
     <chapter src="Chapters.xml"/>
     <chapter src="Documents.xml"/>
+    <chapter src="WordLists.xml"/>
     <chapter src="Notes.xml"/>
   </content>
   <presentation>

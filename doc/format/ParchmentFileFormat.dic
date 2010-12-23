@@ -1,5 +1,6 @@
 # Document word list
 's
+basename
 blockquote
 blockquotes
 bolded
@@ -11,6 +12,7 @@ ie
 initialisms
 inlines
 mergeable
+microformats
 monospaced
 namespace
 O'Reilly

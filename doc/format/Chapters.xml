@@ -45,8 +45,8 @@ component title block <literal>&lt;division&gt;</literal> or
 <literal>&lt;special&gt;</literal> blocks, then a series of
 <literal>&lt;endnotes&gt;</literal> (if there are any), then a series
 of <literal>&lt;reference&gt;</literal>s (if there are any). By
-convention <literal>&lt;reference&gt;</literal> blocks will be
-shuffled to the end of the last component in the document when saving.
+convention <literal>&lt;reference&gt;</literal> blocks are shuffled to
+the end of the last component in the document when saving.
 </text>
 <text>
 The blocks can contain the following inlines:
@@ -69,7 +69,7 @@ respectively.
 </text>
 <text>
 Discussion of how a given block type or inline markup is to be
-rendered is largely predicated on the reference
+rendered is largely predicated on the use of the reference
 <type>RenderEngine</type>s that ship by default with <project>Quill
 and Parchment</project>. The user (or the user's organization) is of
 course welcome to do anything they want, but the Quack format is
@@ -160,7 +160,7 @@ work as a whole:
 The Tao of Joda
 &lt;/division&gt;
 &lt;text&gt;
-As told to Lake Groundcrawler.
+As told to Fluke roundcrawler.
 &lt;/text&gt;
 &lt;/quack&gt;
 </code>
@@ -229,13 +229,13 @@ with when merging.
 <bold>Preformatted blocks</bold>, <literal>&lt;code&gt;</literal>
 </text>
 <text>
-The major use of of Quill and Parchment is technical writing, so after
-normal prose the most common block type is preformatted computer
-program source code.
+The originally targeted use of Quill and Parchment was for technical
+writing. So, after normal prose, the most common block type is
+preformatted computer program source code.
 </text>
 <text>
-These blocks are <italics>not</italics> wrapped. Whitespace (newlines,
-spaces, and tabs) is preserved.
+These blocks are <italics>not</italics> wrapped when saved to disk.
+Whitespace (newlines, spaces, and tabs) is preserved.
 </text>
 <text>
 The code we use for reading and writing <acronym>XML</acronym>, an
@@ -243,6 +243,10 @@ excellent library called <project>Xom</project>, is rigorously
 standards compliant and properly escapes <literal>'&lt;'</literal>,
 <literal>'&gt;'</literal>, <literal>'&amp;'</literal> and friends as
 entities.
+</text>
+<text>
+When rendered, preformatted blocks are rendered in the monospaced font
+and not wrapped at the right hand margin.
 </text>
 <text>
 <bold>Quote blocks</bold>, <literal>&lt;quote&gt;</literal>
@@ -253,17 +257,18 @@ There are two block types for quotations: blockquotes and poems.
 <text>
 Blockquote are expected to be presented indented from the margin on
 both sides. They <italics>are</italics> word wrapped. If the
-<type>RenderEngine</type> is double spacing normal text the text in a
-quote would not be double spaced.
+<type>RenderEngine</type> is double spacing normal text, the text in a
+quote would <italics>not</italics> be double spaced. Blockquotes are
+rendered in the normal serif font.
 </text>
 <text>
 <bold>Poetry blocks</bold>, <literal>&lt;poem&gt;</literal>
 </text>
 <text>
-Poems are passages which are <italics>not</italics> word wrapped. You
-wouldn't really expect poems to be offset indented like blockquotes -
-these are ultimately just normal text blocks that happen to preserve
-whitespace - but presentation is ultimately up to the
+Poems are passages which are <italics>not</italics> word wrapped. And
+meanwhile, you wouldn't really expect poems to be offset indented like
+blockquotes - these are ultimately just normal text blocks that happen
+to preserve whitespace - but presentation is ultimately up to the
 <type>RenderEngine</type> being used.
 </text>
 <text>
@@ -364,8 +369,8 @@ one <type>ListitemSegment</type> per bullet; the only case where
 </text>
 <text>
 As discussed elsewhere, parts, chapters, and sections are
-<bold>not</bold> elements which enclose their subordinate structure.
-Headings are just further blocks in the flow of paragraphs.
+<bold>not</bold> elements which enclose their subordinate structure. A
+headings is just another block in the flow of paragraphs.
 </text>
 <text>
 Headings are single line only (strictly, a single wrapped paragraph,
@@ -388,7 +393,8 @@ Note that there is no "subheading" block type. This is because a) we
 didn't need the granularity in navigation, b) the idea of depth in an
 outline leads to the need to constantly promote and demote sections,
 increasing complexity for little gain; and c) if you want to create
-such an effect (as appears in this document) just use emboldened text. 
+such an effect (as appears in this document) just use a line of
+emboldened text.
 </text>
 <text>
 <bold>Endnotes and Reference blocks</bold>,
@@ -416,7 +422,7 @@ References are similarly block level elements:
 &lt;reference name="[Einstein]"&gt;
 "On the Electrodynamics of Moving Bodies", in
 &lt;title&gt;Annalen der Physik&lt;/title&gt; (17, pages
-891-921,26 Sep 1905)
+891-921, 26 Sep 1905)
 &lt;/reference&gt;
 </code>
 <text>
@@ -464,8 +470,8 @@ contents. Speaking of which...
 <bold>Special blocks</bold>, <literal>&lt;special&gt;</literal>
 </text>
 <text>
-Finally there is a special block type for special cases. These mark
-the insertion point where generated list of collected endnotes and the
+Finally there is a block type for special cases. These mark the
+insertion point where generated list of collected endnotes and the
 generated list of collected references are to be rendered.
 <literal>&lt;special&gt;</literal> is empty, with a single attribute
 <literal>type</literal> indicating which it is. Valid values are
@@ -483,12 +489,12 @@ of our documents we generally put:
 Notes to text
 &lt;/heading&gt;
 &lt;special type="endnotes"/&gt;
-&lt;heading&gt;
 </code>
 <text>
 followed quickly by:
 </text>
 <code xml:space="preserve">
+&lt;heading&gt;
 References
 &lt;/heading&gt;
 &lt;special type="references"/&gt;
@@ -501,7 +507,7 @@ to get the desired effect.
 <literal>&lt;leader&gt;</literal>
 </text>
 <text>
-Did we say finally? No, there's one last one. &lt;leader&gt; is a
+Did we say finally? No, there's one more. &lt;leader&gt; is a
 specialist heading which is used to title meta text in front-matter
 and back-matter. For example:
 </text>
@@ -543,12 +549,12 @@ italics}, and weight {normal, bold} to work with.
 </text>
 <text>
 Gently emphasized text to be rendered in italics. Note that we're off
-to a good start here; we don't mean emphasis in the way that
-<acronym>HTML</acronym>; if you want italics you use italics; if you
-want bolded text then you say bold. Done. It's <italics>not</italics>
-up to the <type>RenderEngine</type> to decide about such things;
-italic text is a semantic all of its own. If the author wants italics
-they get italics. And so that's what's in Quack.
+to a good start here; we don't mean emphasis in the way
+<acronym>HTML</acronym> does; if you want italics you use italics; if
+you want bolded text then you say bold. Done. It's
+<italics>not</italics> up to the <type>RenderEngine</type> to decide
+about such things; italic text is a semantic all of its own. If the
+author wants italics they get italics. And so that's what's in Quack.
 </text>
 <text>
 <bold>Bold</bold>, <literal>&lt;bold&gt;</literal>
@@ -560,18 +566,18 @@ Strongly emphasized text to be rendered in a bold font.
 <bold>Code Literals</bold>, <literal>&lt;literal&gt;</literal>
 </text>
 <text>
-Used for short literal code fragments from source code. Rendered in a
-monospaced font, the same as used for preformatted code blocks
-(indeed, when configuring the stylesheet the <literal>mono</literal>
-font's size is chosen in order that these literals look good inline
-with normal text).
+Used for short literal code fragments from source code. Rendered in
+the same monospaced font as used for preformatted code blocks (indeed,
+when configuring the stylesheet the <literal>mono</literal> font's
+size is chosen in order that these literals look good inline with
+normal text).
 </text>
 <text>
 <bold>Class and Method</bold>, <literal>&lt;type&gt;</literal> and
 <literal>&lt;function&gt;</literal>
 </text>
 <text>
-These are specialist markups for writing about program code. C
+These are specialist markups for talking about program code. C
 programmers write about functions; Java programmers talk about their
 classes a lot, and just as frequently mention methods by name.
 </text>
@@ -623,11 +629,11 @@ rendered in italics.
 <text>
 We follow the convention used in publications like <title>The
 Economist</title>, where initialisms, abbreviations, and acronyms are
-presented in a small capitals font, and this markup gives the user
-access to that. Note that in our renderer we manually map capital
-letters to their small caps equivalent for presentation purposes; the
-user is still expected to write their abbreviation in capital letters.
-This means that on-disk the file contains:
+presented in a small capitals font. This markup gives the user access
+to that. Note that in our renderer we manually map capital letters to
+their small caps equivalent for presentation purposes; the user is
+still expected to write their abbreviation in capital letters. This
+means that on-disk the file contains:
 </text>
 <code xml:space="preserve">
 The American space agency, &lt;acronym&gt;NASA&lt;/acronym&gt;, reports that
@@ -661,10 +667,10 @@ right thing.
 </text>
 <text>
 Mostly this markup will show up when you're writing notes and
-references, but it can be used everywhere, of course.
+references, but it can be used everywhere.
 </text>
 <text>
-<bold>Notes</bold>, <literal>&lt;note&gt;</literal>
+<bold>Note anchors</bold>, <literal>&lt;note&gt;</literal>
 </text>
 <text>
 Finally we have two special inlines to indicate the position of an
@@ -686,8 +692,8 @@ would indicate the 42nd endnote of a given chapter.
 <text>
 The Quack Schema does not enforce any particular numbering scheme, and
 nor does it enforce whether you have to restart numbering each chapter
-(though that convention, and clearly advisable on a work of any
-significant length). Obviously there should only be one
+(though that is clearly advisable on a work of any significant
+length). Obviously there should only be one
 <literal>&lt;note&gt;</literal> marker per
 <literal>&lt;endnote&gt;</literal>.
 </text>
@@ -698,7 +704,7 @@ As discussed above, it is convention to put the
 <literal>.xml</literal> file the note appears in.
 </text>
 <text>
-<bold>Citations</bold>, <literal>&lt;cite&gt;</literal>
+<bold>Citation anchors</bold>, <literal>&lt;cite&gt;</literal>
 </text>
 <text>
 Unlike note anchors, the text of a citation's <literal>ref</literal>
@@ -792,5 +798,18 @@ Provided with <project>Quill and Parchment</project> is a simple front
 end, <command>format</command>, which normalizes a document by loading
 it and then saving it out again. This can be useful if you've had to
 manually change one of the chapter files after a merge.
+</text>
+<heading>
+What's with the duck?
+</heading>
+<text>
+Quill started life as something we could write books with. We looked
+seriously at DocBook (see Appendix). When we changed course and
+started coming up with something suited to our needs, it needed a
+name, and in a fit of whimsy, I called it Quack, acknowledging the
+influence of DocBook and their ubiquitous wood duck logo. Amusingly,
+around the same time I discovered that <project>GNOME</project>'s new
+help documentation format - also inheriting concepts from DocBook - is
+called Mallard.
 </text>
 </quack>

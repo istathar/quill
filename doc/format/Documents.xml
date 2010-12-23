@@ -8,6 +8,7 @@ Since the Quack schema describes a single chapter, we need something
 to express what a book or other work is. It doesn't need much. A book
 is, after all, just a series of chapters. So, we need is a single file
 which is "the work" which lists the component files that make it up.
+This file is what the user "opens" in order to run the application.
 </text>
 <text>
 <project>Quill and Parchment</project> is about separation of content
@@ -34,9 +35,11 @@ Here is the <literal>.parchment</literal> file for this document:
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;manuscript xmlns="http://namespace.operationaldynamics.com/parchment/5.0"&gt;
   &lt;content&gt;
+    &lt;chapter src="CoverPage.xml"/&gt;
     &lt;chapter src="Background.xml"/&gt;
     &lt;chapter src="Chapters.xml"/&gt;
     &lt;chapter src="Documents.xml"/&gt;
+    &lt;chapter src="Notes.xml"/&gt;
   &lt;/content&gt;
   &lt;presentation&gt;
     &lt;renderer class="parchment.render.ReportRenderEngine"/&gt;
@@ -58,10 +61,10 @@ Here is the <literal>.parchment</literal> file for this document:
 Pretty simple! That's in
 <filename>ParchmentFileFormat.parchment</filename>. The user can call
 their documents anything they want, of course.
-<project>Quill</project> is set up so that when it generates a
-<acronym>PDF</acronym> it will use the document's base name for where
-it will write; <filename>ParchmentFileFormat.pdf</filename> in this
-case.
+<command>quill</command> and <command>render</command> are set up so
+that when they generate a <acronym>PDF</acronym> they will use the
+document's basename for where it will write;
+<filename>ParchmentFileFormat.pdf</filename> in this case.
 </text>
 <heading>
 Content
@@ -89,12 +92,12 @@ to what size of paper.
 </text>
 <text>
 There are only two valid paper sizes, <literal>Letter</literal> and
-<literal>A4</literal>. That's because, regardless of the page size
-that's going to be used in final production, . It is important to know
-your audience, though, and one does have to be picked; you can't
-generate a <acronym>PDF</acronym> for both sizes simultaneously; text
-flow and pagination depends on available area and that depends on
-paper size.
+<literal>A4</literal>. Regardless of the page size that's going to be
+used in final production, during writing we read and edit our
+manuscripts by printing with our local printers on standard paper.
+Text flow and pagination depends on available area and that depends on
+paper size, so one does have to be picked; you can't generate a
+<acronym>PDF</acronym> for both sizes simultaneously.
 </text>
 <text>
 Margins are expressed in millimetres.
@@ -113,14 +116,15 @@ Metadata
 </heading>
 <text>
 Finally is <literal>&lt;metadata&gt;</literal>. This section was added
-when we tackled spell checking and the need for a Quill to know what
-dictionary to load. The <literal>&lt;spelling&gt;</literal> element
-specifies an <project>Enchant</project> dictionary "language tag".
+when we tackled spell checking and <project>Quill</project> needed to
+know what dictionary to load. The <literal>&lt;spelling&gt;</literal>
+element specifies an <project>Enchant</project> dictionary "language
+tag".
 </text>
 <text>
-Not long after that we added support for rendering headers and footers
-and realized we needed somewhere for the author and title of the work
-as a whole. Note that there are <italics>not</italics> multiple
+Not long after, we added support for rendering headers and footers and
+realized we needed somewhere for the author and title of the work as a
+whole. Note that there are <italics>not</italics> multiple
 <literal>&lt;author&gt;</literal> elements; this is just for use in a
 header or footer, so if there are two of you it's <literal>"Kermit and
 Fozzie"</literal> and if more, well, that's up to you, but

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quack xmlns="http://namespace.operationaldynamics.com/parchment/5.0">
 <chapter>
-Notes on Other Formats
+Appendix: Other Formats
 </chapter>
 <text>
 So that's the Parchment file format. For reference and comparison,
@@ -12,14 +12,14 @@ and their file formats for "text documents".
 Open Document Format
 </heading>
 <text>
-But on the topic of on-disk file formats, here are our comments on
-<acronym>ODF</acronym> for text documents.
-</text>
-<text/>
-<text>
-This is the very definition of un-fun. Open Document Format was
-already disqualified on the grounds of it being contained in a single
-Zip compressed file and thus unsuitable for version control.
+We discussed our general view of <project>Open Office</project> and
+its suitability for office work and its
+<italics>un</italics>suitability for technical writing in the
+introduction. On the topic of on-disk file formats, though, here are
+our comments on <acronym>ODF</acronym> for text documents: this is the
+very definition of un-fun. Open Document Format was already
+disqualified on the grounds of it being contained in a single Zip
+compressed file and thus unsuitable for version control.
 </text>
 <text>
 Which raised the possibility that one could, hypothetically, unzip the
@@ -42,11 +42,35 @@ Office</project> - an article, report, or essay. Unzip the file (just
 because it says <literal>.odt</literal> doesn't mean its not a zip
 compressed archive) and have a look at all the pieces.
 </text>
-<text/>
+<text>
+At first glance the files within an <literal>.odt</literal> Zip are
+what you'd expect - content, styles, files for the various images in
+your document (though with horrid machine generated names), making
+them rather unrecognizable. Within the content file, though is the
+real shock: your document is there, but it's almost unreadable for all
+the control coding and editor specific nonsense. And even if you've
+carefully used styles, each "paragraph" is still loaded with gumpf.
+Frankly, how anyone considers this future safe (in the "yes, I can
+read my documents in the future" sense) is quite the mystery.
+</text>
 <text>
 The give away was looking at what Writer writes out when you tell it
 to pretend it's an web page editor and ask it to save as
-<acronym>HTML</acronym>... <highlight>HERE</highlight>
+<acronym>HTML</acronym>. I once had high hopes for this, Hyper Text
+Markup Language originally having been all about structure and content
+and not presentation, but the <acronym>HTML</acronym> produced by the
+what-you-see-is-what-you-get word processors is an attempt to make the
+resultant web page as similar as possible to
+what-you-saw-was-what-you-were-getting. The web isn't paper, though,
+and, last time we looked - and despite the word processor having
+"styles" as a central part of how it does business - the resultant
+<acronym>HTML</acronym> was completely opaque and entirely unsuitable
+for being styled with <acronym>CSS</acronym>.
+</text>
+<text>
+Needless to say, something this complicated did not really fit the
+bill for our simple but specific needs. So much for
+<acronym>ODF</acronym>.
 </text>
 <heading>
 DocBook XML
@@ -66,12 +90,7 @@ work out just how to go about using it properly.
 </text>
 <text>
 DocBook is exceedingly difficult to work in programmatically due to
-the arbitrary nesting it allows. And because of that nesting it is
-really difficult to handle merge conflicts between two versions of a
-document.
-</text>
-<text>
-Contrast an image in DocBook:
+the arbitrary nesting it allows. Contrast an image in DocBook:
 </text>
 <code xml:space="preserve">
 &lt;mediaobject&gt;
@@ -152,17 +171,48 @@ perhaps using <acronym>XSLT</acronym>, perhaps using a custom
 <type>RenderEngine</type> implementation.
 </text>
 <text>
-If you ever <italics>are</italics> working with DocBook, ensure you're
-working with version 5 of the spec. They've cleaned up a few things,
-and now their documents are composed with a root element identified
-with a <literal>xmlns</literal> namespace attribute, rather than
-<literal>DOCTYPE</literal> declarations.
+Incidentally, if you ever <italics>are</italics> working with DocBook,
+ensure you're working with version 5 of the spec. They've cleaned up a
+few things, and now their documents are composed with a root element
+identified with a <literal>xmlns</literal> namespace attribute, rather
+than <literal>DOCTYPE</literal> declarations.
+</text>
+<heading>
+Latex
+</heading>
+<text>
+The moment you mention content-presentation separation, most people
+think of Latex, and they then wonder why Quill wasn't written as a
+Latex editor. Our observations are three-fold.
+</text>
+<text>
+Most of the time, people are forced to specify (in agonizing detail)
+the expected formatting of their text inline in their text. This is
+not semantic markup at all, and in that regard is really no different
+to roff(7) or the kind of <acronym>HTML</acronym> that
+<project>Microsoft Office</project> outputs.
+</text>
+<text>
+Secondly, because of its free-form nature, it is impossible to stamp a
+required schema on documents written in it, breaching our need for
+structural simplicity we can keep in control. Also, if we used a well
+known format we would have introduced the same round-trip expectations
+endemic to the other formats discussed here.
+</text>
+<text>
+Finally, while we do, of course, have immense respect for the Latex
+rendering engines - its work was ground breaking and will be for a
+long time to come the definitive standard for academic publications;
+its typesetting quality is something we aspire to - the markup itself
+makes your eyes bleed. That's that, really.
 </text>
 <heading>
 Microformats in XHTML
 </heading>
 <text>
-We also investigated ways to make .
+We also investigated the possibilities of the "microformats" trend,
+which is a technique of embedding content in <acronym>XHTML</acronym>
+markup.
 </text>
 <text>
 This had a lot of appeal, notably because it would make the question
@@ -176,5 +226,9 @@ of handling. People would also instantly expect Quill to be able to
 use those files as web pages, which is a problem: there's a big
 difference between the content and metadata of a text document on
 disk, and that document as marked up for presentation online.
+</text>
+<text>
+An exporter to <acronym>HTML</acronym> is in the cards, but it's not
+what we want to be storing our documents in.
 </text>
 </quack>
