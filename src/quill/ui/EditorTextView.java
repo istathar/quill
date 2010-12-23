@@ -1897,10 +1897,12 @@ abstract class EditorTextView extends TextView
 
                 propagateTextualChange(offset, wide, span.getWidth());
             } else {
-                // the word has been added, so we need to unmark it.
-                start = buffer.getIter(offset);
-                finish = buffer.getIter(offset + wide);
-                buffer.removeTag(spelling, start, finish);
+                /*
+                 * The word has been added, so we need to unmark it. But not
+                 * only that, we need to unmark it everywhere in the currently
+                 * displayed chapter. So, force a recheck.
+                 */
+                parent.forceRecheck();
             }
         }
     }
