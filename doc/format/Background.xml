@@ -10,29 +10,55 @@ tools we have to write with make it harder.
 <text>
 My colleagues do a lot of writing. Some write books for publishers.
 Others write software and need to write the documentation to go with
-their applications.
+their applications. We also write conference papers, magazine
+articles, and do a considerable amount of report writing, often in
+relation to technical analysis.
 </text>
-<heading>
-Objective and Audience
-</heading>
-<text/>
 <text>
-<highlight>MORE</highlight>
+Working with traditional word processors is frustrating. For one thing
+<italics>screen</italics> fonts are very different beasties from
+<italics>printer</italics> fonts; the catch is that printer fonts do
+<bold>not</bold> look good on most monitors because the resolution
+isn't remotely high enough; that's what screen fonts are for (which in
+turn tend to look terrible on paper). Another thing is trying to
+provide consistent output; anyone who has ever tried to mix Times New
+Roman and Courier New will have realized they look terrible together,
+and so you spend endless time trying to get that right. Then you
+realize that the height of the italics in one place isn't matched by
+the height in another. And on it goes.
+</text>
+<text>
+This nibbles away at an issue that is actually well understood:
+separation of content and presentation. When you're writing you want
+to be able to concentrate on the substance of your content; when it's
+time to publish your work, then you care about what it looks like. The
+two have very little overlap, but what-you-see-is-what-you-get word
+processors have long accustomed us to thinking they are inexorably
+linked.
+</text>
+<text>
+<project>Quill and Parchment</project> is an effort to create a tool
+suitable for writing technical documents that provides a user
+interface focused the needs of such authors while otherwise trying to
+keep out of the way as much as possible. Along the way we of course
+needed to store our documents o n disk, and it wasn't very surprising
+to find that the currently available file formats didn't really suit
+our needs.
 </text>
 <heading>
 Criteria
 </heading>
 <text>
-Thus we have the following criteria:
+We have the following criteria:
 </text>
 <text>
 <bold>1. Text based</bold>
 </text>
 <text>
-The driving imperative for Quack documents is that they be manageable
-with the collaboration tools we use to write open source software -
-specifically the modern 3rd generation distributed version control
-systems (<acronym>DVCS</acronym>) such as the most excellent
+The driving imperative for Parchment documents is that they be
+manageable with the collaboration tools we use to write open source
+software - specifically the modern 3rd generation distributed version
+control systems (<acronym>DVCS</acronym>) such as the most excellent
 <project>Bazaar</project> (<command>bzr</command>) or its friends
 <project>Git</project> (<command>git</command>) or
 <project>Mercurial</project> (<command>hg</command>).
