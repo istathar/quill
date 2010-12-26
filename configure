@@ -99,6 +99,9 @@ sub bail {
 	exit(1);
 }
 
+my $PWD=`pwd`;
+chomp $PWD;
+
 # The files (jars) to check for should be listed in order of preference, as the
 # first one found will be the one selected.  For example, if you want version 3
 # but version 2 will do, list them in that order.  Typically, this means that
@@ -1098,12 +1101,15 @@ mkdir "tmp/launcher";
 open LAUNCHER, ">tmp/launcher/quill-local";
 
 print LAUNCHER "#! /bin/sh\n";
+
+print LAUNCHER "DOCUMENT=`readlink -fn \"\$1\"`\n";
+print LAUNCHER "cd $PWD\n";
 print LAUNCHER join (" ",
 	"exec",
 	"$JAVA",
 	"-classpath tmp/classes:$GNOME_JARS:$XOM_JARS",
 	"quill.client.Quill",
-	"\$*") . "\n";
+	"\$DOCUMENT") . "\n";
 
 close LAUNCHER;
 
