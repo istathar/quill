@@ -1121,13 +1121,14 @@ close LAUNCHER;
 open LAUNCHER, ">tmp/launcher/quill-install";
 
 print LAUNCHER "#! /bin/sh\n";
+print LAUNCHER "DOCUMENT=`readlink -fn \"\$1\"`\n";
 print LAUNCHER "cd $prefix\n";
 print LAUNCHER join (" ",
 	"exec",
 	"$JAVA",
 	"-classpath $QUILL_JARS:$GNOME_JARS:$XOM_JARS",
 	"quill.client.Quill",
-	"\$*") . "\n";
+	"\$DOCUMENT") . "\n";
 
 close LAUNCHER;
 
