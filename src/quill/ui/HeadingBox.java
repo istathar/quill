@@ -20,6 +20,7 @@ package quill.ui;
 
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.HSeparator;
+import org.gnome.gtk.Justification;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.VBox;
 
@@ -31,28 +32,27 @@ abstract class HeadingBox extends VBox
 
     private HeadingEditorTextView title;
 
+    private HBox box;
+
     private Label label;
 
     HeadingBox() {
         super(false, 0);
         top = this;
+        box = new HBox(false, 0);
     }
 
     void setupBox(final ComponentEditorWidget parent, final Segment segment, final String text) {
-        final HBox box;
-
-        box = new HBox(false, 0);
-
-        title = new HeadingEditorTextView(parent, segment);
-        box.packStart(title, true, true, 0);
-
         label = new Label();
         label.setWidthChars(20);
         label.setUseMarkup(true);
         label.setLabel("<span color='gray'>" + text + "</span>");
         box.packEnd(label, false, false, 0);
 
-        top.packStart(box, false, false, 0);
+        title = new HeadingEditorTextView(parent, segment);
+        box.packEnd(title, true, true, 0);
+
+        top.packEnd(box, false, false, 0);
     }
 
     void setupLine() {
@@ -61,6 +61,15 @@ abstract class HeadingBox extends VBox
         sep = new HSeparator();
 
         top.packStart(sep, false, false, 0);
+    }
+
+    void setCentered() {
+        final Label spacer;
+
+        spacer = new Label();
+        spacer.setWidthChars(20);
+        box.packStart(spacer, false, false, 0);
+        title.setJustify(Justification.CENTER);
     }
 
     EditorTextView getEditor() {

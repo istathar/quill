@@ -507,6 +507,11 @@ class PresentSegmentButton extends Button implements Button.Clicked
         primary.ensureVisible(series, segment);
     }
 
+    /**
+     * Put the appropriate text on the Button label, and update its
+     * Button.Clicked handler to jump to the appopriate Series,Segment
+     * location.
+     */
     void setAddress(final Series series, final Segment segment) {
         final StringBuilder buf;
         final Extract entire;
@@ -540,8 +545,10 @@ class PresentSegmentButton extends Button implements Button.Clicked
             buf.append(escaped);
             buf.append("</span>");
         } else if (segment instanceof DivisionSegment) {
-            buf.append("<span size='xx-large'>  ");
+            buf.append("<span size='x-large'>  ");
+            buf.append("<span weight='bold' stretch='condensed'>");
             buf.append(escaped);
+            buf.append("</span>");
             buf.append("</span>");
         } else {
             throw new AssertionError();

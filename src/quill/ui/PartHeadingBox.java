@@ -27,5 +27,6 @@ class PartHeadingBox extends HeadingBox
 
         super.setupBox(parent, segment, "Part");
         super.setupLine();
+        super.setCentered();
     }
 }
