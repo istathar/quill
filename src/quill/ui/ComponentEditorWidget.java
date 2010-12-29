@@ -472,6 +472,7 @@ class ComponentEditorWidget extends ScrolledWindow
             editor.advanceTo(segment);
 
             widget.showAll();
+            cursorSegment = segment;
             editor.grabFocus();
         }
 
@@ -515,6 +516,8 @@ class ComponentEditorWidget extends ScrolledWindow
             }
             editor.advanceTo(segment);
         }
+
+        this.ensureVisible(cursorSegment);
     }
 
     /**
