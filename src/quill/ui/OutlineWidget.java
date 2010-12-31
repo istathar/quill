@@ -636,6 +636,8 @@ class CompressedLines extends DrawingArea
 
                 dots.add(words);
                 types.add(segment);
+                dots.add(0);
+                types.add(null);
             } else {
                 chain = new TextChain(entire);
                 paras = chain.extractParagraphs();
@@ -664,14 +666,14 @@ class CompressedLines extends DrawingArea
             }
         }
 
-        self.setSizeRequest(40 + WIDTH, SPACING * num);
+        self.setSizeRequest((int) RIGHT, SPACING * num);
 
         this.connect(new Widget.ExposeEvent() {
             public boolean onExposeEvent(Widget source, EventExpose event) {
                 final Context cr;
                 final int I;
-                int i, j, wide;
-                double x, y, rem;
+                int i, j;
+                double x, y, wide;
                 Segment segment;
 
                 cr = new Context(event);
@@ -689,13 +691,13 @@ class CompressedLines extends DrawingArea
                 for (i = 0; i < I; i++) {
                     segment = types.get(i);
                     if (segment instanceof ImageSegment) {
-                        wide = 10;
+                        wide = 8.0;
                     } else {
                         wide = dots.get(i);
                     }
 
                     if (wide == 0) {
-                        x += 2;
+                        x += 2.0;
                         continue;
                     }
 
@@ -707,23 +709,24 @@ class CompressedLines extends DrawingArea
                         cr.setSource(0.5, 0.5, 0.5);
                     }
 
-                    if (x + wide > RIGHT) {
-                        rem = RIGHT - x;
-                        cr.moveTo(x, y);
-                        x += rem;
-                        cr.lineTo(x, y);
-                        j++;
-                        x = LEFT;
-                        y = SPACING * j;
-                        cr.moveTo(x, y);
-                        x += wide - rem;
-                        cr.lineTo(x, y);
-                    } else {
-                        cr.moveTo(x, y);
-                        x += wide;
-                        cr.lineTo(x, y);
-                    }
+                    while (wide > 0.0) {
+                        if (x + wide >= RIGHT) {
+                            cr.moveTo(x, y);
+                            cr.lineTo(RIGHT, y);
 
+                            wide -= RIGHT - x;
+
+                            j++;
+                            x = LEFT;
+                            y = SPACING * j;
+                        } else {
+                            cr.moveTo(x, y);
+                            x += wide;
+                            cr.lineTo(x, y);
+
+                            break;
+                        }
+                    }
                     cr.stroke();
                 }
 
