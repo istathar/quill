@@ -51,7 +51,9 @@ import quill.textbase.Folio;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.Markup;
+import quill.textbase.PoeticSegment;
 import quill.textbase.PreformatSegment;
+import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.TextChain;
@@ -629,7 +631,7 @@ class CompressedLines extends DrawingArea
             segment = list.get(k);
             entire = segment.getEntire();
 
-            if (segment instanceof PreformatSegment) {
+            if ((segment instanceof PreformatSegment) || (segment instanceof ImageSegment)) {
                 tourist = new WordCountingCharacterVisitor();
                 entire.visit(tourist);
                 words = tourist.getCount();
@@ -690,21 +692,27 @@ class CompressedLines extends DrawingArea
 
                 for (i = 0; i < I; i++) {
                     segment = types.get(i);
+                    wide = dots.get(i);
+
                     if (segment instanceof ImageSegment) {
-                        wide = 8.0;
-                    } else {
-                        wide = dots.get(i);
+                        if (wide == 0.0) {
+                            wide = 3.0;
+                        }
                     }
 
                     if (wide == 0) {
-                        x += 2.0;
+                        if (x > LEFT) {
+                            x += 2.0;
+                        }
                         continue;
                     }
 
                     if (segment instanceof PreformatSegment) {
                         cr.setSource(0.7, 0.7, 0.7);
                     } else if (segment instanceof ImageSegment) {
-                        cr.setSource(1.0, 0.0, 0.0);
+                        cr.setSource(0.9, 0.0, 0.7);
+                    } else if ((segment instanceof QuoteSegment) || (segment instanceof PoeticSegment)) {
+                        cr.setSource(0.2, 0.2, 0.7);
                     } else {
                         cr.setSource(0.5, 0.5, 0.5);
                     }
