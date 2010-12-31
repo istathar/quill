@@ -74,7 +74,6 @@ public class UserInterface
     private void loadImages() {
         try {
             images.quill = new Pixbuf("share/pixmaps/quill-and-parchment.png"); // 48x48
-            images.graphic = new Pixbuf("share/pixmaps/graphic-16x16.png", -1, 10, true);
         } catch (FileNotFoundException fnfe) {
             System.err.println("Icon file not found: " + fnfe.getMessage());
         }
@@ -317,8 +316,6 @@ public class UserInterface
 class images
 {
     static Pixbuf quill;
-
-    static Pixbuf graphic;
 }
 
 class fonts
