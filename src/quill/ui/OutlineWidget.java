@@ -19,6 +19,7 @@
 package quill.ui;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.freedesktop.cairo.Antialias;
 import org.freedesktop.cairo.Context;
@@ -28,7 +29,6 @@ import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Button;
 import org.gnome.gtk.DrawingArea;
 import org.gnome.gtk.HBox;
-import org.gnome.gtk.Image;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ReliefStyle;
@@ -112,12 +112,12 @@ class OutlineWidget extends ScrolledWindow
         HBox box;
         Segment segment;
         int i, j;
+        List<Segment> list;
         Extract entire;
         StringBuilder buf;
         PresentSegmentButton button;
         Label label;
         DrawingArea lines;
-        Image image;
         String str;
 
         if (folio == null) {
@@ -126,6 +126,7 @@ class OutlineWidget extends ScrolledWindow
         meta = folio.getMetadata();
 
         group = new SizeGroup(HORIZONTAL);
+        list = new ArrayList<Segment>();
         buttons = new ArrayList<PresentSegmentButton>();
 
         buf = new StringBuilder();
@@ -153,7 +154,6 @@ class OutlineWidget extends ScrolledWindow
          * Document filename
          */
 
-        buf.setLength(0);
         manuscript = folio.getManuscript();
 
         label = createDocumentFilenameLabel(manuscript);
@@ -184,11 +184,10 @@ class OutlineWidget extends ScrolledWindow
                 segment = series.getSegment(i);
                 entire = segment.getEntire();
 
-                buf.setLength(0);
-                box = new HBox(false, 0);
-
                 if (segment instanceof ComponentSegment) {
                     incrementWordCount(j, entire);
+
+                    box = new HBox(false, 0);
 
                     button = new PresentSegmentButton(primary, group);
                     box.packStart(button, false, false, 0);
@@ -211,8 +210,16 @@ class OutlineWidget extends ScrolledWindow
                     wordsChapter[j] = label;
                     box.packEnd(label, false, false, 0);
 
+                    if (list.size() > 0) {
+                        lines = new CompressedLines(list);
+                        top.packStart(lines, false, false, 0);
+                        list.clear();
+                    }
+                    top.packStart(box, false, false, 0);
                 } else if (segment instanceof HeadingSegment) {
                     incrementWordCount(j, entire);
+
+                    box = new HBox(false, 0);
 
                     button = new PresentSegmentButton(primary, group);
                     box.packStart(button, false, false, 0);
@@ -220,27 +227,30 @@ class OutlineWidget extends ScrolledWindow
                     button.setAddress(series, segment);
                     buttons.add(button);
 
-                } else if (segment instanceof ImageSegment) {
-                    incrementWordCount(j, entire);
-
-                    image = new Image(images.graphic);
-                    image.setAlignment(Alignment.LEFT, Alignment.TOP);
-                    image.setPadding(40, 3);
-
-                    box.packStart(image, false, false, 0);
-                } else {
-
-                    if (segment instanceof PreformatSegment) {
-                        lines = new CompressedLines(entire, true);
-                    } else {
-                        lines = new CompressedLines(entire, false);
-                        incrementWordCount(j, entire);
+                    if (list.size() > 0) {
+                        lines = new CompressedLines(list);
+                        top.packStart(lines, false, false, 0);
+                        list.clear();
                     }
-                    box.packStart(lines, false, false, 0);
+                    top.packStart(box, false, false, 0);
+                } else if (segment instanceof ImageSegment) {
+                    list.add(segment);
+                    incrementWordCount(j, entire);
+                } else if (segment instanceof PreformatSegment) {
+                    list.add(segment);
+                    // don't increment
+                } else {
+                    list.add(segment);
+                    incrementWordCount(j, entire);
                 }
-
-                top.packStart(box, false, false, 0);
             }
+            if (list.size() > 0) {
+                lines = new CompressedLines(list);
+                top.packStart(lines, false, false, 0);
+                list.clear();
+            }
+
+            list.clear();
         }
 
         /*
@@ -446,39 +456,39 @@ class OutlineWidget extends ScrolledWindow
         return buf.toString();
     }
 
-    private class WordCountingCharacterVisitor implements CharacterVisitor
-    {
-        private boolean word;
-
-        private int count;
-
-        private WordCountingCharacterVisitor() {
-            count = 0;
-            word = false;
-        }
-
-        public boolean visit(int character, Markup markup) {
-            if (Character.isWhitespace(character)) {
-                if (word) {
-                    word = false;
-                }
-            } else {
-                if (!word) {
-                    count++;
-                    word = true;
-                }
-            }
-            return false;
-        }
-
-        private int getCount() {
-            return count;
-        }
-    }
-
     @SuppressWarnings("serial")
     private class StructureChangedException extends ApplicationException
     {
+    }
+}
+
+class WordCountingCharacterVisitor implements CharacterVisitor
+{
+    private boolean word;
+
+    private int count;
+
+    WordCountingCharacterVisitor() {
+        count = 0;
+        word = false;
+    }
+
+    public boolean visit(int character, Markup markup) {
+        if (Character.isWhitespace(character)) {
+            if (word) {
+                word = false;
+            }
+        } else {
+            if (!word) {
+                count++;
+                word = true;
+            }
+        }
+        return false;
+    }
+
+    int getCount() {
+        return count;
     }
 }
 
@@ -584,98 +594,138 @@ class HeadingLabel extends Label
 
 class CompressedLines extends DrawingArea
 {
-    private int[] dots;
+    private final List<Integer> dots;
+
+    private final List<Segment> types;
 
     private int num;
-
-    private boolean pre;
 
     private static final int WIDTH = 200;
 
     private static final int SPACING = 3;
 
-    CompressedLines(Extract entire, boolean program) {
+    private static final double LEFT = 40.0;
+
+    private static final double RIGHT = WIDTH + LEFT;
+
+    CompressedLines(final List<Segment> list) {
         super();
+        Extract entire;
         final DrawingArea self;
-        final TextChain chain;
+        Segment segment;
+        WordCountingCharacterVisitor tourist;
+        TextChain chain;
         Extract[] paras;
-        String line;
-        int j, i, words, width;
+        Extract extract;
+        final int K, I;
+        int k, j, i, words, width;
 
         self = this;
+        dots = new ArrayList<Integer>();
+        types = new ArrayList<Segment>();
 
-        chain = new TextChain(entire);
-        paras = chain.extractParagraphs();
-        dots = new int[paras.length];
-        j = 0;
+        K = list.size();
+        for (k = 0; k < K; k++) {
+            segment = list.get(k);
+            entire = segment.getEntire();
 
-        for (Extract extract : paras) {
-            if (extract == null) {
-                continue;
+            if (segment instanceof PreformatSegment) {
+                tourist = new WordCountingCharacterVisitor();
+                entire.visit(tourist);
+                words = tourist.getCount();
+
+                dots.add(words);
+                types.add(segment);
+            } else {
+                chain = new TextChain(entire);
+                paras = chain.extractParagraphs();
+
+                for (j = 0; j < paras.length; j++) {
+                    tourist = new WordCountingCharacterVisitor();
+                    extract = paras[j];
+                    extract.visit(tourist);
+                    words = tourist.getCount();
+                    dots.add(words);
+                    types.add(segment);
+                    dots.add(0);
+                    types.add(null);
+                }
             }
-            line = extract.getText();
-            i = -1;
-            words = 0;
-
-            do {
-                i++;
-                words++;
-            } while ((i = line.indexOf(' ', i)) != -1);
-
-            dots[j++] = words;
         }
 
         num = 1;
         width = 0;
-        for (i = 0; i < dots.length; i++) {
-            width += dots[i] + 2;
+        I = dots.size();
+        for (i = 0; i < I; i++) {
+            width += dots.get(i) + 2;
             if (width > WIDTH) {
                 num++;
                 width = 0;
             }
         }
 
-        pre = program;
-
         self.setSizeRequest(40 + WIDTH, SPACING * num);
 
         this.connect(new Widget.ExposeEvent() {
             public boolean onExposeEvent(Widget source, EventExpose event) {
                 final Context cr;
-                int i, j, width, rem;
+                final int I;
+                int i, j, wide;
+                double x, y, rem;
+                Segment segment;
 
                 cr = new Context(event);
-
-                if (pre) {
-                    cr.setSource(0.7, 0.7, 0.7);
-                } else {
-                    cr.setSource(0.5, 0.5, 0.5);
-                }
 
                 cr.setLineWidth(1.0);
                 cr.setAntialias(Antialias.NONE);
                 cr.translate(0.5, 0.5);
 
-                cr.moveTo(40, 0);
-                width = 0;
+                x = 40.0;
+                y = 0.0;
+
                 j = 0;
+                I = dots.size();
 
-                for (i = 0; i < dots.length; i++) {
-                    if (width + dots[i] > WIDTH) {
-                        rem = WIDTH - width;
-                        cr.lineRelative(rem, 0);
-                        j++;
-                        cr.moveTo(40, SPACING * j);
-                        cr.lineRelative(dots[i] - rem, 0);
-                        width = dots[i] - rem + 2;
+                for (i = 0; i < I; i++) {
+                    segment = types.get(i);
+                    if (segment instanceof ImageSegment) {
+                        wide = 10;
                     } else {
-                        cr.lineRelative(dots[i], 0);
-                        width += dots[i] + 2;
+                        wide = dots.get(i);
                     }
-                    cr.moveRelative(2, 0);
-                }
 
-                cr.stroke();
+                    if (wide == 0) {
+                        x += 2;
+                        continue;
+                    }
+
+                    if (segment instanceof PreformatSegment) {
+                        cr.setSource(0.7, 0.7, 0.7);
+                    } else if (segment instanceof ImageSegment) {
+                        cr.setSource(1.0, 0.0, 0.0);
+                    } else {
+                        cr.setSource(0.5, 0.5, 0.5);
+                    }
+
+                    if (x + wide > RIGHT) {
+                        rem = RIGHT - x;
+                        cr.moveTo(x, y);
+                        x += rem;
+                        cr.lineTo(x, y);
+                        j++;
+                        x = LEFT;
+                        y = SPACING * j;
+                        cr.moveTo(x, y);
+                        x += wide - rem;
+                        cr.lineTo(x, y);
+                    } else {
+                        cr.moveTo(x, y);
+                        x += wide;
+                        cr.lineTo(x, y);
+                    }
+
+                    cr.stroke();
+                }
 
                 return true;
             }
