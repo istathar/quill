@@ -655,7 +655,6 @@ class PrimaryWindow extends Window
         outline.affect(folio);
 
         preview.refreshDisplay();
-        outline.refreshDisplay();
         this.updateTitle();
     }
 
