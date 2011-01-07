@@ -139,15 +139,25 @@ class ComponentEditorWidget extends ScrolledWindow
         }
     }
 
+    /**
+     * Ensure the specified Segment is visible. Doing so in a non-jarring way
+     * is rather tricky; there are a number of corner cases arising from the
+     * fact that this is used both when inserting Segments, and when
+     * navigating from the Outline.
+     */
     void ensureVisible(Segment segment) {
-        final EditorTextView editor;
+        final Widget[] children;
+        final Widget widget;
+        final int i;
         final Allocation alloc;
-        int h, H;
-        int y;
+        int v, h, H;
+        int y, R;
 
-        editor = lookup(segment);
+        children = box.getChildren();
+        i = series.indexOf(segment);
+        widget = children[i];
 
-        alloc = editor.getAllocation();
+        alloc = widget.getAllocation();
         y = alloc.getY();
 
         if (y < 0) {
@@ -171,14 +181,48 @@ class ComponentEditorWidget extends ScrolledWindow
                 return;
             }
         }
+        R = alloc.getHeight();
 
+        v = (int) adj.getValue();
         h = (int) adj.getPageSize();
         H = (int) adj.getUpper();
 
-        if (y + h > H) {
-            adj.setValue(H - h);
-        } else {
+        if (y < v) {
+            /*
+             * Clearly, we need to snap back to target.
+             */
             adj.setValue(y);
+        } else if (y + R < v + h) {
+            /*
+             * Target allocation already completely visible on screen; don't
+             * scroll.
+             */
+            return;
+        } else if (y + h > H) {
+            /*
+             * Target location beyond end of ScrolledWindow; bounce back from
+             * end by one scrollbar handle size. This happens when you
+             * navigate to end via Outline.
+             */
+            adj.setValue(H - h);
+        } else if (y < v + h + R) {
+            /*
+             * If the target is off screen below, but by less than a scrollbar
+             * handle size, then position target at bottom. This happens
+             * inserting.
+             */
+            adj.setValue(y - (h - R));
+        } else if (y > v + h) {
+            /*
+             * Pk, it's just out of sight below; snap the target location on
+             * screen.
+             */
+            adj.setValue(y);
+        } else {
+            /*
+             * Target location already visible on screen; don't scroll.
+             */
+            return;
         }
 
     }
@@ -517,7 +561,9 @@ class ComponentEditorWidget extends ScrolledWindow
             editor.advanceTo(segment);
         }
 
-        this.ensureVisible(cursorSegment);
+        if (added > 0) {
+            this.ensureVisible(cursorSegment);
+        }
     }
 
     /**
