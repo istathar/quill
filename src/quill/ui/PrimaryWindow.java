@@ -104,7 +104,7 @@ class PrimaryWindow extends Window
 
     private OutlineWidget outline;
 
-    private NotesEditorWidget endnotes;
+    private ReferencesComponentEditorWidget endnotes;
 
     /**
      * The document this PrimaryWindow is displaying.
@@ -265,8 +265,6 @@ class PrimaryWindow extends Window
         this.advanceTo(following);
     }
 
-    /*
-     */
     private void setupWindow() {
         final Screen screen;
         final int availableWidth, availableHeight;
@@ -319,7 +317,7 @@ class PrimaryWindow extends Window
         left.setShowBorder(false);
         left.setSizeRequest(400, -1);
 
-        editor = new ComponentEditorWidget(this);
+        editor = new MainComponentEditorWidget(this);
         left.insertPage(editor, null, 0);
 
         stylist = new StylesheetEditorWidget(this);
@@ -353,7 +351,7 @@ class PrimaryWindow extends Window
         outline = new OutlineWidget(this);
         right.add(outline);
 
-        endnotes = new NotesEditorWidget(this);
+        endnotes = new ReferencesComponentEditorWidget(this);
         right.add(endnotes);
 
         intro = new IntroductionWidget();
@@ -618,11 +616,10 @@ class PrimaryWindow extends Window
     }
 
     /**
-     * Change the right side to show the outline navigator.
+     * Change the right side to show the notes and references editor.
      */
     void switchToEndnotes() {
         right.setCurrentPage(3);
-        endnotes.refreshDisplay();
     }
 
     /**
@@ -649,6 +646,7 @@ class PrimaryWindow extends Window
         cursorSeries = series;
 
         editor.initializeSeries(series);
+        endnotes.initializeSeries(series);
         stylist.initializeStylesheet(folio);
         metaditor.initializeMetadata(folio);
         preview.affect(folio);
