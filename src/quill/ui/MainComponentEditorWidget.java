@@ -31,16 +31,20 @@ import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.Widget;
 
 import quill.textbase.AttributionSegment;
-import quill.textbase.ComponentSegment;
+import quill.textbase.ChapterSegment;
+import quill.textbase.DivisionSegment;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
+import quill.textbase.LeaderSegment;
+import quill.textbase.ListitemSegment;
 import quill.textbase.NormalSegment;
 import quill.textbase.PoeticSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
+import quill.textbase.SpecialSegment;
 
 /**
  * Left hand side of a PrimaryWindow for editing a them main body of a
@@ -59,6 +63,7 @@ public class MainComponentEditorWidget extends ComponentEditorWidget
         final EditorTextView editor;
         final HeadingBox heading;
         final ImageDisplayBox image;
+        final NormalListitemBox listitem;
         final Scrollbar bar;
         final ScrolledWindow wide;
         final List<EditorTextView> editors;
@@ -75,6 +80,11 @@ public class MainComponentEditorWidget extends ComponentEditorWidget
             editor = new PoeticEditorTextView(this, segment);
 
             result = editor;
+        } else if (segment instanceof ListitemSegment) {
+            listitem = new NormalListitemBox(this, segment);
+
+            editor = listitem.getEditor();
+            result = listitem;
         } else if (segment instanceof AttributionSegment) {
             editor = new AttributionEditorTextView(this, segment);
 
@@ -139,11 +149,24 @@ public class MainComponentEditorWidget extends ComponentEditorWidget
 
             editor = heading.getEditor();
             result = heading;
-        } else if (segment instanceof ComponentSegment) {
+        } else if (segment instanceof LeaderSegment) {
+            editor = new LeaderEditorTextView(this, segment);
+
+            result = editor;
+        } else if (segment instanceof ChapterSegment) {
             heading = new ChapterHeadingBox(this, segment);
 
             editor = heading.getEditor();
             result = heading;
+        } else if (segment instanceof DivisionSegment) {
+            heading = new PartHeadingBox(this, segment);
+
+            editor = heading.getEditor();
+            result = heading;
+        } else if (segment instanceof SpecialSegment) {
+            // TODO placeholder; improve!
+            editor = null;
+            result = new SpecialHeadingBox(this, segment);
         } else {
             /*
              * Sanity check; don't really need this. FIXME In fact, returning
