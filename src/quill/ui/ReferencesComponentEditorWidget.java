@@ -18,20 +18,16 @@
  */
 package quill.ui;
 
-import org.gnome.gtk.HBox;
-import org.gnome.gtk.Justification;
+import java.util.List;
+
 import org.gnome.gtk.Label;
 import org.gnome.gtk.SizeGroup;
-import org.gnome.gtk.TextBuffer;
-import org.gnome.gtk.TextView;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
-import org.gnome.gtk.WrapMode;
 
 import quill.textbase.EndnoteSegment;
 import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
-import quill.textbase.Series;
 
 import static org.gnome.gtk.Alignment.LEFT;
 import static org.gnome.gtk.Alignment.TOP;
@@ -68,67 +64,32 @@ public class ReferencesComponentEditorWidget extends ComponentEditorWidget
 
     protected Widget createEditorForSegment(int index, Segment segment) {
         final PrimaryWindow primary;
+        final Widget result;
+        final EditorTextView editor;
+        final ReferenceListitemBox listitem;
+        final List<EditorTextView> editors;
 
         primary = super.getPrimary();
 
         if (segment instanceof EndnoteSegment) {
-            return createReferenceTagAndBody(segment);
+            listitem = new ReferenceListitemBox(this, segment);
+
+            editor = listitem.getEditor();
+            result = listitem;
         } else if (segment instanceof ReferenceSegment) {
-            return createReferenceTagAndBody(segment);
+            listitem = new ReferenceListitemBox(this, segment);
+
+            editor = listitem.getEditor();
+            result = listitem;
         } else {
             // skip!
-            return null;
-        }
-    }
-
-    private Widget createReferenceTagAndBody(Segment segment) {
-        final HBox hbox;
-        final VBox vbox;
-        final String str;
-        final TextView ref, body;
-        final TextBuffer one;
-
-        hbox = new HBox(false, 0);
-
-        str = segment.getExtra();
-
-        one = new TextBuffer();
-        one.setText(str);
-        ref = new TextView(one);
-        ref.setAcceptsTab(false);
-        ref.setWrapMode(WrapMode.NONE);
-        ref.setMarginLeft(10);
-        ref.setJustify(Justification.RIGHT);
-        vbox = new VBox(false, 0);
-        vbox.packStart(ref, false, false, 0);
-        hbox.packStart(vbox, false, false, 10);
-        group.add(ref);
-
-        body = new NormalEditorTextView(this, segment);
-
-        hbox.packStart(body, true, true, 0);
-        return hbox;
-    }
-
-    void initializeSeries(Series series) {
-        final int I;
-        final VBox top;
-        int i;
-        Segment segment;
-        Widget widget;
-
-        I = series.size();
-        top = super.getTop();
-
-        for (i = 0; i < I; i++) {
-            segment = series.getSegment(i);
-            widget = createEditorForSegment(i, segment);
-            if (widget == null) {
-                continue;
-            }
-            top.packStart(widget, false, false, 0);
+            editor = null;
+            result = null;
         }
 
-        top.showAll();
+        editors = super.getEditors();
+        editors.add(index, editor);
+
+        return result;
     }
 }

@@ -22,13 +22,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.gnome.gdk.Color;
-import org.gnome.gdk.EventExpose;
-import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Container;
 import org.gnome.gtk.PolicyType;
-import org.gnome.gtk.Scrollbar;
 import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.StateType;
 import org.gnome.gtk.Test;
@@ -76,7 +73,7 @@ abstract class ComponentEditorWidget extends ScrolledWindow
 
     ComponentEditorWidget(PrimaryWindow primary) {
         super();
-        scroll = this;
+        this.scroll = this;
         this.primary = primary;
 
         setupScrolling();
@@ -271,8 +268,6 @@ abstract class ComponentEditorWidget extends ScrolledWindow
             }
 
             box.packStart(widget, false, false, 0);
-            editor = findEditorIn(widget);
-            editors.add(i, editor);
         }
 
         box.showAll();
