@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -35,7 +35,7 @@ import static quill.textbase.Span.createSpan;
 public class ValidateDocumentModified extends GraphicalTestCase
 {
     private static final void insertThreeSpansIntoFirstSegment(final PrimaryWindow primary) {
-        final ComponentEditorWidget parent;
+        final SeriesEditorWidget parent;
         final EditorTextView editor;
         Folio folio;
         final Span[] spans;

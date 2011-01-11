@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -47,14 +47,13 @@ import quill.textbase.Segment;
 import quill.textbase.SpecialSegment;
 
 /**
- * Left hand side of a PrimaryWindow for editing a them main body of a
- * chapter.
+ * Left hand side of a PrimaryWindow for editing the main body of a chapter.
  * 
  * @author Andrew Cowie
  */
-public class MainComponentEditorWidget extends ComponentEditorWidget
+public class MainSeriesEditorWidget extends SeriesEditorWidget
 {
-    MainComponentEditorWidget(PrimaryWindow primary) {
+    MainSeriesEditorWidget(PrimaryWindow primary) {
         super(primary);
     }
 

@@ -90,7 +90,7 @@ class PrimaryWindow extends Window
 
     private Notebook right;
 
-    private ComponentEditorWidget editor;
+    private SeriesEditorWidget editor;
 
     private StylesheetEditorWidget stylist;
 
@@ -104,7 +104,7 @@ class PrimaryWindow extends Window
 
     private OutlineWidget outline;
 
-    private ReferencesComponentEditorWidget endnotes;
+    private ReferencesSeriesEditorWidget endnotes;
 
     /**
      * The document this PrimaryWindow is displaying.
@@ -168,7 +168,7 @@ class PrimaryWindow extends Window
         this.folio = folio;
 
         /*
-         * Update the ComponentEditorWidget to the current state
+         * Update the SeriesEditorWidget to the current state
          */
 
         i = folio.getIndexUpdated();
@@ -208,7 +208,7 @@ class PrimaryWindow extends Window
         this.folio = folio;
 
         /*
-         * Update the ComponentEditorWidget to the current state
+         * Update the SeriesEditorWidget to the current state
          */
 
         i = current.getIndexUpdated();
@@ -317,7 +317,7 @@ class PrimaryWindow extends Window
         left.setShowBorder(false);
         left.setSizeRequest(400, -1);
 
-        editor = new MainComponentEditorWidget(this);
+        editor = new MainSeriesEditorWidget(this);
         left.insertPage(editor, null, 0);
 
         stylist = new StylesheetEditorWidget(this);
@@ -351,7 +351,7 @@ class PrimaryWindow extends Window
         outline = new OutlineWidget(this);
         right.add(outline);
 
-        endnotes = new ReferencesComponentEditorWidget(this);
+        endnotes = new ReferencesSeriesEditorWidget(this);
         right.add(endnotes);
 
         intro = new IntroductionWidget();
@@ -1040,7 +1040,7 @@ class PrimaryWindow extends Window
      * @param widget
      *            Chapter editor calling in.
      */
-    void update(ComponentEditorWidget widget, Series former, Series series) {
+    void update(SeriesEditorWidget widget, Series former, Series series) {
         Folio anticedant, replacement;
         int i;
 
@@ -1056,7 +1056,7 @@ class PrimaryWindow extends Window
     /*
      * For testing only
      */
-    final ComponentEditorWidget testGetEditor() {
+    final SeriesEditorWidget testGetEditor() {
         return editor;
     }
 
@@ -1098,7 +1098,7 @@ class PrimaryWindow extends Window
 
     /**
      * Ensure that the given "address" is presented in the
-     * ComponentEditorWidget with the appropriate Chapter showing.
+     * SeriesEditorWidget with the appropriate Chapter showing.
      */
     void ensureVisible(Series series, Segment segment) {
         if (series != cursorSeries) {

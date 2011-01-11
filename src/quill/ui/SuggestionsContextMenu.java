@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -42,7 +42,7 @@ class SuggestionsContextMenu extends ContextMenu
 
     private SuggestionsContextMenu.WordSelected handler;
 
-    SuggestionsContextMenu(ComponentEditorWidget parent) {
+    SuggestionsContextMenu(SeriesEditorWidget parent) {
         super(parent);
         dict = primary.getDictionary();
 

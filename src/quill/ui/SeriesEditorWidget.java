@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -49,7 +49,7 @@ import quill.textbase.Series;
  * 
  * @author Andrew Cowie
  */
-abstract class ComponentEditorWidget extends ScrolledWindow
+abstract class SeriesEditorWidget extends ScrolledWindow
 {
     private ScrolledWindow scroll;
 
@@ -71,7 +71,7 @@ abstract class ComponentEditorWidget extends ScrolledWindow
 
     private Series series;
 
-    ComponentEditorWidget(PrimaryWindow primary) {
+    SeriesEditorWidget(PrimaryWindow primary) {
         super();
         this.scroll = this;
         this.primary = primary;
@@ -113,7 +113,7 @@ abstract class ComponentEditorWidget extends ScrolledWindow
     private void hookupAdjustmentReactions() {}
 
     /**
-     * Tell the ComponentEditorWidget to ensure that the range from to
+     * Tell the SeriesEditorWidget to ensure that the range from to
      * from+height is scrolled to and within view. This is used by the
      * EditorTextViews to handle the cursor moving one line above or below the
      * current viewport.
@@ -571,7 +571,7 @@ abstract class ComponentEditorWidget extends ScrolledWindow
             }
         }
         if (i == I) {
-            throw new AssertionError("originating EditorTextView not in this ComponentEditorWidget");
+            throw new AssertionError("originating EditorTextView not in this SeriesEditorWidget");
         }
 
         /*

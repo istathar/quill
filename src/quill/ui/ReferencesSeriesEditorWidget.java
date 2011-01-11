@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -33,11 +33,16 @@ import static org.gnome.gtk.Alignment.LEFT;
 import static org.gnome.gtk.Alignment.TOP;
 import static org.gnome.gtk.SizeGroupMode.HORIZONTAL;
 
-public class ReferencesComponentEditorWidget extends ComponentEditorWidget
+/**
+ * Series editor for editing notes or references.
+ * 
+ * @author Andrew Cowie
+ */
+public class ReferencesSeriesEditorWidget extends SeriesEditorWidget
 {
     private SizeGroup group;
 
-    ReferencesComponentEditorWidget(PrimaryWindow primary) {
+    ReferencesSeriesEditorWidget(PrimaryWindow primary) {
         super(primary);
         setupLabels();
         addHeading("Endnotes");

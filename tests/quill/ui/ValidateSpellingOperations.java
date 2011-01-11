@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -41,7 +41,7 @@ public class ValidateSpellingOperations extends GraphicalTestCase
         final Manuscript manuscript;
         final Folio folio;
         final PrimaryWindow primary;
-        final ComponentEditorWidget parent;
+        final SeriesEditorWidget parent;
         final EditorTextView editor;
         Extract entire;
         final Span span;
@@ -151,7 +151,7 @@ public class ValidateSpellingOperations extends GraphicalTestCase
         final Folio folio;
         final UserInterface ui;
         final PrimaryWindow primary;
-        final ComponentEditorWidget parent;
+        final SeriesEditorWidget parent;
         final SpellChecker dict;
         final Span[] spans;
         final Extract entire;

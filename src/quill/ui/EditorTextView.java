@@ -100,11 +100,11 @@ abstract class EditorTextView extends TextView
 
     private final UserInterface ui;
 
-    private final ComponentEditorWidget parent;
+    private final SeriesEditorWidget parent;
 
     private SpellChecker dict;
 
-    EditorTextView(ComponentEditorWidget parent, Segment segment) {
+    EditorTextView(SeriesEditorWidget parent, Segment segment) {
         super();
         this.view = this;
         this.ui = Quill.getUserInterface();
@@ -874,7 +874,7 @@ abstract class EditorTextView extends TextView
     /**
      * Get (craete) a [new] Segment representing the state of this TextChain
      * as at the time you call this method, then pass it up to the parent
-     * ComponentEditorWidget for further propagation.
+     * SeriesEditorWidget for further propagation.
      * 
      * The internal TextChain must be updated before you call this.
      * 
@@ -989,7 +989,7 @@ abstract class EditorTextView extends TextView
 
         /*
          * When you click in an EditorTextView, you may have come from
-         * somewhere else, so update the enclosing ComponentEditorWidget's
+         * somewhere else, so update the enclosing SeriesEditorWidget's
          * idea of what the current segment is, thereby allowing it to drive
          * preview of the correct page.
          */
@@ -1160,7 +1160,7 @@ abstract class EditorTextView extends TextView
 
     private static class InsertContextMenu extends ContextMenu
     {
-        private InsertContextMenu(ComponentEditorWidget parent) {
+        private InsertContextMenu(SeriesEditorWidget parent) {
             super(parent);
         }
     }
