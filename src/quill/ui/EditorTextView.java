@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -50,7 +50,7 @@ import org.gnome.pango.FontDescription;
 import quill.client.Quill;
 import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
-import quill.textbase.ComponentSegment;
+import quill.textbase.FirstSegment;
 import quill.textbase.Extract;
 import quill.textbase.FormatTextualChange;
 import quill.textbase.HeadingSegment;
@@ -1264,7 +1264,7 @@ abstract class EditorTextView extends TextView
                     }
                 }
             }
-        } else if (segment instanceof ComponentSegment) {
+        } else if (segment instanceof FirstSegment) {
             for (i = 0; i < insertDetails.length; i++) {
                 children[i].setSensitive(false);
             }

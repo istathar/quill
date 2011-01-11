@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -214,7 +214,7 @@ public class ValidateWrapperExpansions extends TestCase
 
     /*
      * This is quite contrived, since in standard components you are NOT
-     * allowed to splice the leading ComponentSegment.
+     * allowed to splice the leading FirstSegment.
      */
     public final void testSeriesSpliceBegin() {
         final Series before, after;

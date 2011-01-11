@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -24,7 +24,7 @@ import nu.xom.Document;
 import quill.textbase.AttributionSegment;
 import quill.textbase.ChapterSegment;
 import quill.textbase.Common;
-import quill.textbase.ComponentSegment;
+import quill.textbase.FirstSegment;
 import quill.textbase.DivisionSegment;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
@@ -154,7 +154,7 @@ public class QuackLoader
     }
 
     /**
-     * Ensure that the first Segment in the Series is a ComponentSegment.
+     * Ensure that the first Segment in the Series is a FirstSegment.
      */
     /*
      * This is a bit of a hack, but this means that at run time inside the app
@@ -180,7 +180,7 @@ public class QuackLoader
 
         first = list.get(0);
 
-        if (first instanceof ComponentSegment) {
+        if (first instanceof FirstSegment) {
             if (num > 1) {
                 /*
                  * This is the usual case; there's a title and some body.

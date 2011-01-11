@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -44,7 +44,7 @@ import parchment.manuscript.Metadata;
 import quill.client.ApplicationException;
 import quill.textbase.ChapterSegment;
 import quill.textbase.CharacterVisitor;
-import quill.textbase.ComponentSegment;
+import quill.textbase.FirstSegment;
 import quill.textbase.DivisionSegment;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
@@ -186,7 +186,7 @@ class OutlineWidget extends ScrolledWindow
                 segment = series.getSegment(i);
                 entire = segment.getEntire();
 
-                if (segment instanceof ComponentSegment) {
+                if (segment instanceof FirstSegment) {
                     incrementWordCount(j, entire);
 
                     box = new HBox(false, 0);
