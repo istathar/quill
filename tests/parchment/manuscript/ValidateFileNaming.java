@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -21,15 +21,12 @@ package parchment.manuscript;
 import java.io.File;
 import java.io.IOException;
 
-import parchment.manuscript.Chapter;
-import parchment.manuscript.Manuscript;
-
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
+import quill.textbase.Component;
 import quill.textbase.Folio;
-import quill.textbase.Series;
 
 public class ValidateFileNaming extends IOTestCase
 {
@@ -68,15 +65,15 @@ public class ValidateFileNaming extends IOTestCase
     public final void testChapterName() throws IOException {
         final Manuscript manuscript;
         final Chapter chapter;
-        final Series series;
+        final Component component;
         final File target;
 
         manuscript = new Manuscript();
         chapter = new Chapter(manuscript);
-        series = chapter.createDocument();
+        component = chapter.createDocument();
 
         try {
-            chapter.saveDocument(series);
+            chapter.saveDocument(component);
             fail("Lack of name not trapped");
         } catch (IllegalStateException ise) {
             // good

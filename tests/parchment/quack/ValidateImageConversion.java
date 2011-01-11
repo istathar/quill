@@ -23,6 +23,7 @@ import java.io.IOException;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.client.ImproperFilenameException;
+import quill.textbase.Component;
 import quill.textbase.FirstSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.Segment;
@@ -32,10 +33,12 @@ public class ValidateImageConversion extends QuackTestCase
 {
     public final void testImageWithCaption() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
+        final Component component;
         final Series series;
         Segment segment;
 
-        series = loadDocument("tests/parchment/quack/ImageWithCaption.xml");
+        component = loadDocument("tests/parchment/quack/ImageWithCaption.xml");
+        series = component.getSeriesMain();
 
         assertEquals(1 + 1, series.size());
 
@@ -46,15 +49,17 @@ public class ValidateImageConversion extends QuackTestCase
         assertTrue(segment instanceof ImageSegment);
         assertEquals("NonExistent.svg", segment.getExtra());
 
-        compareDocument(series);
+        compareDocument(component);
     }
 
     public final void testImageWithoutCaption() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
+        final Component component;
         final Series series;
         Segment segment;
 
-        series = loadDocument("tests/parchment/quack/ImageWithoutCaption.xml");
+        component = loadDocument("tests/parchment/quack/ImageWithoutCaption.xml");
+        series = component.getSeriesMain();
 
         assertEquals(1 + 1, series.size());
 
@@ -65,6 +70,6 @@ public class ValidateImageConversion extends QuackTestCase
         assertTrue(segment instanceof ImageSegment);
         assertEquals("OfNoFixedAddress.svg", segment.getExtra());
 
-        compareDocument(series);
+        compareDocument(component);
     }
 }

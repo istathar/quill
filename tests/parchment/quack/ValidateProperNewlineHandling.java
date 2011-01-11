@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -27,6 +27,7 @@ import parchment.manuscript.Chapter;
 import parchment.manuscript.Manuscript;
 import quill.client.ImproperFilenameException;
 import quill.textbase.Common;
+import quill.textbase.Component;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.NormalSegment;
@@ -48,6 +49,7 @@ public class ValidateProperNewlineHandling extends QuackTestCase
         int i;
         Span span;
         final Folio folio;
+        Component component;
         Series series;
         Segment segment;
         final ByteArrayOutputStream out;
@@ -60,7 +62,8 @@ public class ValidateProperNewlineHandling extends QuackTestCase
         manuscript = new Manuscript();
         folio = manuscript.createDocument();
 
-        series = folio.getSeries(0);
+        component = folio.getComponent(0);
+        series = component.getSeriesMain();
         segment = series.getSegment(1);
         assertTrue(segment instanceof NormalSegment);
         entire = segment.getEntire();
@@ -88,8 +91,8 @@ public class ValidateProperNewlineHandling extends QuackTestCase
         entire = chain.extractAll();
         segment = segment.createSimilar(entire, 0, 0, entire.getWidth());
         series = series.update(1, segment);
-
-        chapter.saveDocument(series, out);
+        component = component.updateMain(series);
+        chapter.saveDocument(component, out);
 
         blob = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -134,9 +137,9 @@ public class ValidateProperNewlineHandling extends QuackTestCase
      */
     public final void testBugOverlyLongInline() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
-        final Series series;
+        final Component component;
 
-        series = loadDocument("tests/parchment/quack/ReallyLongInlineLeadingBlock.xml");
-        compareDocument(series);
+        component = loadDocument("tests/parchment/quack/ReallyLongInlineLeadingBlock.xml");
+        compareDocument(component);
     }
 }

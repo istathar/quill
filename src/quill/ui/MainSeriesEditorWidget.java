@@ -32,6 +32,7 @@ import org.gnome.gtk.Widget;
 
 import quill.textbase.AttributionSegment;
 import quill.textbase.ChapterSegment;
+import quill.textbase.Component;
 import quill.textbase.DivisionSegment;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.HeadingSegment;
@@ -44,6 +45,7 @@ import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
+import quill.textbase.Series;
 import quill.textbase.SpecialSegment;
 
 /**
@@ -51,10 +53,16 @@ import quill.textbase.SpecialSegment;
  * 
  * @author Andrew Cowie
  */
-public class MainSeriesEditorWidget extends SeriesEditorWidget
+class MainSeriesEditorWidget extends SeriesEditorWidget
 {
+    private Component component;
+
     MainSeriesEditorWidget(PrimaryWindow primary) {
         super(primary);
+    }
+
+    Component getComponent() {
+        return component;
     }
 
     protected Widget createEditorForSegment(int index, Segment segment) {
@@ -183,5 +191,52 @@ public class MainSeriesEditorWidget extends SeriesEditorWidget
         editors.add(index, editor);
 
         return result;
+    }
+
+    /*
+     * Convenience wrappers
+     */
+
+    void initialize(Component component) {
+        final Series series;
+
+        series = component.getSeriesMain();
+        super.initializeSeries(series);
+
+        this.component = component;
+    }
+
+    void advanceTo(Component replacement) {
+        final Series series;
+
+        series = replacement.getSeriesMain();
+        super.advanceTo(series);
+
+        this.component = replacement;
+    }
+
+    void reveseTo(Component replacement) {
+        final Series series;
+
+        series = replacement.getSeriesMain();
+        super.reveseTo(series);
+
+        this.component = replacement;
+    }
+
+    void propegateTextualChange(final PrimaryWindow primary, final Series former,
+            final Series replacement) {
+        final Component apres;
+
+        apres = component.updateMain(replacement);
+        primary.update(this, component, apres);
+    }
+
+    void propegateStructuralChange(final PrimaryWindow primary, final Series former,
+            final Series replacement) {
+        final Component apres;
+
+        apres = component.updateMain(replacement);
+        primary.update(this, component, apres);
     }
 }

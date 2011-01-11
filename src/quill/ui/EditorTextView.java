@@ -989,8 +989,8 @@ abstract class EditorTextView extends TextView
 
         /*
          * When you click in an EditorTextView, you may have come from
-         * somewhere else, so update the enclosing SeriesEditorWidget's
-         * idea of what the current segment is, thereby allowing it to drive
+         * somewhere else, so update the enclosing SeriesEditorWidget's idea
+         * of what the current segment is, thereby allowing it to drive
          * preview of the correct page.
          */
         view.connect(new Widget.ButtonPressEvent() {

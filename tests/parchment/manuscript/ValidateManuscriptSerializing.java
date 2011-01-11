@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -26,8 +26,8 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
+import quill.textbase.Component;
 import quill.textbase.Folio;
-import quill.textbase.Series;
 
 /**
  * Evaluate XOM's Serializer to output our <code>&lt;manuscript&gt;</code>
@@ -48,7 +48,7 @@ public class ValidateManuscriptSerializing extends IOTestCase
         File dir;
         Manuscript manuscript;
         Chapter chapter;
-        Series series;
+        Component component;
         Folio folio;
         Stylesheet style;
         Metadata meta;
@@ -66,13 +66,13 @@ public class ValidateManuscriptSerializing extends IOTestCase
         folio = manuscript.createDocument();
 
         chapter = folio.getChapter(0);
-        series = folio.getSeries(0);
+        component = folio.getComponent(0);
         style = new Stylesheet("parchment.render.ReportRenderEngine", "A4", "15.0", "20.0", "12.5",
                 "10.0", "Linux Libertine O", "Liberation Sans", "Inconsolata", "Linux Libertine O C",
                 "3.2", "2.6", "3.0", "5.6");
         meta = new Metadata("Untitled", "", "en_CA");
 
-        folio = new Folio(manuscript, chapter, series, style, meta);
+        folio = new Folio(manuscript, chapter, component, style, meta);
 
         converter = new ManuscriptConverter(folio);
         converter.writeManuscript(out);

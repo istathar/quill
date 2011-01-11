@@ -149,7 +149,6 @@ public class ValidateSpellingOperations extends GraphicalTestCase
             IOException {
         final Manuscript manuscript;
         final Folio folio;
-        final UserInterface ui;
         final PrimaryWindow primary;
         final SeriesEditorWidget parent;
         final SpellChecker dict;

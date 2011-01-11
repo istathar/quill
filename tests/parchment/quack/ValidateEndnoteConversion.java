@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -28,6 +28,7 @@ import parchment.manuscript.Manuscript;
 import quill.client.ImproperFilenameException;
 import quill.textbase.ChapterSegment;
 import quill.textbase.CharacterSpan;
+import quill.textbase.Component;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
 import quill.textbase.MarkerSpan;
@@ -56,11 +57,13 @@ public class ValidateEndnoteConversion extends QuackTestCase
 
     public final void testInlineNote() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
+        final Component component;
         final Series series;
         Segment segment;
         final Extract entire;
 
-        series = loadDocument("tests/parchment/quack/Endnote.xml");
+        component = loadDocument("tests/parchment/quack/Endnote.xml");
+        series = component.getSeriesMain();
 
         assertEquals(2, series.size());
 
@@ -88,15 +91,17 @@ public class ValidateEndnoteConversion extends QuackTestCase
             }
         });
 
-        compareDocument(series);
+        compareDocument(component);
     }
 
     public final void testManyNotes() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
+        final Component component;
         final Series series;
         Segment segment;
 
-        series = loadDocument("tests/parchment/quack/Manynotes.xml");
+        component = loadDocument("tests/parchment/quack/Manynotes.xml");
+        series = component.getSeriesMain();
 
         /*
          * Check the state is what we think it is
@@ -117,7 +122,7 @@ public class ValidateEndnoteConversion extends QuackTestCase
          * Now, write out, and test.
          */
 
-        compareDocument(series);
+        compareDocument(component);
     }
 
     /*
@@ -128,6 +133,7 @@ public class ValidateEndnoteConversion extends QuackTestCase
             ImproperFilenameException {
         final Manuscript manuscript;
         final Chapter chapter;
+        final Component component;
         Series series;
         Segment segment;
         final TextChain chain;
@@ -152,7 +158,8 @@ public class ValidateEndnoteConversion extends QuackTestCase
          * Check the state is what we think it is
          */
 
-        series = chapter.loadDocument();
+        component = chapter.loadDocument();
+        series = component.getSeriesMain();
         assertEquals(4, series.size());
 
         segment = series.getSegment(0);
@@ -214,11 +221,12 @@ public class ValidateEndnoteConversion extends QuackTestCase
 
     public final void testSpecials() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
+        Component component;
         Series series;
         Segment segment;
 
-        series = loadDocument("tests/parchment/quack/Specials.xml");
-
+        component = loadDocument("tests/parchment/quack/Specials.xml");
+        series = component.getSeriesMain();
         /*
          * Check the state is what we think it is
          */
@@ -234,7 +242,7 @@ public class ValidateEndnoteConversion extends QuackTestCase
          * Now, write out, and test. We shouldn't lose anything
          */
 
-        compareDocument(series);
+        compareDocument(component);
     }
 
     /*
@@ -243,11 +251,13 @@ public class ValidateEndnoteConversion extends QuackTestCase
      */
     public final void testCitationInEndnoteWrapping() throws IOException, ValidityException,
             ParsingException, ImproperFilenameException {
+        Component component;
         Series series;
         Segment segment;
         Extract entire;
 
-        series = loadDocument("tests/parchment/quack/EndnoteWrappingBug.xml");
+        component = loadDocument("tests/parchment/quack/EndnoteWrappingBug.xml");
+        series = component.getSeriesMain();
 
         assertEquals(2, series.size());
 
@@ -311,7 +321,7 @@ public class ValidateEndnoteConversion extends QuackTestCase
          * getting spaces moved around.
          */
 
-        compareDocument(series);
+        compareDocument(component);
     }
 
     /*
@@ -320,11 +330,13 @@ public class ValidateEndnoteConversion extends QuackTestCase
      */
     public final void testNoteInQuotationWrapping() throws IOException, ValidityException,
             ParsingException, ImproperFilenameException {
+        Component component;
         Series series;
         Segment segment;
         Extract entire;
 
-        series = loadDocument("tests/parchment/quack/QuoteWithNoteWrappingBug.xml");
+        component = loadDocument("tests/parchment/quack/QuoteWithNoteWrappingBug.xml");
+        series = component.getSeriesMain();
 
         assertEquals(2, series.size());
 
@@ -372,6 +384,6 @@ public class ValidateEndnoteConversion extends QuackTestCase
          * has the problem is in the Converter.
          */
 
-        compareDocument(series);
+        compareDocument(component);
     }
 }

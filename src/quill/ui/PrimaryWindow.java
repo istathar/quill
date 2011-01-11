@@ -60,6 +60,7 @@ import parchment.render.RenderEngine;
 import quill.client.ApplicationException;
 import quill.client.ImproperFilenameException;
 import quill.client.Quill;
+import quill.textbase.Component;
 import quill.textbase.Folio;
 import quill.textbase.Origin;
 import quill.textbase.Segment;
@@ -90,7 +91,7 @@ class PrimaryWindow extends Window
 
     private Notebook right;
 
-    private SeriesEditorWidget editor;
+    private MainSeriesEditorWidget editor;
 
     private StylesheetEditorWidget stylist;
 
@@ -104,7 +105,7 @@ class PrimaryWindow extends Window
 
     private OutlineWidget outline;
 
-    private ReferencesSeriesEditorWidget endnotes;
+    private EndnotesSeriesEditorWidget endnotes;
 
     /**
      * The document this PrimaryWindow is displaying.
@@ -163,7 +164,7 @@ class PrimaryWindow extends Window
      */
     private void advanceTo(Folio folio) {
         final int i;
-        final Series series;
+        final Component component;
 
         this.folio = folio;
 
@@ -174,12 +175,12 @@ class PrimaryWindow extends Window
         i = folio.getIndexUpdated();
 
         if (i >= 0) {
-            series = folio.getSeries(i);
+            component = folio.getComponent(i);
 
-            editor.advanceTo(series);
+            editor.advanceTo(component);
 
             // is this the right place to set this?
-            cursorSeries = series;
+            cursor = component;
         }
 
         stylist.affect(folio);
@@ -202,7 +203,7 @@ class PrimaryWindow extends Window
     private void reverseTo(Folio folio) {
         Folio current;
         int i;
-        Series series;
+        Component component;
 
         current = this.folio;
         this.folio = folio;
@@ -212,12 +213,12 @@ class PrimaryWindow extends Window
          */
 
         i = current.getIndexUpdated();
-        series = folio.getSeries(i);
+        component = folio.getComponent(i);
 
-        editor.reveseTo(series);
+        editor.reveseTo(component);
 
         // is this the right place to set this?
-        cursorSeries = series;
+        cursor = component;
 
         /*
          * Update the PreviewWidget's idea of the current state
@@ -351,7 +352,7 @@ class PrimaryWindow extends Window
         outline = new OutlineWidget(this);
         right.add(outline);
 
-        endnotes = new ReferencesSeriesEditorWidget(this);
+        endnotes = new EndnotesSeriesEditorWidget(this);
         right.add(endnotes);
 
         intro = new IntroductionWidget();
@@ -628,7 +629,7 @@ class PrimaryWindow extends Window
      */
     // FIXME rename?
     void displayDocument(Folio folio) {
-        Series series;
+        Component component;
 
         this.manuscript = folio.getManuscript();
 
@@ -642,11 +643,11 @@ class PrimaryWindow extends Window
         this.loadDictionary();
 
         // FIXME
-        series = folio.getSeries(0);
-        cursorSeries = series;
+        component = folio.getComponent(0);
+        cursor = component;
 
-        editor.initializeSeries(series);
-        endnotes.initializeSeries(series);
+        editor.initialize(component);
+        endnotes.initialize(component);
         stylist.initializeStylesheet(folio);
         metaditor.initializeMetadata(folio);
         preview.affect(folio);
@@ -658,8 +659,8 @@ class PrimaryWindow extends Window
 
     /**
      * Set or reset the Window title based on the text of the first Segment of
-     * the currently dipslayed Series (which will be the FirstSegment
-     * leading this chapter with the chapter title).
+     * the currently dipslayed Series (which will be the FirstSegment leading
+     * this chapter with the chapter title).
      */
     /*
      * There is a HIG question here, as to whether the application name should
@@ -671,12 +672,14 @@ class PrimaryWindow extends Window
      */
     void updateTitle() {
         final Metadata meta;
+        final Series series;
         final Segment first;
         final String documentTitle, chapterTitle;
         final String str;
 
         meta = folio.getMetadata();
-        first = cursorSeries.getSegment(0);
+        series = cursor.getSeriesMain();
+        first = series.getSegment(0);
 
         if ((meta == cachedDocumentTitle) && (first == cachedChapterTitle)) {
             return;
@@ -728,15 +731,15 @@ class PrimaryWindow extends Window
         editor.grabFocus();
     }
 
-    private Series cursorSeries;
+    private Component cursor;
 
     Origin getCursor() {
         final int folioPosition;
 
-        if (cursorSeries == null) {
+        if (cursor == null) {
             return null;
         }
-        folioPosition = folio.indexOf(cursorSeries);
+        folioPosition = folio.indexOf(cursor);
 
         return editor.getCursor(folioPosition);
     }
@@ -1040,7 +1043,7 @@ class PrimaryWindow extends Window
      * @param widget
      *            Chapter editor calling in.
      */
-    void update(SeriesEditorWidget widget, Series former, Series series) {
+    void update(SeriesEditorWidget widget, Component former, Component component) {
         Folio anticedant, replacement;
         int i;
 
@@ -1048,7 +1051,7 @@ class PrimaryWindow extends Window
 
         i = anticedant.indexOf(former);
 
-        replacement = anticedant.update(i, series);
+        replacement = anticedant.update(i, component);
 
         this.apply(replacement);
     }
@@ -1063,16 +1066,16 @@ class PrimaryWindow extends Window
     private void handleComponentPrevious() {
         int i;
 
-        i = folio.indexOf(cursorSeries);
+        i = folio.indexOf(cursor);
 
         if (i == 0) {
             return;
         }
 
         i--;
-        cursorSeries = folio.getSeries(i);
+        cursor = folio.getComponent(i);
 
-        editor.initializeSeries(cursorSeries);
+        editor.initialize(cursor);
         preview.refreshDisplay();
         updateTitle();
     }
@@ -1082,28 +1085,28 @@ class PrimaryWindow extends Window
         int i;
 
         len = folio.size();
-        i = folio.indexOf(cursorSeries);
+        i = folio.indexOf(cursor);
         i++;
 
         if (i == len) {
             return;
         }
 
-        cursorSeries = folio.getSeries(i);
+        cursor = folio.getComponent(i);
 
-        editor.initializeSeries(cursorSeries);
+        editor.initialize(cursor);
         preview.refreshDisplay();
         updateTitle();
     }
 
     /**
-     * Ensure that the given "address" is presented in the
-     * SeriesEditorWidget with the appropriate Chapter showing.
+     * Ensure that the given "address" is presented in the SeriesEditorWidget
+     * with the appropriate Chapter showing.
      */
-    void ensureVisible(Series series, Segment segment) {
-        if (series != cursorSeries) {
-            cursorSeries = series;
-            editor.initializeSeries(cursorSeries);
+    void ensureVisible(Component component, Segment segment) {
+        if (component != cursor) {
+            cursor = component;
+            editor.initialize(cursor);
         }
 
         editor.ensureVisible(segment);

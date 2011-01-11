@@ -33,6 +33,7 @@ import org.gnome.gtk.VBox;
 import org.gnome.gtk.Viewport;
 import org.gnome.gtk.Widget;
 
+import quill.textbase.Component;
 import quill.textbase.Origin;
 import quill.textbase.Segment;
 import quill.textbase.Series;
@@ -237,7 +238,6 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         int i;
         final int num;
         Widget widget;
-        EditorTextView editor;
 
         /*
          * If loading a new document, there may be a chapter already
@@ -324,9 +324,21 @@ abstract class SeriesEditorWidget extends ScrolledWindow
      *            The position within the series that this Segment is found.
      * @param segment
      */
-    protected Widget createEditorForSegment(int index, Segment segment) {
-        throw new AssertionError();
-    }
+    abstract Widget createEditorForSegment(int index, Segment segment);
+
+    /**
+     * Initialize the editor with the appropriate Series from the given
+     * Component.
+     * 
+     * @param component
+     */
+    abstract void initialize(Component component);
+
+    abstract void advanceTo(Component replacement);
+
+    abstract void reveseTo(Component replacement);
+
+    abstract Component getComponent();
 
     /**
      * @deprecated
@@ -541,8 +553,17 @@ abstract class SeriesEditorWidget extends ScrolledWindow
          * Now propegate that a state change has happened upwards.
          */
 
-        primary.update(this, former, replacement);
+        propegateTextualChange(primary, former, replacement);
     }
+
+    /**
+     * Compose a new Component object from the given Series and propegate
+     * upwards.
+     */
+    /*
+     * First argument is just there to restrict visibility
+     */
+    abstract void propegateTextualChange(PrimaryWindow primary, Series former, Series replacement);
 
     /**
      * 
@@ -586,8 +607,14 @@ abstract class SeriesEditorWidget extends ScrolledWindow
             replacement = former.splice(i, first, added, third);
         }
 
-        primary.update(this, former, replacement);
+        propegateStructuralChange(primary, former, replacement);
     }
+
+    /**
+     * Compose a new Component object from the given Series and propegate
+     * upwards.
+     */
+    abstract void propegateStructuralChange(PrimaryWindow primary, Series former, Series replacement);
 
     public void grabFocus() {
         final Segment segment;

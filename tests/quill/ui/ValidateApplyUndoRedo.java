@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -23,8 +23,8 @@ import parchment.manuscript.Chapter;
 import parchment.manuscript.Manuscript;
 import parchment.manuscript.Metadata;
 import parchment.manuscript.Stylesheet;
+import quill.textbase.Component;
 import quill.textbase.Folio;
-import quill.textbase.Series;
 
 /**
  * Test adding Folio instances to a ChangeStack, and that undo and redo of
@@ -39,13 +39,13 @@ public class ValidateApplyUndoRedo extends TestCase
         final Folio one, two, three, four;
         Folio folio;
 
-        one = new Folio((Manuscript) null, (Chapter) null, (Series) null, (Stylesheet) null,
+        one = new Folio((Manuscript) null, (Chapter) null, (Component) null, (Stylesheet) null,
                 (Metadata) null);
-        two = new Folio((Manuscript) null, (Chapter) null, (Series) null, (Stylesheet) null,
+        two = new Folio((Manuscript) null, (Chapter) null, (Component) null, (Stylesheet) null,
                 (Metadata) null);
-        three = new Folio((Manuscript) null, (Chapter) null, (Series) null, (Stylesheet) null,
+        three = new Folio((Manuscript) null, (Chapter) null, (Component) null, (Stylesheet) null,
                 (Metadata) null);
-        four = new Folio((Manuscript) null, (Chapter) null, (Series) null, (Stylesheet) null,
+        four = new Folio((Manuscript) null, (Chapter) null, (Component) null, (Stylesheet) null,
                 (Metadata) null);
 
         stack = new ChangeStack(one);

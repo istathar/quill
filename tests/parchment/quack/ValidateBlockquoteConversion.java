@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -27,6 +27,7 @@ import parchment.manuscript.Chapter;
 import parchment.manuscript.Manuscript;
 import quill.client.ImproperFilenameException;
 import quill.textbase.ChapterSegment;
+import quill.textbase.Component;
 import quill.textbase.NormalSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
@@ -38,6 +39,7 @@ public class ValidateBlockquoteConversion extends TestCase
             ImproperFilenameException {
         final Manuscript manuscript;
         final Chapter chapter;
+        final Component component;
         final Series series;
         Segment segment;
 
@@ -45,7 +47,8 @@ public class ValidateBlockquoteConversion extends TestCase
         manuscript.setFilename("tests/parchment/quack/ValidateBlockquoteConversion.parchment"); // junk
         chapter = new Chapter(manuscript);
         chapter.setFilename("Blockquote.xml");
-        series = chapter.loadDocument();
+        component = chapter.loadDocument();
+        series = component.getSeriesMain();
 
         assertEquals(4, series.size());
 

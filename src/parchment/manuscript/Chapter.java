@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -26,17 +26,17 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import parchment.quack.QuackConverter;
-import parchment.quack.QuackLoader;
-import parchment.quack.QuackNodeFactory;
-
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.NodeFactory;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
+import parchment.quack.QuackConverter;
+import parchment.quack.QuackLoader;
+import parchment.quack.QuackNodeFactory;
 import quill.client.ImproperFilenameException;
 import quill.textbase.ChapterSegment;
+import quill.textbase.Component;
 import quill.textbase.Extract;
 import quill.textbase.NormalSegment;
 import quill.textbase.Segment;
@@ -74,11 +74,12 @@ public class Chapter
         parent = manuscript;
     }
 
-    public Series createDocument() {
+    public Component createDocument() {
         final Segment heading, para;
         Extract entire;
-        final List<Segment> list;
-        final Series result;
+        List<Segment> list;
+        final Series series, empty;
+        final Component result;
 
         entire = Extract.create();
         heading = new ChapterSegment(entire);
@@ -86,27 +87,41 @@ public class Chapter
         entire = Extract.create();
         para = new NormalSegment(entire);
 
+        /*
+         * Main body
+         */
+
         list = new ArrayList<Segment>(2);
         list.add(heading);
         list.add(para);
 
-        result = new Series(list);
+        series = new Series(list);
+
+        /*
+         * Endnotes, References
+         */
+
+        list = new ArrayList<Segment>(1);
+        list.add(para);
+        empty = new Series(list);
+
+        result = new Component(series, empty, empty);
 
         return result;
     }
 
     /**
      * Given this Chapter's current pathname, load and parse the document into
-     * a Segment[], wrapped as a Series.
+     * set of Segment[], wrapped as a Component.
      */
-    public Series loadDocument() throws ValidityException, ParsingException, IOException {
+    public Component loadDocument() throws ValidityException, ParsingException, IOException {
         final String filename;
         final File source, probe;
         final NodeFactory factory;
         final Builder parser;
         final Document doc;
         final QuackLoader loader; // change to interface or baseclass
-        final Series series;
+        final Component component;
 
         filename = this.getFilename();
 
@@ -130,9 +145,9 @@ public class Chapter
         doc = parser.build(source);
 
         loader = new QuackLoader();
-        series = loader.process(doc);
+        component = loader.process(doc);
 
-        return series;
+        return component;
     }
 
     /**
@@ -192,7 +207,7 @@ public class Chapter
     /**
      * You need to have set the filename first, of course.
      */
-    public void saveDocument(final Series series) throws IOException {
+    public void saveDocument(final Component component) throws IOException {
         final String filename;
         final File target, tmp;
         final FileOutputStream out;
@@ -232,7 +247,7 @@ public class Chapter
 
         try {
             out = new FileOutputStream(tmp);
-            saveDocument(series, out);
+            saveDocument(component, out);
             out.close();
         } catch (IOException ioe) {
             tmp.delete();
@@ -250,9 +265,11 @@ public class Chapter
         }
     }
 
-    public void saveDocument(final Series series, final OutputStream out) throws IOException {
+    public void saveDocument(final Component component, final OutputStream out) throws IOException {
         final QuackConverter converter;
-        int i;
+        Series series;
+        Segment segment;
+        int i, I;
 
         /*
          * Create an output converter and run the segments through it to turn
@@ -261,8 +278,25 @@ public class Chapter
 
         converter = new QuackConverter();
 
-        for (i = 0; i < series.size(); i++) {
-            converter.append(series.getSegment(i));
+        series = component.getSeriesMain();
+        I = series.size();
+        for (i = 0; i < I; i++) {
+            segment = series.getSegment(i);
+            converter.append(segment);
+        }
+
+        series = component.getSeriesEndnotes();
+        I = series.size();
+        for (i = 0; i < I; i++) {
+            segment = series.getSegment(i);
+            converter.append(segment);
+        }
+
+        series = component.getSeriesReferences();
+        I = series.size();
+        for (i = 0; i < I; i++) {
+            segment = series.getSegment(i);
+            converter.append(segment);
         }
 
         /*
@@ -287,7 +321,7 @@ public class Chapter
         return directory + "/" + relative;
     }
 
-    void emergencySave(Series series, PrintStream err, int index) {
+    void emergencySave(Component component, PrintStream err, int index) {
         final String savename;
         File target = null;
         final OutputStream out;
@@ -310,7 +344,7 @@ public class Chapter
             }
 
             out = new FileOutputStream(target);
-            saveDocument(series, out);
+            saveDocument(component, out);
             out.close();
 
         } catch (Throwable t) {

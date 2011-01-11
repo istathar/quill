@@ -40,17 +40,17 @@ import static org.gnome.gtk.SizeGroupMode.HORIZONTAL;
  * 
  * @author Andrew Cowie
  */
-class ReferencesSeriesEditorWidget extends SeriesEditorWidget
+// cloned from ReferencesSeriesEditorWidget
+class EndnotesSeriesEditorWidget extends SeriesEditorWidget
 {
     private SizeGroup group;
 
     private Component component;
 
-    ReferencesSeriesEditorWidget(PrimaryWindow primary) {
+    EndnotesSeriesEditorWidget(PrimaryWindow primary) {
         super(primary);
         setupLabels();
         addHeading("Endnotes");
-        addHeading("References");
     }
 
     Component getComponent() {
@@ -113,7 +113,7 @@ class ReferencesSeriesEditorWidget extends SeriesEditorWidget
     void initialize(Component component) {
         final Series series;
 
-        series = component.getSeriesReferences();
+        series = component.getSeriesEndnotes();
         super.initializeSeries(series);
 
         this.component = component;
@@ -122,7 +122,7 @@ class ReferencesSeriesEditorWidget extends SeriesEditorWidget
     void advanceTo(Component replacement) {
         final Series series;
 
-        series = replacement.getSeriesReferences();
+        series = replacement.getSeriesEndnotes();
         super.advanceTo(series);
 
         this.component = replacement;
@@ -131,7 +131,7 @@ class ReferencesSeriesEditorWidget extends SeriesEditorWidget
     void reveseTo(Component replacement) {
         final Series series;
 
-        series = replacement.getSeriesReferences();
+        series = replacement.getSeriesEndnotes();
         super.reveseTo(series);
 
         this.component = replacement;
@@ -141,7 +141,7 @@ class ReferencesSeriesEditorWidget extends SeriesEditorWidget
             final Series replacement) {
         final Component apres;
 
-        apres = component.updateReferences(replacement);
+        apres = component.updateEndnotes(replacement);
         primary.update(this, component, apres);
     }
 
@@ -149,7 +149,7 @@ class ReferencesSeriesEditorWidget extends SeriesEditorWidget
             final Series replacement) {
         final Component apres;
 
-        apres = component.updateReferences(replacement);
+        apres = component.updateEndnotes(replacement);
         primary.update(this, component, apres);
     }
 }

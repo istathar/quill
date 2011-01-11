@@ -23,6 +23,7 @@ import java.io.IOException;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.client.ImproperFilenameException;
+import quill.textbase.Component;
 import quill.textbase.FirstSegment;
 import quill.textbase.ListitemSegment;
 import quill.textbase.Segment;
@@ -32,10 +33,12 @@ public class ValidateListitemConversion extends QuackTestCase
 {
     public final void testElementToSegmentBullets() throws IOException, ValidityException,
             ParsingException, ImproperFilenameException {
+        final Component component;
         final Series series;
         Segment segment;
 
-        series = loadDocument("tests/parchment/quack/BulletListitems.xml");
+        component = loadDocument("tests/parchment/quack/BulletListitems.xml");
+        series = component.getSeriesMain();
 
         assertEquals(1 + 3, series.size());
 
@@ -54,15 +57,17 @@ public class ValidateListitemConversion extends QuackTestCase
         assertTrue(segment instanceof ListitemSegment);
         assertEquals("\u2022", segment.getExtra());
 
-        compareDocument(series);
+        compareDocument(component);
     }
 
     public final void testElementToSegmentOrdinals() throws IOException, ValidityException,
             ParsingException, ImproperFilenameException {
+        final Component component;
         final Series series;
         Segment segment;
 
-        series = loadDocument("tests/parchment/quack/OrdinalListitems.xml");
+        component = loadDocument("tests/parchment/quack/OrdinalListitems.xml");
+        series = component.getSeriesMain();
 
         assertEquals(1 + 3, series.size());
 
@@ -81,6 +86,6 @@ public class ValidateListitemConversion extends QuackTestCase
         assertTrue(segment instanceof ListitemSegment);
         assertEquals("3", segment.getExtra());
 
-        compareDocument(series);
+        compareDocument(component);
     }
 }

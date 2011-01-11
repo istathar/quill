@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -25,6 +25,7 @@ import nu.xom.ValidityException;
 import parchment.manuscript.InvalidDocumentException;
 import quill.client.ImproperFilenameException;
 import quill.textbase.ChapterSegment;
+import quill.textbase.Component;
 import quill.textbase.Extract;
 import quill.textbase.MarkerSpan;
 import quill.textbase.NormalSegment;
@@ -48,11 +49,13 @@ public class ValidateCitationConversion extends QuackTestCase
 
     public final void testInlineCite() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException, InvalidDocumentException {
+        final Component component;
         final Series series;
         Segment segment;
         final Extract entire;
 
-        series = loadDocument("tests/parchment/quack/Citation.xml");
+        component = loadDocument("tests/parchment/quack/Citation.xml");
+        series = component.getSeriesMain();
 
         assertEquals(2, series.size());
 
@@ -82,6 +85,6 @@ public class ValidateCitationConversion extends QuackTestCase
             }
         });
 
-        compareDocument(series);
+        compareDocument(component);
     }
 }

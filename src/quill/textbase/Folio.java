@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -37,7 +37,7 @@ import parchment.manuscript.Stylesheet;
 // immutable
 public class Folio
 {
-    private final Series[] components;
+    private final Component[] components;
 
     /**
      * Which Series was updated to create this Folio?
@@ -70,13 +70,13 @@ public class Folio
      * Create a Folio with a single [presumably nigh-on-empty] component as
      * its body.
      */
-    public Folio(Manuscript manuscript, Chapter chapter, Series component, Stylesheet style,
+    public Folio(Manuscript manuscript, Chapter chapter, Component component, Stylesheet style,
             Metadata meta) {
         this.manuscript = manuscript;
         this.chapters = new Chapter[] {
             chapter
         };
-        this.components = new Series[] {
+        this.components = new Component[] {
             component
         };
         this.updated = -1;
@@ -87,11 +87,11 @@ public class Folio
     /**
      * Create a Folio with a list of components to be used as the body.
      */
-    public Folio(Manuscript manuscript, List<Chapter> chapters, List<Series> components,
+    public Folio(Manuscript manuscript, List<Chapter> chapters, List<Component> components,
             Stylesheet style, Metadata meta) {
         final int num;
         final Chapter[] c;
-        final Series[] s;
+        final Component[] s;
 
         num = chapters.size();
         if (num != components.size()) {
@@ -103,14 +103,14 @@ public class Folio
         c = new Chapter[num];
         this.chapters = chapters.toArray(c);
 
-        s = new Series[num];
+        s = new Component[num];
         this.components = components.toArray(s);
         this.updated = -1;
         this.style = style;
         this.meta = meta;
     }
 
-    private Folio(Manuscript manuscript, Chapter[] chapters, Series[] components, int updated,
+    private Folio(Manuscript manuscript, Chapter[] chapters, Component[] components, int updated,
             Stylesheet style, Metadata meta) {
         this.manuscript = manuscript;
         this.chapters = chapters;
@@ -132,7 +132,10 @@ public class Folio
         return manuscript;
     }
 
-    public Series getSeries(int index) {
+    /**
+     * Get the <code>i</code>th Component in this Folio.
+     */
+    public Component getComponent(int index) {
         return components[index];
     }
 
@@ -143,27 +146,27 @@ public class Folio
         return chapters[index];
     }
 
-    public int indexOf(Series series) {
+    public int indexOf(Component component) {
         int i;
 
         for (i = 0; i < components.length; i++) {
-            if (components[i] == series) {
+            if (components[i] == component) {
                 return i;
             }
         }
 
-        throw new IllegalArgumentException("\n" + "Series not in this Folio");
+        throw new IllegalArgumentException("\n" + "Component not in this Folio");
     }
 
-    public Folio update(int position, Series series) {
-        final Series[] original, replacement;
+    public Folio update(int position, Component component) {
+        final Component[] original, replacement;
 
         original = this.components;
 
-        replacement = new Series[original.length];
+        replacement = new Component[original.length];
 
         System.arraycopy(original, 0, replacement, 0, position);
-        replacement[position] = series;
+        replacement[position] = component;
         System.arraycopy(original, position + 1, replacement, position + 1, original.length - position
                 - 1);
 

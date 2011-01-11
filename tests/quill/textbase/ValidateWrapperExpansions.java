@@ -229,8 +229,8 @@ public class ValidateWrapperExpansions extends TestCase
         assertTrue(before.getSegment(1) instanceof HeadingSegment);
         assertSame(before.getSegment(1), segments[1]);
 
-        after = before.splice(0, new ChapterSegment(blank), new QuoteSegment(blank),
-                new ChapterSegment(blank));
+        after = before.splice(0, new ChapterSegment(blank), new QuoteSegment(blank), new ChapterSegment(
+                blank));
 
         assertEquals(7, after.size());
         assertTrue(after.getSegment(0) instanceof ChapterSegment);
