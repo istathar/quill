@@ -555,6 +555,7 @@ abstract class ComponentEditorWidget extends ScrolledWindow
     void propegateStructuralChange(final EditorTextView originating, final Segment first,
             final Segment added, final Segment third) {
         Series former, replacement;
+        final int I;
         int i;
 
         former = series;
@@ -562,13 +563,14 @@ abstract class ComponentEditorWidget extends ScrolledWindow
         /*
          * Find the index of the view into the VBox.
          */
+        I = editors.size();
 
-        for (i = 0; i < editors.size(); i++) {
+        for (i = 0; i < I; i++) {
             if (editors.get(i) == originating) {
                 break;
             }
         }
-        if (i == editors.size()) {
+        if (i == I) {
             throw new AssertionError("originating EditorTextView not in this ComponentEditorWidget");
         }
 

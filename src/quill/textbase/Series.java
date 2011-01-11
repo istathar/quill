@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -22,9 +22,10 @@ import java.util.List;
 
 /**
  * A collection of Segments, comprising a visible section of a document. Like
- * other areas in textbase, is is a wrapper around an array. \
+ * other areas in textbase, this started lifea as a wrapper around an array,
+ * but has evolved to handle various application specific use cases.
  * 
- * It also has information about what changed from the previous Series, to
+ * Series also has information about what changed from the previous Series, to
  * facilitate undo and redo.
  * 
  * @author Andrew Cowie
