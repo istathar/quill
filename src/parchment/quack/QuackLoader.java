@@ -310,37 +310,50 @@ public class QuackLoader
 
         if (block instanceof TextElement) {
             segment = new NormalSegment(entire);
+            mainbody.add(segment);
         } else if (block instanceof CodeElement) {
             segment = new PreformatSegment(entire);
+            mainbody.add(segment);
         } else if (block instanceof QuoteElement) {
             segment = new QuoteSegment(entire);
+            mainbody.add(segment);
         } else if (block instanceof PoemElement) {
             segment = new PoeticSegment(entire);
+            mainbody.add(segment);
         } else if (block instanceof ListElement) {
             segment = new ListitemSegment(entire, attribute);
+            mainbody.add(segment);
         } else if (block instanceof CreditElement) {
             segment = new AttributionSegment(entire);
+            mainbody.add(segment);
         } else if (block instanceof HeadingElement) {
             segment = new HeadingSegment(entire, attribute);
+            mainbody.add(segment);
         } else if (block instanceof ImageElement) {
             segment = new ImageSegment(entire, attribute);
+            mainbody.add(segment);
         } else if (block instanceof ChapterElement) {
             segment = new ChapterSegment(entire, attribute);
+            mainbody.add(segment);
         } else if (block instanceof DivisionElement) {
             segment = new DivisionSegment(entire, attribute);
+            mainbody.add(segment);
         } else if (block instanceof EndnoteElement) {
             segment = new EndnoteSegment(entire, attribute);
+            endnotes.add(segment);
         } else if (block instanceof ReferenceElement) {
             segment = new ReferenceSegment(entire, attribute);
+            references.add(segment);
         } else if (block instanceof LeaderElement) {
             segment = new LeaderSegment(entire);
+            mainbody.add(segment);
         } else if (block instanceof SpecialElement) {
             segment = new SpecialSegment(attribute);
+            mainbody.add(segment);
         } else {
             throw new IllegalStateException("\n" + "What kind of Block is " + block);
         }
 
-        mainbody.add(segment);
     }
 
     private void processData(final Block block) {
