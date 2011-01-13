@@ -354,7 +354,6 @@ public abstract class RenderEngine
         TextChain chain;
         Extract[] paras;
         String filename;
-        ArrayList<Segment>[] endnotes;
         final ArrayList<Segment> references;
         String label, type;
 
@@ -362,8 +361,6 @@ public abstract class RenderEngine
         areas = new ArrayList<Area>(64);
 
         references = new ArrayList<Segment>(4);
-
-        endnotes = new ArrayList[I];
 
         /*
          * Accumulate ReferenceSegments so they can later be output when a
@@ -399,8 +396,6 @@ public abstract class RenderEngine
             if (i > 0) {
                 appendPageBreak(cr);
             }
-
-            endnotes[i] = new ArrayList<Segment>(4);
 
             J = series.size();
             for (j = 0; j < J; j++) {
@@ -472,10 +467,9 @@ public abstract class RenderEngine
                     filename = segment.getExtra();
                     appendSegmentBreak(cr);
                     appendExternalGraphic(cr, filename, entire);
-                } else if (segment instanceof EndnoteSegment) {
-                    endnotes[i].add(segment);
-                } else if (segment instanceof ReferenceSegment) {
-                    // already accumulated
+                } else if ((segment instanceof EndnoteSegment) || (segment instanceof ReferenceSegment)) {
+                    // shouldn't be here
+                    throw new AssertionError();
                 } else if (segment instanceof LeaderSegment) {
                     appendSegmentBreak(cr);
                     appendLeader(cr, entire);
@@ -483,7 +477,7 @@ public abstract class RenderEngine
                     type = segment.getExtra();
 
                     if (type.equals("endnotes")) {
-                        processSpecialEndnotes(cr, endnotes);
+                        processSpecialEndnotes(cr);
                     } else if (type.equals("references")) {
                         processSpecialReferences(cr, references);
                     }
@@ -494,16 +488,16 @@ public abstract class RenderEngine
         }
     }
 
-    void processSpecialEndnotes(final Context cr, ArrayList<Segment>[] endnotes) {
+    void processSpecialEndnotes(final Context cr) {
         int i, j;
         int I, J;
         Component component;
-        Series series;
+        Series endnotes, mainbody;
         Extract entire;
         Segment segment;
         String which, label;
 
-        I = endnotes.length;
+        I = folio.size();
 
         /*
          * Now build the notes and references. This is somewhat hardcoded, but
@@ -511,7 +505,10 @@ public abstract class RenderEngine
          */
 
         for (i = 0; i < I; i++) {
-            J = endnotes[i].size();
+            component = folio.getComponent(i);
+            endnotes = component.getSeriesEndnotes();
+
+            J = endnotes.size();
 
             if (J == 0) {
                 continue;
@@ -526,11 +523,9 @@ public abstract class RenderEngine
              * > 1 chapter, though.
              */
 
-            component = folio.getComponent(i);
-            series = component.getSeriesEndnotes();
-
-            if ((I > 1) && (series.size() > 0)) {
-                segment = series.getSegment(0);
+            if ((I > 1) && (J > 0)) {
+                mainbody = component.getSeriesMain();
+                segment = mainbody.getSegment(0);
                 if (segment instanceof ChapterSegment) {
                     entire = segment.getEntire();
                     which = entire.getText();
@@ -542,7 +537,7 @@ public abstract class RenderEngine
             for (j = 0; j < J; j++) {
                 appendSegmentBreak(cr);
 
-                segment = endnotes[i].get(j);
+                segment = endnotes.getSegment(j);
                 label = segment.getExtra();
                 entire = segment.getEntire();
                 appendReferenceParagraph(cr, label, entire);
