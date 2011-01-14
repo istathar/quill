@@ -18,7 +18,11 @@
  */
 package quill.ui;
 
+import org.gnome.gdk.Color;
+import org.gnome.gdk.EventButton;
+import org.gnome.gtk.EventBox;
 import org.gnome.gtk.HBox;
+import org.gnome.gtk.StateType;
 import org.gnome.gtk.Widget;
 
 /**
@@ -27,8 +31,10 @@ import org.gnome.gtk.Widget;
  * 
  * @author Andrew Cowie
  */
-abstract class ListitemBox extends HBox
+abstract class ListitemBox extends EventBox
 {
+    private final EventBox eb;
+
     private final HBox box;
 
     private Widget label;
@@ -36,8 +42,19 @@ abstract class ListitemBox extends HBox
     private EditorTextView body;
 
     ListitemBox() {
-        super(false, 0);
-        box = this;
+        super();
+        eb = this;
+
+        box = new HBox(false, 0);
+        eb.add(box);
+        eb.modifyBackground(StateType.NORMAL, Color.WHITE);
+
+        eb.connect(new Widget.ButtonPressEvent() {
+            public boolean onButtonPressEvent(Widget source, EventButton event) {
+                // TODO
+                return false;
+            }
+        });
     }
 
     void setupLabel(final Widget widget) {

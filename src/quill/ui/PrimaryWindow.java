@@ -91,7 +91,7 @@ class PrimaryWindow extends Window
 
     private Notebook right;
 
-    private MainSeriesEditorWidget editor;
+    private MainSeriesEditorWidget mainbody;
 
     private StylesheetEditorWidget stylist;
 
@@ -106,6 +106,8 @@ class PrimaryWindow extends Window
     private OutlineWidget outline;
 
     private EndnotesSeriesEditorWidget endnotes;
+
+    private ReferencesSeriesEditorWidget references;
 
     /**
      * The document this PrimaryWindow is displaying.
@@ -177,7 +179,9 @@ class PrimaryWindow extends Window
         if (i >= 0) {
             component = folio.getComponent(i);
 
-            editor.advanceTo(component);
+            mainbody.advanceTo(component);
+            endnotes.advanceTo(component);
+            references.advanceTo(component);
 
             // is this the right place to set this?
             cursor = component;
@@ -185,6 +189,7 @@ class PrimaryWindow extends Window
 
         stylist.affect(folio);
         metaditor.affect(folio);
+
         /*
          * Update the PreviewWidget's idea of the current state
          */
@@ -215,7 +220,7 @@ class PrimaryWindow extends Window
         i = current.getIndexUpdated();
         component = folio.getComponent(i);
 
-        editor.reveseTo(component);
+        mainbody.reveseTo(component);
 
         // is this the right place to set this?
         cursor = component;
@@ -318,8 +323,8 @@ class PrimaryWindow extends Window
         left.setShowBorder(false);
         left.setSizeRequest(400, -1);
 
-        editor = new MainSeriesEditorWidget(this);
-        left.insertPage(editor, null, 0);
+        mainbody = new MainSeriesEditorWidget(this);
+        left.insertPage(mainbody, null, 0);
 
         stylist = new StylesheetEditorWidget(this);
         align = new Alignment();
@@ -334,6 +339,9 @@ class PrimaryWindow extends Window
         align.setPadding(0, 0, 3, 0);
         align.add(metaditor);
         left.insertPage(align, null, 2);
+
+        references = new ReferencesSeriesEditorWidget(this);
+        left.add(references);
 
         pane.add1(left);
     }
@@ -419,6 +427,10 @@ class PrimaryWindow extends Window
                         return true;
                     } else if (key == Keyval.F7) {
                         switchToMetadata();
+                        return true;
+                    } else if (key == Keyval.F8) {
+                        switchToReferences();
+                        return true;
                     }
 
                     if ((key == Keyval.F8) || (key == Keyval.F9) || (key == Keyval.F10)) {
@@ -529,7 +541,7 @@ class PrimaryWindow extends Window
      * is. The correct end result would be keeping the vertical height of
      * previously set, and probably horizontal width as well. What is really
      * bad is that if you return to maximized with the right hand side turned
-     * off suddenly the editor is super wide, and that's a horrible
+     * off suddenly the mainbody is super wide, and that's a horrible
      * experience.
      */
     private void toggleRightSide() {
@@ -548,14 +560,14 @@ class PrimaryWindow extends Window
     }
 
     /**
-     * Change the left side to show the chapter editor.
+     * Change the left side to show the chapter mainbody.
      */
     void switchToEditor() {
         left.setCurrentPage(0);
     }
 
     /**
-     * Change the left side to show the Stylesheet editor.
+     * Change the left side to show the Stylesheet mainbody.
      */
     void switchToStylesheet() {
         left.setCurrentPage(1);
@@ -563,7 +575,7 @@ class PrimaryWindow extends Window
     }
 
     /**
-     * Change the left side to show the Metadata editor.
+     * Change the left side to show the Metadata mainbody.
      */
     void switchToMetadata() {
         left.setCurrentPage(2);
@@ -605,7 +617,7 @@ class PrimaryWindow extends Window
      */
     void forceRecheck() {
         this.loadDictionary();
-        editor.forceRecheck();
+        mainbody.forceRecheck();
     }
 
     /**
@@ -617,19 +629,24 @@ class PrimaryWindow extends Window
     }
 
     /**
-     * Change the right side to show the notes and references editor.
+     * Change the right side to show the notes and references mainbody.
      */
     void switchToEndnotes() {
         right.setCurrentPage(3);
     }
 
+    void switchToReferences() {
+        left.setCurrentPage(3);
+    }
+
     /**
      * Show the nominated Series in this PrimaryWindow. Switches the left side
-     * to editor, and refreshes the preview if it's showing.
+     * to mainbody, and refreshes the preview if it's showing.
      */
     // FIXME rename?
     void displayDocument(Folio folio) {
         Component component;
+        int i;
 
         this.manuscript = folio.getManuscript();
 
@@ -646,8 +663,13 @@ class PrimaryWindow extends Window
         component = folio.getComponent(0);
         cursor = component;
 
-        editor.initialize(component);
+        mainbody.initialize(component);
         endnotes.initialize(component);
+
+        i = folio.size() - 1;
+        component = folio.getComponent(i);
+        references.initialize(component);
+
         stylist.initializeStylesheet(folio);
         metaditor.initializeMetadata(folio);
         preview.affect(folio);
@@ -728,7 +750,7 @@ class PrimaryWindow extends Window
     private transient Segment cachedChapterTitle;
 
     public void grabFocus() {
-        editor.grabFocus();
+        mainbody.grabFocus();
     }
 
     private Component cursor;
@@ -741,7 +763,7 @@ class PrimaryWindow extends Window
         }
         folioPosition = folio.indexOf(cursor);
 
-        return editor.getCursor(folioPosition);
+        return mainbody.getCursor(folioPosition);
     }
 
     /**
@@ -870,7 +892,7 @@ class PrimaryWindow extends Window
 
         cancel = new Button();
         cancel.setImage(new Image(ActionIcon.DOCUMENT_REVERT, IconSize.BUTTON));
-        cancel.setLabel("Return to editor");
+        cancel.setLabel("Return to mainbody");
         dialog.addButton(cancel, ResponseType.CANCEL);
 
         ok = new Button();
@@ -895,7 +917,7 @@ class PrimaryWindow extends Window
     }
 
     /**
-     * Open a new chapter in the editor, replacing the current one.
+     * Open a new chapter in the mainbody, replacing the current one.
      */
     void openDocument() {
         String directory;
@@ -1041,7 +1063,7 @@ class PrimaryWindow extends Window
 
     /**
      * @param widget
-     *            Chapter editor calling in.
+     *            Chapter mainbody calling in.
      */
     void update(SeriesEditorWidget widget, Component former, Component component) {
         Folio anticedant, replacement;
@@ -1060,7 +1082,7 @@ class PrimaryWindow extends Window
      * For testing only
      */
     final SeriesEditorWidget testGetEditor() {
-        return editor;
+        return mainbody;
     }
 
     private void handleComponentPrevious() {
@@ -1075,7 +1097,8 @@ class PrimaryWindow extends Window
         i--;
         cursor = folio.getComponent(i);
 
-        editor.initialize(cursor);
+        mainbody.initialize(cursor);
+        endnotes.initialize(cursor);
         preview.refreshDisplay();
         updateTitle();
     }
@@ -1094,7 +1117,8 @@ class PrimaryWindow extends Window
 
         cursor = folio.getComponent(i);
 
-        editor.initialize(cursor);
+        mainbody.initialize(cursor);
+        endnotes.initialize(cursor);
         preview.refreshDisplay();
         updateTitle();
     }
@@ -1106,10 +1130,10 @@ class PrimaryWindow extends Window
     void ensureVisible(Component component, Segment segment) {
         if (component != cursor) {
             cursor = component;
-            editor.initialize(cursor);
+            mainbody.initialize(cursor);
         }
 
-        editor.ensureVisible(segment);
+        mainbody.ensureVisible(segment);
 
         preview.refreshDisplay();
         updateTitle();

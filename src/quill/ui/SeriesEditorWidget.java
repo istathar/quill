@@ -21,22 +21,23 @@ package quill.ui;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.gnome.gdk.Color;
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Container;
+import org.gnome.gtk.Label;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ScrolledWindow;
-import org.gnome.gtk.StateType;
 import org.gnome.gtk.Test;
 import org.gnome.gtk.VBox;
-import org.gnome.gtk.Viewport;
 import org.gnome.gtk.Widget;
 
 import quill.textbase.Component;
 import quill.textbase.Origin;
 import quill.textbase.Segment;
 import quill.textbase.Series;
+
+import static org.gnome.gtk.Alignment.LEFT;
+import static org.gnome.gtk.Alignment.TOP;
 
 /**
  * Code for editing a Series (of Segments), presenting them as a list of
@@ -73,32 +74,47 @@ abstract class SeriesEditorWidget extends ScrolledWindow
     private Series series;
 
     SeriesEditorWidget(PrimaryWindow primary) {
+        this(primary, null);
+    }
+
+    SeriesEditorWidget(PrimaryWindow primary, String heading) {
         super();
         this.scroll = this;
         this.primary = primary;
 
-        setupScrolling();
+        setupScrolling(heading);
         hookupAdjustmentReactions();
     }
 
-    private void setupScrolling() {
-        final Viewport port;
+    private void setupScrolling(String heading) {
+        final VBox outer;
+        final Label label;
+
         box = new VBox(false, 3);
 
+        if (heading == null) {
+            scroll.addWithViewport(box);
+        } else {
+            outer = new VBox(false, 0);
+
+            label = new Label("<span size='xx-large'>" + heading + "</span>");
+            label.setUseMarkup(true);
+            label.setAlignment(LEFT, TOP);
+            outer.packStart(label, false, false, 6);
+            outer.packStart(box, false, false, 0);
+            scroll.addWithViewport(outer);
+        }
+
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
-        scroll.addWithViewport(box);
 
         /*
-         * Set the background color of the entire EditorWidget to white in
-         * order to hide the upper side of the horizontal Scrollbars in the
-         * preformatted blocks. Finding that this was the right place was
-         * traumatic, but it turns out that the Viewport has the underlying
-         * [org.gnome.gdk] Window where the drawing happens. Annoyingly,
-         * calling modifyBackground() on the ScolledWindow didn't work.
+         * For reasons I don't entirely understand, the recursive showAll()
+         * from PrimaryWindow isn't getting though this to the children
+         * ReferenceEditorTextViews. Strange. Anyway, show()ing here fixes it,
+         * though I hate unexplained workarounds.
          */
 
-        port = (Viewport) scroll.getChild();
-        port.modifyBackground(StateType.NORMAL, Color.WHITE);
+        scroll.show();
 
         adj = scroll.getVAdjustment();
     }
@@ -276,7 +292,11 @@ abstract class SeriesEditorWidget extends ScrolledWindow
          * And make sure the cursor is a Segment from this Series.
          */
 
-        this.cursorSegment = series.getSegment(0);
+        if (series.size() > 0) {
+            this.cursorSegment = series.getSegment(0);
+        } else {
+            this.cursorSegment = null;
+        }
     }
 
     private Segment lookup(Widget editor) {

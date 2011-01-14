@@ -28,6 +28,8 @@ import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.Scrollbar;
 import org.gnome.gtk.ScrolledWindow;
+import org.gnome.gtk.StateType;
+import org.gnome.gtk.Viewport;
 import org.gnome.gtk.Widget;
 
 import quill.textbase.AttributionSegment;
@@ -59,6 +61,19 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
 
     MainSeriesEditorWidget(PrimaryWindow primary) {
         super(primary);
+        final Viewport port;
+
+        /*
+         * Set the background color of the entire EditorWidget to white in
+         * order to hide the upper side of the horizontal Scrollbars in the
+         * preformatted blocks. Finding that this was the right place was
+         * traumatic, but it turns out that the Viewport has the underlying
+         * [org.gnome.gdk] Window where the drawing happens. Annoyingly,
+         * calling modifyBackground() on the ScolledWindow didn't work.
+         */
+
+        port = (Viewport) super.getChild();
+        port.modifyBackground(StateType.NORMAL, Color.WHITE);
     }
 
     Component getComponent() {

@@ -20,19 +20,14 @@ package quill.ui;
 
 import java.util.List;
 
-import org.gnome.gtk.Label;
 import org.gnome.gtk.SizeGroup;
-import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
 import quill.textbase.Component;
-import quill.textbase.EndnoteSegment;
 import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 
-import static org.gnome.gtk.Alignment.LEFT;
-import static org.gnome.gtk.Alignment.TOP;
 import static org.gnome.gtk.SizeGroupMode.HORIZONTAL;
 
 /**
@@ -47,10 +42,8 @@ class ReferencesSeriesEditorWidget extends SeriesEditorWidget
     private Component component;
 
     ReferencesSeriesEditorWidget(PrimaryWindow primary) {
-        super(primary);
+        super(primary, "References");
         setupLabels();
-        addHeading("Endnotes");
-        addHeading("References");
     }
 
     Component getComponent() {
@@ -59,20 +52,6 @@ class ReferencesSeriesEditorWidget extends SeriesEditorWidget
 
     private void setupLabels() {
         group = new SizeGroup(HORIZONTAL);
-    }
-
-    private void addHeading(String title) {
-        final Label heading;
-        final VBox top;
-
-        heading = new Label();
-        heading.setUseMarkup(true);
-        heading.setLineWrap(true);
-        heading.setLabel("<span size='xx-large'>" + title + "</span>");
-        heading.setAlignment(LEFT, TOP);
-
-        top = super.getTop();
-        top.packStart(heading, false, false, 6);
     }
 
     Widget createEditorForSegment(int index, Segment segment) {
@@ -84,20 +63,13 @@ class ReferencesSeriesEditorWidget extends SeriesEditorWidget
 
         primary = super.getPrimary();
 
-        if (segment instanceof EndnoteSegment) {
-            listitem = new ReferenceListitemBox(this, segment);
-
-            editor = listitem.getEditor();
-            result = listitem;
-        } else if (segment instanceof ReferenceSegment) {
+        if (segment instanceof ReferenceSegment) {
             listitem = new ReferenceListitemBox(this, segment);
 
             editor = listitem.getEditor();
             result = listitem;
         } else {
-            // skip!
-            editor = null;
-            result = null;
+            throw new AssertionError();
         }
 
         editors = super.getEditors();
@@ -122,6 +94,10 @@ class ReferencesSeriesEditorWidget extends SeriesEditorWidget
     void advanceTo(Component replacement) {
         final Series series;
 
+        if (replacement == this.component) {
+            return;
+        }
+
         series = replacement.getSeriesReferences();
         super.advanceTo(series);
 
@@ -130,6 +106,10 @@ class ReferencesSeriesEditorWidget extends SeriesEditorWidget
 
     void reveseTo(Component replacement) {
         final Series series;
+
+        if (replacement == this.component) {
+            return;
+        }
 
         series = replacement.getSeriesReferences();
         super.reveseTo(series);

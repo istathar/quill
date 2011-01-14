@@ -76,16 +76,16 @@ public class Chapter
 
     public Component createDocument() {
         final Segment heading, para;
-        Extract entire;
+        Extract blank;
         List<Segment> list;
         final Series series, empty;
         final Component result;
 
-        entire = Extract.create();
-        heading = new ChapterSegment(entire);
+        blank = Extract.create();
+        heading = new ChapterSegment(blank);
 
-        entire = Extract.create();
-        para = new NormalSegment(entire);
+        blank = Extract.create();
+        para = new NormalSegment(blank);
 
         /*
          * Main body
