@@ -892,28 +892,6 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         return findEditorIn(children[i]);
     }
 
-    /**
-     * @deprecated Replaced by editors[].
-     */
-    private EditorTextView[] findEditors() {
-        final Widget[] children;
-        final EditorTextView[] editors;
-        final int num;
-        int i;
-        Widget child;
-
-        children = box.getChildren();
-        num = children.length;
-        editors = new EditorTextView[num];
-
-        for (i = 0; i < num; i++) {
-            child = children[i];
-            editors[i] = findEditorIn(child);
-        }
-
-        return editors;
-    }
-
     void moveCursorStart() {
         final EditorTextView editor;
 
