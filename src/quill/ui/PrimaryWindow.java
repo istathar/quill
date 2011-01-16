@@ -175,8 +175,13 @@ class PrimaryWindow extends Window
 
         pos = current.indexOf(cursor);
         i = folio.getIndexUpdated();
-        component = folio.getComponent(i);
         I = folio.size();
+
+        if (i >= 0) {
+            component = folio.getComponent(i);
+        } else {
+            component = null;
+        }
 
         /*
          * Update the SeriesEditorWidget to the current state,
@@ -227,8 +232,13 @@ class PrimaryWindow extends Window
 
         pos = current.indexOf(cursor);
         i = current.getIndexUpdated();
-        component = folio.getComponent(i);
         I = folio.size();
+
+        if (i >= 0) {
+            component = folio.getComponent(i);
+        } else {
+            component = null;
+        }
 
         if (i == pos) {
             mainbody.reverseTo(component);
