@@ -1162,7 +1162,7 @@ class PrimaryWindow extends Window
             mainbody.initialize(cursor);
         }
 
-        mainbody.ensureVisible(segment);
+        mainbody.ensureVisible(segment, true);
 
         preview.refreshDisplay();
         updateTitle();
