@@ -215,6 +215,10 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
     void initialize(Component component) {
         final Series series;
 
+        if (component == this.component) {
+            return;
+        }
+
         series = component.getSeriesMain();
         super.initializeSeries(series);
 
@@ -224,6 +228,10 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
     void advanceTo(Component replacement) {
         final Series series;
 
+        if (replacement == this.component) {
+            return;
+        }
+
         series = replacement.getSeriesMain();
         super.advanceTo(series);
 
@@ -232,6 +240,10 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
 
     void reveseTo(Component replacement) {
         final Series series;
+
+        if (replacement == this.component) {
+            return;
+        }
 
         series = replacement.getSeriesMain();
         super.reveseTo(series);

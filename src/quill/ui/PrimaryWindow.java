@@ -165,26 +165,34 @@ class PrimaryWindow extends Window
      * General case of affecting the state currently given in this.folio.
      */
     private void advanceTo(Folio folio) {
-        final int i;
+        final Folio current;
+        final int pos, I;
+        int i;
         final Component component;
 
+        current = this.folio;
         this.folio = folio;
 
+        pos = current.indexOf(cursor);
+        i = folio.getIndexUpdated();
+        component = folio.getComponent(i);
+        I = folio.size();
+
         /*
-         * Update the SeriesEditorWidget to the current state
+         * Update the SeriesEditorWidget to the current state,
          */
 
-        i = folio.getIndexUpdated();
-
-        if (i >= 0) {
-            component = folio.getComponent(i);
-
+        if (i == pos) {
             mainbody.advanceTo(component);
             endnotes.advanceTo(component);
-            references.advanceTo(component);
 
             // is this the right place to set this?
+
             cursor = component;
+        }
+
+        if (i == I - 1) {
+            references.advanceTo(component);
         }
 
         stylist.affect(folio);
@@ -206,8 +214,8 @@ class PrimaryWindow extends Window
     }
 
     private void reverseTo(Folio folio) {
-        Folio current;
-        int i;
+        final Folio current;
+        final int i, pos, I;
         Component component;
 
         current = this.folio;
@@ -217,13 +225,22 @@ class PrimaryWindow extends Window
          * Update the SeriesEditorWidget to the current state
          */
 
+        pos = current.indexOf(cursor);
         i = current.getIndexUpdated();
         component = folio.getComponent(i);
+        I = folio.size();
 
-        mainbody.reveseTo(component);
+        if (i == pos) {
+            mainbody.reveseTo(component);
+            endnotes.reveseTo(component);
 
-        // is this the right place to set this?
-        cursor = component;
+            // is this the right place to set this?
+            cursor = component;
+        }
+
+        if (i == I - 1) {
+            references.reveseTo(component);
+        }
 
         /*
          * Update the PreviewWidget's idea of the current state
