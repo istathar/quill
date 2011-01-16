@@ -345,19 +345,19 @@ class PrimaryWindow extends Window
         right.setShowBorder(false);
 
         preview = new PreviewWidget(this);
-        right.add(preview);
+        right.insertPage(preview, null, 0);
 
         help = new HelpWidget();
-        right.add(help);
+        right.insertPage(help, null, 1);
 
         outline = new OutlineWidget(this);
-        right.add(outline);
+        right.insertPage(outline, null, 2);
 
         endnotes = new NotesEditorWidget(this);
-        right.add(endnotes);
+        right.insertPage(endnotes, null, 3);
 
         intro = new IntroductionWidget();
-        right.add(intro);
+        right.insertPage(intro, null, 4);
 
         pane.add2(right);
     }
@@ -401,25 +401,22 @@ class PrimaryWindow extends Window
 
                 if (mod == ModifierType.NONE) {
                     if (key == Keyval.F1) {
-                        switchToHelp();
-                        return true;
-                    } else if (key == Keyval.F2) {
-                        switchToPreview();
-                        return true;
-                    } else if (key == Keyval.F3) {
-                        switchToOutline();
-                        return true;
-                    } else if (key == Keyval.F4) {
-                        switchToEndnotes();
-                        return true;
-                    } else if (key == Keyval.F5) {
                         switchToEditor();
                         return true;
-                    } else if (key == Keyval.F6) {
+                    } else if (key == Keyval.F2) {
                         switchToStylesheet();
                         return true;
-                    } else if (key == Keyval.F7) {
+                    } else if (key == Keyval.F3) {
                         switchToMetadata();
+                        return true;
+                    } else if (key == Keyval.F5) {
+                        switchToPreview();
+                        return true;
+                    } else if (key == Keyval.F6) {
+                        switchToOutline();
+                        return true;
+                    } else if (key == Keyval.F7) {
+                        switchToEndnotes();
                     }
 
                     if ((key == Keyval.F8) || (key == Keyval.F9) || (key == Keyval.F10)) {
@@ -433,6 +430,13 @@ class PrimaryWindow extends Window
                     } else if (key == Keyval.F12) {
                         toggleRightSide();
                         return true;
+                    }
+                } else if (mod == ModifierType.SHIFT_MASK) {
+                    if (key == Keyval.F1) {
+                        switchToHelp();
+                        return true;
+                    } else if (key == Keyval.F12) {
+                        switchToIntro();
                     }
                 } else if (mod == ModifierType.CONTROL_MASK) {
                     if (key == Keyval.p) {
@@ -572,6 +576,14 @@ class PrimaryWindow extends Window
     }
 
     /**
+     * Put the introduction pane back up. Don't really need this, but we might
+     * morph it into an AboutDialog, or global help, or...
+     */
+    void switchToIntro() {
+        right.setCurrentPage(4);
+    }
+
+    /**
      * Change the right side to show the help pane.
      */
     void switchToHelp() {
@@ -622,7 +634,6 @@ class PrimaryWindow extends Window
      */
     void switchToEndnotes() {
         right.setCurrentPage(3);
-        endnotes.refreshDisplay();
     }
 
     /**
@@ -1108,7 +1119,7 @@ class PrimaryWindow extends Window
             editor.initializeSeries(cursorSeries);
         }
 
-        editor.ensureVisible(segment);
+        editor.ensureVisible(segment, true);
 
         preview.refreshDisplay();
         updateTitle();

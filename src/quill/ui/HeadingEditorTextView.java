@@ -25,6 +25,7 @@ class HeadingEditorTextView extends EditorTextView
     HeadingEditorTextView(ComponentEditorWidget parent, Segment segment) {
         super(parent, segment);
         view.modifyFont(fonts.heading);
+        view.setPaddingBelowParagraph(1);
     }
 
     protected boolean isEnterAllowed() {

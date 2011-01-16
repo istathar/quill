@@ -7,24 +7,6 @@ Bugs
 User Interface
 </heading>
 <text>
-<bold>Scrolling on new </bold><type>Segment</type><bold> insert</bold>
-</text>
-<text>
-Inserting a Section heading from last line of last
-<type>NormalEditorTextView</type>, then cursor <bold>Down</bold>
-doesn't cause the new line to be scrolled into visible area of
-<type>ComponentEditorWidget</type>.
-</text>
-<text>
-<type>Segment</type><bold> text needs escaping before passing to GTK
-</bold><type>Label</type><bold>?</bold>
-</text>
-<text>
-If you put the text <literal>&lt;!--</literal> into a section heading,
-then <keyboard>F3</keyboard> Outline, the application crashes with an
-error from <type>Label</type>'s <literal>setUseMarkup()</literal>.
-</text>
-<text>
 <bold>Selection should be cleared when leaving </bold>
 <type>EditorTextView</type>
 </text>
@@ -107,7 +89,7 @@ The mere presence of this section as text in a
 purpose built UI, is a bug. <literal>:)</literal>
 </text>
 <quote>
-Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
+Copyright © 2008-2011 Operational Dynamics Consulting, Pty Ltd
 </quote>
 <quote>
 As project documentation, this file forms an integral part of the

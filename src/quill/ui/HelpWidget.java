@@ -70,44 +70,46 @@ class HelpWidget extends ScrolledWindow
         views = new String[][] {
             new String[] {
                 "F1",
-                _("Help"),
-                _("This help screen.")
-            },
-            new String[] {
-                "F2",
-                _("Preview"),
-                _("A preview of what the current page will look like in its final rendered form.")
-            },
-            new String[] {
-                "F3",
-                _("Outline"),
-                _("An outline of the document's chapters and section headings allowing you to navigate.")
-            },
-            new String[] {
-                "F4",
-                _("Notes"),
-                _("Edit footnotes and references")
-            },
-            new String[] {
-                "F5",
                 _("Editor"),
                 _("Edit your manuscript!")
             },
             new String[] {
-                "F6",
+                "F2",
                 _("Stylesheet"),
                 _("Change the settings being used to render your document.")
             },
             new String[] {
-                "F7",
+                "F3",
                 _("Metadata"),
                 _("Adjust the overall document's properties.")
             },
             new String[] {
+                "F5",
+                _("Preview"),
+                _("A preview of what the current page will look like in its final rendered form.")
+            },
+            new String[] {
+                "F6",
+                _("Outline"),
+                _("An outline of the document's chapters and section headings, allowing you to navigate.")
+            },
+            new String[] {
+                "F7",
+                _("Notes"),
+                _("Edit endnotes for the current chapter.")
+            },
+
+            new String[] {
                 "F11",
                 _("Fullscreen"),
                 _("Work in fullscreen mode, giving you a better view of your document.")
-            }
+            },
+            new String[] {
+                "Shift+F1",
+                _("Help"),
+                _("This help screen.")
+            },
+
         };
 
         actions = new String[][] {

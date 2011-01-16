@@ -93,7 +93,7 @@ class IntroductionWidget extends VBox
             description.setJustify(Justification.CENTER);
             top.packStart(description, false, false, 20);
 
-            help = new Label(_("Press F1 for help"));
+            help = new Label(_("Press Shift+F1 for help"));
             help.setLineWrap(true);
             help.setUseMarkup(true);
 

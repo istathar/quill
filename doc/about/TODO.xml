@@ -4,12 +4,8 @@
 Todo
 </chapter>
 <heading>
-File format
+File handling
 </heading>
-<text>
-The on-disk format needs to be completed, and finalized as
-<literal>1.0</literal>.
-</text>
 <text>
 <bold>Launching documents from Nautilus</bold>
 </text>
@@ -26,9 +22,6 @@ to differentiate between development and normal use (start new
 instance &amp; terminate existing vs just load into existing
 instance?).
 </text>
-<text>
-Should individual chapters be launchable, or just the document?
-</text>
 <heading>
 User interface
 </heading>
@@ -42,22 +35,27 @@ tags is implemented, there's no user interface for adding or creating
 these markers yet, nor editing the reference bodies.
 </text>
 <text>
-<bold>Document word lists</bold>
+<bold>Inserting chapters</bold>
 </text>
 <text>
-While we have enabled adding words to the user's custom dictionary via
-"Add" in the suggestions menu, it may make sense to add words to the
-document. Perhaps this is just "Ignore"?
+There's not yet any <acronym>UI</acronym> for actually inserting a new
+chapter (be it a <literal>&lt;chapter&gt;</literal> or
+<literal>&lt;part&gt;</literal>).
 </text>
 <text>
-This will likely make more sense when we have a proper notion of
-document and can store a word list there.
+<bold>Search</bold>
+</text>
+<text>
+Need search in text hooked up to <keyboard>Ctrl+F</keyboard>. Should
+it be in a horizontal bar like <project>Epiphany</project> and
+<project>Devhelp</project> or should it be a popup dialog like
+<project>GEdit</project> and <project>Eclipse</project>?
 </text>
 <heading>
 Copyright
 </heading>
 <quote>
-Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
+Copyright © 2008-2011 Operational Dynamics Consulting, Pty Ltd
 </quote>
 <quote>
 As project documentation, this file forms an integral part of the
