@@ -90,7 +90,7 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         final VBox outer;
         final Label label;
 
-        box = new VBox(false, 3);
+        box = new VBox(false, 0);
 
         if (heading == null) {
             scroll.addWithViewport(box);

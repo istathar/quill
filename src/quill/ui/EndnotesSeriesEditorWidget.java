@@ -20,7 +20,9 @@ package quill.ui;
 
 import java.util.List;
 
+import org.gnome.gtk.HSeparator;
 import org.gnome.gtk.SizeGroup;
+import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
 import quill.textbase.Component;
@@ -56,19 +58,24 @@ class EndnotesSeriesEditorWidget extends SeriesEditorWidget
     }
 
     Widget createEditorForSegment(int index, Segment segment) {
-        final PrimaryWindow primary;
         final Widget result;
         final EditorTextView editor;
         final ReferenceListitemBox listitem;
+        final VBox box;
         final List<EditorTextView> editors;
-
-        primary = super.getPrimary();
 
         if (segment instanceof EndnoteSegment) {
             listitem = new ReferenceListitemBox(this, segment);
 
             editor = listitem.getEditor();
-            result = listitem;
+            if (index > 0) {
+                box = new VBox(false, 0);
+                box.packStart(new HSeparator(), false, false, 0);
+                box.packStart(listitem, false, false, 0);
+                result = box;
+            } else {
+                result = listitem;
+            }
         } else {
             throw new AssertionError();
         }
