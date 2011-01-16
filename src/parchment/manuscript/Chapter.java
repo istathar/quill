@@ -101,8 +101,7 @@ public class Chapter
          * Endnotes, References
          */
 
-        list = new ArrayList<Segment>(1);
-        list.add(para);
+        list = new ArrayList<Segment>(0);
         empty = new Series(list);
 
         result = new Component(series, empty, empty);

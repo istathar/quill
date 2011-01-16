@@ -264,6 +264,12 @@ public class ValidateEndnoteConversion extends QuackTestCase
         segment = series.getSegment(0);
         assertTrue(segment instanceof ChapterSegment);
         segment = series.getSegment(1);
+        assertTrue(segment instanceof NormalSegment);
+
+        series = component.getSeriesEndnotes();
+        assertEquals(1, series.size());
+
+        segment = series.getSegment(0);
         assertTrue(segment instanceof EndnoteSegment);
 
         /*
