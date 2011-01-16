@@ -101,7 +101,7 @@ abstract class SeriesEditorWidget extends ScrolledWindow
             label.setUseMarkup(true);
             label.setAlignment(LEFT, TOP);
             outer.packStart(label, false, false, 6);
-            outer.packStart(box, false, false, 0);
+            outer.packStart(box, true, true, 0);
             scroll.addWithViewport(outer);
         }
 
@@ -297,6 +297,17 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         } else {
             this.cursorSegment = null;
         }
+
+        /*
+         * Once again, I'm not happy with this. The bug is that sometimes the
+         * EndnoteSeriesEditorWidget and ReferencesSeriesEditorWidget are not
+         * actually requesting the appropriate amount of vertical space
+         * because they haven't calculated it yet. So annoying. Cycling the
+         * main loop seems to allow the idle handler to run, working around
+         * the problem Hopefully GTK 3.0 will be better about this.
+         */
+
+        Test.cycleMainLoop();
     }
 
     private Segment lookup(Widget editor) {
