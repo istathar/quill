@@ -231,15 +231,15 @@ class PrimaryWindow extends Window
         I = folio.size();
 
         if (i == pos) {
-            mainbody.reveseTo(component);
-            endnotes.reveseTo(component);
+            mainbody.reverseTo(component);
+            endnotes.reverseTo(component);
 
             // is this the right place to set this?
             cursor = component;
         }
 
         if (i == I - 1) {
-            references.reveseTo(component);
+            references.reverseTo(component);
         }
 
         /*

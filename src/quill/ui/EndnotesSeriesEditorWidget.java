@@ -105,7 +105,7 @@ class EndnotesSeriesEditorWidget extends SeriesEditorWidget
         this.component = replacement;
     }
 
-    void reveseTo(Component replacement) {
+    void reverseTo(Component replacement) {
         final Series series;
 
         if (replacement == this.component) {

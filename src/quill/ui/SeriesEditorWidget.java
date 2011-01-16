@@ -367,7 +367,7 @@ abstract class SeriesEditorWidget extends ScrolledWindow
 
     abstract void advanceTo(Component replacement);
 
-    abstract void reveseTo(Component replacement);
+    abstract void reverseTo(Component replacement);
 
     abstract Component getComponent();
 
