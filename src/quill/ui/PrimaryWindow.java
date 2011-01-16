@@ -1119,7 +1119,7 @@ class PrimaryWindow extends Window
             editor.initializeSeries(cursorSeries);
         }
 
-        editor.ensureVisible(segment);
+        editor.ensureVisible(segment, true);
 
         preview.refreshDisplay();
         updateTitle();
