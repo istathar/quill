@@ -22,7 +22,8 @@ import quill.textbase.Segment;
 
 /**
  * We define notes as being only a single paragraph, so we subclass in order
- * to disallow <b><code>Enter</code></b>.
+ * to disallow <b><code>Enter</code></b> and to permit appending a similar
+ * Segment in sequence.
  * 
  * @author Andrew Cowie
  */
@@ -40,5 +41,9 @@ class ReferenceEditorTextView extends EditorTextView
 
     protected boolean isSpliceAllowed() {
         return false;
+    }
+
+    protected boolean isSequenceAllowed() {
+        return true;
     }
 }

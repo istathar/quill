@@ -50,8 +50,8 @@ import org.gnome.pango.FontDescription;
 import quill.client.Quill;
 import quill.textbase.Common;
 import quill.textbase.Extract;
-import quill.textbase.FirstSegment;
 import quill.textbase.FormatTextualChange;
+import quill.textbase.HeadingSegment;
 import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
 import quill.textbase.Segment;
@@ -158,6 +158,19 @@ abstract class EditorTextView extends TextView
      */
     protected boolean isSpliceAllowed() {
         return true;
+    }
+
+    /**
+     * In most cases, you are NOT allowed to follow a Segment with another
+     * Segment of the same type. The exception in main Series is
+     * ListitemSegment, and in endnotes and references EndnoteSegment and
+     * ReferenceSegment.
+     * 
+     * If this is overridden to <code>true</code> then the user is allowed to
+     * append another Segment of the same type. Default <code>false</code>.
+     */
+    protected boolean isSequenceAllowed() {
+        return false;
     }
 
     private void hookupKeybindings() {
@@ -1201,17 +1214,19 @@ abstract class EditorTextView extends TextView
 
         children = split.getChildren();
 
-        for (i = 0; i < I; i++) {
-            if (details[i].type.isInstance(segment)) {
-                children[i].setSensitive(false);
-            } else {
-                children[i].setSensitive(true);
+        if (isSequenceAllowed()) {
+            // leave them all on
+        } else {
+            for (i = 0; i < I; i++) {
+                if (details[i].type.isInstance(segment)) {
+                    children[i].setSensitive(false);
+                }
             }
         }
 
         /*
          * if we're at the last character of an existing Segment, then turn
-         * off the type that's already following
+         * off the type that's already following.
          */
 
         if (insertOffset == chain.length()) {
@@ -1224,15 +1239,11 @@ abstract class EditorTextView extends TextView
                 next = series.getSegment(i);
 
                 for (i = 0; i < details.length; i++) {
-                    if (details[i].type.isInstance(next)) {
+                    if ((details[i].type.isInstance(next)) && (details[i].type != HeadingSegment.class)) {
                         children[i].setSensitive(false);
                         break;
                     }
                 }
-            }
-        } else if (segment instanceof FirstSegment) {
-            for (i = 0; i < details.length; i++) {
-                children[i].setSensitive(false);
             }
         }
 
@@ -1320,8 +1331,9 @@ abstract class EditorTextView extends TextView
 
     /**
      * Take the necessary actions to create a new Segment, which you pass in.
-     * If we're at the end of the view we're appending. Jump the logic to the
-     * user interface facades on PrimaryWindow.
+     * If we're at the end of the view [or splice not allowed] then we are
+     * appending. Jump the logic to the user interface facades on
+     * PrimaryWindow.
      */
     private void handleInsertSegment(Class<?> type) {
         final int offset, width;
@@ -1337,7 +1349,7 @@ abstract class EditorTextView extends TextView
         offset = insertOffset;
         width = chain.length() - offset;
 
-        if (width > 0) {
+        if ((width > 0) && (isSpliceAllowed())) {
             removed = chain.extractRange(offset, width);
             third = segment.createSimilar(removed, 0, 0, width);
 
@@ -1876,6 +1888,10 @@ abstract class EditorTextView extends TextView
 
     int getInsertOffset() {
         return insertOffset;
+    }
+
+    Segment getSegment() {
+        return segment;
     }
 
     /*

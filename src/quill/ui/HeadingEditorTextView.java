@@ -31,4 +31,12 @@ class HeadingEditorTextView extends EditorTextView
     protected boolean isEnterAllowed() {
         return false;
     }
+
+    protected boolean isSpliceAllowed() {
+        return false;
+    }
+
+    protected boolean isSequenceAllowed() {
+        return true;
+    }
 }
