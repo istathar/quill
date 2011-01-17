@@ -1103,11 +1103,13 @@ abstract class EditorTextView extends TextView
 
     private Widget createEndnote(Span span) {
         final String ref;
+        final Markup markup;
         final FontDescription desc;
         final Label label;
         final EventBox box;
 
         ref = span.getText();
+        markup = span.getMarkup();
         desc = new FontDescription("Deja Vu Sans, 8.0");
         label = new Label(ref);
         label.modifyFont(desc);
@@ -1118,7 +1120,13 @@ abstract class EditorTextView extends TextView
 
         box.connect(new Widget.ButtonPressEvent() {
             public boolean onButtonPressEvent(Widget source, EventButton event) {
-                parent.getPrimary().switchToEndnotes();
+                if (markup == Special.NOTE) {
+                    parent.getPrimary().switchToEndnotes();
+                } else if (markup == Special.CITE) {
+                    parent.getPrimary().switchToReferences();
+                } else {
+                    throw new AssertionError();
+                }
                 return false;
             }
         });
