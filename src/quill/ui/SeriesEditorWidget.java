@@ -324,9 +324,11 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         Test.cycleMainLoop();
     }
 
-    private Segment lookup(Widget editor) {
+    private Segment lookup(Widget widget) {
         final int len;
         int i;
+        Editor editor;
+        EditorTextView view;
 
         len = editors.size();
 
@@ -335,7 +337,9 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         }
 
         for (i = 0; i < len; i++) {
-            if (editors.get(i) == editor) {
+            editor = editors.get(i);
+            view = editor.getTextView();
+            if (view == widget) {
                 return series.getSegment(i);
             }
         }
