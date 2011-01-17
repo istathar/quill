@@ -38,4 +38,8 @@ public final class QuoteSegment extends Segment
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
         return new QuoteSegment(entire, offset, removed, inserted);
     }
+
+    public Segment createSimilar(String extra) {
+        return this;
+    }
 }

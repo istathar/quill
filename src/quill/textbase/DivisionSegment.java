@@ -31,4 +31,8 @@ public final class DivisionSegment extends FirstSegment
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
         return new DivisionSegment(entire, super.getExtra(), offset, removed, inserted);
     }
+
+    public Segment createSimilar(String extra) {
+        return this;
+    }
 }

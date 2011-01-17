@@ -36,4 +36,8 @@ public final class AttributionSegment extends Segment
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
         return new AttributionSegment(entire, offset, removed, inserted);
     }
+
+    public Segment createSimilar(String extra) {
+        return this;
+    }
 }

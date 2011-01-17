@@ -35,4 +35,8 @@ public final class ChapterSegment extends FirstSegment
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
         return new ChapterSegment(entire, super.getExtra(), offset, removed, inserted);
     }
+
+    public Segment createSimilar(String extra) {
+        return this;
+    }
 }

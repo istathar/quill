@@ -46,4 +46,12 @@ public final class ReferenceSegment extends Segment
 
         return new ReferenceSegment(entire, extra, offset, removed, inserted);
     }
+
+    public Segment createSimilar(String extra) {
+        final Extract entire;
+
+        entire = super.getEntire();
+
+        return new ReferenceSegment(entire, extra, 0, 0, 0);
+    }
 }

@@ -48,6 +48,20 @@ public final class SpecialSegment extends Segment
     }
 
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
-        return new SpecialSegment(entire, super.getExtra(), offset, removed, inserted);
+        final String extra;
+
+        extra = super.getExtra();
+
+        return new SpecialSegment(entire, extra, offset, removed, inserted);
+    }
+
+    public Segment createSimilar(String extra) {
+        final Extract entire;
+        final String type;
+
+        entire = super.getEntire();
+        type = validate(extra);
+
+        return new SpecialSegment(entire, type, 0, 0, 0);
     }
 }
