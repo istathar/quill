@@ -48,18 +48,12 @@ import org.gnome.gtk.WrapMode;
 import org.gnome.pango.FontDescription;
 
 import quill.client.Quill;
-import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
-import quill.textbase.FirstSegment;
 import quill.textbase.Extract;
+import quill.textbase.FirstSegment;
 import quill.textbase.FormatTextualChange;
-import quill.textbase.HeadingSegment;
 import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
-import quill.textbase.NormalSegment;
-import quill.textbase.PoeticSegment;
-import quill.textbase.PreformatSegment;
-import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
@@ -68,7 +62,6 @@ import quill.textbase.Special;
 import quill.textbase.TextChain;
 import quill.textbase.WordVisitor;
 
-import static org.freedesktop.bindings.Internationalization._;
 import static org.gnome.gdk.ModifierType.mask;
 import static org.gnome.gtk.TextWindowType.TEXT;
 import static quill.ui.Format.spelling;
@@ -112,7 +105,6 @@ abstract class EditorTextView extends TextView
         this.chain = new TextChain();
 
         setupTextView();
-        setupInsertMenuDetails();
         setupContextMenu();
 
         initializeSegment(segment);
@@ -157,6 +149,14 @@ abstract class EditorTextView extends TextView
      * (headings, properties)
      */
     protected boolean isEnterAllowed() {
+        return true;
+    }
+
+    /**
+     * Can you split this kind of Segment in two, or can you only append? This
+     * was originally for endnotes and references.
+     */
+    protected boolean isSpliceAllowed() {
         return true;
     }
 
@@ -1126,8 +1126,6 @@ abstract class EditorTextView extends TextView
         return box;
     }
 
-    private InsertMenuDetails[] insertDetails;
-
     private MenuItem createMenuItem(InsertMenuDetails details) {
         final String markup;
         final Class<?> type;
@@ -1165,45 +1163,12 @@ abstract class EditorTextView extends TextView
         }
     }
 
-    private static class InsertMenuDetails
-    {
-        final Class<?> type;
-
-        final String text;
-
-        final String subtext;
-
-        private InsertMenuDetails(Class<?> type, String text, String subtext) {
-            this.type = type;
-            this.text = text;
-            this.subtext = subtext;
-        }
-    }
-
-    /*
-     * Yes it would be "better" to write this such that the two arrays weren't
-     * coupled but instead strongly typed objects with two+ fields.
-     */
-    private void setupInsertMenuDetails() {
-        insertDetails = new InsertMenuDetails[] {
-            new InsertMenuDetails(NormalSegment.class, _("Text _paragraphs"), _("normal wrapped text")),
-            new InsertMenuDetails(PreformatSegment.class, _("_Program code"),
-                    _("formating preserved; monospaced")),
-            new InsertMenuDetails(QuoteSegment.class, _("Block _quote"),
-                    _("normal wrapped text, but indented")),
-            new InsertMenuDetails(PoeticSegment.class, _("Poe_m"), _("formating preserved")),
-            new InsertMenuDetails(AttributionSegment.class, _("_Attribution"),
-                    _("smaller wrapped text, offset right")),
-            new InsertMenuDetails(HeadingSegment.class, _("Section _heading"),
-                    _("bold text, single line"))
-        };
-    }
-
     /*
      * This is a bit hideous.
      */
     private void popupInsertMenu() {
         final ContextMenu split;
+        final InsertMenuDetails[] details;
         final int I;
         MenuItem item;
         int i;
@@ -1220,10 +1185,11 @@ abstract class EditorTextView extends TextView
          */
 
         split = new InsertContextMenu(parent);
-        I = insertDetails.length;
+        details = parent.getInsertMenuDetails();
+        I = details.length;
 
         for (i = 0; i < I; i++) {
-            item = createMenuItem(insertDetails[i]);
+            item = createMenuItem(details[i]);
             split.append(item);
         }
 
@@ -1236,7 +1202,7 @@ abstract class EditorTextView extends TextView
         children = split.getChildren();
 
         for (i = 0; i < I; i++) {
-            if (insertDetails[i].type.isInstance(segment)) {
+            if (details[i].type.isInstance(segment)) {
                 children[i].setSensitive(false);
             } else {
                 children[i].setSensitive(true);
@@ -1257,15 +1223,15 @@ abstract class EditorTextView extends TextView
                 i++;
                 next = series.getSegment(i);
 
-                for (i = 0; i < insertDetails.length; i++) {
-                    if (insertDetails[i].type.isInstance(next)) {
+                for (i = 0; i < details.length; i++) {
+                    if (details[i].type.isInstance(next)) {
                         children[i].setSensitive(false);
                         break;
                     }
                 }
             }
         } else if (segment instanceof FirstSegment) {
-            for (i = 0; i < insertDetails.length; i++) {
+            for (i = 0; i < details.length; i++) {
                 children[i].setSensitive(false);
             }
         }
@@ -1396,7 +1362,8 @@ abstract class EditorTextView extends TextView
             constructor = type.getConstructor(Extract.class);
             second = (Segment) constructor.newInstance(blank);
         } catch (Exception e) {
-            throw new AssertionError(e);
+            e.printStackTrace();
+            throw new AssertionError();
         }
 
         segment = first;

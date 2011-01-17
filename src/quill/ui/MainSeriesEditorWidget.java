@@ -50,6 +50,8 @@ import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.SpecialSegment;
 
+import static org.freedesktop.bindings.Internationalization._;
+
 /**
  * Left hand side of a PrimaryWindow for editing the main body of a chapter.
  * 
@@ -265,5 +267,26 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
 
         apres = component.updateMain(replacement);
         primary.update(this, component, apres);
+    }
+
+    private static InsertMenuDetails[] details;
+
+    static {
+        details = new InsertMenuDetails[] {
+            new InsertMenuDetails(NormalSegment.class, _("Text _paragraphs"), _("normal wrapped text")),
+            new InsertMenuDetails(PreformatSegment.class, _("_Program code"),
+                    _("formating preserved; monospaced")),
+            new InsertMenuDetails(QuoteSegment.class, _("Block _quote"),
+                    _("normal wrapped text, but indented")),
+            new InsertMenuDetails(PoeticSegment.class, _("Poe_m"), _("formating preserved")),
+            new InsertMenuDetails(AttributionSegment.class, _("_Attribution"),
+                    _("smaller wrapped text, offset right")),
+            new InsertMenuDetails(HeadingSegment.class, _("Section _heading"),
+                    _("bold text, single line"))
+        };
+    }
+
+    InsertMenuDetails[] getInsertMenuDetails() {
+        return details;
     }
 }

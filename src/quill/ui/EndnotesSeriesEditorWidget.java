@@ -30,6 +30,7 @@ import quill.textbase.EndnoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 
+import static org.freedesktop.bindings.Internationalization._;
 import static org.gnome.gtk.SizeGroupMode.HORIZONTAL;
 
 /**
@@ -139,5 +140,17 @@ class EndnotesSeriesEditorWidget extends SeriesEditorWidget
 
         apres = component.updateEndnotes(replacement);
         primary.update(this, component, apres);
+    }
+
+    private static InsertMenuDetails[] details;
+
+    static {
+        details = new InsertMenuDetails[] {
+            new InsertMenuDetails(EndnoteSegment.class, _("_Endnote"), _("An endnote to this chapter")),
+        };
+    }
+
+    InsertMenuDetails[] getInsertMenuDetails() {
+        return details;
     }
 }

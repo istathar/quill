@@ -944,4 +944,25 @@ abstract class SeriesEditorWidget extends ScrolledWindow
             editor.forceRecheck();
         }
     }
+
+    /**
+     * Get the data describing the popup menu appropriate for the Series being
+     * edited.
+     */
+    abstract InsertMenuDetails[] getInsertMenuDetails();
+}
+
+class InsertMenuDetails
+{
+    final Class<?> type;
+
+    final String text;
+
+    final String subtext;
+
+    InsertMenuDetails(Class<?> type, String text, String subtext) {
+        this.type = type;
+        this.text = text;
+        this.subtext = subtext;
+    }
 }

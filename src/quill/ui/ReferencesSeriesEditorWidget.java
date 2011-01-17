@@ -30,6 +30,7 @@ import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 
+import static org.freedesktop.bindings.Internationalization._;
 import static org.gnome.gtk.SizeGroupMode.HORIZONTAL;
 
 /**
@@ -138,5 +139,18 @@ class ReferencesSeriesEditorWidget extends SeriesEditorWidget
 
         apres = component.updateReferences(replacement);
         primary.update(this, component, apres);
+    }
+
+    private static InsertMenuDetails[] details;
+
+    static {
+        details = new InsertMenuDetails[] {
+            new InsertMenuDetails(ReferenceSegment.class, _("_Reference"),
+                    _("Add a reference to the document")),
+        };
+    }
+
+    InsertMenuDetails[] getInsertMenuDetails() {
+        return details;
     }
 }
