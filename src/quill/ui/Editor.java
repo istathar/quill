@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2010-2011 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -18,30 +18,33 @@
  */
 package quill.ui;
 
+import org.gnome.gtk.Entry;
+
 import quill.textbase.Segment;
 
-class ReferenceListitemBox extends ListitemBox
-{
-    ReferenceListitemBox(final SeriesEditorWidget parent, final Segment segment) {
-        super(parent);
-        final ListitemEntry entry;
-        final EditorTextView editor;
-
-        entry = new ReferenceListitemEntry(parent, segment);
-        editor = new ReferenceEditorTextView(parent, segment);
-
-        super.setupLabelTop(entry);
-        super.setupBody(editor);
-    }
-}
-
-/*
- * This is a placeholder; strictly we don't need a subclass, but in due course
- * we might have more complex behaviours. For now, this shows the point.
+/**
+ * Things that change state when a new Segment comes along, ie EditorTextViews
+ * and ListitemEntries. This is a bit recursive.
  */
-class ReferenceListitemEntry extends ListitemEntry
+interface Editor
 {
-    public ReferenceListitemEntry(final SeriesEditorWidget parent, final Segment segment) {
-        super(parent, segment);
-    }
+
+    void advanceTo(Segment segment);
+
+    void reverseTo(Segment segment);
+
+    /**
+     * Get the Entry for editing the "label" (extra metadata) of this Segment,
+     * if it has one. Otherwise <code>null</code>.
+     */
+    Entry getLabel();
+
+    /**
+     * Get the EditorTextView that is the main body (Quack inlines) editor for
+     * this Segment. For EditorTextViews themselves this is effectively just a
+     * cast. For Entries it'll be <code>null</code>.
+     */
+    EditorTextView getTextView();
+
+    void grabFocus();
 }

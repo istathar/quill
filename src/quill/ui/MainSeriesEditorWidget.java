@@ -36,7 +36,6 @@ import quill.textbase.AttributionSegment;
 import quill.textbase.ChapterSegment;
 import quill.textbase.Component;
 import quill.textbase.DivisionSegment;
-import quill.textbase.EndnoteSegment;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.LeaderSegment;
@@ -45,7 +44,6 @@ import quill.textbase.NormalSegment;
 import quill.textbase.PoeticSegment;
 import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
-import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.SpecialSegment;
@@ -84,41 +82,46 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
 
     protected Widget createEditorForSegment(int index, Segment segment) {
         final Widget result;
-        final EditorTextView editor;
+        final Editor editor;
+        final EditorTextView view;
         final HeadingBox heading;
         final ImageDisplayBox image;
         final NormalListitemBox listitem;
         final Scrollbar bar;
         final ScrolledWindow wide;
-        final List<EditorTextView> editors;
+        final List<Editor> editors;
 
         if (segment instanceof NormalSegment) {
-            editor = new NormalEditorTextView(this, segment);
+            view = new NormalEditorTextView(this, segment);
 
-            result = editor;
+            editor = view;
+            result = view;
         } else if (segment instanceof QuoteSegment) {
-            editor = new QuoteEditorTextView(this, segment);
+            view = new QuoteEditorTextView(this, segment);
 
-            result = editor;
+            editor = view;
+            result = view;
         } else if (segment instanceof PoeticSegment) {
-            editor = new PoeticEditorTextView(this, segment);
+            view = new PoeticEditorTextView(this, segment);
 
-            result = editor;
+            editor = view;
+            result = view;
         } else if (segment instanceof ListitemSegment) {
             listitem = new NormalListitemBox(this, segment);
 
-            editor = listitem.getEditor();
+            editor = listitem;
             result = listitem;
         } else if (segment instanceof AttributionSegment) {
-            editor = new AttributionEditorTextView(this, segment);
+            view = new AttributionEditorTextView(this, segment);
 
-            result = editor;
+            editor = view;
+            result = view;
         } else if (segment instanceof PreformatSegment) {
-            editor = new PreformatEditorTextView(this, segment);
+            view = new PreformatEditorTextView(this, segment);
 
             wide = new ScrolledWindow();
             wide.setPolicy(PolicyType.ALWAYS, PolicyType.NEVER);
-            wide.add(editor);
+            wide.add(view);
 
             /*
              * Having set up horizontal scrollbars for code blocks, we want to
@@ -126,13 +129,13 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
              */
 
             bar = wide.getHScrollbar();
-            editor.connect(new Widget.FocusInEvent() {
+            view.connect(new Widget.FocusInEvent() {
                 public boolean onFocusInEvent(Widget source, EventFocus event) {
                     bar.setSensitive(true);
                     return false;
                 }
             });
-            editor.connect(new Widget.FocusOutEvent() {
+            view.connect(new Widget.FocusOutEvent() {
                 public boolean onFocusOutEvent(Widget source, EventFocus event) {
                     bar.setValue(0);
                     bar.setSensitive(false);
@@ -162,46 +165,42 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
                 }
             });
 
+            editor = view;
             result = wide;
         } else if (segment instanceof ImageSegment) {
             image = new ImageDisplayBox(this, segment);
 
+            // FUTURE works, but needs upgrading
             editor = image.getEditor();
             result = image;
         } else if (segment instanceof HeadingSegment) {
             heading = new SectionHeadingBox(this, segment);
 
-            editor = heading.getEditor();
+            // FUTURE correct now, but will change when we do labels
+            editor = heading.getTextView();
             result = heading;
         } else if (segment instanceof LeaderSegment) {
-            editor = new LeaderEditorTextView(this, segment);
+            view = new LeaderEditorTextView(this, segment);
 
-            result = editor;
+            editor = view;
+            result = view;
         } else if (segment instanceof ChapterSegment) {
             heading = new ChapterHeadingBox(this, segment);
 
-            editor = heading.getEditor();
+            editor = heading.getTextView();
             result = heading;
         } else if (segment instanceof DivisionSegment) {
             heading = new PartHeadingBox(this, segment);
 
-            editor = heading.getEditor();
+            editor = heading.getTextView();
             result = heading;
         } else if (segment instanceof SpecialSegment) {
+
             // TODO placeholder; improve!
             editor = null;
             result = new SpecialHeadingBox(this, segment);
         } else {
-            /*
-             * Sanity check; don't really need this. FIXME In fact, returning
-             * a Widget without placing an editor is probably harmful.
-             */
-
-            if ((segment instanceof EndnoteSegment) || (segment instanceof ReferenceSegment)) {
-                // skip
-                return null;
-            }
-            throw new IllegalStateException("Unknown Segment type");
+            throw new AssertionError("Unknown Segment type");
         }
 
         editors = super.getEditors();

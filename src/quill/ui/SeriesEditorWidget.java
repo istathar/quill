@@ -59,7 +59,7 @@ abstract class SeriesEditorWidget extends ScrolledWindow
 
     private VBox box;
 
-    private LinkedList<EditorTextView> editors;
+    private LinkedList<Editor> editors;
 
     /**
      * Which Segment currently has the cursor?
@@ -287,7 +287,7 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         num = series.size();
         this.series = series;
 
-        this.editors = new LinkedList<EditorTextView>();
+        this.editors = new LinkedList<Editor>();
 
         for (i = 0; i < num; i++) {
             segment = series.getSegment(i);
@@ -351,13 +351,14 @@ abstract class SeriesEditorWidget extends ScrolledWindow
      */
     private EditorTextView lookup(Segment segment) {
         final int i;
+        final Editor editor;
 
         i = series.indexOf(segment);
-
-        return editors.get(i);
+        editor = editors.get(i);
+        return editor.getTextView();
     }
 
-    protected List<EditorTextView> getEditors() {
+    protected List<Editor> getEditors() {
         return editors;
     }
 
@@ -427,7 +428,7 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         int i;
         Widget widget;
         Widget[] children;
-        EditorTextView editor;
+        Editor editor;
         Segment segment;
 
         if (this.series == replacement) {
@@ -520,7 +521,7 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         final int updated, added, third, deleted;
         Widget widget;
         Widget[] children;
-        EditorTextView editor;
+        Editor editor;
         Segment segment;
 
         if (this.series == series) {
@@ -578,8 +579,7 @@ abstract class SeriesEditorWidget extends ScrolledWindow
      * 
      * @param editor
      */
-    void propegateTextualChange(final EditorTextView editor, final Segment previous,
-            final Segment segment) {
+    void propegateTextualChange(final Editor editor, final Segment previous, final Segment segment) {
         final Series former, replacement;
         final int i;
 
@@ -699,7 +699,8 @@ abstract class SeriesEditorWidget extends ScrolledWindow
     void moveCursorUp(final Widget from, final int position) {
         int i;
         Segment segment;
-        final EditorTextView editor;
+        final Editor editor;
+        final EditorTextView view;
 
         segment = lookup(from);
         i = series.indexOf(segment);
@@ -710,8 +711,9 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         i--;
 
         editor = editors.get(i);
-        editor.placeCursorLastLine(position);
-        editor.grabFocus();
+        view = editor.getTextView();
+        view.placeCursorLastLine(position);
+        view.grabFocus();
 
         cursorSegment = segment;
     }
@@ -719,7 +721,8 @@ abstract class SeriesEditorWidget extends ScrolledWindow
     void moveCursorDown(final Widget from, final int position) {
         int i;
         Segment segment;
-        final EditorTextView editor;
+        final Editor editor;
+        final EditorTextView view;
 
         segment = lookup(from);
         i = series.indexOf(segment);
@@ -732,8 +735,9 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         segment = series.getSegment(i);
 
         editor = editors.get(i);
-        editor.placeCursorFirstLine(position);
-        editor.grabFocus();
+        view = editor.getTextView();
+        view.placeCursorFirstLine(position);
+        view.grabFocus();
 
         cursorSegment = segment;
     }
@@ -930,18 +934,23 @@ abstract class SeriesEditorWidget extends ScrolledWindow
      * For testing only
      */
     final EditorTextView testGetEditor(int index) {
-        return editors.get(index);
+        final Editor editor;
+
+        editor = editors.get(index);
+        return editor.getTextView();
     }
 
     void forceRecheck() {
         final int I;
         int i;
-        EditorTextView editor;
+        Editor editor;
+        EditorTextView view;
 
         I = editors.size();
         for (i = 0; i < I; i++) {
             editor = editors.get(i);
-            editor.forceRecheck();
+            view = editor.getTextView();
+            view.forceRecheck();
         }
     }
 

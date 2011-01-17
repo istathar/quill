@@ -59,15 +59,13 @@ class ReferencesSeriesEditorWidget extends SeriesEditorWidget
 
     Widget createEditorForSegment(int index, Segment segment) {
         final Widget result;
-        final EditorTextView editor;
         final ReferenceListitemBox listitem;
         final VBox box;
-        final List<EditorTextView> editors;
+        final List<Editor> editors;
 
         if (segment instanceof ReferenceSegment) {
             listitem = new ReferenceListitemBox(this, segment);
 
-            editor = listitem.getEditor();
             if (index > 0) {
                 box = new VBox(false, 0);
                 box.packStart(new HSeparator(), false, false, 0);
@@ -81,7 +79,7 @@ class ReferencesSeriesEditorWidget extends SeriesEditorWidget
         }
 
         editors = super.getEditors();
-        editors.add(index, editor);
+        editors.add(index, listitem);
 
         return result;
     }

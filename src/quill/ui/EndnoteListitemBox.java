@@ -18,56 +18,30 @@
  */
 package quill.ui;
 
-import org.gnome.gtk.Alignment;
-import org.gnome.gtk.Entry;
-import org.gnome.gtk.Widget;
-
 import quill.textbase.Segment;
 
-class NormalListitemBox extends ListitemBox
+// cloned from ReferenceListitemBox
+class EndnoteListitemBox extends ListitemBox
 {
-    NormalListitemBox(final SeriesEditorWidget parent, final Segment segment) {
+    EndnoteListitemBox(final SeriesEditorWidget parent, final Segment segment) {
         super(parent);
         final ListitemEntry entry;
         final EditorTextView editor;
 
-        entry = new NormalListitemEntry(parent, segment);
-        editor = new NormalEditorTextView(parent, segment);
+        entry = new EndnoteListitemEntry(parent, segment);
+        editor = new ReferenceEditorTextView(parent, segment);
 
-        super.setupLabelSide(entry, 8, 5);
+        super.setupLabelSide(entry, 0, 1);
         super.setupBody(editor);
-    }
-
-    private Widget createLabel(final Segment segment) {
-        final String text;
-        final Entry entry; // field?
-        final Alignment align;
-
-        text = segment.getExtra();
-
-        entry = new Entry();
-        entry.setText(text);
-        entry.setWidthChars(3);
-        entry.setHasFrame(false);
-        entry.setAlignment(Alignment.RIGHT);
-
-        align = new Alignment(Alignment.LEFT, Alignment.TOP, 0, 0);
-        align.setPadding(5, 0, 0, 0);
-        align.add(entry);
-
-        return align;
     }
 }
 
 /**
- * 
- * Placeholder for more advanced UI when we evolve one.
- * 
  * @see ReferenceListitemEntry
  */
-class NormalListitemEntry extends ListitemEntry
+class EndnoteListitemEntry extends ListitemEntry
 {
-    NormalListitemEntry(final SeriesEditorWidget parent, final Segment segment) {
+    EndnoteListitemEntry(SeriesEditorWidget parent, Segment segment) {
         super(parent, segment);
     }
 }

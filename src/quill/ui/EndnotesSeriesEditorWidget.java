@@ -60,15 +60,13 @@ class EndnotesSeriesEditorWidget extends SeriesEditorWidget
 
     Widget createEditorForSegment(int index, Segment segment) {
         final Widget result;
-        final EditorTextView editor;
-        final ReferenceListitemBox listitem;
+        final ListitemBox listitem;
         final VBox box;
-        final List<EditorTextView> editors;
+        final List<Editor> editors;
 
         if (segment instanceof EndnoteSegment) {
-            listitem = new ReferenceListitemBox(this, segment);
+            listitem = new EndnoteListitemBox(this, segment);
 
-            editor = listitem.getEditor();
             if (index > 0) {
                 box = new VBox(false, 0);
                 box.packStart(new HSeparator(), false, false, 0);
@@ -82,7 +80,7 @@ class EndnotesSeriesEditorWidget extends SeriesEditorWidget
         }
 
         editors = super.getEditors();
-        editors.add(index, editor);
+        editors.add(index, listitem);
 
         return result;
     }

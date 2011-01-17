@@ -72,7 +72,7 @@ abstract class HeadingBox extends VBox
         title.setJustify(Justification.CENTER);
     }
 
-    EditorTextView getEditor() {
+    EditorTextView getTextView() {
         return title;
     }
 }

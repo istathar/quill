@@ -31,6 +31,7 @@ import org.gnome.gdk.MouseButton;
 import org.gnome.gdk.Rectangle;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
+import org.gnome.gtk.Entry;
 import org.gnome.gtk.EventBox;
 import org.gnome.gtk.InputMethod;
 import org.gnome.gtk.Label;
@@ -67,7 +68,7 @@ import static org.gnome.gtk.TextWindowType.TEXT;
 import static quill.ui.Format.spelling;
 import static quill.ui.Format.tagForMarkup;
 
-abstract class EditorTextView extends TextView
+abstract class EditorTextView extends TextView implements Editor
 {
     protected final TextView view;
 
@@ -713,7 +714,7 @@ abstract class EditorTextView extends TextView
      * this to be called has already updated the TextBuffer to match the
      * requirements of this state.
      */
-    void advanceTo(Segment segment) {
+    public void advanceTo(Segment segment) {
         final Segment previous;
         final Extract entire, extract;
         final TextIter start, finish;
@@ -778,7 +779,7 @@ abstract class EditorTextView extends TextView
         this.segment = segment;
     }
 
-    void reverseTo(Segment segment) {
+    public void reverseTo(Segment segment) {
         final Segment previous;
         final Extract entire, extract;
         final TextIter start, finish;
@@ -1898,7 +1899,7 @@ abstract class EditorTextView extends TextView
         return insertOffset;
     }
 
-    Segment getSegment() {
+    public Segment getSegment() {
         return segment;
     }
 
@@ -1933,5 +1934,16 @@ abstract class EditorTextView extends TextView
         dict = primary.getDictionary();
 
         checkSpellingRange(0, chain.length());
+    }
+
+    /*
+     * Implement Editor
+     */
+    public Entry getLabel() {
+        return null;
+    }
+
+    public EditorTextView getTextView() {
+        return this;
     }
 }
