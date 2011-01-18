@@ -142,11 +142,12 @@ public class RenderSettings
      * really sufficient; that's just initial parsing. The reqal question is
      * how to access the actual font as chosen by fontconfig?
      */
-    private static FontDescription loadDescription(String description, String size) {
+    private static FontDescription loadDescription(String family, String size) {
         final FontDescription desc;
         final double mm, points;
 
-        desc = new FontDescription(description);
+        desc = new FontDescription();
+        desc.setFamily(family);
 
         mm = Double.valueOf(size); // * 130.0 / 96.0 ?
         points = convertMilimetresToPoints(mm);

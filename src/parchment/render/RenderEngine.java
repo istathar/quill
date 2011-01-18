@@ -337,7 +337,7 @@ public abstract class RenderEngine
         desc = settings.getFontHeading();
         headingFace = new Typeface(cr, desc, 0.0);
 
-        desc = new FontDescription("Linux Libertine O");
+        desc = new FontDescription("Linux Libertine O,");
         desc.setSize(size);
         smallFace = new Typeface(cr, desc, 0.0);
 
