@@ -716,7 +716,7 @@ abstract class EditorTextView extends TextView implements Editor
      */
     public void advanceTo(Segment segment) {
         final Segment previous;
-        final Extract entire, extract;
+        final Extract current, entire, extract;
         final TextIter start, finish;
         final int offset, removed, inserted;
 
@@ -729,7 +729,12 @@ abstract class EditorTextView extends TextView implements Editor
          * Set the internal state
          */
 
+        current = chain.extractAll();
         entire = segment.getEntire();
+        if (current == entire) {
+            return;
+        }
+
         chain.setTree(entire);
 
         /*
@@ -781,7 +786,7 @@ abstract class EditorTextView extends TextView implements Editor
 
     public void reverseTo(Segment segment) {
         final Segment previous;
-        final Extract entire, extract;
+        final Extract current, entire, extract;
         final TextIter start, finish;
         final int offset, removed, inserted;
 
@@ -794,7 +799,11 @@ abstract class EditorTextView extends TextView implements Editor
          * Set the internal state
          */
 
+        current = chain.extractAll();
         entire = segment.getEntire();
+        if (current == entire) {
+            return;
+        }
         chain.setTree(entire);
 
         offset = previous.getOffset();

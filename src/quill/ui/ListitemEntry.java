@@ -21,7 +21,6 @@ package quill.ui;
 import org.gnome.gtk.Editable;
 import org.gnome.gtk.Entry;
 
-import quill.textbase.Extract;
 import quill.textbase.Segment;
 
 /**
@@ -49,22 +48,32 @@ abstract class ListitemEntry extends Entry implements Editor
 
         entry.connect(new Entry.Changed() {
             public void onChanged(Editable source) {
-                final Entry entry;
-                final String value;
-
-                entry = (Entry) source;
-                value = entry.getText();
-
-                handleLabelChanged(value);
+                handleLabelChanged();
             }
         });
     }
 
-    private void handleLabelChanged(String value) {
-        final Extract entire;
-        final Segment previous, segment;
+    /**
+     * Are we apply()ing a change programatically?
+     */
+    private boolean applying;
 
-        previous = this.segment;
+    private void handleLabelChanged() {
+        final Segment previous;
+        final String current, value;
+
+        if (applying) {
+            return;
+        }
+
+        current = segment.getExtra();
+        value = entry.getText();
+
+        if (current.equals(value)) {
+            return;
+        }
+
+        previous = segment;
         segment = previous.createSimilar(value);
 
         parent.propegateTextualChange(this, previous, segment);
@@ -90,16 +99,19 @@ abstract class ListitemEntry extends Entry implements Editor
         return null;
     }
 
-    private void apply(Segment segment) {
+    private void apply(Segment replacement) {
         final String text;
 
-        if (segment == this.segment) {
+        if (replacement == segment) {
             return;
         }
 
-        text = segment.getExtra();
+        applying = true;
+        text = replacement.getExtra();
         entry.setText(text);
+        entry.setPosition(-1);
+        applying = false;
 
-        this.segment = segment;
+        segment = replacement;
     }
 }
