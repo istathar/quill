@@ -626,6 +626,8 @@ abstract class SeriesEditorWidget extends ScrolledWindow
             final Segment added, final Segment third) {
         Series former, replacement;
         final int I;
+        Editor editor;
+        EditorTextView view;
         int i;
 
         former = series;
@@ -636,7 +638,9 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         I = editors.size();
 
         for (i = 0; i < I; i++) {
-            if (editors.get(i) == originating) {
+            editor = editors.get(i);
+            view = editor.getTextView();
+            if (view == originating) {
                 break;
             }
         }
