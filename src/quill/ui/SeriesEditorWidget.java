@@ -670,15 +670,16 @@ abstract class SeriesEditorWidget extends ScrolledWindow
     abstract void propegateStructuralChange(PrimaryWindow primary, Series former, Series replacement);
 
     public void grabFocus() {
-        final Segment segment;
-        final EditorTextView first;
+        final Editor editor;
+        final int i;
 
-        segment = series.getSegment(0);
-        first = lookup(segment);
-        first.placeCursorFirstLine(0);
-        first.grabFocus();
+        if (series.size() == 0) {
+            return;
+        }
 
-        cursorSegment = segment;
+        i = series.indexOf(cursorSegment);
+        editor = editors.get(i);
+        editor.grabFocus();
     }
 
     Origin getCursor(final int folioPosition) {

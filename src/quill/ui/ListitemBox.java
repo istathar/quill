@@ -19,7 +19,7 @@
 package quill.ui;
 
 import org.gnome.gdk.Color;
-import org.gnome.gdk.EventButton;
+import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.EventBox;
@@ -29,7 +29,6 @@ import org.gnome.gtk.StateType;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
-import quill.textbase.Extract;
 import quill.textbase.Segment;
 
 /**
@@ -71,9 +70,17 @@ abstract class ListitemBox extends EventBox implements Editor
 
         eb.modifyBackground(StateType.NORMAL, Color.WHITE);
 
-        eb.connect(new Widget.ButtonPressEvent() {
-            public boolean onButtonPressEvent(Widget source, EventButton event) {
-                // TODO
+        /*
+         * This is to prevent the annoying behaviour of the Entry selecting
+         * its entire text when focus passes through. Bit of a workaround, but
+         * doing this down in ListitemEntry seems not to work.
+         */
+
+        eb.setCanFocus(true);
+        eb.connect(new Widget.FocusInEvent() {
+            public boolean onFocusInEvent(Widget source, EventFocus event) {
+                label.setPosition(-1);
+                label.selectRegion(0, 0);
                 return false;
             }
         });
@@ -116,16 +123,6 @@ abstract class ListitemBox extends EventBox implements Editor
         label = widget;
     }
 
-    private void handleLabelChanged(String value) {
-        final Extract entire;
-        final Segment previous, segment;
-
-        previous = body.getSegment();
-        segment = previous.createSimilar(value);
-
-        parent.propegateTextualChange(body, previous, segment);
-    }
-
     void setupBody(final EditorTextView view) {
         body = view;
         box.packStart(body, true, true, 0);
@@ -149,4 +146,9 @@ abstract class ListitemBox extends EventBox implements Editor
         body.reverseTo(segment);
     }
 
+    public void grabFocus() {
+        label.selectRegion(0, 0);
+        label.setPosition(-1);
+        body.grabFocus();
+    }
 }

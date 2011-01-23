@@ -46,5 +46,9 @@ interface Editor
      */
     EditorTextView getTextView();
 
+    /**
+     * Send the focus to the appropriate place amongst the children. This
+     * would seem to be defined as the EditorTextView?
+     */
     void grabFocus();
 }
