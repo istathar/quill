@@ -2,7 +2,7 @@
 #
 # tests.sh
 #
-# Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+# Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
 # 
 # The code in this file, and the library it is a part of, are made available
 # to you by the authors under the terms of the "GNU General Public Licence
@@ -12,10 +12,20 @@
 
 source .config
 
-if [ ! -f tmp/stamp/build-tests ] ; then
-	touch -d "2001-01-01" tmp/stamp/build-tests
-fi
-find tests -type f -name '*.java' -newer tmp/stamp/build-tests > tmp/stamp/list-tests
+find tests -type f -name '*.java' | perl -n -e '
+	chomp;
+	$java = $_;
+	s{src}{tmp/classes};
+	s{\.java}{\.class};
+	$class = $_;
+
+	@source = stat($java);
+	@target = stat($class);
+
+	if ($source[9] > $target[9]) {
+		print $java . "\n";
+	}
+' > tmp/stamp/list-tests
 
 if [ -s tmp/stamp/list-tests ] ; then
 	echo -n "${JAVAC_CMD}"
@@ -27,7 +37,6 @@ if [ -s tmp/stamp/list-tests ] ; then
 	if [ $? -ne 0 ] ; then
 		exit 1
 	fi
-	touch tmp/stamp/build-tests
 	rm tmp/stamp/list-tests
 fi
 

@@ -3,7 +3,7 @@
 # compile.sh
 # Build the source code
 #
-# Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+# Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
 # 
 # The code in this file, and the library it is a part of, are made available
 # to you by the authors under the terms of the "GNU General Public Licence
@@ -20,10 +20,20 @@ if [ ! -d  tmp/classes ] ; then
 	mkdir -p tmp/i18n
 fi
 
-if [ ! -f tmp/stamp/build-core ] ; then
-	touch -d "2001-01-01" tmp/stamp/build-core
-fi
-find src -type f -name '*.java' -newer tmp/stamp/build-core > tmp/stamp/list-core
+find src -type f -name '*.java' | perl -n -e '
+	chomp;
+	$java = $_;
+	s{src}{tmp/classes};
+	s{\.java}{\.class};
+	$class = $_;
+
+	@source = stat($java);
+	@target = stat($class);
+
+	if ($source[9] > $target[9]) {
+		print $java . "\n";
+	}
+' > tmp/stamp/list-core
 
 if [ -s tmp/stamp/list-core ] ; then
 	echo -n "${JAVAC_CMD}"
@@ -35,7 +45,6 @@ if [ -s tmp/stamp/list-core ] ; then
 	if [ $? -ne 0 ] ; then
 		exit 1
 	fi
-	touch tmp/stamp/build-core
 	rm tmp/stamp/list-core
 fi
 
