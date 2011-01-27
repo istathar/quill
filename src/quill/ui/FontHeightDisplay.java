@@ -64,6 +64,10 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
     public boolean onExposeEvent(Widget source, EventExpose event) {
         final Context cr;
 
+        if (settings == null) {
+            return false;
+        }
+
         cr = new Context(event);
         layout = new Layout(cr);
         list = new AttributeList();

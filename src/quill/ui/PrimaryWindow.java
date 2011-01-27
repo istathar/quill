@@ -46,7 +46,6 @@ import org.gnome.gtk.Image;
 import org.gnome.gtk.InfoMessageDialog;
 import org.gnome.gtk.MessageDialog;
 import org.gnome.gtk.MessageType;
-import org.gnome.gtk.Notebook;
 import org.gnome.gtk.ResponseType;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
@@ -86,10 +85,6 @@ class PrimaryWindow extends Window
     private VBox top;
 
     private HPaned pane;
-
-    private Notebook left;
-
-    private Notebook right;
 
     private MainSeriesEditorWidget mainbody;
 
@@ -327,9 +322,11 @@ class PrimaryWindow extends Window
 
         if ((availableWidth < desiredWidth) || (availableHeight < desiredHeight)) {
             window.setMaximize(true);
+            largeScreen = false;
         } else {
             window.setDefaultSize(desiredWidth, desiredHeight);
             window.setPosition(WindowPosition.CENTER_ALWAYS);
+            largeScreen = true;
         }
 
         window.setTitle("Quill");
@@ -342,63 +339,69 @@ class PrimaryWindow extends Window
         top.packStart(pane, true, true, 0);
     }
 
+    Widget[] gauche, droit;
+
     private void setupEditorSide() {
         Alignment align;
 
-        left = new Notebook();
-        left.setShowTabs(false);
-        left.setShowBorder(false);
-        left.setSizeRequest(400, -1);
+        gauche = new Widget[3];
 
         mainbody = new MainSeriesEditorWidget(this);
-        left.insertPage(mainbody, null, 0);
+        mainbody.setSizeRequest(400, -1);
+        mainbody.showAll();
+        gauche[0] = mainbody;
 
         stylist = new StylesheetEditorWidget(this);
         align = new Alignment();
         align.setAlignment(Alignment.LEFT, Alignment.TOP, 1.0f, 1.0f);
         align.setPadding(0, 0, 3, 0);
         align.add(stylist);
-        left.insertPage(align, null, 1);
+        align.showAll();
+        gauche[1] = align;
 
         metaditor = new MetadataEditorWidget(this);
         align = new Alignment();
         align.setAlignment(Alignment.LEFT, Alignment.TOP, 1.0f, 1.0f);
         align.setPadding(0, 0, 3, 0);
         align.add(metaditor);
-        left.insertPage(align, null, 2);
+        align.showAll();
+        gauche[2] = align;
 
-        pane.add1(left);
+        pane.add1(mainbody);
     }
 
     private void setupPreviewSide() {
-        right = new Notebook();
-        right.setShowTabs(false);
-        right.setShowBorder(false);
+        droit = new Widget[6];
 
         preview = new PreviewWidget(this);
-        right.insertPage(preview, null, 0);
+        preview.showAll();
+        droit[0] = preview;
 
         help = new HelpWidget();
-        right.insertPage(help, null, 1);
+        help.showAll();
+        droit[1] = help;
 
         outline = new OutlineWidget(this);
-        right.insertPage(outline, null, 2);
+        outline.showAll();
+        droit[2] = outline;
 
         endnotes = new EndnotesSeriesEditorWidget(this);
-        right.insertPage(endnotes, null, 3);
+        endnotes.showAll();
+        droit[3] = endnotes;
 
         intro = new IntroductionWidget();
-        right.insertPage(intro, null, 4);
+        intro.showAll();
+        droit[4] = intro;
 
         references = new ReferencesSeriesEditorWidget(this);
-        right.insertPage(references, null, 5);
+        references.showAll();
+        droit[5] = references;
 
-        pane.add2(right);
+        pane.add2(intro);
     }
 
     private void initialPresentation() {
         window.showAll();
-        right.setCurrentPage(4);
 
         window.present();
         window.setPosition(WindowPosition.NONE);
@@ -564,6 +567,8 @@ class PrimaryWindow extends Window
         }
     }
 
+    private boolean largeScreen;
+
     private boolean showingRightSide = true;
 
     /*
@@ -577,15 +582,24 @@ class PrimaryWindow extends Window
      */
     private void toggleRightSide() {
         final Allocation alloc;
+        final Widget left, right;
+
+        left = pane.getChild1();
+        right = pane.getChild2();
 
         if (showingRightSide) {
             alloc = left.getAllocation();
             right.hide();
-            window.setMaximize(false);
+            if (!largeScreen) {
+                window.setMaximize(false);
+            }
             window.resize(alloc.getWidth(), 950);
             showingRightSide = false;
         } else {
             right.show();
+            if (!largeScreen) {
+                window.setMaximize(true);
+            }
             showingRightSide = true;
         }
     }
@@ -594,14 +608,23 @@ class PrimaryWindow extends Window
      * Change the left side to show the chapter mainbody.
      */
     void switchToEditor() {
-        left.setCurrentPage(0);
+        final Widget child;
+
+        child = pane.getChild1();
+        pane.remove(child);
+        pane.add1(gauche[0]);
     }
 
     /**
      * Change the left side to show the Stylesheet mainbody.
      */
     void switchToStylesheet() {
-        left.setCurrentPage(1);
+        final Widget child;
+
+        child = pane.getChild1();
+        pane.remove(child);
+        pane.add1(gauche[1]);
+
         stylist.grabDefault();
     }
 
@@ -609,7 +632,12 @@ class PrimaryWindow extends Window
      * Change the left side to show the Metadata mainbody.
      */
     void switchToMetadata() {
-        left.setCurrentPage(2);
+        final Widget child;
+
+        child = pane.getChild1();
+        pane.remove(child);
+        pane.add1(gauche[2]);
+
         metaditor.grabDefault();
     }
 
@@ -618,14 +646,22 @@ class PrimaryWindow extends Window
      * morph it into an AboutDialog, or global help, or...
      */
     void switchToIntro() {
-        right.setCurrentPage(4);
+        final Widget child;
+
+        child = pane.getChild2();
+        pane.remove(child);
+        pane.add2(droit[4]);
     }
 
     /**
      * Change the right side to show the help pane.
      */
     void switchToHelp() {
-        right.setCurrentPage(1);
+        final Widget child;
+
+        child = pane.getChild2();
+        pane.remove(child);
+        pane.add2(droit[1]);
     }
 
     /**
@@ -633,7 +669,12 @@ class PrimaryWindow extends Window
      * to date.
      */
     void switchToPreview() {
-        right.setCurrentPage(0);
+        final Widget child;
+
+        child = pane.getChild2();
+        pane.remove(child);
+        pane.add2(droit[0]);
+
         preview.refreshDisplayAtCursor();
     }
 
@@ -663,7 +704,12 @@ class PrimaryWindow extends Window
      * Change the right side to show the outline navigator.
      */
     void switchToOutline() {
-        right.setCurrentPage(2);
+        final Widget child;
+
+        child = pane.getChild2();
+        pane.remove(child);
+        pane.add2(droit[2]);
+
         outline.refreshDisplay();
     }
 
@@ -671,11 +717,19 @@ class PrimaryWindow extends Window
      * Change the right side to show the notes and references mainbody.
      */
     void switchToEndnotes() {
-        right.setCurrentPage(3);
+        final Widget child;
+
+        child = pane.getChild2();
+        pane.remove(child);
+        pane.add2(droit[3]);
     }
 
     void switchToReferences() {
-        right.setCurrentPage(5);
+        final Widget child;
+
+        child = pane.getChild2();
+        pane.remove(child);
+        pane.add2(droit[5]);
     }
 
     /**
