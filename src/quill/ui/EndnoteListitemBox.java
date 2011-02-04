@@ -20,18 +20,28 @@ package quill.ui;
 
 import quill.textbase.Segment;
 
-class PoeticEditorTextView extends EditorTextView
+// cloned from ReferenceListitemBox
+class EndnoteListitemBox extends ListitemBox
 {
-    PoeticEditorTextView(SeriesEditorWidget parent, Segment segment) {
-        super(parent, segment);
+    EndnoteListitemBox(final SeriesEditorWidget parent, final Segment segment) {
+        super(parent);
+        final ListitemEntry entry;
+        final EditorTextView editor;
 
-        view.modifyFont(fonts.serif);
-        view.setMarginLeft(10);
-        view.setMarginRight(150);
-        view.setBorderWidth(10);
+        entry = new EndnoteListitemEntry(parent, segment);
+        editor = new ReferenceEditorTextView(parent, segment);
+
+        super.setupLabelSide(entry, 0, 1);
+        super.setupBody(editor);
     }
+}
 
-    protected boolean isTabAllowed() {
-        return true;
+/**
+ * @see ReferenceListitemEntry
+ */
+class EndnoteListitemEntry extends ListitemEntry
+{
+    EndnoteListitemEntry(SeriesEditorWidget parent, Segment segment) {
+        super(parent, segment);
     }
 }

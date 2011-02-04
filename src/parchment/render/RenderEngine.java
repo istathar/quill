@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -25,7 +25,6 @@ import java.util.TreeMap;
 
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.FontOptions;
-import org.freedesktop.cairo.Pattern;
 import org.freedesktop.cairo.Surface;
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.PaperSize;
@@ -55,6 +54,7 @@ import quill.client.ApplicationException;
 import quill.textbase.AttributionSegment;
 import quill.textbase.ChapterSegment;
 import quill.textbase.Common;
+import quill.textbase.Component;
 import quill.textbase.DivisionSegment;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
@@ -337,7 +337,7 @@ public abstract class RenderEngine
         desc = settings.getFontHeading();
         headingFace = new Typeface(cr, desc, 0.0);
 
-        desc = new FontDescription("Linux Libertine O");
+        desc = new FontDescription("Linux Libertine O,");
         desc.setSize(size);
         smallFace = new Typeface(cr, desc, 0.0);
 
@@ -347,13 +347,13 @@ public abstract class RenderEngine
     void processSegmentsIntoAreas(final Context cr) {
         int i, j, k;
         int I, J;
+        Component component;
         Series series;
         Segment segment;
         Extract entire;
         TextChain chain;
         Extract[] paras;
         String filename;
-        ArrayList<Segment>[] endnotes;
         final ArrayList<Segment> references;
         String label, type;
 
@@ -362,15 +362,14 @@ public abstract class RenderEngine
 
         references = new ArrayList<Segment>(4);
 
-        endnotes = new ArrayList[I];
-
         /*
          * Accumulate ReferenceSegments so they can later be output when a
          * SpecialSegment is encountered.
          */
 
         for (i = 0; i < I; i++) {
-            series = folio.getSeries(i);
+            component = folio.getComponent(i);
+            series = component.getSeriesReferences();
 
             J = series.size();
             for (j = 0; j < J; j++) {
@@ -378,6 +377,9 @@ public abstract class RenderEngine
 
                 if (segment instanceof ReferenceSegment) {
                     references.add(segment);
+                } else {
+                    // isn't this a given now?
+                    throw new AssertionError();
                 }
             }
         }
@@ -387,14 +389,13 @@ public abstract class RenderEngine
          */
 
         for (i = 0; i < I; i++) {
-            series = folio.getSeries(i);
+            component = folio.getComponent(i);
+            series = component.getSeriesMain();
             folioIndex = i;
 
             if (i > 0) {
                 appendPageBreak(cr);
             }
-
-            endnotes[i] = new ArrayList<Segment>(4);
 
             J = series.size();
             for (j = 0; j < J; j++) {
@@ -466,10 +467,9 @@ public abstract class RenderEngine
                     filename = segment.getExtra();
                     appendSegmentBreak(cr);
                     appendExternalGraphic(cr, filename, entire);
-                } else if (segment instanceof EndnoteSegment) {
-                    endnotes[i].add(segment);
-                } else if (segment instanceof ReferenceSegment) {
-                    // already accumulated
+                } else if ((segment instanceof EndnoteSegment) || (segment instanceof ReferenceSegment)) {
+                    // shouldn't be here
+                    throw new AssertionError();
                 } else if (segment instanceof LeaderSegment) {
                     appendSegmentBreak(cr);
                     appendLeader(cr, entire);
@@ -477,7 +477,7 @@ public abstract class RenderEngine
                     type = segment.getExtra();
 
                     if (type.equals("endnotes")) {
-                        processSpecialEndnotes(cr, endnotes);
+                        processSpecialEndnotes(cr);
                     } else if (type.equals("references")) {
                         processSpecialReferences(cr, references);
                     }
@@ -488,15 +488,16 @@ public abstract class RenderEngine
         }
     }
 
-    void processSpecialEndnotes(final Context cr, ArrayList<Segment>[] endnotes) {
+    void processSpecialEndnotes(final Context cr) {
         int i, j;
         int I, J;
-        Series series;
+        Component component;
+        Series endnotes, mainbody;
         Extract entire;
         Segment segment;
         String which, label;
 
-        I = endnotes.length;
+        I = folio.size();
 
         /*
          * Now build the notes and references. This is somewhat hardcoded, but
@@ -504,7 +505,10 @@ public abstract class RenderEngine
          */
 
         for (i = 0; i < I; i++) {
-            J = endnotes[i].size();
+            component = folio.getComponent(i);
+            endnotes = component.getSeriesEndnotes();
+
+            J = endnotes.size();
 
             if (J == 0) {
                 continue;
@@ -519,10 +523,9 @@ public abstract class RenderEngine
              * > 1 chapter, though.
              */
 
-            series = folio.getSeries(i);
-
-            if ((I > 1) && (series.size() > 0)) {
-                segment = series.getSegment(0);
+            if ((I > 1) && (J > 0)) {
+                mainbody = component.getSeriesMain();
+                segment = mainbody.getSegment(0);
                 if (segment instanceof ChapterSegment) {
                     entire = segment.getEntire();
                     which = entire.getText();
@@ -534,7 +537,7 @@ public abstract class RenderEngine
             for (j = 0; j < J; j++) {
                 appendSegmentBreak(cr);
 
-                segment = endnotes[i].get(j);
+                segment = endnotes.getSegment(j);
                 label = segment.getExtra();
                 entire = segment.getEntire();
                 appendReferenceParagraph(cr, label, entire);
@@ -895,7 +898,6 @@ public abstract class RenderEngine
         final Area area, group;
         final Area[] list, areas;
         final double savedLeft;
-        int i;
 
         /*
          * Label
@@ -1726,12 +1728,9 @@ public abstract class RenderEngine
     protected void appendExternalGraphic(final Context cr, final String source, final Extract entire) {
         final Manuscript manuscript;
         final String parent, filename;
-        final Pixbuf pixbuf;
         final TextChain chain;
         final Extract extract;
         final double dpi;
-        final Pattern pattern;
-        final Surface implicit;
         final Area image, blank, group;
         final double request, savedLeft, savedRight;
         final FontDescription desc;

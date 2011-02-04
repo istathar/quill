@@ -796,6 +796,10 @@ class PageSizeDisplay extends DrawingArea
         final double pixelWidth;
         final double scaleFactor;
 
+        if (engine == null) {
+            return;
+        }
+
         rect = this.getAllocation();
 
         pixelWidth = rect.getWidth();

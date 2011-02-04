@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -44,9 +44,10 @@ import parchment.manuscript.Metadata;
 import quill.client.ApplicationException;
 import quill.textbase.ChapterSegment;
 import quill.textbase.CharacterVisitor;
-import quill.textbase.ComponentSegment;
+import quill.textbase.Component;
 import quill.textbase.DivisionSegment;
 import quill.textbase.Extract;
+import quill.textbase.FirstSegment;
 import quill.textbase.Folio;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
@@ -110,6 +111,7 @@ class OutlineWidget extends ScrolledWindow
         final Alignment align;
         final int J;
         Chapter chapter;
+        Component component;
         Series series;
         HBox box;
         Segment segment;
@@ -180,13 +182,14 @@ class OutlineWidget extends ScrolledWindow
         top.packStart(box, false, false, 3);
 
         for (j = 0; j < J; j++) {
-            series = folio.getSeries(j);
+            component = folio.getComponent(j);
+            series = component.getSeriesMain();
 
             for (i = 0; i < series.size(); i++) {
                 segment = series.getSegment(i);
                 entire = segment.getEntire();
 
-                if (segment instanceof ComponentSegment) {
+                if (segment instanceof FirstSegment) {
                     incrementWordCount(j, entire);
 
                     box = new HBox(false, 0);
@@ -194,7 +197,7 @@ class OutlineWidget extends ScrolledWindow
                     button = new PresentSegmentButton(primary, group);
                     box.packStart(button, false, false, 0);
 
-                    button.setAddress(series, segment);
+                    button.setAddress(component, segment);
                     buttons.add(button);
 
                     chapter = folio.getChapter(j);
@@ -226,7 +229,7 @@ class OutlineWidget extends ScrolledWindow
                     button = new PresentSegmentButton(primary, group);
                     box.packStart(button, false, false, 0);
 
-                    button.setAddress(series, segment);
+                    button.setAddress(component, segment);
                     buttons.add(button);
 
                     if (list.size() > 0) {
@@ -347,7 +350,8 @@ class OutlineWidget extends ScrolledWindow
         final int J;
         int i, j, I, k;
         final Folio after;
-        Series previous, next;
+        Component previous, next;
+        Series avant, apres;
         Segment segment;
         PresentSegmentButton button;
 
@@ -368,10 +372,13 @@ class OutlineWidget extends ScrolledWindow
         J = after.size();
 
         for (j = 0; j < J; j++) {
-            previous = before.getSeries(j);
-            next = after.getSeries(j);
+            previous = before.getComponent(j);
+            next = after.getComponent(j);
 
-            if (previous.size() != next.size()) {
+            avant = previous.getSeriesMain();
+            apres = next.getSeriesMain();
+
+            if (avant.size() != apres.size()) {
                 throw new StructureChangedException();
             }
         }
@@ -384,18 +391,19 @@ class OutlineWidget extends ScrolledWindow
         k = 0;
 
         for (j = 0; j < J; j++) {
-            previous = before.getSeries(j);
-            next = after.getSeries(j);
+            previous = before.getComponent(j);
+            next = after.getComponent(j);
 
-            segment = next.getSegment(0);
+            apres = next.getSeriesMain();
+            segment = apres.getSegment(0);
             button = buttons.get(k);
             button.setAddress(next, segment);
             k++;
 
-            I = next.size();
+            I = apres.size();
 
             for (i = 1; i < I; i++) {
-                segment = next.getSegment(i);
+                segment = apres.getSegment(i);
 
                 if (segment instanceof HeadingSegment) {
                     button = buttons.get(k);
@@ -496,7 +504,7 @@ class WordCountingCharacterVisitor implements CharacterVisitor
 
 class PresentSegmentButton extends Button implements Button.Clicked
 {
-    private Series series;
+    private Component component;
 
     private Segment segment;
 
@@ -516,7 +524,7 @@ class PresentSegmentButton extends Button implements Button.Clicked
     }
 
     public void onClicked(Button source) {
-        primary.ensureVisible(series, segment);
+        primary.ensureVisible(component, segment);
     }
 
     /**
@@ -524,7 +532,7 @@ class PresentSegmentButton extends Button implements Button.Clicked
      * Button.Clicked handler to jump to the appopriate Series,Segment
      * location.
      */
-    void setAddress(final Series series, final Segment segment) {
+    void setAddress(final Component component, final Segment segment) {
         final StringBuilder buf;
         final Extract entire;
         final String str, escaped;
@@ -533,10 +541,10 @@ class PresentSegmentButton extends Button implements Button.Clicked
          * Update state if necessary
          */
 
-        if (series == this.series) {
+        if (component == this.component) {
             return;
         }
-        this.series = series;
+        this.component = component;
         this.segment = segment;
 
         /*

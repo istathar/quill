@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -28,6 +28,7 @@ import parchment.manuscript.Manuscript;
 import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
 import quill.textbase.Common;
+import quill.textbase.Component;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.NormalSegment;
@@ -82,19 +83,22 @@ public class ValidateDataIntegrity extends IOTestCase
         final Manuscript manuscript;
         final Chapter chapter;
         final Folio folio;
+        Component component;
         Series series;
         final ByteArrayOutputStream out;
         final String expected;
 
         manuscript = new Manuscript();
         folio = manuscript.createDocument();
-        series = folio.getSeries(0);
+        component = folio.getComponent(0);
+        series = component.getSeriesMain();
         chapter = folio.getChapter(0);
 
         series = insertThreeSpansIntoFirstSegment(series);
+        component = component.updateMain(series);
 
         out = new ByteArrayOutputStream();
-        chapter.saveDocument(series, out);
+        chapter.saveDocument(component, out);
 
         expected = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -118,6 +122,7 @@ public class ValidateDataIntegrity extends IOTestCase
         final Manuscript manuscript;
         final Chapter chapter;
         final Span[] expected;
+        final Component component;
         final Series series;
         final Segment segment;
         final Extract entire;
@@ -136,7 +141,8 @@ public class ValidateDataIntegrity extends IOTestCase
         chapter = new Chapter(manuscript);
         chapter.setFilename("ContinuousMarkup.xml"); // real
 
-        series = chapter.loadDocument();
+        component = chapter.loadDocument();
+        series = component.getSeriesMain();
         segment = series.getSegment(1);
         entire = segment.getEntire();
         assertNotNull(entire);
@@ -157,6 +163,7 @@ public class ValidateDataIntegrity extends IOTestCase
         final Manuscript manuscript;
         final Chapter chapter;
         final Span[] inbound;
+        final Component component;
         final Series series;
         final Segment segment;
         final Extract entire;
@@ -176,7 +183,8 @@ public class ValidateDataIntegrity extends IOTestCase
 
         chapter = new Chapter(manuscript);
         chapter.setFilename("TwoBlocksMarkup.xml");
-        series = chapter.loadDocument();
+        component = chapter.loadDocument();
+        series = component.getSeriesMain();
         segment = series.getSegment(1);
         entire = segment.getEntire();
         assertNotNull(entire);
@@ -192,7 +200,7 @@ public class ValidateDataIntegrity extends IOTestCase
         });
 
         out = new ByteArrayOutputStream();
-        chapter.saveDocument(series, out);
+        chapter.saveDocument(component, out);
 
         outbound = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -217,6 +225,7 @@ public class ValidateDataIntegrity extends IOTestCase
             ValidityException, ParsingException, IOException {
         final Manuscript manuscript;
         final Chapter chapter;
+        final Component component;
         final Span[] inbound;
         final Series series;
         final Segment segment;
@@ -237,7 +246,8 @@ public class ValidateDataIntegrity extends IOTestCase
 
         chapter = new Chapter(manuscript);
         chapter.setFilename("WhitespaceBetweenConsequtiveMarkup.xml");
-        series = chapter.loadDocument();
+        component = chapter.loadDocument();
+        series = component.getSeriesMain();
         segment = series.getSegment(1);
         assertTrue(segment instanceof QuoteSegment);
 
@@ -263,7 +273,7 @@ public class ValidateDataIntegrity extends IOTestCase
          */
 
         out = new ByteArrayOutputStream();
-        chapter.saveDocument(series, out);
+        chapter.saveDocument(component, out);
 
         outbound = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",

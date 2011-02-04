@@ -18,8 +18,18 @@
  */
 package quill.ui;
 
+import org.gnome.gdk.Color;
+import org.gnome.gdk.EventFocus;
+import org.gnome.gtk.Alignment;
+import org.gnome.gtk.Entry;
+import org.gnome.gtk.EventBox;
 import org.gnome.gtk.HBox;
+import org.gnome.gtk.Label;
+import org.gnome.gtk.StateType;
+import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
+
+import quill.textbase.Segment;
 
 /**
  * An Editor wrapper that has a label and a body. For list items, and notes
@@ -27,30 +37,118 @@ import org.gnome.gtk.Widget;
  * 
  * @author Andrew Cowie
  */
-abstract class ListitemBox extends HBox
+abstract class ListitemBox extends EventBox implements Editor
 {
+    /**
+     * Width of label (or corresponding indent).
+     */
+    private static final int WIDTH = 30;
+
+    private final EventBox eb;
+
+    private final VBox top;
+
     private final HBox box;
 
-    private Widget label;
+    /*
+     * This is a terrible name, but what else are we supposed to use?
+     */
+    private ListitemEntry label;
 
     private EditorTextView body;
 
-    ListitemBox() {
-        super(false, 0);
-        box = this;
+    private final SeriesEditorWidget parent;
+
+    ListitemBox(final SeriesEditorWidget parent) {
+        super();
+        eb = this;
+
+        top = new VBox(false, 0);
+        box = new HBox(false, 0);
+        top.packEnd(box, false, false, 0);
+        eb.add(top);
+
+        eb.modifyBackground(StateType.NORMAL, Color.WHITE);
+
+        /*
+         * This is to prevent the annoying behaviour of the Entry selecting
+         * its entire text when focus passes through. Bit of a workaround, but
+         * doing this down in ListitemEntry seems not to work.
+         */
+
+        eb.setCanFocus(true);
+        eb.connect(new Widget.FocusInEvent() {
+            public boolean onFocusInEvent(Widget source, EventFocus event) {
+                label.setPosition(-1);
+                label.selectRegion(0, 0);
+                return false;
+            }
+        });
+
+        this.parent = parent;
     }
 
-    void setupLabel(final Widget widget) {
+    /**
+     * Put a label in the normal bullet or endnote number. Labels are right
+     * aligned. Top <code>padding</code> is for pushing the bullet or ordinal
+     * down to line up with the text's baseline.
+     */
+    void setupLabelSide(final ListitemEntry entry, final int left, final int top) {
+        final Alignment align;
+
+        entry.setSizeRequest(WIDTH - left, -1);
+        entry.setAlignment(Alignment.LEFT);
+
+        align = new Alignment(Alignment.LEFT, Alignment.TOP, 0.0f, 0.0f);
+        align.setPadding(top, 0, left, 0);
+        align.add(entry);
+
+        box.packStart(align, false, false, 0);
+
+        label = entry;
+    }
+
+    /**
+     * Put a label that is a "line above" (references; definition lists if we
+     * ever do them). These are left aligned.
+     */
+    void setupLabelTop(final ListitemEntry widget) {
+        final Label spacer;
+
+        spacer = new Label();
+        spacer.setSizeRequest(WIDTH, -1);
+        top.packStart(widget, false, false, 0);
+        box.packStart(spacer, false, false, 0);
+
         label = widget;
-        box.packStart(label, false, false, 0);
     }
 
-    void setupBody(final EditorTextView editor) {
-        body = editor;
+    void setupBody(final EditorTextView view) {
+        body = view;
         box.packStart(body, true, true, 0);
     }
 
-    EditorTextView getEditor() {
+    public void advanceTo(Segment segment) {
+        label.advanceTo(segment);
+        body.advanceTo(segment);
+    }
+
+    public Entry getLabel() {
+        return label;
+    }
+
+    public EditorTextView getTextView() {
         return body;
+    }
+
+    public void reverseTo(Segment segment) {
+        label.reverseTo(segment);
+        body.reverseTo(segment);
+    }
+
+    public void grabFocus() {
+        label.selectRegion(0, 0);
+        label.setPosition(-1);
+        body.grabFocus();
     }
 }

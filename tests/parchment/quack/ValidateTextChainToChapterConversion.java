@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -33,6 +33,7 @@ import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
 import quill.textbase.ChapterSegment;
 import quill.textbase.Common;
+import quill.textbase.Component;
 import quill.textbase.Extract;
 import quill.textbase.HeadingSegment;
 import quill.textbase.NormalSegment;
@@ -49,6 +50,7 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
             ImproperFilenameException {
         final Manuscript manuscript;
         final Chapter chapter;
+        final Component component;
         final Series series;
         final Extract entire;
 
@@ -56,11 +58,12 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         manuscript.setFilename("tests/parchment/quack/HelloWorld.parchment"); // fake
         chapter = new Chapter(manuscript);
         chapter.setFilename("HelloWorld.xml"); // real
-        series = chapter.loadDocument();
+        component = chapter.loadDocument();
+        series = component.getSeriesMain();
 
         /*
          * Loaded <text> block gives a NormalSegment, now plus an automatic
-         * empty ComponentSegment for the UI.
+         * empty FirstSegment for the UI.
          */
         assertEquals(2, series.size());
 
@@ -193,6 +196,7 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
             ImproperFilenameException {
         final Manuscript manuscript;
         final Chapter chapter;
+        final Component component;
         final Series series;
         final Extract entire;
 
@@ -200,7 +204,8 @@ public class ValidateTextChainToChapterConversion extends IOTestCase
         manuscript.setFilename("tests/parchment/quack/HelloWorld.parchment"); // ignored
         chapter = new Chapter(manuscript);
         chapter.setFilename("TemporaryFiles.xml");
-        series = chapter.loadDocument();
+        component = chapter.loadDocument();
+        series = component.getSeriesMain();
         assertEquals(2, series.size());
 
         entire = series.getSegment(1).getEntire();

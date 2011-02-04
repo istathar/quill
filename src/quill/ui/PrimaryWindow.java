@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -46,7 +46,6 @@ import org.gnome.gtk.Image;
 import org.gnome.gtk.InfoMessageDialog;
 import org.gnome.gtk.MessageDialog;
 import org.gnome.gtk.MessageType;
-import org.gnome.gtk.Notebook;
 import org.gnome.gtk.ResponseType;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
@@ -60,6 +59,7 @@ import parchment.render.RenderEngine;
 import quill.client.ApplicationException;
 import quill.client.ImproperFilenameException;
 import quill.client.Quill;
+import quill.textbase.Component;
 import quill.textbase.Folio;
 import quill.textbase.Origin;
 import quill.textbase.Segment;
@@ -86,11 +86,7 @@ class PrimaryWindow extends Window
 
     private HPaned pane;
 
-    private Notebook left;
-
-    private Notebook right;
-
-    private ComponentEditorWidget editor;
+    private MainSeriesEditorWidget mainbody;
 
     private StylesheetEditorWidget stylist;
 
@@ -104,7 +100,14 @@ class PrimaryWindow extends Window
 
     private OutlineWidget outline;
 
-    private NotesEditorWidget endnotes;
+    private EndnotesSeriesEditorWidget endnotes;
+
+    private ReferencesSeriesEditorWidget references;
+
+    /**
+     * What was the last side requested?
+     */
+    private Widget previous;
 
     /**
      * The document this PrimaryWindow is displaying.
@@ -162,28 +165,44 @@ class PrimaryWindow extends Window
      * General case of affecting the state currently given in this.folio.
      */
     private void advanceTo(Folio folio) {
-        final int i;
-        final Series series;
+        final Folio current;
+        final int pos, I;
+        int i;
+        final Component component;
 
+        current = this.folio;
         this.folio = folio;
 
-        /*
-         * Update the ComponentEditorWidget to the current state
-         */
-
+        pos = current.indexOf(cursor);
         i = folio.getIndexUpdated();
+        I = folio.size();
 
         if (i >= 0) {
-            series = folio.getSeries(i);
+            component = folio.getComponent(i);
+        } else {
+            component = null;
+        }
 
-            editor.advanceTo(series);
+        /*
+         * Update the SeriesEditorWidget to the current state,
+         */
+
+        if (i == pos) {
+            mainbody.advanceTo(component);
+            endnotes.advanceTo(component);
 
             // is this the right place to set this?
-            cursorSeries = series;
+
+            cursor = component;
+        }
+
+        if (i == I - 1) {
+            references.advanceTo(component);
         }
 
         stylist.affect(folio);
         metaditor.affect(folio);
+
         /*
          * Update the PreviewWidget's idea of the current state
          */
@@ -200,24 +219,38 @@ class PrimaryWindow extends Window
     }
 
     private void reverseTo(Folio folio) {
-        Folio current;
-        int i;
-        Series series;
+        final Folio current;
+        final int i, pos, I;
+        Component component;
 
         current = this.folio;
         this.folio = folio;
 
         /*
-         * Update the ComponentEditorWidget to the current state
+         * Update the SeriesEditorWidget to the current state
          */
 
+        pos = current.indexOf(cursor);
         i = current.getIndexUpdated();
-        series = folio.getSeries(i);
+        I = folio.size();
 
-        editor.reveseTo(series);
+        if (i >= 0) {
+            component = folio.getComponent(i);
+        } else {
+            component = null;
+        }
 
-        // is this the right place to set this?
-        cursorSeries = series;
+        if (i == pos) {
+            mainbody.reverseTo(component);
+            endnotes.reverseTo(component);
+
+            // is this the right place to set this?
+            cursor = component;
+        }
+
+        if (i == I - 1) {
+            references.reverseTo(component);
+        }
 
         /*
          * Update the PreviewWidget's idea of the current state
@@ -265,8 +298,6 @@ class PrimaryWindow extends Window
         this.advanceTo(following);
     }
 
-    /*
-     */
     private void setupWindow() {
         final Screen screen;
         final int availableWidth, availableHeight;
@@ -296,9 +327,11 @@ class PrimaryWindow extends Window
 
         if ((availableWidth < desiredWidth) || (availableHeight < desiredHeight)) {
             window.setMaximize(true);
+            largeScreen = false;
         } else {
             window.setDefaultSize(desiredWidth, desiredHeight);
             window.setPosition(WindowPosition.CENTER_ALWAYS);
+            largeScreen = true;
         }
 
         window.setTitle("Quill");
@@ -311,60 +344,70 @@ class PrimaryWindow extends Window
         top.packStart(pane, true, true, 0);
     }
 
+    Widget[] gauche, droit;
+
     private void setupEditorSide() {
         Alignment align;
 
-        left = new Notebook();
-        left.setShowTabs(false);
-        left.setShowBorder(false);
-        left.setSizeRequest(400, -1);
+        gauche = new Widget[3];
 
-        editor = new ComponentEditorWidget(this);
-        left.insertPage(editor, null, 0);
+        mainbody = new MainSeriesEditorWidget(this);
+        mainbody.setSizeRequest(400, -1);
+        mainbody.showAll();
+        gauche[0] = mainbody;
 
         stylist = new StylesheetEditorWidget(this);
         align = new Alignment();
         align.setAlignment(Alignment.LEFT, Alignment.TOP, 1.0f, 1.0f);
         align.setPadding(0, 0, 3, 0);
         align.add(stylist);
-        left.insertPage(align, null, 1);
+        align.showAll();
+        gauche[1] = align;
 
         metaditor = new MetadataEditorWidget(this);
         align = new Alignment();
         align.setAlignment(Alignment.LEFT, Alignment.TOP, 1.0f, 1.0f);
         align.setPadding(0, 0, 3, 0);
         align.add(metaditor);
-        left.insertPage(align, null, 2);
+        align.showAll();
+        gauche[2] = align;
 
-        pane.add1(left);
+        pane.add1(mainbody);
+        previous = mainbody; // gauche[0], actually
     }
 
     private void setupPreviewSide() {
-        right = new Notebook();
-        right.setShowTabs(false);
-        right.setShowBorder(false);
+        droit = new Widget[6];
 
         preview = new PreviewWidget(this);
-        right.insertPage(preview, null, 0);
+        preview.showAll();
+        droit[0] = preview;
 
         help = new HelpWidget();
-        right.insertPage(help, null, 1);
+        help.showAll();
+        droit[1] = help;
 
         outline = new OutlineWidget(this);
-        right.insertPage(outline, null, 2);
+        outline.showAll();
+        droit[2] = outline;
 
-        endnotes = new NotesEditorWidget(this);
-        right.insertPage(endnotes, null, 3);
+        endnotes = new EndnotesSeriesEditorWidget(this);
+        endnotes.showAll();
+        droit[3] = endnotes;
 
         intro = new IntroductionWidget();
-        right.insertPage(intro, null, 4);
+        intro.showAll();
+        droit[4] = intro;
 
-        pane.add2(right);
+        references = new ReferencesSeriesEditorWidget(this);
+        references.showAll();
+        droit[5] = references;
+
+        pane.add2(intro);
     }
 
     private void initialPresentation() {
         window.showAll();
-        right.setCurrentPage(4);
 
         window.present();
         window.setPosition(WindowPosition.NONE);
@@ -417,9 +460,13 @@ class PrimaryWindow extends Window
                         return true;
                     } else if (key == Keyval.F7) {
                         switchToEndnotes();
+                        return true;
+                    } else if (key == Keyval.F8) {
+                        switchToReferences();
+                        return true;
                     }
 
-                    if ((key == Keyval.F8) || (key == Keyval.F9) || (key == Keyval.F10)) {
+                    if ((key == Keyval.F9) || (key == Keyval.F10)) {
                         // nothing yet
                         return true;
                     }
@@ -526,6 +573,8 @@ class PrimaryWindow extends Window
         }
     }
 
+    private boolean largeScreen;
+
     private boolean showingRightSide = true;
 
     /*
@@ -534,44 +583,111 @@ class PrimaryWindow extends Window
      * is. The correct end result would be keeping the vertical height of
      * previously set, and probably horizontal width as well. What is really
      * bad is that if you return to maximized with the right hand side turned
-     * off suddenly the editor is super wide, and that's a horrible
+     * off suddenly the mainbody is super wide, and that's a horrible
      * experience.
      */
     private void toggleRightSide() {
         final Allocation alloc;
+        final Widget left, right;
+
+        left = pane.getChild1();
+        right = pane.getChild2();
 
         if (showingRightSide) {
             alloc = left.getAllocation();
-            right.hide();
-            window.setMaximize(false);
+
+            if (previous == left) {
+                right.hide();
+            } else {
+                left.hide();
+            }
+
+            if (!largeScreen) {
+                window.setMaximize(false);
+            }
             window.resize(alloc.getWidth(), 950);
             showingRightSide = false;
         } else {
+            left.show();
             right.show();
+            if (!largeScreen) {
+                window.setMaximize(true);
+            }
             showingRightSide = true;
         }
     }
 
-    /**
-     * Change the left side to show the chapter editor.
+    /*
+     * Further commentary about the sides. This is a bit magical: if there is
+     * only one side of a Paned showing, the resizing divider does not show.
+     * That's great, what we want, and the effect we probably would have had
+     * to code ourselves if it didn't work that way. Which of course means
+     * we're going to need to watch out for that behaving on other people's
+     * systems.
      */
-    void switchToEditor() {
-        left.setCurrentPage(0);
+    private void switchPaneLeft(Widget replacement) {
+        final Widget child;
+        final Widget left, right;
+
+        if (!showingRightSide) {
+            left = pane.getChild1();
+            right = pane.getChild2();
+
+            right.hide();
+            left.show();
+        }
+
+        child = pane.getChild1();
+
+        if (child != replacement) {
+            pane.remove(child);
+            pane.add1(replacement);
+        }
+
+        previous = replacement;
+    }
+
+    private void switchPaneRight(Widget replacement) {
+        final Widget child;
+        final Widget left, right;
+
+        if (!showingRightSide) {
+            left = pane.getChild1();
+            right = pane.getChild2();
+
+            left.hide();
+            right.show();
+        }
+        child = pane.getChild2();
+
+        if (child != replacement) {
+            pane.remove(child);
+            pane.add2(replacement);
+        }
+
+        previous = replacement;
     }
 
     /**
-     * Change the left side to show the Stylesheet editor.
+     * Change the left side to show the chapter mainbody.
+     */
+    void switchToEditor() {
+        this.switchPaneLeft(gauche[0]);
+    }
+
+    /**
+     * Change the left side to show the Stylesheet mainbody.
      */
     void switchToStylesheet() {
-        left.setCurrentPage(1);
+        this.switchPaneLeft(gauche[1]);
         stylist.grabDefault();
     }
 
     /**
-     * Change the left side to show the Metadata editor.
+     * Change the left side to show the Metadata mainbody.
      */
     void switchToMetadata() {
-        left.setCurrentPage(2);
+        this.switchPaneLeft(gauche[2]);
         metaditor.grabDefault();
     }
 
@@ -580,14 +696,14 @@ class PrimaryWindow extends Window
      * morph it into an AboutDialog, or global help, or...
      */
     void switchToIntro() {
-        right.setCurrentPage(4);
+        this.switchPaneRight(droit[4]);
     }
 
     /**
      * Change the right side to show the help pane.
      */
     void switchToHelp() {
-        right.setCurrentPage(1);
+        this.switchPaneRight(droit[1]);
     }
 
     /**
@@ -595,7 +711,7 @@ class PrimaryWindow extends Window
      * to date.
      */
     void switchToPreview() {
-        right.setCurrentPage(0);
+        this.switchPaneRight(droit[0]);
         preview.refreshDisplayAtCursor();
     }
 
@@ -618,31 +734,36 @@ class PrimaryWindow extends Window
      */
     void forceRecheck() {
         this.loadDictionary();
-        editor.forceRecheck();
+        mainbody.forceRecheck();
     }
 
     /**
      * Change the right side to show the outline navigator.
      */
     void switchToOutline() {
-        right.setCurrentPage(2);
+        this.switchPaneRight(droit[2]);
         outline.refreshDisplay();
     }
 
     /**
-     * Change the right side to show the outline navigator.
+     * Change the right side to show the notes and references mainbody.
      */
     void switchToEndnotes() {
-        right.setCurrentPage(3);
+        this.switchPaneRight(droit[3]);
+    }
+
+    void switchToReferences() {
+        this.switchPaneRight(droit[5]);
     }
 
     /**
      * Show the nominated Series in this PrimaryWindow. Switches the left side
-     * to editor, and refreshes the preview if it's showing.
+     * to mainbody, and refreshes the preview if it's showing.
      */
     // FIXME rename?
     void displayDocument(Folio folio) {
-        Series series;
+        Component component;
+        int i;
 
         this.manuscript = folio.getManuscript();
 
@@ -656,10 +777,16 @@ class PrimaryWindow extends Window
         this.loadDictionary();
 
         // FIXME
-        series = folio.getSeries(0);
-        cursorSeries = series;
+        component = folio.getComponent(0);
+        cursor = component;
 
-        editor.initializeSeries(series);
+        mainbody.initialize(component);
+        endnotes.initialize(component);
+
+        i = folio.size() - 1;
+        component = folio.getComponent(i);
+        references.initialize(component);
+
         stylist.initializeStylesheet(folio);
         metaditor.initializeMetadata(folio);
         preview.affect(folio);
@@ -671,8 +798,8 @@ class PrimaryWindow extends Window
 
     /**
      * Set or reset the Window title based on the text of the first Segment of
-     * the currently dipslayed Series (which will be the ComponentSegment
-     * leading this chapter with the chapter title).
+     * the currently dipslayed Series (which will be the FirstSegment leading
+     * this chapter with the chapter title).
      */
     /*
      * There is a HIG question here, as to whether the application name should
@@ -684,12 +811,14 @@ class PrimaryWindow extends Window
      */
     void updateTitle() {
         final Metadata meta;
+        final Series series;
         final Segment first;
         final String documentTitle, chapterTitle;
         final String str;
 
         meta = folio.getMetadata();
-        first = cursorSeries.getSegment(0);
+        series = cursor.getSeriesMain();
+        first = series.getSegment(0);
 
         if ((meta == cachedDocumentTitle) && (first == cachedChapterTitle)) {
             return;
@@ -738,20 +867,20 @@ class PrimaryWindow extends Window
     private transient Segment cachedChapterTitle;
 
     public void grabFocus() {
-        editor.grabFocus();
+        mainbody.grabFocus();
     }
 
-    private Series cursorSeries;
+    private Component cursor;
 
     Origin getCursor() {
         final int folioPosition;
 
-        if (cursorSeries == null) {
+        if (cursor == null) {
             return null;
         }
-        folioPosition = folio.indexOf(cursorSeries);
+        folioPosition = folio.indexOf(cursor);
 
-        return editor.getCursor(folioPosition);
+        return mainbody.getCursor(folioPosition);
     }
 
     /**
@@ -880,7 +1009,7 @@ class PrimaryWindow extends Window
 
         cancel = new Button();
         cancel.setImage(new Image(ActionIcon.DOCUMENT_REVERT, IconSize.BUTTON));
-        cancel.setLabel("Return to editor");
+        cancel.setLabel("Return to mainbody");
         dialog.addButton(cancel, ResponseType.CANCEL);
 
         ok = new Button();
@@ -905,7 +1034,7 @@ class PrimaryWindow extends Window
     }
 
     /**
-     * Open a new chapter in the editor, replacing the current one.
+     * Open a new chapter in the mainbody, replacing the current one.
      */
     void openDocument() {
         String directory;
@@ -1051,9 +1180,9 @@ class PrimaryWindow extends Window
 
     /**
      * @param widget
-     *            Chapter editor calling in.
+     *            Chapter mainbody calling in.
      */
-    void update(ComponentEditorWidget widget, Series former, Series series) {
+    void update(SeriesEditorWidget widget, Component former, Component component) {
         Folio anticedant, replacement;
         int i;
 
@@ -1061,7 +1190,7 @@ class PrimaryWindow extends Window
 
         i = anticedant.indexOf(former);
 
-        replacement = anticedant.update(i, series);
+        replacement = anticedant.update(i, component);
 
         this.apply(replacement);
     }
@@ -1069,23 +1198,24 @@ class PrimaryWindow extends Window
     /*
      * For testing only
      */
-    final ComponentEditorWidget testGetEditor() {
-        return editor;
+    final SeriesEditorWidget testGetEditor() {
+        return mainbody;
     }
 
     private void handleComponentPrevious() {
         int i;
 
-        i = folio.indexOf(cursorSeries);
+        i = folio.indexOf(cursor);
 
         if (i == 0) {
             return;
         }
 
         i--;
-        cursorSeries = folio.getSeries(i);
+        cursor = folio.getComponent(i);
 
-        editor.initializeSeries(cursorSeries);
+        mainbody.initialize(cursor);
+        endnotes.initialize(cursor);
         preview.refreshDisplay();
         updateTitle();
     }
@@ -1095,31 +1225,34 @@ class PrimaryWindow extends Window
         int i;
 
         len = folio.size();
-        i = folio.indexOf(cursorSeries);
+        i = folio.indexOf(cursor);
         i++;
 
         if (i == len) {
             return;
         }
 
-        cursorSeries = folio.getSeries(i);
+        cursor = folio.getComponent(i);
 
-        editor.initializeSeries(cursorSeries);
+        mainbody.initialize(cursor);
+        endnotes.initialize(cursor);
         preview.refreshDisplay();
         updateTitle();
     }
 
     /**
-     * Ensure that the given "address" is presented in the
-     * ComponentEditorWidget with the appropriate Chapter showing.
+     * Ensure that the given "address" is presented in the SeriesEditorWidget
+     * with the appropriate Chapter showing.
      */
-    void ensureVisible(Series series, Segment segment) {
-        if (series != cursorSeries) {
-            cursorSeries = series;
-            editor.initializeSeries(cursorSeries);
+    void ensureVisible(Component component, Segment segment) {
+        if (component != cursor) {
+            cursor = component;
+            mainbody.initialize(cursor);
         }
 
-        editor.ensureVisible(segment, true);
+        this.switchToEditor();
+
+        mainbody.ensureVisible(segment, true);
 
         preview.refreshDisplay();
         updateTitle();

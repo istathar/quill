@@ -114,12 +114,19 @@ class SpellChecker
             line = in.readLine();
 
             /*
-             * If we're here at all, it's because there was at least one. Note
-             * that readLine() trims, and, we output a leading (not trailing)
-             * \n to observe Enchant's conventions. We strip it later.
+             * If we're here at all, it's because there was at least one.
              */
 
             line = in.readLine();
+            out.write(line);
+
+            /*
+             * Note that readLine() trims, and, we output a leading (not
+             * trailing) \n to observe Enchant's conventions.
+             */
+
+            line = in.readLine();
+
             while (line != null) {
                 out.write('\n');
                 out.write(line);
@@ -224,13 +231,6 @@ class SpellChecker
 
             reader = new FileReader(tmp);
             in = new BufferedReader(reader);
-
-            /*
-             * Annoying Enchant writes a blank line first, and we play along
-             * when creating the temp file for symmetry. Skip it.
-             */
-
-            line = in.readLine();
 
             line = in.readLine();
             while (line != null) {

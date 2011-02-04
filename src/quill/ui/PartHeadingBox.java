@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -22,7 +22,7 @@ import quill.textbase.Segment;
 
 class PartHeadingBox extends HeadingBox
 {
-    PartHeadingBox(final ComponentEditorWidget parent, final Segment segment) {
+    PartHeadingBox(final SeriesEditorWidget parent, final Segment segment) {
         super();
 
         super.setupBox(parent, segment, "Part");

@@ -29,6 +29,18 @@ public class ImageSegment extends Segment
     }
 
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
-        return new ImageSegment(entire, super.getExtra(), offset, removed, inserted);
+        final String extra;
+
+        extra = super.getExtra();
+
+        return new ImageSegment(entire, extra, offset, removed, inserted);
+    }
+
+    public Segment createSimilar(String extra) {
+        final Extract entire;
+
+        entire = super.getEntire();
+
+        return new ImageSegment(entire, extra, 0, 0, 0);
     }
 }

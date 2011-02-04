@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -26,15 +26,15 @@ import quill.textbase.Segment;
 
 class NormalListitemBox extends ListitemBox
 {
-    NormalListitemBox(final ComponentEditorWidget parent, final Segment segment) {
-        super();
-        final Widget widget;
+    NormalListitemBox(final SeriesEditorWidget parent, final Segment segment) {
+        super(parent);
+        final ListitemEntry entry;
         final EditorTextView editor;
 
-        widget = createLabel(segment);
-        super.setupLabel(widget);
-
+        entry = new NormalListitemEntry(parent, segment);
         editor = new NormalEditorTextView(parent, segment);
+
+        super.setupLabelSide(entry, 8, 5);
         super.setupBody(editor);
     }
 
@@ -56,5 +56,18 @@ class NormalListitemBox extends ListitemBox
         align.add(entry);
 
         return align;
+    }
+}
+
+/**
+ * 
+ * Placeholder for more advanced UI when we evolve one.
+ * 
+ * @see ReferenceListitemEntry
+ */
+class NormalListitemEntry extends ListitemEntry
+{
+    NormalListitemEntry(final SeriesEditorWidget parent, final Segment segment) {
+        super(parent, segment);
     }
 }

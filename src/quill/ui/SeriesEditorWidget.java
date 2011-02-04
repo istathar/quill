@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -19,49 +19,39 @@
 package quill.ui;
 
 import java.util.LinkedList;
+import java.util.List;
 
-import org.freedesktop.cairo.Context;
-import org.freedesktop.cairo.Surface;
-import org.gnome.gdk.Color;
-import org.gnome.gdk.EventExpose;
-import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Container;
+import org.gnome.gtk.Label;
 import org.gnome.gtk.PolicyType;
-import org.gnome.gtk.Scrollbar;
 import org.gnome.gtk.ScrolledWindow;
-import org.gnome.gtk.StateType;
 import org.gnome.gtk.Test;
 import org.gnome.gtk.VBox;
-import org.gnome.gtk.Viewport;
 import org.gnome.gtk.Widget;
 
-import quill.textbase.AttributionSegment;
-import quill.textbase.ChapterSegment;
-import quill.textbase.DivisionSegment;
-import quill.textbase.EndnoteSegment;
-import quill.textbase.HeadingSegment;
-import quill.textbase.ImageSegment;
-import quill.textbase.LeaderSegment;
-import quill.textbase.ListitemSegment;
-import quill.textbase.NormalSegment;
+import quill.textbase.Component;
 import quill.textbase.Origin;
-import quill.textbase.PoeticSegment;
-import quill.textbase.PreformatSegment;
-import quill.textbase.QuoteSegment;
-import quill.textbase.ReferenceSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
-import quill.textbase.SpecialSegment;
+
+import static org.gnome.gtk.Alignment.LEFT;
+import static org.gnome.gtk.Alignment.TOP;
 
 /**
- * Left hand side of a PrimaryWindow for editing a Component (Article or
- * Chapter).
+ * Code for editing a Series (of Segments), presenting them as a list of
+ * EditorTextViews. This is primarily about the editor for the main body of
+ * each chapter, but is also reused to power the notes and references editor.
+ * 
+ * <p>
+ * <i>The name "component" derives from DocBook's generic name for its
+ * articles and chapters, though it wasn't actually as strictly typed as
+ * that.</i>
  * 
  * @author Andrew Cowie
  */
-class ComponentEditorWidget extends ScrolledWindow
+abstract class SeriesEditorWidget extends ScrolledWindow
 {
     private ScrolledWindow scroll;
 
@@ -69,7 +59,7 @@ class ComponentEditorWidget extends ScrolledWindow
 
     private VBox box;
 
-    private LinkedList<EditorTextView> editors;
+    private LinkedList<Editor> editors;
 
     /**
      * Which Segment currently has the cursor?
@@ -79,45 +69,68 @@ class ComponentEditorWidget extends ScrolledWindow
     /**
      * What is the top level UI holding this document?
      */
-    private PrimaryWindow primary;
+    private final PrimaryWindow primary;
 
     private Series series;
 
-    ComponentEditorWidget(PrimaryWindow primary) {
+    SeriesEditorWidget(PrimaryWindow primary) {
+        this(primary, null);
+    }
+
+    SeriesEditorWidget(PrimaryWindow primary, String heading) {
         super();
-        scroll = this;
+        this.scroll = this;
         this.primary = primary;
 
-        setupScrolling();
+        setupScrolling(heading);
         hookupAdjustmentReactions();
     }
 
-    private void setupScrolling() {
-        final Viewport port;
-        box = new VBox(false, 3);
+    private void setupScrolling(String heading) {
+        final VBox outer;
+        final Label label;
+
+        box = new VBox(false, 0);
+
+        if (heading == null) {
+            scroll.addWithViewport(box);
+        } else {
+            outer = new VBox(false, 0);
+
+            label = new Label("<span size='xx-large'>" + heading + "</span>");
+            label.setUseMarkup(true);
+            label.setAlignment(LEFT, TOP);
+            outer.packStart(label, false, false, 6);
+            outer.packStart(box, true, true, 0);
+            scroll.addWithViewport(outer);
+        }
 
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
-        scroll.addWithViewport(box);
 
         /*
-         * Set the background color of the entire EditorWidget to white in
-         * order to hide the upper side of the horizontal Scrollbars in the
-         * preformatted blocks. Finding that this was the right place was
-         * traumatic, but it turns out that the Viewport has the underlying
-         * [org.gnome.gdk] Window where the drawing happens. Annoyingly,
-         * calling modifyBackground() on the ScolledWindow didn't work.
+         * For reasons I don't entirely understand, the recursive showAll()
+         * from PrimaryWindow isn't getting though this to the children
+         * ReferenceEditorTextViews. Strange. Anyway, show()ing here fixes it,
+         * though I hate unexplained workarounds.
          */
 
-        port = (Viewport) scroll.getChild();
-        port.modifyBackground(StateType.NORMAL, Color.WHITE);
+        scroll.show();
 
         adj = scroll.getVAdjustment();
+    }
+
+    /**
+     * Get the VBox that the contents of this Widget are to be packed into;
+     * this is scrolled.
+     */
+    protected VBox getTop() {
+        return box;
     }
 
     private void hookupAdjustmentReactions() {}
 
     /**
-     * Tell the ComponentEditorWidget to ensure that the range from to
+     * Tell the SeriesEditorWidget to ensure that the range from to
      * from+height is scrolled to and within view. This is used by the
      * EditorTextViews to handle the cursor moving one line above or below the
      * current viewport.
@@ -274,12 +287,15 @@ class ComponentEditorWidget extends ScrolledWindow
         num = series.size();
         this.series = series;
 
-        this.editors = new LinkedList<EditorTextView>();
+        this.editors = new LinkedList<Editor>();
 
         for (i = 0; i < num; i++) {
             segment = series.getSegment(i);
 
             widget = createEditorForSegment(i, segment);
+            if (widget == null) {
+                continue;
+            }
 
             box.packStart(widget, false, false, 0);
         }
@@ -290,12 +306,29 @@ class ComponentEditorWidget extends ScrolledWindow
          * And make sure the cursor is a Segment from this Series.
          */
 
-        this.cursorSegment = series.getSegment(0);
+        if (series.size() > 0) {
+            this.cursorSegment = series.getSegment(0);
+        } else {
+            this.cursorSegment = null;
+        }
+
+        /*
+         * Once again, I'm not happy with this. The bug is that sometimes the
+         * EndnoteSeriesEditorWidget and ReferencesSeriesEditorWidget are not
+         * actually requesting the appropriate amount of vertical space
+         * because they haven't calculated it yet. So annoying. Cycling the
+         * main loop seems to allow the idle handler to run, working around
+         * the problem Hopefully GTK 3.0 will be better about this.
+         */
+
+        Test.cycleMainLoop();
     }
 
-    private Segment lookup(Widget editor) {
+    private Segment lookup(Widget widget) {
         final int len;
         int i;
+        Editor editor;
+        EditorTextView view;
 
         len = editors.size();
 
@@ -304,7 +337,9 @@ class ComponentEditorWidget extends ScrolledWindow
         }
 
         for (i = 0; i < len; i++) {
-            if (editors.get(i) == editor) {
+            editor = editors.get(i);
+            view = editor.getTextView();
+            if (view == widget) {
                 return series.getSegment(i);
             }
         }
@@ -320,146 +355,45 @@ class ComponentEditorWidget extends ScrolledWindow
      */
     private EditorTextView lookup(Segment segment) {
         final int i;
+        final Editor editor;
 
         i = series.indexOf(segment);
-
-        return editors.get(i);
+        editor = editors.get(i);
+        return editor.getTextView();
     }
 
-    private Widget createEditorForSegment(int index, Segment segment) {
-        final Widget result;
-        final EditorTextView editor;
-        final HeadingBox heading;
-        final ImageDisplayBox image;
-        final Scrollbar bar;
-        final ScrolledWindow wide;
-        final ListitemBox listitem;
-
-        if (segment instanceof NormalSegment) {
-            editor = new NormalEditorTextView(this, segment);
-
-            result = editor;
-        } else if (segment instanceof QuoteSegment) {
-            editor = new QuoteEditorTextView(this, segment);
-
-            result = editor;
-        } else if (segment instanceof PoeticSegment) {
-            editor = new PoeticEditorTextView(this, segment);
-
-            result = editor;
-        } else if (segment instanceof ListitemSegment) {
-            listitem = new NormalListitemBox(this, segment);
-
-            editor = listitem.getEditor();
-            result = listitem;
-        } else if (segment instanceof AttributionSegment) {
-            editor = new AttributionEditorTextView(this, segment);
-
-            result = editor;
-        } else if (segment instanceof PreformatSegment) {
-            editor = new PreformatEditorTextView(this, segment);
-
-            wide = new ScrolledWindow();
-            wide.setPolicy(PolicyType.ALWAYS, PolicyType.NEVER);
-            wide.add(editor);
-
-            /*
-             * Having set up horizontal scrollbars for code blocks, we want to
-             * make them a bit less obtrusive in normal use.
-             */
-
-            bar = wide.getHScrollbar();
-            editor.connect(new Widget.FocusInEvent() {
-                public boolean onFocusInEvent(Widget source, EventFocus event) {
-                    bar.setSensitive(true);
-                    return false;
-                }
-            });
-            editor.connect(new Widget.FocusOutEvent() {
-                public boolean onFocusOutEvent(Widget source, EventFocus event) {
-                    bar.setValue(0);
-                    bar.setSensitive(false);
-                    return false;
-                }
-            });
-            bar.setSensitive(false);
-
-            bar.connect(new ExposeEvent() {
-                public boolean onExposeEvent(Widget source, EventExpose event) {
-                    final Context cr;
-                    final Surface surface;
-
-                    if (bar.getSensitive()) {
-                        return false;
-                    }
-
-                    cr = new Context(event);
-
-                    cr.setSource(Color.WHITE);
-                    cr.paint();
-
-                    surface = cr.getTarget();
-                    surface.flush();
-
-                    return true;
-                }
-            });
-
-            result = wide;
-        } else if (segment instanceof ImageSegment) {
-            image = new ImageDisplayBox(this, segment);
-
-            editor = image.getEditor();
-            result = image;
-        } else if (segment instanceof HeadingSegment) {
-            heading = new SectionHeadingBox(this, segment);
-
-            editor = heading.getEditor();
-            result = heading;
-        } else if (segment instanceof LeaderSegment) {
-            editor = new LeaderEditorTextView(this, segment);
-
-            result = editor;
-        } else if (segment instanceof ChapterSegment) {
-            heading = new ChapterHeadingBox(this, segment);
-
-            editor = heading.getEditor();
-            result = heading;
-        } else if (segment instanceof DivisionSegment) {
-            heading = new PartHeadingBox(this, segment);
-
-            editor = heading.getEditor();
-            result = heading;
-        }
-        /*
-         * TODO this is for testing ONLY, so we can at least see the note
-         * texts somewhere and edit them. Soon we will move this out of the
-         * main chapter body editor UI.
-         */
-        else if (segment instanceof EndnoteSegment) {
-            listitem = new ReferenceListitemBox(this, segment);
-
-            editor = listitem.getEditor();
-            result = listitem;
-        } else if (segment instanceof ReferenceSegment) {
-            listitem = new ReferenceListitemBox(this, segment);
-
-            editor = listitem.getEditor();
-            result = listitem;
-        } else if (segment instanceof SpecialSegment) {
-            // TODO placeholder; improve!
-            editor = null;
-            result = new SpecialHeadingBox(this, segment);
-        } else {
-
-            throw new IllegalStateException("Unknown Segment type");
-        }
-
-        editors.add(index, editor);
-
-        return result;
+    protected List<Editor> getEditors() {
+        return editors;
     }
 
+    /**
+     * Given a Segment, create the user interface for it. To be implemented by
+     * concrete subclasses.
+     * 
+     * @param index
+     *            The position within the series that this Segment is found.
+     * @param segment
+     */
+    abstract Widget createEditorForSegment(int index, Segment segment);
+
+    /**
+     * Initialize the editor with the appropriate Series from the given
+     * Component.
+     * 
+     * @param component
+     */
+    abstract void initialize(Component component);
+
+    abstract void advanceTo(Component replacement);
+
+    abstract void reverseTo(Component replacement);
+
+    abstract Component getComponent();
+
+    /**
+     * @deprecated
+     */
+    @SuppressWarnings("unused")
     private static boolean doesContainerHaveChild(Widget widget, Widget target) {
         final Widget[] children;
         Container parent;
@@ -498,7 +432,7 @@ class ComponentEditorWidget extends ScrolledWindow
         int i;
         Widget widget;
         Widget[] children;
-        EditorTextView editor;
+        Editor editor;
         Segment segment;
 
         if (this.series == replacement) {
@@ -591,7 +525,7 @@ class ComponentEditorWidget extends ScrolledWindow
         final int updated, added, third, deleted;
         Widget widget;
         Widget[] children;
-        EditorTextView editor;
+        Editor editor;
         Segment segment;
 
         if (this.series == series) {
@@ -649,8 +583,7 @@ class ComponentEditorWidget extends ScrolledWindow
      * 
      * @param editor
      */
-    void propegateTextualChange(final EditorTextView editor, final Segment previous,
-            final Segment segment) {
+    void propegateTextualChange(final Editor editor, final Segment previous, final Segment segment) {
         final Series former, replacement;
         final int i;
 
@@ -669,8 +602,17 @@ class ComponentEditorWidget extends ScrolledWindow
          * Now propegate that a state change has happened upwards.
          */
 
-        primary.update(this, former, replacement);
+        propegateTextualChange(primary, former, replacement);
     }
+
+    /**
+     * Compose a new Component object from the given Series and propegate
+     * upwards.
+     */
+    /*
+     * First argument is just there to restrict visibility
+     */
+    abstract void propegateTextualChange(PrimaryWindow primary, Series former, Series replacement);
 
     /**
      * 
@@ -683,6 +625,9 @@ class ComponentEditorWidget extends ScrolledWindow
     void propegateStructuralChange(final EditorTextView originating, final Segment first,
             final Segment added, final Segment third) {
         Series former, replacement;
+        final int I;
+        Editor editor;
+        EditorTextView view;
         int i;
 
         former = series;
@@ -690,14 +635,17 @@ class ComponentEditorWidget extends ScrolledWindow
         /*
          * Find the index of the view into the VBox.
          */
+        I = editors.size();
 
-        for (i = 0; i < editors.size(); i++) {
-            if (editors.get(i) == originating) {
+        for (i = 0; i < I; i++) {
+            editor = editors.get(i);
+            view = editor.getTextView();
+            if (view == originating) {
                 break;
             }
         }
-        if (i == editors.size()) {
-            throw new AssertionError("originating EditorTextView not in this ComponentEditorWidget");
+        if (i == I) {
+            throw new AssertionError("originating EditorTextView not in this SeriesEditorWidget");
         }
 
         /*
@@ -712,19 +660,26 @@ class ComponentEditorWidget extends ScrolledWindow
             replacement = former.splice(i, first, added, third);
         }
 
-        primary.update(this, former, replacement);
+        propegateStructuralChange(primary, former, replacement);
     }
 
+    /**
+     * Compose a new Component object from the given Series and propegate
+     * upwards.
+     */
+    abstract void propegateStructuralChange(PrimaryWindow primary, Series former, Series replacement);
+
     public void grabFocus() {
-        final Segment segment;
-        final EditorTextView first;
+        final Editor editor;
+        final int i;
 
-        segment = series.getSegment(0);
-        first = lookup(segment);
-        first.placeCursorFirstLine(0);
-        first.grabFocus();
+        if (series.size() == 0) {
+            return;
+        }
 
-        cursorSegment = segment;
+        i = series.indexOf(cursorSegment);
+        editor = editors.get(i);
+        editor.grabFocus();
     }
 
     Origin getCursor(final int folioPosition) {
@@ -753,7 +708,8 @@ class ComponentEditorWidget extends ScrolledWindow
     void moveCursorUp(final Widget from, final int position) {
         int i;
         Segment segment;
-        final EditorTextView editor;
+        final Editor editor;
+        final EditorTextView view;
 
         segment = lookup(from);
         i = series.indexOf(segment);
@@ -764,8 +720,9 @@ class ComponentEditorWidget extends ScrolledWindow
         i--;
 
         editor = editors.get(i);
-        editor.placeCursorLastLine(position);
-        editor.grabFocus();
+        view = editor.getTextView();
+        view.placeCursorLastLine(position);
+        view.grabFocus();
 
         cursorSegment = segment;
     }
@@ -773,7 +730,8 @@ class ComponentEditorWidget extends ScrolledWindow
     void moveCursorDown(final Widget from, final int position) {
         int i;
         Segment segment;
-        final EditorTextView editor;
+        final Editor editor;
+        final EditorTextView view;
 
         segment = lookup(from);
         i = series.indexOf(segment);
@@ -786,8 +744,9 @@ class ComponentEditorWidget extends ScrolledWindow
         segment = series.getSegment(i);
 
         editor = editors.get(i);
-        editor.placeCursorFirstLine(position);
-        editor.grabFocus();
+        view = editor.getTextView();
+        view.placeCursorFirstLine(position);
+        view.grabFocus();
 
         cursorSegment = segment;
     }
@@ -960,28 +919,6 @@ class ComponentEditorWidget extends ScrolledWindow
         return findEditorIn(children[i]);
     }
 
-    /**
-     * @deprecated Replaced by editors[].
-     */
-    private EditorTextView[] findEditors() {
-        final Widget[] children;
-        final EditorTextView[] editors;
-        final int num;
-        int i;
-        Widget child;
-
-        children = box.getChildren();
-        num = children.length;
-        editors = new EditorTextView[num];
-
-        for (i = 0; i < num; i++) {
-            child = children[i];
-            editors[i] = findEditorIn(child);
-        }
-
-        return editors;
-    }
-
     void moveCursorStart() {
         final EditorTextView editor;
 
@@ -1006,18 +943,44 @@ class ComponentEditorWidget extends ScrolledWindow
      * For testing only
      */
     final EditorTextView testGetEditor(int index) {
-        return editors.get(index);
+        final Editor editor;
+
+        editor = editors.get(index);
+        return editor.getTextView();
     }
 
     void forceRecheck() {
         final int I;
         int i;
-        EditorTextView editor;
+        Editor editor;
+        EditorTextView view;
 
         I = editors.size();
         for (i = 0; i < I; i++) {
             editor = editors.get(i);
-            editor.forceRecheck();
+            view = editor.getTextView();
+            view.forceRecheck();
         }
+    }
+
+    /**
+     * Get the data describing the popup menu appropriate for the Series being
+     * edited.
+     */
+    abstract InsertMenuDetails[] getInsertMenuDetails();
+}
+
+class InsertMenuDetails
+{
+    final Class<?> type;
+
+    final String text;
+
+    final String subtext;
+
+    InsertMenuDetails(Class<?> type, String text, String subtext) {
+        this.type = type;
+        this.text = text;
+        this.subtext = subtext;
     }
 }

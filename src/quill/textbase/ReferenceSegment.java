@@ -25,8 +25,14 @@ package quill.textbase;
  */
 public final class ReferenceSegment extends Segment
 {
+    // for loading
     public ReferenceSegment(Extract entire, String extra) {
         super(entire, extra, 0, 0, entire.getWidth());
+    }
+
+    // for insert segment
+    public ReferenceSegment(Extract entire) {
+        super(entire, "", 0, 0, entire.getWidth());
     }
 
     private ReferenceSegment(Extract entire, String extra, int offset, int removed, int inserted) {
@@ -39,5 +45,13 @@ public final class ReferenceSegment extends Segment
         extra = super.getExtra();
 
         return new ReferenceSegment(entire, extra, offset, removed, inserted);
+    }
+
+    public Segment createSimilar(String extra) {
+        final Extract entire;
+
+        entire = super.getEntire();
+
+        return new ReferenceSegment(entire, extra, 0, 0, 0);
     }
 }

@@ -35,4 +35,8 @@ public final class HeadingSegment extends Segment
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
         return new HeadingSegment(entire, super.getExtra(), offset, removed, inserted);
     }
+
+    public Segment createSimilar(String extra) {
+        return this;
+    }
 }

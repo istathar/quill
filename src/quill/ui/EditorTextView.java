@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -31,6 +31,7 @@ import org.gnome.gdk.MouseButton;
 import org.gnome.gdk.Rectangle;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
+import org.gnome.gtk.Entry;
 import org.gnome.gtk.EventBox;
 import org.gnome.gtk.InputMethod;
 import org.gnome.gtk.Label;
@@ -48,18 +49,12 @@ import org.gnome.gtk.WrapMode;
 import org.gnome.pango.FontDescription;
 
 import quill.client.Quill;
-import quill.textbase.AttributionSegment;
 import quill.textbase.Common;
-import quill.textbase.ComponentSegment;
 import quill.textbase.Extract;
 import quill.textbase.FormatTextualChange;
 import quill.textbase.HeadingSegment;
 import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
-import quill.textbase.NormalSegment;
-import quill.textbase.PoeticSegment;
-import quill.textbase.PreformatSegment;
-import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
 import quill.textbase.Span;
@@ -68,13 +63,12 @@ import quill.textbase.Special;
 import quill.textbase.TextChain;
 import quill.textbase.WordVisitor;
 
-import static org.freedesktop.bindings.Internationalization._;
 import static org.gnome.gdk.ModifierType.mask;
 import static org.gnome.gtk.TextWindowType.TEXT;
 import static quill.ui.Format.spelling;
 import static quill.ui.Format.tagForMarkup;
 
-abstract class EditorTextView extends TextView
+abstract class EditorTextView extends TextView implements Editor
 {
     protected final TextView view;
 
@@ -100,11 +94,11 @@ abstract class EditorTextView extends TextView
 
     private final UserInterface ui;
 
-    private final ComponentEditorWidget parent;
+    private final SeriesEditorWidget parent;
 
     private SpellChecker dict;
 
-    EditorTextView(ComponentEditorWidget parent, Segment segment) {
+    EditorTextView(SeriesEditorWidget parent, Segment segment) {
         super();
         this.view = this;
         this.ui = Quill.getUserInterface();
@@ -112,7 +106,6 @@ abstract class EditorTextView extends TextView
         this.chain = new TextChain();
 
         setupTextView();
-        setupInsertMenuDetails();
         setupContextMenu();
 
         initializeSegment(segment);
@@ -158,6 +151,27 @@ abstract class EditorTextView extends TextView
      */
     protected boolean isEnterAllowed() {
         return true;
+    }
+
+    /**
+     * Can you split this kind of Segment in two, or can you only append? This
+     * was originally for endnotes and references.
+     */
+    protected boolean isSpliceAllowed() {
+        return true;
+    }
+
+    /**
+     * In most cases, you are NOT allowed to follow a Segment with another
+     * Segment of the same type. The exception in main Series is
+     * ListitemSegment, and in endnotes and references EndnoteSegment and
+     * ReferenceSegment.
+     * 
+     * If this is overridden to <code>true</code> then the user is allowed to
+     * append another Segment of the same type. Default <code>false</code>.
+     */
+    protected boolean isSequenceAllowed() {
+        return false;
     }
 
     private void hookupKeybindings() {
@@ -700,9 +714,9 @@ abstract class EditorTextView extends TextView
      * this to be called has already updated the TextBuffer to match the
      * requirements of this state.
      */
-    void advanceTo(Segment segment) {
+    public void advanceTo(Segment segment) {
         final Segment previous;
-        final Extract entire, extract;
+        final Extract current, entire, extract;
         final TextIter start, finish;
         final int offset, removed, inserted;
 
@@ -715,7 +729,12 @@ abstract class EditorTextView extends TextView
          * Set the internal state
          */
 
+        current = chain.extractAll();
         entire = segment.getEntire();
+        if (current == entire) {
+            return;
+        }
+
         chain.setTree(entire);
 
         /*
@@ -765,9 +784,9 @@ abstract class EditorTextView extends TextView
         this.segment = segment;
     }
 
-    void reverseTo(Segment segment) {
+    public void reverseTo(Segment segment) {
         final Segment previous;
-        final Extract entire, extract;
+        final Extract current, entire, extract;
         final TextIter start, finish;
         final int offset, removed, inserted;
 
@@ -780,7 +799,11 @@ abstract class EditorTextView extends TextView
          * Set the internal state
          */
 
+        current = chain.extractAll();
         entire = segment.getEntire();
+        if (current == entire) {
+            return;
+        }
         chain.setTree(entire);
 
         offset = previous.getOffset();
@@ -874,7 +897,7 @@ abstract class EditorTextView extends TextView
     /**
      * Get (craete) a [new] Segment representing the state of this TextChain
      * as at the time you call this method, then pass it up to the parent
-     * ComponentEditorWidget for further propagation.
+     * SeriesEditorWidget for further propagation.
      * 
      * The internal TextChain must be updated before you call this.
      * 
@@ -989,8 +1012,8 @@ abstract class EditorTextView extends TextView
 
         /*
          * When you click in an EditorTextView, you may have come from
-         * somewhere else, so update the enclosing ComponentEditorWidget's
-         * idea of what the current segment is, thereby allowing it to drive
+         * somewhere else, so update the enclosing SeriesEditorWidget's idea
+         * of what the current segment is, thereby allowing it to drive
          * preview of the correct page.
          */
         view.connect(new Widget.ButtonPressEvent() {
@@ -1090,11 +1113,13 @@ abstract class EditorTextView extends TextView
 
     private Widget createEndnote(Span span) {
         final String ref;
+        final Markup markup;
         final FontDescription desc;
         final Label label;
         final EventBox box;
 
         ref = span.getText();
+        markup = span.getMarkup();
         desc = new FontDescription("Deja Vu Sans, 8.0");
         label = new Label(ref);
         label.modifyFont(desc);
@@ -1105,7 +1130,13 @@ abstract class EditorTextView extends TextView
 
         box.connect(new Widget.ButtonPressEvent() {
             public boolean onButtonPressEvent(Widget source, EventButton event) {
-                parent.getPrimary().switchToEndnotes();
+                if (markup == Special.NOTE) {
+                    parent.getPrimary().switchToEndnotes();
+                } else if (markup == Special.CITE) {
+                    parent.getPrimary().switchToReferences();
+                } else {
+                    throw new AssertionError();
+                }
                 return false;
             }
         });
@@ -1125,8 +1156,6 @@ abstract class EditorTextView extends TextView
         box.showAll();
         return box;
     }
-
-    private InsertMenuDetails[] insertDetails;
 
     private MenuItem createMenuItem(InsertMenuDetails details) {
         final String markup;
@@ -1160,43 +1189,9 @@ abstract class EditorTextView extends TextView
 
     private static class InsertContextMenu extends ContextMenu
     {
-        private InsertContextMenu(ComponentEditorWidget parent) {
+        private InsertContextMenu(SeriesEditorWidget parent) {
             super(parent);
         }
-    }
-
-    private static class InsertMenuDetails
-    {
-        final Class<?> type;
-
-        final String text;
-
-        final String subtext;
-
-        private InsertMenuDetails(Class<?> type, String text, String subtext) {
-            this.type = type;
-            this.text = text;
-            this.subtext = subtext;
-        }
-    }
-
-    /*
-     * Yes it would be "better" to write this such that the two arrays weren't
-     * coupled but instead strongly typed objects with two+ fields.
-     */
-    private void setupInsertMenuDetails() {
-        insertDetails = new InsertMenuDetails[] {
-            new InsertMenuDetails(NormalSegment.class, _("Text _paragraphs"), _("normal wrapped text")),
-            new InsertMenuDetails(PreformatSegment.class, _("_Program code"),
-                    _("formating preserved; monospaced")),
-            new InsertMenuDetails(QuoteSegment.class, _("Block _quote"),
-                    _("normal wrapped text, but indented")),
-            new InsertMenuDetails(PoeticSegment.class, _("Poe_m"), _("formating preserved")),
-            new InsertMenuDetails(AttributionSegment.class, _("_Attribution"),
-                    _("smaller wrapped text, offset right")),
-            new InsertMenuDetails(HeadingSegment.class, _("Section _heading"),
-                    _("bold text, single line"))
-        };
     }
 
     /*
@@ -1204,6 +1199,7 @@ abstract class EditorTextView extends TextView
      */
     private void popupInsertMenu() {
         final ContextMenu split;
+        final InsertMenuDetails[] details;
         final int I;
         MenuItem item;
         int i;
@@ -1220,10 +1216,11 @@ abstract class EditorTextView extends TextView
          */
 
         split = new InsertContextMenu(parent);
-        I = insertDetails.length;
+        details = parent.getInsertMenuDetails();
+        I = details.length;
 
         for (i = 0; i < I; i++) {
-            item = createMenuItem(insertDetails[i]);
+            item = createMenuItem(details[i]);
             split.append(item);
         }
 
@@ -1235,17 +1232,19 @@ abstract class EditorTextView extends TextView
 
         children = split.getChildren();
 
-        for (i = 0; i < I; i++) {
-            if (insertDetails[i].type.isInstance(segment)) {
-                children[i].setSensitive(false);
-            } else {
-                children[i].setSensitive(true);
+        if (isSequenceAllowed()) {
+            // leave them all on
+        } else {
+            for (i = 0; i < I; i++) {
+                if (details[i].type.isInstance(segment)) {
+                    children[i].setSensitive(false);
+                }
             }
         }
 
         /*
          * if we're at the last character of an existing Segment, then turn
-         * off the type that's already following
+         * off the type that's already following.
          */
 
         if (insertOffset == chain.length()) {
@@ -1257,16 +1256,12 @@ abstract class EditorTextView extends TextView
                 i++;
                 next = series.getSegment(i);
 
-                for (i = 0; i < insertDetails.length; i++) {
-                    if (insertDetails[i].type.isInstance(next)) {
+                for (i = 0; i < details.length; i++) {
+                    if ((details[i].type.isInstance(next)) && (details[i].type != HeadingSegment.class)) {
                         children[i].setSensitive(false);
                         break;
                     }
                 }
-            }
-        } else if (segment instanceof ComponentSegment) {
-            for (i = 0; i < insertDetails.length; i++) {
-                children[i].setSensitive(false);
             }
         }
 
@@ -1354,8 +1349,9 @@ abstract class EditorTextView extends TextView
 
     /**
      * Take the necessary actions to create a new Segment, which you pass in.
-     * If we're at the end of the view we're appending. Jump the logic to the
-     * user interface facades on PrimaryWindow.
+     * If we're at the end of the view [or splice not allowed] then we are
+     * appending. Jump the logic to the user interface facades on
+     * PrimaryWindow.
      */
     private void handleInsertSegment(Class<?> type) {
         final int offset, width;
@@ -1371,7 +1367,7 @@ abstract class EditorTextView extends TextView
         offset = insertOffset;
         width = chain.length() - offset;
 
-        if (width > 0) {
+        if ((width > 0) && (isSpliceAllowed())) {
             removed = chain.extractRange(offset, width);
             third = segment.createSimilar(removed, 0, 0, width);
 
@@ -1396,7 +1392,8 @@ abstract class EditorTextView extends TextView
             constructor = type.getConstructor(Extract.class);
             second = (Segment) constructor.newInstance(blank);
         } catch (Exception e) {
-            throw new AssertionError(e);
+            e.printStackTrace();
+            throw new AssertionError();
         }
 
         segment = first;
@@ -1911,6 +1908,10 @@ abstract class EditorTextView extends TextView
         return insertOffset;
     }
 
+    public Segment getSegment() {
+        return segment;
+    }
+
     /*
      * For testing only
      */
@@ -1942,5 +1943,16 @@ abstract class EditorTextView extends TextView
         dict = primary.getDictionary();
 
         checkSpellingRange(0, chain.length());
+    }
+
+    /*
+     * Implement Editor
+     */
+    public Entry getLabel() {
+        return null;
+    }
+
+    public EditorTextView getTextView() {
+        return this;
     }
 }

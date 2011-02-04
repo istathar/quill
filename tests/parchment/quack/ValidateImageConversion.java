@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -23,7 +23,8 @@ import java.io.IOException;
 import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.client.ImproperFilenameException;
-import quill.textbase.ComponentSegment;
+import quill.textbase.Component;
+import quill.textbase.FirstSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
@@ -32,39 +33,43 @@ public class ValidateImageConversion extends QuackTestCase
 {
     public final void testImageWithCaption() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
+        final Component component;
         final Series series;
         Segment segment;
 
-        series = loadDocument("tests/parchment/quack/ImageWithCaption.xml");
+        component = loadDocument("tests/parchment/quack/ImageWithCaption.xml");
+        series = component.getSeriesMain();
 
         assertEquals(1 + 1, series.size());
 
         segment = series.getSegment(0);
-        assertTrue(segment instanceof ComponentSegment);
+        assertTrue(segment instanceof FirstSegment);
 
         segment = series.getSegment(1);
         assertTrue(segment instanceof ImageSegment);
         assertEquals("NonExistent.svg", segment.getExtra());
 
-        compareDocument(series);
+        compareDocument(component);
     }
 
     public final void testImageWithoutCaption() throws IOException, ValidityException, ParsingException,
             ImproperFilenameException {
+        final Component component;
         final Series series;
         Segment segment;
 
-        series = loadDocument("tests/parchment/quack/ImageWithoutCaption.xml");
+        component = loadDocument("tests/parchment/quack/ImageWithoutCaption.xml");
+        series = component.getSeriesMain();
 
         assertEquals(1 + 1, series.size());
 
         segment = series.getSegment(0);
-        assertTrue(segment instanceof ComponentSegment);
+        assertTrue(segment instanceof FirstSegment);
 
         segment = series.getSegment(1);
         assertTrue(segment instanceof ImageSegment);
         assertEquals("OfNoFixedAddress.svg", segment.getExtra());
 
-        compareDocument(series);
+        compareDocument(component);
     }
 }

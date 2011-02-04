@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -32,8 +32,8 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.client.ImproperFilenameException;
 import quill.client.RecoveryFileExistsException;
+import quill.textbase.Component;
 import quill.textbase.Folio;
-import quill.textbase.Series;
 
 /**
  * A document on disk in a .parchment file contining a &lt;manuscript&gt; root
@@ -86,15 +86,15 @@ public class Manuscript
         final int size;
         String[] sources;
         int i;
-        Series series;
+        Component component;
         Chapter chapter;
-        final List<Series> components;
+        final List<Component> components;
         final List<Chapter> chapters;
         final Stylesheet style;
         final Metadata meta;
         final Folio folio;
 
-        components = new ArrayList<Series>();
+        components = new ArrayList<Component>();
         chapters = new ArrayList<Chapter>();
 
         source = new File(filename);
@@ -125,11 +125,11 @@ public class Manuscript
             chapter = new Chapter(this);
             chapter.setFilename(sources[i]);
 
-            series = chapter.loadDocument();
+            component = chapter.loadDocument();
 
             // Hm?
             chapters.add(chapter);
-            components.add(series);
+            components.add(component);
         }
 
         style = loader.getPresentationStylesheet();
@@ -173,18 +173,18 @@ public class Manuscript
      * directory. This is called when you start Quill without a filename.
      */
     public Folio createDocument(String directory) {
-        final Series series1;
+        final Component component1;
         final Folio folio;
         final Chapter chapter1;
         final Stylesheet blank;
         final Metadata none;
 
         chapter1 = new Chapter(this);
-        series1 = chapter1.createDocument();
+        component1 = chapter1.createDocument();
         blank = new Stylesheet();
         none = new Metadata();
 
-        folio = new Folio(this, chapter1, series1, blank, none);
+        folio = new Folio(this, chapter1, component1, blank, none);
 
         try {
             this.setFilename(directory + "/" + "Untitled.parchment");
@@ -256,7 +256,7 @@ public class Manuscript
      */
     public void saveDocument(Folio folio) throws IOException {
         int i;
-        Series series;
+        Component component;
         Chapter chapter;
 
         this.saveDocument0(folio);
@@ -266,9 +266,9 @@ public class Manuscript
          */
 
         for (i = 0; i < folio.size(); i++) {
-            series = folio.getSeries(i);
+            component = folio.getComponent(i);
             chapter = folio.getChapter(i);
-            chapter.saveDocument(series);
+            chapter.saveDocument(component);
         }
     }
 
@@ -341,7 +341,7 @@ public class Manuscript
         File marker;
         boolean result;
         Chapter chapter;
-        Series series;
+        Component component;
         final PrintStream err;
         int i;
 
@@ -373,9 +373,9 @@ public class Manuscript
 
         for (i = 0; i < folio.size(); i++) {
             chapter = folio.getChapter(i);
-            series = folio.getSeries(i);
+            component = folio.getComponent(i);
 
-            chapter.emergencySave(series, err, i);
+            chapter.emergencySave(component, err, i);
         }
 
         err.println("Done.");

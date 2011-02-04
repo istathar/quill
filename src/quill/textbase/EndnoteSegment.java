@@ -25,8 +25,14 @@ package quill.textbase;
  */
 public final class EndnoteSegment extends Segment
 {
+    // for loading
     public EndnoteSegment(Extract entire, String extra) {
         super(entire, extra, 0, 0, entire.getWidth());
+    }
+
+    // for insert segment
+    public EndnoteSegment(Extract entire) {
+        super(entire, "", 0, 0, entire.getWidth());
     }
 
     private EndnoteSegment(Extract entire, String extra, int offset, int removed, int inserted) {
@@ -39,5 +45,9 @@ public final class EndnoteSegment extends Segment
         extra = super.getExtra();
 
         return new EndnoteSegment(entire, extra, offset, removed, inserted);
+    }
+
+    public Segment createSimilar(String extra) {
+        return new ImageSegment(this.getEntire(), extra, 0, 0, 0);
     }
 }

@@ -105,6 +105,8 @@ public abstract class Segment
 
     public abstract Segment createSimilar(Extract entire, int offset, int removed, int inserted);
 
+    public abstract Segment createSimilar(String extra);
+
     /**
      * A single item of metadata, originally the filename for an ImageSegment.
      */

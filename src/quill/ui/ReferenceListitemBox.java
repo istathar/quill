@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -18,41 +18,30 @@
  */
 package quill.ui;
 
-import org.gnome.gtk.Alignment;
-import org.gnome.gtk.Label;
-import org.gnome.gtk.Widget;
-
 import quill.textbase.Segment;
 
 class ReferenceListitemBox extends ListitemBox
 {
-    ReferenceListitemBox(final ComponentEditorWidget parent, final Segment segment) {
-        super();
-        final Widget widget;
+    ReferenceListitemBox(final SeriesEditorWidget parent, final Segment segment) {
+        super(parent);
+        final ListitemEntry entry;
         final EditorTextView editor;
 
-        widget = createLabel(segment);
+        entry = new ReferenceListitemEntry(parent, segment);
         editor = new ReferenceEditorTextView(parent, segment);
 
-        super.setupLabel(widget);
+        super.setupLabelTop(entry);
         super.setupBody(editor);
     }
+}
 
-    private Widget createLabel(final Segment segment) {
-        final String text;
-        final Label label; // field?
-        final Alignment align;
-
-        text = segment.getExtra();
-
-        label = new Label();
-        label.setLabel(text);
-        label.setWidthChars(3);
-
-        align = new Alignment(Alignment.LEFT, Alignment.TOP, 0, 0);
-        align.setPadding(3, 0, 0, 1);
-        align.add(label);
-
-        return align;
+/*
+ * This is a placeholder; strictly we don't need a subclass, but in due course
+ * we might have more complex behaviours. For now, this shows the point.
+ */
+class ReferenceListitemEntry extends ListitemEntry
+{
+    public ReferenceListitemEntry(final SeriesEditorWidget parent, final Segment segment) {
+        super(parent, segment);
     }
 }

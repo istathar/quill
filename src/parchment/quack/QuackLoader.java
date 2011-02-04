@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -24,10 +24,11 @@ import nu.xom.Document;
 import quill.textbase.AttributionSegment;
 import quill.textbase.ChapterSegment;
 import quill.textbase.Common;
-import quill.textbase.ComponentSegment;
+import quill.textbase.Component;
 import quill.textbase.DivisionSegment;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.Extract;
+import quill.textbase.FirstSegment;
 import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.LeaderSegment;
@@ -56,7 +57,11 @@ import static quill.textbase.Span.createSpan;
  */
 public class QuackLoader
 {
-    private final ArrayList<Segment> list;
+    private final ArrayList<Segment> mainbody;
+
+    private final ArrayList<Segment> endnotes;
+
+    private final ArrayList<Segment> references;
 
     /**
      * The (single) formatting applicable at this insertion point.
@@ -103,7 +108,10 @@ public class QuackLoader
     private Span pending;
 
     public QuackLoader() {
-        list = new ArrayList<Segment>(5);
+        mainbody = new ArrayList<Segment>(16);
+        endnotes = new ArrayList<Segment>(4);
+        references = new ArrayList<Segment>(0);
+
         chain = null;
     }
 
@@ -116,7 +124,7 @@ public class QuackLoader
      * and we don't force instantiating a new QuackLoader, then clear the
      * processor state here.
      */
-    public Series process(Document doc) {
+    public Component process(Document doc) {
         final Root quack;
         int j;
         Block[] blocks;
@@ -141,7 +149,7 @@ public class QuackLoader
 
         ensureChapterHasTitle();
 
-        return new Series(list);
+        return new Component(new Series(mainbody), new Series(endnotes), new Series(references));
     }
 
     private void processComponent(Root quack) {
@@ -154,7 +162,7 @@ public class QuackLoader
     }
 
     /**
-     * Ensure that the first Segment in the Series is a ComponentSegment.
+     * Ensure that the first Segment in the Series is a FirstSegment.
      */
     /*
      * This is a bit of a hack, but this means that at run time inside the app
@@ -167,20 +175,20 @@ public class QuackLoader
         Segment first, second;
         final Extract blank;
 
-        num = list.size();
+        num = mainbody.size();
 
         if (num == 0) {
             blank = Extract.create();
             first = new ChapterSegment(blank);
-            list.add(first);
+            mainbody.add(first);
             second = new NormalSegment(blank);
-            list.add(second);
+            mainbody.add(second);
             return;
         }
 
-        first = list.get(0);
+        first = mainbody.get(0);
 
-        if (first instanceof ComponentSegment) {
+        if (first instanceof FirstSegment) {
             if (num > 1) {
                 /*
                  * This is the usual case; there's a title and some body.
@@ -191,11 +199,11 @@ public class QuackLoader
 
             blank = Extract.create();
             second = new NormalSegment(blank);
-            list.add(second);
+            mainbody.add(second);
         } else {
             blank = Extract.create();
             first = new ChapterSegment(blank);
-            list.add(0, first);
+            mainbody.add(0, first);
         }
     }
 
@@ -218,8 +226,8 @@ public class QuackLoader
                 chain.setTree(entire);
                 chain.append(Span.createSpan('\n', null));
 
-                i = list.size() - 1;
-                list.remove(i);
+                i = mainbody.size() - 1;
+                mainbody.remove(i);
             }
         } else if (block instanceof CodeElement) {
             preserve = true;
@@ -230,8 +238,8 @@ public class QuackLoader
                 chain.setTree(entire);
                 chain.append(Span.createSpan('\n', null));
 
-                i = list.size() - 1;
-                list.remove(i);
+                i = mainbody.size() - 1;
+                mainbody.remove(i);
             }
         } else if (block instanceof PoemElement) {
             preserve = true;
@@ -243,8 +251,8 @@ public class QuackLoader
                 chain.setTree(entire);
                 chain.append(Span.createSpan('\n', null));
 
-                i = list.size() - 1;
-                list.remove(i);
+                i = mainbody.size() - 1;
+                mainbody.remove(i);
 
                 attribute = segment.getExtra();
             }
@@ -255,8 +263,8 @@ public class QuackLoader
                 chain.setTree(entire);
                 chain.append(Span.createSpan('\n', null));
 
-                i = list.size() - 1;
-                list.remove(i);
+                i = mainbody.size() - 1;
+                mainbody.remove(i);
             }
         } else if (block instanceof HeadingElement) {
             preserve = false;
@@ -302,37 +310,50 @@ public class QuackLoader
 
         if (block instanceof TextElement) {
             segment = new NormalSegment(entire);
+            mainbody.add(segment);
         } else if (block instanceof CodeElement) {
             segment = new PreformatSegment(entire);
+            mainbody.add(segment);
         } else if (block instanceof QuoteElement) {
             segment = new QuoteSegment(entire);
+            mainbody.add(segment);
         } else if (block instanceof PoemElement) {
             segment = new PoeticSegment(entire);
+            mainbody.add(segment);
         } else if (block instanceof ListElement) {
             segment = new ListitemSegment(entire, attribute);
+            mainbody.add(segment);
         } else if (block instanceof CreditElement) {
             segment = new AttributionSegment(entire);
+            mainbody.add(segment);
         } else if (block instanceof HeadingElement) {
             segment = new HeadingSegment(entire, attribute);
+            mainbody.add(segment);
         } else if (block instanceof ImageElement) {
             segment = new ImageSegment(entire, attribute);
+            mainbody.add(segment);
         } else if (block instanceof ChapterElement) {
             segment = new ChapterSegment(entire, attribute);
+            mainbody.add(segment);
         } else if (block instanceof DivisionElement) {
             segment = new DivisionSegment(entire, attribute);
+            mainbody.add(segment);
         } else if (block instanceof EndnoteElement) {
             segment = new EndnoteSegment(entire, attribute);
+            endnotes.add(segment);
         } else if (block instanceof ReferenceElement) {
             segment = new ReferenceSegment(entire, attribute);
+            references.add(segment);
         } else if (block instanceof LeaderElement) {
             segment = new LeaderSegment(entire);
+            mainbody.add(segment);
         } else if (block instanceof SpecialElement) {
             segment = new SpecialSegment(attribute);
+            mainbody.add(segment);
         } else {
             throw new IllegalStateException("\n" + "What kind of Block is " + block);
         }
 
-        list.add(segment);
     }
 
     private void processData(final Block block) {

@@ -98,6 +98,11 @@ class HelpWidget extends ScrolledWindow
                 _("Notes"),
                 _("Edit endnotes for the current chapter.")
             },
+            new String[] {
+                "F8",
+                _("References"),
+                _("Edit the document's list of references.")
+            },
 
             new String[] {
                 "F11",

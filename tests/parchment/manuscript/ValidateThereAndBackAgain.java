@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -25,7 +25,7 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
-import quill.textbase.Series;
+import quill.textbase.Component;
 
 /**
  * <p>
@@ -41,7 +41,7 @@ public class ValidateThereAndBackAgain extends IOTestCase
         final Manuscript manuscript;
         final File source, target;
         final Chapter chapter;
-        final Series series;
+        final Component component;
         final String msg;
         final String sum1, sum2;
 
@@ -52,14 +52,14 @@ public class ValidateThereAndBackAgain extends IOTestCase
         manuscript.setFilename("NonExistent.parchment"); // junk
         chapter = new Chapter(manuscript);
         chapter.setFilename(from);
-        series = chapter.loadDocument();
+        component = chapter.loadDocument();
 
         ensureDirectory("tmp/unittests/parchment/manuscript/");
         manuscript.setFilename("tmp/unittests/parchment/manuscript/ValidateThereAndBackAgain.parchment"); // junk
         chapter.setFilename("testRoundTrip.xml");
         target = new File(chapter.getFilename());
 
-        chapter.saveDocument(series);
+        chapter.saveDocument(component);
 
         /*
          * Now run an hashing algorithm over both files to figure out if
@@ -99,14 +99,14 @@ public class ValidateThereAndBackAgain extends IOTestCase
             ImproperFilenameException {
         final Manuscript manuscript;
         final Chapter chapter;
-        final Series series;
+        final Component component;
         int i;
 
         manuscript = new Manuscript();
         manuscript.setFilename("tests/ExampleDocument.parchment");
         chapter = new Chapter(manuscript);
         chapter.setFilename("SomeOfEverything.xml");
-        series = chapter.loadDocument();
+        component = chapter.loadDocument();
 
         for (i = 1; i <= 70; i++) {
             System.err.print(i / 10);
@@ -118,6 +118,6 @@ public class ValidateThereAndBackAgain extends IOTestCase
         System.err.println("\n");
         System.err.flush();
 
-        chapter.saveDocument(series, System.out);
+        chapter.saveDocument(component, System.out);
     }
 }

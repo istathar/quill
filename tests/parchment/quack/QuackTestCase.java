@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2010-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -28,18 +28,18 @@ import parchment.manuscript.Chapter;
 import parchment.manuscript.Manuscript;
 import quill.client.IOTestCase;
 import quill.client.ImproperFilenameException;
-import quill.textbase.Series;
+import quill.textbase.Component;
 
 /**
  * Tests to round-trip a Quack Schema chapter. Use as follows:
  * 
  * <pre>
  * public final void testFeatureSix() {
- *     series = super.loadDocument(&quot;tests/parchment/quack/ImageWithCaption.xml&quot;);
+ *     component = super.loadDocument(&quot;tests/parchment/quack/ImageWithCaption.xml&quot;);
  * 
  *     // do tests, as you wish.
  * 
- *     super.compareDocument(series);
+ *     super.compareDocument(component);
  * }
  * </pre>
  * 
@@ -54,12 +54,12 @@ class QuackTestCase extends IOTestCase
     /**
      * Load the given file for later comparison.
      */
-    protected Series loadDocument(String filename) throws ValidityException, ParsingException,
+    protected Component loadDocument(String filename) throws ValidityException, ParsingException,
             IOException, ImproperFilenameException {
         final Manuscript manuscript;
         final File source;
         final Chapter chapter;
-        final Series series;
+        final Component component;
         final String directory, basename;
 
         source = new File(filename);
@@ -78,26 +78,27 @@ class QuackTestCase extends IOTestCase
         chapter = new Chapter(manuscript);
         chapter.setFilename(basename);
 
-        series = chapter.loadDocument();
+        component = chapter.loadDocument();
 
         this.filename = filename;
         this.chapter = chapter;
 
-        return series;
+        return component;
     }
 
     /**
-     * Write the given Series out to disk and compare it to the document that
-     * this QuackTestCase was loaded from in {@link #loadDocument(String)}
+     * Write the given Component out to disk and compare it to the document
+     * that this QuackTestCase was loaded from in
+     * {@link #loadDocument(String)}
      */
-    protected void compareDocument(Series series) throws IOException {
+    protected void compareDocument(Component component) throws IOException {
         final ByteArrayOutputStream out;
         final String original, result;
 
         original = loadFileIntoString(filename);
 
         out = new ByteArrayOutputStream();
-        chapter.saveDocument(series, out);
+        chapter.saveDocument(component, out);
 
         result = out.toString();
         assertEquals(original, result);

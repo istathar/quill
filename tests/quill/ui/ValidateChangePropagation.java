@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -33,6 +33,7 @@ import org.gnome.gtk.TextIter;
 
 import parchment.manuscript.Chapter;
 import parchment.manuscript.Manuscript;
+import quill.textbase.Component;
 import quill.textbase.Extract;
 import quill.textbase.Folio;
 import quill.textbase.Segment;
@@ -63,9 +64,10 @@ public class ValidateChangePropagation extends GraphicalTestCase
         final Manuscript manuscript;
         final Chapter chapter;
         final Folio folio;
+        Component component;
         Series series;
         final PrimaryWindow primary;
-        final ComponentEditorWidget parent;
+        final SeriesEditorWidget parent;
         final EditorTextView editor;
         final Segment segment;
         final Extract entire;
@@ -80,7 +82,8 @@ public class ValidateChangePropagation extends GraphicalTestCase
         primary = new PrimaryWindow();
         primary.displayDocument(folio);
 
-        series = folio.getSeries(0);
+        component = folio.getComponent(0);
+        series = component.getSeriesMain();
         segment = series.getSegment(1);
         entire = segment.getEntire();
         span = createSpan('h', null);
@@ -88,10 +91,10 @@ public class ValidateChangePropagation extends GraphicalTestCase
         parent = primary.testGetEditor();
         editor = parent.testGetEditor(0);
         editor.testAppendSpan(span);
-        series = parent.getSeries();
+        component = parent.getComponent();
 
         out = new ByteArrayOutputStream();
-        chapter.saveDocument(series, out);
+        chapter.saveDocument(component, out);
 
         expected = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -108,6 +111,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         final Manuscript manuscript;
         final Chapter chapter;
         final Folio folio;
+        final Component component;
         final Series series;
         final PrimaryWindow primary;
         final Segment segment;
@@ -131,7 +135,8 @@ public class ValidateChangePropagation extends GraphicalTestCase
          * Establish some starting text.
          */
 
-        series = folio.getSeries(0);
+        component = folio.getComponent(0);
+        series = component.getSeriesMain();
         segment = series.getSegment(1);
         entire = segment.getEntire();
         span = createSpan("This is a test of the emergency broadcast system", null);
@@ -139,7 +144,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         // FIXME
 
         out = new ByteArrayOutputStream();
-        chapter.saveDocument(series, out);
+        chapter.saveDocument(component, out);
 
         expected = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -186,7 +191,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
          */
 
         out = new ByteArrayOutputStream();
-        chapter.saveDocument(series, out);
+        chapter.saveDocument(component, out);
 
         expected = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -204,6 +209,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         final PrimaryWindow primary;
         final Folio folio;
         final Chapter chapter;
+        final Component component;
         final Series series;
         final Segment segment;
         final TextChain chain;
@@ -220,13 +226,14 @@ public class ValidateChangePropagation extends GraphicalTestCase
         folio = manuscript.createDocument();
         primary.displayDocument(folio);
         chapter = folio.getChapter(0);
-        series = folio.getSeries(0);
+        component = folio.getComponent(0);
+        series = component.getSeriesMain();
 
         /*
          * Establish some starting text.
          */
 
-        segment = folio.getSeries(0).getSegment(1);
+        segment = series.getSegment(1);
         extract = segment.getEntire();
 
         span = createSpan("This is a test of the emergency broadcast system", null);
@@ -237,7 +244,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         // Common.ITALICS);
 
         out = new ByteArrayOutputStream();
-        chapter.saveDocument(series, out);
+        chapter.saveDocument(component, out);
 
         expected = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -271,7 +278,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         buffer.endUserAction();
 
         out = new ByteArrayOutputStream();
-        chapter.saveDocument(series, out);
+        chapter.saveDocument(component, out);
 
         expected = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -301,7 +308,7 @@ public class ValidateChangePropagation extends GraphicalTestCase
         buffer.endUserAction();
 
         out = new ByteArrayOutputStream();
-        chapter.saveDocument(series, out);
+        chapter.saveDocument(component, out);
 
         expected = combine(new String[] {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",

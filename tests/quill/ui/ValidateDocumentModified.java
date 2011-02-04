@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -23,6 +23,7 @@ import java.io.IOException;
 import parchment.manuscript.Manuscript;
 import quill.client.ImproperFilenameException;
 import quill.textbase.Common;
+import quill.textbase.Component;
 import quill.textbase.Folio;
 import quill.textbase.NormalSegment;
 import quill.textbase.Segment;
@@ -35,17 +36,20 @@ import static quill.textbase.Span.createSpan;
 public class ValidateDocumentModified extends GraphicalTestCase
 {
     private static final void insertThreeSpansIntoFirstSegment(final PrimaryWindow primary) {
-        final ComponentEditorWidget parent;
+        final SeriesEditorWidget parent;
         final EditorTextView editor;
-        Folio folio;
+        final Folio folio;
+        final Component component;
         final Span[] spans;
         int i;
         Span span;
+
         Series series;
         Segment segment;
 
         folio = primary.getDocument();
-        series = folio.getSeries(0);
+        component = folio.getComponent(0);
+        series = component.getSeriesMain();
         segment = series.getSegment(1);
         assertTrue(segment instanceof NormalSegment);
 

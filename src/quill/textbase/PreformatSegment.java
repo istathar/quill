@@ -39,4 +39,8 @@ public final class PreformatSegment extends Segment
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
         return new PreformatSegment(entire, offset, removed, inserted);
     }
+
+    public Segment createSimilar(String extra) {
+        return this;
+    }
 }
