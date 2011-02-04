@@ -604,27 +604,42 @@ class PrimaryWindow extends Window
         }
     }
 
+    private void switchPaneLeft(Widget replacement) {
+        final Widget child;
+
+        if (true) {
+            child = pane.getChild1();
+            pane.remove(child);
+            pane.add1(replacement);
+        }
+    }
+
+    private void switchPaneRight(Widget replacement) {
+        final Widget child;
+
+        if (showingRightSide) {
+            child = pane.getChild2();
+            pane.remove(child);
+            pane.add2(replacement);
+        } else {
+            child = pane.getChild1();
+            pane.remove(child);
+            pane.add1(replacement);
+        }
+    }
+
     /**
      * Change the left side to show the chapter mainbody.
      */
     void switchToEditor() {
-        final Widget child;
-
-        child = pane.getChild1();
-        pane.remove(child);
-        pane.add1(gauche[0]);
+        this.switchPaneLeft(gauche[0]);
     }
 
     /**
      * Change the left side to show the Stylesheet mainbody.
      */
     void switchToStylesheet() {
-        final Widget child;
-
-        child = pane.getChild1();
-        pane.remove(child);
-        pane.add1(gauche[1]);
-
+        this.switchPaneLeft(gauche[1]);
         stylist.grabDefault();
     }
 
@@ -632,12 +647,7 @@ class PrimaryWindow extends Window
      * Change the left side to show the Metadata mainbody.
      */
     void switchToMetadata() {
-        final Widget child;
-
-        child = pane.getChild1();
-        pane.remove(child);
-        pane.add1(gauche[2]);
-
+        this.switchPaneLeft(gauche[2]);
         metaditor.grabDefault();
     }
 
@@ -646,22 +656,14 @@ class PrimaryWindow extends Window
      * morph it into an AboutDialog, or global help, or...
      */
     void switchToIntro() {
-        final Widget child;
-
-        child = pane.getChild2();
-        pane.remove(child);
-        pane.add2(droit[4]);
+        this.switchPaneRight(droit[4]);
     }
 
     /**
      * Change the right side to show the help pane.
      */
     void switchToHelp() {
-        final Widget child;
-
-        child = pane.getChild2();
-        pane.remove(child);
-        pane.add2(droit[1]);
+        this.switchPaneRight(droit[1]);
     }
 
     /**
@@ -669,12 +671,7 @@ class PrimaryWindow extends Window
      * to date.
      */
     void switchToPreview() {
-        final Widget child;
-
-        child = pane.getChild2();
-        pane.remove(child);
-        pane.add2(droit[0]);
-
+        this.switchPaneRight(droit[0]);
         preview.refreshDisplayAtCursor();
     }
 
@@ -704,12 +701,7 @@ class PrimaryWindow extends Window
      * Change the right side to show the outline navigator.
      */
     void switchToOutline() {
-        final Widget child;
-
-        child = pane.getChild2();
-        pane.remove(child);
-        pane.add2(droit[2]);
-
+        this.switchPaneRight(droit[2]);
         outline.refreshDisplay();
     }
 
@@ -717,19 +709,11 @@ class PrimaryWindow extends Window
      * Change the right side to show the notes and references mainbody.
      */
     void switchToEndnotes() {
-        final Widget child;
-
-        child = pane.getChild2();
-        pane.remove(child);
-        pane.add2(droit[3]);
+        this.switchPaneRight(droit[3]);
     }
 
     void switchToReferences() {
-        final Widget child;
-
-        child = pane.getChild2();
-        pane.remove(child);
-        pane.add2(droit[5]);
+        this.switchPaneRight(droit[5]);
     }
 
     /**
