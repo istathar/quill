@@ -105,6 +105,11 @@ class PrimaryWindow extends Window
     private ReferencesSeriesEditorWidget references;
 
     /**
+     * What was the last side requested?
+     */
+    private Widget previous;
+
+    /**
      * The document this PrimaryWindow is displaying.
      */
     private Manuscript manuscript;
@@ -368,6 +373,7 @@ class PrimaryWindow extends Window
         gauche[2] = align;
 
         pane.add1(mainbody);
+        previous = mainbody; // gauche[0], actually
     }
 
     private void setupPreviewSide() {
@@ -589,7 +595,13 @@ class PrimaryWindow extends Window
 
         if (showingRightSide) {
             alloc = left.getAllocation();
-            right.hide();
+
+            if (previous == left) {
+                right.hide();
+            } else {
+                left.hide();
+            }
+
             if (!largeScreen) {
                 window.setMaximize(false);
             }
@@ -628,6 +640,8 @@ class PrimaryWindow extends Window
         child = pane.getChild1();
         pane.remove(child);
         pane.add1(replacement);
+
+        previous = replacement;
     }
 
     private void switchPaneRight(Widget replacement) {
@@ -644,6 +658,8 @@ class PrimaryWindow extends Window
         child = pane.getChild2();
         pane.remove(child);
         pane.add2(replacement);
+
+        previous = replacement;
     }
 
     /**
