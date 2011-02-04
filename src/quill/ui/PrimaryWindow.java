@@ -596,6 +596,7 @@ class PrimaryWindow extends Window
             window.resize(alloc.getWidth(), 950);
             showingRightSide = false;
         } else {
+            left.show();
             right.show();
             if (!largeScreen) {
                 window.setMaximize(true);
@@ -604,28 +605,45 @@ class PrimaryWindow extends Window
         }
     }
 
+    /*
+     * Further commentary about the sides. This is a bit magical: if there is
+     * only one side of a Paned showing, the resizing divider does not show.
+     * That's great, what we want, and the effect we probably would have had
+     * to code ourselves if it didn't work that way. Which of course means
+     * we're going to need to watch out for that behaving on other people's
+     * systems.
+     */
     private void switchPaneLeft(Widget replacement) {
         final Widget child;
+        final Widget left, right;
 
-        if (true) {
-            child = pane.getChild1();
-            pane.remove(child);
-            pane.add1(replacement);
+        if (!showingRightSide) {
+            left = pane.getChild1();
+            right = pane.getChild2();
+
+            right.hide();
+            left.show();
         }
+
+        child = pane.getChild1();
+        pane.remove(child);
+        pane.add1(replacement);
     }
 
     private void switchPaneRight(Widget replacement) {
         final Widget child;
+        final Widget left, right;
 
-        if (showingRightSide) {
-            child = pane.getChild2();
-            pane.remove(child);
-            pane.add2(replacement);
-        } else {
-            child = pane.getChild1();
-            pane.remove(child);
-            pane.add1(replacement);
+        if (!showingRightSide) {
+            left = pane.getChild1();
+            right = pane.getChild2();
+
+            left.hide();
+            right.show();
         }
+        child = pane.getChild2();
+        pane.remove(child);
+        pane.add2(replacement);
     }
 
     /**
