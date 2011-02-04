@@ -638,8 +638,11 @@ class PrimaryWindow extends Window
         }
 
         child = pane.getChild1();
-        pane.remove(child);
-        pane.add1(replacement);
+
+        if (child != replacement) {
+            pane.remove(child);
+            pane.add1(replacement);
+        }
 
         previous = replacement;
     }
@@ -656,8 +659,11 @@ class PrimaryWindow extends Window
             right.show();
         }
         child = pane.getChild2();
-        pane.remove(child);
-        pane.add2(replacement);
+
+        if (child != replacement) {
+            pane.remove(child);
+            pane.add2(replacement);
+        }
 
         previous = replacement;
     }
@@ -1243,6 +1249,8 @@ class PrimaryWindow extends Window
             cursor = component;
             mainbody.initialize(cursor);
         }
+
+        this.switchToEditor();
 
         mainbody.ensureVisible(segment, true);
 
