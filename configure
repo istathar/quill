@@ -1144,7 +1144,7 @@ Comment=Content Presentation Publishing separation
 Categories=GNOME;GTK;Office;
 Path=$prefix
 Exec=$prefix/bin/quill
-Icon=$prefix/share/pixmaps/quill-and-parchment.png
+Icon=quill-and-parchment
 StartupNotify=true
 MimeType=application/x-parchment
 HERE

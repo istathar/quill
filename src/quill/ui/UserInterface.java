@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2008-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2008-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -73,7 +73,7 @@ public class UserInterface
 
     private void loadImages() {
         try {
-            images.quill = new Pixbuf("share/pixmaps/quill-and-parchment.png"); // 48x48
+            images.quill = new Pixbuf("share/icons/hicolor/48x48/apps/quill-and-parchment.png"); // 48x48
         } catch (FileNotFoundException fnfe) {
             System.err.println("Icon file not found: " + fnfe.getMessage());
         }
