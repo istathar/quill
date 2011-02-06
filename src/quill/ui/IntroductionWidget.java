@@ -63,7 +63,7 @@ class IntroductionWidget extends VBox
         try {
             top = this;
 
-            pixbuf = new Pixbuf("share/pixmaps/feather.png", 128, 128, true);
+            pixbuf = new Pixbuf("share/quill/images/feather.png", 128, 128, true);
             image = new Image(pixbuf);
             image.setAlignment(Alignment.CENTER, Alignment.BOTTOM);
             top.packStart(image, false, false, 10);
