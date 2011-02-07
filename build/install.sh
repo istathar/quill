@@ -3,7 +3,7 @@
 # install.sh
 # Install the source code
 #
-# Copyright © 2010 Operational Dynamics Consulting, Pty Ltd
+# Copyright © 2010-2011 Operational Dynamics Consulting, Pty Ltd
 # 
 # The code in this file, and the library it is a part of, are made available
 # to you by the authors under the terms of the "GNU General Public Licence
@@ -14,15 +14,25 @@
 source .config
 
 
-# --------------------------------------------------------------------
-# Installation
-# --------------------------------------------------------------------
+#
+# Build .jar file if necessary
+#
 
-if [ tmp/stamp/build-core -nt tmp/quill.jar ] ; then
+if [ -f tmp/quill.jar ] ; then
+	find tmp/classes -type f -name '*.class' -newer tmp/quill.jar > tmp/stamp/list-classes
+else
+	echo "ALL" > tmp/stamp/list-classes
+fi
+
+if [ -s tmp/stamp/list-classes ] ; then
 	echo -e "${JAR_CMD}\ttmp/quill.jar"
 	${JAR} -cf tmp/quill.jar -C tmp/classes .
 fi
+rm -f tmp/stamp/list-classes
 
+#
+# Install to prefix
+#
 
 install_mkdir () {
 	if [ ! -d $1 ] ; then
