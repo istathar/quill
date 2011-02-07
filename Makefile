@@ -72,6 +72,7 @@ install: compile
 clean:
 	@/bin/echo -e "RM\ttemporary build directories"
 	-rm -rf tmp/classes
+	-rm -rf tmp/unittests
 	-rm -rf tmp/stamp
 	-rm -rf hs_err_*
 	@/bin/echo -e "RM\texecutables and wrappers"
