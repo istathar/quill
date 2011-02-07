@@ -12,10 +12,14 @@
 
 source .config
 
+#
+# Compile test case code.
+#
+
 find tests -type f -name '*.java' | perl -n -e '
 	chomp;
 	$java = $_;
-	s{src}{tmp/classes};
+	s{tests}{tmp/unittests};
 	s{\.java}{\.class};
 	$class = $_;
 
@@ -37,8 +41,17 @@ if [ -s tmp/stamp/list-tests ] ; then
 	if [ $? -ne 0 ] ; then
 		exit 1
 	fi
-	rm tmp/stamp/list-tests
 fi
+
+#
+# Cleanup.
+#
+
+rm -f tmp/stamp/list-tests
+
+#
+# Run tests.
+#
 
 echo -e "${JAVA_CMD}\tUnitTests"
 exec ${JAVA} \

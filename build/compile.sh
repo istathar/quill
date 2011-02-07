@@ -20,6 +20,10 @@ if [ ! -d  tmp/classes ] ; then
 	mkdir -p tmp/i18n
 fi
 
+#
+# Compile main program code.
+#
+
 find src -type f -name '*.java' | perl -n -e '
 	chomp;
 	$java = $_;
@@ -45,7 +49,6 @@ if [ -s tmp/stamp/list-core ] ; then
 	if [ $? -ne 0 ] ; then
 		exit 1
 	fi
-	rm tmp/stamp/list-core
 fi
 
 # strictly speaking, not necessary to generate the .pot file, but this has to
@@ -56,15 +59,13 @@ if [ ! -f tmp/i18n/quill.pot ] ; then
 fi
 find src -type f -name '*.java' -newer tmp/i18n/quill.pot > tmp/stamp/list-i18n
 if [ -s tmp/stamp/list-i18n ] ; then
-	rm tmp/stamp/list-i18n
 	echo -e "EXTRACT\ttmp/i18n/quill.pot"
 	find src -type f -name '*.java' > tmp/stamp/list-core
 	xgettext -o tmp/i18n/quill.pot --omit-header --from-code=UTF-8 --keyword=_ --keyword=N_ `cat tmp/stamp/list-core`
-	rm tmp/stamp/list-core
 fi
 
 #
-# Compile translations
+# Compile translations.
 #
 
 for i in po/*.po
@@ -86,3 +87,10 @@ if [ tmp/launcher/quill-local -nt quill ] ; then
 	echo -e "CHMOD\tquill"
 	chmod +x quill
 fi
+
+#
+# Cleanup. Leave build stamps; they are for communicating between scripts.
+#
+
+rm -f tmp/stamp/list-core
+rm -f tmp/stamp/list-i18n
