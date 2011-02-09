@@ -47,6 +47,7 @@ class OptionalMenuBar extends MenuBar
 
         setupManuscriptMenu();
         setupChapterMenu();
+        setupInsertMenu();
         setupEditMenu();
         setupViewMenu();
         setupFormatMenu();
@@ -54,11 +55,80 @@ class OptionalMenuBar extends MenuBar
     }
 
     private void setupManuscriptMenu() {
-        bar.append(new MenuItem("_Manuscript"));
+        final Menu menu;
+        final MenuItem manuscript;
+        final MenuItem create, open, save, print, export, quit;
+
+        menu = new Menu();
+        menu.setAcceleratorGroup(group);
+
+        create = new ImageMenuItem(Stock.NEW);
+        menu.append(create);
+
+        open = new ImageMenuItem(Stock.OPEN);
+        open.setAccelerator(group, Keyval.o, ModifierType.CONTROL_MASK);
+        menu.append(open);
+
+        save = new ImageMenuItem(Stock.SAVE);
+        save.setAccelerator(group, Keyval.s, ModifierType.CONTROL_MASK);
+        menu.append(save);
+
+        menu.append(new SeparatorMenuItem());
+
+        print = new ImageMenuItem(Stock.PRINT);
+        print.setAccelerator(group, Keyval.p, ModifierType.CONTROL_MASK);
+        menu.append(print);
+
+        export = new MenuItem("_Export");
+        export.setAccelerator(group, Keyval.e, ModifierType.CONTROL_MASK);
+        menu.append(export);
+
+        menu.append(new SeparatorMenuItem());
+
+        quit = new ImageMenuItem(Stock.QUIT);
+        quit.setAccelerator(group, Keyval.q, ModifierType.CONTROL_MASK);
+        menu.append(quit);
+
+        /*
+         * Build the actual top level item for the menu bar.
+         */
+
+        manuscript = new MenuItem("_Manuscript");
+        manuscript.setSubmenu(menu);
+
+        bar.append(manuscript);
     }
 
     private void setupChapterMenu() {
         bar.append(new MenuItem("_Chapter"));
+    }
+
+    private void setupInsertMenu() {
+        final Menu menu;
+        final MenuItem edit;
+        final MenuItem note, cite, block;
+
+        menu = new Menu();
+        menu.setAcceleratorGroup(group);
+
+        note = new MenuItem("Endnote Anchor");
+        menu.append(note);
+
+        cite = new MenuItem("Reference Citation");
+        menu.append(cite);
+
+        block = new MenuItem("Block...");
+        block.setAccelerator(group, Keyval.Insert, ModifierType.NONE);
+        menu.append(block);
+
+        /*
+         * Build the actual top level item for the menu bar.
+         */
+
+        edit = new MenuItem("_Insert");
+        edit.setSubmenu(menu);
+
+        bar.append(edit);
     }
 
     private void setupEditMenu() {
@@ -104,8 +174,8 @@ class OptionalMenuBar extends MenuBar
     private void setupViewMenu() {
         final Menu menu;
         final MenuItem view;
-        final MenuItem editor, stylist, metaditor, preview, outline, endnotes, references;
-        final CheckMenuItem fullscreen, single, optional;
+        final MenuItem editor, stylist, metaditor, preview, outline, endnotes, references, fullscreen;
+        final CheckMenuItem single, optional;
 
         menu = new Menu();
         menu.setAcceleratorGroup(group);
@@ -140,8 +210,7 @@ class OptionalMenuBar extends MenuBar
 
         menu.append(new SeparatorMenuItem());
 
-        fullscreen = new CheckMenuItem("Fullscreen");
-        fullscreen.setActive(false);
+        fullscreen = new ImageMenuItem(Stock.FULLSCREEN);
         fullscreen.setAccelerator(group, Keyval.F11, ModifierType.NONE);
         menu.append(fullscreen);
 
