@@ -21,10 +21,12 @@ package quill.ui;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gtk.AcceleratorGroup;
+import org.gnome.gtk.CheckMenuItem;
 import org.gnome.gtk.ImageMenuItem;
 import org.gnome.gtk.Menu;
 import org.gnome.gtk.MenuBar;
 import org.gnome.gtk.MenuItem;
+import org.gnome.gtk.SeparatorMenuItem;
 import org.gnome.gtk.Stock;
 
 class OptionalMenuBar extends MenuBar
@@ -40,13 +42,13 @@ class OptionalMenuBar extends MenuBar
         this.bar = this;
         this.primary = primary;
 
-        group = new AcceleratorGroup();
-        primary.addAcceleratorGroup(group);
+        this.group = new AcceleratorGroup();
+        this.primary.addAcceleratorGroup(group);
 
         setupManuscriptMenu();
         bar.append(new MenuItem("_Chapter"));
         bar.append(new MenuItem("_Edit"));
-        bar.append(new MenuItem("_View"));
+        setupViewMenu();
         setupFormatMenu();
     }
 
@@ -54,32 +56,95 @@ class OptionalMenuBar extends MenuBar
         bar.append(new MenuItem("_Manuscript"));
     }
 
+    private void setupViewMenu() {
+        final Menu menu;
+        final MenuItem format;
+        final MenuItem editor, stylist, metaditor, preview, outline, endnotes, references;
+        final CheckMenuItem fullscreen, single, optional;
+
+        menu = new Menu();
+        menu.setAcceleratorGroup(group);
+
+        editor = new MenuItem("_Editor");
+        editor.setAccelerator(group, Keyval.F1, ModifierType.NONE);
+        menu.append(editor);
+
+        stylist = new MenuItem("_Stylesheet");
+        stylist.setAccelerator(group, Keyval.F2, ModifierType.NONE);
+        menu.append(stylist);
+
+        metaditor = new MenuItem("_Metadata");
+        metaditor.setAccelerator(group, Keyval.F3, ModifierType.NONE);
+        menu.append(metaditor);
+
+        preview = new MenuItem("_Preview");
+        preview.setAccelerator(group, Keyval.F5, ModifierType.NONE);
+        menu.append(preview);
+
+        outline = new MenuItem("_Outline");
+        outline.setAccelerator(group, Keyval.F6, ModifierType.NONE);
+        menu.append(outline);
+
+        endnotes = new MenuItem("End_notes");
+        endnotes.setAccelerator(group, Keyval.F7, ModifierType.NONE);
+        menu.append(endnotes);
+
+        references = new MenuItem("_References");
+        references.setAccelerator(group, Keyval.F8, ModifierType.NONE);
+        menu.append(references);
+
+        menu.append(new SeparatorMenuItem());
+
+        fullscreen = new CheckMenuItem("Fullscreen");
+        fullscreen.setActive(false);
+        fullscreen.setAccelerator(group, Keyval.F11, ModifierType.NONE);
+        menu.append(fullscreen);
+
+        optional = new CheckMenuItem("Menubar");
+        optional.setActive(true);
+        optional.setAccelerator(group, Keyval.F12, ModifierType.NONE);
+        menu.append(optional);
+
+        single = new CheckMenuItem("Right-hand side");
+        single.setActive(true);
+        single.setAccelerator(group, Keyval.F12, ModifierType.SHIFT_MASK);
+        menu.append(single);
+
+        /*
+         * Build the actual top level item for the menu bar.
+         */
+
+        format = new MenuItem("_View");
+        format.setSubmenu(menu);
+
+        bar.append(format);
+    }
+
     private void setupFormatMenu() {
         final Menu menu;
         final MenuItem format;
         final MenuItem clear, italics, bold, filename, type, function, project, command, literal, highlight, publication, acronym, keyboard;
-        final ModifierType CTRL, CTRL_SHIFT;
+        final ModifierType both;
 
-        CTRL = ModifierType.CONTROL_MASK;
-        CTRL_SHIFT = ModifierType.or(ModifierType.CONTROL_MASK, ModifierType.SHIFT_MASK);
+        both = ModifierType.or(ModifierType.CONTROL_MASK, ModifierType.SHIFT_MASK);
 
         menu = new Menu();
         menu.setAcceleratorGroup(group);
 
         clear = new MenuItem("_Clear");
-        clear.setAccelerator(group, Keyval.Space, CTRL_SHIFT);
+        clear.setAccelerator(group, Keyval.Space, both);
         menu.append(clear);
 
         italics = new ImageMenuItem(Stock.ITALIC);
-        italics.setAccelerator(group, Keyval.i, CTRL);
+        italics.setAccelerator(group, Keyval.i, ModifierType.CONTROL_MASK);
         menu.append(italics);
 
         bold = new ImageMenuItem(Stock.BOLD);
-        bold.setAccelerator(group, Keyval.b, CTRL);
+        bold.setAccelerator(group, Keyval.b, ModifierType.CONTROL_MASK);
         menu.append(bold);
 
         filename = new MenuItem("_File");
-        filename.setAccelerator(group, Keyval.f, CTRL_SHIFT);
+        filename.setAccelerator(group, Keyval.f, both);
         filename.connect(new MenuItem.Activate() {
             public void onActivate(MenuItem source) {
                 System.out.println("DEBUG: Filename!");
@@ -88,39 +153,39 @@ class OptionalMenuBar extends MenuBar
         menu.append(filename);
 
         type = new MenuItem("_Class or Type");
-        type.setAccelerator(group, Keyval.c, CTRL_SHIFT);
+        type.setAccelerator(group, Keyval.c, both);
         menu.append(type);
 
         function = new MenuItem("_Method or Function");
-        function.setAccelerator(group, Keyval.m, CTRL_SHIFT);
+        function.setAccelerator(group, Keyval.m, both);
         menu.append(function);
 
         project = new MenuItem("_Project");
-        project.setAccelerator(group, Keyval.p, CTRL_SHIFT);
+        project.setAccelerator(group, Keyval.p, both);
         menu.append(project);
 
         command = new MenuItem("C_ommand");
-        command.setAccelerator(group, Keyval.o, CTRL_SHIFT);
+        command.setAccelerator(group, Keyval.o, both);
         menu.append(command);
 
         literal = new MenuItem("Code _Literal");
-        literal.setAccelerator(group, Keyval.l, CTRL_SHIFT);
+        literal.setAccelerator(group, Keyval.l, both);
         menu.append(literal);
 
         highlight = new MenuItem("_Highlight");
-        highlight.setAccelerator(group, Keyval.h, CTRL_SHIFT);
+        highlight.setAccelerator(group, Keyval.h, both);
         menu.append(highlight);
 
-        publication = new MenuItem("_Publication Title");
-        publication.setAccelerator(group, Keyval.t, CTRL_SHIFT);
+        publication = new MenuItem("Publication _Title");
+        publication.setAccelerator(group, Keyval.t, both);
         menu.append(publication);
 
         acronym = new MenuItem("_Acronym");
-        acronym.setAccelerator(group, Keyval.a, CTRL_SHIFT);
+        acronym.setAccelerator(group, Keyval.a, both);
         menu.append(acronym);
 
         keyboard = new MenuItem("_Keystroke");
-        keyboard.setAccelerator(group, Keyval.k, CTRL_SHIFT);
+        keyboard.setAccelerator(group, Keyval.k, both);
         menu.append(keyboard);
 
         /*
