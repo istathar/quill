@@ -1,7 +1,7 @@
 /*
  * Quill and Parchment, a WYSIWYN document editor and rendering engine. 
  *
- * Copyright © 2009-2010 Operational Dynamics Consulting, Pty Ltd
+ * Copyright © 2009-2011 Operational Dynamics Consulting, Pty Ltd
  *
  * The code in this file, and the program it is a part of, is made available
  * to you by its authors as open source software: you can redistribute it
@@ -108,6 +108,11 @@ class HelpWidget extends ScrolledWindow
                 "F11",
                 _("Fullscreen"),
                 _("Work in fullscreen mode, giving you a better view of your document.")
+            },
+            new String[] {
+                "F12",
+                _("Show Menubar"),
+                _("Toggle the main menu.")
             },
             new String[] {
                 "Shift+F1",
