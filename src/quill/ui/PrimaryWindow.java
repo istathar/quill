@@ -44,6 +44,8 @@ import org.gnome.gtk.HPaned;
 import org.gnome.gtk.IconSize;
 import org.gnome.gtk.Image;
 import org.gnome.gtk.InfoMessageDialog;
+import org.gnome.gtk.MenuBar;
+import org.gnome.gtk.MenuItem;
 import org.gnome.gtk.MessageDialog;
 import org.gnome.gtk.MessageType;
 import org.gnome.gtk.ResponseType;
@@ -83,6 +85,8 @@ class PrimaryWindow extends Window
     private UserInterface ui;
 
     private VBox top;
+
+    private MenuBar bar;
 
     private HPaned pane;
 
@@ -134,6 +138,7 @@ class PrimaryWindow extends Window
     PrimaryWindow() {
         super();
         setupWindow();
+        setupOptionalMenu();
         setupEditorSide();
         setupPreviewSide();
         hookupDefaultKeyhandlers();
@@ -339,6 +344,9 @@ class PrimaryWindow extends Window
         top = new VBox(false, 0);
         window.add(top);
 
+        bar = new MenuBar();
+        top.packStart(bar, false, false, 0);
+
         pane = new HPaned();
         pane.setPosition(690);
         top.packStart(pane, true, true, 0);
@@ -406,8 +414,23 @@ class PrimaryWindow extends Window
         pane.add2(intro);
     }
 
+    private boolean showingMenu;
+
+    private void setupOptionalMenu() {
+        showingMenu = false;
+
+        bar.append(new MenuItem("_Manuscript"));
+        bar.append(new MenuItem("_Chapter"));
+        bar.append(new MenuItem("_Edit"));
+        bar.append(new MenuItem("_View"));
+        bar.append(new MenuItem("_Format"));
+    }
+
     private void initialPresentation() {
-        window.showAll();
+        pane.showAll();
+        bar.hide();
+        top.show();
+        window.show();
 
         window.present();
         window.setPosition(WindowPosition.NONE);
@@ -475,16 +498,21 @@ class PrimaryWindow extends Window
                         toggleFullscreen();
                         return true;
                     } else if (key == Keyval.F12) {
-                        toggleRightSide();
+                        toggleOptionalMenu();
                         return true;
                     }
                 } else if (mod == ModifierType.SHIFT_MASK) {
                     if (key == Keyval.F1) {
                         switchToHelp();
                         return true;
-                    } else if (key == Keyval.F12) {
+                    } else if (key == Keyval.F11) {
                         switchToIntro();
+                        return true;
+                    } else if (key == Keyval.F12) {
+                        toggleRightSide();
+                        return true;
                     }
+
                 } else if (mod == ModifierType.CONTROL_MASK) {
                     if (key == Keyval.p) {
                         printDocument();
@@ -614,6 +642,16 @@ class PrimaryWindow extends Window
                 window.setMaximize(true);
             }
             showingRightSide = true;
+        }
+    }
+
+    private void toggleOptionalMenu() {
+        if (showingMenu) {
+            bar.hide();
+            showingMenu = false;
+        } else {
+            bar.showAll();
+            showingMenu = true;
         }
     }
 
