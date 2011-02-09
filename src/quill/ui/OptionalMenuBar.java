@@ -49,8 +49,8 @@ class OptionalMenuBar extends MenuBar
         setupChapterMenu();
         setupInsertMenu();
         setupEditMenu();
-        setupViewMenu();
         setupFormatMenu();
+        setupViewMenu();
         setupHelpMenu();
     }
 
@@ -79,7 +79,7 @@ class OptionalMenuBar extends MenuBar
         print.setAccelerator(group, Keyval.p, ModifierType.CONTROL_MASK);
         menu.append(print);
 
-        export = new MenuItem("_Export");
+        export = new MenuItem("_Export...");
         export.setAccelerator(group, Keyval.e, ModifierType.CONTROL_MASK);
         menu.append(export);
 
@@ -100,7 +100,36 @@ class OptionalMenuBar extends MenuBar
     }
 
     private void setupChapterMenu() {
-        bar.append(new MenuItem("_Chapter"));
+        final Menu menu;
+        final MenuItem chapter;
+        final ImageMenuItem create, prev, next;
+
+        menu = new Menu();
+        menu.setAcceleratorGroup(group);
+
+        create = new ImageMenuItem(Stock.NEW);
+        menu.append(create);
+
+        menu.append(new SeparatorMenuItem());
+
+        prev = new ImageMenuItem(Stock.GO_BACK);
+        prev.setAlwaysShowImage(true);
+        prev.setAccelerator(group, Keyval.PageUp, ModifierType.CONTROL_MASK);
+        menu.append(prev);
+
+        next = new ImageMenuItem(Stock.GO_FORWARD);
+        next.setAlwaysShowImage(true);
+        next.setAccelerator(group, Keyval.PageDown, ModifierType.CONTROL_MASK);
+        menu.append(next);
+
+        /*
+         * Build the actual top level item for the menu bar.
+         */
+
+        chapter = new MenuItem("_Chapter");
+        chapter.setSubmenu(menu);
+
+        bar.append(chapter);
     }
 
     private void setupInsertMenu() {
@@ -111,10 +140,10 @@ class OptionalMenuBar extends MenuBar
         menu = new Menu();
         menu.setAcceleratorGroup(group);
 
-        note = new MenuItem("Endnote Anchor");
+        note = new MenuItem("End_note Anchor");
         menu.append(note);
 
-        cite = new MenuItem("Reference Citation");
+        cite = new MenuItem("_Reference Citation");
         menu.append(cite);
 
         block = new MenuItem("Block...");
@@ -219,7 +248,7 @@ class OptionalMenuBar extends MenuBar
         optional.setAccelerator(group, Keyval.F12, ModifierType.NONE);
         menu.append(optional);
 
-        single = new CheckMenuItem("Right-hand side");
+        single = new CheckMenuItem("Right-Hand Side");
         single.setActive(true);
         single.setAccelerator(group, Keyval.F12, ModifierType.SHIFT_MASK);
         menu.append(single);
@@ -237,8 +266,8 @@ class OptionalMenuBar extends MenuBar
     private void setupFormatMenu() {
         final Menu menu;
         final MenuItem format;
-        final ImageMenuItem clear;
-        final MenuItem italics, bold, filename, type, function, project, command, literal, highlight, publication, acronym, keyboard;
+        final ImageMenuItem clear, italics, bold;
+        final MenuItem filename, type, function, project, command, literal, highlight, publication, acronym, keyboard;
         final ModifierType both;
 
         both = ModifierType.or(ModifierType.CONTROL_MASK, ModifierType.SHIFT_MASK);
@@ -254,10 +283,12 @@ class OptionalMenuBar extends MenuBar
         menu.append(new SeparatorMenuItem());
 
         italics = new ImageMenuItem(Stock.ITALIC);
+        italics.setAlwaysShowImage(true);
         italics.setAccelerator(group, Keyval.i, ModifierType.CONTROL_MASK);
         menu.append(italics);
 
         bold = new ImageMenuItem(Stock.BOLD);
+        bold.setAlwaysShowImage(true);
         bold.setAccelerator(group, Keyval.b, ModifierType.CONTROL_MASK);
         menu.append(bold);
 
