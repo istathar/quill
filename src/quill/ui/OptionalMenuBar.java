@@ -47,7 +47,7 @@ class OptionalMenuBar extends MenuBar
 
         setupManuscriptMenu();
         bar.append(new MenuItem("_Chapter"));
-        bar.append(new MenuItem("_Edit"));
+        setupEditMenu();
         setupViewMenu();
         setupFormatMenu();
     }
@@ -56,9 +56,39 @@ class OptionalMenuBar extends MenuBar
         bar.append(new MenuItem("_Manuscript"));
     }
 
+    private void setupEditMenu() {
+        final Menu menu;
+        final MenuItem edit;
+        final MenuItem cut, copy, paste;
+
+        menu = new Menu();
+        menu.setAcceleratorGroup(group);
+
+        cut = new ImageMenuItem(Stock.CUT);
+        cut.setAccelerator(group, Keyval.x, ModifierType.CONTROL_MASK);
+        menu.append(cut);
+
+        copy = new ImageMenuItem(Stock.COPY);
+        copy.setAccelerator(group, Keyval.c, ModifierType.CONTROL_MASK);
+        menu.append(copy);
+
+        paste = new ImageMenuItem(Stock.PASTE);
+        paste.setAccelerator(group, Keyval.v, ModifierType.CONTROL_MASK);
+        menu.append(paste);
+
+        /*
+         * Build the actual top level item for the menu bar.
+         */
+
+        edit = new MenuItem("_Edit");
+        edit.setSubmenu(menu);
+
+        bar.append(edit);
+    }
+
     private void setupViewMenu() {
         final Menu menu;
-        final MenuItem format;
+        final MenuItem view;
         final MenuItem editor, stylist, metaditor, preview, outline, endnotes, references;
         final CheckMenuItem fullscreen, single, optional;
 
@@ -114,10 +144,10 @@ class OptionalMenuBar extends MenuBar
          * Build the actual top level item for the menu bar.
          */
 
-        format = new MenuItem("_View");
-        format.setSubmenu(menu);
+        view = new MenuItem("_View");
+        view.setSubmenu(menu);
 
-        bar.append(format);
+        bar.append(view);
     }
 
     private void setupFormatMenu() {
