@@ -34,6 +34,8 @@ import org.gnome.gtk.Image;
 import org.gnome.gtk.Justification;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.LinkButton;
+import org.gnome.gtk.MenuBar;
+import org.gnome.gtk.MenuItem;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
@@ -50,8 +52,11 @@ class IntroductionWidget extends VBox
 {
     private final VBox top;
 
+    private final MenuBar spacer;
+
     IntroductionWidget() {
         super(false, 0);
+        final MenuItem blank;
         final Label title, description, help;
         final Pixbuf pixbuf;
         final Image image;
@@ -62,6 +67,29 @@ class IntroductionWidget extends VBox
 
         try {
             top = this;
+
+            /*
+             * We need to put a MenuBar at the top of the IntroductionWidget
+             * pane so that when the application's real MenuBar is shown we
+             * can hide this one for the effect that the content of the pane
+             * stays put. This is unfortunately necessary because toggling the
+             * optional menu is something you can expect from this pane, and
+             * we want the view to stay still.
+             */
+
+            spacer = new MenuBar();
+            top.packStart(spacer, false, false, 0);
+            blank = new MenuItem("Quill and Parchment");
+            spacer.prepend(blank);
+            spacer.connect(new Widget.ExposeEvent() {
+                public boolean onExposeEvent(Widget source, EventExpose event) {
+                    return true;
+                }
+            });
+
+            /*
+             * Now on with the actual display.
+             */
 
             pixbuf = new Pixbuf("share/quill/images/feather.png", 128, 128, true);
             image = new Image(pixbuf);
@@ -85,9 +113,9 @@ class IntroductionWidget extends VBox
                     "This is <b>Quill</b>, a <u>W</u>hat <u>Y</u>ou <u>S</u>ee <u>I</u>s <u>W</u>hat <u>Y</u>ou <u>N</u>eed document editor, "
                             + "attempting to give you a clean display of your content and subtle indications of semantic markup."
                             + "\n\n"
-                            + "<b>Parchment</b> a simple but powerful rendering "
+                            + "<b>Parchment</b> is a simple but powerful rendering "
                             + "back-end which takes these documents and outputs them as PDF files. "
-                            + "Different document types have different rendering engines (ie, stylesheets) customized for the purpose.");
+                            + "There are rendering engines (ie, stylesheets) customized for various different document types.");
             description.setLineWrap(true);
             description.setUseMarkup(true);
             description.setJustify(Justification.CENTER);
@@ -134,6 +162,14 @@ class IntroductionWidget extends VBox
             e.printStackTrace();
             throw new AssertionError();
         }
+    }
+
+    void showSpacer() {
+        spacer.show();
+    }
+
+    void hideSpacer() {
+        spacer.hide();
     }
 }
 

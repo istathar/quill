@@ -638,9 +638,11 @@ class PrimaryWindow extends Window
     private void toggleOptionalMenu() {
         if (showingMenu) {
             bar.hide();
+            intro.showSpacer();
             showingMenu = false;
         } else {
             bar.showAll();
+            intro.hideSpacer();
             showingMenu = true;
         }
     }
