@@ -46,23 +46,38 @@ class OptionalMenuBar extends MenuBar
         this.primary.addAcceleratorGroup(group);
 
         setupManuscriptMenu();
-        bar.append(new MenuItem("_Chapter"));
+        setupChapterMenu();
         setupEditMenu();
         setupViewMenu();
         setupFormatMenu();
+        setupHelpMenu();
     }
 
     private void setupManuscriptMenu() {
         bar.append(new MenuItem("_Manuscript"));
     }
 
+    private void setupChapterMenu() {
+        bar.append(new MenuItem("_Chapter"));
+    }
+
     private void setupEditMenu() {
         final Menu menu;
         final MenuItem edit;
-        final MenuItem cut, copy, paste;
+        final ImageMenuItem undo, redo, cut, copy, paste;
 
         menu = new Menu();
         menu.setAcceleratorGroup(group);
+
+        undo = new ImageMenuItem(Stock.UNDO);
+        undo.setAccelerator(group, Keyval.z, ModifierType.CONTROL_MASK);
+        menu.append(undo);
+
+        redo = new ImageMenuItem(Stock.REDO);
+        redo.setAccelerator(group, Keyval.y, ModifierType.CONTROL_MASK);
+        menu.append(redo);
+
+        menu.append(new SeparatorMenuItem());
 
         cut = new ImageMenuItem(Stock.CUT);
         cut.setAccelerator(group, Keyval.x, ModifierType.CONTROL_MASK);
@@ -153,7 +168,8 @@ class OptionalMenuBar extends MenuBar
     private void setupFormatMenu() {
         final Menu menu;
         final MenuItem format;
-        final MenuItem clear, italics, bold, filename, type, function, project, command, literal, highlight, publication, acronym, keyboard;
+        final ImageMenuItem clear;
+        final MenuItem italics, bold, filename, type, function, project, command, literal, highlight, publication, acronym, keyboard;
         final ModifierType both;
 
         both = ModifierType.or(ModifierType.CONTROL_MASK, ModifierType.SHIFT_MASK);
@@ -161,9 +177,12 @@ class OptionalMenuBar extends MenuBar
         menu = new Menu();
         menu.setAcceleratorGroup(group);
 
-        clear = new MenuItem("_Clear");
+        clear = new ImageMenuItem(Stock.CLEAR);
+        clear.setAlwaysShowImage(true);
         clear.setAccelerator(group, Keyval.Space, both);
         menu.append(clear);
+
+        menu.append(new SeparatorMenuItem());
 
         italics = new ImageMenuItem(Stock.ITALIC);
         italics.setAccelerator(group, Keyval.i, ModifierType.CONTROL_MASK);
@@ -226,5 +245,27 @@ class OptionalMenuBar extends MenuBar
         format.setSubmenu(menu);
 
         bar.append(format);
+    }
+
+    private void setupHelpMenu() {
+
+        final Menu menu;
+        final MenuItem help;
+        final MenuItem about;
+
+        menu = new Menu();
+        menu.setAcceleratorGroup(group);
+
+        about = new ImageMenuItem(Stock.ABOUT);
+        menu.append(about);
+
+        /*
+         * Build the actual top level item for the menu bar.
+         */
+
+        help = new MenuItem("_Help");
+        help.setSubmenu(menu);
+
+        bar.append(help);
     }
 }
