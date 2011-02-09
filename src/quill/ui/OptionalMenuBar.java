@@ -248,13 +248,43 @@ class OptionalMenuBar extends MenuBar
     }
 
     private void setupHelpMenu() {
-
         final Menu menu;
         final MenuItem help;
+        final MenuItem editor, stylist, metaditor, preview, outline, endnotes, references;
         final MenuItem about;
 
         menu = new Menu();
         menu.setAcceleratorGroup(group);
+
+        editor = new MenuItem("Using the _Editor");
+        editor.setAccelerator(group, Keyval.F1, ModifierType.SHIFT_MASK);
+        menu.append(editor);
+
+        stylist = new MenuItem("Configuring _Stylesheet");
+        stylist.setAccelerator(group, Keyval.F2, ModifierType.SHIFT_MASK);
+        menu.append(stylist);
+
+        metaditor = new MenuItem("Editing _Metadata");
+        metaditor.setAccelerator(group, Keyval.F3, ModifierType.SHIFT_MASK);
+        menu.append(metaditor);
+
+        preview = new MenuItem("Using the _Preview");
+        preview.setAccelerator(group, Keyval.F5, ModifierType.SHIFT_MASK);
+        menu.append(preview);
+
+        outline = new MenuItem("Using the _Outline");
+        outline.setAccelerator(group, Keyval.F6, ModifierType.SHIFT_MASK);
+        menu.append(outline);
+
+        endnotes = new MenuItem("Editing End_notes");
+        endnotes.setAccelerator(group, Keyval.F7, ModifierType.SHIFT_MASK);
+        menu.append(endnotes);
+
+        references = new MenuItem("Editing _References");
+        references.setAccelerator(group, Keyval.F8, ModifierType.SHIFT_MASK);
+        menu.append(references);
+
+        menu.append(new SeparatorMenuItem());
 
         about = new ImageMenuItem(Stock.ABOUT);
         menu.append(about);
