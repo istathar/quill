@@ -45,7 +45,6 @@ import org.gnome.gtk.IconSize;
 import org.gnome.gtk.Image;
 import org.gnome.gtk.InfoMessageDialog;
 import org.gnome.gtk.MenuBar;
-import org.gnome.gtk.MenuItem;
 import org.gnome.gtk.MessageDialog;
 import org.gnome.gtk.MessageType;
 import org.gnome.gtk.ResponseType;
@@ -138,7 +137,6 @@ class PrimaryWindow extends Window
     PrimaryWindow() {
         super();
         setupWindow();
-        setupOptionalMenu();
         setupEditorSide();
         setupPreviewSide();
         hookupDefaultKeyhandlers();
@@ -344,12 +342,14 @@ class PrimaryWindow extends Window
         top = new VBox(false, 0);
         window.add(top);
 
-        bar = new MenuBar();
+        bar = new OptionalMenuBar(this);
         top.packStart(bar, false, false, 0);
+        showingMenu = false;
 
         pane = new HPaned();
         pane.setPosition(690);
         top.packStart(pane, true, true, 0);
+        showingRightSide = true;
     }
 
     Widget[] gauche, droit;
@@ -415,18 +415,6 @@ class PrimaryWindow extends Window
     }
 
     private boolean showingMenu;
-
-    private void setupOptionalMenu() {
-        showingMenu = false;
-
-        bar.append(new MenuItem("_Manuscript"));
-        bar.append(new MenuItem("_Chapter"));
-        bar.append(new MenuItem("_Edit"));
-        bar.append(new MenuItem("_View"));
-        bar.append(new MenuItem("_Insert"));
-        bar.append(new MenuItem("_Format"));
-        bar.append(new MenuItem("_Help"));
-    }
 
     private void initialPresentation() {
         pane.showAll();
