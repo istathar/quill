@@ -423,7 +423,9 @@ class PrimaryWindow extends Window
         bar.append(new MenuItem("_Chapter"));
         bar.append(new MenuItem("_Edit"));
         bar.append(new MenuItem("_View"));
+        bar.append(new MenuItem("_Insert"));
         bar.append(new MenuItem("_Format"));
+        bar.append(new MenuItem("_Help"));
     }
 
     private void initialPresentation() {
