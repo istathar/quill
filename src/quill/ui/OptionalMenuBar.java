@@ -21,14 +21,27 @@ package quill.ui;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gtk.AcceleratorGroup;
+import org.gnome.gtk.Action;
 import org.gnome.gtk.CheckMenuItem;
+import org.gnome.gtk.IconSize;
+import org.gnome.gtk.Image;
 import org.gnome.gtk.ImageMenuItem;
 import org.gnome.gtk.Menu;
 import org.gnome.gtk.MenuBar;
 import org.gnome.gtk.MenuItem;
 import org.gnome.gtk.SeparatorMenuItem;
 import org.gnome.gtk.Stock;
+import org.gnome.gtk.ToggleAction;
 
+/**
+ * The code for the optional MenuBar. It's "optional" because you're supposed
+ * to be able to use the entire application without using the menu, thereby
+ * allowing you to get your 24 vertical pixels back. The menu is here
+ * primarily for accessibiltiy reasons, and secondarily to help people learn
+ * the UI.
+ * 
+ * @author Andrew Cowie
+ */
 class OptionalMenuBar extends MenuBar
 {
     private final MenuBar bar;
@@ -47,10 +60,10 @@ class OptionalMenuBar extends MenuBar
 
         setupManuscriptMenu();
         setupChapterMenu();
-        setupInsertMenu();
         setupEditMenu();
-        setupFormatMenu();
         setupViewMenu();
+        setupInsertMenu();
+        setupFormatMenu();
         setupHelpMenu();
     }
 
@@ -62,7 +75,7 @@ class OptionalMenuBar extends MenuBar
         menu = new Menu();
         menu.setAcceleratorGroup(group);
 
-        create = new ImageMenuItem(Stock.NEW);
+        create = new ImageMenuItem(new Image(Stock.NEW, IconSize.MENU), "New Document...");
         menu.append(create);
 
         open = new ImageMenuItem(Stock.OPEN);
@@ -107,7 +120,7 @@ class OptionalMenuBar extends MenuBar
         menu = new Menu();
         menu.setAcceleratorGroup(group);
 
-        create = new ImageMenuItem(Stock.NEW);
+        create = new ImageMenuItem(new Image(Stock.NEW, IconSize.MENU), "New Chapter...");
         menu.append(create);
 
         menu.append(new SeparatorMenuItem());
@@ -203,55 +216,178 @@ class OptionalMenuBar extends MenuBar
     private void setupViewMenu() {
         final Menu menu;
         final MenuItem view;
-        final MenuItem editor, stylist, metaditor, preview, outline, endnotes, references, fullscreen;
-        final CheckMenuItem single, optional;
+        Action action;
+        MenuItem item;
+        CheckMenuItem check;
+        SeparatorMenuItem sep;
 
         menu = new Menu();
         menu.setAcceleratorGroup(group);
 
-        editor = new MenuItem("_Editor");
-        editor.setAccelerator(group, Keyval.F1, ModifierType.NONE);
-        menu.append(editor);
+        /*
+         * Editor
+         */
 
-        stylist = new MenuItem("_Stylesheet");
-        stylist.setAccelerator(group, Keyval.F2, ModifierType.NONE);
-        menu.append(stylist);
+        action = new Action("switch-to-editor", "_Editor");
+        action.setAccelerator(group, Keyval.F1, ModifierType.NONE);
 
-        metaditor = new MenuItem("_Metadata");
-        metaditor.setAccelerator(group, Keyval.F3, ModifierType.NONE);
-        menu.append(metaditor);
+        item = action.createMenuItem();
+        menu.append(item);
 
-        preview = new MenuItem("_Preview");
-        preview.setAccelerator(group, Keyval.F5, ModifierType.NONE);
-        menu.append(preview);
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+                primary.switchToEditor();
+            }
+        });
 
-        outline = new MenuItem("_Outline");
-        outline.setAccelerator(group, Keyval.F6, ModifierType.NONE);
-        menu.append(outline);
+        /*
+         * Stylesheet
+         */
 
-        endnotes = new MenuItem("End_notes");
-        endnotes.setAccelerator(group, Keyval.F7, ModifierType.NONE);
-        menu.append(endnotes);
+        action = new Action("switch-to-stylesheet", "_Stylesheet");
+        action.setAccelerator(group, Keyval.F2, ModifierType.NONE);
 
-        references = new MenuItem("_References");
-        references.setAccelerator(group, Keyval.F8, ModifierType.NONE);
-        menu.append(references);
+        item = action.createMenuItem();
+        menu.append(item);
 
-        menu.append(new SeparatorMenuItem());
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+                primary.switchToStylesheet();
+            }
+        });
 
-        fullscreen = new ImageMenuItem(Stock.FULLSCREEN);
-        fullscreen.setAccelerator(group, Keyval.F11, ModifierType.NONE);
-        menu.append(fullscreen);
+        /*
+         * Metadata
+         */
 
-        optional = new CheckMenuItem("Menubar");
-        optional.setActive(true);
-        optional.setAccelerator(group, Keyval.F12, ModifierType.NONE);
-        menu.append(optional);
+        action = new Action("switch-to-metadata", "_Metadata");
+        action.setAccelerator(group, Keyval.F3, ModifierType.NONE);
 
-        single = new CheckMenuItem("Right-Hand Side");
-        single.setActive(true);
-        single.setAccelerator(group, Keyval.F12, ModifierType.SHIFT_MASK);
-        menu.append(single);
+        item = action.createMenuItem();
+        menu.append(item);
+
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+                primary.switchToMetadata();
+            }
+        });
+
+        /*
+         * Preview
+         */
+
+        action = new Action("switch-to-preview", "_Preview");
+        action.setAccelerator(group, Keyval.F5, ModifierType.NONE);
+
+        item = action.createMenuItem();
+        menu.append(item);
+
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+                primary.switchToPreview();
+            }
+        });
+
+        /*
+         * Outline
+         */
+
+        action = new Action("switch-to-outline", "_Outline");
+        action.setAccelerator(group, Keyval.F6, ModifierType.NONE);
+
+        item = action.createMenuItem();
+        menu.append(item);
+
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+                primary.switchToOutline();
+            }
+        });
+
+        /*
+         * Endnotes
+         */
+
+        action = new Action("switch-to-endnotes", "End_notes");
+        action.setAccelerator(group, Keyval.F7, ModifierType.NONE);
+
+        item = action.createMenuItem();
+        menu.append(item);
+
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+                primary.switchToEndnotes();
+            }
+        });
+
+        /*
+         * References
+         */
+
+        action = new Action("switch-to-references", "_References");
+        action.setAccelerator(group, Keyval.F8, ModifierType.NONE);
+
+        item = action.createMenuItem();
+        menu.append(item);
+
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+                primary.switchToReferences();
+            }
+        });
+
+        sep = new SeparatorMenuItem();
+        menu.append(sep);
+
+        /*
+         * Fullscreen
+         */
+
+        action = new Action("toggle-fullscreen", Stock.FULLSCREEN);
+        action.setAccelerator(group, Keyval.F11, ModifierType.NONE);
+
+        item = action.createMenuItem();
+        menu.append(item);
+
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+                primary.toggleFullscreen();
+            }
+        });
+
+        /*
+         * Menubar
+         */
+
+        action = new ToggleAction("toggle-menubar", "Menubar");
+        action.setAccelerator(group, Keyval.F12, ModifierType.NONE);
+
+        check = (CheckMenuItem) action.createMenuItem();
+        check.setActive(true);
+        menu.append(check);
+
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+                primary.toggleOptionalMenu();
+            }
+        });
+
+        /*
+         * Right-hand side
+         */
+
+        action = new ToggleAction("toggle-right-side", "Right-Hand Side");
+        action.setAccelerator(group, Keyval.F12, ModifierType.SHIFT_MASK);
+
+        check = (CheckMenuItem) action.createMenuItem();
+        check.setActive(true);
+        menu.append(check);
+
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+                primary.toggleRightSide();
+            }
+        });
 
         /*
          * Build the actual top level item for the menu bar.

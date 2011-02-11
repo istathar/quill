@@ -456,40 +456,16 @@ class PrimaryWindow extends Window
                 }
 
                 if (mod == ModifierType.NONE) {
-                    if (key == Keyval.F1) {
-                        switchToEditor();
-                        return true;
-                    } else if (key == Keyval.F2) {
-                        switchToStylesheet();
-                        return true;
-                    } else if (key == Keyval.F3) {
-                        switchToMetadata();
-                        return true;
-                    } else if (key == Keyval.F5) {
-                        switchToPreview();
-                        return true;
-                    } else if (key == Keyval.F6) {
-                        switchToOutline();
-                        return true;
-                    } else if (key == Keyval.F7) {
-                        switchToEndnotes();
-                        return true;
-                    } else if (key == Keyval.F8) {
-                        switchToReferences();
-                        return true;
-                    }
 
-                    if ((key == Keyval.F9) || (key == Keyval.F10)) {
+                    if (key == Keyval.F9) {
                         // nothing yet
                         return true;
                     }
-
-                    else if (key == Keyval.F11) {
-                        toggleFullscreen();
-                        return true;
-                    } else if (key == Keyval.F12) {
-                        toggleOptionalMenu();
-                        return true;
+                    if (key == Keyval.F10) {
+                        /*
+                         * Desktop global "focus menu". Do we even get this?
+                         */
+                        return false;
                     }
                 } else if (mod == ModifierType.SHIFT_MASK) {
                     if (key == Keyval.F1) {
@@ -497,9 +473,6 @@ class PrimaryWindow extends Window
                         return true;
                     } else if (key == Keyval.F11) {
                         switchToIntro();
-                        return true;
-                    } else if (key == Keyval.F12) {
-                        toggleRightSide();
                         return true;
                     }
 
@@ -604,7 +577,7 @@ class PrimaryWindow extends Window
      * off suddenly the mainbody is super wide, and that's a horrible
      * experience.
      */
-    private void toggleRightSide() {
+    void toggleRightSide() {
         final Allocation alloc;
         final Widget left, right;
 
@@ -635,7 +608,7 @@ class PrimaryWindow extends Window
         }
     }
 
-    private void toggleOptionalMenu() {
+    void toggleOptionalMenu() {
         if (showingMenu) {
             bar.hide();
             intro.showSpacer();
