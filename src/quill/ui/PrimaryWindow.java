@@ -468,10 +468,7 @@ class PrimaryWindow extends Window
                         return false;
                     }
                 } else if (mod == ModifierType.SHIFT_MASK) {
-                    if (key == Keyval.F1) {
-                        switchToHelp();
-                        return true;
-                    } else if (key == Keyval.F11) {
+                    if (key == Keyval.F11) {
                         switchToIntro();
                         return true;
                     }

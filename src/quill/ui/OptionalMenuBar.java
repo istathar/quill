@@ -219,13 +219,13 @@ class OptionalMenuBar extends MenuBar
         Action action;
         MenuItem item;
         CheckMenuItem check;
-        SeparatorMenuItem sep;
+        SeparatorMenuItem separator;
 
         menu = new Menu();
         menu.setAcceleratorGroup(group);
 
         /*
-         * Editor
+         * Switch to Editor
          */
 
         action = new Action("switch-to-editor", "_Editor");
@@ -241,7 +241,7 @@ class OptionalMenuBar extends MenuBar
         });
 
         /*
-         * Stylesheet
+         * Switch to Stylesheet
          */
 
         action = new Action("switch-to-stylesheet", "_Stylesheet");
@@ -257,7 +257,7 @@ class OptionalMenuBar extends MenuBar
         });
 
         /*
-         * Metadata
+         * Switch to Metadata
          */
 
         action = new Action("switch-to-metadata", "_Metadata");
@@ -273,7 +273,7 @@ class OptionalMenuBar extends MenuBar
         });
 
         /*
-         * Preview
+         * Switch to Preview
          */
 
         action = new Action("switch-to-preview", "_Preview");
@@ -289,7 +289,7 @@ class OptionalMenuBar extends MenuBar
         });
 
         /*
-         * Outline
+         * Switch to Outline
          */
 
         action = new Action("switch-to-outline", "_Outline");
@@ -305,7 +305,7 @@ class OptionalMenuBar extends MenuBar
         });
 
         /*
-         * Endnotes
+         * Switch to Endnotes
          */
 
         action = new Action("switch-to-endnotes", "End_notes");
@@ -321,7 +321,7 @@ class OptionalMenuBar extends MenuBar
         });
 
         /*
-         * References
+         * Switch to References
          */
 
         action = new Action("switch-to-references", "_References");
@@ -336,11 +336,11 @@ class OptionalMenuBar extends MenuBar
             }
         });
 
-        sep = new SeparatorMenuItem();
-        menu.append(sep);
+        separator = new SeparatorMenuItem();
+        menu.append(separator);
 
         /*
-         * Fullscreen
+         * Toggle Fullscreen
          */
 
         action = new Action("toggle-fullscreen", Stock.FULLSCREEN);
@@ -356,7 +356,7 @@ class OptionalMenuBar extends MenuBar
         });
 
         /*
-         * Menubar
+         * Toggle Menubar
          */
 
         action = new ToggleAction("toggle-menubar", "Menubar");
@@ -373,7 +373,7 @@ class OptionalMenuBar extends MenuBar
         });
 
         /*
-         * Right-hand side
+         * Toggle Right Side
          */
 
         action = new ToggleAction("toggle-right-side", "Right-Hand Side");
@@ -486,44 +486,142 @@ class OptionalMenuBar extends MenuBar
     private void setupHelpMenu() {
         final Menu menu;
         final MenuItem help;
-        final MenuItem editor, stylist, metaditor, preview, outline, endnotes, references;
-        final MenuItem about;
+        Action action;
+        MenuItem item;
+        SeparatorMenuItem separator;
 
         menu = new Menu();
         menu.setAcceleratorGroup(group);
 
-        editor = new MenuItem("Using the _Editor");
-        editor.setAccelerator(group, Keyval.F1, ModifierType.SHIFT_MASK);
-        menu.append(editor);
+        /*
+         * Help for Editor
+         */
 
-        stylist = new MenuItem("Configuring _Stylesheet");
-        stylist.setAccelerator(group, Keyval.F2, ModifierType.SHIFT_MASK);
-        menu.append(stylist);
+        action = new Action("help-for-editor", "Using the _Editor");
+        action.setAccelerator(group, Keyval.F1, ModifierType.SHIFT_MASK);
 
-        metaditor = new MenuItem("Editing _Metadata");
-        metaditor.setAccelerator(group, Keyval.F3, ModifierType.SHIFT_MASK);
-        menu.append(metaditor);
+        item = action.createMenuItem();
+        menu.append(item);
 
-        preview = new MenuItem("Using the _Preview");
-        preview.setAccelerator(group, Keyval.F5, ModifierType.SHIFT_MASK);
-        menu.append(preview);
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+                primary.switchToHelp();
+            }
+        });
 
-        outline = new MenuItem("Using the _Outline");
-        outline.setAccelerator(group, Keyval.F6, ModifierType.SHIFT_MASK);
-        menu.append(outline);
+        /*
+         * Help for Stylist
+         */
 
-        endnotes = new MenuItem("Editing End_notes");
-        endnotes.setAccelerator(group, Keyval.F7, ModifierType.SHIFT_MASK);
-        menu.append(endnotes);
+        action = new Action("help-for-stylist", "Configuring _Stylesheet");
+        action.setAccelerator(group, Keyval.F2, ModifierType.SHIFT_MASK);
 
-        references = new MenuItem("Editing _References");
-        references.setAccelerator(group, Keyval.F8, ModifierType.SHIFT_MASK);
-        menu.append(references);
+        item = action.createMenuItem();
+        menu.append(item);
 
-        menu.append(new SeparatorMenuItem());
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+            // TODO
+            }
+        });
 
-        about = new ImageMenuItem(Stock.ABOUT);
-        menu.append(about);
+        /*
+         * Help for Metadata
+         */
+
+        action = new Action("help-for-metadata", "Editing _Metadata");
+        action.setAccelerator(group, Keyval.F3, ModifierType.SHIFT_MASK);
+
+        item = action.createMenuItem();
+        menu.append(item);
+
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+            // TODO
+            }
+        });
+
+        /*
+         * Help for Preview
+         */
+
+        action = new Action("help-for-preview", "Using the _Preview");
+        action.setAccelerator(group, Keyval.F5, ModifierType.SHIFT_MASK);
+
+        item = action.createMenuItem();
+        menu.append(item);
+
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+            // TODO
+            }
+        });
+
+        /*
+         * Help for Outline
+         */
+
+        action = new Action("help-for-preview", "Using the _Outline");
+        action.setAccelerator(group, Keyval.F6, ModifierType.SHIFT_MASK);
+
+        item = action.createMenuItem();
+        menu.append(item);
+
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+            // TODO
+            }
+        });
+
+        /*
+         * Help for Endnotes
+         */
+
+        action = new Action("help-for-endnotes", "Editing End_notes");
+        action.setAccelerator(group, Keyval.F7, ModifierType.SHIFT_MASK);
+
+        item = action.createMenuItem();
+        menu.append(item);
+
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+            // TODO
+            }
+        });
+
+        /*
+         * Help for References
+         */
+
+        action = new Action("help-for-references", "Editing _References");
+        action.setAccelerator(group, Keyval.F8, ModifierType.SHIFT_MASK);
+
+        item = action.createMenuItem();
+        menu.append(item);
+
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+            // TODO
+            }
+        });
+
+        separator = new SeparatorMenuItem();
+        menu.append(separator);
+
+        /*
+         * About
+         */
+
+        action = new Action("help-about", Stock.ABOUT);
+
+        item = action.createMenuItem();
+        menu.append(item);
+
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+            // TODO
+            }
+        });
 
         /*
          * Build the actual top level item for the menu bar.
