@@ -115,25 +115,65 @@ class OptionalMenuBar extends MenuBar
     private void setupChapterMenu() {
         final Menu menu;
         final MenuItem chapter;
-        final ImageMenuItem create, prev, next;
+        Action action;
+        MenuItem item;
+        ImageMenuItem image;
+        SeparatorMenuItem separator;
 
         menu = new Menu();
         menu.setAcceleratorGroup(group);
 
-        create = new ImageMenuItem(new Image(Stock.NEW, IconSize.MENU), "New Chapter...");
-        menu.append(create);
+        /*
+         * New Chapter
+         */
 
-        menu.append(new SeparatorMenuItem());
+        action = new Action("chapter-new", "New Chapter...", null, Stock.NEW);
 
-        prev = new ImageMenuItem(Stock.GO_BACK);
-        prev.setAlwaysShowImage(true);
-        prev.setAccelerator(group, Keyval.PageUp, ModifierType.CONTROL_MASK);
-        menu.append(prev);
+        item = action.createMenuItem();
+        menu.append(item);
 
-        next = new ImageMenuItem(Stock.GO_FORWARD);
-        next.setAlwaysShowImage(true);
-        next.setAccelerator(group, Keyval.PageDown, ModifierType.CONTROL_MASK);
-        menu.append(next);
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+            // TODO
+            }
+        });
+
+        separator = new SeparatorMenuItem();
+        menu.append(separator);
+
+        /*
+         * Previous chapter
+         */
+
+        action = new Action("chapter-previous", "Previous", null, Stock.GO_BACK);
+        action.setAccelerator(group, Keyval.PageUp, ModifierType.CONTROL_MASK);
+
+        image = (ImageMenuItem) action.createMenuItem();
+        image.setAlwaysShowImage(true);
+        menu.append(image);
+
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+                primary.handleComponentPrevious();
+            }
+        });
+
+        /*
+         * Next chapter
+         */
+
+        action = new Action("chapter-next", "Next", null, Stock.GO_FORWARD);
+        action.setAccelerator(group, Keyval.PageDown, ModifierType.CONTROL_MASK);
+
+        image = (ImageMenuItem) action.createMenuItem();
+        image.setAlwaysShowImage(true);
+        menu.append(image);
+
+        action.connect(new Action.Activate() {
+            public void onActivate(Action source) {
+                primary.handleComponentNext();
+            }
+        });
 
         /*
          * Build the actual top level item for the menu bar.

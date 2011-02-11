@@ -534,12 +534,6 @@ class PrimaryWindow extends Window
                     } else if (key == Keyval.z) {
                         undo();
                         return true;
-                    } else if (key == Keyval.PageUp) {
-                        handleComponentPrevious();
-                        return true;
-                    } else if (key == Keyval.PageDown) {
-                        handleComponentNext();
-                        return true;
                     }
                 }
 
@@ -1202,7 +1196,7 @@ class PrimaryWindow extends Window
         return mainbody;
     }
 
-    private void handleComponentPrevious() {
+    void handleComponentPrevious() {
         int i;
 
         i = folio.indexOf(cursor);
@@ -1220,7 +1214,7 @@ class PrimaryWindow extends Window
         updateTitle();
     }
 
-    private void handleComponentNext() {
+    void handleComponentNext() {
         final int len;
         int i;
 
