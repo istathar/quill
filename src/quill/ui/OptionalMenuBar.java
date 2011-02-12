@@ -50,13 +50,16 @@ class OptionalMenuBar extends MenuBar
 
     private final AcceleratorGroup group;
 
-    OptionalMenuBar(PrimaryWindow primary) {
+    private final UserActions actions;
+
+    OptionalMenuBar(PrimaryWindow primary, UserActions actions) {
         super();
         this.bar = this;
         this.primary = primary;
 
         this.group = new AcceleratorGroup();
         this.primary.addAcceleratorGroup(group);
+        this.actions = actions;
 
         setupManuscriptMenu();
         setupChapterMenu();
@@ -127,16 +130,13 @@ class OptionalMenuBar extends MenuBar
          * New Chapter
          */
 
-        action = new Action("chapter-new", "New Chapter...", null, Stock.NEW);
-
+        action = actions.chapter.create;
         item = action.createMenuItem();
         menu.append(item);
 
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-            // TODO
-            }
-        });
+        /*
+         * Separator
+         */
 
         separator = new SeparatorMenuItem();
         menu.append(separator);
@@ -145,35 +145,19 @@ class OptionalMenuBar extends MenuBar
          * Previous chapter
          */
 
-        action = new Action("chapter-previous", "Previous", null, Stock.GO_BACK);
-        action.setAccelerator(group, Keyval.PageUp, ModifierType.CONTROL_MASK);
-
+        action = actions.chapter.previous;
         image = (ImageMenuItem) action.createMenuItem();
         image.setAlwaysShowImage(true);
         menu.append(image);
-
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-                primary.handleComponentPrevious();
-            }
-        });
 
         /*
          * Next chapter
          */
 
-        action = new Action("chapter-next", "Next", null, Stock.GO_FORWARD);
-        action.setAccelerator(group, Keyval.PageDown, ModifierType.CONTROL_MASK);
-
+        action = actions.chapter.next;
         image = (ImageMenuItem) action.createMenuItem();
         image.setAlwaysShowImage(true);
         menu.append(image);
-
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-                primary.handleComponentNext();
-            }
-        });
 
         /*
          * Build the actual top level item for the menu bar.
@@ -224,6 +208,7 @@ class OptionalMenuBar extends MenuBar
         undo = new ImageMenuItem(Stock.UNDO);
         undo.setAccelerator(group, Keyval.z, ModifierType.CONTROL_MASK);
         menu.append(undo);
+        actions.edit.undo = undo.getRelatedAction();
 
         redo = new ImageMenuItem(Stock.REDO);
         redo.setAccelerator(group, Keyval.y, ModifierType.CONTROL_MASK);
@@ -279,6 +264,8 @@ class OptionalMenuBar extends MenuBar
                 primary.switchToEditor();
             }
         });
+
+        actions.view.editor = action;
 
         /*
          * Switch to Stylesheet

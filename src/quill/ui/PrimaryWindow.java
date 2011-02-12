@@ -342,7 +342,8 @@ class PrimaryWindow extends Window
         top = new VBox(false, 0);
         window.add(top);
 
-        bar = new OptionalMenuBar(this);
+        actions = new UserActions(this);
+        bar = new OptionalMenuBar(this, actions);
         top.packStart(bar, false, false, 0);
         showingMenu = false;
 
@@ -424,6 +425,14 @@ class PrimaryWindow extends Window
 
         window.present();
         window.setPosition(WindowPosition.NONE);
+
+        actions.chapter.previous.setSensitive(false);
+    }
+
+    private UserActions actions;
+
+    UserActions getActions() {
+        return actions;
     }
 
     private void hookupWindowManagement() {
