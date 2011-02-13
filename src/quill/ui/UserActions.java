@@ -445,7 +445,10 @@ class UserActions
             }
 
             public void onActivate(Action source) {
-            // TODO
+                if (editor == null) {
+                    return;
+                }
+                editor.handleCutText();
             }
         }
 
@@ -456,7 +459,10 @@ class UserActions
             }
 
             public void onActivate(Action source) {
-            // TODO
+                if (editor == null) {
+                    return;
+                }
+                editor.handleCopyText();
             }
         }
 
@@ -467,7 +473,10 @@ class UserActions
             }
 
             public void onActivate(Action source) {
-            // TODO
+                if (editor == null) {
+                    return;
+                }
+                editor.handlePasteText();
             }
         }
     }
@@ -571,6 +580,9 @@ class UserActions
             }
 
             public void onActivate(Action source) {
+                if (editor == null) {
+                    return;
+                }
                 editor.handleClearFormat();
             }
         }
@@ -582,6 +594,9 @@ class UserActions
             }
 
             public void onActivate(Action source) {
+                if (editor == null) {
+                    return;
+                }
                 editor.handleToggleMarkup(Common.ITALICS);
             }
         }
@@ -593,6 +608,9 @@ class UserActions
             }
 
             public void onActivate(Action source) {
+                if (editor == null) {
+                    return;
+                }
                 editor.handleToggleMarkup(Common.BOLD);
             }
         }
@@ -604,6 +622,9 @@ class UserActions
             }
 
             public void onActivate(Action source) {
+                if (editor == null) {
+                    return;
+                }
                 editor.handleToggleMarkup(Common.FILENAME);
             }
         }
@@ -615,6 +636,9 @@ class UserActions
             }
 
             public void onActivate(Action source) {
+                if (editor == null) {
+                    return;
+                }
                 editor.handleToggleMarkup(Common.TYPE);
             }
         }
@@ -626,6 +650,9 @@ class UserActions
             }
 
             public void onActivate(Action source) {
+                if (editor == null) {
+                    return;
+                }
                 editor.handleToggleMarkup(Common.FUNCTION);
             }
         }
@@ -637,6 +664,9 @@ class UserActions
             }
 
             public void onActivate(Action source) {
+                if (editor == null) {
+                    return;
+                }
                 editor.handleToggleMarkup(Common.PROJECT);
             }
         }
@@ -648,6 +678,9 @@ class UserActions
             }
 
             public void onActivate(Action source) {
+                if (editor == null) {
+                    return;
+                }
                 editor.handleToggleMarkup(Common.COMMAND);
             }
         }
@@ -659,6 +692,9 @@ class UserActions
             }
 
             public void onActivate(Action source) {
+                if (editor == null) {
+                    return;
+                }
                 editor.handleToggleMarkup(Common.LITERAL);
             }
         }
@@ -670,6 +706,9 @@ class UserActions
             }
 
             public void onActivate(Action source) {
+                if (editor == null) {
+                    return;
+                }
                 editor.handleToggleMarkup(Common.HIGHLIGHT);
             }
         }
@@ -681,6 +720,9 @@ class UserActions
             }
 
             public void onActivate(Action source) {
+                if (editor == null) {
+                    return;
+                }
                 editor.handleToggleMarkup(Common.TITLE);
             }
         }
@@ -692,6 +734,9 @@ class UserActions
             }
 
             public void onActivate(Action source) {
+                if (editor == null) {
+                    return;
+                }
                 editor.handleToggleMarkup(Common.ACRONYM);
             }
         }
@@ -703,6 +748,9 @@ class UserActions
             }
 
             public void onActivate(Action source) {
+                if (editor == null) {
+                    return;
+                }
                 editor.handleToggleMarkup(Common.KEYBOARD);
             }
         }

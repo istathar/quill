@@ -353,17 +353,8 @@ abstract class EditorTextView extends TextView implements Editor
                     if (key == Keyval.a) {
                         // select all; pass through
                         return false;
-                    } else if (key == Keyval.c) {
-                        copyText();
-                        return true;
                     } else if (key == Keyval.g) {
                         insertImage();
-                        return true;
-                    } else if (key == Keyval.v) {
-                        pasteText();
-                        return true;
-                    } else if (key == Keyval.x) {
-                        cutText();
                         return true;
                     } else if (key == Keyval.Home) {
                         return handleJumpHome();
@@ -433,6 +424,12 @@ abstract class EditorTextView extends TextView implements Editor
             }
         });
 
+        /*
+         * This is a kludge: the UserActions need to know which the current
+         * editor is, if any. So, when focus come into this EditorTextView, we
+         * tell UserActions about it.
+         */
+
         view.connect(new Widget.FocusInEvent() {
             public boolean onFocusInEvent(Widget source, EventFocus event) {
                 final PrimaryWindow primary;
@@ -484,7 +481,7 @@ abstract class EditorTextView extends TextView implements Editor
         propagateTextualChange(offset, removed, span.getWidth());
     }
 
-    private void pasteText() {
+    void handlePasteText() {
         final Extract stash;
         final TextIter selection, start, finish;
         final int selectionOffset, offset, removed;
@@ -817,11 +814,11 @@ abstract class EditorTextView extends TextView implements Editor
         this.segment = segment;
     }
 
-    private void copyText() {
+    void handleCopyText() {
         extractText(true);
     }
 
-    private void cutText() {
+    void handleCutText() {
         extractText(false);
     }
 

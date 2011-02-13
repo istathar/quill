@@ -636,6 +636,7 @@ class PrimaryWindow extends Window
     void switchToStylesheet() {
         this.switchPaneLeft(gauche[1]);
         stylist.grabDefault();
+        actions.setCurrentEditor(null);
     }
 
     /**
@@ -644,6 +645,7 @@ class PrimaryWindow extends Window
     void switchToMetadata() {
         this.switchPaneLeft(gauche[2]);
         metaditor.grabDefault();
+        actions.setCurrentEditor(null);
     }
 
     /**
@@ -652,6 +654,7 @@ class PrimaryWindow extends Window
      */
     void switchToIntro() {
         this.switchPaneRight(droit[4]);
+        actions.setCurrentEditor(null);
     }
 
     /**
@@ -659,6 +662,7 @@ class PrimaryWindow extends Window
      */
     void switchToHelp() {
         this.switchPaneRight(droit[1]);
+        actions.setCurrentEditor(null);
     }
 
     /**
@@ -668,6 +672,7 @@ class PrimaryWindow extends Window
     void switchToPreview() {
         this.switchPaneRight(droit[0]);
         preview.refreshDisplayAtCursor();
+        actions.setCurrentEditor(null);
     }
 
     /**
@@ -698,6 +703,7 @@ class PrimaryWindow extends Window
     void switchToOutline() {
         this.switchPaneRight(droit[2]);
         outline.refreshDisplay();
+        actions.setCurrentEditor(null);
     }
 
     /**
