@@ -24,6 +24,7 @@ import org.gnome.gdk.Color;
 import org.gnome.gdk.Cursor;
 import org.gnome.gdk.EventButton;
 import org.gnome.gdk.EventCrossing;
+import org.gnome.gdk.EventFocus;
 import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
@@ -49,7 +50,6 @@ import org.gnome.gtk.WrapMode;
 import org.gnome.pango.FontDescription;
 
 import quill.client.Quill;
-import quill.textbase.Common;
 import quill.textbase.Extract;
 import quill.textbase.FormatTextualChange;
 import quill.textbase.HeadingSegment;
@@ -98,7 +98,7 @@ abstract class EditorTextView extends TextView implements Editor
 
     private SpellChecker dict;
 
-    EditorTextView(SeriesEditorWidget parent, Segment segment) {
+    EditorTextView(final SeriesEditorWidget parent, final Segment segment) {
         super();
         this.view = this;
         this.ui = Quill.getUserInterface();
@@ -353,17 +353,11 @@ abstract class EditorTextView extends TextView implements Editor
                     if (key == Keyval.a) {
                         // select all; pass through
                         return false;
-                    } else if (key == Keyval.b) {
-                        toggleMarkup(Common.BOLD);
-                        return true;
                     } else if (key == Keyval.c) {
                         copyText();
                         return true;
                     } else if (key == Keyval.g) {
                         insertImage();
-                        return true;
-                    } else if (key == Keyval.i) {
-                        toggleMarkup(Common.ITALICS);
                         return true;
                     } else if (key == Keyval.v) {
                         pasteText();
@@ -390,41 +384,7 @@ abstract class EditorTextView extends TextView implements Editor
                 }
 
                 if (mod.contains(ModifierType.CONTROL_MASK) && mod.contains(ModifierType.SHIFT_MASK)) {
-                    if (key == Keyval.Space) {
-                        clearFormat();
-                        return true;
-                    } else if (key == Keyval.A) {
-                        toggleMarkup(Common.ACRONYM);
-                        return true;
-                    } else if (key == Keyval.C) {
-                        toggleMarkup(Common.TYPE);
-                        return true;
-                    } else if (key == Keyval.L) {
-                        toggleMarkup(Common.LITERAL);
-                        return true;
-                    } else if (key == Keyval.F) {
-                        toggleMarkup(Common.FILENAME);
-                        return true;
-                    } else if (key == Keyval.H) {
-                        toggleMarkup(Common.HIGHLIGHT);
-                        return true;
-                    } else if (key == Keyval.K) {
-                        toggleMarkup(Common.KEYBOARD);
-                        return true;
-                    } else if (key == Keyval.M) {
-                        // function or _m_ethod
-                        toggleMarkup(Common.FUNCTION);
-                        return true;
-                    } else if (key == Keyval.P) {
-                        toggleMarkup(Common.PROJECT);
-                        return true;
-                    } else if (key == Keyval.O) {
-                        toggleMarkup(Common.COMMAND);
-                        return true;
-                    } else if (key == Keyval.T) {
-                        toggleMarkup(Common.TITLE);
-                        return true;
-                    } else if (key == Keyval.U) {
+                    if (key == Keyval.U) {
                         /*
                          * Special to GTK's default input method, so pass
                          * through!
@@ -469,6 +429,22 @@ abstract class EditorTextView extends TextView implements Editor
                 if (input.filterKeypress(event)) {
                     return true;
                 }
+                return false;
+            }
+        });
+
+        view.connect(new Widget.FocusInEvent() {
+            public boolean onFocusInEvent(Widget source, EventFocus event) {
+                final PrimaryWindow primary;
+                final UserActions actions;
+                final EditorTextView editor;
+
+                editor = EditorTextView.this;
+
+                primary = parent.getPrimary();
+                actions = primary.getActions();
+                actions.setCurrentEditor(editor);
+
                 return false;
             }
         });
@@ -597,7 +573,7 @@ abstract class EditorTextView extends TextView implements Editor
         propagateTextualChange(offset, removed, 0);
     }
 
-    private void toggleMarkup(Markup format) {
+    void handleToggleMarkup(Markup format) {
         TextIter start, end;
         int alpha, omega, offset, width;
         final int tmp;
@@ -1024,7 +1000,7 @@ abstract class EditorTextView extends TextView implements Editor
         });
     }
 
-    private void clearFormat() {
+    void handleClearFormat() {
         final TextIter start, end;
         final Extract original, replacement;
         int alpha, omega, offset, width;

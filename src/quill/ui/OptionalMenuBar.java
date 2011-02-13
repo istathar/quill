@@ -414,76 +414,129 @@ class OptionalMenuBar extends MenuBar
     private void setupFormatMenu() {
         final Menu menu;
         final MenuItem format;
-        final ImageMenuItem clear, italics, bold;
-        final MenuItem filename, type, function, project, command, literal, highlight, publication, acronym, keyboard;
-        final ModifierType both;
-
-        both = ModifierType.or(ModifierType.CONTROL_MASK, ModifierType.SHIFT_MASK);
+        Action action;
+        MenuItem item;
+        ImageMenuItem icon;
 
         menu = new Menu();
         menu.setAcceleratorGroup(group);
 
-        clear = new ImageMenuItem(Stock.CLEAR);
-        clear.setAlwaysShowImage(true);
-        clear.setAccelerator(group, Keyval.Space, both);
-        menu.append(clear);
+        /*
+         * Clear Formatting
+         */
 
-        menu.append(new SeparatorMenuItem());
+        action = actions.format.clear;
+        item = action.createMenuItem();
+        icon = (ImageMenuItem) item;
+        icon.setAlwaysShowImage(true);
+        menu.append(item);
 
-        italics = new ImageMenuItem(Stock.ITALIC);
-        italics.setAlwaysShowImage(true);
-        italics.setAccelerator(group, Keyval.i, ModifierType.CONTROL_MASK);
-        menu.append(italics);
+        /*
+         * Separator
+         */
 
-        bold = new ImageMenuItem(Stock.BOLD);
-        bold.setAlwaysShowImage(true);
-        bold.setAccelerator(group, Keyval.b, ModifierType.CONTROL_MASK);
-        menu.append(bold);
+        item = new SeparatorMenuItem();
+        menu.append(item);
 
-        filename = new MenuItem("_File");
-        filename.setAccelerator(group, Keyval.f, both);
-        filename.connect(new MenuItem.Activate() {
-            public void onActivate(MenuItem source) {
-                System.out.println("DEBUG: Filename!");
-            }
-        });
-        menu.append(filename);
+        /*
+         * Apply Italic Formatting
+         */
 
-        type = new MenuItem("_Class or Type");
-        type.setAccelerator(group, Keyval.c, both);
-        menu.append(type);
+        action = actions.format.italics;
+        item = action.createMenuItem();
+        icon = (ImageMenuItem) item;
+        icon.setAlwaysShowImage(true);
+        menu.append(item);
 
-        function = new MenuItem("_Method or Function");
-        function.setAccelerator(group, Keyval.m, both);
-        menu.append(function);
+        /*
+         * Apply Bold Formatting
+         */
 
-        project = new MenuItem("_Project");
-        project.setAccelerator(group, Keyval.p, both);
-        menu.append(project);
+        action = actions.format.bold;
+        item = action.createMenuItem();
+        icon = (ImageMenuItem) item;
+        icon.setAlwaysShowImage(true);
+        menu.append(item);
 
-        command = new MenuItem("C_ommand");
-        command.setAccelerator(group, Keyval.o, both);
-        menu.append(command);
+        /*
+         * Apply Filename Formatting
+         */
 
-        literal = new MenuItem("Code _Literal");
-        literal.setAccelerator(group, Keyval.l, both);
-        menu.append(literal);
+        action = actions.format.filename;
+        item = action.createMenuItem();
+        menu.append(item);
 
-        highlight = new MenuItem("_Highlight");
-        highlight.setAccelerator(group, Keyval.h, both);
-        menu.append(highlight);
+        /*
+         * Apply Class/Type Formatting
+         */
 
-        publication = new MenuItem("Publication _Title");
-        publication.setAccelerator(group, Keyval.t, both);
-        menu.append(publication);
+        action = actions.format.type;
+        item = action.createMenuItem();
+        menu.append(item);
 
-        acronym = new MenuItem("_Acronym");
-        acronym.setAccelerator(group, Keyval.a, both);
-        menu.append(acronym);
+        /*
+         * Apply Method/Function Formatting
+         */
 
-        keyboard = new MenuItem("_Keystroke");
-        keyboard.setAccelerator(group, Keyval.k, both);
-        menu.append(keyboard);
+        action = actions.format.function;
+        item = action.createMenuItem();
+        menu.append(item);
+
+        /*
+         * Apply Project Formatting
+         */
+
+        action = actions.format.project;
+        item = action.createMenuItem();
+        menu.append(item);
+
+        /*
+         * Apply Command Formatting
+         */
+
+        action = actions.format.command;
+        item = action.createMenuItem();
+        menu.append(item);
+
+        /*
+         * Apply Literal Formatting
+         */
+
+        action = actions.format.literal;
+        item = action.createMenuItem();
+        menu.append(item);
+
+        /*
+         * Apply Highlight Formatting
+         */
+
+        action = actions.format.highlight;
+        item = action.createMenuItem();
+        menu.append(item);
+
+        /*
+         * Apply Title Formatting
+         */
+
+        action = actions.format.publication;
+        item = action.createMenuItem();
+        menu.append(item);
+
+        /*
+         * Apply Acronym Formatting
+         */
+
+        action = actions.format.acronym;
+        item = action.createMenuItem();
+        menu.append(item);
+
+        /*
+         * Apply Keystroke Formatting
+         */
+
+        action = actions.format.keyboard;
+        item = action.createMenuItem();
+        menu.append(item);
 
         /*
          * Build the actual top level item for the menu bar.

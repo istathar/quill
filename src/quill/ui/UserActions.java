@@ -25,6 +25,7 @@ import org.gnome.gtk.Action;
 import org.gnome.gtk.Stock;
 
 import quill.client.Quill;
+import quill.textbase.Common;
 
 /**
  * Actions that the user can take. There is one of these per PrimaryWindow.
@@ -35,6 +36,11 @@ class UserActions
 {
     private final PrimaryWindow primary;
 
+    /**
+     * The current editor widget, whichever it is.
+     */
+    private EditorTextView editor;
+
     private final AcceleratorGroup group;
 
     final Manuscript manuscript;
@@ -43,14 +49,19 @@ class UserActions
 
     final View view;
 
+    final Format format;
+
     final Chapter chapter;
 
     final Help help;
 
     private static int count;
 
+    private static final ModifierType both;
+
     static {
         count = 0;
+        both = ModifierType.or(ModifierType.CONTROL_MASK, ModifierType.SHIFT_MASK);
     }
 
     /*
@@ -126,6 +137,7 @@ class UserActions
         this.edit = new Edit();
         this.view = new View();
         this.chapter = new Chapter();
+        this.format = new Format();
         this.help = new Help();
     }
 
@@ -260,7 +272,7 @@ class UserActions
 
         final Action rightside;
 
-        View() {
+        private View() {
             editor = new SwitchEditor();
             stylist = new SwitchStylist();
             metaditor = new SwitchMetaditor();
@@ -396,7 +408,7 @@ class UserActions
 
         final Action paste;
 
-        Edit() {
+        private Edit() {
             undo = new Undo();
             redo = new Redo();
             cut = new Cut();
@@ -468,7 +480,7 @@ class UserActions
 
         final Action next;
 
-        Chapter() {
+        private Chapter() {
             create = new Create();
             previous = new Previous();
             next = new Next();
@@ -504,6 +516,194 @@ class UserActions
 
             public void onActivate(Action source) {
                 primary.handleComponentNext();
+            }
+        }
+    }
+
+    class Format
+    {
+        final Action clear;
+
+        final Action italics;
+
+        final Action bold;
+
+        final Action filename;
+
+        final Action type;
+
+        final Action function;
+
+        final Action project;
+
+        final Action command;
+
+        final Action literal;
+
+        final Action highlight;
+
+        final Action publication;
+
+        final Action acronym;
+
+        final Action keyboard;
+
+        private Format() {
+            clear = new ClearFormat();
+            italics = new ApplyItalics();
+            bold = new ApplyBold();
+            filename = new ApplyFilename();
+            type = new ApplyType();
+            function = new ApplyFunction();
+            project = new ApplyProject();
+            command = new ApplyCommand();
+            literal = new ApplyLiteral();
+            highlight = new ApplyHighlight();
+            publication = new ApplyTitle();
+            acronym = new ApplyAcronym();
+            keyboard = new ApplyKeystroke();
+        }
+
+        private class ClearFormat extends NormalAction
+        {
+            private ClearFormat() {
+                super(Stock.NEW, Keyval.Space, both);
+            }
+
+            public void onActivate(Action source) {
+                editor.handleClearFormat();
+            }
+        }
+
+        private class ApplyItalics extends NormalAction
+        {
+            private ApplyItalics() {
+                super(Stock.ITALIC, Keyval.i, ModifierType.CONTROL_MASK);
+            }
+
+            public void onActivate(Action source) {
+                editor.handleToggleMarkup(Common.ITALICS);
+            }
+        }
+
+        private class ApplyBold extends NormalAction
+        {
+            private ApplyBold() {
+                super(Stock.BOLD, Keyval.b, ModifierType.CONTROL_MASK);
+            }
+
+            public void onActivate(Action source) {
+                editor.handleToggleMarkup(Common.BOLD);
+            }
+        }
+
+        private class ApplyFilename extends NormalAction
+        {
+            private ApplyFilename() {
+                super("_Filename", Keyval.f, both);
+            }
+
+            public void onActivate(Action source) {
+                editor.handleToggleMarkup(Common.FILENAME);
+            }
+        }
+
+        private class ApplyType extends NormalAction
+        {
+            private ApplyType() {
+                super("_Class or Type", Keyval.c, both);
+            }
+
+            public void onActivate(Action source) {
+                editor.handleToggleMarkup(Common.TYPE);
+            }
+        }
+
+        private class ApplyFunction extends NormalAction
+        {
+            private ApplyFunction() {
+                super("_Method or Function", Keyval.m, both);
+            }
+
+            public void onActivate(Action source) {
+                editor.handleToggleMarkup(Common.FUNCTION);
+            }
+        }
+
+        private class ApplyProject extends NormalAction
+        {
+            private ApplyProject() {
+                super("_Project", Keyval.p, both);
+            }
+
+            public void onActivate(Action source) {
+                editor.handleToggleMarkup(Common.PROJECT);
+            }
+        }
+
+        private class ApplyCommand extends NormalAction
+        {
+            private ApplyCommand() {
+                super("C_ommand", Keyval.o, both);
+            }
+
+            public void onActivate(Action source) {
+                editor.handleToggleMarkup(Common.COMMAND);
+            }
+        }
+
+        private class ApplyLiteral extends NormalAction
+        {
+            private ApplyLiteral() {
+                super("Code _Literal", Keyval.l, both);
+            }
+
+            public void onActivate(Action source) {
+                editor.handleToggleMarkup(Common.LITERAL);
+            }
+        }
+
+        private class ApplyHighlight extends NormalAction
+        {
+            private ApplyHighlight() {
+                super("_Highlight", Keyval.h, both);
+            }
+
+            public void onActivate(Action source) {
+                editor.handleToggleMarkup(Common.HIGHLIGHT);
+            }
+        }
+
+        private class ApplyTitle extends NormalAction
+        {
+            private ApplyTitle() {
+                super("Publication _Title", Keyval.t, both);
+            }
+
+            public void onActivate(Action source) {
+                editor.handleToggleMarkup(Common.TITLE);
+            }
+        }
+
+        private class ApplyAcronym extends NormalAction
+        {
+            private ApplyAcronym() {
+                super("_Acronym", Keyval.a, both);
+            }
+
+            public void onActivate(Action source) {
+                editor.handleToggleMarkup(Common.ACRONYM);
+            }
+        }
+
+        private class ApplyKeystroke extends NormalAction
+        {
+            private ApplyKeystroke() {
+                super("_Keystroke", Keyval.k, both);
+            }
+
+            public void onActivate(Action source) {
+                editor.handleToggleMarkup(Common.KEYBOARD);
             }
         }
     }
@@ -624,5 +824,9 @@ class UserActions
                 primary.switchToIntro();
             }
         }
+    }
+
+    void setCurrentEditor(EditorTextView view) {
+        this.editor = view;
     }
 }
