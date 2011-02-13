@@ -35,13 +35,13 @@ class UserActions
 
     private final AcceleratorGroup group;
 
-    final EditActions edit;
+    final Edit edit;
 
-    final ViewActions view;
+    final View view;
 
-    final ChapterActions chapter;
+    final Chapter chapter;
 
-    final HelpActions help;
+    final Help help;
 
     private static int count;
 
@@ -54,35 +54,58 @@ class UserActions
      */
     private static String generateName() {
         count++;
-        return "PrimaryAction-" + count;
+        return "NormalAction-" + count;
     }
 
-    abstract class PrimaryAction extends Action implements Action.Activate
+    /**
+     * Base class to facilitate easily coding Actions with their Activate
+     * callbacks, while accessing our reference to the top level
+     * PrimaryWindow.
+     */
+    private abstract class NormalAction extends org.gnome.gtk.Action implements Action.Activate
     {
-        PrimaryAction(Stock stock) {
+        NormalAction(Stock stock) {
             super(generateName(), stock);
             super.connect(this);
         }
 
-        PrimaryAction(String label) {
+        NormalAction(String label) {
             super(generateName(), label);
             super.connect(this);
         }
 
-        PrimaryAction(String label, Stock stock) {
+        NormalAction(String label, Stock stock) {
             super(generateName(), label, null, stock);
             super.connect(this);
         }
 
-        PrimaryAction(String label, Keyval keyval, ModifierType modifier) {
+        NormalAction(String label, Keyval keyval, ModifierType modifier) {
             super(generateName(), label);
             super.setAccelerator(group, keyval, modifier);
             super.connect(this);
         }
 
-        PrimaryAction(Stock stock, Keyval keyval, ModifierType modifier) {
+        NormalAction(Stock stock, Keyval keyval, ModifierType modifier) {
             super(generateName(), stock);
             super.setAccelerator(group, keyval, modifier);
+            super.connect(this);
+        }
+    }
+
+    private abstract class ToggleAction extends org.gnome.gtk.ToggleAction implements Action.Activate
+    {
+        ToggleAction(String label, Keyval keyval, ModifierType modifier, boolean initial) {
+            super(generateName(), label);
+            super.setAccelerator(group, keyval, modifier);
+            super.setActive(initial);
+            super.connect(this);
+
+        }
+
+        ToggleAction(Stock stock, Keyval keyval, ModifierType modifier, boolean initial) {
+            super(generateName(), stock);
+            super.setAccelerator(group, keyval, modifier);
+            super.setActive(initial);
             super.connect(this);
         }
     }
@@ -95,22 +118,159 @@ class UserActions
         this.group = new AcceleratorGroup();
         this.primary.addAcceleratorGroup(group);
 
-        this.edit = new EditActions();
-        this.view = new ViewActions();
-        this.chapter = new ChapterActions();
-        this.help = new HelpActions();
+        this.edit = new Edit();
+        this.view = new View();
+        this.chapter = new Chapter();
+        this.help = new Help();
     }
 
-    class ViewActions
+    class View
     {
-        Action editor;
+        final Action editor;
 
-        Action stylist;
+        final Action stylist;
 
-        Action metadata;
+        final Action metaditor;
+
+        final Action preview;
+
+        final Action outline;
+
+        final Action endnotes;
+
+        final Action references;
+
+        final Action fullscreen;
+
+        final Action menubar;
+
+        final Action rightside;
+
+        View() {
+            editor = new SwitchEditor();
+            stylist = new SwitchStylist();
+            metaditor = new SwitchMetaditor();
+            preview = new SwitchPreview();
+            outline = new SwitchOutline();
+            endnotes = new SwitchEndnotes();
+            references = new SwitchReferences();
+            fullscreen = new ToggleFullscreen();
+            menubar = new ToggleMenubar();
+            rightside = new ToggleRightSide();
+        }
+
+        private class SwitchEditor extends NormalAction
+        {
+            private SwitchEditor() {
+                super("_Editor", Keyval.F1, ModifierType.NONE);
+            }
+
+            public void onActivate(Action source) {
+                primary.switchToEditor();
+            }
+        }
+
+        private class SwitchStylist extends NormalAction
+        {
+            private SwitchStylist() {
+                super("_Stylesheet", Keyval.F2, ModifierType.NONE);
+            }
+
+            public void onActivate(Action source) {
+                primary.switchToStylesheet();
+            }
+        }
+
+        private class SwitchMetaditor extends NormalAction
+        {
+            private SwitchMetaditor() {
+                super("_Metadata", Keyval.F3, ModifierType.NONE);
+            }
+
+            public void onActivate(Action source) {
+                primary.switchToMetadata();
+            }
+        }
+
+        private class SwitchPreview extends NormalAction
+        {
+            private SwitchPreview() {
+                super("_Preview", Keyval.F5, ModifierType.NONE);
+            }
+
+            public void onActivate(Action source) {
+                primary.switchToPreview();
+            }
+        }
+
+        private class SwitchOutline extends NormalAction
+        {
+            private SwitchOutline() {
+                super("_Outline", Keyval.F6, ModifierType.NONE);
+            }
+
+            public void onActivate(Action source) {
+                primary.switchToOutline();
+            }
+        }
+
+        private class SwitchEndnotes extends NormalAction
+        {
+            private SwitchEndnotes() {
+                super("End_notes", Keyval.F7, ModifierType.NONE);
+            }
+
+            public void onActivate(Action source) {
+                primary.switchToEndnotes();
+            }
+        }
+
+        private class SwitchReferences extends NormalAction
+        {
+            private SwitchReferences() {
+                super("_References", Keyval.F8, ModifierType.NONE);
+            }
+
+            public void onActivate(Action source) {
+                primary.switchToReferences();
+            }
+        }
+
+        private class ToggleFullscreen extends ToggleAction
+        {
+            private ToggleFullscreen() {
+                super(Stock.FULLSCREEN, Keyval.F11, ModifierType.NONE, false);
+            }
+
+            public void onActivate(Action source) {
+                primary.toggleFullscreen();
+            }
+        }
+
+        private class ToggleMenubar extends ToggleAction
+        {
+            private ToggleMenubar() {
+                super("Menubar", Keyval.F12, ModifierType.NONE, false);
+            }
+
+            public void onActivate(Action source) {
+                primary.toggleOptionalMenu();
+            }
+        }
+
+        private class ToggleRightSide extends ToggleAction
+        {
+            private ToggleRightSide() {
+                super("Right-Hand Side", Keyval.F12, ModifierType.SHIFT_MASK, true);
+            }
+
+            public void onActivate(Action source) {
+                primary.toggleRightSide();
+            }
+        }
     }
 
-    class EditActions
+    class Edit
     {
         final Action undo;
 
@@ -122,17 +282,17 @@ class UserActions
 
         final Action paste;
 
-        EditActions() {
-            undo = new UndoAction();
-            redo = new RedoAction();
-            cut = new CutAction();
-            copy = new CopyAction();
-            paste = new PasteAction();
+        Edit() {
+            undo = new Undo();
+            redo = new Redo();
+            cut = new Cut();
+            copy = new Copy();
+            paste = new Paste();
         }
 
-        private class UndoAction extends PrimaryAction
+        private class Undo extends NormalAction
         {
-            private UndoAction() {
+            private Undo() {
                 super(Stock.UNDO, Keyval.z, ModifierType.CONTROL_MASK);
             }
 
@@ -141,9 +301,9 @@ class UserActions
             }
         }
 
-        private class RedoAction extends PrimaryAction
+        private class Redo extends NormalAction
         {
-            private RedoAction() {
+            private Redo() {
                 super(Stock.REDO, Keyval.y, ModifierType.CONTROL_MASK);
             }
 
@@ -152,9 +312,9 @@ class UserActions
             }
         }
 
-        private class CutAction extends PrimaryAction
+        private class Cut extends NormalAction
         {
-            private CutAction() {
+            private Cut() {
                 super(Stock.CUT, Keyval.x, ModifierType.CONTROL_MASK);
             }
 
@@ -163,9 +323,9 @@ class UserActions
             }
         }
 
-        private class CopyAction extends PrimaryAction
+        private class Copy extends NormalAction
         {
-            private CopyAction() {
+            private Copy() {
                 super(Stock.COPY, Keyval.c, ModifierType.CONTROL_MASK);
             }
 
@@ -174,9 +334,9 @@ class UserActions
             }
         }
 
-        private class PasteAction extends PrimaryAction
+        private class Paste extends NormalAction
         {
-            private PasteAction() {
+            private Paste() {
                 super(Stock.PASTE, Keyval.v, ModifierType.CONTROL_MASK);
             }
 
@@ -186,7 +346,7 @@ class UserActions
         }
     }
 
-    class ChapterActions
+    class Chapter
     {
         final Action create;
 
@@ -194,15 +354,15 @@ class UserActions
 
         final Action next;
 
-        ChapterActions() {
-            create = new ChapterCreate();
-            previous = new ChapterPrevious();
-            next = new ChapterNext();
+        Chapter() {
+            create = new Create();
+            previous = new Previous();
+            next = new Next();
         }
 
-        private class ChapterCreate extends PrimaryAction
+        private class Create extends NormalAction
         {
-            private ChapterCreate() {
+            private Create() {
                 super("New Chapter", Stock.NEW);
             }
 
@@ -211,9 +371,9 @@ class UserActions
             }
         }
 
-        private class ChapterPrevious extends PrimaryAction
+        private class Previous extends NormalAction
         {
-            private ChapterPrevious() {
+            private Previous() {
                 super("Previous", Keyval.PageUp, ModifierType.CONTROL_MASK);
             }
 
@@ -222,9 +382,9 @@ class UserActions
             }
         }
 
-        private class ChapterNext extends PrimaryAction
+        private class Next extends NormalAction
         {
-            private ChapterNext() {
+            private Next() {
                 super("Next", Keyval.PageDown, ModifierType.CONTROL_MASK);
             }
 
@@ -234,7 +394,7 @@ class UserActions
         }
     }
 
-    class HelpActions
+    class Help
     {
         Action editor;
     }

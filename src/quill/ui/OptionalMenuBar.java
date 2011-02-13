@@ -31,7 +31,6 @@ import org.gnome.gtk.MenuBar;
 import org.gnome.gtk.MenuItem;
 import org.gnome.gtk.SeparatorMenuItem;
 import org.gnome.gtk.Stock;
-import org.gnome.gtk.ToggleAction;
 
 /**
  * The code for the optional MenuBar. It's "optional" because you're supposed
@@ -269,7 +268,6 @@ class OptionalMenuBar extends MenuBar
         Action action;
         MenuItem item;
         CheckMenuItem check;
-        SeparatorMenuItem separator;
 
         menu = new Menu();
         menu.setAcceleratorGroup(group);
@@ -278,118 +276,64 @@ class OptionalMenuBar extends MenuBar
          * Switch to Editor
          */
 
-        action = new Action("switch-to-editor", "_Editor");
-        action.setAccelerator(group, Keyval.F1, ModifierType.NONE);
-
+        action = actions.view.editor;
         item = action.createMenuItem();
         menu.append(item);
-
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-                primary.switchToEditor();
-            }
-        });
-
-        actions.view.editor = action;
 
         /*
          * Switch to Stylesheet
          */
 
-        action = new Action("switch-to-stylesheet", "_Stylesheet");
-        action.setAccelerator(group, Keyval.F2, ModifierType.NONE);
-
+        action = actions.view.stylist;
         item = action.createMenuItem();
         menu.append(item);
-
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-                primary.switchToStylesheet();
-            }
-        });
 
         /*
          * Switch to Metadata
          */
 
-        action = new Action("switch-to-metadata", "_Metadata");
-        action.setAccelerator(group, Keyval.F3, ModifierType.NONE);
-
+        action = actions.view.metaditor;
         item = action.createMenuItem();
         menu.append(item);
-
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-                primary.switchToMetadata();
-            }
-        });
 
         /*
          * Switch to Preview
          */
 
-        action = new Action("switch-to-preview", "_Preview");
-        action.setAccelerator(group, Keyval.F5, ModifierType.NONE);
-
+        action = actions.view.preview;
         item = action.createMenuItem();
         menu.append(item);
-
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-                primary.switchToPreview();
-            }
-        });
 
         /*
          * Switch to Outline
          */
 
-        action = new Action("switch-to-outline", "_Outline");
-        action.setAccelerator(group, Keyval.F6, ModifierType.NONE);
-
+        action = actions.view.outline;
         item = action.createMenuItem();
         menu.append(item);
-
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-                primary.switchToOutline();
-            }
-        });
 
         /*
          * Switch to Endnotes
          */
 
-        action = new Action("switch-to-endnotes", "End_notes");
-        action.setAccelerator(group, Keyval.F7, ModifierType.NONE);
-
+        action = actions.view.endnotes;
         item = action.createMenuItem();
         menu.append(item);
-
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-                primary.switchToEndnotes();
-            }
-        });
 
         /*
          * Switch to References
          */
 
-        action = new Action("switch-to-references", "_References");
-        action.setAccelerator(group, Keyval.F8, ModifierType.NONE);
-
+        action = actions.view.references;
         item = action.createMenuItem();
         menu.append(item);
 
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-                primary.switchToReferences();
-            }
-        });
+        /*
+         * Separator
+         */
 
-        separator = new SeparatorMenuItem();
-        menu.append(separator);
+        item = new SeparatorMenuItem();
+        menu.append(item);
 
         /*
          * Toggle Fullscreen
@@ -411,35 +355,17 @@ class OptionalMenuBar extends MenuBar
          * Toggle Menubar
          */
 
-        action = new ToggleAction("toggle-menubar", "Menubar");
-        action.setAccelerator(group, Keyval.F12, ModifierType.NONE);
-
-        check = (CheckMenuItem) action.createMenuItem();
-        check.setActive(true);
-        menu.append(check);
-
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-                primary.toggleOptionalMenu();
-            }
-        });
+        action = actions.view.menubar;
+        item = action.createMenuItem();
+        menu.append(item);
 
         /*
          * Toggle Right Side
          */
 
-        action = new ToggleAction("toggle-right-side", "Right-Hand Side");
-        action.setAccelerator(group, Keyval.F12, ModifierType.SHIFT_MASK);
-
+        action = actions.view.rightside;
         check = (CheckMenuItem) action.createMenuItem();
-        check.setActive(true);
         menu.append(check);
-
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-                primary.toggleRightSide();
-            }
-        });
 
         /*
          * Build the actual top level item for the menu bar.
