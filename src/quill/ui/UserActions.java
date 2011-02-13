@@ -24,6 +24,8 @@ import org.gnome.gtk.AcceleratorGroup;
 import org.gnome.gtk.Action;
 import org.gnome.gtk.Stock;
 
+import quill.client.Quill;
+
 /**
  * Actions that the user can take. There is one of these per PrimaryWindow.
  * 
@@ -34,6 +36,8 @@ class UserActions
     private final PrimaryWindow primary;
 
     private final AcceleratorGroup group;
+
+    final Manuscript manuscript;
 
     final Edit edit;
 
@@ -118,10 +122,120 @@ class UserActions
         this.group = new AcceleratorGroup();
         this.primary.addAcceleratorGroup(group);
 
+        this.manuscript = new Manuscript();
         this.edit = new Edit();
         this.view = new View();
         this.chapter = new Chapter();
         this.help = new Help();
+    }
+
+    class Manuscript
+    {
+        final Action create;
+
+        final Action open;
+
+        final Action save;
+
+        final Action print;
+
+        final Action export;
+
+        final Action quit;
+
+        private Manuscript() {
+            create = new Create();
+            open = new Open();
+            save = new Save();
+            print = new Print();
+            export = new Export();
+            quit = new Quit();
+        }
+
+        private class Create extends NormalAction
+        {
+            private Create() {
+                super("New Document");
+            }
+
+            public void onActivate(Action source) {
+                throw new Error();
+            }
+        }
+
+        private class Open extends NormalAction
+        {
+            private Open() {
+                super(Stock.OPEN, Keyval.o, ModifierType.CONTROL_MASK);
+            }
+
+            public void onActivate(Action source) {
+                try {
+                    primary.saveIfModified();
+                    primary.openDocument();
+                } catch (SaveCancelledException e) {
+                    // ok
+                }
+
+            }
+        }
+
+        private class Save extends NormalAction
+        {
+            private Save() {
+                super(Stock.SAVE, Keyval.s, ModifierType.CONTROL_MASK);
+            }
+
+            public void onActivate(Action source) {
+                try {
+                    primary.saveDocument();
+                } catch (SaveCancelledException e) {
+                    // ok
+                }
+            }
+        }
+
+        private class Print extends NormalAction
+        {
+            private Print() {
+                super(Stock.PRINT, Keyval.p, ModifierType.CONTROL_MASK);
+            }
+
+            public void onActivate(Action source) {
+                primary.printDocument();
+            }
+        }
+
+        private class Export extends NormalAction
+        {
+            private Export() {
+                super("_Export", Keyval.e, ModifierType.CONTROL_MASK);
+            }
+
+            public void onActivate(Action source) {
+            // TODO
+            }
+        }
+
+        private class Quit extends NormalAction
+        {
+            private Quit() {
+                super(Stock.QUIT, Keyval.q, ModifierType.CONTROL_MASK);
+            }
+
+            public void onActivate(Action source) {
+                final UserInterface ui;
+
+                try {
+                    ui = Quill.getUserInterface();
+
+                    primary.saveIfModified();
+                    ui.shutdown();
+                } catch (SaveCancelledException sce) {
+                    // ok
+                }
+            }
+        }
     }
 
     class View
@@ -410,7 +524,9 @@ class UserActions
 
         final Action references;
 
-        Help() {
+        final Action intro;
+
+        private Help() {
             editor = new SwitchEditor();
             stylist = new SwitchStylist();
             metaditor = new SwitchMetaditor();
@@ -418,6 +534,7 @@ class UserActions
             outline = new SwitchOutline();
             endnotes = new SwitchEndnotes();
             references = new SwitchReferences();
+            intro = new SwitchIntro(); // testing
         }
 
         private class SwitchEditor extends NormalAction
@@ -494,6 +611,17 @@ class UserActions
 
             public void onActivate(Action source) {
             // TODO
+            }
+        }
+
+        private class SwitchIntro extends NormalAction
+        {
+            private SwitchIntro() {
+                super("Introduction", Keyval.F9, ModifierType.SHIFT_MASK);
+            }
+
+            public void onActivate(Action source) {
+                primary.switchToIntro();
             }
         }
     }

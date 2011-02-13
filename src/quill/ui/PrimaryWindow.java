@@ -477,17 +477,7 @@ class PrimaryWindow extends Window
                          */
                         return false;
                     }
-                } else if (mod == ModifierType.SHIFT_MASK) {
-                    if (key == Keyval.F11) {
-                        switchToIntro();
-                        return true;
-                    }
-
                 } else if (mod == ModifierType.CONTROL_MASK) {
-                    if (key == Keyval.p) {
-                        printDocument();
-                        return true;
-                    }
                     if (key == Keyval.n) {
                         /*
                          * I was about to hook up ui.newDocument() here, but I
@@ -497,32 +487,6 @@ class PrimaryWindow extends Window
                          * series would be good too.
                          */
                         return true;
-                    }
-                    if (key == Keyval.o) {
-                        try {
-                            saveIfModified();
-                            openDocument();
-                            return true;
-                        } catch (SaveCancelledException sce) {
-                            return true;
-                        }
-                    }
-                    if (key == Keyval.q) {
-                        try {
-                            saveIfModified();
-                            ui.shutdown();
-                            return true;
-                        } catch (SaveCancelledException sce) {
-                            return true;
-                        }
-                    }
-                    if (key == Keyval.s) {
-                        try {
-                            saveDocument();
-                        } catch (SaveCancelledException e) {
-                            // ignore
-                        }
-                        return true;
                     } else if (key == Keyval.w) {
                         /*
                          * FIXME if we evolve to holding multiple documents
@@ -531,13 +495,6 @@ class PrimaryWindow extends Window
                          * (document?) that is currently active instead of
                          * terminating the application.
                          */
-                        try {
-                            saveIfModified();
-                            ui.shutdown();
-                            return true;
-                        } catch (SaveCancelledException sce) {
-                            return true;
-                        }
                     }
                 }
 

@@ -23,8 +23,6 @@ import org.gnome.gdk.ModifierType;
 import org.gnome.gtk.AcceleratorGroup;
 import org.gnome.gtk.Action;
 import org.gnome.gtk.CheckMenuItem;
-import org.gnome.gtk.IconSize;
-import org.gnome.gtk.Image;
 import org.gnome.gtk.ImageMenuItem;
 import org.gnome.gtk.Menu;
 import org.gnome.gtk.MenuBar;
@@ -72,37 +70,73 @@ class OptionalMenuBar extends MenuBar
     private void setupManuscriptMenu() {
         final Menu menu;
         final MenuItem manuscript;
-        final MenuItem create, open, save, print, export, quit;
+        Action action;
+        MenuItem item;
 
         menu = new Menu();
         menu.setAcceleratorGroup(group);
 
-        create = new ImageMenuItem(new Image(Stock.NEW, IconSize.MENU), "New Document...");
-        menu.append(create);
+        /*
+         * New Document
+         */
 
-        open = new ImageMenuItem(Stock.OPEN);
-        open.setAccelerator(group, Keyval.o, ModifierType.CONTROL_MASK);
-        menu.append(open);
+        action = actions.manuscript.create;
+        item = action.createMenuItem();
+        menu.append(item);
 
-        save = new ImageMenuItem(Stock.SAVE);
-        save.setAccelerator(group, Keyval.s, ModifierType.CONTROL_MASK);
-        menu.append(save);
+        /*
+         * Open Document
+         */
 
-        menu.append(new SeparatorMenuItem());
+        action = actions.manuscript.open;
+        item = action.createMenuItem();
+        menu.append(item);
 
-        print = new ImageMenuItem(Stock.PRINT);
-        print.setAccelerator(group, Keyval.p, ModifierType.CONTROL_MASK);
-        menu.append(print);
+        /*
+         * Save Document
+         */
 
-        export = new MenuItem("_Export...");
-        export.setAccelerator(group, Keyval.e, ModifierType.CONTROL_MASK);
-        menu.append(export);
+        action = actions.manuscript.save;
+        item = action.createMenuItem();
+        menu.append(item);
 
-        menu.append(new SeparatorMenuItem());
+        /*
+         * Separator
+         */
 
-        quit = new ImageMenuItem(Stock.QUIT);
-        quit.setAccelerator(group, Keyval.q, ModifierType.CONTROL_MASK);
-        menu.append(quit);
+        item = new SeparatorMenuItem();
+        menu.append(item);
+
+        /*
+         * Print Document
+         */
+
+        action = actions.manuscript.print;
+        item = action.createMenuItem();
+        menu.append(item);
+
+        /*
+         * Export Document
+         */
+
+        action = actions.manuscript.export;
+        item = action.createMenuItem();
+        menu.append(item);
+
+        /*
+         * Separator
+         */
+
+        item = new SeparatorMenuItem();
+        menu.append(item);
+
+        /*
+         * Quit
+         */
+
+        action = actions.manuscript.quit;
+        item = action.createMenuItem();
+        menu.append(item);
 
         /*
          * Build the actual top level item for the menu bar.
