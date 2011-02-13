@@ -92,11 +92,11 @@ public class ValidateDocumentModified extends GraphicalTestCase
         insertThreeSpansIntoFirstSegment(primary);
 
         assertTrue(primary.isModified());
-        primary.undo();
+        primary.handleUndo();
         assertTrue(primary.isModified());
-        primary.undo();
+        primary.handleUndo();
         assertTrue(primary.isModified());
-        primary.undo();
+        primary.handleUndo();
         assertFalse(primary.isModified());
     }
 
@@ -126,17 +126,17 @@ public class ValidateDocumentModified extends GraphicalTestCase
          * (non-zero) save point to see if the modified behaviour holds.
          */
 
-        primary.undo();
+        primary.handleUndo();
         assertTrue(primary.isModified());
 
-        primary.redo();
+        primary.handleRedo();
         assertFalse(primary.isModified());
 
         insertThreeSpansIntoFirstSegment(primary);
         assertTrue(primary.isModified());
-        primary.undo();
-        primary.undo();
-        primary.undo();
+        primary.handleUndo();
+        primary.handleUndo();
+        primary.handleUndo();
         assertFalse(primary.isModified());
     }
 }

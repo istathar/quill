@@ -156,6 +156,7 @@ class PrimaryWindow extends Window
          */
 
         stack.apply(replacement);
+        actions.edit.undo.setSensitive(true);
 
         /*
          * Propagate
@@ -274,7 +275,7 @@ class PrimaryWindow extends Window
      * Pick the latest Folio off the ChangeStack, and then do something with
      * it
      */
-    void undo() {
+    void handleUndo() {
         final Folio previous;
 
         previous = stack.undo();
@@ -289,7 +290,7 @@ class PrimaryWindow extends Window
     /**
      * Grab the Change that was most recently undone, and redo it.
      */
-    void redo() {
+    void handleRedo() {
         final Folio following;
 
         following = stack.redo();
@@ -537,12 +538,6 @@ class PrimaryWindow extends Window
                         } catch (SaveCancelledException sce) {
                             return true;
                         }
-                    } else if (key == Keyval.y) {
-                        redo();
-                        return true;
-                    } else if (key == Keyval.z) {
-                        undo();
-                        return true;
                     }
                 }
 

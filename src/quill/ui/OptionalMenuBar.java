@@ -200,33 +200,58 @@ class OptionalMenuBar extends MenuBar
     private void setupEditMenu() {
         final Menu menu;
         final MenuItem edit;
-        final ImageMenuItem undo, redo, cut, copy, paste;
+        Action action;
+        MenuItem item;
 
         menu = new Menu();
         menu.setAcceleratorGroup(group);
 
-        undo = new ImageMenuItem(Stock.UNDO);
-        undo.setAccelerator(group, Keyval.z, ModifierType.CONTROL_MASK);
-        menu.append(undo);
-        actions.edit.undo = undo.getRelatedAction();
+        /*
+         * Undo
+         */
 
-        redo = new ImageMenuItem(Stock.REDO);
-        redo.setAccelerator(group, Keyval.y, ModifierType.CONTROL_MASK);
-        menu.append(redo);
+        action = actions.edit.undo;
+        item = action.createMenuItem();
+        menu.append(item);
 
-        menu.append(new SeparatorMenuItem());
+        /*
+         * Redo
+         */
 
-        cut = new ImageMenuItem(Stock.CUT);
-        cut.setAccelerator(group, Keyval.x, ModifierType.CONTROL_MASK);
-        menu.append(cut);
+        action = actions.edit.redo;
+        item = action.createMenuItem();
+        menu.append(item);
 
-        copy = new ImageMenuItem(Stock.COPY);
-        copy.setAccelerator(group, Keyval.c, ModifierType.CONTROL_MASK);
-        menu.append(copy);
+        /*
+         * Separator
+         */
 
-        paste = new ImageMenuItem(Stock.PASTE);
-        paste.setAccelerator(group, Keyval.v, ModifierType.CONTROL_MASK);
-        menu.append(paste);
+        item = new SeparatorMenuItem();
+        menu.append(item);
+
+        /*
+         * Cut
+         */
+
+        action = actions.edit.cut;
+        item = action.createMenuItem();
+        menu.append(item);
+
+        /*
+         * Copy
+         */
+
+        action = actions.edit.copy;
+        item = action.createMenuItem();
+        menu.append(item);
+
+        /*
+         * Paste
+         */
+
+        action = actions.edit.paste;
+        item = action.createMenuItem();
+        menu.append(item);
 
         /*
          * Build the actual top level item for the menu bar.

@@ -74,9 +74,15 @@ class UserActions
             super.connect(this);
         }
 
-        PrimaryAction(String label, Keyval key, ModifierType mod) {
+        PrimaryAction(String label, Keyval keyval, ModifierType modifier) {
             super(generateName(), label);
-            super.setAccelerator(group, key, mod);
+            super.setAccelerator(group, keyval, modifier);
+            super.connect(this);
+        }
+
+        PrimaryAction(Stock stock, Keyval keyval, ModifierType modifier) {
+            super(generateName(), stock);
+            super.setAccelerator(group, keyval, modifier);
             super.connect(this);
         }
     }
@@ -106,9 +112,78 @@ class UserActions
 
     class EditActions
     {
-        Action undo;
+        final Action undo;
 
-        Action redo;
+        final Action redo;
+
+        final Action cut;
+
+        final Action copy;
+
+        final Action paste;
+
+        EditActions() {
+            undo = new UndoAction();
+            redo = new RedoAction();
+            cut = new CutAction();
+            copy = new CopyAction();
+            paste = new PasteAction();
+        }
+
+        private class UndoAction extends PrimaryAction
+        {
+            private UndoAction() {
+                super(Stock.UNDO, Keyval.z, ModifierType.CONTROL_MASK);
+            }
+
+            public void onActivate(Action source) {
+                primary.handleUndo();
+            }
+        }
+
+        private class RedoAction extends PrimaryAction
+        {
+            private RedoAction() {
+                super(Stock.REDO, Keyval.y, ModifierType.CONTROL_MASK);
+            }
+
+            public void onActivate(Action source) {
+                primary.handleRedo();
+            }
+        }
+
+        private class CutAction extends PrimaryAction
+        {
+            private CutAction() {
+                super(Stock.CUT, Keyval.x, ModifierType.CONTROL_MASK);
+            }
+
+            public void onActivate(Action source) {
+            // TODO
+            }
+        }
+
+        private class CopyAction extends PrimaryAction
+        {
+            private CopyAction() {
+                super(Stock.COPY, Keyval.c, ModifierType.CONTROL_MASK);
+            }
+
+            public void onActivate(Action source) {
+            // TODO
+            }
+        }
+
+        private class PasteAction extends PrimaryAction
+        {
+            private PasteAction() {
+                super(Stock.PASTE, Keyval.v, ModifierType.CONTROL_MASK);
+            }
+
+            public void onActivate(Action source) {
+            // TODO
+            }
+        }
     }
 
     class ChapterActions
