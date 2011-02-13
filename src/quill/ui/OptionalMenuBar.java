@@ -205,20 +205,35 @@ class OptionalMenuBar extends MenuBar
     private void setupInsertMenu() {
         final Menu menu;
         final MenuItem edit;
-        final MenuItem note, cite, block;
+        Action action;
+        MenuItem item;
 
         menu = new Menu();
         menu.setAcceleratorGroup(group);
 
-        note = new MenuItem("End_note Anchor");
-        menu.append(note);
+        /*
+         * Insert Endnote Anchor
+         */
 
-        cite = new MenuItem("_Reference Citation");
-        menu.append(cite);
+        action = actions.insert.note;
+        item = action.createMenuItem();
+        menu.append(item);
 
-        block = new MenuItem("Block...");
-        block.setAccelerator(group, Keyval.Insert, ModifierType.NONE);
-        menu.append(block);
+        /*
+         * Insert Reference Anchor
+         */
+
+        action = actions.insert.cite;
+        item = action.createMenuItem();
+        menu.append(item);
+
+        /*
+         * Insert Block
+         */
+
+        action = actions.insert.block;
+        item = action.createMenuItem();
+        menu.append(item);
 
         /*
          * Build the actual top level item for the menu bar.

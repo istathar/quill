@@ -1170,7 +1170,7 @@ abstract class EditorTextView extends TextView implements Editor
     /*
      * This is a bit hideous.
      */
-    private void popupInsertMenu() {
+    void popupInsertMenu() {
         final ContextMenu split;
         final InsertMenuDetails[] details;
         final int I;

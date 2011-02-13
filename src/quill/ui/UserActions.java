@@ -45,13 +45,15 @@ class UserActions
 
     final Manuscript manuscript;
 
+    final Chapter chapter;
+
     final Edit edit;
 
     final View view;
 
-    final Format format;
+    final Insert insert;
 
-    final Chapter chapter;
+    final Format format;
 
     final Help help;
 
@@ -69,7 +71,7 @@ class UserActions
      */
     private static String generateName() {
         count++;
-        return "NormalAction-" + count;
+        return "quill-" + count;
     }
 
     /**
@@ -134,9 +136,10 @@ class UserActions
         this.primary.addAcceleratorGroup(group);
 
         this.manuscript = new Manuscript();
+        this.chapter = new Chapter();
         this.edit = new Edit();
         this.view = new View();
-        this.chapter = new Chapter();
+        this.insert = new Insert();
         this.format = new Format();
         this.help = new Help();
     }
@@ -525,6 +528,57 @@ class UserActions
 
             public void onActivate(Action source) {
                 primary.handleComponentNext();
+            }
+        }
+    }
+
+    class Insert
+    {
+        final Action note;
+
+        final Action cite;
+
+        final Action block;
+
+        private Insert() {
+            note = new EndnoteAnchor();
+            cite = new ReferenceAnchor();
+            block = new InsertBlock();
+        }
+
+        private class EndnoteAnchor extends NormalAction
+        {
+            private EndnoteAnchor() {
+                super("End_note Anchor");
+            }
+
+            public void onActivate(Action source) {
+            // TODO
+            }
+        }
+
+        private class ReferenceAnchor extends NormalAction
+        {
+            private ReferenceAnchor() {
+                super("_Reference Citation");
+            }
+
+            public void onActivate(Action source) {
+            // TODO
+            }
+        }
+
+        private class InsertBlock extends NormalAction
+        {
+            private InsertBlock() {
+                super("Insert Block...", Keyval.Insert, ModifierType.NONE);
+            }
+
+            public void onActivate(Action source) {
+                if (editor == null) {
+                    return;
+                }
+                editor.popupInsertMenu();
             }
         }
     }
