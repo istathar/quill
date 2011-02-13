@@ -466,7 +466,6 @@ class OptionalMenuBar extends MenuBar
         final MenuItem help;
         Action action;
         MenuItem item;
-        SeparatorMenuItem separator;
 
         menu = new Menu();
         menu.setAcceleratorGroup(group);
@@ -475,116 +474,60 @@ class OptionalMenuBar extends MenuBar
          * Help for Editor
          */
 
-        action = new Action("help-for-editor", "Using the _Editor");
-        action.setAccelerator(group, Keyval.F1, ModifierType.SHIFT_MASK);
-
+        action = actions.help.editor;
         item = action.createMenuItem();
         menu.append(item);
-
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-                primary.switchToHelp();
-            }
-        });
 
         /*
          * Help for Stylist
          */
 
-        action = new Action("help-for-stylist", "Configuring _Stylesheet");
-        action.setAccelerator(group, Keyval.F2, ModifierType.SHIFT_MASK);
-
+        action = actions.help.stylist;
         item = action.createMenuItem();
         menu.append(item);
-
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-            // TODO
-            }
-        });
 
         /*
          * Help for Metadata
          */
 
-        action = new Action("help-for-metadata", "Editing _Metadata");
-        action.setAccelerator(group, Keyval.F3, ModifierType.SHIFT_MASK);
-
+        action = actions.help.metaditor;
         item = action.createMenuItem();
         menu.append(item);
-
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-            // TODO
-            }
-        });
 
         /*
          * Help for Preview
          */
 
-        action = new Action("help-for-preview", "Using the _Preview");
-        action.setAccelerator(group, Keyval.F5, ModifierType.SHIFT_MASK);
-
+        action = actions.help.preview;
         item = action.createMenuItem();
         menu.append(item);
-
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-            // TODO
-            }
-        });
 
         /*
          * Help for Outline
          */
 
-        action = new Action("help-for-preview", "Using the _Outline");
-        action.setAccelerator(group, Keyval.F6, ModifierType.SHIFT_MASK);
-
+        action = actions.help.outline;
         item = action.createMenuItem();
         menu.append(item);
-
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-            // TODO
-            }
-        });
 
         /*
          * Help for Endnotes
          */
 
-        action = new Action("help-for-endnotes", "Editing End_notes");
-        action.setAccelerator(group, Keyval.F7, ModifierType.SHIFT_MASK);
-
+        action = actions.help.endnotes;
         item = action.createMenuItem();
         menu.append(item);
-
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-            // TODO
-            }
-        });
 
         /*
          * Help for References
          */
 
-        action = new Action("help-for-references", "Editing _References");
-        action.setAccelerator(group, Keyval.F8, ModifierType.SHIFT_MASK);
-
+        action = actions.help.references;
         item = action.createMenuItem();
         menu.append(item);
 
-        action.connect(new Action.Activate() {
-            public void onActivate(Action source) {
-            // TODO
-            }
-        });
-
-        separator = new SeparatorMenuItem();
-        menu.append(separator);
+        item = new SeparatorMenuItem();
+        menu.append(item);
 
         /*
          * About

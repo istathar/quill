@@ -396,6 +396,105 @@ class UserActions
 
     class Help
     {
-        Action editor;
+        final Action editor;
+
+        final Action stylist;
+
+        final Action metaditor;
+
+        final Action preview;
+
+        final Action outline;
+
+        final Action endnotes;
+
+        final Action references;
+
+        Help() {
+            editor = new SwitchEditor();
+            stylist = new SwitchStylist();
+            metaditor = new SwitchMetaditor();
+            preview = new SwitchPreview();
+            outline = new SwitchOutline();
+            endnotes = new SwitchEndnotes();
+            references = new SwitchReferences();
+        }
+
+        private class SwitchEditor extends NormalAction
+        {
+            private SwitchEditor() {
+                super("Using the _Editor", Keyval.F1, ModifierType.SHIFT_MASK);
+            }
+
+            public void onActivate(Action source) {
+                primary.switchToHelp();
+            }
+        }
+
+        private class SwitchStylist extends NormalAction
+        {
+            private SwitchStylist() {
+                super("Configuring _Stylesheet", Keyval.F2, ModifierType.SHIFT_MASK);
+            }
+
+            public void onActivate(Action source) {
+            // TODO
+            }
+        }
+
+        private class SwitchMetaditor extends NormalAction
+        {
+            private SwitchMetaditor() {
+                super("Editing _Metadata", Keyval.F3, ModifierType.SHIFT_MASK);
+            }
+
+            public void onActivate(Action source) {
+            // TODO
+            }
+        }
+
+        private class SwitchPreview extends NormalAction
+        {
+            private SwitchPreview() {
+                super("Using the _Preview", Keyval.F5, ModifierType.SHIFT_MASK);
+            }
+
+            public void onActivate(Action source) {
+            // TODO
+            }
+        }
+
+        private class SwitchOutline extends NormalAction
+        {
+            private SwitchOutline() {
+                super("Using the _Outline", Keyval.F6, ModifierType.SHIFT_MASK);
+            }
+
+            public void onActivate(Action source) {
+            // TODO
+            }
+        }
+
+        private class SwitchEndnotes extends NormalAction
+        {
+            private SwitchEndnotes() {
+                super("Editing End_notes", Keyval.F7, ModifierType.SHIFT_MASK);
+            }
+
+            public void onActivate(Action source) {
+            // TODO
+            }
+        }
+
+        private class SwitchReferences extends NormalAction
+        {
+            private SwitchReferences() {
+                super("Editing _References", Keyval.F8, ModifierType.SHIFT_MASK);
+            }
+
+            public void onActivate(Action source) {
+            // TODO
+            }
+        }
     }
 }
