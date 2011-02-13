@@ -153,7 +153,7 @@ class OptionalMenuBar extends MenuBar
         final MenuItem chapter;
         Action action;
         MenuItem item;
-        ImageMenuItem image;
+        ImageMenuItem icon;
         SeparatorMenuItem separator;
 
         menu = new Menu();
@@ -179,18 +179,20 @@ class OptionalMenuBar extends MenuBar
          */
 
         action = actions.chapter.previous;
-        image = (ImageMenuItem) action.createMenuItem();
-        image.setAlwaysShowImage(true);
-        menu.append(image);
+        item = action.createMenuItem();
+        icon = (ImageMenuItem) item;
+        icon.setAlwaysShowImage(true);
+        menu.append(icon);
 
         /*
          * Next chapter
          */
 
         action = actions.chapter.next;
-        image = (ImageMenuItem) action.createMenuItem();
-        image.setAlwaysShowImage(true);
-        menu.append(image);
+        item = action.createMenuItem();
+        icon = (ImageMenuItem) item;
+        icon.setAlwaysShowImage(true);
+        menu.append(item);
 
         /*
          * Build the actual top level item for the menu bar.

@@ -107,6 +107,12 @@ class UserActions
             super.setAccelerator(group, keyval, modifier);
             super.connect(this);
         }
+
+        NormalAction(String label, Stock stock, Keyval keyval, ModifierType modifier) {
+            super(generateName(), label, null, stock);
+            super.setAccelerator(group, keyval, modifier);
+            super.connect(this);
+        }
     }
 
     private abstract class ToggleAction extends org.gnome.gtk.ToggleAction implements Action.Activate
@@ -191,7 +197,6 @@ class UserActions
                 } catch (SaveCancelledException e) {
                     // ok
                 }
-
             }
         }
 
@@ -512,7 +517,7 @@ class UserActions
         private class Previous extends NormalAction
         {
             private Previous() {
-                super("Previous", Keyval.PageUp, ModifierType.CONTROL_MASK);
+                super("Previous", Stock.GO_BACK, Keyval.PageUp, ModifierType.CONTROL_MASK);
             }
 
             public void onActivate(Action source) {
@@ -523,7 +528,7 @@ class UserActions
         private class Next extends NormalAction
         {
             private Next() {
-                super("Next", Keyval.PageDown, ModifierType.CONTROL_MASK);
+                super("Next", Stock.GO_FORWARD, Keyval.PageDown, ModifierType.CONTROL_MASK);
             }
 
             public void onActivate(Action source) {

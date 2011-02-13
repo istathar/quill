@@ -1164,12 +1164,18 @@ class PrimaryWindow extends Window
     }
 
     void handleComponentPrevious() {
+        final int len;
         int i;
 
+        len = folio.size();
         i = folio.indexOf(cursor);
 
         if (i == 0) {
             return;
+        }
+
+        if (i == len - 1) {
+            actions.chapter.next.setSensitive(true);
         }
 
         i--;
@@ -1179,6 +1185,10 @@ class PrimaryWindow extends Window
         endnotes.initialize(cursor);
         preview.refreshDisplay();
         updateTitle();
+
+        if (i == 0) {
+            actions.chapter.previous.setSensitive(false);
+        }
     }
 
     void handleComponentNext() {
@@ -1193,12 +1203,20 @@ class PrimaryWindow extends Window
             return;
         }
 
+        if (i == 1) {
+            actions.chapter.previous.setSensitive(true);
+        }
+
         cursor = folio.getComponent(i);
 
         mainbody.initialize(cursor);
         endnotes.initialize(cursor);
         preview.refreshDisplay();
         updateTitle();
+
+        if (i == len - 1) {
+            actions.chapter.next.setSensitive(false);
+        }
     }
 
     /**
