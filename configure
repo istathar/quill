@@ -513,7 +513,7 @@ if ($os eq "gentoo") {
 	check_prereq(@xom_jars,
 			"Xom XML library",
 			"dev-java/xom",
-			"/usr/share/xom-1.2/lib/xom.jar");
+			"/usr/share/xom/lib/xom.jar");
 	check_prereq(@xom_jars,
 			"Xerces XML parser",
 			"dev-java/xerces",
