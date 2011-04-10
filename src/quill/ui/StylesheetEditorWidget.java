@@ -20,13 +20,13 @@ package quill.ui;
 
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Matrix;
-import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.AttachOptions;
 import org.gnome.gtk.CellRendererPixbuf;
 import org.gnome.gtk.CellRendererText;
 import org.gnome.gtk.ComboBox;
+import org.gnome.gtk.ComboBoxText;
 import org.gnome.gtk.DataColumn;
 import org.gnome.gtk.DataColumnPixbuf;
 import org.gnome.gtk.DataColumnString;
@@ -38,7 +38,6 @@ import org.gnome.gtk.ListStore;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.SizeGroupMode;
 import org.gnome.gtk.Table;
-import org.gnome.gtk.TextComboBox;
 import org.gnome.gtk.TreeIter;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
@@ -83,7 +82,7 @@ class StylesheetEditorWidget extends VBox
 
     private RendererPicker rendererList;
 
-    private TextComboBox paperList;
+    private ComboBoxText paperList;
 
     private Label paperWidth, paperHeight;
 
@@ -183,7 +182,7 @@ class StylesheetEditorWidget extends VBox
          * constant for it...
          */
 
-        paperList = new TextComboBox();
+        paperList = new ComboBoxText();
         paperList.appendText("A4");
         paperList.appendText("Letter");
         paperList.setActive(0);
@@ -756,11 +755,8 @@ class PageSizeDisplay extends DrawingArea
     PageSizeDisplay() {
         drawing = this;
 
-        drawing.connect(new Widget.ExposeEvent() {
-            public boolean onExposeEvent(Widget source, EventExpose event) {
-                final Context cr;
-
-                cr = new Context(event);
+        drawing.connect(new Widget.Draw() {
+            public boolean onDraw(Widget source, Context cr) {
 
                 scaleOutput(cr, engine);
                 drawPageOutline(cr);

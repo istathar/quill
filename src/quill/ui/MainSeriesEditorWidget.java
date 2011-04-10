@@ -23,7 +23,6 @@ import java.util.List;
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Surface;
 import org.gnome.gdk.Color;
-import org.gnome.gdk.EventExpose;
 import org.gnome.gdk.EventFocus;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.Scrollbar;
@@ -144,16 +143,14 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
             });
             bar.setSensitive(false);
 
-            bar.connect(new ExposeEvent() {
-                public boolean onExposeEvent(Widget source, EventExpose event) {
-                    final Context cr;
+            bar.connect(new Widget.Draw() {
+
+                public boolean onDraw(Widget source, Context cr) {
                     final Surface surface;
 
                     if (bar.getSensitive()) {
                         return false;
                     }
-
-                    cr = new Context(event);
 
                     cr.setSource(Color.WHITE);
                     cr.paint();

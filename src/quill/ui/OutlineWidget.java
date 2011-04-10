@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.freedesktop.cairo.Antialias;
 import org.freedesktop.cairo.Context;
-import org.gnome.gdk.EventExpose;
 import org.gnome.glib.Glib;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Button;
@@ -678,15 +677,13 @@ class CompressedLines extends DrawingArea
 
         self.setSizeRequest((int) RIGHT, SPACING * num);
 
-        this.connect(new Widget.ExposeEvent() {
-            public boolean onExposeEvent(Widget source, EventExpose event) {
-                final Context cr;
+        this.connect(new Widget.Draw() {
+
+            public boolean onDraw(Widget source, Context cr) {
                 final int I;
                 int i, j;
                 double x, y, wide;
                 Segment segment;
-
-                cr = new Context(event);
 
                 cr.setLineWidth(1.0);
                 cr.setAntialias(Antialias.NONE);

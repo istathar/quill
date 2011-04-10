@@ -20,7 +20,6 @@ package quill.ui;
 
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Matrix;
-import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.DrawingArea;
@@ -105,12 +104,9 @@ class PreviewWidget extends HBox
 
         this.primary = window;
 
-        drawing.connect(new Widget.ExposeEvent() {
-            public boolean onExposeEvent(Widget source, EventExpose event) {
-                final Context cr;
+        drawing.connect(new Widget.Draw() {
+            public boolean onDraw(Widget source, Context cr) {
                 final Origin cursor;
-
-                cr = new Context(event);
 
                 scaleOutput(cr, engine);
                 drawPageOutline(cr, engine);

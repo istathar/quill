@@ -26,7 +26,6 @@ import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Extend;
 import org.freedesktop.cairo.LinearPattern;
 import org.freedesktop.cairo.Pattern;
-import org.gnome.gdk.EventExpose;
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.DrawingArea;
@@ -81,8 +80,8 @@ class IntroductionWidget extends VBox
             top.packStart(spacer, false, false, 0);
             blank = new MenuItem("Quill and Parchment");
             spacer.prepend(blank);
-            spacer.connect(new Widget.ExposeEvent() {
-                public boolean onExposeEvent(Widget source, EventExpose event) {
+            spacer.connect(new Widget.Draw() {
+                public boolean onDraw(Widget source, Context cr) {
                     return true;
                 }
             });
@@ -185,12 +184,9 @@ class UnderConstruction extends Alignment
         drawing = new DrawingArea();
         drawing.setSizeRequest(-1, 30);
 
-        drawing.connect(new Widget.ExposeEvent() {
-            public boolean onExposeEvent(Widget source, EventExpose event) {
-                final Context cr;
+        drawing.connect(new Widget.Draw() {
+            public boolean onDraw(Widget source, Context cr) {
                 final Pattern pattern;
-
-                cr = new Context(event);
 
                 pattern = new LinearPattern(0.0, 0.0, 20.0, 20.0);
                 pattern.addColorStopRGB(0.0, 0.0, 0.0, 0.0);

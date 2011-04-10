@@ -24,10 +24,10 @@ import java.util.List;
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Container;
+import org.gnome.gtk.Gtk;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ScrolledWindow;
-import org.gnome.gtk.Test;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
@@ -180,12 +180,13 @@ abstract class SeriesEditorWidget extends ScrolledWindow
             /*
              * Yet again we bump into the TextView doesn't know it's own hight
              * yet probem. Suprisingly, cycling the main loop appears to let
-             * the idle handler run?!? FIXME Perhaps it's time to expose
-             * mainIterationDo() in java-gnome for real, since we really
-             * shouldn't be using Test as a workaround.
+             * the idle handler run?!?
              */
 
-            Test.cycleMainLoop();
+            while (Gtk.eventsPending()) {
+                Gtk.mainIterationDo(false);
+            }
+
             y = alloc.getY();
 
             /*
@@ -321,7 +322,9 @@ abstract class SeriesEditorWidget extends ScrolledWindow
          * the problem Hopefully GTK 3.0 will be better about this.
          */
 
-        Test.cycleMainLoop();
+        while (Gtk.eventsPending()) {
+            Gtk.mainIterationDo(false);
+        }
     }
 
     private Segment lookup(Widget widget) {
