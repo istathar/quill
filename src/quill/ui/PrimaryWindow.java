@@ -45,7 +45,6 @@ import org.gnome.gtk.IconSize;
 import org.gnome.gtk.Image;
 import org.gnome.gtk.InfoMessageDialog;
 import org.gnome.gtk.MenuBar;
-import org.gnome.gtk.MenuItem;
 import org.gnome.gtk.MessageDialog;
 import org.gnome.gtk.MessageType;
 import org.gnome.gtk.ResponseType;
@@ -138,7 +137,6 @@ class PrimaryWindow extends Window
     PrimaryWindow() {
         super();
         setupWindow();
-        setupOptionalMenu();
         setupEditorSide();
         setupPreviewSide();
         hookupDefaultKeyhandlers();
@@ -158,6 +156,7 @@ class PrimaryWindow extends Window
          */
 
         stack.apply(replacement);
+        actions.edit.undo.setSensitive(true);
 
         /*
          * Propagate
@@ -276,7 +275,7 @@ class PrimaryWindow extends Window
      * Pick the latest Folio off the ChangeStack, and then do something with
      * it
      */
-    void undo() {
+    void handleUndo() {
         final Folio previous;
 
         previous = stack.undo();
@@ -291,7 +290,7 @@ class PrimaryWindow extends Window
     /**
      * Grab the Change that was most recently undone, and redo it.
      */
-    void redo() {
+    void handleRedo() {
         final Folio following;
 
         following = stack.redo();
@@ -344,12 +343,15 @@ class PrimaryWindow extends Window
         top = new VBox(false, 0);
         window.add(top);
 
-        bar = new MenuBar();
+        actions = new UserActions(this);
+        bar = new OptionalMenuBar(this, actions);
         top.packStart(bar, false, false, 0);
+        showingMenu = false;
 
         pane = new HPaned();
         pane.setPosition(690);
         top.packStart(pane, true, true, 0);
+        showingRightSide = true;
     }
 
     Widget[] gauche, droit;
@@ -416,18 +418,6 @@ class PrimaryWindow extends Window
 
     private boolean showingMenu;
 
-    private void setupOptionalMenu() {
-        showingMenu = false;
-
-        bar.append(new MenuItem("_Manuscript"));
-        bar.append(new MenuItem("_Chapter"));
-        bar.append(new MenuItem("_Edit"));
-        bar.append(new MenuItem("_View"));
-        bar.append(new MenuItem("_Insert"));
-        bar.append(new MenuItem("_Format"));
-        bar.append(new MenuItem("_Help"));
-    }
-
     private void initialPresentation() {
         pane.showAll();
         bar.hide();
@@ -436,6 +426,14 @@ class PrimaryWindow extends Window
 
         window.present();
         window.setPosition(WindowPosition.NONE);
+
+        actions.chapter.previous.setSensitive(false);
+    }
+
+    private UserActions actions;
+
+    UserActions getActions() {
+        return actions;
     }
 
     private void hookupWindowManagement() {
@@ -468,58 +466,18 @@ class PrimaryWindow extends Window
                 }
 
                 if (mod == ModifierType.NONE) {
-                    if (key == Keyval.F1) {
-                        switchToEditor();
-                        return true;
-                    } else if (key == Keyval.F2) {
-                        switchToStylesheet();
-                        return true;
-                    } else if (key == Keyval.F3) {
-                        switchToMetadata();
-                        return true;
-                    } else if (key == Keyval.F5) {
-                        switchToPreview();
-                        return true;
-                    } else if (key == Keyval.F6) {
-                        switchToOutline();
-                        return true;
-                    } else if (key == Keyval.F7) {
-                        switchToEndnotes();
-                        return true;
-                    } else if (key == Keyval.F8) {
-                        switchToReferences();
-                        return true;
-                    }
 
-                    if ((key == Keyval.F9) || (key == Keyval.F10)) {
+                    if (key == Keyval.F9) {
                         // nothing yet
                         return true;
                     }
-
-                    else if (key == Keyval.F11) {
-                        toggleFullscreen();
-                        return true;
-                    } else if (key == Keyval.F12) {
-                        toggleOptionalMenu();
-                        return true;
+                    if (key == Keyval.F10) {
+                        /*
+                         * Desktop global "focus menu". Do we even get this?
+                         */
+                        return false;
                     }
-                } else if (mod == ModifierType.SHIFT_MASK) {
-                    if (key == Keyval.F1) {
-                        switchToHelp();
-                        return true;
-                    } else if (key == Keyval.F11) {
-                        switchToIntro();
-                        return true;
-                    } else if (key == Keyval.F12) {
-                        toggleRightSide();
-                        return true;
-                    }
-
                 } else if (mod == ModifierType.CONTROL_MASK) {
-                    if (key == Keyval.p) {
-                        printDocument();
-                        return true;
-                    }
                     if (key == Keyval.n) {
                         /*
                          * I was about to hook up ui.newDocument() here, but I
@@ -529,32 +487,6 @@ class PrimaryWindow extends Window
                          * series would be good too.
                          */
                         return true;
-                    }
-                    if (key == Keyval.o) {
-                        try {
-                            saveIfModified();
-                            openDocument();
-                            return true;
-                        } catch (SaveCancelledException sce) {
-                            return true;
-                        }
-                    }
-                    if (key == Keyval.q) {
-                        try {
-                            saveIfModified();
-                            ui.shutdown();
-                            return true;
-                        } catch (SaveCancelledException sce) {
-                            return true;
-                        }
-                    }
-                    if (key == Keyval.s) {
-                        try {
-                            saveDocument();
-                        } catch (SaveCancelledException e) {
-                            // ignore
-                        }
-                        return true;
                     } else if (key == Keyval.w) {
                         /*
                          * FIXME if we evolve to holding multiple documents
@@ -563,25 +495,6 @@ class PrimaryWindow extends Window
                          * (document?) that is currently active instead of
                          * terminating the application.
                          */
-                        try {
-                            saveIfModified();
-                            ui.shutdown();
-                            return true;
-                        } catch (SaveCancelledException sce) {
-                            return true;
-                        }
-                    } else if (key == Keyval.y) {
-                        redo();
-                        return true;
-                    } else if (key == Keyval.z) {
-                        undo();
-                        return true;
-                    } else if (key == Keyval.PageUp) {
-                        handleComponentPrevious();
-                        return true;
-                    } else if (key == Keyval.PageDown) {
-                        handleComponentNext();
-                        return true;
                     }
                 }
 
@@ -616,7 +529,7 @@ class PrimaryWindow extends Window
      * off suddenly the mainbody is super wide, and that's a horrible
      * experience.
      */
-    private void toggleRightSide() {
+    void toggleRightSide() {
         final Allocation alloc;
         final Widget left, right;
 
@@ -647,12 +560,14 @@ class PrimaryWindow extends Window
         }
     }
 
-    private void toggleOptionalMenu() {
+    void toggleOptionalMenu() {
         if (showingMenu) {
             bar.hide();
+            intro.showSpacer();
             showingMenu = false;
         } else {
             bar.showAll();
+            intro.hideSpacer();
             showingMenu = true;
         }
     }
@@ -721,6 +636,7 @@ class PrimaryWindow extends Window
     void switchToStylesheet() {
         this.switchPaneLeft(gauche[1]);
         stylist.grabDefault();
+        actions.setCurrentEditor(null);
     }
 
     /**
@@ -729,6 +645,7 @@ class PrimaryWindow extends Window
     void switchToMetadata() {
         this.switchPaneLeft(gauche[2]);
         metaditor.grabDefault();
+        actions.setCurrentEditor(null);
     }
 
     /**
@@ -737,6 +654,7 @@ class PrimaryWindow extends Window
      */
     void switchToIntro() {
         this.switchPaneRight(droit[4]);
+        actions.setCurrentEditor(null);
     }
 
     /**
@@ -744,6 +662,7 @@ class PrimaryWindow extends Window
      */
     void switchToHelp() {
         this.switchPaneRight(droit[1]);
+        actions.setCurrentEditor(null);
     }
 
     /**
@@ -753,6 +672,7 @@ class PrimaryWindow extends Window
     void switchToPreview() {
         this.switchPaneRight(droit[0]);
         preview.refreshDisplayAtCursor();
+        actions.setCurrentEditor(null);
     }
 
     /**
@@ -783,6 +703,7 @@ class PrimaryWindow extends Window
     void switchToOutline() {
         this.switchPaneRight(droit[2]);
         outline.refreshDisplay();
+        actions.setCurrentEditor(null);
     }
 
     /**
@@ -1242,13 +1163,19 @@ class PrimaryWindow extends Window
         return mainbody;
     }
 
-    private void handleComponentPrevious() {
+    void handleComponentPrevious() {
+        final int len;
         int i;
 
+        len = folio.size();
         i = folio.indexOf(cursor);
 
         if (i == 0) {
             return;
+        }
+
+        if (i == len - 1) {
+            actions.chapter.next.setSensitive(true);
         }
 
         i--;
@@ -1258,9 +1185,13 @@ class PrimaryWindow extends Window
         endnotes.initialize(cursor);
         preview.refreshDisplay();
         updateTitle();
+
+        if (i == 0) {
+            actions.chapter.previous.setSensitive(false);
+        }
     }
 
-    private void handleComponentNext() {
+    void handleComponentNext() {
         final int len;
         int i;
 
@@ -1272,12 +1203,20 @@ class PrimaryWindow extends Window
             return;
         }
 
+        if (i == 1) {
+            actions.chapter.previous.setSensitive(true);
+        }
+
         cursor = folio.getComponent(i);
 
         mainbody.initialize(cursor);
         endnotes.initialize(cursor);
         preview.refreshDisplay();
         updateTitle();
+
+        if (i == len - 1) {
+            actions.chapter.next.setSensitive(false);
+        }
     }
 
     /**
