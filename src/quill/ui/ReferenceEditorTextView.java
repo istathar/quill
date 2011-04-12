@@ -32,7 +32,7 @@ class ReferenceEditorTextView extends EditorTextView
     ReferenceEditorTextView(SeriesEditorWidget parent, Segment segment) {
         super(parent, segment);
 
-        view.modifyFont(fonts.serif);
+        view.overrideFont(fonts.serif);
     }
 
     protected boolean isEnterAllowed() {

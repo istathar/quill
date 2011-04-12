@@ -25,7 +25,7 @@ class NormalEditorTextView extends EditorTextView
     NormalEditorTextView(SeriesEditorWidget parent, Segment segment) {
         super(parent, segment);
 
-        view.modifyFont(fonts.serif);
+        view.overrideFont(fonts.serif);
 
         view.setPaddingAboveParagraph(4);
         view.setPaddingBelowParagraph(6);

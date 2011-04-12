@@ -27,7 +27,7 @@ class PreformatEditorTextView extends EditorTextView
     PreformatEditorTextView(SeriesEditorWidget parent, Segment segment) {
         super(parent, segment);
 
-        view.modifyFont(fonts.mono);
+        view.overrideFont(fonts.mono);
 
         view.setWrapMode(WrapMode.NONE);
     }

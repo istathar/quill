@@ -24,10 +24,11 @@ import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Surface;
 import org.gnome.gdk.Color;
 import org.gnome.gdk.EventFocus;
+import org.gnome.gdk.RGBA;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.Scrollbar;
 import org.gnome.gtk.ScrolledWindow;
-import org.gnome.gtk.StateType;
+import org.gnome.gtk.StateFlags;
 import org.gnome.gtk.Viewport;
 import org.gnome.gtk.Widget;
 
@@ -72,7 +73,7 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
          */
 
         port = (Viewport) super.getChild();
-        port.modifyBackground(StateType.NORMAL, Color.WHITE);
+        port.overrideBackground(StateFlags.NORMAL, RGBA.WHITE);
     }
 
     Component getComponent() {

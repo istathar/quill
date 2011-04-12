@@ -25,7 +25,7 @@ class QuoteEditorTextView extends EditorTextView
     QuoteEditorTextView(SeriesEditorWidget parent, Segment segment) {
         super(parent, segment);
 
-        view.modifyFont(fonts.serif);
+        view.overrideFont(fonts.serif);
         view.setMarginLeft(40);
         view.setMarginRight(40);
         view.setPaddingAboveParagraph(4);

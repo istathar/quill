@@ -32,7 +32,7 @@ class PropertyEditorTextView extends EditorTextView
     PropertyEditorTextView(SeriesEditorWidget parent, Segment segment) {
         super(parent, segment);
 
-        view.modifyFont(fonts.mono);
+        view.overrideFont(fonts.mono);
         view.setWrapMode(WrapMode.NONE);
         view.setPaddingAboveParagraph(0);
         view.setPaddingBelowParagraph(0);

@@ -20,7 +20,6 @@ package quill.ui;
 
 import java.lang.reflect.Constructor;
 
-import org.gnome.gdk.Color;
 import org.gnome.gdk.Cursor;
 import org.gnome.gdk.EventButton;
 import org.gnome.gdk.EventCrossing;
@@ -29,6 +28,7 @@ import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gdk.MouseButton;
+import org.gnome.gdk.RGBA;
 import org.gnome.gdk.Rectangle;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
@@ -38,7 +38,7 @@ import org.gnome.gtk.InputMethod;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.MenuItem;
 import org.gnome.gtk.SimpleInputMethod;
-import org.gnome.gtk.StateType;
+import org.gnome.gtk.StateFlags;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
@@ -125,7 +125,7 @@ abstract class EditorTextView extends TextView implements Editor
 
         view.setMarginLeft(3);
         view.setBorderWidth(2);
-        view.modifyBackground(StateType.NORMAL, Color.WHITE);
+        view.overrideBackground(StateFlags.NORMAL, RGBA.WHITE);
 
         view.setAcceptsTab(true);
     }
@@ -1095,7 +1095,7 @@ abstract class EditorTextView extends TextView implements Editor
         markup = span.getMarkup();
         desc = new FontDescription("Deja Vu Sans, 8.0");
         label = new Label(ref);
-        label.modifyFont(desc);
+        label.overrideFont(desc);
 
         box = new EventBox();
         box.setVisibleWindow(false);

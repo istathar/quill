@@ -24,7 +24,7 @@ class HeadingEditorTextView extends EditorTextView
 {
     HeadingEditorTextView(SeriesEditorWidget parent, Segment segment) {
         super(parent, segment);
-        view.modifyFont(fonts.heading);
+        view.overrideFont(fonts.heading);
         view.setPaddingBelowParagraph(1);
     }
 

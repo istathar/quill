@@ -18,14 +18,14 @@
  */
 package quill.ui;
 
-import org.gnome.gdk.Color;
 import org.gnome.gdk.EventFocus;
+import org.gnome.gdk.RGBA;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.EventBox;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
-import org.gnome.gtk.StateType;
+import org.gnome.gtk.StateFlags;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
@@ -68,7 +68,7 @@ abstract class ListitemBox extends EventBox implements Editor
         top.packEnd(box, false, false, 0);
         eb.add(top);
 
-        eb.modifyBackground(StateType.NORMAL, Color.WHITE);
+        eb.overrideBackground(StateFlags.NORMAL, RGBA.WHITE);
 
         /*
          * This is to prevent the annoying behaviour of the Entry selecting
