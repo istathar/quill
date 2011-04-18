@@ -24,6 +24,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.Collator;
+import java.util.Comparator;
+import java.util.Locale;
 import java.util.TreeSet;
 
 import org.freedesktop.bindings.Environment;
@@ -59,6 +62,12 @@ class SpellChecker
 
     private File tmp;
 
+    private static final UnixSortComparator COMPARATOR;
+
+    static {
+        COMPARATOR = new UnixSortComparator();
+    }
+
     SpellChecker(final Manuscript manuscript, final String lang) {
         if (Enchant.existsDictionary(lang)) {
             dict = Enchant.requestDictionary(lang);
@@ -89,6 +98,7 @@ class SpellChecker
         BufferedReader in;
         BufferedWriter out;
         String line;
+        boolean first; // one already written?
 
         pid = Environment.getProcessID();
         counter++;
@@ -108,30 +118,32 @@ class SpellChecker
             out = new BufferedWriter(writer);
 
             /*
-             * Discard cosmetic comment.
-             */
-
-            line = in.readLine();
-
-            /*
-             * If we're here at all, it's because there was at least one.
-             */
-
-            line = in.readLine();
-            out.write(line);
-
-            /*
              * Note that readLine() trims, and, we output a leading (not
              * trailing) \n to observe Enchant's conventions.
              */
 
-            line = in.readLine();
+            first = false;
 
-            while (line != null) {
-                out.write('\n');
-                out.write(line);
-
+            while (true) {
                 line = in.readLine();
+
+                if (line == null) {
+                    break;
+                }
+                if (line.equals("")) {
+                    continue;
+                }
+                if (line.charAt(0) == '#') {
+                    continue;
+                }
+
+                if (first) {
+                    out.write('\n');
+                } else {
+                    first = true;
+                }
+
+                out.write(line);
             }
 
             in.close();
@@ -227,7 +239,7 @@ class SpellChecker
             return;
         }
         try {
-            sorted = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+            sorted = new TreeSet<String>(COMPARATOR);
 
             reader = new FileReader(tmp);
             in = new BufferedReader(reader);
@@ -246,6 +258,9 @@ class SpellChecker
             out.write("# Document word list\n");
 
             for (String word : sorted) {
+                if (word.equals("")) {
+                    continue;
+                }
                 out.write(word);
                 out.write('\n');
             }
@@ -302,5 +317,39 @@ class SpellChecker
         }
 
         return result;
+    }
+}
+
+/**
+ * Go to the trouble of achieving the sort order defined by the Unix sort
+ * program. This is capital letters before lower case, and accents in natural
+ * alphabetical ordering.
+ * 
+ * @author Andrew Cowie
+ */
+class UnixSortComparator implements Comparator<String>
+{
+    private final Collator col;
+
+    UnixSortComparator() {
+        col = Collator.getInstance(Locale.ENGLISH);
+        col.setStrength(Collator.PRIMARY);
+    }
+
+    public int compare(String str1, String str2) {
+        int cmp;
+
+        cmp = col.compare(str1, str2);
+
+        if (cmp != 0) {
+            return cmp;
+        } else {
+            cmp = str1.compareToIgnoreCase(str2);
+            if (cmp != 0) {
+                return cmp;
+            } else {
+                return str1.compareTo(str2);
+            }
+        }
     }
 }

@@ -425,9 +425,10 @@ abstract class EditorTextView extends TextView implements Editor
         });
 
         /*
-         * This is a kludge: the UserActions need to know which the current
-         * editor is, if any. So, when focus come into this EditorTextView, we
-         * tell UserActions about it.
+         * The UserActions need to know which the current editor is, if any.
+         * So, when focus comes into this EditorTextView we tell UserActions
+         * about it, and when it leaves we deactivate ourself. Better way to
+         * do this globally?
          */
 
         view.connect(new Widget.FocusInEvent() {
@@ -441,6 +442,19 @@ abstract class EditorTextView extends TextView implements Editor
                 primary = parent.getPrimary();
                 actions = primary.getActions();
                 actions.setCurrentEditor(editor);
+
+                return false;
+            }
+        });
+
+        view.connect(new Widget.FocusOutEvent() {
+            public boolean onFocusOutEvent(Widget source, EventFocus event) {
+                final PrimaryWindow primary;
+                final UserActions actions;
+
+                primary = parent.getPrimary();
+                actions = primary.getActions();
+                actions.setCurrentEditor(null);
 
                 return false;
             }

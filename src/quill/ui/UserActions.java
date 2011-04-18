@@ -933,6 +933,11 @@ class UserActions
         }
     }
 
+    /**
+     * Inform UserActions which EditorTextView the editing actions
+     * (formatting, etc) should be directed to. Pass <code>null</code> to
+     * clear the setting.
+     */
     void setCurrentEditor(EditorTextView view) {
         this.editor = view;
     }

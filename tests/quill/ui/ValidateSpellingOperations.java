@@ -265,4 +265,41 @@ public class ValidateSpellingOperations extends GraphicalTestCase
         pointer.forwardChar();
         assertTrue(pointer.isEnd());
     }
+
+    public final void testUnixSorting() {
+        UnixSortComparator sort;
+        int cmp;
+
+        sort = new UnixSortComparator();
+
+        cmp = sort.compare("Hello", "World");
+        assertTrue(cmp < 0);
+
+        cmp = sort.compare("Hello", "Hello");
+        assertTrue(cmp == 0);
+
+        cmp = sort.compare("World", "Hello");
+        assertTrue(cmp > 0);
+
+        cmp = sort.compare("Orc", "orc");
+        assertTrue(cmp < 0);
+
+        cmp = sort.compare("orc", "Prc");
+        assertTrue(cmp < 0);
+
+        cmp = sort.compare("orc", "órc");
+        assertTrue(cmp < 0);
+
+        cmp = sort.compare("Órc", "órc");
+        assertTrue(cmp < 0);
+
+        cmp = sort.compare("òrc", "órc");
+        assertTrue(cmp < 0);
+
+        cmp = sort.compare("erc", "orc");
+        assertTrue(cmp < 0);
+
+        cmp = sort.compare("érc", "orc");
+        assertTrue(cmp < 0);
+    }
 }
