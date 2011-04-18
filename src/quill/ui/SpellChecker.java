@@ -89,6 +89,7 @@ class SpellChecker
         BufferedReader in;
         BufferedWriter out;
         String line;
+        boolean first;
 
         pid = Environment.getProcessID();
         counter++;
@@ -108,30 +109,32 @@ class SpellChecker
             out = new BufferedWriter(writer);
 
             /*
-             * Discard cosmetic comment.
-             */
-
-            line = in.readLine();
-
-            /*
-             * If we're here at all, it's because there was at least one.
-             */
-
-            line = in.readLine();
-            out.write(line);
-
-            /*
              * Note that readLine() trims, and, we output a leading (not
              * trailing) \n to observe Enchant's conventions.
              */
 
-            line = in.readLine();
+            first = false;
 
-            while (line != null) {
-                out.write('\n');
-                out.write(line);
-
+            while (true) {
                 line = in.readLine();
+
+                if (line == null) {
+                    break;
+                }
+                if (line.equals("")) {
+                    continue;
+                }
+                if (line.charAt(0) == '#') {
+                    continue;
+                }
+
+                if (!first) {
+                    out.write('\n');
+                } else {
+                    first = true;
+                }
+
+                out.write(line);
             }
 
             in.close();
@@ -246,6 +249,9 @@ class SpellChecker
             out.write("# Document word list\n");
 
             for (String word : sorted) {
+                if (word.equals("")) {
+                    continue;
+                }
                 out.write(word);
                 out.write('\n');
             }
