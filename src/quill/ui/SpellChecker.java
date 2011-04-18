@@ -89,7 +89,7 @@ class SpellChecker
         BufferedReader in;
         BufferedWriter out;
         String line;
-        boolean first;
+        boolean first; // one already written?
 
         pid = Environment.getProcessID();
         counter++;
@@ -128,7 +128,7 @@ class SpellChecker
                     continue;
                 }
 
-                if (!first) {
+                if (first) {
                     out.write('\n');
                 } else {
                     first = true;
