@@ -24,6 +24,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.Collator;
+import java.util.Comparator;
+import java.util.Locale;
 import java.util.TreeSet;
 
 import org.freedesktop.bindings.Environment;
@@ -58,6 +61,12 @@ class SpellChecker
     private File target;
 
     private File tmp;
+
+    private static final UnixSortComparator COMPARATOR;
+
+    static {
+        COMPARATOR = new UnixSortComparator();
+    }
 
     SpellChecker(final Manuscript manuscript, final String lang) {
         if (Enchant.existsDictionary(lang)) {
@@ -230,7 +239,7 @@ class SpellChecker
             return;
         }
         try {
-            sorted = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+            sorted = new TreeSet<String>(COMPARATOR);
 
             reader = new FileReader(tmp);
             in = new BufferedReader(reader);
@@ -308,5 +317,39 @@ class SpellChecker
         }
 
         return result;
+    }
+}
+
+/**
+ * Go to the trouble of achieving the sort order defined by the Unix sort
+ * program. This is capital letters before lower case, and accents in natural
+ * alphabetical ordering.
+ * 
+ * @author Andrew Cowie
+ */
+class UnixSortComparator implements Comparator<String>
+{
+    private final Collator col;
+
+    UnixSortComparator() {
+        col = Collator.getInstance(Locale.ENGLISH);
+        col.setStrength(Collator.PRIMARY);
+    }
+
+    public int compare(String str1, String str2) {
+        int cmp;
+
+        cmp = col.compare(str1, str2);
+
+        if (cmp != 0) {
+            return cmp;
+        } else {
+            cmp = str1.compareToIgnoreCase(str2);
+            if (cmp != 0) {
+                return cmp;
+            } else {
+                return str1.compareTo(str2);
+            }
+        }
     }
 }
