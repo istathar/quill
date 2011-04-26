@@ -30,6 +30,13 @@ public class ListitemSegment extends Segment
         super(entire, label, 0, 0, entire.getWidth());
     }
 
+    /*
+     * Invoked via reflection on Ins context menu insertion.
+     */
+    public ListitemSegment(Extract entire) {
+        super(entire, "•", 0, 0, entire.getWidth());
+    }
+
     public ListitemSegment(Extract entire, String label, int offset, int removed, int inserted) {
         super(entire, label, offset, removed, inserted);
     }
@@ -48,5 +55,9 @@ public class ListitemSegment extends Segment
         entire = super.getEntire();
 
         return new ListitemSegment(entire, extra, 0, 0, 0);
+    }
+
+    public boolean isSequenceAllowed() {
+        return true;
     }
 }

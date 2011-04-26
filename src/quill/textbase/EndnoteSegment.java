@@ -54,4 +54,8 @@ public final class EndnoteSegment extends Segment
 
         return new ImageSegment(entire, extra, 0, 0, 0);
     }
+
+    public boolean isSequenceAllowed() {
+        return true;
+    }
 }

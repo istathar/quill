@@ -54,4 +54,8 @@ public final class ReferenceSegment extends Segment
 
         return new ReferenceSegment(entire, extra, 0, 0, 0);
     }
+
+    public boolean isSequenceAllowed() {
+        return true;
+    }
 }

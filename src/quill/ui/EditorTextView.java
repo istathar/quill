@@ -161,19 +161,6 @@ abstract class EditorTextView extends TextView implements Editor
         return true;
     }
 
-    /**
-     * In most cases, you are NOT allowed to follow a Segment with another
-     * Segment of the same type. The exception in main Series is
-     * ListitemSegment, and in endnotes and references EndnoteSegment and
-     * ReferenceSegment.
-     * 
-     * If this is overridden to <code>true</code> then the user is allowed to
-     * append another Segment of the same type. Default <code>false</code>.
-     */
-    protected boolean isSequenceAllowed() {
-        return false;
-    }
-
     private void hookupKeybindings() {
         input = new SimpleInputMethod();
 
@@ -1219,7 +1206,7 @@ abstract class EditorTextView extends TextView implements Editor
 
         children = split.getChildren();
 
-        if (isSequenceAllowed()) {
+        if (segment.isSequenceAllowed()) {
             // leave them all on
         } else {
             for (i = 0; i < I; i++) {

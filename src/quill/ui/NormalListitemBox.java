@@ -18,10 +18,6 @@
  */
 package quill.ui;
 
-import org.gnome.gtk.Alignment;
-import org.gnome.gtk.Entry;
-import org.gnome.gtk.Widget;
-
 import quill.textbase.Segment;
 
 class NormalListitemBox extends ListitemBox
@@ -36,26 +32,6 @@ class NormalListitemBox extends ListitemBox
 
         super.setupLabelSide(entry, 8, 5);
         super.setupBody(editor);
-    }
-
-    private Widget createLabel(final Segment segment) {
-        final String text;
-        final Entry entry; // field?
-        final Alignment align;
-
-        text = segment.getExtra();
-
-        entry = new Entry();
-        entry.setText(text);
-        entry.setWidthChars(3);
-        entry.setHasFrame(false);
-        entry.setAlignment(Alignment.RIGHT);
-
-        align = new Alignment(Alignment.LEFT, Alignment.TOP, 0, 0);
-        align.setPadding(5, 0, 0, 0);
-        align.add(entry);
-
-        return align;
     }
 }
 

@@ -108,6 +108,19 @@ public abstract class Segment
     public abstract Segment createSimilar(String extra);
 
     /**
+     * In most cases, you are NOT allowed to follow a Segment with another
+     * Segment of the same type. The exception in main Series is
+     * ListitemSegment, and in endnotes and references EndnoteSegment and
+     * ReferenceSegment.
+     * 
+     * If this is overridden to <code>true</code> then the user is allowed to
+     * append another Segment of the same type. Default <code>false</code>.
+     */
+    public boolean isSequenceAllowed() {
+        return false;
+    }
+
+    /**
      * A single item of metadata, originally the filename for an ImageSegment.
      */
     private final String extra;

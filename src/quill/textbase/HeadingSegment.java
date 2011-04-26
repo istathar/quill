@@ -39,4 +39,8 @@ public final class HeadingSegment extends Segment
     public Segment createSimilar(String extra) {
         return this;
     }
+
+    protected boolean isSequenceAllowed() {
+        return true;
+    }
 }

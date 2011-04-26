@@ -278,6 +278,7 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
             new InsertMenuDetails(QuoteSegment.class, _("Block _quote"),
                     _("normal wrapped text, but indented")),
             new InsertMenuDetails(PoeticSegment.class, _("Poe_m"), _("formating preserved")),
+            new InsertMenuDetails(ListitemSegment.class, _("_List item"), _("normal wrapped text")),
             new InsertMenuDetails(AttributionSegment.class, _("_Attribution"),
                     _("smaller wrapped text, offset right")),
             new InsertMenuDetails(HeadingSegment.class, _("Section _heading"),
