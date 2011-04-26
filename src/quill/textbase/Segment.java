@@ -153,6 +153,10 @@ public abstract class Segment
      * For debugging
      */
     public String toString() {
-        return getClass().getSimpleName() + " \"" + getText() + "\"";
+        if (getExtra() == null) {
+            return getClass().getSimpleName() + " \"" + getText() + "\"";
+        } else {
+            return getClass().getSimpleName() + " [" + getExtra() + "] \"" + getText() + "\"";
+        }
     }
 }
