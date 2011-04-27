@@ -153,6 +153,13 @@ final class TextArea extends Area
 
         return width;
     }
+
+    /**
+     * Create a clone of this TextArea, changing only the height.
+     */
+    TextArea changeHeight(double height) {
+        return new TextArea(this.origin, this.x, height, this.a, this.line, this.error);
+    }
 }
 
 final class ImageArea extends Area

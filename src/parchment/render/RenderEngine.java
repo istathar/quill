@@ -895,15 +895,22 @@ public abstract class RenderEngine
     }
 
     protected void appendReferenceParagraph(final Context cr, final String label, final Extract extract) {
-        final Area area, group;
-        final Area[] list, areas;
-        final double savedLeft;
+        final Area area, bullet, group;
+        Area[] list, areas;
+        final double width, savedLeft;
 
         /*
          * Label
          */
 
         area = layoutAreaBullet(cr, label, serifFace, 0.0);
+
+        width = area.getWidth();
+        if (width + 3.0 >= 31.0) {
+            bullet = ((TextArea) area).changeHeight(serifFace.lineHeight);
+        } else {
+            bullet = area;
+        }
 
         /*
          * Body. 25 points is suitable for [99] and (barely) enough for [999].
@@ -915,13 +922,12 @@ public abstract class RenderEngine
         list = layoutAreaText(cr, extract, serifFace, false, false, 0.0, 1, false);
 
         areas = new Area[2];
-        areas[0] = area;
+        areas[0] = bullet;
         areas[1] = list[0];
-
-        list[0] = null;
-
         group = Area.composite(areas);
         accumulate(group);
+
+        list[0] = null;
         accumulate(list);
 
         leftMargin = savedLeft;
@@ -949,6 +955,27 @@ public abstract class RenderEngine
          */
 
         area = new TextArea(origin, leftMargin + position, 0.0, serifFace.lineAscent, line, false);
+
+        return area;
+    }
+
+    private Area layoutAreaBullet2(final Context cr, final String label, final Typeface face,
+            final double position) {
+        final Layout layout;
+        final LayoutLine line;
+        final Origin origin;
+        final Area area;
+
+        layout = new Layout(cr);
+        layout.setFontDescription(face.desc);
+        layout.setText(label);
+
+        line = layout.getLineReadonly(0);
+
+        origin = new Origin(folioIndex, seriesIndex, 0);
+
+        area = new TextArea(origin, leftMargin + position, serifFace.lineHeight, serifFace.lineAscent,
+                line, false);
 
         return area;
     }
