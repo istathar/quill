@@ -698,6 +698,7 @@ abstract class EditorTextView extends TextView implements Editor
             return;
         }
         previous = this.segment;
+        this.segment = segment;
 
         /*
          * Set the internal state
@@ -754,8 +755,6 @@ abstract class EditorTextView extends TextView implements Editor
          */
 
         parent.setCursor(segment);
-
-        this.segment = segment;
     }
 
     public void reverseTo(Segment segment) {
