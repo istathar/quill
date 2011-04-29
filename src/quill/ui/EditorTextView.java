@@ -1429,7 +1429,7 @@ abstract class EditorTextView extends TextView implements Editor
         menu.presentAt(xo + xr, yo + yr, R);
     }
 
-    private void handleInsertUncommon(Markup type) {
+    void handleInsertUncommon(Markup type) {
         final TextIter pointer;
         final Span span;
 

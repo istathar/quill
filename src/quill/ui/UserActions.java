@@ -26,6 +26,7 @@ import org.gnome.gtk.Stock;
 
 import quill.client.Quill;
 import quill.textbase.Common;
+import quill.textbase.Special;
 
 /**
  * Actions that the user can take. There is one of these per PrimaryWindow.
@@ -558,7 +559,7 @@ class UserActions
             }
 
             public void onActivate(Action source) {
-            // TODO
+                editor.handleInsertUncommon(Special.NOTE);
             }
         }
 
@@ -569,7 +570,7 @@ class UserActions
             }
 
             public void onActivate(Action source) {
-            // TODO
+                editor.handleInsertUncommon(Special.CITE);
             }
         }
 
