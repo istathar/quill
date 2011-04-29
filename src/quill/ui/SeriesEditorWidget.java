@@ -32,6 +32,7 @@ import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
 import quill.textbase.Component;
+import quill.textbase.Markup;
 import quill.textbase.Origin;
 import quill.textbase.Segment;
 import quill.textbase.Series;
@@ -967,7 +968,9 @@ abstract class SeriesEditorWidget extends ScrolledWindow
      * Get the data describing the popup menu appropriate for the Series being
      * edited.
      */
-    abstract InsertMenuDetails[] getInsertMenuDetails();
+    abstract InsertMenuDetails[] getMenuDetailsInsert();
+
+    abstract UncommonMenuDetails[] getMenuDetailsUncommon();
 }
 
 class InsertMenuDetails
@@ -979,6 +982,21 @@ class InsertMenuDetails
     final String subtext;
 
     InsertMenuDetails(Class<?> type, String text, String subtext) {
+        this.type = type;
+        this.text = text;
+        this.subtext = subtext;
+    }
+}
+
+class UncommonMenuDetails
+{
+    final Markup type;
+
+    final String text;
+
+    final String subtext;
+
+    UncommonMenuDetails(Markup type, String text, String subtext) {
         this.type = type;
         this.text = text;
         this.subtext = subtext;

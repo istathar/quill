@@ -180,7 +180,7 @@ class UserActions
             }
 
             public void onActivate(Action source) {
-                throw new Error();
+                throw new UnsupportedOperationException("Not yet implemented");
             }
         }
 

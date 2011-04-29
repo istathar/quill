@@ -201,11 +201,6 @@ abstract class EditorTextView extends TextView implements Editor
                     return true;
                 }
 
-                if (key == Keyval.Insert) {
-                    popupInsertMenu();
-                    return true;
-                }
-
                 /*
                  * Other special keys that we DO handle. The newline case is
                  * interesting. We let a \n fly but clear any current
@@ -263,6 +258,11 @@ abstract class EditorTextView extends TextView implements Editor
                 }
 
                 if (mod == ModifierType.NONE) {
+                    if (key == Keyval.Insert) {
+                        popupInsertMenu();
+                        return true;
+                    }
+
                     /*
                      * Special cases in cursor movement, but only if
                      * unmodified (otherwise, let default handler do its
@@ -326,6 +326,11 @@ abstract class EditorTextView extends TextView implements Editor
 
                 if (mod == ModifierType.SHIFT_MASK) {
                     if (key == Keyval.BackTab) {
+                        return true;
+                    }
+
+                    if (key == Keyval.Insert) {
+                        popupUncommonMenu();
                         return true;
                     }
 
@@ -1130,7 +1135,7 @@ abstract class EditorTextView extends TextView implements Editor
         return box;
     }
 
-    private MenuItem createMenuItem(InsertMenuDetails details) {
+    private MenuItem createMenuItemInsert(InsertMenuDetails details) {
         final String markup;
         final Class<?> type;
         final MenuItem result;
@@ -1189,11 +1194,11 @@ abstract class EditorTextView extends TextView implements Editor
          */
 
         split = new InsertContextMenu(parent);
-        details = parent.getInsertMenuDetails();
+        details = parent.getMenuDetailsInsert();
         I = details.length;
 
         for (i = 0; i < I; i++) {
-            item = createMenuItem(details[i]);
+            item = createMenuItemInsert(details[i]);
             split.append(item);
         }
 
@@ -1374,6 +1379,101 @@ abstract class EditorTextView extends TextView implements Editor
 
         if (width > 0) {
             checkSpellingRange(offset, 0);
+        }
+    }
+
+    /*
+     * This is almost the same code as popupInsertMenu(); the positioning code
+     * would be abstracted if a good way to change the invoked
+     * handleInsertSegment() could be found.
+     */
+    void popupUncommonMenu() {
+        final ContextMenu menu;
+        final UncommonMenuDetails[] details;
+        final int I;
+        MenuItem item;
+        int i;
+        final int xr, yr, X, Y, R, xo, yo;
+        final Rectangle rectangle;
+        final TextIter pointer;
+        final org.gnome.gdk.Window underlying;
+
+        /*
+         * Build the menu
+         */
+
+        details = parent.getMenuDetailsUncommon();
+        I = details.length;
+        menu = new UncommonContextMenu(parent);
+
+        for (i = 0; i < I; i++) {
+            item = createMenuItemUncommon(details[i]);
+            menu.append(item);
+        }
+
+        menu.showAll();
+
+        pointer = buffer.getIter(insertOffset);
+        rectangle = view.getLocation(pointer);
+        X = rectangle.getX();
+        Y = rectangle.getY();
+        R = rectangle.getHeight();
+
+        xr = view.convertBufferToWindowCoordsX(TEXT, X);
+        yr = view.convertBufferToWindowCoordsY(TEXT, Y);
+
+        underlying = view.getWindow();
+        xo = underlying.getOriginX();
+        yo = underlying.getOriginY();
+
+        menu.presentAt(xo + xr, yo + yr, R);
+    }
+
+    private void handleInsertUncommon(Markup type) {
+        final TextIter pointer;
+        final Span span;
+
+        pointer = buffer.getIter(insertOffset);
+        span = Span.createMarker("42", type); // FIXME
+        insertSpanIntoBuffer(pointer, span);
+
+        this.propagateTextualChange(insertOffset, 0, 1);
+    }
+
+    private MenuItem createMenuItemUncommon(UncommonMenuDetails details) {
+        final String markup;
+        final Markup type;
+        final MenuItem result;
+        final Label label;
+
+        type = details.type; // FIXME
+        markup = "<b>" + details.text + "</b>\n<small>(" + details.subtext + ")</small>";
+
+        label = new Label(markup);
+        label.setUseMarkup(true);
+        label.setUseUnderline(true);
+        label.setAlignment(Alignment.LEFT, Alignment.CENTER);
+
+        result = new MenuItem();
+        result.add(label);
+
+        result.connect(new MenuItem.Activate() {
+            public void onActivate(MenuItem source) {
+                try {
+                    handleInsertUncommon(type);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        return result;
+    }
+
+    private static class UncommonContextMenu extends ContextMenu
+    {
+        private UncommonContextMenu(SeriesEditorWidget parent) {
+            super(parent);
         }
     }
 

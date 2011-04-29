@@ -29,6 +29,7 @@ import quill.textbase.Component;
 import quill.textbase.EndnoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
+import quill.textbase.Special;
 
 import static org.freedesktop.bindings.Internationalization._;
 import static org.gnome.gtk.SizeGroupMode.HORIZONTAL;
@@ -142,13 +143,24 @@ class EndnotesSeriesEditorWidget extends SeriesEditorWidget
 
     private static InsertMenuDetails[] details;
 
+    private static UncommonMenuDetails[] uncommon;
+
     static {
         details = new InsertMenuDetails[] {
             new InsertMenuDetails(EndnoteSegment.class, _("_Endnote"), _("An endnote to this chapter")),
         };
+
+        uncommon = new UncommonMenuDetails[] {
+            new UncommonMenuDetails(Special.CITE, _("_Reference Citation"),
+                    _("Reference that will appear at the end of the work")),
+        };
     }
 
-    InsertMenuDetails[] getInsertMenuDetails() {
+    InsertMenuDetails[] getMenuDetailsInsert() {
         return details;
+    }
+
+    UncommonMenuDetails[] getMenuDetailsUncommon() {
+        return uncommon;
     }
 }
