@@ -1429,15 +1429,19 @@ abstract class EditorTextView extends TextView implements Editor
         menu.presentAt(xo + xr, yo + yr, R);
     }
 
-    void handleInsertUncommon(Markup type) {
+    void handleInsertMarker(Markup type) {
+        final int offset;
         final TextIter pointer;
         final Span span;
 
-        pointer = buffer.getIter(insertOffset);
+        offset = insertOffset;
+        pointer = buffer.getIter(offset);
         span = Span.createMarker("42", type); // FIXME
+
+        chain.insert(offset, span);
         insertSpanIntoBuffer(pointer, span);
 
-        this.propagateTextualChange(insertOffset, 0, 1);
+        this.propagateTextualChange(offset, 0, 1);
     }
 
     private MenuItem createMenuItemUncommon(UncommonMenuDetails details) {
@@ -1460,7 +1464,7 @@ abstract class EditorTextView extends TextView implements Editor
         result.connect(new MenuItem.Activate() {
             public void onActivate(MenuItem source) {
                 try {
-                    handleInsertUncommon(type);
+                    handleInsertMarker(type);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

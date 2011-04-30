@@ -559,7 +559,7 @@ class UserActions
             }
 
             public void onActivate(Action source) {
-                editor.handleInsertUncommon(Special.NOTE);
+                editor.handleInsertMarker(Special.NOTE);
             }
         }
 
@@ -570,7 +570,7 @@ class UserActions
             }
 
             public void onActivate(Action source) {
-                editor.handleInsertUncommon(Special.CITE);
+                editor.handleInsertMarker(Special.CITE);
             }
         }
 
