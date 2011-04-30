@@ -63,6 +63,7 @@ import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.LeaderSegment;
 import quill.textbase.ListitemSegment;
+import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.Origin;
@@ -959,27 +960,6 @@ public abstract class RenderEngine
         return area;
     }
 
-    private Area layoutAreaBullet2(final Context cr, final String label, final Typeface face,
-            final double position) {
-        final Layout layout;
-        final LayoutLine line;
-        final Origin origin;
-        final Area area;
-
-        layout = new Layout(cr);
-        layout.setFontDescription(face.desc);
-        layout.setText(label);
-
-        line = layout.getLineReadonly(0);
-
-        origin = new Origin(folioIndex, seriesIndex, 0);
-
-        area = new TextArea(origin, leftMargin + position, serifFace.lineHeight, serifFace.lineAscent,
-                line, false);
-
-        return area;
-    }
-
     // character
     private int previous;
 
@@ -1149,30 +1129,31 @@ public abstract class RenderEngine
          * creating Attributes along the way.
          */
 
-        // TODO replace with CharacterVisitor?
         extract.visit(new SpanVisitor() {
             private int offset = 0;
 
             public boolean visit(Span span) {
                 final Markup format;
-                final int len;
+                final int J;
                 int width, j;
-                String str;
+                final String str;
 
                 format = span.getMarkup();
                 width = 0;
 
-                /*
-                 * FIXME Use Span characters, not String!!!! Fixing this will
-                 * involve refactoring MarkerSpan to store reference data in
-                 * Markup instances, not Span text.
-                 */
+                if (span instanceof MarkerSpan) {
+                    str = span.getText();
+                    J = str.length();
 
-                str = span.getText();
-                len = str.length();
+                    for (j = 0; j < J; j++) {
+                        width += translateAndAppend(buf, str.charAt(j), format, preformatted);
+                    }
+                } else {
+                    J = span.getWidth();
 
-                for (j = 0; j < len; j++) {
-                    width += translateAndAppend(buf, str.charAt(j), format, preformatted);
+                    for (j = 0; j < J; j++) {
+                        width += translateAndAppend(buf, span.getChar(j), format, preformatted);
+                    }
                 }
 
                 for (Attribute attr : attributesForMarkup(format)) {
