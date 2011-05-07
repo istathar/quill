@@ -148,7 +148,11 @@ class ReferencesSeriesEditorWidget extends SeriesEditorWidget
         };
     }
 
-    InsertMenuDetails[] getInsertMenuDetails() {
+    InsertMenuDetails[] getMenuDetailsInsert() {
         return details;
+    }
+
+    UncommonMenuDetails[] getMenuDetailsUncommon() {
+        return new UncommonMenuDetails[] {};
     }
 }

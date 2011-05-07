@@ -63,6 +63,7 @@ import quill.textbase.HeadingSegment;
 import quill.textbase.ImageSegment;
 import quill.textbase.LeaderSegment;
 import quill.textbase.ListitemSegment;
+import quill.textbase.MarkerSpan;
 import quill.textbase.Markup;
 import quill.textbase.NormalSegment;
 import quill.textbase.Origin;
@@ -895,15 +896,22 @@ public abstract class RenderEngine
     }
 
     protected void appendReferenceParagraph(final Context cr, final String label, final Extract extract) {
-        final Area area, group;
-        final Area[] list, areas;
-        final double savedLeft;
+        final Area area, bullet, group;
+        Area[] list, areas;
+        final double width, savedLeft;
 
         /*
          * Label
          */
 
         area = layoutAreaBullet(cr, label, serifFace, 0.0);
+
+        width = area.getWidth();
+        if (width + 3.0 >= 31.0) {
+            bullet = ((TextArea) area).changeHeight(serifFace.lineHeight);
+        } else {
+            bullet = area;
+        }
 
         /*
          * Body. 25 points is suitable for [99] and (barely) enough for [999].
@@ -915,13 +923,12 @@ public abstract class RenderEngine
         list = layoutAreaText(cr, extract, serifFace, false, false, 0.0, 1, false);
 
         areas = new Area[2];
-        areas[0] = area;
+        areas[0] = bullet;
         areas[1] = list[0];
-
-        list[0] = null;
-
         group = Area.composite(areas);
         accumulate(group);
+
+        list[0] = null;
         accumulate(list);
 
         leftMargin = savedLeft;
@@ -1122,30 +1129,31 @@ public abstract class RenderEngine
          * creating Attributes along the way.
          */
 
-        // TODO replace with CharacterVisitor?
         extract.visit(new SpanVisitor() {
             private int offset = 0;
 
             public boolean visit(Span span) {
                 final Markup format;
-                final int len;
+                final int J;
                 int width, j;
-                String str;
+                final String str;
 
                 format = span.getMarkup();
                 width = 0;
 
-                /*
-                 * FIXME Use Span characters, not String!!!! Fixing this will
-                 * involve refactoring MarkerSpan to store reference data in
-                 * Markup instances, not Span text.
-                 */
+                if (span instanceof MarkerSpan) {
+                    str = span.getText();
+                    J = str.length();
 
-                str = span.getText();
-                len = str.length();
+                    for (j = 0; j < J; j++) {
+                        width += translateAndAppend(buf, str.charAt(j), format, preformatted);
+                    }
+                } else {
+                    J = span.getWidth();
 
-                for (j = 0; j < len; j++) {
-                    width += translateAndAppend(buf, str.charAt(j), format, preformatted);
+                    for (j = 0; j < J; j++) {
+                        width += translateAndAppend(buf, span.getChar(j), format, preformatted);
+                    }
                 }
 
                 for (Attribute attr : attributesForMarkup(format)) {

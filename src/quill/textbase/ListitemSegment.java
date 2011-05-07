@@ -30,15 +30,34 @@ public class ListitemSegment extends Segment
         super(entire, label, 0, 0, entire.getWidth());
     }
 
+    /*
+     * Invoked via reflection on Ins context menu insertion.
+     */
+    public ListitemSegment(Extract entire) {
+        super(entire, "•", 0, 0, entire.getWidth());
+    }
+
     public ListitemSegment(Extract entire, String label, int offset, int removed, int inserted) {
         super(entire, label, offset, removed, inserted);
     }
 
     public Segment createSimilar(Extract entire, int offset, int removed, int inserted) {
-        return new ListitemSegment(entire, super.getExtra(), offset, removed, inserted);
+        final String extra;
+
+        extra = super.getExtra();
+
+        return new ListitemSegment(entire, extra, offset, removed, inserted);
     }
 
     public Segment createSimilar(String extra) {
-        return this;
+        final Extract entire;
+
+        entire = super.getEntire();
+
+        return new ListitemSegment(entire, extra, 0, 0, 0);
+    }
+
+    public boolean isSequenceAllowed() {
+        return true;
     }
 }

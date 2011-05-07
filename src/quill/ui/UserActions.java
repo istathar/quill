@@ -26,6 +26,7 @@ import org.gnome.gtk.Stock;
 
 import quill.client.Quill;
 import quill.textbase.Common;
+import quill.textbase.Special;
 
 /**
  * Actions that the user can take. There is one of these per PrimaryWindow.
@@ -180,7 +181,7 @@ class UserActions
             }
 
             public void onActivate(Action source) {
-                throw new Error();
+                throw new UnsupportedOperationException("Not yet implemented");
             }
         }
 
@@ -558,7 +559,7 @@ class UserActions
             }
 
             public void onActivate(Action source) {
-            // TODO
+                editor.handleInsertMarker(Special.NOTE);
             }
         }
 
@@ -569,7 +570,7 @@ class UserActions
             }
 
             public void onActivate(Action source) {
-            // TODO
+                editor.handleInsertMarker(Special.CITE);
             }
         }
 
@@ -933,6 +934,11 @@ class UserActions
         }
     }
 
+    /**
+     * Inform UserActions which EditorTextView the editing actions
+     * (formatting, etc) should be directed to. Pass <code>null</code> to
+     * clear the setting.
+     */
     void setCurrentEditor(EditorTextView view) {
         this.editor = view;
     }
