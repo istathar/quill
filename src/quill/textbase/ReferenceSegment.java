@@ -32,7 +32,7 @@ public final class ReferenceSegment extends Segment
 
     // for insert segment
     public ReferenceSegment(Extract entire) {
-        super(entire, "", 0, 0, entire.getWidth());
+        super(entire, "[]", 0, 0, entire.getWidth());
     }
 
     private ReferenceSegment(Extract entire, String extra, int offset, int removed, int inserted) {
@@ -53,5 +53,9 @@ public final class ReferenceSegment extends Segment
         entire = super.getEntire();
 
         return new ReferenceSegment(entire, extra, 0, 0, 0);
+    }
+
+    public boolean isSequenceAllowed() {
+        return true;
     }
 }

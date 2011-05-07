@@ -46,6 +46,7 @@ import quill.textbase.PreformatSegment;
 import quill.textbase.QuoteSegment;
 import quill.textbase.Segment;
 import quill.textbase.Series;
+import quill.textbase.Special;
 import quill.textbase.SpecialSegment;
 
 import static org.freedesktop.bindings.Internationalization._;
@@ -268,7 +269,9 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
         primary.update(this, component, apres);
     }
 
-    private static InsertMenuDetails[] details;
+    private static final InsertMenuDetails[] details;
+
+    private static final UncommonMenuDetails[] uncommon;
 
     static {
         details = new InsertMenuDetails[] {
@@ -278,14 +281,27 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
             new InsertMenuDetails(QuoteSegment.class, _("Block _quote"),
                     _("normal wrapped text, but indented")),
             new InsertMenuDetails(PoeticSegment.class, _("Poe_m"), _("formating preserved")),
+            new InsertMenuDetails(ListitemSegment.class, _("_List item"), _("normal wrapped text")),
             new InsertMenuDetails(AttributionSegment.class, _("_Attribution"),
                     _("smaller wrapped text, offset right")),
             new InsertMenuDetails(HeadingSegment.class, _("Section _heading"),
                     _("bold text, single line"))
         };
+
+        uncommon = new UncommonMenuDetails[] {
+            new UncommonMenuDetails(Special.NOTE, _("End_note Anchor"),
+                    _("Note that will be grouped by chapter")),
+            new UncommonMenuDetails(Special.CITE, _("_Reference Citation"),
+                    _("Reference that will appear at the end of the work")),
+        };
+
     }
 
-    InsertMenuDetails[] getInsertMenuDetails() {
+    InsertMenuDetails[] getMenuDetailsInsert() {
         return details;
+    }
+
+    UncommonMenuDetails[] getMenuDetailsUncommon() {
+        return uncommon;
     }
 }
