@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 
 import org.gnome.gdk.EventFocus;
 import org.gnome.gdk.RGBA;
-import org.gnome.gtk.Editable;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
@@ -68,7 +67,7 @@ class MilimetreEntry extends HBox
          */
 
         entry.connect(new Entry.Changed() {
-            public void onChanged(Editable source) {
+            public void onChanged(Entry source) {
                 final String str;
                 final double d;
 
