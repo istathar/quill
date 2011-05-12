@@ -43,6 +43,7 @@ import org.gnome.gtk.MessageType;
 import org.gnome.gtk.ResponseType;
 import org.gnome.gtk.Settings;
 import org.gnome.gtk.Stock;
+import org.gnome.gtk.Widget;
 import org.gnome.pango.FontDescription;
 
 import quill.client.ApplicationException;
@@ -310,6 +311,31 @@ public class UserInterface
 
     String getCurrentFolder() {
         return curent;
+    }
+
+    public static void debugAllocation(Widget source) {
+        int width, height;
+
+        System.out.printf("%15s", source.getAllocatedWidth() + "x" + source.getAllocatedHeight());
+
+        System.out.printf("%15s", source.getPreferredWidthMinimum() + "x"
+                + source.getPreferredHeightMinimum());
+
+        System.out.printf("%15s", source.getPreferredWidthNatural() + "x"
+                + source.getPreferredHeightNatural());
+
+        width = source.getPreferredWidthMinimum();
+        height = source.getPreferredHeightMinimum();
+
+        System.out.printf("%15s", source.getPreferredWidthForHeightMinimum(height) + "x"
+                + source.getPreferredHeightForWidthMinimum(width));
+
+        width = source.getPreferredWidthNatural();
+        height = source.getPreferredHeightNatural();
+
+        System.out.printf("%15s", source.getPreferredWidthForHeightNatural(height) + "x"
+                + source.getPreferredHeightForWidthNatural(width));
+        System.out.println();
     }
 }
 
