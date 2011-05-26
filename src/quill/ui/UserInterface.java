@@ -313,28 +313,25 @@ public class UserInterface
         return curent;
     }
 
+    private static boolean header = false;
+
     public static void debugAllocation(Widget source) {
-        int width, height;
+        int width;
+
+        if (!header) {
+            System.out.printf("%15s%15s%15s", "alloc", "pref(min)", "pref(nat)");
+            System.out.println();
+            header = true;
+        }
 
         System.out.printf("%15s", source.getAllocatedWidth() + "x" + source.getAllocatedHeight());
 
-        System.out.printf("%15s", source.getPreferredWidthMinimum() + "x"
-                + source.getPreferredHeightMinimum());
-
-        System.out.printf("%15s", source.getPreferredWidthNatural() + "x"
-                + source.getPreferredHeightNatural());
-
         width = source.getPreferredWidthMinimum();
-        height = source.getPreferredHeightMinimum();
-
-        System.out.printf("%15s", source.getPreferredWidthForHeightMinimum(height) + "x"
-                + source.getPreferredHeightForWidthMinimum(width));
+        System.out.printf("%15s", width + "x" + source.getPreferredHeightForWidthMinimum(width));
 
         width = source.getPreferredWidthNatural();
-        height = source.getPreferredHeightNatural();
+        System.out.printf("%15s", width + "x" + source.getPreferredHeightForWidthNatural(width));
 
-        System.out.printf("%15s", source.getPreferredWidthForHeightNatural(height) + "x"
-                + source.getPreferredHeightForWidthNatural(width));
         System.out.println();
     }
 }
