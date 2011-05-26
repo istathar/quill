@@ -20,13 +20,13 @@ package quill.ui;
 
 import org.gnome.gdk.EventFocus;
 import org.gnome.gdk.RGBA;
+import org.gnome.gtk.Align;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.EventBox;
-import org.gnome.gtk.HBox;
+import org.gnome.gtk.Grid;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.StateFlags;
-import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
 import quill.textbase.Segment;
@@ -46,9 +46,7 @@ abstract class ListitemBox extends EventBox implements Editor
 
     private final EventBox eb;
 
-    private final VBox top;
-
-    private final HBox box;
+    private final Grid grid;
 
     /*
      * This is a terrible name, but what else are we supposed to use?
@@ -63,11 +61,9 @@ abstract class ListitemBox extends EventBox implements Editor
         super();
         eb = this;
 
-        top = new VBox(false, 0);
-        box = new HBox(false, 0);
-        top.packEnd(box, false, false, 0);
-        eb.add(top);
+        grid = new Grid();
 
+        eb.add(grid);
         eb.overrideBackground(StateFlags.NORMAL, RGBA.WHITE);
 
         /*
@@ -94,16 +90,15 @@ abstract class ListitemBox extends EventBox implements Editor
      * down to line up with the text's baseline.
      */
     void setupLabelSide(final ListitemEntry entry, final int left, final int top) {
-        final Alignment align;
 
-        entry.setSizeRequest(WIDTH - left, -1);
+        entry.setSizeRequest(WIDTH, -1);
         entry.setAlignment(Alignment.LEFT);
 
-        align = new Alignment(Alignment.LEFT, Alignment.TOP, 0.0f, 0.0f);
-        align.setPadding(top, 0, left, 0);
-        align.add(entry);
+        entry.setExpandHorizontal(false);
+        entry.setAlignHorizontal(Align.START);
+        entry.setAlignVertical(Align.START);
 
-        box.packStart(align, false, false, 0);
+        grid.attach(entry, 0, 1, 1, 1);
 
         label = entry;
     }
@@ -115,17 +110,21 @@ abstract class ListitemBox extends EventBox implements Editor
     void setupLabelTop(final ListitemEntry widget) {
         final Label spacer;
 
+        widget.setAlignVertical(Align.START);
+        grid.attach(widget, 0, 0, 2, 1);
+
         spacer = new Label();
         spacer.setSizeRequest(WIDTH, -1);
-        top.packStart(widget, false, false, 0);
-        box.packStart(spacer, false, false, 0);
+        grid.attach(spacer, 0, 1, 1, 1);
 
         label = widget;
     }
 
     void setupBody(final EditorTextView view) {
         body = view;
-        box.packStart(body, true, true, 0);
+        body.setExpandHorizontal(true);
+        body.setExpandVertical(false);
+        grid.attach(body, 1, 1, 1, 1);
     }
 
     public void advanceTo(Segment segment) {

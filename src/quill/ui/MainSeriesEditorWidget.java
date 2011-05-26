@@ -22,9 +22,10 @@ import java.util.List;
 
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Surface;
-import org.gnome.gdk.Color;
 import org.gnome.gdk.EventFocus;
 import org.gnome.gdk.RGBA;
+import org.gnome.gtk.Grid;
+import org.gnome.gtk.Label;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.Scrollbar;
 import org.gnome.gtk.ScrolledWindow;
@@ -81,8 +82,8 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
         return component;
     }
 
-    protected Widget createEditorForSegment(int index, Segment segment) {
-        final Widget result;
+    protected void createEditorForSegment(final int index, final Segment segment) {
+        final Grid grid;
         final Editor editor;
         final EditorTextView view;
         final HeadingBox heading;
@@ -92,120 +93,149 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
         final ScrolledWindow wide;
         final List<Editor> editors;
 
+        grid = super.getTop();
+
         if (segment instanceof NormalSegment) {
             view = new NormalEditorTextView(this, segment);
 
             editor = view;
-            result = view;
+            grid.attach(view, 0, index, 3, 1);
         } else if (segment instanceof QuoteSegment) {
             view = new QuoteEditorTextView(this, segment);
 
             editor = view;
-            result = view;
+            grid.attach(view, 0, index, 3, 1);
         } else if (segment instanceof PoeticSegment) {
             view = new PoeticEditorTextView(this, segment);
 
             editor = view;
-            result = view;
+            grid.attach(view, 0, index, 3, 1);
         } else if (segment instanceof ListitemSegment) {
             listitem = new NormalListitemBox(this, segment);
 
             editor = listitem;
-            result = listitem;
+            grid.attach(listitem, 0, index, 3, 1);
         } else if (segment instanceof AttributionSegment) {
             view = new AttributionEditorTextView(this, segment);
 
             editor = view;
-            result = view;
+            grid.attach(view, 0, index, 3, 1);
         } else if (segment instanceof PreformatSegment) {
-            view = new PreformatEditorTextView(this, segment);
-
-            wide = new ScrolledWindow();
-            wide.setPolicy(PolicyType.ALWAYS, PolicyType.NEVER);
-            wide.add(view);
-
-            /*
-             * Having set up horizontal scrollbars for code blocks, we want to
-             * make them a bit less obtrusive in normal use.
-             */
-
-            bar = wide.getHScrollbar();
-            view.connect(new Widget.FocusInEvent() {
-                public boolean onFocusInEvent(Widget source, EventFocus event) {
-                    bar.setSensitive(true);
-                    return false;
-                }
-            });
-            view.connect(new Widget.FocusOutEvent() {
-                public boolean onFocusOutEvent(Widget source, EventFocus event) {
-                    bar.setValue(0);
-                    bar.setSensitive(false);
-                    return false;
-                }
-            });
-            bar.setSensitive(false);
-
-            bar.connect(new Widget.Draw() {
-
-                public boolean onDraw(Widget source, Context cr) {
-                    final Surface surface;
-
-                    if (bar.getSensitive()) {
-                        return false;
-                    }
-
-                    cr.setSource(Color.WHITE);
-                    cr.paint();
-
-                    surface = cr.getTarget();
-                    surface.flush();
-
-                    return true;
-                }
-            });
-
-            editor = view;
-            result = wide;
+            editor = setupPreformat(grid, index, segment);
         } else if (segment instanceof ImageSegment) {
             image = new ImageDisplayBox(this, segment);
 
             // FUTURE works, but needs upgrading
             editor = image.getEditor();
-            result = image;
+            grid.attach(image, 0, index, 3, 1);
         } else if (segment instanceof HeadingSegment) {
-            heading = new SectionHeadingBox(this, segment);
+            editor = setupHeading(grid, index, segment, "Section");
 
-            // FUTURE correct now, but will change when we do labels
-            editor = heading.getTextView();
-            result = heading;
+            /*
+             * heading = new SectionHeadingBox(this, segment);
+             * 
+             * // FUTURE correct now, but will change when we do labels editor
+             * = heading.getTextView(); grid.attach(heading, 0, index, 3, 1);
+             */
         } else if (segment instanceof LeaderSegment) {
             view = new LeaderEditorTextView(this, segment);
 
             editor = view;
-            result = view;
+            grid.attach(view, 0, index, 3, 1);
         } else if (segment instanceof ChapterSegment) {
-            heading = new ChapterHeadingBox(this, segment);
-
-            editor = heading.getTextView();
-            result = heading;
+            editor = setupHeading(grid, index, segment, "Chapter");
         } else if (segment instanceof DivisionSegment) {
             heading = new PartHeadingBox(this, segment);
 
             editor = heading.getTextView();
-            result = heading;
+            grid.attach(heading, 0, index, 3, 1);
         } else if (segment instanceof SpecialSegment) {
-
+            Widget widget;
             // TODO placeholder; improve!
             editor = null;
-            result = new SpecialHeadingBox(this, segment);
+            widget = new SpecialHeadingBox(this, segment);
+            grid.attach(widget, 0, index, 3, 1);
         } else {
             throw new AssertionError("Unknown Segment type");
         }
 
         editors = super.getEditors();
         editors.add(index, editor);
+    }
 
-        return result;
+    private Editor setupHeading(final Grid grid, final int index, final Segment segment,
+        final String text) {
+        final EditorTextView title;
+        final Label label;
+
+        title = new HeadingEditorTextView(this, segment);
+        title.setExpandHorizontal(true);
+        grid.attach(title, 0, index, 2, 1);
+
+        label = new Label();
+        label.setWidthChars(20);
+        label.setUseMarkup(true);
+        label.setLabel("<span color='gray'>" + text + "</span>");
+
+        grid.attach(label, 2, index, 1, 1);
+
+        return title;
+    }
+
+    private Editor setupPreformat(final Grid grid, final int index, final Segment segment) {
+        final Scrollbar bar;
+        final EditorTextView view;
+        final ScrolledWindow wide;
+
+        view = new PreformatEditorTextView(this, segment);
+        view.setExpandHorizontal(true);
+        wide = new ScrolledWindow();
+        wide.setPolicy(PolicyType.ALWAYS, PolicyType.NEVER);
+        wide.add(view);
+
+        /*
+         * Having set up horizontal scrollbars for code blocks, we want to
+         * make them a bit less obtrusive in normal use.
+         */
+
+        bar = wide.getHScrollbar();
+        view.connect(new Widget.FocusInEvent() {
+            public boolean onFocusInEvent(Widget source, EventFocus event) {
+                bar.setSensitive(true);
+                return false;
+            }
+        });
+        view.connect(new Widget.FocusOutEvent() {
+            public boolean onFocusOutEvent(Widget source, EventFocus event) {
+                bar.setValue(0);
+                bar.setSensitive(false);
+                return false;
+            }
+        });
+
+        bar.setSensitive(false);
+
+        bar.connect(new Widget.Draw() {
+            public boolean onDraw(Widget source, Context cr) {
+                final Surface surface;
+
+                if (bar.getSensitive()) {
+                    return false;
+                }
+
+                cr.setSource(RGBA.WHITE);
+                cr.paint();
+
+                surface = cr.getTarget();
+                surface.flush();
+
+                return true;
+            }
+        });
+
+        grid.attach(wide, 0, index, 3, 1);
+
+        return view;
     }
 
     /*
@@ -252,7 +282,7 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
     }
 
     void propegateTextualChange(final PrimaryWindow primary, final Series former,
-            final Series replacement) {
+        final Series replacement) {
         final Component apres;
 
         apres = component.updateMain(replacement);
@@ -260,7 +290,7 @@ class MainSeriesEditorWidget extends SeriesEditorWidget
     }
 
     void propegateStructuralChange(final PrimaryWindow primary, final Series former,
-            final Series replacement) {
+        final Series replacement) {
         final Component apres;
 
         apres = component.updateMain(replacement);

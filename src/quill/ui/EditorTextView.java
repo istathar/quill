@@ -28,7 +28,6 @@ import org.gnome.gdk.EventKey;
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
 import org.gnome.gdk.MouseButton;
-import org.gnome.gdk.RGBA;
 import org.gnome.gdk.Rectangle;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.Allocation;
@@ -38,7 +37,6 @@ import org.gnome.gtk.InputMethod;
 import org.gnome.gtk.Label;
 import org.gnome.gtk.MenuItem;
 import org.gnome.gtk.SimpleInputMethod;
-import org.gnome.gtk.StateFlags;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
 import org.gnome.gtk.TextMark;
@@ -124,8 +122,7 @@ abstract class EditorTextView extends TextView implements Editor
         view.setWrapMode(WrapMode.WORD);
 
         view.setMarginLeft(3);
-        view.setBorderWidth(2);
-        view.overrideBackground(StateFlags.NORMAL, RGBA.WHITE);
+        view.setBorderWidth(0);
 
         view.setAcceptsTab(true);
     }
