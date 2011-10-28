@@ -41,7 +41,7 @@ linked.
 suitable for writing technical documents that provides a user
 interface focused the needs of such authors while otherwise trying to
 keep out of the way as much as possible. Along the way we of course
-needed to store our documents o n disk, and it wasn't very surprising
+needed to store our documents on disk, and it wasn't very surprising
 to find that the currently available file formats didn't really suit
 our needs.
 </text>
