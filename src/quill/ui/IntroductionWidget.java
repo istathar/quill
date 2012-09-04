@@ -198,9 +198,9 @@ class UnderConstruction extends Alignment
 
                 pattern = new LinearPattern(0.0, 0.0, 20.0, 20.0);
                 pattern.addColorStopRGB(0.0, 0.0, 0.0, 0.0);
-                pattern.addColorStopRGB(0.5, 0.0, 0.0, 0.0);
-                pattern.addColorStopRGB(0.5, 255.0 / 255.0, 196.0 / 255.0, 0.0 / 255.0);
-                pattern.addColorStopRGB(1.0, 255.0 / 255.0, 196.0 / 255.0, 0.0 / 255.0);
+                pattern.addColorStopRGB(0.46, 0.0, 0.0, 0.0);
+                pattern.addColorStopRGB(0.50, 255.0 / 255.0, 196.0 / 255.0, 0.0 / 255.0);
+                pattern.addColorStopRGB(0.96, 255.0 / 255.0, 196.0 / 255.0, 0.0 / 255.0);
                 pattern.addColorStopRGB(1.0, 0.0, 0.0, 0.0);
                 pattern.setExtend(Extend.REPEAT);
 
