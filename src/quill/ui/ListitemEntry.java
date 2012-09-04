@@ -18,7 +18,6 @@
  */
 package quill.ui;
 
-import org.gnome.gtk.Editable;
 import org.gnome.gtk.Entry;
 
 import quill.textbase.Segment;
@@ -47,7 +46,7 @@ abstract class ListitemEntry extends Entry implements Editor
         apply(segment);
 
         entry.connect(new Entry.Changed() {
-            public void onChanged(Editable source) {
+            public void onChanged(Entry source) {
                 handleLabelChanged();
             }
         });

@@ -352,6 +352,15 @@ class PrimaryWindow extends Window
         pane.setPosition(690);
         top.packStart(pane, true, true, 0);
         showingRightSide = true;
+
+        /*
+         * While resize-grips as a default artifact are nice and all from a
+         * Desktop consistency standpoint, they displace right-hand scrollbars
+         * if present, and that creates an uneven visual effect when not
+         * maximized - which is the case on a larger display.
+         */
+
+        window.setHasResizeGrip(false);
     }
 
     Widget[] gauche, droit;

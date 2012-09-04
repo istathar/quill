@@ -25,7 +25,7 @@ class AttributionEditorTextView extends EditorTextView
     AttributionEditorTextView(SeriesEditorWidget parent, Segment segment) {
         super(parent, segment);
 
-        view.modifyFont(fonts.serif);
+        view.overrideFont(fonts.serif);
         view.setMarginLeft(350);
         view.setMarginRight(0);
         view.setPaddingAboveParagraph(0);

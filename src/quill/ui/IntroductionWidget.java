@@ -26,7 +26,6 @@ import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Extend;
 import org.freedesktop.cairo.LinearPattern;
 import org.freedesktop.cairo.Pattern;
-import org.gnome.gdk.EventExpose;
 import org.gnome.gdk.Pixbuf;
 import org.gnome.gtk.Alignment;
 import org.gnome.gtk.DrawingArea;
@@ -36,6 +35,8 @@ import org.gnome.gtk.Label;
 import org.gnome.gtk.LinkButton;
 import org.gnome.gtk.MenuBar;
 import org.gnome.gtk.MenuItem;
+import org.gnome.gtk.PolicyType;
+import org.gnome.gtk.ScrolledWindow;
 import org.gnome.gtk.VBox;
 import org.gnome.gtk.Widget;
 
@@ -48,14 +49,15 @@ import static org.freedesktop.bindings.Internationalization._;
  * 
  * @author Andrew Cowie
  */
-class IntroductionWidget extends VBox
+class IntroductionWidget extends ScrolledWindow
 {
     private final VBox top;
 
     private final MenuBar spacer;
 
     IntroductionWidget() {
-        super(false, 0);
+        super();
+        final ScrolledWindow scroll;
         final MenuItem blank;
         final Label title, description, help;
         final Pixbuf pixbuf;
@@ -66,7 +68,10 @@ class IntroductionWidget extends VBox
         final LinkButton site;
 
         try {
-            top = this;
+            scroll = this;
+            scroll.setPolicy(PolicyType.NEVER, PolicyType.AUTOMATIC);
+            top = new VBox(false, 0);
+            scroll.addWithViewport(top);
 
             /*
              * We need to put a MenuBar at the top of the IntroductionWidget
@@ -81,8 +86,8 @@ class IntroductionWidget extends VBox
             top.packStart(spacer, false, false, 0);
             blank = new MenuItem("Quill and Parchment");
             spacer.prepend(blank);
-            spacer.connect(new Widget.ExposeEvent() {
-                public boolean onExposeEvent(Widget source, EventExpose event) {
+            spacer.connect(new Widget.Draw() {
+                public boolean onDraw(Widget source, Context cr) {
                     return true;
                 }
             });
@@ -117,12 +122,14 @@ class IntroductionWidget extends VBox
                             + "back-end which takes these documents and outputs them as PDF files. "
                             + "There are rendering engines (ie, stylesheets) customized for various different document types.");
             description.setLineWrap(true);
+            description.setWidthChars(50);
             description.setUseMarkup(true);
+            description.setPadding(15, 0);
             description.setJustify(Justification.CENTER);
             top.packStart(description, false, false, 20);
 
             help = new Label(_("Press F12 to show the menu"));
-            help.setLineWrap(true);
+            help.setLineWrap(false);
             help.setUseMarkup(true);
 
             top.packStart(help, true, false, 0);
@@ -149,9 +156,9 @@ class IntroductionWidget extends VBox
                             + "\n");
             warning.setLineWrap(true);
             warning.setUseMarkup(true);
-            warning.setWidthChars(70);
+            warning.setWidthChars(50);
             warning.setAlignment(Alignment.CENTER, Alignment.TOP);
-            warning.setPadding(0, 10);
+            warning.setPadding(15, 10);
             warning.setJustify(Justification.CENTER);
             top.packStart(warning, false, false, 0);
 
@@ -185,12 +192,9 @@ class UnderConstruction extends Alignment
         drawing = new DrawingArea();
         drawing.setSizeRequest(-1, 30);
 
-        drawing.connect(new Widget.ExposeEvent() {
-            public boolean onExposeEvent(Widget source, EventExpose event) {
-                final Context cr;
+        drawing.connect(new Widget.Draw() {
+            public boolean onDraw(Widget source, Context cr) {
                 final Pattern pattern;
-
-                cr = new Context(event);
 
                 pattern = new LinearPattern(0.0, 0.0, 20.0, 20.0);
                 pattern.addColorStopRGB(0.0, 0.0, 0.0, 0.0);

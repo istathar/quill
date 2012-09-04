@@ -501,13 +501,13 @@ if ($os eq "gentoo") {
 		check_prereq(@gnome_jars,
 			"java-gnome UI library",
 			"java-gnome",
-			"$java_gnome_home/share/java/gtk-4.0.jar",
-			"$java_gnome_home/tmp/gtk-4.0.jar");
+			"$java_gnome_home/share/java/gtk-4.1.jar",
+			"$java_gnome_home/tmp/gtk-4.1.jar");
 	} else {
 		check_prereq(@gnome_jars,
 			"java-gnome UI library",
 			"java-gnome",
-			"/usr/share/java-gnome-4.0/lib/gtk.jar");
+			"/usr/share/java-gnome-4.1/lib/gtk.jar");
 	}
 
 	check_prereq(@xom_jars,
@@ -535,15 +535,15 @@ if ($os eq "gentoo") {
 		check_prereq(@gnome_jars,
 			"java-gnome UI library",
 			"libjava-gnome-java",
-			"$java_gnome_home/share/java/gtk-4.0.jar",
-			"$java_gnome_home/tmp/gtk-4.0.jar");
+			"$java_gnome_home/share/java/gtk-4.1.jar",
+			"$java_gnome_home/tmp/gtk-4.1.jar");
 	} else {
 		check_prereq(@gnome_jars,
 			"java-gnome UI library",
 			"libjava-gnome-java",
-			"$prefix/share/java/gtk-4.0.jar",
-			"/usr/share/java/gtk-4.0.jar",
-			"~/share/java/gtk-4.0.jar");
+			"$prefix/share/java/gtk-4.1.jar",
+			"/usr/share/java/gtk-4.1.jar",
+			"~/share/java/gtk-4.1.jar");
 	}
 
 	check_prereq(@xom_jars,
@@ -573,8 +573,8 @@ if ($os eq "gentoo") {
 	check_prereq(@gnome_jars,
 			"java-gnome UI library",
 			"java-gnome",
-			"$java_gnome_home/share/java/gtk-4.0.jar",
-			"~/share/java/gtk-4.0.jar");
+			"$java_gnome_home/share/java/gtk-4.1.jar",
+			"~/share/java/gtk-4.1.jar");
 
 	check_prereq(@xom_jars,
 			"Xom XML library",

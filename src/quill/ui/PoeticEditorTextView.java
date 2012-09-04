@@ -25,7 +25,7 @@ class PoeticEditorTextView extends EditorTextView
     PoeticEditorTextView(SeriesEditorWidget parent, Segment segment) {
         super(parent, segment);
 
-        view.modifyFont(fonts.serif);
+        view.overrideFont(fonts.serif);
         view.setMarginLeft(10);
         view.setMarginRight(150);
         view.setBorderWidth(10);

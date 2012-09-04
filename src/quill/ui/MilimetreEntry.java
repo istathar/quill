@@ -20,13 +20,12 @@ package quill.ui;
 
 import java.math.BigDecimal;
 
-import org.gnome.gdk.Color;
 import org.gnome.gdk.EventFocus;
-import org.gnome.gtk.Editable;
+import org.gnome.gdk.RGBA;
 import org.gnome.gtk.Entry;
 import org.gnome.gtk.HBox;
 import org.gnome.gtk.Label;
-import org.gnome.gtk.StateType;
+import org.gnome.gtk.StateFlags;
 import org.gnome.gtk.Widget;
 
 import static org.gnome.gtk.Alignment.RIGHT;
@@ -68,7 +67,7 @@ class MilimetreEntry extends HBox
          */
 
         entry.connect(new Entry.Changed() {
-            public void onChanged(Editable source) {
+            public void onChanged(Entry source) {
                 final String str;
                 final double d;
 
@@ -81,13 +80,13 @@ class MilimetreEntry extends HBox
                     d = Double.valueOf(str);
                     safeValue = constrainDecimal(d);
                     valid = true;
-                    entry.modifyText(StateType.NORMAL, Color.BLACK);
+                    entry.overrideColor(StateFlags.NORMAL, RGBA.BLACK);
                 } catch (NumberFormatException nfe) {
                     /*
                      * if the user input is invalid, then we warn about it.
                      */
                     valid = false;
-                    entry.modifyText(StateType.NORMAL, Color.RED);
+                    entry.overrideColor(StateFlags.NORMAL, RGBA.RED);
                 }
             }
         });

@@ -20,6 +20,7 @@ package quill.ui;
 
 import java.util.List;
 
+import org.gnome.gtk.Grid;
 import org.gnome.gtk.HSeparator;
 import org.gnome.gtk.SizeGroup;
 import org.gnome.gtk.VBox;
@@ -59,11 +60,14 @@ class EndnotesSeriesEditorWidget extends SeriesEditorWidget
         group = new SizeGroup(HORIZONTAL);
     }
 
-    Widget createEditorForSegment(int index, Segment segment) {
+    void createEditorForSegment(int index, Segment segment) {
+        final Grid grid;
         final Widget result;
         final ListitemBox listitem;
         final VBox box;
         final List<Editor> editors;
+
+        grid = super.getTop();
 
         if (segment instanceof EndnoteSegment) {
             listitem = new EndnoteListitemBox(this, segment);
@@ -83,7 +87,7 @@ class EndnotesSeriesEditorWidget extends SeriesEditorWidget
         editors = super.getEditors();
         editors.add(index, listitem);
 
-        return result;
+        grid.attach(result, 0, index, 3, 1);
     }
 
     /*

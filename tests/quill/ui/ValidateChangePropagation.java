@@ -27,6 +27,7 @@ import nu.xom.ValidityException;
 
 import org.gnome.gdk.Keyval;
 import org.gnome.gdk.ModifierType;
+import org.gnome.gtk.Gtk;
 import org.gnome.gtk.Test;
 import org.gnome.gtk.TextBuffer;
 import org.gnome.gtk.TextIter;
@@ -173,9 +174,13 @@ public class ValidateChangePropagation extends GraphicalTestCase
         end = buffer.getIter(21);
         buffer.selectRange(start, end);
         assertEquals(" test of the", buffer.getText(start, end, true));
-        Test.cycleMainLoop();
+        while (Gtk.eventsPending()) {
+            Gtk.mainIterationDo(false);
+        }
         Test.sendKey(editor, Keyval.n, ModifierType.NONE);
-        Test.cycleMainLoop();
+        while (Gtk.eventsPending()) {
+            Gtk.mainIterationDo(false);
+        }
 
         /*
          * Check to make sure it actually did what we want (thereby passing

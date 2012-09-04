@@ -43,7 +43,7 @@ class LeaderEditorTextView extends EditorTextView
     LeaderEditorTextView(SeriesEditorWidget parent, Segment segment) {
         super(parent, segment);
 
-        view.modifyFont(desc);
+        view.overrideFont(desc);
         view.setMarginLeft(40);
         view.setMarginRight(40);
         view.setPaddingAboveParagraph(2);

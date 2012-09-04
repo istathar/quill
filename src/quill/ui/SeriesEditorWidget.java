@@ -21,14 +21,17 @@ package quill.ui;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.gnome.gdk.RGBA;
 import org.gnome.gtk.Adjustment;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.Container;
+import org.gnome.gtk.Grid;
+import org.gnome.gtk.Gtk;
 import org.gnome.gtk.Label;
+import org.gnome.gtk.Orientation;
 import org.gnome.gtk.PolicyType;
 import org.gnome.gtk.ScrolledWindow;
-import org.gnome.gtk.Test;
-import org.gnome.gtk.VBox;
+import org.gnome.gtk.StateFlags;
 import org.gnome.gtk.Widget;
 
 import quill.textbase.Component;
@@ -58,7 +61,7 @@ abstract class SeriesEditorWidget extends ScrolledWindow
 
     private Adjustment adj;
 
-    private VBox box;
+    private Grid grid;
 
     private LinkedList<Editor> editors;
 
@@ -88,46 +91,46 @@ abstract class SeriesEditorWidget extends ScrolledWindow
     }
 
     private void setupScrolling(String heading) {
-        final VBox outer;
+        final Grid outer;
         final Label label;
 
-        box = new VBox(false, 0);
+        grid = new Grid();
+        grid.setOrientation(Orientation.VERTICAL);
+        grid.setExpandHorizontal(true);
+        grid.overrideBackground(StateFlags.NORMAL, RGBA.WHITE);
 
         if (heading == null) {
-            scroll.addWithViewport(box);
+            scroll.addWithViewport(grid);
         } else {
-            outer = new VBox(false, 0);
+            outer = new Grid();
+            outer.setOrientation(Orientation.VERTICAL);
+            outer.setExpandHorizontal(true);
+            outer.setRowSpacing(6);
 
             label = new Label("<span size='xx-large'>" + heading + "</span>");
             label.setUseMarkup(true);
             label.setAlignment(LEFT, TOP);
-            outer.packStart(label, false, false, 6);
-            outer.packStart(box, true, true, 0);
+            outer.add(label);
+            outer.add(grid);
             scroll.addWithViewport(outer);
         }
 
         scroll.setPolicy(PolicyType.NEVER, PolicyType.ALWAYS);
 
-        /*
-         * For reasons I don't entirely understand, the recursive showAll()
-         * from PrimaryWindow isn't getting though this to the children
-         * ReferenceEditorTextViews. Strange. Anyway, show()ing here fixes it,
-         * though I hate unexplained workarounds.
-         */
-
-        scroll.show();
-
         adj = scroll.getVAdjustment();
     }
 
     /**
-     * Get the VBox that the contents of this Widget are to be packed into;
+     * Get the VGrid that the contents of this Widget are to be packed into;
      * this is scrolled.
      */
-    protected VBox getTop() {
-        return box;
+    protected Grid getTop() {
+        return grid;
     }
 
+    /**
+     * 
+     */
     private void hookupAdjustmentReactions() {}
 
     /**
@@ -170,7 +173,7 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         int v, h, H;
         int y, R;
 
-        children = box.getChildren();
+        children = grid.getChildren();
         i = series.indexOf(segment);
         widget = children[i];
 
@@ -181,12 +184,13 @@ abstract class SeriesEditorWidget extends ScrolledWindow
             /*
              * Yet again we bump into the TextView doesn't know it's own hight
              * yet probem. Suprisingly, cycling the main loop appears to let
-             * the idle handler run?!? FIXME Perhaps it's time to expose
-             * mainIterationDo() in java-gnome for real, since we really
-             * shouldn't be using Test as a workaround.
+             * the idle handler run?!?
              */
 
-            Test.cycleMainLoop();
+            while (Gtk.eventsPending()) {
+                Gtk.mainIterationDo(false);
+            }
+
             y = alloc.getY();
 
             /*
@@ -275,11 +279,11 @@ abstract class SeriesEditorWidget extends ScrolledWindow
          * displayed; if so remove its children first.
          */
 
-        children = box.getChildren();
+        children = grid.getChildren();
 
         for (i = 0; i < children.length; i++) {
             widget = children[i];
-            box.remove(widget);
+            grid.remove(widget);
         }
 
         /*
@@ -292,16 +296,10 @@ abstract class SeriesEditorWidget extends ScrolledWindow
 
         for (i = 0; i < num; i++) {
             segment = series.getSegment(i);
-
-            widget = createEditorForSegment(i, segment);
-            if (widget == null) {
-                continue;
-            }
-
-            box.packStart(widget, false, false, 0);
+            createEditorForSegment(i, segment);
         }
 
-        box.showAll();
+        grid.showAll();
 
         /*
          * And make sure the cursor is a Segment from this Series.
@@ -312,17 +310,6 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         } else {
             this.cursorSegment = null;
         }
-
-        /*
-         * Once again, I'm not happy with this. The bug is that sometimes the
-         * EndnoteSeriesEditorWidget and ReferencesSeriesEditorWidget are not
-         * actually requesting the appropriate amount of vertical space
-         * because they haven't calculated it yet. So annoying. Cycling the
-         * main loop seems to allow the idle handler to run, working around
-         * the problem Hopefully GTK 3.0 will be better about this.
-         */
-
-        Test.cycleMainLoop();
     }
 
     private Segment lookup(Widget widget) {
@@ -369,13 +356,14 @@ abstract class SeriesEditorWidget extends ScrolledWindow
 
     /**
      * Given a Segment, create the user interface for it. To be implemented by
-     * concrete subclasses.
+     * concrete subclasses. <b>Will be inserted into the Grid at row
+     * index</b>.
      * 
      * @param index
      *            The position within the series that this Segment is found.
      * @param segment
      */
-    abstract Widget createEditorForSegment(int index, Segment segment);
+    abstract void createEditorForSegment(int index, Segment segment);
 
     /**
      * Initialize the editor with the appropriate Series from the given
@@ -457,37 +445,30 @@ abstract class SeriesEditorWidget extends ScrolledWindow
 
         if (added > 0) {
             segment = replacement.getSegment(added);
-            widget = createEditorForSegment(added, segment);
-            box.packStart(widget, false, false, 0);
-            box.reorderChild(widget, added);
+            createEditorForSegment(added, segment);
 
             editor = editors.get(added);
             editor.advanceTo(segment);
 
-            widget.showAll();
             cursorSegment = segment;
             editor.grabFocus();
         }
 
         if (third > 0) {
             segment = replacement.getSegment(third);
-            widget = createEditorForSegment(third, segment);
-            box.packStart(widget, false, false, 0);
-            box.reorderChild(widget, third);
+            createEditorForSegment(third, segment);
 
             editor = editors.get(third);
             editor.advanceTo(segment);
-
-            widget.showAll();
         }
 
         // UNTRIED
         if (deleted >= 0) {
             segment = replacement.getSegment(deleted);
 
-            children = box.getChildren();
+            children = grid.getChildren();
             widget = children[deleted];
-            box.remove(widget);
+            grid.remove(widget);
 
             editors.remove(deleted);
         }
@@ -546,17 +527,17 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         }
 
         if (third > 0) {
-            children = box.getChildren();
+            children = grid.getChildren();
             widget = children[third];
-            box.remove(widget);
+            grid.remove(widget);
 
             editors.remove(third);
         }
 
         if (added > 0) {
-            children = box.getChildren();
+            children = grid.getChildren();
             widget = children[added];
-            box.remove(widget);
+            grid.remove(widget);
 
             editors.remove(added);
         }
@@ -564,14 +545,11 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         // UNTRIED
         if (deleted >= 0) {
             segment = current.getSegment(deleted);
-            widget = createEditorForSegment(deleted, segment);
-            box.packStart(widget, false, false, 0);
-            box.reorderChild(widget, deleted);
+            createEditorForSegment(deleted, segment);
 
             editor = editors.get(deleted);
             editor.advanceTo(segment);
 
-            widget.showAll();
             editor.grabFocus();
         }
 
@@ -624,7 +602,7 @@ abstract class SeriesEditorWidget extends ScrolledWindow
      *            if null, then we are appending
      */
     void propegateStructuralChange(final EditorTextView originating, final Segment first,
-            final Segment added, final Segment third) {
+        final Segment added, final Segment third) {
         Series former, replacement;
         final int I;
         Editor editor;
@@ -888,7 +866,7 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         Widget child;
         Allocation alloc;
 
-        children = box.getChildren();
+        children = grid.getChildren();
         child = null;
 
         for (i = 0; i < children.length; i++) {
@@ -907,7 +885,7 @@ abstract class SeriesEditorWidget extends ScrolledWindow
     private EditorTextView findEditorFirst() {
         final Widget[] children;
 
-        children = box.getChildren();
+        children = grid.getChildren();
         return findEditorIn(children[0]);
     }
 
@@ -915,7 +893,7 @@ abstract class SeriesEditorWidget extends ScrolledWindow
         final Widget[] children;
         final int i;
 
-        children = box.getChildren();
+        children = grid.getChildren();
         i = children.length - 1;
         return findEditorIn(children[i]);
     }

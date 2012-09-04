@@ -21,7 +21,6 @@ package quill.ui;
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.FontOptions;
 import org.freedesktop.cairo.Matrix;
-import org.gnome.gdk.EventExpose;
 import org.gnome.gtk.Allocation;
 import org.gnome.gtk.DrawingArea;
 import org.gnome.gtk.Widget;
@@ -39,7 +38,7 @@ import parchment.render.RenderSettings;
 import static org.freedesktop.cairo.HintMetrics.OFF;
 import static org.freedesktop.cairo.HintStyle.NONE;
 
-class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
+class FontHeightDisplay extends DrawingArea implements Widget.Draw
 {
     private final DrawingArea drawing;
 
@@ -61,14 +60,11 @@ class FontHeightDisplay extends DrawingArea implements Widget.ExposeEvent
 
     private double baseline, xheight, scaleFactor;
 
-    public boolean onExposeEvent(Widget source, EventExpose event) {
-        final Context cr;
-
+    public boolean onDraw(Widget source, Context cr) {
         if (settings == null) {
             return false;
         }
 
-        cr = new Context(event);
         layout = new Layout(cr);
         list = new AttributeList();
 

@@ -290,7 +290,6 @@ class DictionarySelectionWindow extends Window
 
     private void setupStatusbar() {
         status = new Statusbar();
-        status.setHasResizeGrip(false);
         status.setBorderWidth(0);
 
         top.packStart(status, false, false, 0);
