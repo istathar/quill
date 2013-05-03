@@ -134,6 +134,8 @@ sub check_prereq (\@$$@) {
 
 		if ($os eq "gentoo") {
 			$str .= "emerge";
+		} elsif ($os eq "arch") {
+			$str .= "pacman -S";
 		} elsif ($os eq "debian") {
 			$str .= "apt-get install";
 		} elsif ($os eq "fedora") {
@@ -529,6 +531,35 @@ if ($os eq "gentoo") {
 			"/usr/share/junit/lib/junit.jar");
 
 
+} elsif ($os eq "arch") {
+
+	if ($java_gnome_home) {
+		check_prereq(@gnome_jars,
+			"java-gnome UI library",
+			"java-gnome",
+			"$java_gnome_home/share/java/gtk-4.1.jar",
+			"$java_gnome_home/tmp/gtk-4.1.jar");
+	} else {
+		check_prereq(@gnome_jars,
+			"java-gnome UI library",
+			"java-gnome",
+			"$prefix/share/java/gtk-4.1.jar",
+			"/usr/share/java/gtk-4.1.jar",
+			"~/share/java/gtk-4.1.jar");
+	}
+
+	check_prereq(@xom_jars,
+			"Xom XML library",
+			"xom",
+			"$prefix/share/java/xom.jar",
+			"/usr/share/java/xom.jar");
+
+	check_prereq(@junit_jars,
+			"JUnit test framework",
+			"junit",
+			"/usr/share/java/junit.jar");
+
+	
 } elsif ($os eq "debian") {
 
 	if ($java_gnome_home) {
@@ -695,6 +726,29 @@ if ($os eq "gentoo") {
 	check_jar($jar, "$vendor jar", $jar_candidate, "");
 	check_javadoc($javadoc, "$vendor javadoc", $javadoc_candidate, "");
 
+} elsif ($os eq "arch") {
+	my $javac_candidate;
+	my $javah_candidate;
+	my $jar_candidate;
+	my $javadoc_candidate;
+	my $vendor;
+	if ($jdk_home) {
+		$vendor = "Specified";
+	} else {
+		$vendor = "System";
+		$jdk_home = $ENV{"JAVA_HOME"};
+	}
+
+	$javac_candidate = "$jdk_home/bin/javac";
+	$javah_candidate = "$jdk_home/bin/javah";
+	$jar_candidate = "$jdk_home/bin/jar";
+	$javadoc_candidate = "$jdk_home/bin/javadoc";
+
+	check_compiler($javac, "$vendor javac", $javac_candidate, "-g");
+
+	check_jar($jar, "$vendor jar", $jar_candidate, "");
+	check_javadoc($javadoc, "$vendor javadoc", $javadoc_candidate, "");
+
 } elsif ($os eq "debian") {
 	# we can do much better than this, especially for java/javac.
 	# Do we access the alternatives system, or just go with known
@@ -833,6 +887,20 @@ if ($os eq "gentoo") {
 		$cacao_candidate = "/usr/bin/cacao";
 	}
 	check_runtime($cacao, "CACAO VM", $cacao_candidate, "");
+
+
+} elsif ($os eq "arch") {
+	my $java_candidate;
+	my $vendor;
+	if ($jdk_home) {
+		$vendor = "Specified";
+	} else {
+		$vendor = "System";
+		$jdk_home = $ENV{"JAVA_HOME"};
+	}
+	$java_candidate = "$jdk_home/bin/java";
+
+	check_runtime($java, "$vendor java VM", $java_candidate, "-client -ea");
 
 } elsif ($os eq "debian") {
 	# check for a proper JDK/JRE java Virtual Machine (presumably either
